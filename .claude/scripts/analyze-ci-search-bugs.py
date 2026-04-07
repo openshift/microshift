@@ -205,7 +205,7 @@ def extract_keywords(error_signature):
             score += 5
         return score
 
-    ranked = sorted(tokens, key=specificity, reverse=True)
+    ranked = sorted(tokens, key=lambda t: (-specificity(t), t))
     return ranked[:4]
 
 
@@ -223,11 +223,11 @@ def build_candidates(groups):
     candidates = []
 
     for group in groups:
-        rep = max(group, key=lambda j: j["severity"])
+        rep = max(group, key=lambda j: (j["severity"], j.get("job_name", "")))
         keywords = extract_keywords(rep["error_signature"])
         test_ids = extract_test_ids(rep["error_signature"])
 
-        step_names = list({j["step_name"] for j in group if j["step_name"]})
+        step_names = sorted({j["step_name"] for j in group if j["step_name"]})
 
         candidates.append({
             "error_signature": rep["error_signature"],
@@ -248,7 +248,7 @@ def build_candidates(groups):
         })
 
     # Sort by severity desc, then job count desc
-    candidates.sort(key=lambda c: (c["severity"], c["affected_jobs"]), reverse=True)
+    candidates.sort(key=lambda c: (-c["severity"], -c["affected_jobs"], c["error_signature"]))
     return candidates
 
 

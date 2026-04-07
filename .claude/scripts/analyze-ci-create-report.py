@@ -165,8 +165,12 @@ def discover_files(workdir, releases):
 def load_json(filepath):
     if not filepath or not os.path.exists(filepath):
         return None
-    with open(filepath, "r") as f:
-        return json.load(f)
+    try:
+        with open(filepath, "r") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError) as exc:
+        print(f"WARNING: failed to load {filepath}: {exc}", file=sys.stderr)
+        return None
 
 
 def load_bug_candidates(filepath):
@@ -202,6 +206,41 @@ def match_issue_to_bugs(issue_title, bug_candidates):
             best_score = score
             best = cand
     return best if best_score >= MATCH_THRESHOLD else None
+
+
+def _extract_pr_numbers(candidate):
+    """Extract PR numbers from a bug candidate's job names/URLs.
+
+    Handles two patterns:
+    - File-derived job names: "-pr123-" (from analyze-ci-prs-job-*-pr<N>-*.txt)
+    - Prow URLs: ".../pull/openshift_microshift/123/..."
+    """
+    pr_nums = set()
+    for job in candidate.get("jobs", []):
+        url = job.get("job_url", "")
+        m = re.search(r"/pull/[^/]+/(\d+)/", url)
+        if m:
+            pr_nums.add(int(m.group(1)))
+        name = job.get("job_name", "")
+        m = re.search(r"-pr(\d+)-", name)
+        if m:
+            pr_nums.add(int(m.group(1)))
+    return pr_nums
+
+
+def _index_pr_bugs(bug_paths):
+    """Load PR bug candidates and index them by PR number.
+
+    Returns a dict mapping PR number (int) to list of bug candidates.
+    Candidates affecting multiple PRs appear under each PR.
+    """
+    by_pr = {}
+    for path in bug_paths:
+        for cand in load_bug_candidates(path):
+            pr_nums = _extract_pr_numbers(cand)
+            for num in pr_nums:
+                by_pr.setdefault(num, []).append(cand)
+    return by_pr
 
 
 # ---------------------------------------------------------------------------
@@ -327,6 +366,7 @@ def render_pr_section(pr_data, all_pr_bugs, pr_status):
     """Render the Pull Requests tab.
 
     pr_data: analyzed PR summary (from aggregate), may be None.
+    all_pr_bugs: dict mapping PR number (int) to list of bug candidates.
     pr_status: list of all PR status snapshots (from prepare), may be None.
     """
     # Build a lookup of analyzed PRs by number
@@ -432,11 +472,12 @@ def render_pr_section(pr_data, all_pr_bugs, pr_status):
             lines.append(f'                <span class="breakdown-item"><strong>{pending}</strong> Running</span>')
         lines.append("            </div>")
 
+        pr_bugs = all_pr_bugs.get(pr["number"], [])
         if analysis and analysis.get("issues"):
 
             lines.append('            <table class="issues-table">')
             for issue in analysis["issues"]:
-                bug_match = match_issue_to_bugs(issue.get("title", ""), all_pr_bugs)
+                bug_match = match_issue_to_bugs(issue.get("title", ""), pr_bugs)
                 jc = issue["job_count"]
                 sev = issue.get("severity", "UNKNOWN").upper()
                 sev_css = f"severity-{sev.lower()}" if sev in ("HIGH", "MEDIUM", "LOW", "CRITICAL") else ""
@@ -653,9 +694,7 @@ def main():
     pr_data = load_json(pr_entry["summary"])
     pr_status = load_json(pr_entry["status"])
 
-    all_pr_bugs = []
-    for path in pr_entry["bugs"]:
-        all_pr_bugs.extend(load_bug_candidates(path))
+    all_pr_bugs = _index_pr_bugs(pr_entry["bugs"])
 
     # Generate HTML
     timestamp = datetime.now(timezone.utc)

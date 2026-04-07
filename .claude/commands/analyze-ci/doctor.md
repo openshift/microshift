@@ -39,7 +39,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
    ```
 3. The script deterministically:
    - For each release: fetches failed periodic jobs, downloads artifacts, writes `${WORKDIR}/analyze-ci-release-<version>-jobs.json`
-   - For rebase PRs: fetches PRs with failures, downloads artifacts, writes `${WORKDIR}/analyze-ci-prs-jobs.json`
+   - For rebase PRs: fetches PRs with failures, downloads artifacts, writes `${WORKDIR}/analyze-ci-prs-jobs.json` and `${WORKDIR}/analyze-ci-prs-status.json`
    - Outputs a JSON summary listing all releases, job counts, and file paths
 4. Read the JSON output to know which releases have jobs to analyze and how many
 
@@ -57,7 +57,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 3. For **every** job across all releases and PRs, launch a separate **Agent** (using the `Agent` tool, NOT the `Skill` tool):
 
    **For release jobs:**
-   ```
+   ```text
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
    1. Run /analyze-ci:prow-job <ARTIFACTS_DIR>
    2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:
@@ -66,7 +66,7 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
    ```
 
    **For PR jobs:**
-   ```
+   ```text
    Agent: subagent_type=general_purpose, prompt="Analyze this Prow job and save the report:
    1. Run /analyze-ci:prow-job <ARTIFACTS_DIR>
    2. After the analysis completes, save the FULL report output (including the --- STRUCTURED SUMMARY --- block) to:

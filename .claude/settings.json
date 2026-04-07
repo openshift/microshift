@@ -17,10 +17,7 @@
       "WebFetch(domain:prow.ci.openshift.org)",
       "Skill(analyze-ci:create-bugs)",
       "Skill(analyze-ci:prow-job)",
-      "Skill(analyze-ci:pull-requests)",
-      "Skill(analyze-ci:doctor)",
-      "Skill(analyze-ci:release)",
-      "Skill(analyze-ci:create-report)"
+      "Skill(analyze-ci:doctor)"
     ],
     "deny": [],
     "ask": []

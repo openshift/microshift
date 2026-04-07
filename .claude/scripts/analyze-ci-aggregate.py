@@ -272,7 +272,7 @@ def _build_issues_from_jobs(jobs):
     Shared by both release and PR builders.
     """
     groups = group_by_signature(jobs)
-    groups.sort(key=lambda g: (max(j["severity"] for j in g), len(g)), reverse=True)
+    groups.sort(key=lambda g: (-max(j["severity"] for j in g), -len(g), g[0].get("error_signature", "")))
 
     breakdown = {"build": 0, "test": 0, "infrastructure": 0}
     for job in jobs:
@@ -284,7 +284,7 @@ def _build_issues_from_jobs(jobs):
 
     issues = []
     for i, group in enumerate(groups, 1):
-        rep = max(group, key=lambda j: j["severity"])
+        rep = max(group, key=lambda j: (j["severity"], j.get("job_name", "")))
         failure_type = classify_breakdown(
             rep["stack_layer"],
             rep.get("step_name", ""),
@@ -387,6 +387,10 @@ def main():
         else:
             print(f"Unknown argument: {args[i]}", file=sys.stderr)
             sys.exit(1)
+
+    if mode is not None and args.count("--release") + args.count("--prs") > 1:
+        print("Error: --release and --prs are mutually exclusive", file=sys.stderr)
+        sys.exit(1)
 
     if mode is None:
         print(
