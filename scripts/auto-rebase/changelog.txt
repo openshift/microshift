@@ -1,9 +1,14 @@
-- cluster-network-operator embedded-component b7adb6895b84c1916904e6eccd93ce578731171f to c56dbe730979a72781c87e01bb5bccffe527e6c6
-  - e97a257 2026-01-21T09:06:18+00:00 Skip _stackmanager execution for libreswan 5.3+
-
-- machine-config-operator embedded-component 18f009eeb40748895fe8a6eba3778ad275655124 to 9c50d5330ae771d7e8682cbb58480867b2a874da
-  - ebbe491b 2026-03-28T10:36:19+00:00 server: re-order logger setting
-
-- operator-framework-olm embedded-component 457b7eb2fdaeb469c117c3e87201ba88281795b4 to 93649380ab6fdccf8ec1716f89162b506c7de172
-  - 70ea3b50 2026-03-30T14:20:21+08:00 Fix nil pointer dereference in sortUnpackJobs when sorting non-failed jobs (#3793)
+- ovn-kubernetes image-arm64 208e0c7fabe0462cdec6d5ae9df4aa0c412f6a81 to 253d3ed8c6babe1b07fcb7910df3ebaf2d3c5b33
+  - 26f25084 2026-02-26T18:27:26+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
+  - c8ada1f6 2026-02-24T11:35:02+01:00 Fix IC cluster cleanup tests zone configuration
+  - e61ba4ba 2026-02-24T11:35:02+01:00 Remove IC zone migration HACK code
+  - b1669576 2026-01-21T14:00:27+01:00 fix(localnet, ipamless): Prevent LSP deletion on sync
+  - 3e2e21c5 2026-01-14T09:09:40+01:00 Replace 0/1 index var to utilnet ipFamily
+  - 484a18f3 2026-01-14T09:09:35+01:00 Skip Multi Homing tests on ipv6 singlestack BGP lane
+  - a4ef8dce 2026-01-14T09:09:31+01:00 Fix bgp tests to work on single stack ipv6
+  - 42359641 2026-01-14T09:09:25+01:00 Add singlestack ipv6 bgp lane
+  - 925ae3bc 2026-01-14T09:09:21+01:00 Add e2e test towards kapi ipv6 address from udn pods
+  - 83fa5f7d 2026-01-14T09:07:51+01:00 Make ip and ipv6 constants in flow code
+  - 983ea56a 2026-01-14T09:04:25+01:00 Consider more than 1 family serviceCIDR range for UDN service flows
+  - 2e5be2d4 2026-01-14T08:52:13+01:00 Fix UDN service CIDR flows that had protocol prefix pinned to `ip`
 
