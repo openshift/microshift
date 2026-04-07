@@ -331,7 +331,7 @@ For each scenario found in Step 4:
    - Validate URL format before making requests
    - Handle malformed URLs
    - Provide examples of valid formats
-   - Suggest using job ID from create-report command
+   - Suggest using job ID from Prow job URL
 
 4. **Version extraction failures**:
    - Handle cases where version cannot be determined

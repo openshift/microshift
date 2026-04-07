@@ -13,7 +13,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__jira__jira_search, mcp
 ```
 
 ## Description
-Reads individual job analysis reports produced by `analyze-ci:release` or `analyze-ci:pull-requests` and creates JIRA bugs in USHIFT for CI test failures. Operates in **dry-run mode by default** - it shows what bugs would be created without actually creating them. Use `--create` to perform actual issue creation.
+Reads individual job analysis reports produced by `analyze-ci:doctor` and creates JIRA bugs in USHIFT for CI test failures. Operates in **dry-run mode by default** - it shows what bugs would be created without actually creating them. Use `--create` to perform actual issue creation.
 
 This command does NOT re-analyze CI jobs. It consumes existing job analysis files from `${WORKDIR}/`.
 
@@ -28,8 +28,8 @@ This command does NOT re-analyze CI jobs. It consumes existing job analysis file
 ## Prerequisites
 
 - Job analysis files must already exist in `${WORKDIR}/`:
-  - For releases: `analyze-ci-release-<release>-job-*.txt` (produced by `/analyze-ci:release`)
-  - For PRs: `analyze-ci-prs-job-*-pr<number>-*.txt` (produced by `/analyze-ci:pull-requests`)
+  - For releases: `analyze-ci-release-<release>-job-*.txt` (produced by `/analyze-ci:doctor`)
+  - For PRs: `analyze-ci-prs-job-*-pr<number>-*.txt` (produced by `/analyze-ci:doctor`)
 - Each job file must contain a `--- STRUCTURED SUMMARY ---` block (see below)
 - MCP Jira server must be configured and accessible
 - User must have permissions to create issues in USHIFT
@@ -44,6 +44,7 @@ SEVERITY: <1-5>
 STACK_LAYER: <AWS Infra|External Infrastructure|build phase|deploy phase|test setup phase|Test Configuration|test|teardown>
 STEP_NAME: <the CI step where the error occurred>
 ERROR_SIGNATURE: <concise, unique description of the root cause error>
+RAW_ERROR: <verbatim primary error message from logs — used for deterministic grouping>
 INFRASTRUCTURE_FAILURE: <true|false>
 JOB_URL: <full prow job URL>
 JOB_NAME: <full periodic job name>
@@ -63,107 +64,46 @@ WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d)
 
 ## Implementation Steps
 
-### Step 1: Parse Arguments and Locate Job Files
+### Step 1: Prepare Bug Candidates (Deterministic Script)
 
 **Actions**:
 1. Parse `$ARGUMENTS` to extract `<source>` and detect `--create` flag
 2. Determine mode: if `--create` is present, set `MODE=create`; otherwise `MODE=dry-run`
 3. Run `WORKDIR=/tmp/analyze-ci-claude-workdir.$(date +%y%m%d) && mkdir -p ${WORKDIR}` using the `Bash` tool
-4. Determine source type and locate job files:
-
-   **a) Release version** (e.g., `4.22`, `main`, `4.19`):
-   - Glob for: `${WORKDIR}/analyze-ci-release-<release>-job-*.txt`
-   - Set `SOURCE_TYPE=release`, `SOURCE_LABEL="release <release>"`
-
-   **b) PR number** (e.g., `pr-6396`, `pr6396`):
-   - Extract the numeric PR number (strip `pr-` or `pr` prefix)
-   - Glob for: `${WORKDIR}/analyze-ci-prs-job-*-pr<number>-*.txt`
-   - Set `SOURCE_TYPE=pr`, `SOURCE_LABEL="PR #<number>"`
-
-   **c) Rebase PR shorthand** (e.g., `rebase-release-4.22`):
-   - Extract the release version from the shorthand (e.g., `4.22`)
-   - Glob for all PR job files: `${WORKDIR}/analyze-ci-prs-job-*.txt`
-   - Read each file's STRUCTURED SUMMARY and find files where JOB_NAME contains the release version (e.g., `release-4.22` or `main`) OR where the JOB_URL contains the release branch
-   - Alternatively, check the PR summary file (`analyze-ci-prs-summary.*.txt`) to find the PR number for the given rebase release
-   - Set `SOURCE_TYPE=pr`, `SOURCE_LABEL="rebase PR for <release> (PR #<number>)"`
-
-5. If no files found, report error and stop
+4. Run the preparation script to parse job files, group by signature, and extract search keywords:
+   ```bash
+   python3 .claude/scripts/analyze-ci-search-bugs.py <source> --workdir ${WORKDIR}
+   ```
+5. The script writes `${WORKDIR}/analyze-ci-bug-candidates-<source>.json` containing:
+   - Parsed and deduplicated bug candidates (grouped by ERROR_SIGNATURE similarity)
+   - Pre-computed `keywords` (2-4 distinctive search terms per candidate)
+   - Pre-computed `test_ids` (numeric IDs like `55394` for test case searches)
+   - Full `analysis_text` for bug descriptions
+   - Job lists with URLs and dates
+6. Read the candidates JSON file for use in Step 2
 
 **Error Handling**:
 - No arguments: show usage and stop
-- No job files found: suggest running the appropriate analysis command first:
-  - For releases: `/analyze-ci:release <release>`
-  - For PRs: `/analyze-ci:pull-requests`
+- Script exits with error if no job files found — relay its error message to the user
 
-### Step 2: Parse STRUCTURED SUMMARY from Each Job File
+### Step 2: Search Jira for Existing Bugs
 
-**Actions**:
-1. For each job file, extract the `--- STRUCTURED SUMMARY ---` block
-2. Parse key-value pairs: SEVERITY, STACK_LAYER, STEP_NAME, ERROR_SIGNATURE, INFRASTRUCTURE_FAILURE, JOB_URL, JOB_NAME, RELEASE, FINISHED
-3. Also capture the full file content for use in the bug description (the error context and analysis above the structured block)
-4. If a file lacks the structured block, log a warning and skip it
-
-**Parsing approach**: Use grep/sed in Bash to extract the block between `--- STRUCTURED SUMMARY ---` and `--- END STRUCTURED SUMMARY ---`, then parse each `KEY: value` line.
-
-**Data structure per job**:
-```text
-{
-  severity: number,
-  stack_layer: string,
-  step_name: string,
-  error_signature: string,
-  infrastructure_failure: boolean,
-  job_url: string,
-  job_name: string,
-  release: string,
-  finished: string,         # job finish date in YYYY-MM-DD format
-  analysis_text: string,    # full file content for bug description
-  source_file: string       # path to the job file
-}
-```
-
-### Step 3: Pass All Failures Through
-
-**Actions**:
-1. All parsed entries from Step 2 proceed directly to Step 4 without any filtering
-2. Do NOT skip entries based on severity, infrastructure failure status, or stack layer
-3. Log the total number of entries proceeding to deduplication
-
-**Output**: Complete list of all parsed failures proceeding to deduplication.
-
-### Step 4: Deduplicate by ERROR_SIGNATURE
-
-**Actions**:
-1. Group remaining entries by `ERROR_SIGNATURE` similarity
-   - Exact matches are grouped together
-   - Near-matches (same error but slightly different wording) should also be grouped — use your judgment to identify when two signatures describe the same root cause
-2. For each group, create a "bug candidate":
-   - **Representative signature**: the ERROR_SIGNATURE that best describes the group
-   - **Affected jobs**: list of all JOB_NAME + JOB_URL in the group
-   - **Max severity**: highest SEVERITY in the group
-   - **Step names**: unique STEP_NAME values in the group
-   - **Analysis text**: from the highest-severity job in the group
-
-**Output**: List of deduplicated bug candidates.
-
-### Step 5: Search Jira for Existing Bugs
-
-For each bug candidate, run ALL of the following searches. Each search is MANDATORY — do not skip any.
+For each bug candidate in the candidates JSON, run ALL of the following searches. The `keywords` and `test_ids` fields are pre-computed by the script — use them directly.
 
 **Search A — Keyword search (multiple focused queries)**:
-1. Extract 2-4 distinctive keywords from the error signature (avoid generic words like "error", "failed", "test")
-2. Run **2-3 separate searches in parallel**, each using 1-2 distinctive keywords. Do NOT put all keywords into a single `text ~` query — Jira requires all terms to match, so queries with 3+ keywords are fragile and miss issues that use slightly different wording. Instead, pick the most distinctive terms (tool names, hyphenated identifiers, error codes) and search for them independently.
+1. Use the pre-computed `keywords` array from the candidate (already filtered for stop words and ranked by specificity)
+2. Run **2-3 separate searches in parallel**, each using 1-2 keywords from the array. Do NOT put all keywords into a single `text ~` query — Jira requires all terms to match, so queries with 3+ keywords are fragile and miss issues that use slightly different wording.
    ```python
-   # Example for error signature: "TLS Scanner image pull failure (ErrImagePull registry.ci.openshift.org/ocp/4.22:tls-scanner-tool on arm64)"
-   # Search A1: most distinctive identifier
-   mcp__jira__jira_search(jql='... AND issuetype = Bug AND text ~ "tls-scanner" ...', limit=5)
-   # Search A2: different distinctive term
-   mcp__jira__jira_search(jql='... AND issuetype = Bug AND text ~ "tls-scanner-tool" ...', limit=5)
+   # Example: candidate.keywords = ["invalidclienttokenid", "cloudformation", "createstack", "aws-2"]
+   # Search A1: most distinctive keyword
+   mcp__jira__jira_search(jql='... AND issuetype = Bug AND text ~ "invalidclienttokenid" ...', limit=5)
+   # Search A2: second keyword
+   mcp__jira__jira_search(jql='... AND issuetype = Bug AND text ~ "cloudformation" ...', limit=5)
    ```
 3. Merge and deduplicate results from all A-series queries before proceeding
 
-**Search B — Test case ID search (MANDATORY when IDs are present)**:
-Extract ALL numeric IDs from the error signature that could be test case references (typically 4-6 digit numbers like `68256`). For EACH numeric ID found, run TWO separate searches:
+**Search B — Test case ID search (MANDATORY when `test_ids` is non-empty)**:
+Use the pre-computed `test_ids` array from the candidate. For EACH ID, run TWO separate searches:
 ```text
 # Search B1: bare number
 jql: ... AND issuetype = Bug AND text ~ "68256" AND status not in (Closed, Verified) ...
@@ -189,7 +129,7 @@ If results are found, fetch their details with `mcp__jira__jira_get_issue` and f
 
 **Note**: Run searches in parallel where possible.
 
-### Step 6: Present Bug Candidates to User
+### Step 3: Present Bug Candidates to User
 
 **Actions**:
 1. Display a numbered list of all bug candidates with:
@@ -214,7 +154,7 @@ If results are found, fetch their details with `mcp__jira__jira_get_issue` and f
      To create these bugs, run:
        /analyze-ci:create-bugs <source> --create
      ```
-   - Do NOT prompt for any actions. Do NOT create any issues. Do NOT proceed to Steps 7/7a (create/reopen). Continue to Step 7b and Step 8.
+   - Do NOT prompt for any actions. Do NOT create any issues. Do NOT proceed to Steps 4/4a (create/reopen). Continue to Step 5 and Step 6.
 
 3. **In create mode** (`--create` specified):
    - For each candidate, prompt the user:
@@ -240,12 +180,12 @@ If results are found, fetch their details with `mcp__jira__jira_get_issue` and f
      Action? [c]reate / [s]kip / [l]ink-to-existing <JIRA-KEY>:
      ```
    - Select the prompt template based on whether closed regressions were found for the candidate: use `ACTION_PROMPT_WITH_REOPEN` when the candidate has closed regressions from Search C, and `ACTION_PROMPT_NO_REOPEN` otherwise.
-   - **create**: Proceed to Step 7
+   - **create**: Proceed to Step 4
    - **skip**: Skip this candidate, move to next
    - **link-to-existing**: Validate the key by calling `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)`. If the issue exists, record the key and move to next. If the call fails or returns not-found, show an error (e.g., `"JIRA key <JIRA-KEY> not found — check for typos"`) and re-prompt with the same `Action?` choices.
-   - **reopen**: Validate the provided JIRA key before proceeding. Call `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)` to confirm the issue exists, then verify that the key matches one of the candidate's closed regressions found in Search C, that the issue status is Closed or Verified, and that the issue type is Bug. If validation fails (key not found, not in the candidate's closed regression list, not in Closed/Verified state, or not a Bug), show an error (e.g., `"JIRA key <JIRA-KEY> not eligible for reopen — must be a Bug closed regression"`) and re-prompt with the same `Action?` choices. If validation passes, proceed to Step 7a.
+   - **reopen**: Validate the provided JIRA key before proceeding. Call `mcp__jira__jira_get_issue(issue_key=<JIRA-KEY>)` to confirm the issue exists, then verify that the key matches one of the candidate's closed regressions found in Search C, that the issue status is Closed or Verified, and that the issue type is Bug. If validation fails (key not found, not in the candidate's closed regression list, not in Closed/Verified state, or not a Bug), show an error (e.g., `"JIRA key <JIRA-KEY> not eligible for reopen — must be a Bug closed regression"`) and re-prompt with the same `Action?` choices. If validation passes, proceed to Step 4a.
 
-### Step 7: Create Bug via MCP (create mode only)
+### Step 4: Create Bug via MCP (create mode only)
 
 **Actions**:
 For each candidate where user chose "create":
@@ -321,9 +261,9 @@ For each candidate where user chose "create":
 - If MCP call fails, report error, ask user if they want to retry or skip
 - Do NOT retry automatically
 
-### Step 7a: Reopen Closed Bug as Regression (create mode only)
+### Step 4a: Reopen Closed Bug as Regression (create mode only)
 
-**Precondition**: The JIRA issue must be a Bug in Closed or Verified state (validated in Step 6). If the issue type is not Bug, do not proceed — show an error and re-prompt.
+**Precondition**: The JIRA issue must be a Bug in Closed or Verified state (validated in Step 3). If the issue type is not Bug, do not proceed — show an error and re-prompt.
 
 **Actions**:
 For each candidate where user chose "reopen":
@@ -377,39 +317,40 @@ For each candidate where user chose "reopen":
 - If the transition fails, report error and ask user if they want to retry, create a new bug instead, or skip
 - Do NOT retry automatically
 
-### Step 7b: Write Machine-Readable Bug Mapping File
+### Step 5: Write Machine-Readable Bug Mapping File
 
 **Actions**:
-After processing all bug candidates (Steps 5-7a) and regardless of mode (dry-run or create), write a machine-readable bug mapping file that `analyze-ci:create-report` can consume to display JIRA bug links in the HTML report. The file content is based on the Jira search results from Step 5 — it is not affected by whether bugs were created or reopened in Steps 7/7a.
+After processing all bug candidates (Steps 2-4a) and regardless of mode (dry-run or create), write a machine-readable bug mapping file that `analyze-ci-create-report.py` can consume to display JIRA bug links in the HTML report. The file content is based on the Jira search results from Step 2 — it is not affected by whether bugs were created or reopened in Steps 4/4a.
 
-1. Save to `${WORKDIR}/analyze-ci-bugs-<source>.txt` (overwrite if exists)
-2. Use this structured format with one block per bug candidate:
+1. Save to `${WORKDIR}/analyze-ci-bugs-<source>.json` (overwrite if exists)
+2. Use this JSON format:
 
-```text
---- BUG MAPPING ---
-SOURCE: <source>
-DATE: YYYY-MM-DD
---- BUG CANDIDATE ---
-ERROR_SIGNATURE: <error_signature>
-SEVERITY: <N>
-STEP_NAME: <step_name>
-AFFECTED_JOBS: <count>
-JIRA_DUPLICATES: <comma-separated list of JIRA keys, or "None">
-JIRA_DUPLICATE_DETAILS: <KEY>|<summary>|<status>, <KEY>|<summary>|<status>, ...
-JIRA_REGRESSIONS: <comma-separated list of JIRA keys, or "None">
-JIRA_REGRESSION_DETAILS: <KEY>|<summary>|<status>, <KEY>|<summary>|<status>, ...
---- END BUG CANDIDATE ---
---- BUG CANDIDATE ---
-...
---- END BUG CANDIDATE ---
---- END BUG MAPPING ---
+```json
+{
+  "source": "<source>",
+  "date": "YYYY-MM-DD",
+  "candidates": [
+    {
+      "error_signature": "<error_signature>",
+      "severity": <N>,
+      "step_name": "<step_name>",
+      "affected_jobs": <count>,
+      "duplicates": [
+        {"key": "<JIRA-KEY>", "summary": "<summary>", "status": "<status>"}
+      ],
+      "regressions": [
+        {"key": "<JIRA-KEY>", "summary": "<summary>", "status": "<status>"}
+      ]
+    }
+  ]
+}
 ```
 
-3. **IMPORTANT**: This file must be written in BOTH dry-run and create modes. The file enables `analyze-ci:create-report` to show linked bugs per issue in the HTML report.
-4. The `JIRA_DUPLICATE_DETAILS` and `JIRA_REGRESSION_DETAILS` lines provide summary and status for each JIRA key, pipe-separated within each entry and comma-separated between entries. If no duplicates/regressions, use "None".
-5. Save using a Bash heredoc to avoid Write tool permission issues with `/tmp` paths.
+3. **IMPORTANT**: This file must be written in BOTH dry-run and create modes. The file enables `analyze-ci-create-report.py` to show linked bugs per issue in the HTML report.
+4. Use empty arrays `[]` for `duplicates` and `regressions` when none are found.
+5. Save using a Bash heredoc with `jq` or `python3 -c` to ensure valid JSON, or use the Write tool.
 
-### Step 8: Generate Results Report
+### Step 6: Generate Results Report
 
 **Actions**:
 1. Save report to `${WORKDIR}/analyze-ci-create-bugs-<source>.<timestamp>.txt`
@@ -523,7 +464,7 @@ Resolves the rebase PR for release 4.22, then interactively creates bugs.
 Error: No job analysis files found at ${WORKDIR}/analyze-ci-release-4.19-job-*.txt
 
 Run the analysis first:
-  /analyze-ci:release 4.19
+  /analyze-ci:doctor 4.19
 ```
 
 ### Example 6: No PR Job Files Found
@@ -534,15 +475,15 @@ Run the analysis first:
 Error: No job analysis files found at ${WORKDIR}/analyze-ci-prs-job-*-pr9999-*.txt
 
 Run the analysis first:
-  /analyze-ci:pull-requests
+  /analyze-ci:doctor <release>
 ```
 
 ## Notes
 
 - This command does NOT run CI analysis — it only consumes existing analysis files from `${WORKDIR}`
 - Supports two file naming patterns:
-  - Release jobs: `analyze-ci-release-<release>-job-*.txt` (from `/analyze-ci:release`)
-  - PR jobs: `analyze-ci-prs-job-*-pr<number>-*.txt` (from `/analyze-ci:pull-requests`)
+  - Release jobs: `analyze-ci-release-<release>-job-*.txt` (from `/analyze-ci:doctor`)
+  - PR jobs: `analyze-ci-prs-job-*-pr<number>-*.txt` (from `/analyze-ci:doctor`)
 - Dry-run is the default to prevent accidental bug creation
 - The `--create` flag triggers interactive mode where each candidate requires user confirmation
 - All failures are included without filtering — no entries are skipped based on severity, infrastructure status, or stack layer
@@ -550,12 +491,10 @@ Run the analysis first:
 - All created bugs are labeled with `microshift-ci-ai-generated` for tracking
 - Security level is set to "Red Hat Employee" on all created issues
 - The STRUCTURED SUMMARY block in job files is required — this is a contract with `/analyze-ci:prow-job`
-- In addition to the text report, a machine-readable bug mapping file (`analyze-ci-bugs-<source>.txt`) is written in both dry-run and create modes — this file is consumed by `analyze-ci:create-report` to show JIRA bug links in the HTML report
+- In addition to the text report, a machine-readable bug mapping file (`analyze-ci-bugs-<source>.json`) is written in both dry-run and create modes — this file is consumed by `analyze-ci-create-report.py` to show JIRA bug links in the HTML report
 
 ## Related Skills
 
-- **analyze-ci:release**: Produces release job analysis files consumed by this command
-- **analyze-ci:pull-requests**: Produces PR job analysis files consumed by this command
-- **analyze-ci:doctor**: Multi-release orchestrator
+- **analyze-ci:doctor**: Produces job analysis files consumed by this command
 - **analyze-ci:prow-job**: Command that produces individual job reports with STRUCTURED SUMMARY
 - **jira:create-bug**: Interactive bug creation (not used here — we call MCP directly)
