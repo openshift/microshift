@@ -23,6 +23,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -55,6 +56,12 @@ import (
 
 const (
 	kubeAPIStartupTimeout = 60
+	// rbacHookDeadlockTimeout is the time to wait for the RBAC bootstrap hook
+	// before declaring a deadlock. This is shorter than kubeAPIStartupTimeout
+	// to allow for faster recovery.
+	rbacHookDeadlockTimeout = 15
+	// rbacHookCheckInterval is how often to check the RBAC hook status
+	rbacHookCheckInterval = 2
 )
 
 var (
@@ -348,7 +355,13 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return err
 	}
 
-	// run readiness check
+	// Channel to signal RBAC hook deadlock detection
+	rbacDeadlockDetected := make(chan struct{})
+
+	// Run RBAC hook deadlock detector
+	go s.detectRBACHookDeadlock(ctx, restClient, rbacDeadlockDetected)
+
+	// Run standard readiness check
 	go func() {
 		err := wait.PollUntilContextTimeout(ctx, time.Second, kubeAPIStartupTimeout*time.Second, true, func(ctx context.Context) (bool, error) {
 			var status int
@@ -420,7 +433,127 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return err
 	case perr := <-panicChannel:
 		panic(perr)
+	case <-rbacDeadlockDetected:
+		klog.Error("RBAC bootstrap hook deadlock detected - restarting microshift-etcd.scope to recover")
+		if err := restartMicroshiftEtcdScope(); err != nil {
+			klog.Errorf("Failed to restart microshift-etcd.scope: %v", err)
+		}
+		return fmt.Errorf("RBAC bootstrap hook deadlock detected after %d seconds", rbacHookDeadlockTimeout)
 	}
+}
+
+// detectRBACHookDeadlock monitors the RBAC bootstrap hook status and detects deadlock conditions.
+// A deadlock is detected when:
+// 1. The RBAC hook is not completing (stuck in "not finished" state)
+// 2. etcd is healthy and responsive
+// This indicates the circular dependency where the hook waits for API server
+// while API server waits for the hook.
+func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient rest.Interface, deadlockDetected chan<- struct{}) {
+	// Wait a few seconds before starting detection to allow normal startup
+	select {
+	case <-ctx.Done():
+		return
+	case <-time.After(5 * time.Second):
+	}
+
+	checkCount := 0
+	maxChecks := (rbacHookDeadlockTimeout - 5) / rbacHookCheckInterval // Account for initial delay
+
+	for checkCount < maxChecks {
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(rbacHookCheckInterval * time.Second):
+		}
+
+		checkCount++
+
+		// Check RBAC hook status
+		var status int
+		err := restClient.Get().AbsPath("/readyz/poststarthook/rbac/bootstrap-roles").Do(ctx).StatusCode(&status).Error()
+
+		// If hook is ready, no deadlock
+		if err == nil && status == 200 {
+			klog.V(4).Info("RBAC bootstrap hook completed successfully")
+			return
+		}
+
+		// Hook not ready - check if etcd is healthy
+		etcdHealthy, etcdErr := isEtcdHealthy(ctx)
+		if etcdErr != nil {
+			klog.V(4).Infof("Could not check etcd health: %v", etcdErr)
+			continue
+		}
+
+		if etcdHealthy {
+			klog.Warningf("RBAC bootstrap hook not ready (check %d/%d), but etcd is healthy - potential deadlock",
+				checkCount, maxChecks)
+		} else {
+			// etcd not healthy - not a deadlock, just waiting for etcd
+			klog.V(4).Infof("RBAC hook waiting, etcd not yet healthy (check %d/%d)", checkCount, maxChecks)
+			// Reset counter since this isn't a deadlock condition
+			checkCount = 0
+		}
+	}
+
+	// Reached max checks with etcd healthy but hook not completing - deadlock detected
+	klog.Error("RBAC bootstrap hook deadlock confirmed: etcd healthy but hook not completing")
+	close(deadlockDetected)
+}
+
+// isEtcdHealthy checks if etcd is responsive by attempting to connect and get status.
+func isEtcdHealthy(ctx context.Context) (bool, error) {
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
+	etcdAPIServerClientCertDir := cryptomaterial.EtcdAPIServerClientCertDir(certsDir)
+
+	tlsInfo := transport.TLSInfo{
+		CertFile:      cryptomaterial.ClientCertPath(etcdAPIServerClientCertDir),
+		KeyFile:       cryptomaterial.ClientKeyPath(etcdAPIServerClientCertDir),
+		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
+	}
+	tlsConfig, err := tlsInfo.ClientConfig()
+	if err != nil {
+		return false, fmt.Errorf("failed to create TLS config: %w", err)
+	}
+
+	// Use a short timeout for health check
+	checkCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	client, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{"https://localhost:2379"},
+		DialTimeout: 1 * time.Second,
+		TLS:         tlsConfig,
+		Context:     checkCtx,
+	})
+	if err != nil {
+		return false, fmt.Errorf("failed to create etcd client: %w", err)
+	}
+	defer func() { _ = client.Close() }()
+
+	_, err = client.Status(checkCtx, "localhost:2379")
+	if err != nil {
+		return false, nil // etcd not healthy, but not an error condition
+	}
+
+	return true, nil
+}
+
+// restartMicroshiftEtcdScope restarts the microshift-etcd.scope to recover from deadlock.
+// This forces a clean restart of etcd which can help break the circular dependency.
+func restartMicroshiftEtcdScope() error {
+	klog.Info("Stopping microshift-etcd.scope for recovery")
+
+	stopCmd := exec.Command("systemctl", "stop", "microshift-etcd.scope")
+	if out, err := stopCmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to stop microshift-etcd.scope: %w, output: %s", err, string(out))
+	}
+
+	// Wait briefly for cleanup
+	time.Sleep(1 * time.Second)
+
+	klog.Info("microshift-etcd.scope stopped - MicroShift will restart")
+	return nil
 }
 
 func discoverEtcdServers(ctx context.Context, kubeconfigPath string) ([]string, error) {
