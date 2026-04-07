@@ -62,6 +62,10 @@ const (
 	rbacHookDeadlockTimeout = 15
 	// rbacHookCheckInterval is how often to check the RBAC hook status
 	rbacHookCheckInterval = 2
+	// rbacHookMaxWaitDuration is the absolute maximum time to wait for the RBAC hook
+	// regardless of etcd health state changes. This prevents flapping from extending
+	// detection indefinitely.
+	rbacHookMaxWaitDuration = 30 * time.Second
 )
 
 var (
@@ -456,10 +460,18 @@ func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient r
 	case <-time.After(5 * time.Second):
 	}
 
+	// Track wall-clock deadline to prevent flapping from extending detection indefinitely
+	startTime := time.Now()
 	checkCount := 0
 	maxChecks := (rbacHookDeadlockTimeout - 5) / rbacHookCheckInterval // Account for initial delay
 
 	for checkCount < maxChecks {
+		// Check absolute deadline first - this cannot be reset by etcd state changes
+		if time.Since(startTime) >= rbacHookMaxWaitDuration {
+			klog.Errorf("RBAC bootstrap hook exceeded maximum wait duration of %v", rbacHookMaxWaitDuration)
+			break
+		}
+
 		select {
 		case <-ctx.Done():
 			return
@@ -486,18 +498,20 @@ func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient r
 		}
 
 		if etcdHealthy {
-			klog.Warningf("RBAC bootstrap hook not ready (check %d/%d), but etcd is healthy - potential deadlock",
-				checkCount, maxChecks)
+			klog.Warningf("RBAC bootstrap hook not ready (check %d/%d, elapsed %v), but etcd is healthy - potential deadlock",
+				checkCount, maxChecks, time.Since(startTime).Round(time.Second))
 		} else {
 			// etcd not healthy - not a deadlock, just waiting for etcd
 			klog.V(4).Infof("RBAC hook waiting, etcd not yet healthy (check %d/%d)", checkCount, maxChecks)
 			// Reset counter since this isn't a deadlock condition
+			// Note: wall-clock deadline (startTime) is NOT reset - flapping cannot extend indefinitely
 			checkCount = 0
 		}
 	}
 
 	// Reached max checks with etcd healthy but hook not completing - deadlock detected
-	klog.Error("RBAC bootstrap hook deadlock confirmed: etcd healthy but hook not completing")
+	klog.Errorf("RBAC bootstrap hook deadlock confirmed after %v: etcd healthy but hook not completing",
+		time.Since(startTime).Round(time.Second))
 	close(deadlockDetected)
 }
 
