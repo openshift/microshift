@@ -40,14 +40,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    local skip_args=""
-    if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args="--skip sriov"
-    fi
-    # shellcheck disable=SC2086
-    run_tests host1 \
-        --variable "PROMETHEUS_HOST:$(hostname)" \
-        --variable "LOKI_HOST:$(hostname)" \
-        ${skip_args} \
-        suites/optional/multus.robot
+    run_tests host1 suites/optional/multus.robot
 }

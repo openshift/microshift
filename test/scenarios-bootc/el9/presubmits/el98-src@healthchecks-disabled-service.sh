@@ -23,7 +23,7 @@ dynamic_schedule_requirements() {
 min_vcpus=4
 min_memory=4096
 min_disksize=25
-networks="${NETWORKS}"
+networks=
 boot_image=rhel98-bootc-source-optionals
 fips=false
 EOF
@@ -40,14 +40,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    local skip_args=""
-    if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args="--skip sriov"
-    fi
-    # shellcheck disable=SC2086
-    run_tests host1 \
-        --variable "PROMETHEUS_HOST:$(hostname)" \
-        --variable "LOKI_HOST:$(hostname)" \
-        ${skip_args} \
-        suites/optional/healthchecks-disabled-service.robot
+    run_tests host1 suites/optional/healthchecks-disabled-service.robot
 }

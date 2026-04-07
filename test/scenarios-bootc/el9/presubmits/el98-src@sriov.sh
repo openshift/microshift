@@ -46,8 +46,6 @@ scenario_run_tests() {
     fi
     # shellcheck disable=SC2086
     run_tests host1 \
-        --variable "PROMETHEUS_HOST:$(hostname)" \
-        --variable "LOKI_HOST:$(hostname)" \
         ${skip_args} \
         suites/optional/sriov.robot
 }
