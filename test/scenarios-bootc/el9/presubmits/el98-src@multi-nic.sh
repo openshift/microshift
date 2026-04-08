@@ -5,7 +5,7 @@
 # Opt-in to dynamic VM scheduling by declaring requirements
 dynamic_schedule_requirements() {
     cat <<EOF
-min_vcpus=2
+min_vcpus=4
 min_memory=4096
 min_disksize=20
 networks=default,"${VM_MULTUS_NETWORK}"
@@ -18,7 +18,7 @@ EOF
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source
     # Using multus as secondary network to have 2 nics in different networks.
-    launch_vm rhel98-bootc --network default,"${VM_MULTUS_NETWORK}"
+    launch_vm rhel98-bootc --vm_vcpus 4 --network default,"${VM_MULTUS_NETWORK}"
 }
 
 scenario_remove_vms() {

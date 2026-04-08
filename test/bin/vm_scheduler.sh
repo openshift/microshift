@@ -148,10 +148,7 @@ init_scheduler() {
 }
 
 # Default VM resources when not specified in launch_vm
-# Using 4 vCPUs by default maximizes VM reuse potential:
-# - All VMs can run any scenario (no vcpu mismatch)
-# - More queuing = more reuse opportunities
-DEFAULT_VM_VCPUS=4
+DEFAULT_VM_VCPUS=2
 DEFAULT_VM_MEMORY=4096
 
 parse_static_scenario_resources() {
