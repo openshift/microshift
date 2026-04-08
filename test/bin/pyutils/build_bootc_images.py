@@ -658,6 +658,17 @@ def main():
             ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
             ifile = os.path.join(ipkgdir, ifile)
             run_template_cmd(ifile, ofile, args.dry_run)
+        # Process shared bootc templates (USHIFT-6788)
+        tpldir = f"{SCRIPTDIR}/../image-blueprints-bootc/templates"
+        if os.path.isdir(tpldir):
+            for ifile in os.listdir(tpldir):
+                if not ifile.endswith(".template"):
+                    continue
+                ofile = os.path.join(BOOTC_IMAGE_DIR, ifile.removesuffix(".template"))
+                if os.path.exists(ofile) and not FORCE_REBUILD:
+                    continue
+                ifile = os.path.join(tpldir, ifile)
+                run_template_cmd(ifile, ofile, args.dry_run)
         # Run the mirror registry
         common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
         # Skip all image builds
