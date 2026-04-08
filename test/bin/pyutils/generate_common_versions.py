@@ -214,23 +214,25 @@ def get_gitops_version(minor_version):
     """
     url = "https://access.redhat.com/product-life-cycles/api/v1/products"
     params = {"name": "Red Hat OpenShift GitOps"}
-    resp = None
+    versions = []
     for attempt in range(1, 4):
         try:
             resp = requests.get(url, params=params, timeout=10)
             resp.raise_for_status()
+            data = resp.json()
+            product_entries = data.get("data") or []
+            if not product_entries:
+                raise ValueError("Missing GitOps lifecycle data")
+            versions = product_entries[0].get("versions", [])
             break
-        except Exception as e:
+        except (requests.RequestException, ValueError, AttributeError) as e:
+            if attempt == 3:
+                logging.error(f"Failed to fetch GitOps lifecycle data from {url} after 3 attempts: {e}")
+                return None
             logging.warning(f"Attempt {attempt} failed with error: {e}. Retrying...")
             time.sleep(2)
-            continue
-
-    if resp is None:
-        logging.error(f"Failed to fetch data from {url} after 3 attempts")
-        return ""
-    data = resp.json()
     for current_microshift_minor_version in range(minor_version, minor_version - 4, -1):
-        for gitops_version_from_api_docs in data.get("data", [{}])[0].get("versions", []):
+        for gitops_version_from_api_docs in versions:
             gitops_version_ocp_compatibility = gitops_version_from_api_docs.get("openshift_compatibility") or ""
             gitops_version_number = gitops_version_from_api_docs.get("name")
             if f"4.{current_microshift_minor_version}" in gitops_version_ocp_compatibility:
@@ -289,8 +291,15 @@ def generate_common_versions(minor_version):
     rhocp_minor_y2 = yminus2_minor_version
 
     # The current version of the microshift-gitops package.
+    # If the API fetch fails, preserve the existing value to avoid
+    # creating PRs that clear the version due to transient failures.
     logging.info("Getting GITOPS_VERSION")
     gitops_version = get_gitops_version(minor_version)
+    if gitops_version is None:
+        target_file = pathlib.Path(__file__).resolve().parent / '../common_versions.sh'
+        args = ['grep', '-oP', '(?<=GITOPS_VERSION=).*', str(target_file)]
+        gitops_version = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=True).stdout.strip()
+        logging.info(f"API fetch failed, preserving existing GITOPS_VERSION={gitops_version}")
 
     template_path = pathlib.Path(__file__).resolve().parent / '../../assets/common_versions.sh.template'
 
