@@ -18,6 +18,18 @@ WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 
 start_image="rhel98-bootc-brew-lrel-tuned"
 
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    cat <<EOF
+min_vcpus=6
+min_memory=4096
+min_disksize=20
+networks=${VM_IPV6_NETWORK}
+boot_image=${start_image}
+fips=false
+EOF
+}
+
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
 

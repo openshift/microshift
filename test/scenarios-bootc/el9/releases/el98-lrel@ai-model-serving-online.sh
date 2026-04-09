@@ -4,6 +4,18 @@
 
 start_image="rhel98-bootc-brew-lrel-optional"
 
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    cat <<EOF
+min_vcpus=4
+min_memory=4096
+min_disksize=30
+networks=
+boot_image=${start_image}
+fips=false
+EOF
+}
+
 # Currently, RHOAI is only available for x86_64
 check_platform() {
     local -r record_junit=${1:-false}

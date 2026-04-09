@@ -4,6 +4,18 @@
 
 start_image="rhel98-bootc-brew-lrel-fips"
 
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    cat <<EOF
+min_vcpus=4
+min_memory=4096
+min_disksize=20
+networks=
+boot_image=${start_image}
+fips=true
+EOF
+}
+
 check_platform() {
     if [[ "${UNAME_M}" =~ aarch64 ]] ; then
         record_junit "setup" "scenario_create_vms" "SKIPPED"
