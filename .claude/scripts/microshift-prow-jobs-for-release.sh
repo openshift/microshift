@@ -11,7 +11,8 @@ PROW_URL="https://prow.ci.openshift.org/data.js"
 fetch_latest_per_job() {
     local release="${1}"
     curl -s --max-time 60 "${PROW_URL}" | jq --arg release "${release}" '
-        [.[] | select((.job | contains("microshift")) and (.job | contains($release)))] |
+        [.[] | select((.job | contains("microshift")) and (.job | contains($release))
+                       and .finished and .finished != "")] |
         group_by(.job) |
         map(sort_by(.started | tonumber) | reverse | first) |
         [.[] | {
