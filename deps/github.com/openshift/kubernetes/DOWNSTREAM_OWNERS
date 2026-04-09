@@ -10,6 +10,8 @@ filters:
     - p0lyn0mial
     - tkashem
     - benluddy
+    - jacobsee
+    - jubittajohn
 
     # Approvers are limited to the team that manages rebases and pays the price for carries that are introduced
     approvers:
@@ -19,6 +21,8 @@ filters:
     - p0lyn0mial
     - tkashem
     - benluddy
+    - jacobsee
+    - jubittajohn
 
   "^\\.go.(mod|sum)$":
     labels:

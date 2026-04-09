@@ -1,4 +1,5 @@
-- kubernetes image-arm64 8b1d67b459cd554cd4b6d878e9bf4d425b3bf9a0 to 37f810d09f7e65a78bfd5d427f6348c41d59bae6
+- kubernetes embedded-component 8b1d67b459cd554cd4b6d878e9bf4d425b3bf9a0 to dfffacdf0ad6e9aa75664c7b3167dd2ddbfc17ba
+  - 0e4d25963 2026-04-01T14:54:46Z UPSTREAM: <carry>: Add jacobsee and jubittajohn to DOWNSTREAM_OWNERS
   - 5819cdc08 2026-03-25T15:34:32-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - 8b2bf66ce 2026-03-18T19:15:56Z Release commit for Kubernetes v1.34.6
   - 87990decd 2026-03-11T12:55:56-07:00 drop publishing rules from dependencies.yaml on release branch
@@ -8,4 +9,22 @@
   - 9dfc82f48 2026-02-17T03:33:03-08:00 fix: parsing the patch directly
   - 85056980d 2026-02-08T01:15:47-08:00 Use fast policy refresh interval for TestParamRef
   - dd36f4394 2026-01-21T18:28:19+05:30 Fix flaky TestApplyCRDuringCRDFinalization test
+
+- oc image-amd64 c6c422e62bcd8b75061aea94820e5f077b1562a8 to 9d9df34c46c9deba8c291a2a084de5724c0bd820
+  - f2033c3e 2026-03-28T14:24:28Z MCO-1961: Allow multiple machine-os image versions
+
+- kubernetes image-amd64 8b1d67b459cd554cd4b6d878e9bf4d425b3bf9a0 to dfffacdf0ad6e9aa75664c7b3167dd2ddbfc17ba
+  - 0e4d25963 2026-04-01T14:54:46Z UPSTREAM: <carry>: Add jacobsee and jubittajohn to DOWNSTREAM_OWNERS
+  - 5819cdc08 2026-03-25T15:34:32-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 8b2bf66ce 2026-03-18T19:15:56Z Release commit for Kubernetes v1.34.6
+  - 87990decd 2026-03-11T12:55:56-07:00 drop publishing rules from dependencies.yaml on release branch
+  - da50ffde1 2026-03-09T10:20:21-04:00 cmd/kubeadm: ignore EINVAL error during unmount
+  - 7c49a01f3 2026-02-26T20:14:53Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.5
+  - 1e54c34d7 2026-02-26T10:30:50Z kubeadm: do not add learner member to etcd client endpoints
+  - 9dfc82f48 2026-02-17T03:33:03-08:00 fix: parsing the patch directly
+  - 85056980d 2026-02-08T01:15:47-08:00 Use fast policy refresh interval for TestParamRef
+  - dd36f4394 2026-01-21T18:28:19+05:30 Fix flaky TestApplyCRDuringCRDFinalization test
+
+- kubernetes image-arm64 37f810d09f7e65a78bfd5d427f6348c41d59bae6 to dfffacdf0ad6e9aa75664c7b3167dd2ddbfc17ba
+  - 0e4d25963 2026-04-01T14:54:46Z UPSTREAM: <carry>: Add jacobsee and jubittajohn to DOWNSTREAM_OWNERS
 
