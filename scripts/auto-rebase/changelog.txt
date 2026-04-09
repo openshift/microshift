@@ -1,4 +1,8 @@
-- ovn-kubernetes image-arm64 208e0c7fabe0462cdec6d5ae9df4aa0c412f6a81 to 253d3ed8c6babe1b07fcb7910df3ebaf2d3c5b33
+- machine-config-operator embedded-component 9c50d5330ae771d7e8682cbb58480867b2a874da to c6d2a0384998bb4d60b12d06673d07ed8eea293b
+  - 4c270f59 2026-02-13T12:49:15-05:00 daemon: update 'SetDegrade' flow to include updating the degrade condition in the MCN
+  - 2a6a515f 2026-02-13T12:49:12-05:00 node controller: update MCP degrade status by using MCN NodeDegrade condition status
+
+- ovn-kubernetes image-amd64 208e0c7fabe0462cdec6d5ae9df4aa0c412f6a81 to 253d3ed8c6babe1b07fcb7910df3ebaf2d3c5b33
   - 26f25084 2026-02-26T18:27:26+01:00 nodeallocator: fix subnet leak when hybrid overlay is enabled
   - c8ada1f6 2026-02-24T11:35:02+01:00 Fix IC cluster cleanup tests zone configuration
   - e61ba4ba 2026-02-24T11:35:02+01:00 Remove IC zone migration HACK code
