@@ -10,7 +10,7 @@ https://github.com/openshift/cluster-openshift-controller-manager-operator embed
 https://github.com/openshift/cluster-policy-controller embedded-component 47c783103216aa5e1242632127a5d8f98b8b7455
 https://github.com/openshift/csi-external-snapshotter embedded-component 42604822c25eb2aa0ecb017c24e328221b238eb9
 https://github.com/openshift/etcd embedded-component 05bca97760b1cfa1bcef11c0b1f1a5c4dab19709
-https://github.com/openshift/kubernetes embedded-component 4ef1baeb6786a70898f3842a06e988d9566aa444
+https://github.com/openshift/kubernetes embedded-component 51bc740cd4e090500ccdff94eda526ceddf3d2a9
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 0f8a4eb84ace9b746cf25d51d80dacf34ca5f953
 https://github.com/openshift/machine-config-operator embedded-component 30c659cb9c2a39931bde3b48c6fc35f1c6ea1945
 https://github.com/openshift/openshift-controller-manager embedded-component d9e543dd31e981f279c447e4f92f0dac3f665f9e
@@ -20,10 +20,10 @@ https://github.com/openshift/service-ca-operator embedded-component 37e0c31790b6
 https://github.com/openshift/oc image-amd64 64e778a55fbcdf295b671a7d4e701e7c8cc3a499
 https://github.com/openshift/coredns image-amd64 6f39336e6da9dc77b2db140a96773c413d50a665
 https://github.com/openshift/csi-external-snapshotter image-amd64 42604822c25eb2aa0ecb017c24e328221b238eb9
-https://github.com/openshift/router image-amd64 ef5cab6493660c738412ac322486707a40a58c4a
+https://github.com/openshift/router image-amd64 3c365cad8c7037e4aa64a694994ea393abc4d9a2
 https://github.com/openshift/kube-rbac-proxy image-amd64 b9134351be37c43408334047d8eb85d0ac01fe4e
 https://github.com/openshift/ovn-kubernetes image-amd64 2aec60c6a5b5238c7c75173a1518322ea595a58e
-https://github.com/openshift/kubernetes image-amd64 4ef1baeb6786a70898f3842a06e988d9566aa444
+https://github.com/openshift/kubernetes image-amd64 51bc740cd4e090500ccdff94eda526ceddf3d2a9
 https://github.com/openshift/service-ca-operator image-amd64 37e0c31790b6a954214817974a56c9a699d0cf78
 https://github.com/openshift/oc image-arm64 64e778a55fbcdf295b671a7d4e701e7c8cc3a499
 https://github.com/openshift/coredns image-arm64 6f39336e6da9dc77b2db140a96773c413d50a665
