@@ -250,7 +250,8 @@ For each candidate where user chose "create":
        components="MicroShift",
        additional_fields={
            "labels": ["microshift-ci-ai-generated"],
-           "security": {"name": "Red Hat Employee"}
+           "security": {"name": "Red Hat Employee"},
+           "customfield_10028": 0  # Story Points
        }
    )
    ```
