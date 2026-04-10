@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "productpages": {
+      "type": "http",
+      "url": "https://productpages.redhat.com/mcp",
+      "headers": {
+        "X-MCP-Realm": "urn:mcp:realm:private-core"
+      }
+    }
+  }
+}
