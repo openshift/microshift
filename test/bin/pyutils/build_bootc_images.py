@@ -348,10 +348,11 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     # Run template command on the input file
     bf_outfile = os.path.join(BOOTC_IMAGE_DIR, bootcfile)
     run_template_cmd(bf_path, bf_outfile, dry_run)
-    # Templating may generate an empty file or in dry-run mode the file may not exist
-    if not os.path.exists(bf_outfile) or (not dry_run and not common.file_has_valid_lines(bf_outfile)):
-        common.print_msg(f"Skipping {bootcfile} file (not created or empty)")
-        return
+    # Templating may generate an empty file
+    if not dry_run:
+        if not common.file_has_valid_lines(bf_outfile):
+            common.print_msg(f"Skipping an empty {bootcfile} file")
+            return
 
     common.print_msg(f"Processing {bootcfile} with logs in {bf_logfile}")
     start_process_bootc_image = time.time()
@@ -461,10 +462,6 @@ def process_container_encapsulate(groupdir, containerfile, dry_run):
     # Run template command on the input file
     ce_outfile = os.path.join(BOOTC_IMAGE_DIR, containerfile)
     run_template_cmd(ce_path, ce_outfile, dry_run)
-    # Templating may generate an empty file or in dry-run mode the file may not exist
-    if not os.path.exists(ce_outfile) or (not dry_run and not common.file_has_valid_lines(ce_outfile)):
-        common.print_msg(f"Skipping {containerfile} file (not created or empty)")
-        return
 
     common.print_msg(f"Processing {containerfile} with logs in {ce_logfile}")
     start_process_container_encapsulate = time.time()
@@ -615,7 +612,7 @@ def main():
             args.template = os.path.abspath(args.template)
             dir2process = os.path.dirname(args.template)
             pattern = os.path.basename(args.template)
-        # Make sure the input directory exists (only if specified for group_dir)
+        # Make sure the input directory exists (only if specified)
         if dir2process and not os.path.isdir(dir2process):
             raise Exception(f"The input directory '{dir2process}' does not exist")
         # Make sure the local RPM repository exists
@@ -659,8 +656,8 @@ def main():
             if BREW_NIGHTLY_RELEASE_VERSION:
                 extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
         # Sort the images list, only leaving unique entries
-        if os.path.exists(CONTAINER_LIST):
-            common.sort_uniq_file(CONTAINER_LIST)
+        common.sort_uniq_file(CONTAINER_LIST)
+
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
