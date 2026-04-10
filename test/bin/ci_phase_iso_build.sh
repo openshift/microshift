@@ -157,12 +157,10 @@ run_bootc_image_build() {
         fi
     else
         # Full build for all OS versions
-        for os_ver in el9 el10; do
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer1-base"
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer2-presubmit"
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer3-periodic"
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer4-release"
-        done
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base,./image-blueprints-bootc/el10/layer1-base
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit,./image-blueprints-bootc/el10/layer2-presubmit
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer3-periodic,./image-blueprints-bootc/el10/layer3-periodic
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer4-release,./image-blueprints-bootc/el10/layer4-release
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/upstream
     fi
 }
