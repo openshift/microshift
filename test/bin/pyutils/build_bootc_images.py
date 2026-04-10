@@ -657,7 +657,6 @@ def main():
                 extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
         # Sort the images list, only leaving unique entries
         common.sort_uniq_file(CONTAINER_LIST)
-
         # Process package source templates
         ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
         for ifile in os.listdir(ipkgdir):
