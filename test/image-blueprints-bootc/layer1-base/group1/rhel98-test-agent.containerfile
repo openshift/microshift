@@ -4,9 +4,11 @@ FROM registry.stage.redhat.io/rhel9/rhel-bootc:9.8
 ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
-# Configure the RPM repositories (no EUS in staging environment)
+# Configure the RPM repositories
+# - No EUS repositories in staging environment
+# - Disable default repositories to avoid pre-release repo access errors
 COPY --chmod=755 ./bootc-images/rpm-repo-config.sh /tmp/rpm-repo-config.sh
-RUN /tmp/rpm-repo-config.sh && rm -f /tmp/rpm-repo-config.sh
+RUN /tmp/rpm-repo-config.sh --disable-all && rm -f /tmp/rpm-repo-config.sh
 
 # Configure the RHEL mirror RPM repositories (for use in the staging environment)
 ARG RHEL_MIRROR_REPO_NAME=rhel98-mirror.repo
