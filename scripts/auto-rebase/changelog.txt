@@ -1,18 +1,158 @@
-- api embedded-component 80fcf457ee87d9a81075bcc4e6deac506448195f to e9d6d439b48bfa2d127ee90c28e6d0f55243b620
-  - ceacb94c 2026-03-24T09:40:44+05:30 kubebuilder validation and clarified API behavior for KubeletConfig API doc and adds tests
-  - 13eaa95e 2026-03-02T18:23:59+05:30 kubebuilder validation and clarified API behavior for KubeletConfig API doc and adds tests
+- api embedded-component e9d6d439b48bfa2d127ee90c28e6d0f55243b620 to f50e695cb194278edf2aa4cdc1a8c82dd5102d50
+  - b8c3b96d 2026-04-06T14:49:50-04:00 feat: remove pacemaker from payload deployment
+  - 7480ccda 2026-04-02T23:53:03+01:00 Add extra padding to avoid table being cut-off
+  - a7d84d8f 2026-04-02T23:53:01+01:00 Use static ordering of job variants in HTML output
+  - 492ac673 2026-04-02T14:38:52-04:00 upkeep: lowered the validation for agents down to 0
+  - e9e6359f 2026-04-02T12:34:05-04:00 feat: add exclusion for pacemaker required conditions
+  - 3f0cd07e 2026-04-02T10:37:31-04:00 feat: promote pacemaker to v1 in prep for tnf
+  - 72cac067 2026-04-01T14:05:14-04:00 Include candidate tier in default sippy queries for feature promotion
+  - 78c930f0 2026-03-31T12:59:48-04:00 Remove GCPClusterHostedDNSInstall featuregate
+  - a443b3b6 2026-03-26T11:21:00+01:00 CNTRLPLANE-2796: promote the event-ttl feature
 
-- cluster-ingress-operator embedded-component dfec6c028e2d4eaf7dd161cdc0e75740894df421 to c79099dcdc4e58f5a0d55a47b626a805a02af526
-  - eeb09ed 2026-03-30T14:26:32-04:00 NE-2501: Added network policies for the router
+- cluster-ingress-operator embedded-component c79099dcdc4e58f5a0d55a47b626a805a02af526 to 8008be81974c8aa0add770087908e40a2138f344
+  - 5ce7d1c 2026-04-03T13:08:44-04:00 NE-2332: Implement ROUTER_CURVES environment variable
+  - 0da1246 2026-03-27T19:48:03-04:00 OCPBUGS-3917: Filter non-FIPS TLS 1.3 ciphers and validate effective profiles
 
-- machine-config-operator embedded-component 39ca98383d9b1aedf6147f9ff89e69b5a23541be to f325e92327ccfcda3ff09c09dc1b233a63fb312b
-  - db7b8e1e 2026-04-01T11:47:17Z MCO-2183: migrated configdrift, kubeletconfig, containerruntimeconfig and metrics e2e test cases
-  - 34cd2aa2 2026-03-13T17:30:09+01:00 OCPBUGS-78154: Add GetDefaultLeaderElectionConfig for MCC
-  - 65d648b8 2026-03-13T16:22:34+01:00 OCPBUGS-78154: Log when using HA default leader election timings
-  - 165da5a9 2026-03-13T15:56:37+01:00 OCPBUGS-78154: Add useDefaultTimings flag to GetLeaderElectionConfig
-  - f016a8e8 2026-03-13T09:58:06+01:00 Trim comment in GetLeaderElectionConfig.
-  - a7b45feb 2026-03-13T09:52:13+01:00 OCPBUGS-78154: Use HA leader election defaults for MCO on SNO.
+- cluster-kube-apiserver-operator embedded-component de2a3ebcb3ceea0ea411a6fbb9b5b52c18c27e06 to 360d3fee5c01437f857d761cff755f8b2e5004b3
+  - d22154c 2026-02-23T12:19:42-05:00 scc: fix uid{Min,Max}Range for nested-container
 
-- oc image-arm64 f835dae3a861b593c4dd8b688394a61614dd6663 to 075cd278d1e62cf49b266e157891967bda16079d
+- cluster-kube-controller-manager-operator embedded-component 7df2876085ac1d76ac11bf476c0538876110c9f0 to b646f5481a723f5613ea45cd4a49dd716f5ae16c
+  - feaa384 2026-03-17T16:01:18+01:00 bindata: Import configmap-csr-controller-ca.yaml from KAS-O
+
+- cluster-network-operator embedded-component 594de43f4f1567e5ce55be2eff7c0cf28d1e09e7 to f3e41c5bf61313ae7408f15b263140bfc184b7d6
+  - 740568c 2026-04-02T00:59:59+02:00 Add VTEP update/patch RBAC for CM
+  - f247bbe 2026-04-02T00:35:17+02:00 Update the CRDs for CUDN/VTEP APIs
+
+- machine-config-operator embedded-component f325e92327ccfcda3ff09c09dc1b233a63fb312b to c4a08067821f304642e731fdcca0c8c6a6b19484
+  - b63d34cf 2026-04-02T13:40:13-05:00 Move state logging to updateConfigAndState after SetDone
+  - 2f270e7e 2026-04-02T09:43:18-04:00 AGENT-1416: Add default NodeDisruptionPolicy for IRI
+  - b7189285 2026-03-30T13:33:55-04:00 Fix order of cleanup to further avoid race
+
+- operator-framework-olm embedded-component 438f0e600e4ae75c8b7854afba5be963061eb2a1 to 51af59545315b37207a76f55825f397f5df13910
+  - 22ef120c 2026-04-01T00:04:23Z Add fgiudici as reviewer (#3805)
+
+- service-ca-operator embedded-component 951ea66067b4d69c868470e26a5a1a9f689be23e to 8aea4fc46ad071f3eca583c4f9c12bfa0be055ec
+  - ca5ae82 2026-04-02T10:20:04-04:00 fix: register informer before Start() to prevent WaitForCacheSync hang
+  - 9f8d755 2026-04-02T10:20:04-04:00 add feature gated PKI config support
+  - adc2776 2026-03-30T09:37:20-04:00 vendor: bump for openshift/library-go
+
+- oc image-amd64 12f8fce897cae737720309a894dac856d221485e to 075cd278d1e62cf49b266e157891967bda16079d
   - 075cd278 2026-04-02T11:58:36Z NO-JIRA: Add feature gate changes to changelog JSON output (#2247)
+  - b2332831 2026-03-31T14:21:43-04:00 NO-ISSUE: recover the context in upgrade
+
+- service-ca-operator image-amd64 951ea66067b4d69c868470e26a5a1a9f689be23e to 8aea4fc46ad071f3eca583c4f9c12bfa0be055ec
+  - ca5ae82 2026-04-02T10:20:04-04:00 fix: register informer before Start() to prevent WaitForCacheSync hang
+  - 9f8d755 2026-04-02T10:20:04-04:00 add feature gated PKI config support
+  - adc2776 2026-03-30T09:37:20-04:00 vendor: bump for openshift/library-go
+
+- oc image-arm64 075cd278d1e62cf49b266e157891967bda16079d to 66dee73f66c4f048c333c6a77d76871872027896
+  - 0595c992 2026-04-10T15:01:30+02:00 claude: Split tester agent away from code-reviewer
+  - b2b2a40a 2026-04-07T14:19:27+01:00 Fix extraction of gated manifests using --install-config
+
+- ovn-kubernetes image-arm64 ee514f9f66a328f4dd4b583709a8e411b515fa5f to e327d43ff04f410b1d9f301a6484af5359a98d3d
+  - 5912b521 2026-04-09T19:41:07Z chore: update openshift tests
+  - 613c1a39 2026-04-09T21:19:48+02:00 Fix nil pointer panic in ParseNetConf for conflist configs
+  - af65f624 2026-04-08T19:43:35Z Bump the go_modules group across 2 directories with 4 updates
+  - c97a7eb0 2026-04-08T18:13:26+02:00 e2e: annotate nodes with VTEP IPs and check VTEP health
+  - a1ed35e1 2026-04-08T18:13:26+02:00 Dualstack and IPV6 VTEPs are not supported by FRR
+  - 9dcb94d9 2026-04-08T18:13:26+02:00 VTEP: add Accepted status printer columns
+  - f22bb34e 2026-04-08T18:13:26+02:00 Add RBAC for VTEP updates/patches from CM
+  - 2bd32668 2026-04-08T18:13:26+02:00 RA: configure ToReceive filters for VTEP CIDR ranges
+  - b13a4da6 2026-04-08T18:13:25+02:00 RA: advertise per-node VTEP IPs in default-VRF router
+  - 72eefa5e 2026-04-08T17:34:50+02:00 Add node controller for vtep annotation change logic
+  - 548cec39 2026-04-08T17:34:50+02:00 Add CUDN controller for finalizer logic
+  - 06f610fd 2026-04-08T17:34:50+02:00 Discover Node VTEPIPs for unmanaged mode
+  - 7dd8a48b 2026-04-08T17:34:50+02:00 Implement overlapping CIDR checks across VTEPs
+  - 9c64237c 2026-04-08T17:34:49+02:00 Add finalizers to VTEP
+  - 357e39d5 2026-04-08T17:34:49+02:00 Prevent managed VTEPs from being accepted
+  - 699cf88e 2026-04-08T17:34:49+02:00 Add VTEP controller plumbing
+  - 1a870ee8 2026-04-08T17:32:12+02:00 Add nftables support to test/e2e/diagnostics
+  - 81aa2265 2026-04-08T17:32:12+02:00 Add helpers that know the set of relevant NFT sets/maps
+  - b343bf0e 2026-04-08T17:32:12+02:00 Refactor nftables rule comparison in the unit tests
+  - 0992bf51 2026-04-08T16:33:21+02:00 Fix multicast traffic for EVPN Layer2 primary networks
+  - 78188684 2026-04-08T16:21:44+02:00 routeadvertisements: fix targetVRF auto for MAC-VRF only Layer2 networks
+  - dbd3095d 2026-04-08T15:32:44+02:00 Clean up VTEP annotation on VTEP deletion or mode change
+  - fbf56ce6 2026-04-08T15:32:44+02:00 Add self-healing for externally modified VTEP annotations
+  - 8f05a5c6 2026-04-08T15:32:44+02:00 Skip unnecessary VTEP reconciliation on node address changes
+  - e1ec673e 2026-04-08T15:32:44+02:00 Persist EVPN VTEP IPs in node annotation for stability across reconciles
+  - 5d4a3b77 2026-04-08T15:32:44+02:00 Use node address manager for EVPN VTEP IP discovery
+  - 5d98245f 2026-04-08T15:32:44+02:00 Add EVPN annotation to node admission webhook
+  - 200339aa 2026-04-08T15:32:44+02:00 Pick lowest unmanaged VTEP IP instead of error
+  - ac618f13 2026-04-08T15:32:44+02:00 Add new VTEP annotation utils
+  - d2aab21c 2026-04-06T15:06:55Z Disable informing tests for the time being
+  - d898ccf0 2026-04-06T10:21:11-04:00 e2e: fix no-overlay tcpdump race losing captured packets
+  - 6cf8a4d9 2026-04-06T09:33:49-04:00 fix cudn nopods workload and make cudn_ns template generic
+  - a8e16bda 2026-04-06T09:33:49-04:00 fix cudn workload formatting and align label selectors
+  - e2b4a5a2 2026-04-06T09:33:49-04:00 address review from rsevilla wrt cudn ns
+  - 747caa67 2026-04-06T09:33:49-04:00 add udn and cudn test with pods, svc, netpols
+  - 1e6a545a 2026-04-06T14:51:33+05:30 CUDN: Skip TransportAccepted status for empty transport
+  - b1f1dc86 2026-04-02T14:34:41-07:00 catch ./openshift/ dir up to changes in ./test/e2e
+  - 06062d57 2026-04-02T11:25:24+02:00 Add EVPN node controller unit tests for state transitions and edge cases
+  - c898fae6 2026-04-02T11:25:24+02:00 Wait for FRR daemons before configuring EVPN in kind setup
+  - a82aa48f 2026-04-02T11:25:24+02:00 Fail EVPN VTEP reconciliation when hybrid overlay VXLAN port conflicts
+  - ecf3c321 2026-04-02T11:25:24+02:00 Bump FRR to 10.4.3
+  - 620480c7 2026-04-02T11:25:24+02:00 Handle OVS port not yet available during VTEP reconciliation
+  - fd22bf59 2026-04-02T11:25:23+02:00 Lighten EVPN initial sync: defer OVS ports and pod entries to normal reconciliation
+  - 6482be3d 2026-04-02T11:25:23+02:00 Add static FDB entries and live migration support to EVPN pod controller
+  - 4d170469 2026-04-02T11:25:23+02:00 Add pod neighbor controller for EVPN networks
+  - 7f71214a 2026-04-02T11:25:23+02:00 E2E: Use unmanaged VTEP mode with single CIDR
+  - 3cc8d531 2026-04-02T11:25:23+02:00 Revert "REVERT ME: Temporary commit till ovnkube EVPN implementation lands"
+  - 144e8265 2026-04-02T11:25:23+02:00 Add OVS port handling for layer2 EVPN networks
+  - 02cb3423 2026-04-02T11:25:23+02:00 Add SVI reconciliation for EVPN networks
+  - 97114a68 2026-04-02T11:25:23+02:00 Reconcile VID/VNI mappings for VXLAN devices
+  - 99f03714 2026-04-02T11:23:30+02:00 Clarify unmanaged VTEP IP discovery in OKEP
+  - c26b4259 2026-04-02T11:23:30+02:00 Add EVPN node controller
+  - 8258fa3e 2026-04-02T11:19:15+02:00 Add EVPN device naming utils
+  - 4c404d05 2026-04-02T11:19:14+02:00 Add VTEP informers/clients for EVPN support
+  - db22a8c6 2026-04-01T13:46:57+02:00 Remove EVPN/RA labels from CUDN transport tests
+  - b6e871f4 2026-04-01T13:46:57+02:00 crd,cudn,evpn: fix unanchored regex in RouteTarget CEL validation rules
+  - 5b317c6d 2026-04-01T13:46:57+02:00 Add CEL to block overlapping CIDRs within same VTEP
+  - b14e8027 2026-04-01T13:46:57+02:00 Add CEL validations to control VTEP CIDR mutations
+  - 6d09b15b 2026-04-01T13:46:57+02:00 Allow supporting multiple CIDRs in same family
+  - 3c1ad54b 2026-04-01T13:46:57+02:00 EVPN API: macVRF and ipVRF must use different VNIs
+  - b41be4fa 2026-03-31T21:18:03-04:00 no-overlay e2e: Add managed mode reconciliation tests
+  - 2f5eb215 2026-03-31T17:59:03+02:00 Stop using netlink.AddrList directly
+  - 0d735c61 2026-03-31T17:59:03+02:00 Bump vishvananda/netlink
+  - b288f9fd 2026-03-31T17:59:03+02:00 Use netlink handle with strict check for AdrrList
+  - de6b3bb2 2026-03-31T10:48:10+02:00 E2E: apply interface segregation to infraprovider API
+  - ca939661 2026-03-31T10:48:10+02:00 E2E: Add SSHRunner for remote command execution
+  - a149b229 2026-03-31T10:48:10+02:00 E2E: refactor infraprovider with reusable container ops
+  - e399decd 2026-03-31T10:48:10+02:00 E2E: use NamespacePodSecurityLevel to set PS levels
+  - d4684ae8 2026-03-31T10:48:10+02:00 EVPN E2E: Use f.CreateNamespace for proper label propagation
+  - c55b6d28 2026-03-31T10:48:10+02:00 EVPN E2E: exclude default cluster network CIDRs from random subnet generation
+  - a3b5cd51 2026-03-31T10:48:10+02:00 E2E: move AgnHost image retrieval to deployment config
+  - 4127d21f 2026-03-31T10:48:10+02:00 E2E: add provider factory pattern and move kind to internal package
+  - 79985403 2026-03-31T10:48:10+02:00 E2E: fix GetIPv6Gateway returning wrong gateway
+  - bbaaace7 2026-03-31T10:48:10+02:00 E2E: refactor container operations into reusable abstractions
+  - ff6e8143 2026-03-26T17:06:02+01:00 Fix duplicate deleteEgressIPStatusSetup call in deleteEgressIPAssignments
+  - bc596f5e 2026-03-26T17:00:45+01:00 e2e: avoid EVPN CUDN subnet collision with podman default network
+  - 1a7a0178 2026-03-25T23:26:56-04:00 no-overlay e2e: Refactor test structure: BeforeEach setup hoisted to Describe level
+  - 24585d54 2026-03-25T17:28:32-07:00 Fix SettleAddresses timeout: pass 10*time.Second instead of 10
+  - 2f6a7fef 2026-03-25T13:24:15-07:00 Fix build and test breakages from containernetworking/cni v1.3.0 upgrade
+  - 9431a81c 2026-03-25T13:24:15-07:00 Update multus-cni to return deterministic order of device IDs
+  - 6381f672 2026-03-24T21:56:30Z evpn: fix wrong use of IPv4 GW address on IPv6 ACL
+  - b8554628 2026-03-24T20:14:29+05:30 CUDN: Validate no-overlay transport and update status conditions
+  - 8e4b0a03 2026-03-24T20:13:29+05:30 include all no-overlay network pod subnets in toReceive
+  - 73c528f1 2026-03-24T20:13:29+05:30 CUDN: Cleanup interconnect resources for no-overlay transport UT coverage
+  - d1a51e55 2026-03-24T18:05:29+05:30 fix: trigger ci again
+  - d688d02a 2026-03-24T15:30:30+05:30 Addressesd the comments
+  - 64b0c132 2026-03-24T00:05:10+01:00 skip no-overlay cases for default network is not enable no-overlay
+  - 7bf8ffc6 2026-03-24T00:05:10+01:00 add comments explaining why the no-overlay CI lanes are needed
+  - 23a27430 2026-03-24T00:05:10+01:00 e2e: Add connectivity tests for no-overlay mode
+  - 9ecd2149 2026-03-21T14:10:02-04:00 Change update pod status to just annotations
+  - af5dcb59 2026-03-20T18:12:42-04:00 Trim more information from pod informer cache
+  - 7a7403b7 2026-03-20T11:03:31-07:00 CNI: reorder SR-IOV representor lifecycle to prevent CmdAdd/CmdDel race
+  - 5d367bc8 2026-03-18T11:01:11-07:00 OKEP-5377: Extend Primary UDN/CUDN to Support Multiple Cluster Subnets in Layer3 Topology
+  - d03cc453 2026-03-18T17:25:46+01:00 CNC: Fix typo in CRD description
+  - 52d6d72c 2026-03-10T10:30:54+05:30 CUDN: Add test coverage for BGP route import with transport modes
+  - c8e7f518 2026-03-10T00:42:50+05:30 Fix DNSNameResolver CI lanes
+
+- service-ca-operator image-arm64 951ea66067b4d69c868470e26a5a1a9f689be23e to 7b3033bba87d7b40684b66f8f44a3525433d1ac7
+  - d3b5a4d 2026-04-08T15:26:32-04:00 docs: document feature gate forwarding pattern
+  - 1790560 2026-04-08T15:25:12-04:00 fix: remove FeatureGate runtime detection from controller process
+  - 068f79d 2026-04-08T15:24:54-04:00 fix: consolidate feature gate forwarding to controller via CLI args
+  - ca5ae82 2026-04-02T10:20:04-04:00 fix: register informer before Start() to prevent WaitForCacheSync hang
+  - 9f8d755 2026-04-02T10:20:04-04:00 add feature gated PKI config support
+  - adc2776 2026-03-30T09:37:20-04:00 vendor: bump for openshift/library-go
+  - 769deb7 2026-03-18T14:15:18+01:00 manifests: add service-ca operator and workload network policies
 
