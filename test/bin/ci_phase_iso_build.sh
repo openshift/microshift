@@ -70,8 +70,6 @@ update_build_cache() {
     # Build templates
     $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints-bootc/templates
     # Build the bootc base layer and brew RPMs to be cached
-    #$(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
-    #$(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-release
     $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base,./image-blueprints-bootc/el10/layer1-base
     $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer4-release,./image-blueprints-bootc/el10/layer4-release
 
