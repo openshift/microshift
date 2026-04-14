@@ -439,6 +439,7 @@ prepare_kickstart() {
             -e "s|REPLACE_OSTREE_SERVER_URL|${WEB_SERVER_URL}/repo|g" \
             -e "s|REPLACE_BOOTC_REGISTRY_URL|${MIRROR_REGISTRY_URL}|g" \
             -e "s|REPLACE_RPM_SERVER_URL|${WEB_SERVER_URL}/rpm-repos|g" \
+            -e "s|REPLACE_MAJOR_VERSION|${MAJOR_VERSION}|g" \
             -e "s|REPLACE_MINOR_VERSION|${MINOR_VERSION}|g" \
             -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \
             -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \
@@ -512,7 +513,7 @@ exit_if_image_not_set() {
 
 # Exit the script if microshift previous Z-stream version does not exist in rhocp repository
 exit_if_zprel_not_exist() {
-    local -r rhocp_repo="rhocp-4.${MINOR_VERSION}-for-rhel-9-${UNAME_M}-rpms"
+    local -r rhocp_repo="rhocp-${MAJOR_VERSION}.${MINOR_VERSION}-for-rhel-9-${UNAME_M}-rpms"
     local microshift_zprel
     if ! microshift_zprel="$(dnf repoquery -q --repo "${rhocp_repo}" --latest-limit 1 --nvr microshift 2>&1)"; then
         record_junit "repo ${rhocp_repo} does not exist or is not available: ${microshift_zprel}" "exit_if_zprel_not_exist" "SKIPPED"

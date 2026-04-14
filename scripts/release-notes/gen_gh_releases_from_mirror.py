@@ -60,8 +60,11 @@ import common
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
 
-URL_BASE = "https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift"
-URL_BASE_X86 = "https://mirror.openshift.com/pub/openshift-v4/x86_64/microshift"
+
+def get_mirror_url_base(major_version, arch):
+    """Get the mirror URL base for the given major version and architecture."""
+    return f"https://mirror.openshift.com/pub/openshift-v{major_version}/{arch}/microshift"
+
 
 # An EC RPM filename looks like
 # microshift-4.13.0~ec.4-202303070857.p0.gcf0bce2.assembly.ec.4.el9.aarch64.rpm
@@ -102,17 +105,18 @@ def main():
     # We build a default list of versions to scan using the current
     # version and the previous version. This assumes the script is run
     # out of the main branch where we can find the most current
-    # version under development. During the period where 4.n is being
-    # developed, 4.n-1 may still be producing only release candidates,
+    # version under development. During the period where X.n is being
+    # developed, X.n-1 may still be producing only release candidates,
     # so that scanning those 2 versions give us the 2 most recent
     # candidates for having no releases. During the period where the
     # main branch has not landed a rebase to update the version and
     # both main and the pre-release branch have the same version, we
-    # will end up scanning for EC or RC releases of 4.n-2, but that's
+    # will end up scanning for EC or RC releases of X.n-2, but that's
     # OK because the should all have been tagged already.
+    prev_major, prev_minor = common.get_previous_version(major, minor)
     versions_to_scan = [
         '.'.join([major, minor]),              # this minor version
-        '.'.join([major, str(int(minor)-1)]),  # the previous minor version
+        '.'.join([prev_major, prev_minor]),    # the previous minor version
     ]
 
     parser = argparse.ArgumentParser(
@@ -167,13 +171,22 @@ def main():
     if args.versions_to_scan:
         versions_to_scan = args.versions_to_scan
 
+    # Group versions by major to use correct mirror URL bases
+    versions_by_major = {}
+    for version in versions_to_scan:
+        scan_major = version.split('.', 1)[0]
+        versions_by_major.setdefault(scan_major, []).append(version)
+
     new_releases = []
-    if args.ec:
-        new_releases.extend(find_new_releases(versions_to_scan, URL_BASE, 'ocp-dev-preview'))
-        new_releases.extend(find_new_releases(versions_to_scan, URL_BASE_X86, 'ocp-dev-preview'))
-    if args.rc:
-        new_releases.extend(find_new_releases(versions_to_scan, URL_BASE, 'ocp'))
-        new_releases.extend(find_new_releases(versions_to_scan, URL_BASE_X86, 'ocp'))
+    for scan_major, scan_versions in versions_by_major.items():
+        url_base_aarch64 = get_mirror_url_base(scan_major, 'aarch64')
+        url_base_x86 = get_mirror_url_base(scan_major, 'x86_64')
+        if args.ec:
+            new_releases.extend(find_new_releases(scan_versions, url_base_aarch64, 'ocp-dev-preview'))
+            new_releases.extend(find_new_releases(scan_versions, url_base_x86, 'ocp-dev-preview'))
+        if args.rc:
+            new_releases.extend(find_new_releases(scan_versions, url_base_aarch64, 'ocp'))
+            new_releases.extend(find_new_releases(scan_versions, url_base_x86, 'ocp'))
 
     if not new_releases:
         logging.info("No new releases found.")
@@ -194,7 +207,7 @@ def main():
 class VersionListParser(html.parser.HTMLParser):
     """HTMLParser to extract version numbers from the mirror file list pages.
 
-    A page like https://mirror.openshift.com/pub/openshift-v4/aarch64/microshift/ocp-dev-preview/
+    A page like https://mirror.openshift.com/pub/openshift-v{major}/aarch64/microshift/ocp-dev-preview/
 
     contains HTML like
 
@@ -355,20 +368,25 @@ def publish_candidate_release(new_release, take_action):
     candidate_number = new_release.candidate_number
     release_type = new_release.release_type
 
+    # Extract major version from product version (e.g., "4" from "4.16.0")
+    major_version = product_version.split('.')[0]
+    url_base_x86 = get_mirror_url_base(major_version, 'x86_64')
+    url_base_aarch64 = get_mirror_url_base(major_version, 'aarch64')
+
     # Set up the release notes preamble with download links
     preamble = textwrap.dedent(f"""
     This is a candidate release for {product_version}.
 
     See the mirror for build artifacts:
-    - {URL_BASE_X86}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/
-    - {URL_BASE}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/
+    - {url_base_x86}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/
+    - {url_base_aarch64}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/
 
     Or add this RPM repository to your x86 systems:
 
     ```
     [microshift-{product_version}-{candidate_type}-{candidate_number}]
     name=MicroShift {product_version} EarlyAccess {candidate_type}.{candidate_number} RPMs
-    baseurl={URL_BASE_X86}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/el9/os/
+    baseurl={url_base_x86}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/el9/os/
     enabled=1
     gpgcheck=0
     skip_if_unavailable=0
@@ -379,7 +397,7 @@ def publish_candidate_release(new_release, take_action):
     ```
     [microshift-{product_version}-{candidate_type}-{candidate_number}]
     name=MicroShift {product_version} EarlyAccess {candidate_type}.{candidate_number} RPMs
-    baseurl={URL_BASE}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/el9/os/
+    baseurl={url_base_aarch64}/{release_type}/{product_version}-{candidate_type}.{candidate_number}/el9/os/
     enabled=1
     gpgcheck=0
     skip_if_unavailable=0

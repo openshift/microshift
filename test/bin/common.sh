@@ -229,7 +229,7 @@ get_build_branch() {
 }
 
 # The branch identifier of the current scenario repository,
-# i.e. "main", "release-4.14", etc.
+# i.e. "main", "release-4.14", "release-5.0", etc.
 # Used for top-level directory names when caching build artifacts,
 # i.e. <bucket_name>/<branch>
 # shellcheck disable=SC2034  # used elsewhere

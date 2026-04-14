@@ -18,6 +18,12 @@ import ghutils   # noqa: E402
 
 ARCH = os.uname().machine
 
+# Version map defining the last minor version for each major version.
+# Used for cross-major Y-1/Y-2 calculations (e.g., 5.0's Y-1 is 4.18).
+VERSION_MAP = {
+    4: {'last_minor': 22}
+}
+
 # The version of Sonobuoy package used in CNCF tests.
 # See https://github.com/vmware-tanzu/sonobuoy/releases.
 CNCF_SONOBUOY_VERSION = "v0.57.3"
@@ -33,11 +39,39 @@ logging.basicConfig(
 )
 
 
-def get_candidate_repo_url(minor, dev_preview=False):
+def get_previous_version(major, minor):
+    """
+    Calculate the previous version (Y-1) handling cross-major boundaries.
+
+    When minor > 0, the previous version is simply (major, minor-1).
+    When minor == 0, the previous version crosses to the prior major,
+    using VERSION_MAP to determine the last minor of that major.
+
+    Args:
+        major (int): The major version number.
+        minor (int): The minor version number.
+
+    Returns:
+        tuple: (previous_major, previous_minor) version numbers.
+
+    Raises:
+        KeyError: If the previous major version is not defined in VERSION_MAP.
+    """
+    if minor > 0:
+        return (major, minor - 1)
+    prev_major = major - 1
+    if prev_major not in VERSION_MAP:
+        raise KeyError(f"Major version {prev_major} not found in VERSION_MAP. "
+                       f"Please add it with the last minor version.")
+    return (prev_major, VERSION_MAP[prev_major]['last_minor'])
+
+
+def get_candidate_repo_url(major, minor, dev_preview=False):
     """
     Get the URL of the engineering or release candidate repository.
 
     Args:
+        major (int): The major version, e.g., 4 or 5.
         minor (int): The minor version, e.g., 19 for version 4.19.
         dev_preview (bool): If True, return the engineering candidate repo URL;
             otherwise, return the release candidate repo URL.
@@ -45,34 +79,41 @@ def get_candidate_repo_url(minor, dev_preview=False):
     Returns:
         str: The URL of the candidate repository.
     """
-    return f"https://mirror.openshift.com/pub/openshift-v4/{ARCH}/microshift/ocp{'-dev-preview' if dev_preview else ''}/latest-4.{minor}/el9/os"
+    return f"https://mirror.openshift.com/pub/openshift-v{major}/{ARCH}/microshift/ocp{'-dev-preview' if dev_preview else ''}/latest-{major}.{minor}/el9/os"
 
 
-def get_dependencies_repo_url(minor, steps_back=0):
+def get_dependencies_repo_url(major, minor, steps_back=0):
     """
-    Get the URL of the beta repository for the specified minor version.
+    Get the URL of the beta repository for the specified version.
 
     This function constructs and checks the beta repository URL for the given
-    minor version (e.g., 4.19). If the repository does not exist or does not
+    version (e.g., 4.19 or 5.0). If the repository does not exist or does not
     provide the required packages, it searches previous minor versions—up to
-    `steps_back` times—until a valid repository is found.
+    `steps_back` times—until a valid repository is found. When crossing major
+    version boundaries (e.g., from 5.0 to 4.18), it uses VERSION_MAP.
 
     Args:
+        major (int): The major version, e.g., 4 or 5.
         minor (int): The minor version, e.g., 19 for version 4.19.
-        steps_back (int, optional): How many previous minor versions to try
+        steps_back (int, optional): How many previous versions to try
             if the current version is unavailable. Defaults to 0.
 
     Returns:
         str or None: The URL of a valid beta repository, or None if none are found.
     """
-    logging.info(f"Getting beta dependencies repository for 4.{minor}, max. {steps_back} previous minors")
+    logging.info(f"Getting beta dependencies repository for {major}.{minor}, max. {steps_back} previous versions")
 
-    for i in range(minor, minor-steps_back-1, -1):
-        url = f"https://mirror.openshift.com/pub/openshift-v4/{ARCH}/dependencies/rpms/4.{i}-el9-beta"
+    current_major, current_minor = major, minor
+    for _ in range(steps_back + 1):
+        url = f"https://mirror.openshift.com/pub/openshift-v{current_major}/{ARCH}/dependencies/rpms/{current_major}.{current_minor}-el9-beta"
         if mirror_exists(url) and repo_provides_pkg(url, "cri-o"):
-            logging.info(f"Beta dependencies repository found for 4.{i}")
+            logging.info(f"Beta dependencies repository found for {current_major}.{current_minor}")
             return url
-        logging.info(f"Beta dependencies repository for 4.{i} not found{', trying older minor' if i>minor-steps_back else ''}")
+        logging.info(f"Beta dependencies repository for {current_major}.{current_minor} not found, trying older version")
+        try:
+            current_major, current_minor = get_previous_version(current_major, current_minor)
+        except KeyError:
+            break
     return None
 
 
@@ -124,20 +165,21 @@ def mirror_exists(repo_url):
         return True
 
 
-def get_subscription_repo_name_if_exists(minor):
+def get_subscription_repo_name_if_exists(major, minor):
     """
-    Get the name of the subscription repository for the specified minor version.
+    Get the name of the subscription repository for the specified version.
 
     If the repository provides the microshift package, return the repository name;
     otherwise, return None.
 
     Args:
+        major (int): The major version, e.g., 4 or 5.
         minor (int): The minor version, e.g., 19 for 4.19.
 
     Returns:
         str or None: The name of the subscription repository, or None if not available.
     """
-    repo = f"rhocp-4.{minor}-for-rhel-9-{ARCH}-rpms"
+    repo = f"rhocp-{major}.{minor}-for-rhel-9-{ARCH}-rpms"
 
     if repo_provides_pkg(repo, "microshift"):
         return repo
@@ -145,37 +187,38 @@ def get_subscription_repo_name_if_exists(minor):
         return None
 
 
-def get_microshift_repo(minor):
+def get_microshift_repo(major, minor):
     """
-    Get the repository for the specified minor version.
+    Get the repository for the specified version.
 
     This function searches for a repository that provides the microshift package
-    for the given minor version. It checks the 'rhocp' stream, then release
+    for the given version. It checks the 'rhocp' stream, then release
     candidate (RC), and finally engineering candidate (EC) repositories—in that
     order. If none are available, it returns empty string.
 
     Args:
+        major (int): The major version, e.g., 4 or 5.
         minor (int): The minor version, e.g., 19 for 4.19.
 
     Returns:
         str: The repository name or URL if found, otherwise None.
     """
-    repo = get_subscription_repo_name_if_exists(minor)
+    repo = get_subscription_repo_name_if_exists(major, minor)
     if repo is not None:
-        logging.info(f"Found subscription repository for 4.{minor}")
+        logging.info(f"Found subscription repository for {major}.{minor}")
         return repo
 
-    rc = get_candidate_repo_url(minor, dev_preview=False)
+    rc = get_candidate_repo_url(major, minor, dev_preview=False)
     if mirror_exists(rc) and repo_provides_pkg(rc, "microshift"):
-        logging.info(f"Found release candidate for 4.{minor}")
+        logging.info(f"Found release candidate for {major}.{minor}")
         return rc
 
-    ec = get_candidate_repo_url(minor, dev_preview=True)
+    ec = get_candidate_repo_url(major, minor, dev_preview=True)
     if mirror_exists(ec) and repo_provides_pkg(ec, "microshift"):
-        logging.info(f"Found engineering candidate for 4.{minor}")
+        logging.info(f"Found engineering candidate for {major}.{minor}")
         return ec
 
-    logging.info(f"No repository found for 4.{minor}")
+    logging.info(f"No repository found for {major}.{minor}")
     return ""
 
 
@@ -207,14 +250,13 @@ def get_release_version_string(repo, var_name):
         return None
 
 
-def get_gitops_version(minor_version):
+def get_gitops_version(major_version, minor_version):
     """
     Get the version of the microshift-gitops package.
     Versions compatible with MicroShift: https://access.redhat.com/product-life-cycles?product=Red%20Hat%20OpenShift%20GitOps
     """
     url = "https://access.redhat.com/product-life-cycles/api/v1/products"
     params = {"name": "Red Hat OpenShift GitOps"}
-    versions = []
     for attempt in range(1, 4):
         try:
             resp = requests.get(url, params=params, timeout=10)
@@ -223,7 +265,6 @@ def get_gitops_version(minor_version):
             product_entries = data.get("data") or []
             if not product_entries:
                 raise ValueError("Missing GitOps lifecycle data")
-            versions = product_entries[0].get("versions", [])
             break
         except (requests.RequestException, ValueError, AttributeError) as e:
             if attempt == 3:
@@ -231,70 +272,83 @@ def get_gitops_version(minor_version):
                 return None
             logging.warning(f"Attempt {attempt} failed with error: {e}. Retrying...")
             time.sleep(2)
-    for current_microshift_minor_version in range(minor_version, minor_version - 4, -1):
-        for gitops_version_from_api_docs in versions:
+            continue
+
+    if resp is None:
+        logging.error(f"Failed to fetch data from {url} after 3 attempts")
+        return ""
+    data = resp.json()
+    # Iterate using cross-major version logic
+    current_major, current_minor = major_version, minor_version
+    for _ in range(4):
+        for gitops_version_from_api_docs in data.get("data", [{}])[0].get("versions", []):
             gitops_version_ocp_compatibility = gitops_version_from_api_docs.get("openshift_compatibility") or ""
             gitops_version_number = gitops_version_from_api_docs.get("name")
-            if f"4.{current_microshift_minor_version}" in gitops_version_ocp_compatibility:
+            if f"{current_major}.{current_minor}" in gitops_version_ocp_compatibility:
                 gitops_repo = f"gitops-{gitops_version_number}-for-rhel-9-{ARCH}-rpms"
                 if repo_provides_pkg(gitops_repo, "microshift-gitops"):
                     logging.info(f"Found GitOps version: {gitops_version_number} which is compatible with OCP {gitops_version_ocp_compatibility} on {gitops_repo} repository")
                     return gitops_version_number
+        current_major, current_minor = get_previous_version(current_major, current_minor)
     return ""
 
 
-def generate_common_versions(minor_version):
-    previous_minor_version = minor_version - 1
-    yminus2_minor_version = minor_version - 2
+def generate_common_versions(major_version, minor_version):
+    # Calculate previous versions using cross-major version logic
+    previous_major_version, previous_minor_version = get_previous_version(major_version, minor_version)
+    yminus2_major_version, yminus2_minor_version = get_previous_version(previous_major_version, previous_minor_version)
 
     # The current release repository comes from the 'rhocp' stream for release
     # branches, or the OpenShift mirror if only a RC or EC is available. It can
     # be empty, if no candidate for the current minor has been built yet.
     logging.info("Getting CURRENT_RELEASE_REPO")
-    current_release_repo = get_microshift_repo(minor_version)
+    current_release_repo = get_microshift_repo(major_version, minor_version)
     current_release_version = get_release_version_string(current_release_repo, "CURRENT_RELEASE_REPO")
 
     # The previous release repository value should either point to the OpenShift
     # mirror URL or the 'rhocp' repository name.
     logging.info("Getting PREVIOUS_RELEASE_REPO")
-    previous_release_repo = get_microshift_repo(previous_minor_version)
+    previous_release_repo = get_microshift_repo(previous_major_version, previous_minor_version)
     previous_release_version = get_release_version_string(previous_release_repo, "PREVIOUS_RELEASE_REPO")
 
     # The y-2 release repository value should either point to the OpenShift
     # mirror URL or the 'rhocp' repository name. It should always come from
     # the 'rhocp' stream.
     logging.info("Getting YMINUS2_RELEASE_REPO")
-    yminus2_release_repo = get_microshift_repo(yminus2_minor_version)
+    yminus2_release_repo = get_microshift_repo(yminus2_major_version, yminus2_minor_version)
     yminus2_release_version = get_release_version_string(yminus2_release_repo, "YMINUS2_RELEASE_REPO")
 
     # The 'rhocp_minor_y' variable should be the minor version number, if the
     # current release is available through the 'rhocp' stream, otherwise empty.
-    rhocp_minor_y = minor_version if repo_provides_pkg(f"rhocp-4.{minor_version}-for-rhel-9-{ARCH}-rpms", "cri-o") else '""'
+    rhocp_minor_y = minor_version if repo_provides_pkg(f"rhocp-{major_version}.{minor_version}-for-rhel-9-{ARCH}-rpms", "cri-o") else '""'
+    rhocp_major_y = major_version if rhocp_minor_y != '""' else '""'
 
     # The beta repository, containing dependencies, should point to the
     # OpenShift mirror URL. If the mirror for current minor is not
     # available yet, it should point to an older release.
     logging.info("Getting RHOCP_MINOR_Y_BETA")
-    rhocp_minor_y_beta = get_dependencies_repo_url(minor_version, 3)
+    rhocp_minor_y_beta = get_dependencies_repo_url(major_version, minor_version, 3)
 
-    # The 'rhocp_minor_y' variable should be the previous minor version number, if
+    # The 'rhocp_minor_y1' variable should be the previous minor version number, if
     # the previous release is available through the 'rhocp' stream, otherwise empty.
-    rhocp_minor_y1 = previous_minor_version if repo_provides_pkg(f"rhocp-4.{previous_minor_version}-for-rhel-9-{ARCH}-rpms", "cri-o") else '""'
+    rhocp_minor_y1 = previous_minor_version if repo_provides_pkg(f"rhocp-{previous_major_version}.{previous_minor_version}-for-rhel-9-{ARCH}-rpms", "cri-o") else '""'
+    rhocp_major_y1 = previous_major_version if rhocp_minor_y1 != '""' else '""'
 
     # The beta repository, containing dependencies, should point to the
     # OpenShift mirror URL. The mirror for previous release should always
     # be available.
     logging.info("Getting RHOCP_MINOR_Y1_BETA")
-    rhocp_minor_y1_beta = get_dependencies_repo_url(previous_minor_version)
+    rhocp_minor_y1_beta = get_dependencies_repo_url(previous_major_version, previous_minor_version)
 
     # The 'rhocp_minor_y2' should always be the y-2 minor version number.
     rhocp_minor_y2 = yminus2_minor_version
+    rhocp_major_y2 = yminus2_major_version
 
     # The current version of the microshift-gitops package.
     # If the API fetch fails, preserve the existing value to avoid
     # creating PRs that clear the version due to transient failures.
     logging.info("Getting GITOPS_VERSION")
-    gitops_version = get_gitops_version(minor_version)
+    gitops_version = get_gitops_version(major_version, minor_version)
     if gitops_version is None:
         target_file = pathlib.Path(__file__).resolve().parent / '../common_versions.sh'
         args = ['grep', '-oP', '(?<=GITOPS_VERSION=).*', str(target_file)]
@@ -307,17 +361,25 @@ def generate_common_versions(minor_version):
         template_string = f.read()
 
     output = template_string.format(
+        major_version=major_version,
         minor_version=minor_version,
+        previous_major_version=previous_major_version,
+        previous_minor_version=previous_minor_version,
+        yminus2_major_version=yminus2_major_version,
+        yminus2_minor_version=yminus2_minor_version,
         current_release_repo=current_release_repo,
         current_release_version=current_release_version,
         previous_release_repo=previous_release_repo,
         previous_release_version=previous_release_version,
         yminus2_release_repo=yminus2_release_repo,
         yminus2_release_version=yminus2_release_version,
+        rhocp_major_y=rhocp_major_y,
         rhocp_minor_y=rhocp_minor_y,
         rhocp_minor_y_beta=rhocp_minor_y_beta,
+        rhocp_major_y1=rhocp_major_y1,
         rhocp_minor_y1=rhocp_minor_y1,
         rhocp_minor_y1_beta=rhocp_minor_y1_beta,
+        rhocp_major_y2=rhocp_major_y2,
         rhocp_minor_y2=rhocp_minor_y2,
         CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
         CNCF_SYSTEMD_LOGS_VERSION=CNCF_SYSTEMD_LOGS_VERSION,
@@ -332,6 +394,7 @@ def generate_common_versions(minor_version):
 
 def main():
     parser = argparse.ArgumentParser(description="Generate common_versions.sh variables.")
+    parser.add_argument("--major", type=int, default=4, help="The major version number (default: 4).")
     parser.add_argument("minor", type=int, help="The minor version number.")
     parser.add_argument("--update-file", default=False, action="store_true", help="Update test/bin/common_versions.sh file.")
     parser.add_argument("--create-pr", default=False, action="store_true",
@@ -340,7 +403,7 @@ def main():
     parser.add_argument("--dry-run", default=False, action="store_true", help="Dry run")
     args = parser.parse_args()
 
-    output = generate_common_versions(args.minor)
+    output = generate_common_versions(args.major, args.minor)
 
     if args.update_file or args.create_pr:
         logging.info("Updating test/bin/common_versions.sh file")
@@ -357,8 +420,8 @@ def main():
             exit(0)
 
         base_branch = g.git_repo.active_branch.name
-        if not base_branch.startswith("release-4"):
-            logging.error(f"Script is expected to be executed on branch starting with 'release-4', but it's {base_branch}")
+        if not base_branch.startswith(f"release-{args.major}"):
+            logging.error(f"Script is expected to be executed on branch starting with 'release-{args.major}', but it's {base_branch}")
             exit(1)
 
         gh = ghutils.GithubUtils(dry_run=args.dry_run)
@@ -371,7 +434,7 @@ def main():
 
         pull_req = gh.get_existing_pr_for_a_branch(base_branch, new_branch_name)
         if pull_req is None:
-            # Assuming the script always runs against `release-4.y` branch for the value in brackets.
+            # Assuming the script always runs against `release-X.y` branch for the value in brackets.
             pr_title = f"[{base_branch}] NO-ISSUE: Update common_versions.sh"
             gh.create_pr(base_branch, new_branch_name, pr_title, "")
 
