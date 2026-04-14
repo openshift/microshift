@@ -144,7 +144,7 @@ sed -i 's,url="localhost:8000",url="onnx-triton.apps.example.com",' ./client.py
 curl -o img1.jpg "https://www.hakaimagazine.com/wp-content/uploads/header-gulf-birds.jpg"
 
 python3 -m venv ./venv/
-./venv/bin/python -m pip install 'tritonclient[all]==2.59' torchvision==0.22
+./venv/bin/python -m pip install 'tritonclient[all]==2.59' torchvision==0.22 gevent==24.2.1
 
 hosts="$(hostname -i) onnx-triton.apps.example.com"
 if ! sudo grep -q "${hosts}" /etc/hosts; then
