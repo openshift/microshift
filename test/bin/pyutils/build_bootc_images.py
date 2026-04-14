@@ -218,6 +218,25 @@ def run_template_cmd(ifile, ofile, dry_run):
     common.run_command_in_shell(gomplate_args, dry_run)
 
 
+def process_template_files(tpldir, dry_run, skip_existing=False, ignore_missing_dir=False):
+    """Expand *.template files under tpldir into BOOTC_IMAGE_DIR via gomplate.
+
+    skip_existing: if True, skip outputs that already exist (pass False when forcing rebuild).
+    ignore_missing_dir: if True, no-op when tpldir is absent.
+    """
+
+    if ignore_missing_dir and not os.path.isdir(tpldir):
+        return
+    for name in os.listdir(tpldir):
+        if not name.endswith(".template"):
+            continue
+        ofile = os.path.join(BOOTC_IMAGE_DIR, name.removesuffix(".template"))
+        if skip_existing and os.path.exists(ofile):
+            continue
+        ifile = os.path.join(tpldir, name)
+        run_template_cmd(ifile, ofile, dry_run)
+
+
 def get_process_file_names(idir, ifile, obasedir):
     path = os.path.join(idir, ifile)
     outname = os.path.splitext(ifile)[0]
@@ -518,15 +537,7 @@ def process_group(groupdir, build_type, pattern="*", dry_run=False):
         common.start_junit(groupdir)
         # Process all the template files in the current group directory
         # before starting the parallel processing
-        for ifile in os.listdir(groupdir):
-            if not ifile.endswith(".template"):
-                continue
-            # Create full path for output and input file names
-            ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
-            ifile = os.path.join(groupdir, ifile)
-            # Strip the .template suffix from the output file name
-            ofile = ofile.removesuffix(".template")
-            run_template_cmd(ifile, ofile, dry_run)
+        process_template_files(groupdir, dry_run)
 
         # Parallel processing loop
         with concurrent.futures.ProcessPoolExecutor() as executor:
@@ -660,15 +671,10 @@ def main():
             run_template_cmd(ifile, ofile, args.dry_run)
         # Process shared bootc templates (USHIFT-6788)
         tpldir = f"{SCRIPTDIR}/../image-blueprints-bootc/templates"
-        if os.path.isdir(tpldir):
-            for ifile in os.listdir(tpldir):
-                if not ifile.endswith(".template"):
-                    continue
-                ofile = os.path.join(BOOTC_IMAGE_DIR, ifile.removesuffix(".template"))
-                if os.path.exists(ofile) and not FORCE_REBUILD:
-                    continue
-                ifile = os.path.join(tpldir, ifile)
-                run_template_cmd(ifile, ofile, args.dry_run)
+        process_template_files(
+            tpldir, args.dry_run,
+            skip_existing=not args.force_rebuild,
+            ignore_missing_dir=True)
         # Run the mirror registry
         common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
         # Skip all image builds
