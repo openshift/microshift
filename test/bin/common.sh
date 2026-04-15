@@ -385,11 +385,11 @@ MICROSHIFT_Y2_OPTIONAL_RPMS_LIST=(
     microshift-observability
     microshift-cert-manager
     microshift-cert-manager-release-info
+    microshift-sriov
+    microshift-sriov-release-info
 )
 MICROSHIFT_Y1_OPTIONAL_RPMS_LIST=(
     "${MICROSHIFT_Y2_OPTIONAL_RPMS_LIST[@]}"
-    microshift-sriov
-    microshift-sriov-release-info
 )
 MICROSHIFT_OPTIONAL_RPMS_LIST=(
     "${MICROSHIFT_Y1_OPTIONAL_RPMS_LIST[@]}"
