@@ -18,4 +18,3 @@ echo "Making sure MicroShift is stopped and doesn't restart preventing from rest
 systemctl stop microshift
 
 microshift restore --auto-recovery /var/lib/microshift-auto-recovery
-systemctl reboot
