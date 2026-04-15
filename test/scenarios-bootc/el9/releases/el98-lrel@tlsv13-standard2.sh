@@ -5,15 +5,9 @@
 start_image="rhel98-bootc-brew-lrel-optional"
 
 # Opt-in to dynamic VM scheduling by declaring requirements
+# Uses all defaults from common.sh
 dynamic_schedule_requirements() {
-    cat <<EOF
-min_vcpus=2
-min_memory=4096
-min_disksize=20
-networks=
-boot_image=${start_image}
-fips=false
-EOF
+    echo "boot_image=${start_image}"
 }
 
 scenario_create_vms() {

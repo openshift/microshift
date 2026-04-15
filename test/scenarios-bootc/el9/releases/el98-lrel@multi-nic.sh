@@ -3,17 +3,12 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 start_image="rhel98-bootc-brew-lrel-optional"
+SCENARIO_VCPUS=4
+SCENARIO_NETWORKS="default,${VM_MULTUS_NETWORK}"
 
 # Opt-in to dynamic VM scheduling by declaring requirements
 dynamic_schedule_requirements() {
-    cat <<EOF
-min_vcpus=4
-min_memory=4096
-min_disksize=20
-networks=default,${VM_MULTUS_NETWORK}
-boot_image=${start_image}
-fips=false
-EOF
+    echo "boot_image=${start_image}"
 }
 
 scenario_create_vms() {
@@ -21,7 +16,7 @@ scenario_create_vms() {
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
     # Using multus as secondary network to have 2 nics in different networks.
-    launch_vm rhel98-bootc --network default,"${VM_MULTUS_NETWORK}" --vm_vcpus 4
+    launch_vm rhel98-bootc
 }
 
 scenario_remove_vms() {

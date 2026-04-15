@@ -148,8 +148,7 @@ init_scheduler() {
 }
 
 # Default VM resources when not specified in launch_vm
-DEFAULT_VM_VCPUS=2
-DEFAULT_VM_MEMORY=4096
+# DEFAULT_VM_VCPUS, DEFAULT_VM_MEMORY, DEFAULT_VM_DISKSIZE defined in common.sh
 
 parse_static_scenario_resources() {
     local scenario_script="$1"
@@ -344,7 +343,18 @@ get_scenario_requirements() {
     (
         source "${scenario_script}"
         if type dynamic_schedule_requirements &>/dev/null; then
+            # Get explicit requirements from function
             dynamic_schedule_requirements > "${output_file}"
+
+            # Fill in missing values from SCENARIO_* variables or defaults
+            # This allows scenarios to define SCENARIO_VCPUS=4 and have it picked up
+            # without needing to echo it in dynamic_schedule_requirements()
+            grep -q "^min_vcpus=" "${output_file}" || echo "min_vcpus=${SCENARIO_VCPUS:-${DEFAULT_VM_VCPUS}}" >> "${output_file}"
+            grep -q "^min_memory=" "${output_file}" || echo "min_memory=${SCENARIO_MEMORY:-${DEFAULT_VM_MEMORY}}" >> "${output_file}"
+            grep -q "^min_disksize=" "${output_file}" || echo "min_disksize=${SCENARIO_DISKSIZE:-${DEFAULT_VM_DISKSIZE}}" >> "${output_file}"
+            grep -q "^networks=" "${output_file}" || echo "networks=${SCENARIO_NETWORKS:-}" >> "${output_file}"
+            grep -q "^fips=" "${output_file}" || echo "fips=${SCENARIO_FIPS:-false}" >> "${output_file}"
+            grep -q "^boot_image=" "${output_file}" || echo "boot_image=${start_image:-}" >> "${output_file}"
         else
             # This shouldn't happen if scenario_is_dynamic was checked first
             echo "ERROR: dynamic_schedule_requirements not found" >&2
@@ -413,21 +423,21 @@ vm_satisfies_requirements() {
     local vm_state="${VM_REGISTRY}/${vm_name}/state"
     [ -f "${vm_state}" ] || return 1
 
-    # Get VM capabilities
+    # Get VM capabilities (defaults from common.sh)
     local vm_vcpus vm_memory vm_disksize vm_networks vm_fips vm_boot_image
-    vm_vcpus=$(get_req_value "${vm_state}" "vcpus" "2")
-    vm_memory=$(get_req_value "${vm_state}" "memory" "4096")
-    vm_disksize=$(get_req_value "${vm_state}" "disksize" "20")
-    vm_networks=$(get_req_value "${vm_state}" "networks" "default")
+    vm_vcpus=$(get_req_value "${vm_state}" "vcpus" "${DEFAULT_VM_VCPUS}")
+    vm_memory=$(get_req_value "${vm_state}" "memory" "${DEFAULT_VM_MEMORY}")
+    vm_disksize=$(get_req_value "${vm_state}" "disksize" "${DEFAULT_VM_DISKSIZE}")
+    vm_networks=$(get_req_value "${vm_state}" "networks" "${DEFAULT_VM_NETWORK}")
     vm_fips=$(get_req_value "${vm_state}" "fips" "false")
     vm_boot_image=$(get_req_value "${vm_state}" "boot_image" "")
 
-    # Get scenario requirements
+    # Get scenario requirements (defaults from common.sh)
     local req_vcpus req_memory req_disksize req_networks req_fips req_boot_image
     req_vcpus=$(get_req_value "${scenario_reqs}" "min_vcpus" "${DEFAULT_VM_VCPUS}")
     req_memory=$(get_req_value "${scenario_reqs}" "min_memory" "${DEFAULT_VM_MEMORY}")
-    req_disksize=$(get_req_value "${scenario_reqs}" "min_disksize" "20")
-    req_networks=$(get_req_value "${scenario_reqs}" "networks" "default")
+    req_disksize=$(get_req_value "${scenario_reqs}" "min_disksize" "${DEFAULT_VM_DISKSIZE}")
+    req_networks=$(get_req_value "${scenario_reqs}" "networks" "${DEFAULT_VM_NETWORK}")
     req_fips=$(get_req_value "${scenario_reqs}" "fips" "false")
     req_boot_image=$(get_req_value "${scenario_reqs}" "boot_image" "")
 
@@ -525,12 +535,12 @@ register_vm() {
     # Copy requirements as VM state with status
     cp "${scenario_reqs}" "${vm_dir}/state"
 
-    # Add vcpus/memory/disksize from min_* values and set status
+    # Add vcpus/memory/disksize from min_* values and set status (defaults from common.sh)
     local vcpus memory disksize networks fips boot_image
     vcpus=$(get_req_value "${scenario_reqs}" "min_vcpus" "${DEFAULT_VM_VCPUS}")
     memory=$(get_req_value "${scenario_reqs}" "min_memory" "${DEFAULT_VM_MEMORY}")
-    disksize=$(get_req_value "${scenario_reqs}" "min_disksize" "20")
-    networks=$(get_req_value "${scenario_reqs}" "networks" "default")
+    disksize=$(get_req_value "${scenario_reqs}" "min_disksize" "${DEFAULT_VM_DISKSIZE}")
+    networks=$(get_req_value "${scenario_reqs}" "networks" "${DEFAULT_VM_NETWORK}")
     fips=$(get_req_value "${scenario_reqs}" "fips" "false")
     boot_image=$(get_req_value "${scenario_reqs}" "boot_image" "")
 

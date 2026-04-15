@@ -36,6 +36,23 @@ VM_POOL_BASENAME="vm-storage"
 # The location for storage for the VMs.
 export VM_DISK_BASEDIR="${IMAGEDIR}/${VM_POOL_BASENAME}"
 
+# Default VM resource settings (shared by scenario.sh and vm_scheduler.sh)
+# These can be overridden per-scenario via launch_vm args or dynamic_schedule_requirements()
+DEFAULT_VM_VCPUS=2
+DEFAULT_VM_MEMORY=4096
+DEFAULT_VM_DISKSIZE=20
+DEFAULT_VM_NETWORK="default"
+
+# Scenarios can override defaults by setting SCENARIO_* variables at the top of the file:
+#   SCENARIO_VCPUS     - Number of vCPUs (default: DEFAULT_VM_VCPUS)
+#   SCENARIO_MEMORY    - Memory in MB (default: DEFAULT_VM_MEMORY)
+#   SCENARIO_DISKSIZE  - Disk size in GB (default: DEFAULT_VM_DISKSIZE)
+#   SCENARIO_NETWORKS  - Network(s) to use, comma-separated (default: DEFAULT_VM_NETWORK)
+#   SCENARIO_FIPS      - Enable FIPS mode: "true" or "false" (default: "false")
+#
+# These are automatically used by both launch_vm() and get_scenario_requirements()
+# so you only need to define them once per scenario.
+
 # The isolated network name used by some VMs.
 export VM_ISOLATED_NETWORK="isolated"
 

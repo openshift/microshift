@@ -2,23 +2,21 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+start_image="rhel-9.8-microshift-source"
+SCENARIO_NETWORKS="default,${VM_MULTUS_NETWORK}"
+
 # Opt-in to dynamic VM scheduling by declaring requirements
 dynamic_schedule_requirements() {
     cat <<EOF
-min_vcpus=2
-min_memory=4096
-min_disksize=20
-networks=default,"${VM_MULTUS_NETWORK}"
-boot_image=rhel-9.6-microshift-source
-fips=false
+boot_image=${start_image}
 slow=true
 EOF
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
+    prepare_kickstart host1 kickstart.ks.template "${start_image}"
     # Using multus as secondary network to have 2 nics in different networks.
-    launch_vm rhel-9.8 --network default,"${VM_MULTUS_NETWORK}"
+    launch_vm rhel-9.8
 }
 
 scenario_remove_vms() {

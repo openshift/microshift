@@ -849,12 +849,18 @@ setup_vm_properties_from_existing() {
 #   [--fips]:                       Enable FIPS mode for the VM.
 launch_vm() {
     # Set default values for the optional arguments
+    # Check SCENARIO_* variables first, then fall back to shared defaults from common.sh
+    # This allows scenarios to define SCENARIO_VCPUS=4 once and have it used by both
+    # launch_vm and dynamic_schedule_requirements
     local vmname="host1"
-    local network="default"
-    local vm_memory=4096
-    local vm_vcpus=2
-    local vm_disksize=20
+    local _net="${SCENARIO_NETWORKS:-${DEFAULT_VM_NETWORK}}"
+    local network="${_net//,/ }"
+    local vm_memory="${SCENARIO_MEMORY:-${DEFAULT_VM_MEMORY}}"
+    local vm_vcpus="${SCENARIO_VCPUS:-${DEFAULT_VM_VCPUS}}"
+    local vm_disksize="${SCENARIO_DISKSIZE:-${DEFAULT_VM_DISKSIZE}}"
+    # Convert SCENARIO_FIPS (true/false) to fips_mode (1/0)
     local fips_mode=0
+    [[ "${SCENARIO_FIPS:-false}" == "true" ]] && fips_mode=1
     local kernel_location="images/pxeboot"
 
     # Parse the mandatory arguments

@@ -9,17 +9,12 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
 WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 
 start_image="rhel98-bootc-brew-lrel-optional"
+SCENARIO_VCPUS=4
+SCENARIO_NETWORKS="${VM_IPV6_NETWORK}"
 
 # Opt-in to dynamic VM scheduling by declaring requirements
 dynamic_schedule_requirements() {
-    cat <<EOF
-min_vcpus=4
-min_memory=4096
-min_disksize=20
-networks=${VM_IPV6_NETWORK}
-boot_image=${start_image}
-fips=false
-EOF
+    echo "boot_image=${start_image}"
 }
 
 scenario_create_vms() {
@@ -32,14 +27,14 @@ scenario_create_vms() {
     # Save the original value and temporarily override for prepare_kickstart
     local original_mirror_registry_url="${MIRROR_REGISTRY_URL}"
     MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}/microshift"
-    
+
     # Enable IPv6 single stack in kickstart
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}" false true
-    
+
     # Restore original MIRROR_REGISTRY_URL for runtime use
     MIRROR_REGISTRY_URL="${original_mirror_registry_url}"
 
-    launch_vm rhel98-bootc --network "${VM_IPV6_NETWORK}" --vm_vcpus 4
+    launch_vm rhel98-bootc
 }
 
 scenario_remove_vms() {
