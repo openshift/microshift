@@ -218,21 +218,12 @@ def run_template_cmd(ifile, ofile, dry_run):
     common.run_command_in_shell(gomplate_args, dry_run)
 
 
-def process_template_files(tpldir, dry_run, skip_existing=False, ignore_missing_dir=False):
-    """Expand *.template files under tpldir into BOOTC_IMAGE_DIR via gomplate.
-
-    skip_existing: if True, skip outputs that already exist (pass False when forcing rebuild).
-    ignore_missing_dir: if True, no-op when tpldir is absent.
-    """
-
-    if ignore_missing_dir and not os.path.isdir(tpldir):
-        return
+def process_template_files(tpldir, dry_run):
+    """Expand *.template files under tpldir into BOOTC_IMAGE_DIR via gomplate."""
     for name in os.listdir(tpldir):
         if not name.endswith(".template"):
             continue
         ofile = os.path.join(BOOTC_IMAGE_DIR, name.removesuffix(".template"))
-        if skip_existing and os.path.exists(ofile):
-            continue
         ifile = os.path.join(tpldir, name)
         run_template_cmd(ifile, ofile, dry_run)
 
@@ -669,12 +660,9 @@ def main():
             ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
             ifile = os.path.join(ipkgdir, ifile)
             run_template_cmd(ifile, ofile, args.dry_run)
-        # Process shared bootc templates (USHIFT-6788)
-        tpldir = f"{SCRIPTDIR}/../image-blueprints-bootc/templates"
-        process_template_files(
-            tpldir, args.dry_run,
-            skip_existing=not args.force_rebuild,
-            ignore_missing_dir=True)
+
+        tpldir = os.path.join(SCRIPTDIR, "..", "image-blueprints-bootc", "templates")
+        process_template_files(tpldir, args.dry_run)
         # Run the mirror registry
         common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
         # Skip all image builds
