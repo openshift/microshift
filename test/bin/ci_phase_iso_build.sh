@@ -70,8 +70,8 @@ update_build_cache() {
     # Build templates
     $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints-bootc/templates
     # Build the bootc base layer and brew RPMs to be cached
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base,./image-blueprints-bootc/el10/layer1-base
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer4-release,./image-blueprints-bootc/el10/layer4-release
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base -l ./image-blueprints-bootc/el10/layer1-base
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer4-release -l ./image-blueprints-bootc/el10/layer4-release
 
     # Prepare for the cache upload by stopping composer services and cleaning
     # temporary artifacts
@@ -155,10 +155,10 @@ run_bootc_image_build() {
         fi
     else
         # Full build for all OS versions
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base,./image-blueprints-bootc/el10/layer1-base
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit,./image-blueprints-bootc/el10/layer2-presubmit
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer3-periodic,./image-blueprints-bootc/el10/layer3-periodic
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer4-release,./image-blueprints-bootc/el10/layer4-release
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base -l ./image-blueprints-bootc/el10/layer1-base
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit -l ./image-blueprints-bootc/el10/layer2-presubmit
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer3-periodic -l ./image-blueprints-bootc/el10/layer3-periodic
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer4-release -l ./image-blueprints-bootc/el10/layer4-release
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/upstream
     fi
 }
