@@ -1,0 +1,11 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: nginx-ok1-1399
+  namespace: olm-microshift-single
+spec:
+  channel: alpha
+  installPlanApproval: Automatic
+  name: nginx-ok1-1399
+  source: nginx-ok-catalog
+  sourceNamespace: olm-microshift-single
