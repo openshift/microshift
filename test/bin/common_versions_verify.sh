@@ -13,9 +13,9 @@ if ! git diff --exit-code "${SCENARIO_BUILD_BRANCH}^1...HEAD" "${ROOTDIR}/test/b
     "${ROOTDIR}/scripts/pyutils/create-venv.sh"
 
     if [ "${SCENARIO_BUILD_BRANCH}" == "main" ]; then
-        y=$(awk -F'[ .]' '{print $4}' < "${ROOTDIR}/Makefile.version.x86_64.var")
+        y=$(awk -F'[ .]' '{print $3 "." $4}' < "${ROOTDIR}/Makefile.version.x86_64.var")
     else
-        y=$(echo "${SCENARIO_BUILD_BRANCH}" | awk -F'[-.]' '{ print $3 }')
+        y=$(echo "${SCENARIO_BUILD_BRANCH}" | awk -F'[-]' '{ print $2 }')
     fi
 
     "${ROOTDIR}/_output/pyutils/bin/python" \
