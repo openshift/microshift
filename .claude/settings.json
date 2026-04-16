@@ -5,19 +5,7 @@
       "Write(//tmp/**)",
       "Bash(bash .claude/scripts/*)",
       "Bash(python3 .claude/scripts/*)",
-      "Bash(curl:*)",
-      "Bash(date:*)",
-      "Bash(cat:*)",
-      "Bash(echo:*)",
-      "Bash(wc:*)",
-      "Bash(ls:*)",
-      "Bash(jq:*)",
-      "Bash(gh pr list:*)",
-      "Bash(gh auth status:*)",
-      "WebFetch(domain:prow.ci.openshift.org)",
-      "Skill(analyze-ci:create-bugs)",
-      "Skill(analyze-ci:prow-job)",
-      "Skill(analyze-ci:doctor)"
+      "WebFetch(domain:prow.ci.openshift.org)"
     ],
     "deny": [],
     "ask": []
