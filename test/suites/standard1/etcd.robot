@@ -36,6 +36,10 @@ ${MEMLIMIT0}                SEPARATOR=\n
 Etcd Database Defragment Manually
     [Documentation]    Verify that etcd database can be manually defragmented
     ...    using etcdctl and the database size does not grow.
+    ...    Creates artificial fragmentation first to ensure defrag has
+    ...    meaningful work to do regardless of the initial DB state
+    ...    (e.g. after etcd storage version migration).
+    Create Etcd Fragmentation
     ${size_before}=    Get Etcd Database Size
     Command Should Work    ${ETCDCTL_CMD} defrag
     ${size_after}=    Get Etcd Database Size
@@ -137,6 +141,22 @@ Install Etcdctl
     [Documentation]    Upload the pre-staged etcdctl binary to the remote host.
     ...    The binary is pre-downloaded with checksum verification by scripts/fetch_tools.sh.
     Put File    ${ETCDCTL_LOCAL_PATH}    ${ETCDCTL_BIN}
+
+Create Etcd Fragmentation
+    [Documentation]    Create artificial fragmentation in the etcd database by
+    ...    writing and then deleting a set of keys. The deleted keys leave
+    ...    dead space that defrag can reclaim, ensuring the defrag test
+    ...    works even when the DB starts fully compacted.
+    FOR    ${i}    IN RANGE    100
+        Command Should Work    ${ETCDCTL_CMD} put /defrag-test/key-${i} "$(head -c 1024 /dev/urandom | base64 -w0)"
+    END
+    FOR    ${i}    IN RANGE    100
+        Command Should Work    ${ETCDCTL_CMD} del /defrag-test/key-${i}
+    END
+    ${output}=    Command Should Work    ${ETCDCTL_CMD} endpoint status --write-out\=json
+    ${revision}=    Command Should Work
+    ...    printf '%s' '${output}' | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['Status']['header']['revision'])"
+    Command Should Work    ${ETCDCTL_CMD} compact ${revision}
 
 Get Etcd Database Size
     [Documentation]    Return the current etcd database size in bytes
