@@ -83,6 +83,28 @@ Verify New Pod Works With IPv4
     ...    Remove Dual Stack Config Drop In
     ...    Restart MicroShift
 
+Router Service IP Connectivity
+    [Documentation]    Verify that the router is accessible on all IP addresses
+    ...    assigned to the router-default LoadBalancer service.
+    [Setup]    Run Keywords
+    ...    Migrate To Dual Stack
+    ...    Create Hello MicroShift Pod
+    ...    Expose Hello MicroShift Service Via Route IPv4
+    ...    Restart Router
+
+    @{ips}=    Get Router Service IPs
+    FOR    ${ip}    IN    @{ips}
+        Wait Until Keyword Succeeds    20x    10s
+        ...    Access Hello MicroShift From Host    ${ip}    ${HTTP_PORT}
+    END
+
+    [Teardown]    Run Keywords
+    ...    Delete Hello MicroShift Route
+    ...    Delete Hello MicroShift Pod And Service
+    ...    Wait For Service Deletion With Timeout
+    ...    Remove Dual Stack Config Drop In
+    ...    Restart MicroShift
+
 Verify Host Network Pods Get Dual Stack IP Addresses
     [Documentation]    Verify host network pods get dual stack IP addresses
     [Setup]    Run Keywords
@@ -134,6 +156,30 @@ Migrate To Dual Stack
     ...    \ \ serviceNetwork: [10.43.0.0/16, fd02::/112]
     Drop In MicroShift Config    ${dual_stack}    10-dualstack
     Restart MicroShift
+
+Get Router Service IPs
+    [Documentation]    Get all IP addresses from the router-default LoadBalancer service
+    ...    in the openshift-ingress namespace.
+    ${output}=    Oc Get JsonPath
+    ...    service
+    ...    openshift-ingress
+    ...    router-default
+    ...    .status.loadBalancer.ingress[*].ip
+    Should Not Be Empty    ${output}    Router service has no LoadBalancer ingress IPs
+    @{ips}=    Split String    ${output}
+    RETURN    @{ips}
+
+Access Hello MicroShift From Host
+    [Documentation]    Access hello-microshift from the MicroShift host via SSH using the given IP.
+    [Arguments]    ${router_ip}    ${port}    ${hostname}=${HOSTNAME}
+    ${ip}=    Add Brackets If Ipv6    ${router_ip}
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    curl -k -i --connect-to "${hostname}::${ip}:" "http://${hostname}:${port}"
+    ...    sudo=False    return_rc=True    return_stderr=True    return_stdout=True
+    Log Many    ${stdout}    ${stderr}
+    Should Be Equal As Integers    0    ${rc}
+    Should Match Regexp    ${stdout}    HTTP.*200
+    Should Contain    ${stdout}    Hello MicroShift
 
 Delete Hello MicroShift Route
     [Documentation]    Delete route for cleanup.
