@@ -1,0 +1,12 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: catalog-all
+  namespace: openshift-marketplace
+spec:
+  sourceType: grpc
+  image: quay.io/olmqe/nginx-ok-index:v1399-fbc-multi
+  displayName: Test Nginx Operators
+  publisher: OLM QE
+  grpcPodConfig:
+    securityContextConfig: restricted
