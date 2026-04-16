@@ -238,6 +238,16 @@ def run_template_cmd(ifile, ofile, dry_run):
     common.run_command_in_shell(gomplate_args, dry_run)
 
 
+def process_template_files(tpldir, dry_run):
+    """Expand *.template files under tpldir into BOOTC_IMAGE_DIR via gomplate."""
+    for name in os.listdir(tpldir):
+        if not name.endswith(".template"):
+            continue
+        ofile = os.path.join(BOOTC_IMAGE_DIR, name.removesuffix(".template"))
+        ifile = os.path.join(tpldir, name)
+        run_template_cmd(ifile, ofile, dry_run)
+
+
 def get_process_file_names(idir, ifile, obasedir):
     path = os.path.join(idir, ifile)
     outname = os.path.splitext(ifile)[0]
@@ -538,15 +548,7 @@ def process_group(groupdir, build_type, pattern="*", dry_run=False):
         common.start_junit(groupdir)
         # Process all the template files in the current group directory
         # before starting the parallel processing
-        for ifile in os.listdir(groupdir):
-            if not ifile.endswith(".template"):
-                continue
-            # Create full path for output and input file names
-            ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
-            ifile = os.path.join(groupdir, ifile)
-            # Strip the .template suffix from the output file name
-            ofile = ofile.removesuffix(".template")
-            run_template_cmd(ifile, ofile, dry_run)
+        process_template_files(groupdir, dry_run)
 
         # Parallel processing loop
         with concurrent.futures.ProcessPoolExecutor() as executor:
@@ -678,6 +680,9 @@ def main():
             ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
             ifile = os.path.join(ipkgdir, ifile)
             run_template_cmd(ifile, ofile, args.dry_run)
+
+        tpldir = os.path.join(SCRIPTDIR, "..", "image-blueprints-bootc", "templates")
+        process_template_files(tpldir, args.dry_run)
         # Run the mirror registry
         common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
         # Skip all image builds
