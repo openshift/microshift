@@ -61,7 +61,8 @@ const (
 	// to allow for faster recovery.
 	rbacHookDeadlockTimeout = 15
 	// rbacHookCheckInterval is how often to check the RBAC hook status
-	rbacHookCheckInterval = 2
+	rbacHookPollDelayStart = 5 * time.Second
+	rbacHookCheckInterval  = 2
 	// rbacHookMaxWaitDuration is the absolute maximum time to wait for the RBAC hook
 	// regardless of etcd health state changes. This prevents flapping from extending
 	// detection indefinitely.
@@ -452,24 +453,38 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 // 2. etcd is healthy and responsive
 // This indicates the circular dependency where the hook waits for API server
 // while API server waits for the hook.
+//
+// Closed upstream Kubernetes issues:
+// https://github.com/kubernetes/kubernetes/issues/86715
+// https://github.com/kubernetes/kubernetes/issues/97119
 func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient rest.Interface, deadlockDetected chan<- struct{}) {
 	// Wait a few seconds before starting detection to allow normal startup
 	select {
 	case <-ctx.Done():
 		return
-	case <-time.After(5 * time.Second):
+	case <-time.After(rbacHookPollDelayStart):
 	}
 
+	checkCount := 0
+	maxChecks := int((rbacHookDeadlockTimeout - rbacHookPollDelayStart) / rbacHookCheckInterval) // Account for initial delay
 	// Track wall-clock deadline to prevent flapping from extending detection indefinitely
 	startTime := time.Now()
-	checkCount := 0
-	maxChecks := (rbacHookDeadlockTimeout - 5) / rbacHookCheckInterval // Account for initial delay
 
-	for checkCount < maxChecks {
+	for {
 		// Check absolute deadline first - this cannot be reset by etcd state changes
 		if time.Since(startTime) >= rbacHookMaxWaitDuration {
 			klog.Errorf("RBAC bootstrap hook exceeded maximum wait duration of %v", rbacHookMaxWaitDuration)
-			break
+			// Only trigger deadlock recovery if we've confirmed the predicate enough times
+			if checkCount >= maxChecks {
+				break // Fall through to close(deadlockDetected)
+			}
+			// Timeout but not confirmed deadlock - exit without triggering recovery
+			return
+		}
+
+		// Check if we've confirmed deadlock enough times
+		if checkCount >= maxChecks {
+			break // Fall through to close(deadlockDetected)
 		}
 
 		select {
@@ -478,11 +493,15 @@ func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient r
 		case <-time.After(rbacHookCheckInterval * time.Second):
 		}
 
-		checkCount++
-
 		// Check RBAC hook status
+		probeCtx, cancel := context.WithTimeout(ctx, time.Second)
 		var status int
-		err := restClient.Get().AbsPath("/readyz/poststarthook/rbac/bootstrap-roles").Do(ctx).StatusCode(&status).Error()
+		err := restClient.Get().
+			AbsPath("/readyz/poststarthook/rbac/bootstrap-roles").
+			Do(probeCtx).
+			StatusCode(&status).
+			Error()
+		cancel()
 
 		// If hook is ready, no deadlock
 		if err == nil && status == 200 {
@@ -490,14 +509,23 @@ func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient r
 			return
 		}
 
-		// Hook not ready - check if etcd is healthy
+		// If RBAC probe errored, skip this iteration (don't count toward deadlock)
+		if err != nil {
+			klog.V(4).Infof("RBAC probe error (not counting toward deadlock): %v", err)
+			continue
+		}
+
+		// Hook not ready (status != 200) - check if etcd is healthy
 		etcdHealthy, etcdErr := isEtcdHealthy(ctx)
 		if etcdErr != nil {
-			klog.V(4).Infof("Could not check etcd health: %v", etcdErr)
+			klog.V(4).Infof("Could not check etcd health (not counting toward deadlock): %v", etcdErr)
 			continue
 		}
 
 		if etcdHealthy {
+			// Only increment when BOTH conditions are met:
+			// RBAC probe returned not-ready AND etcd is healthy
+			checkCount++
 			klog.Warningf("RBAC bootstrap hook not ready (check %d/%d, elapsed %v), but etcd is healthy - potential deadlock",
 				checkCount, maxChecks, time.Since(startTime).Round(time.Second))
 		} else {
@@ -509,7 +537,7 @@ func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient r
 		}
 	}
 
-	// Reached max checks with etcd healthy but hook not completing - deadlock detected
+	// Only reached when checkCount >= maxChecks (deadlock confirmed)
 	klog.Errorf("RBAC bootstrap hook deadlock confirmed after %v: etcd healthy but hook not completing",
 		time.Since(startTime).Round(time.Second))
 	close(deadlockDetected)
@@ -558,7 +586,11 @@ func isEtcdHealthy(ctx context.Context) (bool, error) {
 func restartMicroshiftEtcdScope() error {
 	klog.Info("Stopping microshift-etcd.scope for recovery")
 
-	stopCmd := exec.Command("systemctl", "stop", "microshift-etcd.scope")
+	// Set a timeout in case systemd or DBus stalls and the fail-fast recovery path hangs and Run never returns
+	cmdCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	stopCmd := exec.CommandContext(cmdCtx, "systemctl", "stop", "microshift-etcd.scope")
 	if out, err := stopCmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("failed to stop microshift-etcd.scope: %w, output: %s", err, string(out))
 	}
