@@ -19,7 +19,7 @@ import ghutils   # noqa: E402
 ARCH = os.uname().machine
 
 # Version map defining the last minor version for each major version.
-# Used for cross-major Y-1/Y-2 calculations (e.g., 5.0's Y-1 is 4.18).
+# Used for cross-major Y-1/Y-2 calculations (e.g., 5.0's Y-1 is 4.22).
 VERSION_MAP = {
     4: {'last_minor': 22}
 }
@@ -393,9 +393,14 @@ def generate_common_versions(major_version, minor_version):
 
 
 def main():
+    def parse_major_minor(value: str):
+        parts = value.split(".")
+        if len(parts) != 2 or not all(p.isdigit() for p in parts):
+            raise argparse.ArgumentTypeError("version must be in 'X.Y' format")
+        return int(parts[0]), int(parts[1])
+
     parser = argparse.ArgumentParser(description="Generate common_versions.sh variables.")
-    parser.add_argument("--major", type=int, default=4, help="The major version number (default: 4).")
-    parser.add_argument("minor", type=int, help="The minor version number.")
+    parser.add_argument("version", type=str, help="The major.minor version number.")
     parser.add_argument("--update-file", default=False, action="store_true", help="Update test/bin/common_versions.sh file.")
     parser.add_argument("--create-pr", default=False, action="store_true",
                         help=("Commit the changes to a new branch, push it to the openshift/microshift, and create a pull request." +
@@ -403,7 +408,8 @@ def main():
     parser.add_argument("--dry-run", default=False, action="store_true", help="Dry run")
     args = parser.parse_args()
 
-    output = generate_common_versions(args.major, args.minor)
+    major, minor = parse_major_minor(args.version)
+    output = generate_common_versions(major, minor)
 
     if args.update_file or args.create_pr:
         logging.info("Updating test/bin/common_versions.sh file")
@@ -420,8 +426,8 @@ def main():
             exit(0)
 
         base_branch = g.git_repo.active_branch.name
-        if not base_branch.startswith(f"release-{args.major}"):
-            logging.error(f"Script is expected to be executed on branch starting with 'release-{args.major}', but it's {base_branch}")
+        if not base_branch.startswith(f"release-{args.version}"):
+            logging.error(f"Script is expected to be executed on branch starting with 'release-{args.version}', but it's {base_branch}")
             exit(1)
 
         gh = ghutils.GithubUtils(dry_run=args.dry_run)
