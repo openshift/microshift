@@ -1,0 +1,16 @@
+- machine-config-operator embedded-component c6d2a0384998bb4d60b12d06673d07ed8eea293b to df828dfef3bbadf24487359a688a42460abfa90c
+  - 8888b62e 2026-04-08T12:48:08-04:00 controller: always determine MCP machine counts based on node properties
+
+- ovn-kubernetes image-amd64 253d3ed8c6babe1b07fcb7910df3ebaf2d3c5b33 to 816f6da51b9f7f496169aa583aef2022d6333bec
+  - 225848ac 2026-03-25T18:26:11+05:30 EgressFirewall: Use exponential backoff to refresh IP addresses for DNS names
+  - 679442da 2026-02-27T14:28:44+05:30 Add a e2e test for NodePort service
+  - 46ce09a9 2026-02-27T14:28:22+05:30 Clear stale conntrack UDP entries for nodePorts
+  - 8336fa03 2026-02-23T09:49:28+01:00 Minimize ACLs by combining ipBlocks into single ACL
+
+- ovn-kubernetes image-arm64 253d3ed8c6babe1b07fcb7910df3ebaf2d3c5b33 to cf0c520c07d7aaa3494122b7332e8dc017d47772
+  - ab20d0a2 2026-03-31T16:41:42+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+  - 225848ac 2026-03-25T18:26:11+05:30 EgressFirewall: Use exponential backoff to refresh IP addresses for DNS names
+  - 679442da 2026-02-27T14:28:44+05:30 Add a e2e test for NodePort service
+  - 46ce09a9 2026-02-27T14:28:22+05:30 Clear stale conntrack UDP entries for nodePorts
+  - 8336fa03 2026-02-23T09:49:28+01:00 Minimize ACLs by combining ipBlocks into single ACL
+
