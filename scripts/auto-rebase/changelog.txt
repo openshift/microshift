@@ -1,0 +1,18 @@
+- api embedded-component b0658d22beea435e3a576165207416842cb2753b to e010a985205d75f9ff375051c6886afe0e4db220
+  - d2da55fd 2026-04-11T19:04:53Z make update
+  - 26fd6324 2026-04-11T19:04:53Z postpone the removal of the DeploymentConfig API
+
+- machine-config-operator embedded-component 5b0cdfd2162dcd354e4ff9f31286c5b5bff3f1dc to 042006de3967c7b187614eaaf88d197be4d4052f
+  - f43b49df 2026-04-07T12:27:13Z OCPBUGS-78154: Add GetDefaultLeaderElectionConfig for MCC
+  - aaa1b45d 2026-04-07T12:27:13Z OCPBUGS-78154: Log when using HA default leader election timings
+  - e6841a59 2026-04-07T12:27:13Z OCPBUGS-78154: Add useDefaultTimings flag to GetLeaderElectionConfig
+  - 79a9f6fe 2026-04-07T12:27:13Z Trim comment in GetLeaderElectionConfig.
+  - ff9c7f3d 2026-04-07T12:27:12Z OCPBUGS-78154: Use HA leader election defaults for MCO on SNO.
+  - 47cc7a3e 2026-04-03T22:28:34Z Move state logging to updateConfigAndState after SetDone
+
+- ovn-kubernetes image-amd64 0fd9d309727f67d7648d0fbfa29bdbbdfdf14ae3 to 020d072048b272c3ac77470b9a302cfd8ca0559e
+  - 581bfdef 2026-03-31T15:22:33+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+
+- ovn-kubernetes image-arm64 0fd9d309727f67d7648d0fbfa29bdbbdfdf14ae3 to 020d072048b272c3ac77470b9a302cfd8ca0559e
+  - 581bfdef 2026-03-31T15:22:33+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+
