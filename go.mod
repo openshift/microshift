@@ -260,3 +260,5 @@ replace (
 replace sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20250805164133-69b07ae04918 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
 
 replace k8s.io/endpointslice => github.com/openshift/kubernetes/staging/src/k8s.io/endpointslice v0.0.0-20260203155829-4e295fa517e1 // staging kubernetes
+
+replace google.golang.org/grpc => github.com/openshift-sustaining/grpc-go v1.67.3-sec.1

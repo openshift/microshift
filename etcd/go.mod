@@ -182,3 +182,5 @@ replace (
 )
 
 replace k8s.io/endpointslice => github.com/openshift/kubernetes/staging/src/k8s.io/endpointslice v0.0.0-20260203155829-4e295fa517e1 // staging kubernetes
+
+replace google.golang.org/grpc => github.com/openshift-sustaining/grpc-go v1.67.3-sec.1
