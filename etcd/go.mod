@@ -188,3 +188,5 @@ replace (
 	k8s.io/sample-cli-plugin => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin
 	k8s.io/sample-controller => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller
 )
+
+replace google.golang.org/grpc => github.com/openshift-sustaining/grpc-go v1.75.1-sec.1
