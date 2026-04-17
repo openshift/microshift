@@ -65,7 +65,7 @@ if [[ -z "${PULLSPEC_RELEASE_AMD64:-}" ]]; then
     oc registry login --to=/tmp/registry.json
     release_amd64="$(oc image info --registry-config=/tmp/registry.json $OPENSHIFT_RELEASE_IMAGE -o json | jq -r '.config.config.Labels."io.openshift.release"')"
 
-    PULLSPEC_RELEASE_AMD64="registry.ci.openshift.org/ocp/release:${release_amd64}"
+    PULLSPEC_RELEASE_AMD64="registry.ci.openshift.org/ocp/release-5:${release_amd64}"
 else
     echo "INFO: Using provided PULLSPEC_RELEASE_AMD64: ${PULLSPEC_RELEASE_AMD64}"
 fi
@@ -77,7 +77,7 @@ if [[ -z "${PULLSPEC_RELEASE_ARM64:-}" ]]; then
     oc registry login --to=/tmp/registry.json
     release_arm64="$(oc image info --registry-config=/tmp/registry.json $OPENSHIFT_RELEASE_IMAGE_ARM -o json | jq -r '.config.config.Labels."io.openshift.release"')"
 
-    PULLSPEC_RELEASE_ARM64="registry.ci.openshift.org/ocp-arm64/release-arm64:${release_arm64}"
+    PULLSPEC_RELEASE_ARM64="registry.ci.openshift.org/ocp-arm64/release-5-arm64:${release_arm64}"
 else
     echo "INFO: Using provided PULLSPEC_RELEASE_ARM64: ${PULLSPEC_RELEASE_ARM64}"
 fi
