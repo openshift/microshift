@@ -3,8 +3,6 @@
     "allow": [
       "Read(//tmp/**)",
       "Write(//tmp/**)",
-      "Bash(bash .claude/scripts/*)",
-      "Bash(python3 .claude/scripts/*)",
       "WebFetch(domain:prow.ci.openshift.org)"
     ],
     "deny": [],
