@@ -218,18 +218,19 @@ function configure_rhel_repositories() {
         sudo subscription-manager repos --enable "rhocp-${ocp_major}.${RHOCP}-for-rhel-9-$(uname -m)-rpms"
     elif [[ "${RHOCP}" =~ ^http ]]; then
         url=$(echo "${RHOCP}" | cut -d, -f1)
-        ver=$(echo "${RHOCP}" | cut -d, -f2)
-        OCP_REPO_NAME="rhocp-${ocp_major}.${ver}-for-rhel-9-mirrorbeta-$(uname -i)-rpms"
+        major=$(echo "${RHOCP}" | cut -d, -f2)
+        ver=$(echo "${RHOCP}" | cut -d, -f3)
+        OCP_REPO_NAME="rhocp-${major}.${ver}-for-rhel-9-mirrorbeta-$(uname -i)-rpms"
         sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
 [${OCP_REPO_NAME}]
-name=Beta rhocp-${ocp_major}.${ver} RPMs for RHEL 9
+name=Beta rhocp-${major}.${ver} RPMs for RHEL 9
 baseurl=${url}
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0
 EOF
         # Calculate Y-1 version
-        get_prev_version "${ocp_major}" "${ver}"
+        get_prev_version "${major}" "${ver}"
         if [[ -n "${prev_minor}" ]]; then
             PREVIOUS_RHOCP=$("${RHOCP_REPO}" "${prev_minor}" "${prev_major}")
             if [[ "${PREVIOUS_RHOCP}" =~ ^[0-9]{1,2}$ ]]; then

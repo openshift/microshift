@@ -14,9 +14,9 @@
 #
 # Output is:
 # - just a minor version in case of subscription RHOCP repository, e.g.: 15
-# - or an URL to beta mirror followed by comma and minor version, e.g.:
-#   https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.16-el9-beta/,16
-#   https://mirror.openshift.com/pub/openshift-v5/x86_64/dependencies/rpms/5.0-el9-beta/,0
+# - or an URL to beta mirror followed by comma, major, comma, and minor version, e.g.:
+#   https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rpms/4.16-el9-beta/,4,16
+#   https://mirror.openshift.com/pub/openshift-v5/x86_64/dependencies/rpms/5.0-el9-beta/,5,0
 
 set -euo pipefail
 
@@ -88,7 +88,7 @@ for (( step=0; step < max_steps; step++ )); do
 
     rhocp_beta_url="https://mirror.openshift.com/pub/openshift-v${check_major}/$(uname -m)/dependencies/rpms/${check_major}.${check_minor}-el9-beta/"
     if sudo dnf repository-packages --showduplicates --disablerepo '*' --repofrompath "this,${rhocp_beta_url}" this info cri-o 1>&2; then
-        echo "${rhocp_beta_url},${check_minor}"
+        echo "${rhocp_beta_url},${check_major},${check_minor}"
         exit 0
     fi
 
