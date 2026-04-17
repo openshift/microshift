@@ -23,6 +23,23 @@ set -euo pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPOROOT="$(cd "${SCRIPTDIR}/.." && pwd)"
 
+# Map of last minor version for each major (for cross-major transitions)
+declare -A LAST_MINOR_FOR_MAJOR=([4]=22)
+
+# Calculate previous version handling cross-major boundaries.
+# Sets prev_major and prev_minor variables in the caller's scope.
+get_prev_version() {
+    local major=$1
+    local minor=$2
+    if (( minor > 0 )); then
+        prev_major="${major}"
+        prev_minor=$(( minor - 1 ))
+    else
+        prev_major=$(( major - 1 ))
+        prev_minor="${LAST_MINOR_FOR_MAJOR[${prev_major}]:-}"
+    fi
+}
+
 if ! sudo subscription-manager status >&/dev/null; then
     >&2 echo "System must be subscribed"
     exit 1
@@ -44,39 +61,45 @@ if [[ "$#" -ge 2 ]]; then
     # Both minor and major provided as arguments
     current_minor="${1}"
     current_major="${2}"
-    stop="${current_minor}"
+    max_steps=1
 elif [[ "$#" -eq 1 ]]; then
     # Only minor provided, get major from Makefile
     current_minor="${1}"
     current_major=$(grep '^OCP_VERSION' "${make_version}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f1)
-    stop="${current_minor}"
+    max_steps=1
 else
     # No arguments, get both from Makefile
     current_major=$(grep '^OCP_VERSION' "${make_version}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f1)
     current_minor=$(grep '^OCP_VERSION' "${make_version}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f2)
-    stop=$(( current_minor - 3 ))
-    if (( stop < 0 )); then
-        stop=0
-    fi
+    max_steps=4
 fi
 
-# Go through minor versions, starting from current_minor counting down
-# to get latest available rhocp repository.
-# For example, if current version is 4.16, the code will try to access
-# rhocp-4.15 (which may not be released yet) and then rhocp-4.14 (which
-# will be returned if it's usable). Works similarly for version 5.x.
-for ver in $(seq "${current_minor}" -1 "${stop}"); do
-    repository="rhocp-${current_major}.${ver}-for-rhel-9-$(uname -m)-rpms"
+# Go through versions, starting from current version counting down
+# to get latest available rhocp repository. Handles cross-major
+# boundaries (e.g. from 5.0 back to 4.22).
+check_major="${current_major}"
+check_minor="${current_minor}"
+for (( step=0; step < max_steps; step++ )); do
+    repository="rhocp-${check_major}.${check_minor}-for-rhel-9-$(uname -m)-rpms"
     if sudo dnf repository-packages --showduplicates "${repository}" info cri-o 1>&2; then
-        echo "${ver}"
+        echo "${check_minor}"
         exit 0
     fi
 
-    rhocp_beta_url="https://mirror.openshift.com/pub/openshift-v${current_major}/$(uname -m)/dependencies/rpms/${current_major}.${ver}-el9-beta/"
+    rhocp_beta_url="https://mirror.openshift.com/pub/openshift-v${check_major}/$(uname -m)/dependencies/rpms/${check_major}.${check_minor}-el9-beta/"
     if sudo dnf repository-packages --showduplicates --disablerepo '*' --repofrompath "this,${rhocp_beta_url}" this info cri-o 1>&2; then
-        echo "${rhocp_beta_url},${ver}"
+        echo "${rhocp_beta_url},${check_minor}"
         exit 0
     fi
+
+    prev_major=""
+    prev_minor=""
+    get_prev_version "${check_major}" "${check_minor}"
+    if [[ -z "${prev_minor}" ]]; then
+        break
+    fi
+    check_major="${prev_major}"
+    check_minor="${prev_minor}"
 done
 
 >&2 echo "Failed to get latest rhocp repository!"
