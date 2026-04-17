@@ -349,11 +349,15 @@ def generate_common_versions(major_version, minor_version):
     # creating PRs that clear the version due to transient failures.
     logging.info("Getting GITOPS_VERSION")
     gitops_version = get_gitops_version(major_version, minor_version)
-    if gitops_version is None:
+    if not gitops_version:
         target_file = pathlib.Path(__file__).resolve().parent / '../common_versions.sh'
         args = ['grep', '-oP', '(?<=GITOPS_VERSION=).*', str(target_file)]
         gitops_version = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, check=True).stdout.strip()
         logging.info(f"API fetch failed, preserving existing GITOPS_VERSION={gitops_version}")
+
+    last_minor_for_major_bash = " ".join(
+        f"[{major}]={info['last_minor']}" for major, info in VERSION_MAP.items()
+    )
 
     template_path = pathlib.Path(__file__).resolve().parent / '../../assets/common_versions.sh.template'
 
@@ -384,7 +388,8 @@ def generate_common_versions(major_version, minor_version):
         CNCF_SONOBUOY_VERSION=CNCF_SONOBUOY_VERSION,
         CNCF_SYSTEMD_LOGS_VERSION=CNCF_SYSTEMD_LOGS_VERSION,
         GITOPS_VERSION=gitops_version,
-        ARCH=ARCH
+        ARCH=ARCH,
+        last_minor_for_major_bash=last_minor_for_major_bash
     )
 
     output_noarch = output.replace(ARCH, '${UNAME_M}')
