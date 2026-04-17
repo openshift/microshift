@@ -20,6 +20,7 @@ ARCH = os.uname().machine
 
 # Version map defining the last minor version for each major version.
 # Used for cross-major Y-1/Y-2 calculations (e.g., 5.0's Y-1 is 4.22).
+# Authoritative source: lastMinorForMajor in pkg/admin/prerun/version.go
 VERSION_MAP = {
     4: {'last_minor': 22}
 }

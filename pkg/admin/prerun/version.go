@@ -30,6 +30,31 @@ type versionFile struct {
 
 const MAX_VERSION_SKEW = 2
 
+// lastMinorForMajor defines the last minor version for each major version
+// before the next major begins.
+var lastMinorForMajor = map[int]int{
+	4: 22,
+}
+
+// linearVersion flattens a Major.Minor version into a single monotonically
+// increasing integer so that cross-major upgrades can be compared using
+// simple arithmetic.
+// It counts how many minor versions existed in all previous majors, then
+// adds the current minor. For example, major 4 had minors 0 through 22
+// (23 versions), so major 5 starts at offset 23:
+func linearVersion(ver versionMetadata) (int, error) {
+	linear := 0
+	for major := 4; major < ver.Major; major++ {
+		last, ok := lastMinorForMajor[major]
+		if !ok {
+			return 0, fmt.Errorf("unknown major version %d in version map", major)
+		}
+		linear += last + 1
+	}
+	linear += ver.Minor
+	return linear, nil
+}
+
 func (hi *versionFile) BackupName() data.BackupName {
 	return data.BackupName(fmt.Sprintf("%s_%s", hi.DeploymentID, hi.BootID))
 }
@@ -298,32 +323,39 @@ func GetVersionStringOfData() string {
 }
 
 // checkVersionCompatibility compares versions of executable and existing data
-// to detect unsupported version changes
+// to detect unsupported version changes such as downgrades or upgrades that
+// skip too many minor versions. Uses linearVersion to handle cross-major
+// boundaries transparently (e.g. 4.22 -> 5.0 is treated as a single minor
+// version upgrade).
 func checkVersionCompatibility(execVer, dataVer versionMetadata) error {
 	if execVer == dataVer {
 		klog.InfoS("Executable and data versions are the same - continuing")
 		return nil
 	}
 
-	if execVer.Major != dataVer.Major {
-		return fmt.Errorf("major versions are different: %d and %d", dataVer.Major, execVer.Major)
+	execLinear, err := linearVersion(execVer)
+	if err != nil {
+		return err
+	}
+	dataLinear, err := linearVersion(dataVer)
+	if err != nil {
+		return err
 	}
 
-	if execVer.Minor < dataVer.Minor {
-		return fmt.Errorf("executable (%s) is older than existing data (%s): migrating data to older version is not supported", execVer.String(), dataVer.String())
+	if execLinear < dataLinear {
+		return fmt.Errorf("executable (%s) is older than existing data (%s): "+
+			"migrating data to older version is not supported",
+			execVer.String(), dataVer.String())
 	}
 
-	if execVer.Minor > dataVer.Minor {
-		versionSkew := execVer.Minor - dataVer.Minor
-		if versionSkew <= MAX_VERSION_SKEW {
-			klog.Infof("Executable is newer than data by %d minor versions, continuing", versionSkew)
-			return nil
-		} else {
-			return fmt.Errorf("executable (%s) is too recent compared to existing data (%s): minor version difference is %d, maximum allowed difference is %d",
-				execVer.String(), dataVer.String(), versionSkew, MAX_VERSION_SKEW)
-		}
+	skew := execLinear - dataLinear
+	if skew > MAX_VERSION_SKEW {
+		return fmt.Errorf("executable (%s) is too recent compared to existing data (%s): "+
+			"version distance is %d, maximum allowed is %d",
+			execVer.String(), dataVer.String(), skew, MAX_VERSION_SKEW)
 	}
 
-	klog.InfoS("All version checks passed")
+	klog.Infof("Version upgrade from %s to %s (distance %d), continuing",
+		dataVer.String(), execVer.String(), skew)
 	return nil
 }
