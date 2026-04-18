@@ -11,7 +11,7 @@ distro = "rhel-98"
 {{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
 # parent = "rhel-9.8-microshift-crel"
 {{- else -}}
-# parent = "rhel-9.6-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
+# parent = "rhel-9.6-microshift-{{ .Env.PREVIOUS_MAJOR_VERSION }}.{{ .Env.PREVIOUS_MINOR_VERSION }}"
 {{- end -}}
 {{- "\n" -}}
 

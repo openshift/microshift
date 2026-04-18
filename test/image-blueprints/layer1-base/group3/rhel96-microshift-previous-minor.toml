@@ -1,4 +1,4 @@
-name = "rhel-9.6-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
+name = "rhel-9.6-microshift-{{ .Env.PREVIOUS_MAJOR_VERSION }}.{{ .Env.PREVIOUS_MINOR_VERSION }}"
 description = "RHEL 9.6 with MicroShift from the previous minor version (y-stream) installed."
 version = "0.0.1"
 modules = []
@@ -7,7 +7,7 @@ distro = "rhel-96"
 
 # Parent specification directive recognized by test/bin/build_images.sh to be
 # used with the '--parent' argument of 'osbuild-composer'
-# parent = "rhel-9.6-microshift-4.{{ .Env.YMINUS2_MINOR_VERSION }}"
+# parent = "rhel-9.6-microshift-{{ .Env.YMINUS2_MAJOR_VERSION }}.{{ .Env.YMINUS2_MINOR_VERSION }}"
 
 {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]

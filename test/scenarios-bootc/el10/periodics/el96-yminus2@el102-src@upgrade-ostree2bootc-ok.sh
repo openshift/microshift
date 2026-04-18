@@ -5,7 +5,7 @@
 scenario_create_vms() {
     # The y-2 ostree image will be fetched from the cache as it is not built
     # as part of the bootc image build procedure
-    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-4.${YMINUS2_MINOR_VERSION}"
+    prepare_kickstart host1 kickstart.ks.template "rhel-9.6-microshift-${YMINUS2_MAJOR_VERSION}.${YMINUS2_MINOR_VERSION}"
     launch_vm rhel-9.6
 }
 

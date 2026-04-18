@@ -17,7 +17,7 @@ distro = "rhel-98"
 
 # Parent specification directive recognized by test/bin/build_images.sh to be
 # used with the '--parent' argument of 'osbuild-composer'
-# parent = "rhel-9.6-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
+# parent = "rhel-9.6-microshift-{{ .Env.PREVIOUS_MAJOR_VERSION }}.{{ .Env.PREVIOUS_MINOR_VERSION }}"
 
 {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") }}
 [[packages]]
