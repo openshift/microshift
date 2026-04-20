@@ -6,21 +6,17 @@
     command: list_vms
   register: all_vms
 
-- name: find VMs that start with "microshift-*"
-  set_fact:
-    vm_match: "{{ all_vms.list_vms | join(' ') | regex_findall('microshift-\\S+', multiline=True, ignorecase=True) }}"
-
-- name: destroy microshift VM
+- name: destroy target VM if present
   community.libvirt.virt:
-    name: "{{ item }}"
+    name: "{{ vm_name }}"
     state: destroyed
-  loop: "{{ vm_match }}"
+  when: vm_name in (all_vms.list_vms | default([]))
 
-- name: undefine microshift VM
+- name: undefine target VM if present
   community.libvirt.virt:
-    name: "{{ item }}"
+    name: "{{ vm_name }}"
     command: undefine
-  loop: "{{ vm_match }}"
+  when: vm_name in (all_vms.list_vms | default([]))
 
 - name: find create-vm.sh
   ansible.builtin.find:
