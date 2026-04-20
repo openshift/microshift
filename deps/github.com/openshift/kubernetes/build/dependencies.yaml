@@ -110,17 +110,6 @@ dependencies:
     - path: cluster/images/etcd/Makefile
       match: 'GOLANG_VERSION := \d+.\d+(alpha|beta|rc)?\.?(\d+)?'
 
-  # Golang
-  - name: "golang: upstream version"
-    version: 1.24.13
-    refPaths:
-    - path: .go-version
-    - path: build/build-image/cross/VERSION
-    - path: staging/publishing/rules.yaml
-      match: 'default-go-version\: \d+.\d+(alpha|beta|rc)?\.?(\d+)?'
-    - path: test/images/Makefile
-      match: GOLANG_VERSION=\d+.\d+(alpha|beta|rc)?\.?\d+
-
   # Golang pre-releases are denoted as `1.y<pre-release stage>`
   # Example: go1.16rc1
   #
