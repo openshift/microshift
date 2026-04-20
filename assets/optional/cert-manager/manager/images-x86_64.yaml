@@ -4,11 +4,11 @@ metadata:
   name: cert-manager-images
   namespace: cert-manager
 data:
-  cert-manager-webhook: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b
-  cert-manager-ca-injector: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b
-  cert-manager-controller: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b
-  cert-manager-acmesolver: registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:3a40eb434e032fb2135f369b6fc65266ae0f409db92fd65d12cf13c7f32b5020
-  cert-manager-istiocsr: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:0f20d178f980a3fa4527bc1613b8639385e36c367e30c93b4cbb4c4a434d3405
-  controller: registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:8eecb53c8c81c0fa8f198260acb273759c0d12b5c01642a128923c5716df19d2
-  cert-manager-trust-manager: quay.io/jetstack/trust-manager:v0.20.3
+  cert-manager-webhook: registry.stage.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:e6c851778fdb826bfe2536b236ad99c373e9d1e9eaf4c543208bf4597682c06c
+  cert-manager-ca-injector: registry.stage.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:e6c851778fdb826bfe2536b236ad99c373e9d1e9eaf4c543208bf4597682c06c
+  cert-manager-controller: registry.stage.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:e6c851778fdb826bfe2536b236ad99c373e9d1e9eaf4c543208bf4597682c06c
+  cert-manager-acmesolver: registry.stage.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:06738b00d823d39672f97ca7364f2b9c7c3a988e2268741298783b1398784cf5
+  cert-manager-istiocsr: registry.stage.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:c94278e1c409be1a8617e94bb29eb85b602760daf554f1b3120ef3cee04b3f4f
+  controller: registry.stage.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:484342520dc3babe0ff4a9360edc98816556f2bd1b9981ec3d5dbab09a7536a9
+  cert-manager-trust-manager: registry.stage.redhat.io/cert-manager/cert-manager-trust-manager-rhel9@sha256:d6107f05754823ac3a2645d0f555471ee3f8958261e30935c0d60b39851cb98d
   unsupported-addon-features: TrustManager=true
