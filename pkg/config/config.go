@@ -697,6 +697,11 @@ func (c *Config) validate() error {
 	if err := c.Network.Multus.Validate(); err != nil {
 		return fmt.Errorf("error validating multus configuration: %v", err)
 	}
+	if c.C2CC.IsEnabled() {
+		if err := c.C2CC.validate(c); err != nil {
+			return fmt.Errorf("error validating c2cc: %w", err)
+		}
+	}
 	return nil
 }
 
