@@ -1,18 +1,131 @@
-- api embedded-component b0658d22beea435e3a576165207416842cb2753b to e010a985205d75f9ff375051c6886afe0e4db220
-  - d2da55fd 2026-04-11T19:04:53Z make update
-  - 26fd6324 2026-04-11T19:04:53Z postpone the removal of the DeploymentConfig API
+- api embedded-component e010a985205d75f9ff375051c6886afe0e4db220 to ca354f9a48c94558e968a2411a7ddb88cad48be5
+  - 3ea7135c 2026-04-17T15:12:35+02:00 CNTRLPLANE-2796: promote the event-ttl feature
 
-- machine-config-operator embedded-component 5b0cdfd2162dcd354e4ff9f31286c5b5bff3f1dc to 042006de3967c7b187614eaaf88d197be4d4052f
-  - f43b49df 2026-04-07T12:27:13Z OCPBUGS-78154: Add GetDefaultLeaderElectionConfig for MCC
-  - aaa1b45d 2026-04-07T12:27:13Z OCPBUGS-78154: Log when using HA default leader election timings
-  - e6841a59 2026-04-07T12:27:13Z OCPBUGS-78154: Add useDefaultTimings flag to GetLeaderElectionConfig
-  - 79a9f6fe 2026-04-07T12:27:13Z Trim comment in GetLeaderElectionConfig.
-  - ff9c7f3d 2026-04-07T12:27:12Z OCPBUGS-78154: Use HA leader election defaults for MCO on SNO.
-  - 47cc7a3e 2026-04-03T22:28:34Z Move state logging to updateConfigAndState after SetDone
+- cluster-csi-snapshot-controller-operator embedded-component 43ad01e88038be54792f16f0d692b96da1244404 to 8c1ebc60a2014ab925cbad6ef255e06ea0bd72b4
+  - 708b7c8 2026-04-13T07:21:08Z Fix PDB unhealthyPodEvictionPolicy field name
 
-- ovn-kubernetes image-amd64 0fd9d309727f67d7648d0fbfa29bdbbdfdf14ae3 to 020d072048b272c3ac77470b9a302cfd8ca0559e
-  - 581bfdef 2026-03-31T15:22:33+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+- cluster-network-operator embedded-component 259ea6b026f6663fa720a1e11c913a61122402f9 to bf38adbf16e68196077430da0fa282d6d5fd33de
+  - 76e5c5c 2026-03-27T20:39:47Z wait for patch port to apply drop garp flows
 
-- ovn-kubernetes image-arm64 0fd9d309727f67d7648d0fbfa29bdbbdfdf14ae3 to 020d072048b272c3ac77470b9a302cfd8ca0559e
-  - 581bfdef 2026-03-31T15:22:33+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+- ovn-kubernetes image-amd64 020d072048b272c3ac77470b9a302cfd8ca0559e to 7c694144eff2e877d752e7f005bc289448fff7a0
+  - eafe465f 2026-02-26T21:15:00-08:00 add ListNetworks() method to openshift infra provider
+  - d92494bc 2026-02-27T05:02:56Z sync test annotations with upstream changes
+  - 845456d0 2026-02-26T11:45:03-05:00 Moves OVN-K to CNI 1.1.0
+  - 99107d33 2026-02-25T15:58:14-05:00 Implements DPU Health Check
+  - 721400a4 2026-02-25T13:07:13+01:00 (B)ANP conformance: update framework to use retries
+  - 15d73b3d 2026-02-25T13:02:47+01:00 Revert "(B)ANP conformance: update framework to use retries"
+  - 3c67139a 2026-02-25T12:53:36+01:00 (B)ANP conformance: update framework to use retries
+  - 0b82e64f 2026-02-24T22:28:05-06:00 docs: user-defined-network: Fix 'l2-UDN' image link
+  - 9d7b70f8 2026-02-24T22:28:05-06:00 docs: user-defined-networks: Fix markdown syntax
+  - 533f66e7 2026-02-24T15:16:57-05:00 Fix UDN network controller deadlock due to stopChan nil race
+  - d033767f 2026-02-24T15:09:36Z Add Nutanix to adopters page
+  - ca967b82 2026-02-23T15:27:32-05:00 Adds unit test for stale ICMP network policy ACL
+  - 69afd47b 2026-02-23T09:51:35-05:00 Adds E2E testing for ICMP NP bypass
+  - 63468cc8 2026-02-23T08:56:01-05:00 Adds kind.sh and helm support for --allow-icmp-network-policy
+  - bcb7ec91 2026-02-22T02:34:12-08:00 Allow emitting metrics on a single endpoint
+  - 25a4e056 2026-02-20T16:52:44-05:00 docs: Add section on how to debug coredumps from non-go binaries
+  - 58c5dc93 2026-02-20T10:21:03-05:00 Adds support for bypassing network policy for ICMP/ICMPv6
+  - 75d2f8e4 2026-02-19T15:16:11-05:00 e2e: fix static IP collision in ValidatingAdmissionPolicy test
+  - 843ceff7 2026-02-19T12:05:16-05:00 Trivial E2E egress IP fixes
+  - fd270158 2026-02-19T17:58:44+01:00 Minimize ACLs by combining ipBlocks into single ACL
+  - 7feb1238 2026-02-19T10:35:47-05:00 Continue trying to assign egressIP on conflict
+  - 3b98daec 2026-02-19T10:35:47-05:00 Fixes race with egress ip + node ip mgr
+  - 2b1f4a84 2026-02-18T16:09:12-05:00 e2e: clean up stale networks before VRF-Lite BGP tests
+  - 2d3e48b7 2026-02-18T15:01:34-05:00 Adds benchmark test for OpenFlow stream reader
+  - 91375531 2026-02-18T15:01:34-05:00 Reduce memory allocation by OpenFlow Manager
+  - 005e15b8 2026-02-18T08:40:21-08:00 add unit tests for stale primary UDN cleanup
+  - 9caab0e4 2026-02-18T08:40:21-08:00 cleanup logical entities for stale primary networks
+  - d1daa85d 2026-02-18T10:30:50-05:00 E2E: Fixes flaking ANP ACL logging
+  - 24efc26e 2026-02-18T16:28:57+01:00 Reuse test setup across BGP isolation table entries
+  - 32cbabcd 2026-02-18T16:28:57+01:00 Speed up BGP isolation e2e tests
+  - d9888a12 2026-02-18T15:48:20+05:30 fix live migration link navigation
+  - 447b8d18 2026-02-17T12:08:37+01:00 Mention -add-ovs-collector to start sampling
+  - 56f2d8d8 2026-02-16T11:45:25+01:00 Update OVN observability documentation
+  - c2c8e8e5 2026-02-16T08:31:35+01:00 Reduce obj_retry.go log spam
+  - 7606fd88 2026-02-16T08:30:48+01:00 CUDN: cleanup NADs in terminating namespaces without pods
+  - 32f5e7c5 2026-02-15T12:02:26-05:00 Fixes Egress IP Tracker UT
+  - 16480b9e 2026-02-14T09:10:20+08:00 fix issues for adding SAIC Motor to Adopters
+  - b95fc808 2026-02-13T12:05:23-05:00 Fixes gateway egress IP node update logic
+  - 3cfbafff 2026-02-13T12:05:23-05:00 Fix hybrid overlay mutating informer pod object
+  - 0e44890d 2026-02-13T12:05:23-05:00 EgressIP: Fix crash from mutating node informer object
+  - a760e77b 2026-02-13T12:03:11-05:00 Improve EgressFW subnet parsing
+  - 16240491 2026-02-13T12:03:11-05:00 GetActiveNetworkForNamespace Refactor
+  - 67dfeafe 2026-02-13T12:03:11-05:00 egressip: trigger immediate retry when UDN pod port cache is populated
+  - 90e65d62 2026-02-13T12:03:11-05:00 egressip: force pod assignment reprogram when pod IP changes
+  - a114896d 2026-02-13T12:03:11-05:00 E2E: Add integration UDN test
+  - 9ab81e57 2026-02-13T12:03:11-05:00 Bring EgressIP inline with NAD Reconciliation
+  - f1a65d47 2026-02-13T12:03:11-05:00 Fix EgressFirewall GetActiveNetworkForNamespace
+  - 3ae25d25 2026-02-13T12:03:11-05:00 Guard GetPrimaryNADForNamespace when netseg not enabled
+  - b79e6f94 2026-02-13T12:03:11-05:00 Fix Dynamic UDN with services controller
+  - e624ec9d 2026-02-13T12:03:11-05:00 Fix GetActiveNetworkForNamespace usage for NetPol
+  - e95dc868 2026-02-13T12:03:11-05:00 Make node gateway Dynamic UDN aware
+  - 6f78d1d2 2026-02-13T17:56:21+01:00 Handle Docker 29+ "invalid IP" response for IP addresses
+  - 31ee5d7b 2026-02-13T21:32:16+08:00 Add SAIC Motor to ADOPTERS
+  - 2edd4307 2026-02-13T01:44:34-08:00 fix kind load docker-image content digest not found
+  - e527aa80 2026-02-12T10:03:24-05:00 Adds DPU blog
+  - 6ddb8b76 2026-02-12T12:36:15Z Handle stale PCI address in mgmt port Init for DPU Host case
+  - 0974f2e8 2026-01-27T16:17:13-08:00 Unify the metrics servers used by ovnkube-node and OVS/OVN metrics
+  - 1d5e616b 2026-01-23T10:57:13-05:00 Improve nodenft.MatchNFTRules behavior
+  - 809ad111 2026-01-19T15:18:32-05:00 Use `nft destroy` to simplify the UDN cleanup code
+
+- ovn-kubernetes image-arm64 020d072048b272c3ac77470b9a302cfd8ca0559e to 7c694144eff2e877d752e7f005bc289448fff7a0
+  - eafe465f 2026-02-26T21:15:00-08:00 add ListNetworks() method to openshift infra provider
+  - d92494bc 2026-02-27T05:02:56Z sync test annotations with upstream changes
+  - 845456d0 2026-02-26T11:45:03-05:00 Moves OVN-K to CNI 1.1.0
+  - 99107d33 2026-02-25T15:58:14-05:00 Implements DPU Health Check
+  - 721400a4 2026-02-25T13:07:13+01:00 (B)ANP conformance: update framework to use retries
+  - 15d73b3d 2026-02-25T13:02:47+01:00 Revert "(B)ANP conformance: update framework to use retries"
+  - 3c67139a 2026-02-25T12:53:36+01:00 (B)ANP conformance: update framework to use retries
+  - 0b82e64f 2026-02-24T22:28:05-06:00 docs: user-defined-network: Fix 'l2-UDN' image link
+  - 9d7b70f8 2026-02-24T22:28:05-06:00 docs: user-defined-networks: Fix markdown syntax
+  - 533f66e7 2026-02-24T15:16:57-05:00 Fix UDN network controller deadlock due to stopChan nil race
+  - d033767f 2026-02-24T15:09:36Z Add Nutanix to adopters page
+  - ca967b82 2026-02-23T15:27:32-05:00 Adds unit test for stale ICMP network policy ACL
+  - 69afd47b 2026-02-23T09:51:35-05:00 Adds E2E testing for ICMP NP bypass
+  - 63468cc8 2026-02-23T08:56:01-05:00 Adds kind.sh and helm support for --allow-icmp-network-policy
+  - bcb7ec91 2026-02-22T02:34:12-08:00 Allow emitting metrics on a single endpoint
+  - 25a4e056 2026-02-20T16:52:44-05:00 docs: Add section on how to debug coredumps from non-go binaries
+  - 58c5dc93 2026-02-20T10:21:03-05:00 Adds support for bypassing network policy for ICMP/ICMPv6
+  - 75d2f8e4 2026-02-19T15:16:11-05:00 e2e: fix static IP collision in ValidatingAdmissionPolicy test
+  - 843ceff7 2026-02-19T12:05:16-05:00 Trivial E2E egress IP fixes
+  - fd270158 2026-02-19T17:58:44+01:00 Minimize ACLs by combining ipBlocks into single ACL
+  - 7feb1238 2026-02-19T10:35:47-05:00 Continue trying to assign egressIP on conflict
+  - 3b98daec 2026-02-19T10:35:47-05:00 Fixes race with egress ip + node ip mgr
+  - 2b1f4a84 2026-02-18T16:09:12-05:00 e2e: clean up stale networks before VRF-Lite BGP tests
+  - 2d3e48b7 2026-02-18T15:01:34-05:00 Adds benchmark test for OpenFlow stream reader
+  - 91375531 2026-02-18T15:01:34-05:00 Reduce memory allocation by OpenFlow Manager
+  - 005e15b8 2026-02-18T08:40:21-08:00 add unit tests for stale primary UDN cleanup
+  - 9caab0e4 2026-02-18T08:40:21-08:00 cleanup logical entities for stale primary networks
+  - d1daa85d 2026-02-18T10:30:50-05:00 E2E: Fixes flaking ANP ACL logging
+  - 24efc26e 2026-02-18T16:28:57+01:00 Reuse test setup across BGP isolation table entries
+  - 32cbabcd 2026-02-18T16:28:57+01:00 Speed up BGP isolation e2e tests
+  - d9888a12 2026-02-18T15:48:20+05:30 fix live migration link navigation
+  - 447b8d18 2026-02-17T12:08:37+01:00 Mention -add-ovs-collector to start sampling
+  - 56f2d8d8 2026-02-16T11:45:25+01:00 Update OVN observability documentation
+  - c2c8e8e5 2026-02-16T08:31:35+01:00 Reduce obj_retry.go log spam
+  - 7606fd88 2026-02-16T08:30:48+01:00 CUDN: cleanup NADs in terminating namespaces without pods
+  - 32f5e7c5 2026-02-15T12:02:26-05:00 Fixes Egress IP Tracker UT
+  - 16480b9e 2026-02-14T09:10:20+08:00 fix issues for adding SAIC Motor to Adopters
+  - b95fc808 2026-02-13T12:05:23-05:00 Fixes gateway egress IP node update logic
+  - 3cfbafff 2026-02-13T12:05:23-05:00 Fix hybrid overlay mutating informer pod object
+  - 0e44890d 2026-02-13T12:05:23-05:00 EgressIP: Fix crash from mutating node informer object
+  - a760e77b 2026-02-13T12:03:11-05:00 Improve EgressFW subnet parsing
+  - 16240491 2026-02-13T12:03:11-05:00 GetActiveNetworkForNamespace Refactor
+  - 67dfeafe 2026-02-13T12:03:11-05:00 egressip: trigger immediate retry when UDN pod port cache is populated
+  - 90e65d62 2026-02-13T12:03:11-05:00 egressip: force pod assignment reprogram when pod IP changes
+  - a114896d 2026-02-13T12:03:11-05:00 E2E: Add integration UDN test
+  - 9ab81e57 2026-02-13T12:03:11-05:00 Bring EgressIP inline with NAD Reconciliation
+  - f1a65d47 2026-02-13T12:03:11-05:00 Fix EgressFirewall GetActiveNetworkForNamespace
+  - 3ae25d25 2026-02-13T12:03:11-05:00 Guard GetPrimaryNADForNamespace when netseg not enabled
+  - b79e6f94 2026-02-13T12:03:11-05:00 Fix Dynamic UDN with services controller
+  - e624ec9d 2026-02-13T12:03:11-05:00 Fix GetActiveNetworkForNamespace usage for NetPol
+  - e95dc868 2026-02-13T12:03:11-05:00 Make node gateway Dynamic UDN aware
+  - 6f78d1d2 2026-02-13T17:56:21+01:00 Handle Docker 29+ "invalid IP" response for IP addresses
+  - 31ee5d7b 2026-02-13T21:32:16+08:00 Add SAIC Motor to ADOPTERS
+  - 2edd4307 2026-02-13T01:44:34-08:00 fix kind load docker-image content digest not found
+  - e527aa80 2026-02-12T10:03:24-05:00 Adds DPU blog
+  - 6ddb8b76 2026-02-12T12:36:15Z Handle stale PCI address in mgmt port Init for DPU Host case
+  - 0974f2e8 2026-01-27T16:17:13-08:00 Unify the metrics servers used by ovnkube-node and OVS/OVN metrics
+  - 1d5e616b 2026-01-23T10:57:13-05:00 Improve nodenft.MatchNFTRules behavior
+  - 809ad111 2026-01-19T15:18:32-05:00 Use `nft destroy` to simplify the UDN cleanup code
 
