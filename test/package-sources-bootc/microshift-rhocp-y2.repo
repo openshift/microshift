@@ -1,7 +1,7 @@
 {{- if env.Getenv "RHOCP_MINOR_Y2" "" -}}
 [rhocp-y2]
-name = Red Hat OpenShift Container Platform 4.{{ .Env.RHOCP_MINOR_Y2 }} for RHEL 9
-baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/4.{{ .Env.RHOCP_MINOR_Y2 }}/os
+name = Red Hat OpenShift Container Platform {{ .Env.RHOCP_MAJOR_Y2 }}.{{ .Env.RHOCP_MINOR_Y2 }} for RHEL 9
+baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/{{ .Env.RHOCP_MAJOR_Y2 }}.{{ .Env.RHOCP_MINOR_Y2 }}/os
 enabled = 1
 gpgcheck = 1
 gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release

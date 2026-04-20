@@ -11,25 +11,25 @@ distro = "rhel-98"
 {{- if env.Getenv "CURRENT_RELEASE_VERSION" "" -}}
 # parent = "rhel-9.8-microshift-crel"
 {{- else -}}
-# parent = "rhel-9.6-microshift-4.{{ .Env.PREVIOUS_MINOR_VERSION }}"
+# parent = "rhel-9.6-microshift-{{ .Env.PREVIOUS_MAJOR_VERSION }}.{{ .Env.PREVIOUS_MINOR_VERSION }}"
 {{- end -}}
 {{- "\n" -}}
 
 [[packages]]
 name = "microshift"
-version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+version = "{{ .Env.FAKE_NEXT_MAJOR_VERSION }}.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
 name = "microshift-greenboot"
-version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+version = "{{ .Env.FAKE_NEXT_MAJOR_VERSION }}.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
 name = "microshift-networking"
-version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+version = "{{ .Env.FAKE_NEXT_MAJOR_VERSION }}.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
 name = "microshift-selinux"
-version = "4.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
+version = "{{ .Env.FAKE_NEXT_MAJOR_VERSION }}.{{ .Env.FAKE_NEXT_MINOR_VERSION }}.*"
 
 [[packages]]
 name = "microshift-test-agent"

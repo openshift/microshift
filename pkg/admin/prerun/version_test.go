@@ -21,12 +21,6 @@ func TestCheckVersionDiff(t *testing.T) {
 			errExpected: false,
 		},
 		{
-			name:        "X versions must be the same",
-			execVer:     versionMetadata{Major: 4, Minor: 14},
-			dataVer:     versionMetadata{Major: 5, Minor: 14},
-			errExpected: true,
-		},
-		{
 			name:        "binary must not be older than data",
 			execVer:     versionMetadata{Major: 4, Minor: 14},
 			dataVer:     versionMetadata{Major: 4, Minor: 15},
@@ -49,6 +43,42 @@ func TestCheckVersionDiff(t *testing.T) {
 			execVer:     versionMetadata{Major: 4, Minor: 16},
 			dataVer:     versionMetadata{Major: 4, Minor: 13},
 			errExpected: true,
+		},
+		{
+			name:        "cross-major upgrade 4.22 to 5.0 allowed (distance 1)",
+			execVer:     versionMetadata{Major: 5, Minor: 0},
+			dataVer:     versionMetadata{Major: 4, Minor: 22},
+			errExpected: false,
+		},
+		{
+			name:        "cross-major upgrade 4.21 to 5.0 allowed (distance 2)",
+			execVer:     versionMetadata{Major: 5, Minor: 0},
+			dataVer:     versionMetadata{Major: 4, Minor: 21},
+			errExpected: false,
+		},
+		{
+			name:        "cross-major upgrade 4.20 to 5.0 blocked (distance 3)",
+			execVer:     versionMetadata{Major: 5, Minor: 0},
+			dataVer:     versionMetadata{Major: 4, Minor: 20},
+			errExpected: true,
+		},
+		{
+			name:        "cross-major downgrade 5.0 to 4.22 blocked",
+			execVer:     versionMetadata{Major: 4, Minor: 22},
+			dataVer:     versionMetadata{Major: 5, Minor: 0},
+			errExpected: true,
+		},
+		{
+			name:        "cross-major upgrade 4.22 to 5.1 allowed (distance 2)",
+			execVer:     versionMetadata{Major: 5, Minor: 1},
+			dataVer:     versionMetadata{Major: 4, Minor: 22},
+			errExpected: false,
+		},
+		{
+			name:        "same major upgrade 5.0 to 5.1 allowed",
+			execVer:     versionMetadata{Major: 5, Minor: 1},
+			dataVer:     versionMetadata{Major: 5, Minor: 0},
+			errExpected: false,
 		},
 	}
 

@@ -124,6 +124,7 @@ def get_rhocp_beta_url_if_available(major, minor):
 def set_rpm_version_info_vars():
     # See the test/bin/common_versions.sh script for a full list
     # of the variables used for templating
+    global FAKE_NEXT_MAJOR_VERSION
     global FAKE_NEXT_MINOR_VERSION
     global PREVIOUS_RELEASE_REPO
     global PREVIOUS_RELEASE_VERSION
@@ -136,6 +137,7 @@ def set_rpm_version_info_vars():
     global BREW_EC_RELEASE_VERSION
     global BREW_NIGHTLY_RELEASE_VERSION
 
+    FAKE_NEXT_MAJOR_VERSION = common.get_env_var('FAKE_NEXT_MAJOR_VERSION')
     FAKE_NEXT_MINOR_VERSION = common.get_env_var('FAKE_NEXT_MINOR_VERSION')
     PREVIOUS_RELEASE_REPO = common.get_env_var('PREVIOUS_RELEASE_REPO')
     PREVIOUS_RELEASE_VERSION = common.get_env_var('PREVIOUS_RELEASE_VERSION')
@@ -655,7 +657,7 @@ def main():
         else:
             extract_container_images(SOURCE_VERSION, LOCAL_REPO, CONTAINER_LIST, args.dry_run)
             # The following images are specific to layers that use fake rpms built from source
-            extract_container_images(f"4.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
+            extract_container_images(f"{FAKE_NEXT_MAJOR_VERSION}.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(PREVIOUS_RELEASE_VERSION, PREVIOUS_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             extract_container_images(YMINUS2_RELEASE_VERSION, YMINUS2_RELEASE_REPO, CONTAINER_LIST, args.dry_run)
             # The following images are specific to the brew release versions

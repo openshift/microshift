@@ -1,4 +1,4 @@
-name = "rhel-9.6-microshift-4.{{ .Env.YMINUS2_MINOR_VERSION }}"
+name = "rhel-9.6-microshift-{{ .Env.YMINUS2_MAJOR_VERSION }}.{{ .Env.YMINUS2_MINOR_VERSION }}"
 description = "RHEL 9.6 with MicroShift from two minor versions back installed."
 version = "0.0.1"
 modules = []

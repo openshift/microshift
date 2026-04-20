@@ -76,7 +76,16 @@ export PREVIOUS_MAJOR_VERSION={previous_major_version}
 export PREVIOUS_MINOR_VERSION={previous_minor_version}
 export YMINUS2_MAJOR_VERSION={yminus2_major_version}
 export YMINUS2_MINOR_VERSION={yminus2_minor_version}
-export FAKE_NEXT_MINOR_VERSION=$(( "${{MINOR_VERSION}}" + 1 ))
+# Handle cross-major version boundary (e.g. 4.22 -> 5.0)
+declare -A LAST_MINOR_FOR_MAJOR=({last_minor_for_major_bash})
+if [[ -n "${{LAST_MINOR_FOR_MAJOR[${{MAJOR_VERSION}}]:-}}" && \
+      "${{MINOR_VERSION}}" -eq "${{LAST_MINOR_FOR_MAJOR[${{MAJOR_VERSION}}]}}" ]]; then
+    export FAKE_NEXT_MAJOR_VERSION=$(( MAJOR_VERSION + 1 ))
+    export FAKE_NEXT_MINOR_VERSION=0
+else
+    export FAKE_NEXT_MAJOR_VERSION="${{MAJOR_VERSION}}"
+    export FAKE_NEXT_MINOR_VERSION=$(( "${{MINOR_VERSION}}" + 1 ))
+fi
 
 # For a main branch, the current release repository usually comes from
 # the OpenShift mirror site, either 'ocp-dev-preview' in the beginning of the
