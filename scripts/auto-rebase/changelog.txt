@@ -1,7 +1,11 @@
-- api embedded-component 464776f9520793f0f20645fbcb82d945abb0a05b to b37d107c490a35659457ed38f9f5b109f85448da
-  - c90338d3 2026-04-14T14:35:24-04:00 features: disable psa
+- machine-config-operator embedded-component 449e78f7ec941d8db237da39ccce2095912fea43 to eadf8329c93aba9b187de7668ec3e469bc6d168e
+  - a152664a 2026-04-16T06:05:37Z chore: update AMIs
+  - 85109ddb 2026-04-15T17:31:52Z Bug OCPEDGE-2447: fix filename collision in ovs-configuration drop-in
+  - e08af2ec 2026-04-15T17:31:52Z Bug OCPEDGE-2447: prevent configure-ovs.sh re-execution within same boot
+  - bf61c18f 2026-04-15T17:31:52Z Bug OCPEDGE-2447: order corosync after OVS configuration on TNF clusters
+  - 1a6b213d 2026-04-15T14:29:02+02:00 Revert "Merge pull request #5797 from mkowalski/more-cpu-for-ovs"
 
-- ovn-kubernetes image-arm64 e327d43ff04f410b1d9f301a6484af5359a98d3d to 14b5022bad5b21334e3ad9d500763474016b2a9c
+- ovn-kubernetes image-amd64 e327d43ff04f410b1d9f301a6484af5359a98d3d to 14b5022bad5b21334e3ad9d500763474016b2a9c
   - 68ccf1f1 2026-04-15T08:59:44Z openshift tests: disable
   - f6098fc2 2026-04-15T08:58:44Z openshift tests: demote to informing
 
