@@ -83,6 +83,8 @@ Teardown
     Command Should Work    mv /etc/microshift/tuned.yaml.bak /etc/microshift/tuned.yaml
     Enable MicroShift
     Restart MicroShift-Tuned Expecting Reboot
+    # Let's leave VM in a state ready to pick up by next suite
+    Wait For MicroShift Healthcheck Success
     Logout MicroShift Host
 
 Restart MicroShift-Tuned Expecting Reboot
