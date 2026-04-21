@@ -54,8 +54,8 @@ class GithubUtils:
         Checks title of the issue #1239 in the openshift/microshift repository to check if
         given branch is frozen and thus under active development is happening on main branch.
 
-        It returns True if given branch is the first on the list of frozen branches.
-        In such case the target (base) branch of newly created PR should be switch to main.
+        It returns True if given branch is on the list of frozen branches.
+        In such case the target (base) branch of newly created PR should be switched to main.
         """
         if self.dry_run:
             logging.info(f"[DRY RUN] Assuming branch {branch} is under active development")
@@ -68,9 +68,7 @@ class GithubUtils:
             frozen_branches = [x.replace('branch:', '') for x in branches_part.split()]
             if len(frozen_branches) == 0:
                 raise Exception(f"Unexpected amount of branch in the Issue 1239 title: {title}")
-            # Assuming the first branch name is the release under development right now.
-            # No job creating PRs should run against the next release branch.
-            return branch == frozen_branches[0]
+            return branch in frozen_branches
         except Exception as e:
             raise RuntimeError(f"Failed to parse freeze issue title: {title} ({e})")
 
