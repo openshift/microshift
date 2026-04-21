@@ -1447,6 +1447,13 @@ load_scenario_script() {
 
     # shellcheck source=/dev/null
     source "${SCENARIO_SCRIPT}"
+
+    # Auto-increase greenboot timeout for release scenarios
+    # because all optional RPMs are installed and operators need more time to pull images
+    if [[ "${SCENARIO_SCRIPT}" == */releases/* && "${GREENBOOT_TIMEOUT}" -le 600 ]]; then
+        GREENBOOT_TIMEOUT=1200
+        echo "Auto-increased greenboot timeout to ${GREENBOOT_TIMEOUT} for release scenario"
+    fi
 }
 
 # Load the plugin for registering with subscription
