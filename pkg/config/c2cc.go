@@ -59,7 +59,7 @@ func defaultGetHostIPs() ([]net.IP, error) {
 	for _, link := range links {
 		addrs, err := netlink.AddrList(link, netlink.FAMILY_ALL)
 		if err != nil {
-			continue
+			return nil, fmt.Errorf("listing addresses for interface %q: %w", link.Attrs().Name, err)
 		}
 		for _, addr := range addrs {
 			ips = append(ips, addr.IP)
@@ -146,6 +146,7 @@ func (c *C2CC) validate(cfg *Config) error {
 
 		errs = append(errs, validateIPFamilyConsistency(rc.ClusterNetwork, label+".clusterNetwork")...)
 		errs = append(errs, validateIPFamilyConsistency(rc.ServiceNetwork, label+".serviceNetwork")...)
+		errs = append(errs, validateNetworkShape(rc.ClusterNetwork, rc.ServiceNetwork, label)...)
 		errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, rc.ClusterNetwork, label)...)
 		errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, rc.ServiceNetwork, label)...)
 	}
@@ -189,6 +190,22 @@ func validateIPFamilyConsistency(cidrs []string, field string) []error {
 	}
 	if v6 > 1 {
 		errs = append(errs, fmt.Errorf("%s has multiple IPv6 entries (max 1)", field))
+	}
+	return errs
+}
+
+func validateNetworkShape(clusterNetwork, serviceNetwork []string, label string) []error {
+	if len(clusterNetwork) != len(serviceNetwork) {
+		return []error{fmt.Errorf("%s: clusterNetwork and serviceNetwork have different cardinality (%d vs %d)",
+			label, len(clusterNetwork), len(serviceNetwork))}
+	}
+	var errs []error
+	for i := 0; i < len(clusterNetwork); i++ {
+		cFamily := netutils.IPFamilyOfCIDRString(clusterNetwork[i])
+		sFamily := netutils.IPFamilyOfCIDRString(serviceNetwork[i])
+		if cFamily != netutils.IPFamilyUnknown && sFamily != netutils.IPFamilyUnknown && cFamily != sFamily {
+			errs = append(errs, fmt.Errorf("%s: clusterNetwork[%d] and serviceNetwork[%d] have mismatched IP families", label, i, i))
+		}
 	}
 	return errs
 }

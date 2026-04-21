@@ -450,6 +450,30 @@ func TestC2CC_Validate(t *testing.T) {
 				}},
 			}),
 		},
+		{
+			name: "clusterNetwork and serviceNetwork cardinality mismatch",
+			cfg: mkDualStackC2CCConfig(C2CC{
+				RemoteClusters: []RemoteCluster{{
+					NextHop:        "10.100.0.2",
+					ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
+					ServiceNetwork: []string{"10.46.0.0/16"},
+				}},
+			}),
+			expectErr: true,
+			errMsg:    "different cardinality",
+		},
+		{
+			name: "clusterNetwork and serviceNetwork IP family mismatch at same index",
+			cfg: mkDualStackC2CCConfig(C2CC{
+				RemoteClusters: []RemoteCluster{{
+					NextHop:        "10.100.0.2",
+					ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
+					ServiceNetwork: []string{"fd04::/112", "10.46.0.0/16"},
+				}},
+			}),
+			expectErr: true,
+			errMsg:    "mismatched IP families",
+		},
 	}
 
 	for _, tt := range ttests {
