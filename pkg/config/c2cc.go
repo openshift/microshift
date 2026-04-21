@@ -83,6 +83,14 @@ func (c *C2CC) validate(cfg *Config) error {
 		return fmt.Errorf("failed to parse cfg.Node.NodeIP (%q)", cfg.Node.NodeIP)
 	}
 
+	var nodeIPv6 net.IP
+	if cfg.Node.NodeIPV6 != "" {
+		nodeIPv6 = net.ParseIP(cfg.Node.NodeIPV6)
+		if nodeIPv6 == nil {
+			return fmt.Errorf("failed to parse cfg.Node.NodeIPV6 (%q)", cfg.Node.NodeIPV6)
+		}
+	}
+
 	localV4 := cfg.IsIPv4()
 	localV6 := cfg.IsIPv6()
 
@@ -105,7 +113,7 @@ func (c *C2CC) validate(cfg *Config) error {
 			errs = append(errs, fmt.Errorf("%s.nextHop %q is not a valid IP address", label, rc.NextHop))
 		} else {
 			normalizedNextHop := ip.String()
-			if ip.Equal(nodeIP) {
+			if ip.Equal(nodeIP) || (nodeIPv6 != nil && ip.Equal(nodeIPv6)) {
 				errs = append(errs, fmt.Errorf("%s.nextHop %q must not equal the local node IP (routing loop)", label, normalizedNextHop))
 			}
 			if prev, ok := seenNextHops[normalizedNextHop]; ok {

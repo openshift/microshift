@@ -328,8 +328,8 @@ func TestC2CC_Validate(t *testing.T) {
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
 					NextHop:        "10.100.0.2",
-                     ClusterNetwork: []string{"fd03::/48", "fd05::/48"},
-                     ServiceNetwork: []string{"fd04::/112"},
+					ClusterNetwork: []string{"fd03::/48", "fd05::/48"},
+					ServiceNetwork: []string{"fd04::/112"},
 				}},
 			}),
 			expectErr: true,
@@ -439,6 +439,18 @@ func TestC2CC_Validate(t *testing.T) {
 			}),
 			expectErr: true,
 			errMsg:    "domain \"cluster-b.remote\" duplicates remoteClusters[0]",
+		},
+		{
+			name: "NextHop equals local NodeIPV6 in dual-stack",
+			cfg: mkDualStackC2CCConfig(C2CC{
+				RemoteClusters: []RemoteCluster{{
+					NextHop:        "fd00::1",
+					ClusterNetwork: []string{"fd03::/48"},
+					ServiceNetwork: []string{"fd04::/112"},
+				}},
+			}),
+			expectErr: true,
+			errMsg:    "routing loop",
 		},
 		{
 			name: "single-stack IPv4 remote with dual-stack local",
