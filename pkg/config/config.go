@@ -544,6 +544,8 @@ func (c *Config) updateComputedValues() error {
 		c.Telemetry = Telemetry{Status: StatusDisabled}
 	}
 
+	c.C2CC.stripEmptyRemoteClusters()
+
 	return nil
 }
 

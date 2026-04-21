@@ -25,6 +25,36 @@ func TestC2CC_IsEnabled(t *testing.T) {
 	})
 }
 
+func TestC2CC_StripEmptyRemoteClusters(t *testing.T) {
+	t.Run("strips zero-value entries", func(t *testing.T) {
+		c := C2CC{
+			RemoteClusters: []RemoteCluster{{}},
+		}
+		c.stripEmptyRemoteClusters()
+		assert.Empty(t, c.RemoteClusters)
+		assert.False(t, c.IsEnabled())
+	})
+
+	t.Run("keeps non-empty entries", func(t *testing.T) {
+		c := C2CC{
+			RemoteClusters: []RemoteCluster{
+				{},
+				{NextHop: "10.0.0.1", ClusterNetwork: []string{"10.45.0.0/16"}, ServiceNetwork: []string{"10.46.0.0/16"}},
+				{},
+			},
+		}
+		c.stripEmptyRemoteClusters()
+		assert.Len(t, c.RemoteClusters, 1)
+		assert.Equal(t, "10.0.0.1", c.RemoteClusters[0].NextHop)
+	})
+
+	t.Run("no-op on empty list", func(t *testing.T) {
+		c := C2CC{}
+		c.stripEmptyRemoteClusters()
+		assert.Empty(t, c.RemoteClusters)
+	})
+}
+
 func mkC2CCConfig(c2cc C2CC) *Config {
 	return &Config{
 		Network: Network{

@@ -34,6 +34,20 @@ func (c *C2CC) IsEnabled() bool {
 	return len(c.RemoteClusters) > 0
 }
 
+func (rc *RemoteCluster) isEmpty() bool {
+	return rc.NextHop == "" && len(rc.ClusterNetwork) == 0 && len(rc.ServiceNetwork) == 0 && rc.Domain == ""
+}
+
+func (c *C2CC) stripEmptyRemoteClusters() {
+	filtered := c.RemoteClusters[:0]
+	for i := range c.RemoteClusters {
+		if !c.RemoteClusters[i].isEmpty() {
+			filtered = append(filtered, c.RemoteClusters[i])
+		}
+	}
+	c.RemoteClusters = filtered
+}
+
 var getHostIPs = defaultGetHostIPs
 
 func defaultGetHostIPs() ([]net.IP, error) {
