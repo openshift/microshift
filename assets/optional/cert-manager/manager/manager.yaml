@@ -75,21 +75,25 @@ spec:
             - name: OPERATOR_NAME
               value: cert-manager-operator
             - name: RELATED_IMAGE_CERT_MANAGER_WEBHOOK
-              value: quay.io/jetstack/cert-manager-webhook:latest
+              value: quay.io/jetstack/cert-manager-webhook:v1.19.4
             - name: RELATED_IMAGE_CERT_MANAGER_CA_INJECTOR
-              value: quay.io/jetstack/cert-manager-cainjector:latest
+              value: quay.io/jetstack/cert-manager-cainjector:v1.19.4
             - name: RELATED_IMAGE_CERT_MANAGER_CONTROLLER
-              value: quay.io/jetstack/cert-manager-controller:latest
+              value: quay.io/jetstack/cert-manager-controller:v1.19.4
             - name: RELATED_IMAGE_CERT_MANAGER_ACMESOLVER
-              value: quay.io/jetstack/cert-manager-acmesolver:v1.18.4
+              value: quay.io/jetstack/cert-manager-acmesolver:v1.19.4
             - name: RELATED_IMAGE_CERT_MANAGER_ISTIOCSR
-              value: quay.io/jetstack/cert-manager-istio-csr:v0.14.2
+              value: quay.io/jetstack/cert-manager-istio-csr:v0.16.0
+            - name: RELATED_IMAGE_CERT_MANAGER_TRUST_MANAGER
+              value: quay.io/jetstack/trust-manager:v0.20.3
             - name: OPERAND_IMAGE_VERSION
-              value: 1.18.4
+              value: 1.19.4
             - name: ISTIOCSR_OPERAND_IMAGE_VERSION
-              value: 0.14.2
+              value: 0.16.0
+            - name: TRUSTMANAGER_OPERAND_IMAGE_VERSION
+              value: 0.20.3
             - name: OPERATOR_IMAGE_VERSION
-              value: 1.18.1
+              value: 1.19.0
             - name: OPERATOR_LOG_LEVEL
               value: '2'
             - name: TRUSTED_CA_CONFIGMAP_NAME
