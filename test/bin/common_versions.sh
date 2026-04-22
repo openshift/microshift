@@ -81,7 +81,7 @@ export FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 #
 # For a release branch, the current release repository should come from the
 # official 'rhocp' stream.
-CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp-dev-preview/latest-4.22/el9/os"
+CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp/latest-4.22/el9/os"
 CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
@@ -170,6 +170,6 @@ export BREW_LREL_RELEASE_VERSION
 
 # Branch and commit for the openshift-tests-private repository
 OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH="release-4.${MINOR_VERSION}"
-OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT="b5111e366dc8f517732c6d48219ed659497de8e0"
+OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT="0734866a25e2fb4a6b4286e5b503d22d70ea1834"
 export OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH
 export OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT
