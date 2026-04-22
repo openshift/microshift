@@ -5,6 +5,7 @@
   "images": {
     "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:708361988343fb0fc9c10ebdc6a05de75ed038918ece0b7a91888e2cc74f644e",
     "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:a4111417451c83ddf9af3a045a10e0d39bd0f4cf8f7bcc1992d6fcbd980f0427",
+    "cert-manager-trust-manager": "registry.redhat.io/cert-manager/cert-manager-trust-manager-rhel9@sha256:c6b5e8b2779e64004c198d55750a0a0978478148ba7675f2ce9d2c5097708a68",
     "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:22d0f5ed590ad447441f6cf115de3bead3b4d62dfb475622389f847664b4cde8",
     "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:67bb018311dbb0435fd3396f9132aa33db43da9cdef92e4fe17a6c55e66c8de1",
     "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:67bb018311dbb0435fd3396f9132aa33db43da9cdef92e4fe17a6c55e66c8de1",

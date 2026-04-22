@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: featuregate-reader
+    app.kubernetes.io/instance: featuregate-reader
+    app.kubernetes.io/created-by: cert-manager-operator
+    app.kubernetes.io/part-of: cert-manager-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: featuregate-reader
+rules:
+- apiGroups:
+  - config.openshift.io
+  resources:
+  - featuregates
+  verbs:
+  - get
