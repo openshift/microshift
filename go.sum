@@ -304,8 +304,8 @@ github.com/openshift/build-machinery-go v0.0.0-20251023084048-5d77c1a5e5af h1:Ui
 github.com/openshift/build-machinery-go v0.0.0-20251023084048-5d77c1a5e5af/go.mod h1:8jcm8UPtg2mCAsxfqKil1xrmRMI3a+XU2TZ9fF8A7TE=
 github.com/openshift/client-go v0.0.0-20260306160707-3935d929fc7d h1:T+9HFgEEcnu1TDDfsO5JcJC6N0/Kzob5AtG9IpITHJ8=
 github.com/openshift/client-go v0.0.0-20260306160707-3935d929fc7d/go.mod h1:tIA3XSb/WsC/Fg0YNRfs/JrMrloBKPGF+NKVutd7nMI=
-github.com/openshift/cluster-policy-controller v0.0.0-20260311142746-44985a130641 h1:H/FaXLrjsmRShboRgdhL0SE7Z06I65pPpKUGtjZiKyo=
-github.com/openshift/cluster-policy-controller v0.0.0-20260311142746-44985a130641/go.mod h1:aiLBVkadOsGJJcEKuQ+IYrypZF2a4ts2UpOEhQ0rndc=
+github.com/openshift/cluster-policy-controller v0.0.0-20260420102459-bb429f5b2a7d h1:IKzD+8sPwARWV4maM2oJ2IDbU99qQr1+53WyqpsWNxg=
+github.com/openshift/cluster-policy-controller v0.0.0-20260420102459-bb429f5b2a7d/go.mod h1:aiLBVkadOsGJJcEKuQ+IYrypZF2a4ts2UpOEhQ0rndc=
 github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260304192652-72835e43c775 h1:4gZibdvRUsxsQ55Tp+HFRjVzkYh+bcRezmYqhiCMk4U=
 github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260304192652-72835e43c775/go.mod h1:o5cKv/pQ+exEYKq97WapNa5cxSPxuwBezHZHNW5RNRo=
 github.com/openshift/library-go v0.0.0-20260303171201-5d9eb6295ff6 h1:xjqy0OolrFdJ+ofI/aD0+2k9+MSk5anP5dXifFt539Q=
