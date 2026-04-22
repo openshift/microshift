@@ -192,45 +192,9 @@ func (c *C2CC) validate(cfg *Config) error {
 	}
 
 	for i := range c.RemoteClusters {
-		rc := &c.RemoteClusters[i]
-		res := &resolved[i]
-		label := fmt.Sprintf("remoteClusters[%d]", i)
-
-		normalizedNextHop := res.NextHop.String()
-		if res.NextHop.Equal(nodeIP) || (nodeIPv6 != nil && res.NextHop.Equal(nodeIPv6)) {
-			errs = append(errs, fmt.Errorf("%s.nextHop %q must not equal the local node IP (routing loop)", label, normalizedNextHop))
-		}
-		if prev, ok := seenNextHops[normalizedNextHop]; ok {
-			errs = append(errs, fmt.Errorf("%s.nextHop %q duplicates remoteClusters[%d]", label, normalizedNextHop, prev))
-		} else {
-			seenNextHops[normalizedNextHop] = i
-		}
-
-		for j, cidrNet := range res.ClusterNetwork {
-			errs = append(errs, checkCIDRConflicts(cidrNet, rc.ClusterNetwork[j], label, seenCIDRs, hostIPs)...)
-			seenCIDRs = append(seenCIDRs, labeledCIDR{net: cidrNet, str: rc.ClusterNetwork[j]})
-		}
-		for j, cidrNet := range res.ServiceNetwork {
-			errs = append(errs, checkCIDRConflicts(cidrNet, rc.ServiceNetwork[j], label, seenCIDRs, hostIPs)...)
-			seenCIDRs = append(seenCIDRs, labeledCIDR{net: cidrNet, str: rc.ServiceNetwork[j]})
-		}
-
-		if rc.Domain != "" {
-			if domainErrs := validation.IsDNS1123Subdomain(rc.Domain); len(domainErrs) > 0 {
-				errs = append(errs, fmt.Errorf("%s.domain %q is not a valid DNS name: %s", label, rc.Domain, strings.Join(domainErrs, ", ")))
-			}
-			if prev, ok := seenRemoteDomains[rc.Domain]; ok {
-				errs = append(errs, fmt.Errorf("%s.domain %q duplicates remoteClusters[%d]", label, rc.Domain, prev))
-			} else {
-				seenRemoteDomains[rc.Domain] = i
-			}
-		}
-
-		errs = append(errs, validateIPFamilyConsistencyNets(res.ClusterNetwork, label+".clusterNetwork")...)
-		errs = append(errs, validateIPFamilyConsistencyNets(res.ServiceNetwork, label+".serviceNetwork")...)
-		errs = append(errs, validateNetworkShapeNets(res.ClusterNetwork, res.ServiceNetwork, label)...)
-		errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, res.ClusterNetwork, label)...)
-		errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, res.ServiceNetwork, label)...)
+		errs = append(errs, validateRemoteCluster(i, &c.RemoteClusters[i], &resolved[i],
+			nodeIP, nodeIPv6, localV4, localV6, hostIPs,
+			seenNextHops, seenRemoteDomains, &seenCIDRs)...)
 	}
 
 	if err := errors.Join(errs...); err != nil {
@@ -241,17 +205,66 @@ func (c *C2CC) validate(cfg *Config) error {
 	return nil
 }
 
+func validateRemoteCluster(
+	i int, rc *RemoteCluster, res *ResolvedRemoteCluster,
+	nodeIP, nodeIPv6 net.IP, localV4, localV6 bool, hostIPs []net.IP,
+	seenNextHops map[string]int, seenRemoteDomains map[string]int, seenCIDRs *[]labeledCIDR,
+) []error {
+	label := fmt.Sprintf("remoteClusters[%d]", i)
+	var errs []error
+
+	normalizedNextHop := res.NextHop.String()
+	if res.NextHop.Equal(nodeIP) || (nodeIPv6 != nil && res.NextHop.Equal(nodeIPv6)) {
+		errs = append(errs, fmt.Errorf("%s.nextHop %q must not equal the local node IP (routing loop)", label, normalizedNextHop))
+	}
+	if prev, ok := seenNextHops[normalizedNextHop]; ok {
+		errs = append(errs, fmt.Errorf("%s.nextHop %q duplicates remoteClusters[%d]", label, normalizedNextHop, prev))
+	} else {
+		seenNextHops[normalizedNextHop] = i
+	}
+
+	for j, cidrNet := range res.ClusterNetwork {
+		errs = append(errs, checkCIDRConflicts(cidrNet, rc.ClusterNetwork[j], label, *seenCIDRs, hostIPs)...)
+		*seenCIDRs = append(*seenCIDRs, labeledCIDR{net: cidrNet, str: rc.ClusterNetwork[j]})
+	}
+	for j, cidrNet := range res.ServiceNetwork {
+		errs = append(errs, checkCIDRConflicts(cidrNet, rc.ServiceNetwork[j], label, *seenCIDRs, hostIPs)...)
+		*seenCIDRs = append(*seenCIDRs, labeledCIDR{net: cidrNet, str: rc.ServiceNetwork[j]})
+	}
+
+	if rc.Domain != "" {
+		if domainErrs := validation.IsDNS1123Subdomain(rc.Domain); len(domainErrs) > 0 {
+			errs = append(errs, fmt.Errorf("%s.domain %q is not a valid DNS name: %s", label, rc.Domain, strings.Join(domainErrs, ", ")))
+		}
+		if prev, ok := seenRemoteDomains[rc.Domain]; ok {
+			errs = append(errs, fmt.Errorf("%s.domain %q duplicates remoteClusters[%d]", label, rc.Domain, prev))
+		} else {
+			seenRemoteDomains[rc.Domain] = i
+		}
+	}
+
+	errs = append(errs, validateIPFamilyConsistencyNets(res.ClusterNetwork, label+".clusterNetwork")...)
+	errs = append(errs, validateIPFamilyConsistencyNets(res.ServiceNetwork, label+".serviceNetwork")...)
+	errs = append(errs, validateNetworkShapeNets(res.ClusterNetwork, res.ServiceNetwork, label)...)
+	errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, res.ClusterNetwork, label)...)
+	errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, res.ServiceNetwork, label)...)
+
+	return errs
+}
+
 func validateIPFamilyConsistencyNets(cidrs []*net.IPNet, field string) []error {
 	var v4, v6 int
+	var errs []error
 	for _, c := range cidrs {
 		switch netutils.IPFamilyOfCIDR(c) {
 		case netutils.IPv4:
 			v4++
 		case netutils.IPv6:
 			v6++
+		case netutils.IPFamilyUnknown:
+			errs = append(errs, fmt.Errorf("%s has unrecognized IP family: %v", field, c))
 		}
 	}
-	var errs []error
 	if v4 > 1 {
 		errs = append(errs, fmt.Errorf("%s has multiple IPv4 entries (max 1)", field))
 	}
