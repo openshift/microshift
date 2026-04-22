@@ -15,6 +15,9 @@ type C2CC struct {
 	// List of remote clusters to establish connectivity with.
 	// C2CC is disabled when this list is empty.
 	RemoteClusters []RemoteCluster `json:"remoteClusters,omitempty"`
+
+	// Populated during validation with parsed network objects.
+	Resolved []ResolvedRemoteCluster `json:"-"`
 }
 
 type RemoteCluster struct {
@@ -28,6 +31,18 @@ type RemoteCluster struct {
 	// Services are reachable as <svc>.<ns>.svc.<domain>.
 	// Optional — if empty, no DNS forwarding is configured for this remote.
 	Domain string `json:"domain,omitempty"`
+}
+
+type ResolvedRemoteCluster struct {
+	NextHop        net.IP
+	ClusterNetwork []*net.IPNet
+	ServiceNetwork []*net.IPNet
+	Domain         string
+}
+
+type labeledCIDR struct {
+	net *net.IPNet
+	str string
 }
 
 func (c *C2CC) IsEnabled() bool {
@@ -68,9 +83,74 @@ func defaultGetHostIPs() ([]net.IP, error) {
 	return ips, nil
 }
 
+func (c *C2CC) parseRemoteClusters() ([]ResolvedRemoteCluster, []error) {
+	resolved := make([]ResolvedRemoteCluster, len(c.RemoteClusters))
+	var errs []error
+
+	for i := range c.RemoteClusters {
+		rc := &c.RemoteClusters[i]
+		label := fmt.Sprintf("remoteClusters[%d]", i)
+
+		ip := net.ParseIP(rc.NextHop)
+		if ip == nil {
+			errs = append(errs, fmt.Errorf("%s.nextHop %q is not a valid IP address", label, rc.NextHop))
+		}
+		resolved[i].NextHop = ip
+
+		if len(rc.ClusterNetwork) == 0 {
+			errs = append(errs, fmt.Errorf("%s.clusterNetwork must not be empty", label))
+		}
+		if len(rc.ServiceNetwork) == 0 {
+			errs = append(errs, fmt.Errorf("%s.serviceNetwork must not be empty", label))
+		}
+
+		for j, cidr := range rc.ClusterNetwork {
+			if ipNet := parseAndValidateCIDR(cidr, fmt.Sprintf("%s.clusterNetwork[%d]", label, j), &errs); ipNet != nil {
+				resolved[i].ClusterNetwork = append(resolved[i].ClusterNetwork, ipNet)
+			}
+		}
+		for j, cidr := range rc.ServiceNetwork {
+			if ipNet := parseAndValidateCIDR(cidr, fmt.Sprintf("%s.serviceNetwork[%d]", label, j), &errs); ipNet != nil {
+				resolved[i].ServiceNetwork = append(resolved[i].ServiceNetwork, ipNet)
+			}
+		}
+
+		resolved[i].Domain = rc.Domain
+	}
+
+	return resolved, errs
+}
+
+func parseAndValidateCIDR(cidr, field string, errs *[]error) *net.IPNet {
+	_, ipNet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		*errs = append(*errs, fmt.Errorf("%s %q is not a valid CIDR: %w", field, cidr, err))
+		return nil
+	}
+
+	ones, _ := ipNet.Mask.Size()
+	if ipNet.IP.To4() != nil {
+		if ones < 8 {
+			*errs = append(*errs, fmt.Errorf("%s %q has mask /%d shorter than minimum /8", field, cidr, ones))
+			return nil
+		}
+	} else {
+		if ones < 32 {
+			*errs = append(*errs, fmt.Errorf("%s %q has mask /%d shorter than minimum /32", field, cidr, ones))
+			return nil
+		}
+	}
+	return ipNet
+}
+
 func (c *C2CC) validate(cfg *Config) error {
 	if cfg.Network.CNIPlugin != CniPluginUnset && cfg.Network.CNIPlugin != CniPluginOVNK {
 		return fmt.Errorf("c2cc requires OVN-Kubernetes CNI (network.cniPlugin must be \"\" or \"ovnk\", got %q)", cfg.Network.CNIPlugin)
+	}
+
+	resolved, parseErrs := c.parseRemoteClusters()
+	if len(parseErrs) > 0 {
+		return errors.Join(parseErrs...)
 	}
 
 	hostIPs, err := getHostIPs()
@@ -99,46 +179,40 @@ func (c *C2CC) validate(cfg *Config) error {
 	seenNextHops := make(map[string]int, len(c.RemoteClusters))
 	seenRemoteDomains := make(map[string]int, len(c.RemoteClusters))
 
-	// Overlap check: start with local CIDRs, then accumulate each remote's CIDRs.
-	seenCIDRs := make([]string, 0, len(cfg.Network.ClusterNetwork)+len(cfg.Network.ServiceNetwork)+len(c.RemoteClusters)*4)
-	seenCIDRs = append(seenCIDRs, cfg.Network.ClusterNetwork...)
-	seenCIDRs = append(seenCIDRs, cfg.Network.ServiceNetwork...)
+	seenCIDRs := make([]labeledCIDR, 0, len(cfg.Network.ClusterNetwork)+len(cfg.Network.ServiceNetwork)+len(c.RemoteClusters)*4)
+	for _, s := range cfg.Network.ClusterNetwork {
+		if _, ipNet, err := net.ParseCIDR(s); err == nil {
+			seenCIDRs = append(seenCIDRs, labeledCIDR{net: ipNet, str: s})
+		}
+	}
+	for _, s := range cfg.Network.ServiceNetwork {
+		if _, ipNet, err := net.ParseCIDR(s); err == nil {
+			seenCIDRs = append(seenCIDRs, labeledCIDR{net: ipNet, str: s})
+		}
+	}
 
 	for i := range c.RemoteClusters {
 		rc := &c.RemoteClusters[i]
+		res := &resolved[i]
 		label := fmt.Sprintf("remoteClusters[%d]", i)
 
-		ip := net.ParseIP(rc.NextHop)
-		if ip == nil {
-			errs = append(errs, fmt.Errorf("%s.nextHop %q is not a valid IP address", label, rc.NextHop))
+		normalizedNextHop := res.NextHop.String()
+		if res.NextHop.Equal(nodeIP) || (nodeIPv6 != nil && res.NextHop.Equal(nodeIPv6)) {
+			errs = append(errs, fmt.Errorf("%s.nextHop %q must not equal the local node IP (routing loop)", label, normalizedNextHop))
+		}
+		if prev, ok := seenNextHops[normalizedNextHop]; ok {
+			errs = append(errs, fmt.Errorf("%s.nextHop %q duplicates remoteClusters[%d]", label, normalizedNextHop, prev))
 		} else {
-			normalizedNextHop := ip.String()
-			if ip.Equal(nodeIP) || (nodeIPv6 != nil && ip.Equal(nodeIPv6)) {
-				errs = append(errs, fmt.Errorf("%s.nextHop %q must not equal the local node IP (routing loop)", label, normalizedNextHop))
-			}
-			if prev, ok := seenNextHops[normalizedNextHop]; ok {
-				errs = append(errs, fmt.Errorf("%s.nextHop %q duplicates remoteClusters[%d]", label, normalizedNextHop, prev))
-			} else {
-				seenNextHops[normalizedNextHop] = i
-			}
+			seenNextHops[normalizedNextHop] = i
 		}
 
-		if len(rc.ClusterNetwork) == 0 {
-			errs = append(errs, fmt.Errorf("%s.clusterNetwork must not be empty", label))
+		for j, cidrNet := range res.ClusterNetwork {
+			errs = append(errs, checkCIDRConflicts(cidrNet, rc.ClusterNetwork[j], label, seenCIDRs, hostIPs)...)
+			seenCIDRs = append(seenCIDRs, labeledCIDR{net: cidrNet, str: rc.ClusterNetwork[j]})
 		}
-		if len(rc.ServiceNetwork) == 0 {
-			errs = append(errs, fmt.Errorf("%s.serviceNetwork must not be empty", label))
-		}
-
-		for j, cidr := range rc.ClusterNetwork {
-			errs = append(errs, validateRemoteCIDR(cidr, fmt.Sprintf("%s.clusterNetwork[%d]", label, j)))
-			errs = append(errs, checkCIDRConflicts(cidr, label, seenCIDRs, hostIPs)...)
-			seenCIDRs = append(seenCIDRs, cidr)
-		}
-		for j, cidr := range rc.ServiceNetwork {
-			errs = append(errs, validateRemoteCIDR(cidr, fmt.Sprintf("%s.serviceNetwork[%d]", label, j)))
-			errs = append(errs, checkCIDRConflicts(cidr, label, seenCIDRs, hostIPs)...)
-			seenCIDRs = append(seenCIDRs, cidr)
+		for j, cidrNet := range res.ServiceNetwork {
+			errs = append(errs, checkCIDRConflicts(cidrNet, rc.ServiceNetwork[j], label, seenCIDRs, hostIPs)...)
+			seenCIDRs = append(seenCIDRs, labeledCIDR{net: cidrNet, str: rc.ServiceNetwork[j]})
 		}
 
 		if rc.Domain != "" {
@@ -152,44 +226,29 @@ func (c *C2CC) validate(cfg *Config) error {
 			}
 		}
 
-		errs = append(errs, validateIPFamilyConsistency(rc.ClusterNetwork, label+".clusterNetwork")...)
-		errs = append(errs, validateIPFamilyConsistency(rc.ServiceNetwork, label+".serviceNetwork")...)
-		errs = append(errs, validateNetworkShape(rc.ClusterNetwork, rc.ServiceNetwork, label)...)
-		errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, rc.ClusterNetwork, label)...)
-		errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, rc.ServiceNetwork, label)...)
+		errs = append(errs, validateIPFamilyConsistencyNets(res.ClusterNetwork, label+".clusterNetwork")...)
+		errs = append(errs, validateIPFamilyConsistencyNets(res.ServiceNetwork, label+".serviceNetwork")...)
+		errs = append(errs, validateNetworkShapeNets(res.ClusterNetwork, res.ServiceNetwork, label)...)
+		errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, res.ClusterNetwork, label)...)
+		errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, res.ServiceNetwork, label)...)
 	}
 
-	return errors.Join(errs...)
-}
-
-func validateRemoteCIDR(cidr, field string) error {
-	_, ipNet, err := net.ParseCIDR(cidr)
-	if err != nil {
-		return fmt.Errorf("%s %q is not a valid CIDR: %w", field, cidr, err)
+	if err := errors.Join(errs...); err != nil {
+		return err
 	}
 
-	ones, _ := ipNet.Mask.Size()
-	if ipNet.IP.To4() != nil {
-		if ones < 8 {
-			return fmt.Errorf("%s %q has mask /%d shorter than minimum /8", field, cidr, ones)
-		}
-	} else {
-		if ones < 32 {
-			return fmt.Errorf("%s %q has mask /%d shorter than minimum /32", field, cidr, ones)
-		}
-	}
+	c.Resolved = resolved
 	return nil
 }
 
-func validateIPFamilyConsistency(cidrs []string, field string) []error {
+func validateIPFamilyConsistencyNets(cidrs []*net.IPNet, field string) []error {
 	var v4, v6 int
 	for _, c := range cidrs {
-		switch netutils.IPFamilyOfCIDRString(c) {
+		switch netutils.IPFamilyOfCIDR(c) {
 		case netutils.IPv4:
 			v4++
 		case netutils.IPv6:
 			v6++
-		case netutils.IPFamilyUnknown:
 		}
 	}
 	var errs []error
@@ -202,15 +261,15 @@ func validateIPFamilyConsistency(cidrs []string, field string) []error {
 	return errs
 }
 
-func validateNetworkShape(clusterNetwork, serviceNetwork []string, label string) []error {
+func validateNetworkShapeNets(clusterNetwork, serviceNetwork []*net.IPNet, label string) []error {
 	if len(clusterNetwork) != len(serviceNetwork) {
 		return []error{fmt.Errorf("%s: clusterNetwork and serviceNetwork have different cardinality (%d vs %d)",
 			label, len(clusterNetwork), len(serviceNetwork))}
 	}
 	var errs []error
 	for i := 0; i < len(clusterNetwork); i++ {
-		cFamily := netutils.IPFamilyOfCIDRString(clusterNetwork[i])
-		sFamily := netutils.IPFamilyOfCIDRString(serviceNetwork[i])
+		cFamily := netutils.IPFamilyOfCIDR(clusterNetwork[i])
+		sFamily := netutils.IPFamilyOfCIDR(serviceNetwork[i])
 		if cFamily != netutils.IPFamilyUnknown && sFamily != netutils.IPFamilyUnknown && cFamily != sFamily {
 			errs = append(errs, fmt.Errorf("%s: clusterNetwork[%d] and serviceNetwork[%d] have mismatched IP families", label, i, i))
 		}
@@ -218,10 +277,10 @@ func validateNetworkShape(clusterNetwork, serviceNetwork []string, label string)
 	return errs
 }
 
-func validateRemoteIPFamilyCompatibility(localV4, localV6 bool, remoteCIDRs []string, label string) []error {
+func validateRemoteIPFamilyCompatibility(localV4, localV6 bool, remoteCIDRs []*net.IPNet, label string) []error {
 	var errs []error
 	for _, c := range remoteCIDRs {
-		family := netutils.IPFamilyOfCIDRString(c)
+		family := netutils.IPFamilyOfCIDR(c)
 		if family == netutils.IPv4 && !localV4 {
 			errs = append(errs, fmt.Errorf("%s: %q is IPv4 but local cluster has no IPv4 network", label, c))
 		}
@@ -232,28 +291,21 @@ func validateRemoteIPFamilyCompatibility(localV4, localV6 bool, remoteCIDRs []st
 	return errs
 }
 
-func checkCIDRConflicts(cidr, label string, seenCIDRs []string, hostIPs []net.IP) []error {
+func checkCIDRConflicts(cidr *net.IPNet, cidrStr, label string, seenCIDRs []labeledCIDR, hostIPs []net.IP) []error {
 	var errs []error
 	for _, existing := range seenCIDRs {
-		if cidrsOverlap(cidr, existing) {
-			errs = append(errs, fmt.Errorf("%s: CIDR %q overlaps with %q", label, cidr, existing))
+		if cidrsOverlap(cidr, existing.net) {
+			errs = append(errs, fmt.Errorf("%s: CIDR %q overlaps with %q", label, cidrStr, existing.str))
 		}
 	}
-	if _, ipNet, err := net.ParseCIDR(cidr); err == nil {
-		for _, hostIP := range hostIPs {
-			if ipNet.Contains(hostIP) {
-				errs = append(errs, fmt.Errorf("remote CIDR %q contains host interface IP %s — this would disrupt management traffic", cidr, hostIP))
-			}
+	for _, hostIP := range hostIPs {
+		if cidr.Contains(hostIP) {
+			errs = append(errs, fmt.Errorf("remote CIDR %q contains host interface IP %s — this would disrupt management traffic", cidrStr, hostIP))
 		}
 	}
 	return errs
 }
 
-func cidrsOverlap(a, b string) bool {
-	_, netA, errA := net.ParseCIDR(a)
-	_, netB, errB := net.ParseCIDR(b)
-	if errA != nil || errB != nil {
-		return false
-	}
-	return netA.Contains(netB.IP) || netB.Contains(netA.IP)
+func cidrsOverlap(a, b *net.IPNet) bool {
+	return a.Contains(b.IP) || b.Contains(a.IP)
 }
