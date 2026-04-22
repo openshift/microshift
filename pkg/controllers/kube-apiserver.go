@@ -55,14 +55,14 @@ import (
 )
 
 const (
-	kubeAPIStartupTimeout = 60
+	kubeAPIStartupTimeout = 60 * time.Second
 	// rbacHookDeadlockTimeout is the time to wait for the RBAC bootstrap hook
 	// before declaring a deadlock. This is shorter than kubeAPIStartupTimeout
 	// to allow for faster recovery.
-	rbacHookDeadlockTimeout = 15
+	rbacHookDeadlockTimeout = 15 * time.Second
 	// rbacHookCheckInterval is how often to check the RBAC hook status
 	rbacHookPollDelayStart = 5 * time.Second
-	rbacHookCheckInterval  = 2
+	rbacHookCheckInterval  = 2 * time.Second
 	// rbacHookMaxWaitDuration is the absolute maximum time to wait for the RBAC hook
 	// regardless of etcd health state changes. This prevents flapping from extending
 	// detection indefinitely.
@@ -368,7 +368,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 
 	// Run standard readiness check
 	go func() {
-		err := wait.PollUntilContextTimeout(ctx, time.Second, kubeAPIStartupTimeout*time.Second, true, func(ctx context.Context) (bool, error) {
+		err := wait.PollUntilContextTimeout(ctx, time.Second, kubeAPIStartupTimeout, true, func(ctx context.Context) (bool, error) {
 			var status int
 			if err := restClient.Get().AbsPath("/readyz").Do(ctx).StatusCode(&status).Error(); err != nil {
 				klog.Infof("%q not yet ready: %v", s.Name(), err)
@@ -440,7 +440,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		panic(perr)
 	case <-rbacDeadlockDetected:
 		klog.Error("RBAC bootstrap hook deadlock detected - restarting microshift-etcd.scope to recover")
-		if err := restartMicroshiftEtcdScope(); err != nil {
+		if err := restartMicroshiftEtcdScope(ctx); err != nil {
 			klog.Errorf("Failed to restart microshift-etcd.scope: %v", err)
 		}
 		return fmt.Errorf("RBAC bootstrap hook deadlock detected after %d seconds", rbacHookDeadlockTimeout)
@@ -496,11 +496,11 @@ func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient r
 		// Check RBAC hook status
 		probeCtx, cancel := context.WithTimeout(ctx, time.Second)
 		var status int
-		err := restClient.Get().
+		result := restClient.Get().
 			AbsPath("/readyz/poststarthook/rbac/bootstrap-roles").
 			Do(probeCtx).
-			StatusCode(&status).
-			Error()
+			StatusCode(&status)
+		err := result.Error()
 		cancel()
 
 		// If hook is ready, no deadlock
@@ -509,8 +509,8 @@ func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient r
 			return
 		}
 
-		// If RBAC probe errored, skip this iteration (don't count toward deadlock)
-		if err != nil {
+		// If no HTTP status was received, skip this iteration (transport/timeout).
+		if err != nil && status == 0 {
 			klog.V(4).Infof("RBAC probe error (not counting toward deadlock): %v", err)
 			continue
 		}
@@ -583,11 +583,11 @@ func isEtcdHealthy(ctx context.Context) (bool, error) {
 
 // restartMicroshiftEtcdScope restarts the microshift-etcd.scope to recover from deadlock.
 // This forces a clean restart of etcd which can help break the circular dependency.
-func restartMicroshiftEtcdScope() error {
+func restartMicroshiftEtcdScope(ctx context.Context) error {
 	klog.Info("Stopping microshift-etcd.scope for recovery")
 
 	// Set a timeout in case systemd or DBus stalls and the fail-fast recovery path hangs and Run never returns
-	cmdCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	cmdCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	stopCmd := exec.CommandContext(cmdCtx, "systemctl", "stop", "microshift-etcd.scope")
