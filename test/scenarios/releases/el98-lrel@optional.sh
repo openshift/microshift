@@ -2,6 +2,10 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+# Increase greenboot timeout for release scenarios (optional operators need more time)
+# shellcheck disable=SC2034  # used elsewhere
+export GREENBOOT_TIMEOUT=1200
+
 # Redefine network-related settings to use the dedicated network bridge
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere

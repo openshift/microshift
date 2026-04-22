@@ -2,6 +2,10 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+# Increase greenboot timeout for release scenarios (optional operators need more time)
+# shellcheck disable=SC2034  # used elsewhere
+export GREENBOOT_TIMEOUT=1200
+
 start_image="rhel102-bootc-brew-lrel-fips"
 
 check_platform() {
