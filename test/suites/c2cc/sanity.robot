@@ -40,13 +40,13 @@ Cluster B Has Expected Node
     [Documentation]    Verify Cluster B has a node.
     Verify Cluster Has Node    cluster-b
 
-#C2CC Controller Is Running On Cluster A
-#    [Documentation]    Verify c2cc-route-manager logged startup on Cluster A.
-#    Verify C2CC Controller Is Running    cluster-a
+C2CC Controller Is Running On Cluster A
+    [Documentation]    Verify c2cc-route-manager logged startup on Cluster A.
+    Verify C2CC Controller Is Running    cluster-a
 
-#C2CC Controller Is Running On Cluster B
-#    [Documentation]    Verify c2cc-route-manager logged startup on Cluster B.
-#    Verify C2CC Controller Is Running    cluster-b
+C2CC Controller Is Running On Cluster B
+    [Documentation]    Verify c2cc-route-manager logged startup on Cluster B.
+    Verify C2CC Controller Is Running    cluster-b
 
 
 *** Keywords ***
@@ -84,4 +84,5 @@ Verify Cluster Has Node
 Verify C2CC Controller Is Running
     [Documentation]    Verify c2cc-route-manager logged startup in the journal.
     [Arguments]    ${alias}
-    Command On Cluster    ${alias}    journalctl -u microshift --grep c2cc-route-manager --no-pager -q
+    ${stdout}=    Command On Cluster    ${alias}    journalctl -u microshift --grep "C2CC is enabled" --no-pager -q
+    Should Contain    ${stdout}    C2CC is enabled
