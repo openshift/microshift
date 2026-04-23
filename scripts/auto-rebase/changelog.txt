@@ -1,3 +1,0 @@
-- ovn-kubernetes image-amd64 816f6da51b9f7f496169aa583aef2022d6333bec to cf0c520c07d7aaa3494122b7332e8dc017d47772
-  - ab20d0a2 2026-03-31T16:41:42+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
-
