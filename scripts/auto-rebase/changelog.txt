@@ -1,8 +1,0 @@
-- ovn-kubernetes image-amd64 af9d912e101fe65cc197e7d0b06182c82d7368f3 to 3f208c096347db8b0929f5176abd95c1477dc563
-  - 1fd26d34 2026-04-13T17:09:29+05:30 Add unit tests for ex gw pods in terminating or not ready state
-  - 4c19247b 2026-04-02T16:44:55+05:30 Remove routes of ex gw pods in terminating or not ready state
-
-- ovn-kubernetes image-arm64 af9d912e101fe65cc197e7d0b06182c82d7368f3 to 3f208c096347db8b0929f5176abd95c1477dc563
-  - 1fd26d34 2026-04-13T17:09:29+05:30 Add unit tests for ex gw pods in terminating or not ready state
-  - 4c19247b 2026-04-02T16:44:55+05:30 Remove routes of ex gw pods in terminating or not ready state
-
