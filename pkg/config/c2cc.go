@@ -145,7 +145,7 @@ func parseAndValidateCIDR(cidr, field string, errs *[]error) *net.IPNet {
 
 func (c *C2CC) validate(cfg *Config) error {
 	if cfg.Network.CNIPlugin != CniPluginUnset && cfg.Network.CNIPlugin != CniPluginOVNK {
-		return fmt.Errorf("c2cc requires OVN-Kubernetes CNI (network.cniPlugin must be \"\" or \"ovnk\", got %q)", cfg.Network.CNIPlugin)
+		return fmt.Errorf("cluster to cluster requires OVN-Kubernetes CNI (network.cniPlugin must be \"\" or \"ovnk\", got %q)", cfg.Network.CNIPlugin)
 	}
 
 	resolved, parseErrs := c.parseRemoteClusters()

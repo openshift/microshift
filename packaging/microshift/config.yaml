@@ -41,7 +41,7 @@ apiServer:
         # to serve from the API server. Allowed values: VersionTLS12, VersionTLS13.
         # Defaults to VersionTLS12.
         minVersion: VersionTLS12
-c2cc:
+clusterToCluster:
     # List of remote clusters to establish connectivity with.
     # C2CC is disabled when this list is empty.
     remoteClusters:

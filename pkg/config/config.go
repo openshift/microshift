@@ -62,7 +62,7 @@ type Config struct {
 
 	GenericDevicePlugin GenericDevicePlugin `json:"genericDevicePlugin"`
 
-	C2CC C2CC `json:"c2cc"`
+	C2CC C2CC `json:"clusterToCluster"`
 
 	// Internal-only fields
 	userSettings *Config `json:"-"` // the values read from the config file
@@ -701,7 +701,7 @@ func (c *Config) validate() error {
 	}
 	if c.C2CC.IsEnabled() {
 		if err := c.C2CC.validate(c); err != nil {
-			return fmt.Errorf("error validating c2cc: %w", err)
+			return fmt.Errorf("error validating clusterToCluster: %w", err)
 		}
 	}
 	return nil

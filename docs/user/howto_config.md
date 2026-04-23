@@ -30,7 +30,7 @@ apiServer:
     tls:
         cipherSuites: []
         minVersion: ""
-c2cc:
+clusterToCluster:
     remoteClusters:
         - clusterNetwork: []
           domain: ""
@@ -188,7 +188,7 @@ apiServer:
     tls:
         cipherSuites: []
         minVersion: VersionTLS12
-c2cc:
+clusterToCluster:
     remoteClusters:
         - clusterNetwork: []
           domain: ""
