@@ -182,7 +182,11 @@ osbuilder blueprints or bootc containerfiles.
 Summary: Baseline configuration for running low latency workload on MicroShift
 BuildArch: noarch
 Requires: microshift = %{version}
+%if 0%{?rhel} >= 10
+Requires: tuned
+%else
 Requires: tuned-profiles-cpu-partitioning
+%endif
 Requires: python3-pyyaml
 
 %description low-latency
@@ -439,7 +443,11 @@ install -p -m644 packaging/tuned/microshift-cleanup-kubelet.service %{buildroot}
 
 # low-latency
 install -d -m755 %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline
+%if 0%{?rhel} >= 10
+install -p -m644 packaging/tuned/profile/tuned.conf.rhel10 %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline/tuned.conf
+%else
 install -p -m644 packaging/tuned/profile/tuned.conf %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline/tuned.conf
+%endif
 install -p -m755 packaging/tuned/profile/script.sh %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline/script.sh
 install -d -m755 %{buildroot}%{_sysconfdir}/tuned
 install -p -m644 packaging/tuned/profile/variables.conf %{buildroot}%{_sysconfdir}/tuned/microshift-baseline-variables.conf
