@@ -1,36 +1,3 @@
-- kubernetes embedded-component 51bc740cd4e090500ccdff94eda526ceddf3d2a9 to 2d92ab7b3cb444e41ec6d5edf64dfe3b22d93142
-  - 22f2490fe 2026-04-10T14:30:57-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 51a8c572b 2026-03-18T18:28:16+00:00 Release commit for Kubernetes v1.33.10
-  - dd3efcf7a 2026-03-11T12:59:05-07:00 drop publishing rules from dependencies.yaml on release branch
-  - f6bd39f56 2026-03-11T12:58:50-07:00 test/images: read .go-version instead of duplicating
-  - 40cd0abf4 2026-03-09T10:26:36-04:00 cmd/kubeadm: ignore EINVAL error during unmount
-  - 68e7373be 2026-02-26T20:31:46+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.9
-  - 67f0efebf 2026-02-26T10:31:21+00:00 kubeadm: do not add learner member to etcd client endpoints
-  - de4e04baf 2026-02-11T22:10:26+00:00 Fix NPE in CEl accessors of additionalProperties=true objects
-  - 8184dd688 2026-02-09T23:21:41-08:00 Use fast policy refresh interval for TestParamRef
-
-- ovn-kubernetes image-amd64 2aec60c6a5b5238c7c75173a1518322ea595a58e to b8b321eb5f64e9ea776d56e5bec3e5d5bd1ef5b3
-  - 2a5bf31c 2026-03-31T16:31:32+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
-
-- kubernetes image-amd64 51bc740cd4e090500ccdff94eda526ceddf3d2a9 to 2d92ab7b3cb444e41ec6d5edf64dfe3b22d93142
-  - 22f2490fe 2026-04-10T14:30:57-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 51a8c572b 2026-03-18T18:28:16+00:00 Release commit for Kubernetes v1.33.10
-  - dd3efcf7a 2026-03-11T12:59:05-07:00 drop publishing rules from dependencies.yaml on release branch
-  - f6bd39f56 2026-03-11T12:58:50-07:00 test/images: read .go-version instead of duplicating
-  - 40cd0abf4 2026-03-09T10:26:36-04:00 cmd/kubeadm: ignore EINVAL error during unmount
-  - 68e7373be 2026-02-26T20:31:46+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.9
-  - 67f0efebf 2026-02-26T10:31:21+00:00 kubeadm: do not add learner member to etcd client endpoints
-  - de4e04baf 2026-02-11T22:10:26+00:00 Fix NPE in CEl accessors of additionalProperties=true objects
-  - 8184dd688 2026-02-09T23:21:41-08:00 Use fast policy refresh interval for TestParamRef
-
-- kubernetes image-arm64 51bc740cd4e090500ccdff94eda526ceddf3d2a9 to 2d92ab7b3cb444e41ec6d5edf64dfe3b22d93142
-  - 22f2490fe 2026-04-10T14:30:57-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 51a8c572b 2026-03-18T18:28:16+00:00 Release commit for Kubernetes v1.33.10
-  - dd3efcf7a 2026-03-11T12:59:05-07:00 drop publishing rules from dependencies.yaml on release branch
-  - f6bd39f56 2026-03-11T12:58:50-07:00 test/images: read .go-version instead of duplicating
-  - 40cd0abf4 2026-03-09T10:26:36-04:00 cmd/kubeadm: ignore EINVAL error during unmount
-  - 68e7373be 2026-02-26T20:31:46+00:00 Update CHANGELOG/CHANGELOG-1.33.md for v1.33.9
-  - 67f0efebf 2026-02-26T10:31:21+00:00 kubeadm: do not add learner member to etcd client endpoints
-  - de4e04baf 2026-02-11T22:10:26+00:00 Fix NPE in CEl accessors of additionalProperties=true objects
-  - 8184dd688 2026-02-09T23:21:41-08:00 Use fast policy refresh interval for TestParamRef
+- cluster-csi-snapshot-controller-operator embedded-component 019abe0c7671962829eb91269e1d76916966320e to a99bd8ffb9aa596fa8d6932d5d93e0613c5d367f
+  - 0c1c172 2026-04-15T12:46:46Z Fix PDB unhealthyPodEvictionPolicy field name
 
