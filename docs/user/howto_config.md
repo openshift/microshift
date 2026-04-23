@@ -30,6 +30,12 @@ apiServer:
     tls:
         cipherSuites: []
         minVersion: ""
+clusterToCluster:
+    remoteClusters:
+        - clusterNetwork: []
+          domain: ""
+          nextHop: ""
+          serviceNetwork: []
 debugging:
     logLevel: ""
 dns:
@@ -182,6 +188,12 @@ apiServer:
     tls:
         cipherSuites: []
         minVersion: VersionTLS12
+clusterToCluster:
+    remoteClusters:
+        - clusterNetwork: []
+          domain: ""
+          nextHop: ""
+          serviceNetwork: []
 debugging:
     logLevel: Normal
 dns:
