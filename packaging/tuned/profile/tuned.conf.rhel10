@@ -1,0 +1,30 @@
+[main]
+summary=Optimized for running low latency workloads on MicroShift
+# On RHEL 10, the cpu-partitioning profile from tuned-profiles-cpu-partitioning
+# is not recognized by TuneD. Use latency-performance as the parent and inline
+# the necessary cpu-partitioning settings directly.
+include=latency-performance
+
+[variables]
+include=/etc/tuned/microshift-baseline-variables.conf
+isolated_cores_expanded=${f:cpulist_unpack:${isolated_cores}}
+offline_cpu_set_expanded=${f:cpulist_unpack:${offline_cpu_set}}
+
+[bootloader]
+cmdline_cpu_part=+nohz=on nohz_full=${isolated_cores} rcu_nocbs=${isolated_cores} tuned.non_isolcpus=${f:cpulist2hex_invert:${isolated_cores}}
+cmdline_microshift_hp=+hugepagesz=${hugepages_size} hugepages=${hugepages}
+cmdline_microshift_extra=+${additional_args}
+
+[sysctl]
+kernel.hung_task_timeout_secs = 600
+kernel.nmi_watchdog = 0
+vm.stat_interval = 10
+kernel.timer_migration = 0
+kernel.sched_rt_runtime_us=-1
+
+[scheduler]
+isolated_cores=${isolated_cores}
+
+[script]
+priority=5
+script=${i:PROFILE_DIR}/script.sh
