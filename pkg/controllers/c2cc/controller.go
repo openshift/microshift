@@ -160,7 +160,9 @@ func (c *C2CCRouteManager) fullReconcile(ctx context.Context) {
 	}
 	for _, s := range subsystems {
 		if err := s.fn(ctx); err != nil {
-			klog.Errorf("Reconcile %s failed: %v", s.name, err)
+			klog.Errorf("Reconcile %s failed: %v, rolling back all subsystems", s.name, err)
+			c.cleanupAll(ctx)
+			return
 		}
 	}
 }
