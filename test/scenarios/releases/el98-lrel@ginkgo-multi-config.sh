@@ -48,20 +48,22 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_commit_not_found "${start_image}"
 
-    # Wait for microshift-tuned to reboot the node
-    local -r start_time=$(date +%s)
-    while true; do
-        boot_num=$(run_command_on_vm host1 "sudo journalctl --list-boots --quiet | wc -l" || true)
-        boot_num="${boot_num%$'\r'*}"
-        if [[ "${boot_num}" -ge 2 ]]; then
-            break
-        fi
-        if [ $(( $(date +%s) - start_time )) -gt 60 ]; then
-            echo "Timed out waiting for VM having 2 boots"
-            exit 1
-        fi
-        sleep 5
-    done
+    # TODO: Re-enable once kernel-rt is available for RHEL 9.8 and the
+    # rhel98-brew-lrel-tuned image is used as start_image.
+    # # Wait for microshift-tuned to reboot the node
+    # local -r start_time=$(date +%s)
+    # while true; do
+    #     boot_num=$(run_command_on_vm host1 "sudo journalctl --list-boots --quiet | wc -l" || true)
+    #     boot_num="${boot_num%$'\r'*}"
+    #     if [[ "${boot_num}" -ge 2 ]]; then
+    #         break
+    #     fi
+    #     if [ $(( $(date +%s) - start_time )) -gt 60 ]; then
+    #         echo "Timed out waiting for VM having 2 boots"
+    #         exit 1
+    #     fi
+    #     sleep 5
+    # done
 
     # Apply TLSv1.3 configuration via drop-in config
     echo "INFO: Configuring TLSv1.3..."
