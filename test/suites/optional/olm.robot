@@ -128,6 +128,12 @@ OLM Network Policies Are Correctly Configured
     Verify NetworkPolicy Spec Field    olm-operator    ${OLM_NAMESPACE}    ingress    metrics
     Verify NetworkPolicy Spec Field    olm-operator    ${OLM_NAMESPACE}    egress    53
 
+    # default-deny-all: no ingress/egress rules, applies to all pods in marketplace namespace
+    Verify NetworkPolicy Has Empty Pod Selector    default-deny-all    ${MARKETPLACE_NAMESPACE}
+    Verify NetworkPolicy Policy Types    default-deny-all    ${MARKETPLACE_NAMESPACE}
+    Verify NetworkPolicy Spec Field    default-deny-all    ${MARKETPLACE_NAMESPACE}    ingress    ${EMPTY}
+    Verify NetworkPolicy Spec Field    default-deny-all    ${MARKETPLACE_NAMESPACE}    egress    ${EMPTY}
+
     # default-allow-all: both Ingress and Egress defined with no port restrictions in openshift-operators
     Verify NetworkPolicy Has Empty Pod Selector    default-allow-all    ${OPERATORS_NAMESPACE}
     Verify NetworkPolicy Policy Types    default-allow-all    ${OPERATORS_NAMESPACE}
