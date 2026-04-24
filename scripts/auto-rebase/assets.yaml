@@ -252,7 +252,7 @@ assets:
       - file: 0000_50_olm_00-subscriptions.crd.yaml
       - file: 0000_50_olm_01-networkpolicies.yaml
       - file: 0000_50_olm_01-marketplace-networkpolicy.yaml
-        ignore: "MicroShift-specific NetworkPolicy for openshift-marketplace namespace"
+        git_restore: True
       - file: 0000_50_olm_02-olm-operator.serviceaccount.yaml
       - file: 0000_50_olm_03-olmconfig.yaml
       - file: 0000_50_olm_03-services.yaml
