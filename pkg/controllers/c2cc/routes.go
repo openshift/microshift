@@ -19,15 +19,21 @@ const (
 )
 
 type linuxRouteManager struct {
+	policyRouteTable
 	nodeIP      net.IP
 	desiredDsts []*net.IPNet
-	desiredGWs  map[string]net.IP // cidr string -> nexthop
+	desiredGWs  map[string]net.IP
 }
 
 func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 	nodeIP := net.ParseIP(cfg.Node.NodeIP)
 
 	m := &linuxRouteManager{
+		policyRouteTable: policyRouteTable{
+			table:    c2ccRouteTable,
+			proto:    c2ccRouteProto,
+			priority: c2ccRulePriority,
+		},
 		nodeIP:     nodeIP,
 		desiredGWs: make(map[string]net.IP),
 	}
@@ -45,65 +51,28 @@ func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 }
 
 func (m *linuxRouteManager) reconcile(ctx context.Context) error {
-	if err := m.reconcileRoutes(); err != nil {
-		return fmt.Errorf("linux routes: %w", err)
-	}
-	if err := m.reconcileRules(); err != nil {
-		return fmt.Errorf("ip rules: %w", err)
-	}
-	return nil
-}
-
-func (m *linuxRouteManager) reconcileRoutes() error {
 	linkIdx, err := m.getOutgoingLinkIndex()
 	if err != nil {
 		return fmt.Errorf("get outgoing link: %w", err)
 	}
 
-	actual, err := netlink.RouteListFiltered(netlink.FAMILY_ALL, &netlink.Route{
-		Table:    c2ccRouteTable,
-		Protocol: c2ccRouteProto,
-	}, netlink.RT_FILTER_TABLE|netlink.RT_FILTER_PROTOCOL)
-	if err != nil {
-		return fmt.Errorf("listing table %d routes: %w", c2ccRouteTable, err)
-	}
-
-	actualByDst := make(map[string]netlink.Route, len(actual))
-	for _, r := range actual {
-		if r.Dst != nil {
-			actualByDst[r.Dst.String()] = r
-		}
-	}
-
+	var desired []netlink.Route
 	for _, cidr := range m.desiredDsts {
-		dst := cidr.String()
-		if _, exists := actualByDst[dst]; exists {
-			delete(actualByDst, dst)
-			continue
-		}
-		route := netlink.Route{
+		desired = append(desired, netlink.Route{
 			Dst:       cidr,
-			Gw:        m.desiredGWs[dst],
-			Table:     c2ccRouteTable,
-			Protocol:  c2ccRouteProto,
+			Gw:        m.desiredGWs[cidr.String()],
+			Table:     m.table,
+			Protocol:  netlink.RouteProtocol(m.proto),
 			LinkIndex: linkIdx,
-		}
-		if err := netlink.RouteReplace(&route); err != nil {
-			klog.Errorf("Failed to add route to %s via %s: %v", dst, route.Gw, err)
-			continue
-		}
-		klog.V(2).Infof("Route add: %s via %s table %d", dst, route.Gw, c2ccRouteTable)
+		})
 	}
 
-	for dst, r := range actualByDst {
-		route := r
-		if err := netlink.RouteDel(&route); err != nil {
-			klog.Errorf("Failed to delete stale route %s: %v", dst, err)
-			continue
-		}
-		klog.V(2).Infof("Route del: %s table %d (stale)", dst, c2ccRouteTable)
+	if err := m.reconcileRoutes(desired); err != nil {
+		return fmt.Errorf("linux routes: %w", err)
 	}
-
+	if err := m.reconcileRules(); err != nil {
+		return fmt.Errorf("ip rules: %w", err)
+	}
 	return nil
 }
 
@@ -115,7 +84,7 @@ func (m *linuxRouteManager) reconcileRules() error {
 
 	actualByDst := make(map[string]netlink.Rule)
 	for _, r := range allRules {
-		if r.Priority == c2ccRulePriority && r.Table == c2ccRouteTable && r.Dst != nil {
+		if r.Priority == m.priority && r.Table == m.table && r.Dst != nil {
 			actualByDst[r.Dst.String()] = r
 		}
 	}
@@ -128,8 +97,8 @@ func (m *linuxRouteManager) reconcileRules() error {
 		}
 		rule := netlink.NewRule()
 		rule.Dst = cidr
-		rule.Table = c2ccRouteTable
-		rule.Priority = c2ccRulePriority
+		rule.Table = m.table
+		rule.Priority = m.priority
 		rule.Family = ipFamilyOf(cidr)
 		if err := netlink.RuleAdd(rule); err != nil {
 			if !errors.Is(err, syscall.EEXIST) {
@@ -137,7 +106,7 @@ func (m *linuxRouteManager) reconcileRules() error {
 			}
 			continue
 		}
-		klog.V(2).Infof("IP rule add: to %s lookup %d priority %d", dst, c2ccRouteTable, c2ccRulePriority)
+		klog.V(2).Infof("IP rule add: to %s lookup %d priority %d", dst, m.table, m.priority)
 	}
 
 	for dst, r := range actualByDst {
@@ -153,56 +122,9 @@ func (m *linuxRouteManager) reconcileRules() error {
 }
 
 func (m *linuxRouteManager) cleanup(ctx context.Context) error {
-	routes, err := netlink.RouteListFiltered(netlink.FAMILY_ALL, &netlink.Route{
-		Table:    c2ccRouteTable,
-		Protocol: c2ccRouteProto,
-	}, netlink.RT_FILTER_TABLE|netlink.RT_FILTER_PROTOCOL)
-	if err == nil {
-		for _, r := range routes {
-			route := r
-			if err := netlink.RouteDel(&route); err != nil {
-				klog.Errorf("Failed to cleanup route %v: %v", r.Dst, err)
-			}
-		}
-	}
-
-	allRules, err := netlink.RuleList(netlink.FAMILY_ALL)
-	if err == nil {
-		for _, r := range allRules {
-			if r.Priority == c2ccRulePriority && r.Table == c2ccRouteTable {
-				rule := r
-				if err := netlink.RuleDel(&rule); err != nil {
-					klog.Errorf("Failed to cleanup ip rule: %v", err)
-				}
-			}
-		}
-	}
-
+	_ = m.cleanupRoutes()
+	_ = m.cleanupRules()
 	return nil
-}
-
-func (m *linuxRouteManager) subscribe(reconcileCh chan<- string) (chan struct{}, error) {
-	routeUpdates := make(chan netlink.RouteUpdate, 100)
-	done := make(chan struct{})
-
-	if err := netlink.RouteSubscribe(routeUpdates, done); err != nil {
-		return nil, fmt.Errorf("subscribe to route events: %w", err)
-	}
-
-	go func() {
-		for update := range routeUpdates {
-			if update.Table != c2ccRouteTable {
-				continue
-			}
-			select {
-			case reconcileCh <- "linux-route-change":
-			default:
-			}
-		}
-	}()
-
-	klog.V(2).Infof("Subscribed to netlink route events for table %d", c2ccRouteTable)
-	return done, nil
 }
 
 func (m *linuxRouteManager) getOutgoingLinkIndex() (int, error) {
@@ -214,11 +136,4 @@ func (m *linuxRouteManager) getOutgoingLinkIndex() (int, error) {
 		return 0, fmt.Errorf("no route to node IP %s", m.nodeIP)
 	}
 	return routes[0].LinkIndex, nil
-}
-
-func ipFamilyOf(cidr *net.IPNet) int {
-	if cidr.IP.To4() != nil {
-		return netlink.FAMILY_V4
-	}
-	return netlink.FAMILY_V6
 }
