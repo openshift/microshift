@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/ovn-kubernetes/libovsdb/cache"
 	"github.com/ovn-kubernetes/libovsdb/client"
 	"github.com/ovn-kubernetes/libovsdb/model"
 	"github.com/ovn-kubernetes/libovsdb/ovsdb"
@@ -182,6 +184,59 @@ func (m *ovnRouteManager) cleanup(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func (m *ovnRouteManager) subscribe(ctx context.Context, reconcileCh chan<- string) {
+	m.nbClient.Cache().AddEventHandler(&cache.EventHandlerFuncs{
+		UpdateFunc: func(table string, old, new model.Model) {
+			if table != "Logical_Router_Static_Route" {
+				return
+			}
+			if route, ok := new.(*LogicalRouterStaticRoute); ok && route.ExternalIDs[ownerControllerKey] == c2ccOwnerController {
+				select {
+				case reconcileCh <- "ovn-route-updated":
+				default:
+				}
+			}
+		},
+		DeleteFunc: func(table string, old model.Model) {
+			if table != "Logical_Router_Static_Route" {
+				return
+			}
+			if route, ok := old.(*LogicalRouterStaticRoute); ok && route.ExternalIDs[ownerControllerKey] == c2ccOwnerController {
+				select {
+				case reconcileCh <- "ovn-route-deleted":
+				default:
+				}
+			}
+		},
+	})
+	klog.V(2).Infof("Subscribed to OVN NB cache events for C2CC routes")
+
+	go func() {
+		for {
+			disconnectCh := m.nbClient.DisconnectNotify()
+			select {
+			case <-ctx.Done():
+				return
+			case <-disconnectCh:
+				klog.Warningf("OVN NB connection lost, waiting for reconnect...")
+				for !m.nbClient.Connected() {
+					select {
+					case <-ctx.Done():
+						return
+					case <-time.After(1 * time.Second):
+					}
+				}
+				klog.Infof("OVN NB reconnected, triggering full reconcile")
+				select {
+				case reconcileCh <- "ovn-reconnected":
+				default:
+				}
+			}
+		}
+	}()
+	klog.V(2).Infof("Subscribed to OVN NB disconnect notifications")
 }
 
 func (m *ovnRouteManager) listC2CCRoutes(ctx context.Context) ([]LogicalRouterStaticRoute, error) {

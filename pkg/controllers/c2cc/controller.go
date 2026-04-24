@@ -47,7 +47,7 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 
 	if !c.cfg.C2CC.IsEnabled() {
 		klog.Infof("C2CC is disabled")
-		c.initForCleanup()
+		c.initForCleanup(ctx)
 		c.cleanupAll(ctx)
 		close(ready)
 		return ctx.Err()
@@ -72,6 +72,30 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 		return fmt.Errorf("init subsystems: %w", err)
 	}
 
+	reconcileCh := make(chan string, 10)
+
+	c.ovn.subscribe(ctx, reconcileCh)
+
+	if routeDone, err := c.routes.subscribe(reconcileCh); err != nil {
+		klog.Warningf("Could not subscribe to route events for table %d: %v", c2ccRouteTable, err)
+	} else {
+		defer close(routeDone)
+	}
+
+	if svcRouteDone, err := c.svcRoutes.subscribe(reconcileCh); err != nil {
+		klog.Warningf("Could not subscribe to route events for table %d: %v", c2ccSvcRouteTable, err)
+	} else {
+		defer close(svcRouteDone)
+	}
+
+	if nftClose, err := c.nftMgr.subscribe(reconcileCh); err != nil {
+		klog.Warningf("Could not subscribe to nftables events: %v", err)
+	} else {
+		defer nftClose()
+	}
+
+	c.annotation.subscribe(ctx, reconcileCh)
+
 	close(ready)
 	klog.Infof("Ready, starting reconciliation loop")
 
@@ -87,6 +111,9 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 			return ctx.Err()
 		case <-ticker.C:
 			klog.V(4).Infof("Periodic resync")
+			c.fullReconcile(ctx)
+		case reason := <-reconcileCh:
+			klog.V(2).Infof("Event-triggered reconcile: %s", reason)
 			c.fullReconcile(ctx)
 		}
 	}
@@ -130,8 +157,16 @@ func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
 	return nil
 }
 
-func (c *C2CCRouteManager) initForCleanup() {
+func (c *C2CCRouteManager) initForCleanup(ctx context.Context) {
 	_ = c.initKubeClient()
+
+	cleanupCtx, cancel := context.WithTimeout(ctx, connectTimeout)
+	defer cancel()
+	if nbClient, err := connectOVNNB(cleanupCtx); err == nil {
+		c.ovn = newOVNRouteManager(nbClient, c.nodeName, nil)
+	} else {
+		klog.Warningf("Could not connect to OVN NB for cleanup, OVN routes will not be removed: %v", err)
+	}
 
 	c.routes = newLinuxRouteManager(c.cfg)
 	c.svcRoutes = newServiceRouteManager(c.cfg)

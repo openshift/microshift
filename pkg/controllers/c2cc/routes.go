@@ -181,6 +181,30 @@ func (m *linuxRouteManager) cleanup(ctx context.Context) error {
 	return nil
 }
 
+func (m *linuxRouteManager) subscribe(reconcileCh chan<- string) (chan struct{}, error) {
+	routeUpdates := make(chan netlink.RouteUpdate, 100)
+	done := make(chan struct{})
+
+	if err := netlink.RouteSubscribe(routeUpdates, done); err != nil {
+		return nil, fmt.Errorf("subscribe to route events: %w", err)
+	}
+
+	go func() {
+		for update := range routeUpdates {
+			if update.Table != c2ccRouteTable {
+				continue
+			}
+			select {
+			case reconcileCh <- "linux-route-change":
+			default:
+			}
+		}
+	}()
+
+	klog.V(2).Infof("Subscribed to netlink route events for table %d", c2ccRouteTable)
+	return done, nil
+}
+
 func (m *linuxRouteManager) getOutgoingLinkIndex() (int, error) {
 	routes, err := netlink.RouteGet(m.nodeIP)
 	if err != nil {

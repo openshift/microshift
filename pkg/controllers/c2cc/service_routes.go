@@ -211,6 +211,30 @@ func (m *serviceRouteManager) cleanup(ctx context.Context) error {
 	return nil
 }
 
+func (m *serviceRouteManager) subscribe(reconcileCh chan<- string) (chan struct{}, error) {
+	routeUpdates := make(chan netlink.RouteUpdate, 100)
+	done := make(chan struct{})
+
+	if err := netlink.RouteSubscribe(routeUpdates, done); err != nil {
+		return nil, fmt.Errorf("subscribe to route events: %w", err)
+	}
+
+	go func() {
+		for update := range routeUpdates {
+			if update.Table != c2ccSvcRouteTable {
+				continue
+			}
+			select {
+			case reconcileCh <- "service-route-change":
+			default:
+			}
+		}
+	}()
+
+	klog.V(2).Infof("Subscribed to netlink route events for table %d", c2ccSvcRouteTable)
+	return done, nil
+}
+
 func getMgmtPortGateway() (net.IP, int, error) {
 	link, err := netlink.LinkByName(mgmtPortInterface)
 	if err != nil {

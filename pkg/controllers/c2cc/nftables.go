@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"syscall"
 
+	"github.com/vishvananda/netlink/nl"
+	"golang.org/x/sys/unix"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/knftables"
 )
@@ -141,4 +144,39 @@ func (m *nftablesManager) cleanup(ctx context.Context) error {
 	}
 
 	return m.nft.Run(ctx, tx)
+}
+
+func (m *nftablesManager) subscribe(reconcileCh chan<- string) (func(), error) {
+	sock, err := nl.Subscribe(unix.NETLINK_NETFILTER, unix.NFNLGRP_NFTABLES)
+	if err != nil {
+		return nil, fmt.Errorf("subscribe to nftables events: %w", err)
+	}
+
+	go func() {
+		for {
+			msgs, _, err := sock.Receive()
+			if err != nil {
+				klog.V(4).Infof("nftables netlink receive error: %v", err)
+				return
+			}
+			for _, msg := range msgs {
+				if msg.Header.Type == syscall.NLMSG_DONE || msg.Header.Type == syscall.NLMSG_ERROR {
+					continue
+				}
+				// nfnetlink message type = (subsys << 8) | msg_type
+				msgType := int(msg.Header.Type) & 0xFF
+				if msgType == unix.NFT_MSG_NEWRULE ||
+					msgType == unix.NFT_MSG_DELRULE ||
+					msgType == unix.NFT_MSG_DELCHAIN {
+					select {
+					case reconcileCh <- "nftables-change":
+					default:
+					}
+				}
+			}
+		}
+	}()
+
+	klog.V(2).Infof("Subscribed to nftables netlink events (NFNLGRP_NFTABLES)")
+	return sock.Close, nil
 }

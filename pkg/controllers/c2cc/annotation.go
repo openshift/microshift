@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog/v2"
 )
@@ -64,4 +66,35 @@ func (a *annotationManager) cleanup(ctx context.Context) error {
 	}
 	klog.V(2).Infof("Removed node annotation %s", ovnNodeDontSNATSubnets)
 	return nil
+}
+
+func (a *annotationManager) subscribe(ctx context.Context, reconcileCh chan<- string) {
+	go func() {
+		for {
+			watcher, err := a.kubeClient.CoreV1().Nodes().Watch(ctx, metav1.ListOptions{
+				FieldSelector: "metadata.name=" + a.nodeName,
+			})
+			if err != nil {
+				klog.Warningf("Could not watch node for annotation changes: %v", err)
+				select {
+				case <-ctx.Done():
+					return
+				case <-time.After(10 * time.Second):
+					continue
+				}
+			}
+			for event := range watcher.ResultChan() {
+				if event.Type == watch.Modified {
+					select {
+					case reconcileCh <- "node-annotation-changed":
+					default:
+					}
+				}
+			}
+			if ctx.Err() != nil {
+				return
+			}
+		}
+	}()
+	klog.V(2).Infof("Subscribed to node annotation changes for %s", a.nodeName)
 }
