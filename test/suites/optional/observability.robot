@@ -46,12 +46,14 @@ Kube Metrics Are Exported
 Journald Logs Are Exported
     [Documentation]    The opentelemetry-collector should be able to export journald logs.
 
-    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {service_name="journald"}
+    Wait Until Keyword Succeeds    10x    5s
+    ...    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {service_name="journald"}
 
 Kube Events Logs Are Exported
     [Documentation]    The opentelemetry-collector should be able to export Kubernetes events.
 
-    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {service_name="kube_events"}
+    Wait Until Keyword Succeeds    10x    5s
+    ...    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {service_name="kube_events"}
 
 Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration
