@@ -3,9 +3,11 @@ package c2cc
 import (
 	"context"
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/ovn-kubernetes/libovsdb/client"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
@@ -19,7 +21,14 @@ type C2CCRouteManager struct {
 	cfg        *config.Config
 	nodeName   string
 	kubeconfig string
+
 	kubeClient kubernetes.Interface
+	ovn        *ovnRouteManager
+	annotation *annotationManager
+	nftMgr     *nftablesManager
+	routes     *linuxRouteManager
+	svcRoutes  *serviceRouteManager
+	netpol     *networkPolicyManager
 }
 
 func NewC2CCRouteManager(cfg *config.Config) *C2CCRouteManager {
@@ -38,6 +47,7 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 
 	if !c.cfg.C2CC.IsEnabled() {
 		klog.Infof("C2CC is disabled")
+		c.initForCleanup()
 		c.cleanupAll(ctx)
 		close(ready)
 		return ctx.Err()
@@ -48,6 +58,18 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	if err := c.initKubeClient(); err != nil {
 		close(ready)
 		return fmt.Errorf("create kube client: %w", err)
+	}
+
+	nbClient, err := connectOVNNB(ctx)
+	if err != nil {
+		close(ready)
+		return fmt.Errorf("connect OVN NB: %w", err)
+	}
+	defer nbClient.Close()
+
+	if err := c.initSubsystems(nbClient); err != nil {
+		close(ready)
+		return fmt.Errorf("init subsystems: %w", err)
 	}
 
 	close(ready)
@@ -75,31 +97,106 @@ func (c *C2CCRouteManager) initKubeClient() error {
 	if err != nil {
 		return fmt.Errorf("build kubeconfig: %w", err)
 	}
-	client, err := kubernetes.NewForConfig(restCfg)
+	kClient, err := kubernetes.NewForConfig(restCfg)
 	if err != nil {
 		return fmt.Errorf("create kubernetes client: %w", err)
 	}
-	c.kubeClient = client
+	c.kubeClient = kClient
 	return nil
+}
+
+func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
+	c.ovn = newOVNRouteManager(nbClient, c.nodeName, c.cfg.C2CC.Resolved)
+	c.annotation = newAnnotationManager(c.kubeClient, c.nodeName, c.cfg.C2CC.AllRemoteCIDRs())
+	c.routes = newLinuxRouteManager(c.cfg)
+	c.svcRoutes = newServiceRouteManager(c.cfg)
+
+	var remotePodCIDRs []*net.IPNet
+	var allRemoteCIDRs []*net.IPNet
+	for _, rc := range c.cfg.C2CC.Resolved {
+		remotePodCIDRs = append(remotePodCIDRs, rc.ClusterNetwork...)
+		allRemoteCIDRs = append(allRemoteCIDRs, rc.ClusterNetwork...)
+		allRemoteCIDRs = append(allRemoteCIDRs, rc.ServiceNetwork...)
+	}
+
+	nftMgr, err := newNftablesManager(allRemoteCIDRs)
+	if err != nil {
+		return fmt.Errorf("init nftables manager: %w", err)
+	}
+	c.nftMgr = nftMgr
+
+	c.netpol = newNetworkPolicyManager(c.kubeClient, remotePodCIDRs)
+
+	return nil
+}
+
+func (c *C2CCRouteManager) initForCleanup() {
+	_ = c.initKubeClient()
+
+	c.routes = newLinuxRouteManager(c.cfg)
+	c.svcRoutes = newServiceRouteManager(c.cfg)
+
+	if nftMgr, err := newNftablesManager(nil); err == nil {
+		c.nftMgr = nftMgr
+	}
+
+	if c.kubeClient != nil {
+		c.annotation = newAnnotationManager(c.kubeClient, c.nodeName, nil)
+		c.netpol = newNetworkPolicyManager(c.kubeClient, nil)
+	}
 }
 
 func (c *C2CCRouteManager) fullReconcile(ctx context.Context) {
-	var errs []error
-	for i := range c.cfg.C2CC.RemoteClusters {
-		rc := &c.cfg.C2CC.RemoteClusters[i]
-		if err := c.reconcileRemote(ctx, rc); err != nil {
-			errs = append(errs, fmt.Errorf("remote %d (%s): %w", i, rc.NextHop, err))
+	subsystems := []struct {
+		name string
+		fn   func(context.Context) error
+	}{
+		{"ovn-routes", c.ovn.reconcile},
+		{"node-annotation", c.annotation.reconcile},
+		{"linux-routes", c.routes.reconcile},
+		{"service-routes", c.svcRoutes.reconcile},
+		{"nftables", c.nftMgr.reconcile},
+		{"network-policy", c.netpol.reconcile},
+	}
+	for _, s := range subsystems {
+		if err := s.fn(ctx); err != nil {
+			klog.Errorf("Reconcile %s failed: %v", s.name, err)
 		}
 	}
-	for _, err := range errs {
-		klog.Errorf("Reconciliation failed: %v", err)
-	}
-}
-
-func (c *C2CCRouteManager) reconcileRemote(ctx context.Context, rc *config.RemoteCluster) error {
-	return nil
 }
 
 func (c *C2CCRouteManager) cleanupAll(ctx context.Context) {
 	klog.V(2).Infof("Cleaning up any leftover C2CC state")
+
+	type cleanable struct {
+		name string
+		fn   func(context.Context) error
+	}
+
+	var cleanups []cleanable
+
+	if c.ovn != nil {
+		cleanups = append(cleanups, cleanable{"ovn-routes", c.ovn.cleanup})
+	}
+	if c.annotation != nil {
+		cleanups = append(cleanups, cleanable{"node-annotation", c.annotation.cleanup})
+	}
+	if c.routes != nil {
+		cleanups = append(cleanups, cleanable{"linux-routes", c.routes.cleanup})
+	}
+	if c.svcRoutes != nil {
+		cleanups = append(cleanups, cleanable{"service-routes", c.svcRoutes.cleanup})
+	}
+	if c.nftMgr != nil {
+		cleanups = append(cleanups, cleanable{"nftables", c.nftMgr.cleanup})
+	}
+	if c.netpol != nil {
+		cleanups = append(cleanups, cleanable{"network-policy", c.netpol.cleanup})
+	}
+
+	for _, cl := range cleanups {
+		if err := cl.fn(ctx); err != nil {
+			klog.Errorf("Cleanup %s failed: %v", cl.name, err)
+		}
+	}
 }
