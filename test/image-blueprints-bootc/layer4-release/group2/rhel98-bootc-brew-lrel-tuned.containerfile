@@ -2,6 +2,10 @@
 # Note: This comment makes templating add a new line before the code
 FROM localhost/rhel98-bootc-brew-lrel-optional:latest
 
+RUN mkdir -p /usr/lib/systemd/system/tuned.service.d && \
+    printf '[Service]\nExecStart=\nExecStart=/usr/sbin/tuned --debug\n' \
+    > /usr/lib/systemd/system/tuned.service.d/debug.conf
+
 # Enable microshift-tuned service
 RUN systemctl enable microshift-tuned
 

@@ -125,6 +125,9 @@ run_bootc_image_build() {
         # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
         if [[ "${CI_JOB_NAME}" =~ .*release(-arm)?(-el(9|10))?$ ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -X
+            # Rebuild the tuned images to pick up containerfile changes from the PR
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -f -t ./image-blueprints-bootc/layer4-release/group2/rhel98-bootc-brew-lrel-tuned.containerfile
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -f -t ./image-blueprints-bootc/layer4-release/group2/rhel102-bootc-brew-lrel-tuned.containerfile
             return
         fi
 
