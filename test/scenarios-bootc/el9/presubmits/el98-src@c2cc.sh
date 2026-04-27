@@ -29,14 +29,10 @@ clusterToCluster:
     domain: ${CLUSTER_B_DOMAIN}
 EOF"
 
-    # host2 (Cluster B): custom CIDRs + C2CC config pointing to host1
+    # host2 (Cluster B): C2CC config pointing to host1.
+    # Network CIDRs are already set via kickstart (see scenario_create_vms).
     run_command_on_vm host2 "sudo mkdir -p /etc/microshift/config.d"
     run_command_on_vm host2 "sudo tee /etc/microshift/config.d/50-c2cc.yaml > /dev/null << EOF
-network:
-  clusterNetwork:
-  - ${CLUSTER_B_POD_CIDR}
-  serviceNetwork:
-  - ${CLUSTER_B_SVC_CIDR}
 clusterToCluster:
   remoteClusters:
   - nextHop: ${host1_ip}
@@ -60,16 +56,11 @@ EOF"
     run_command_on_vm host2 "sudo firewall-cmd --permanent --zone=trusted --add-source=${CLUSTER_A_SVC_CIDR}"
     run_command_on_vm host2 "sudo firewall-cmd --reload"
 
-    # host2 CIDRs changed from defaults — clean up stale OVN/etcd state
-    run_command_on_vm host2 "echo 1 | sudo microshift-cleanup-data --all --keep-images"
-
-    # Restart MicroShift on both hosts (enable on host2 since cleanup-data disables it)
+    # Restart MicroShift on both hosts to pick up C2CC config
     run_command_on_vm host1 "sudo systemctl restart microshift"
-    run_command_on_vm host2 "sudo systemctl enable --now microshift"
+    run_command_on_vm host2 "sudo systemctl restart microshift"
 
-    # Wait for greenboot on both hosts
-    local -r full_host1=$(full_vm_name host1)
-    local -r full_host2=$(full_vm_name host2)
+    # Wait for greenboot on both hosts after C2CC restart
     if ! wait_for_greenboot "${full_host1}" "${host1_ip}"; then
         record_junit host1 "c2cc_greenboot" "FAILED"
         return 1
@@ -84,9 +75,22 @@ EOF"
 }
 
 scenario_create_vms() {
-    # TODO: Configure network.clusterNetwork and network.serviceNetwork on install, so after boot it'll be only c2cc config & restart (no cleanup)
     prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source
     prepare_kickstart host2 kickstart-bootc.ks.template rhel98-bootc-source
+
+    # Inject host2's non-default CIDRs into its kickstart config so MicroShift
+    # boots with the correct network from the start (no cleanup-data needed).
+    local -r host2_ks_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2"
+    cat >> "${host2_ks_dir}/post-microshift.cfg" <<EOF
+cat - >>/etc/microshift/config.yaml <<IEOF
+network:
+  clusterNetwork:
+  - ${CLUSTER_B_POD_CIDR}
+  serviceNetwork:
+  - ${CLUSTER_B_SVC_CIDR}
+IEOF
+EOF
+
     launch_vm rhel98-bootc --vmname host1
     launch_vm rhel98-bootc --vmname host2
 }
