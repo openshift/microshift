@@ -6,7 +6,7 @@
 # ensure MicroShift is upgraded before running validation tests
 export TEST_RANDOMIZATION=none
 
-start_image="rhel98-bootc-brew-lrel-optional"
+start_image="rhel96-bootc-brew-y1-with-optional"
 dest_image="rhel102-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
@@ -14,7 +14,7 @@ scenario_create_vms() {
     exit_if_image_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm rhel98-bootc --vm_disksize 30 --vm_vcpus 4
+    launch_vm rhel96-bootc --vm_disksize 30 --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -54,10 +54,11 @@ scenario_run_tests() {
     echo "INFO: Checking LVMS resources after upgrade..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/checkLvmsResources.sh"
 
-    # Run ginkgo tests to validate functionality
-    run_ginkgo_tests host1 "~Disruptive"
-
     # Cleanup LVMS workloads
     echo "INFO: Cleaning up LVMS workloads..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
+
+    # Run standard2 suite for basic validation after upgrade
+    run_tests host1 \
+        suites/standard2/
 }
