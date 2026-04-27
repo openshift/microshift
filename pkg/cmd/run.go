@@ -237,6 +237,7 @@ func RunMicroshift(cfg *config.Config) error {
 	util.Must(m.AddService(controllers.NewClusterID(cfg)))
 	util.Must(m.AddService(controllers.NewTelemetryManager(cfg)))
 	util.Must(m.AddService(controllers.NewHostsWatcherManager(cfg)))
+	util.Must(m.AddService(controllers.NewDNSConfigurationWatcherManager(cfg)))
 	util.Must(m.AddService(gdp.NewGenericDevicePlugin(cfg)))
 	util.Must(m.AddService(c2cc.NewC2CCRouteManager(cfg)))
 
