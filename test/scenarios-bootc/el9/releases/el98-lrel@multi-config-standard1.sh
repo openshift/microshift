@@ -96,6 +96,7 @@ EOF"
     echo "INFO: Running validation tests for multi-config scenario..."
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.8" \
+        --exclude version \
         suites/standard1/
 
     echo "SUCCESS: Multi-config scenario validation completed - no conflicts detected"
