@@ -32,8 +32,9 @@ Register Local Cluster
     [Documentation]    Register the primary cluster (host1) for use with generic cluster keywords.
     ...    Must be called after Login MicroShift Host and Setup Kubeconfig.
     [Arguments]    ${alias}
+    ${conn}=    SSHLibrary.Get Connection
     Set To Dictionary    ${C2CC_KUBECONFIGS}    ${alias}    ${KUBECONFIG}
-    Set To Dictionary    ${C2CC_SSH_IDS}    ${alias}    1
+    Set To Dictionary    ${C2CC_SSH_IDS}    ${alias}    ${conn.index}
 
 Register Remote Cluster
     [Documentation]    Open an SSH connection to a remote cluster and register it by alias.
@@ -54,12 +55,16 @@ Register Remote Cluster
 
 Teardown All Remote Clusters
     [Documentation]    Close SSH connections for all registered remote clusters
-    ...    and switch back to the primary (host1) connection.
+    ...    and switch back to the local cluster connection so that
+    ...    Logout MicroShift Host can close it.
     FOR    ${alias}    IN    @{C2CC_REMOTE_ALIASES}
         SSHLibrary.Switch Connection    ${alias}
         SSHLibrary.Close Connection
     END
-    SSHLibrary.Switch Connection    1
+    @{C2CC_REMOTE_ALIASES}=    Create List
+    Set Suite Variable    @{C2CC_REMOTE_ALIASES}
+    ${local_conn}=    Get From Dictionary    ${C2CC_SSH_IDS}    cluster-a
+    SSHLibrary.Switch Connection    ${local_conn}
 
 Command On Cluster
     [Documentation]    Run a shell command on the specified cluster via SSH.
@@ -89,4 +94,18 @@ Oc On Cluster
     Should Be Equal As Integers    ${result.rc}    0
     ${stdout}=    OperatingSystem.Get File    ${stdout_file}
     ${stdout}=    Strip String    ${stdout}
+    RETURN    ${stdout}
+
+Oc Exec On Cluster
+    [Documentation]    Run 'oc exec' on a pod in the specified cluster.
+    [Arguments]    ${alias}    ${pod}    ${cmd}    ${ns}=${EMPTY}
+    ${ns_arg}=    Set Variable If    '${ns}'    -n ${ns}    ${EMPTY}
+    ${stdout}=    Oc On Cluster    ${alias}    oc exec ${ns_arg} ${pod} -- ${cmd}
+    RETURN    ${stdout}
+
+Oc Apply On Cluster
+    [Documentation]    Run 'oc apply -f' on the specified cluster.
+    [Arguments]    ${alias}    ${file}    ${ns}=${EMPTY}
+    ${ns_arg}=    Set Variable If    '${ns}'    -n ${ns}    ${EMPTY}
+    ${stdout}=    Oc On Cluster    ${alias}    oc apply ${ns_arg} -f ${file}
     RETURN    ${stdout}
