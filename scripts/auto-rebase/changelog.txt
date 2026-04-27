@@ -1,0 +1,4 @@
+- api embedded-component fec28cd18ea9143248b8c67fda477c8810d32298 to e9fad7d4cba1537b8af99b972370e76370de72e9
+  - 36551634 2026-04-21T08:59:27Z Add ClusterAPI observedRevisionGeneration
+  - 9a11f9f2 2026-04-21T08:59:27Z Add component names and manifestSubstitutions to CAPI revisions
+
