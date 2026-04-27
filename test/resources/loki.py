@@ -2,6 +2,7 @@ import sys
 import json
 import requests
 from datetime import datetime, timedelta
+import libipv6
 
 
 def query_loki(loki_url: str, query: str, limit: int = 10, start_time: datetime = None, end_time: datetime = None) -> dict:
@@ -68,17 +69,38 @@ def _print_results(results: dict) -> None:
                 _log(f"{log_line}")
 
 
+def check_loki_ready(host: str, port: int) -> None:
+    """Check if Loki is ready by hitting the /ready endpoint.
+
+    Raises Exception if Loki is unreachable or returns a non-200 status code.
+    """
+    address = libipv6.add_brackets_if_ipv6(host)
+    url = f"http://{address}:{port}/ready"
+    _log(f"Checking Loki readiness at {url}")
+    try:
+        response = requests.get(url, timeout=5)
+    except requests.exceptions.ConnectionError as e:
+        raise Exception(f"Loki is unreachable at {url}: {e}") from e
+    except requests.exceptions.Timeout as e:
+        raise Exception(f"Loki readiness check timed out at {url}: {e}") from e
+    _log(f"Loki readiness response: {response.status_code} {response.text.strip()}")
+    if response.status_code != 200:
+        raise Exception(f"Loki is not ready: {response.status_code} {response.text.strip()}")
+
+
 def check_loki_query(host: str, port: int, query: str, limit: int = 10) -> None:
     try:
         from robot.libraries.BuiltIn import BuiltIn
-        # Running within RF
         stdout, _, _ = BuiltIn().run_keyword("Command Execution", "hostname")
         if stdout:
             query = f"{query} | host_name=`{stdout}`"
             _log(f"Added hostname to query: {query}")
-    except Exception:
-        None
-    results = query_loki(f"http://{host}:{port}", query, limit)
+    except ImportError:
+        _log("Not running within Robot Framework, skipping host filter")
+    except Exception as e:
+        _log(f"WARNING: Could not determine hostname, proceeding without host filter: {e}")
+    address = libipv6.add_brackets_if_ipv6(host)
+    results = query_loki(f"http://{address}:{port}", query, limit)
     _print_results(results)
 
 

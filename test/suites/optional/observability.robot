@@ -72,6 +72,7 @@ Setup Suite And Prepare Test Host
     Command Should Work    sudo firewall-cmd --reload
     # Configure observability settings
     Check Required Observability Variables
+    Ensure Loki Is Ready
     Set Test OTEL Configuration
     # We need to do something to the cluster to generate new kube events
     Create Hello MicroShift Pod
@@ -87,6 +88,26 @@ Check Required Observability Variables
     Should Not Be Empty    ${LOKI_HOST}    LOKI_HOST variable is required
     ${string_value}    Convert To String    ${LOKI_HOST}
     Should Not Be Empty    ${string_value}    LOKI_HOST variable is required
+    ${string_value}    Convert To String    ${LOKI_PORT}
+    Should Not Be Empty    ${string_value}    LOKI_PORT variable is required
+
+Ensure Loki Is Ready
+    [Documentation]    Check if Loki's ingester is healthy, restart the container if not.
+    ...    Loki's ingester can enter a shutdown state over time, causing it to
+    ...    reject all writes with HTTP 503 while still responding to queries.
+    ...    After a restart, the ingester needs ~15s before it reports ready.
+    ${status}    ${error}    Run Keyword And Ignore Error
+    ...    Check Loki Ready    ${LOKI_HOST}    ${LOKI_PORT}
+    IF    "${status}" == "PASS"    RETURN
+    Log    Loki is not ready: ${error}    console=True
+    FOR    ${attempt}    IN RANGE    1    4
+        Log    Restarting Loki (attempt ${attempt}/3)    console=True
+        Local Command Should Work    ./bin/manage_loki.sh restart ${LOKI_PORT}
+        ${poll_status}    ${poll_error}    Run Keyword And Ignore Error
+        ...    Wait Until Keyword Succeeds    30s    5s    Check Loki Ready    ${LOKI_HOST}    ${LOKI_PORT}
+        IF    "${poll_status}" == "PASS"    RETURN
+    END
+    Fail    Loki did not become ready after 3 restart attempts. Last error: ${poll_error}
 
 Set Test OTEL Configuration
     [Documentation]    Set Test OTEL Configuration
