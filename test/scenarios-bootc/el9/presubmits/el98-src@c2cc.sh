@@ -15,6 +15,22 @@ CLUSTER_B_DOMAIN="cluster-b.remote"
 configure_c2cc_hosts() {
     local -r host1_ip=$(get_vm_property host1 ip)
     local -r host2_ip=$(get_vm_property host2 ip)
+    local -r full_host1=$(full_vm_name host1)
+    local -r full_host2=$(full_vm_name host2)
+
+    # Wait for greenboot to finish on both hosts before reconfiguring.
+    # Restarting MicroShift mid-healthcheck causes greenboot to reboot the host.
+    if ! wait_for_greenboot "${full_host1}" "${host1_ip}"; then
+        record_junit host1 "c2cc_pre_greenboot" "FAILED"
+        return 1
+    fi
+    record_junit host1 "c2cc_pre_greenboot" "OK"
+
+    if ! wait_for_greenboot "${full_host2}" "${host2_ip}"; then
+        record_junit host2 "c2cc_pre_greenboot" "FAILED"
+        return 1
+    fi
+    record_junit host2 "c2cc_pre_greenboot" "OK"
 
     # host1 (Cluster A): C2CC config pointing to host2
     run_command_on_vm host1 "sudo mkdir -p /etc/microshift/config.d"
