@@ -20,21 +20,17 @@ const (
 
 type linuxRouteManager struct {
 	policyRouteTable
-	nodeIP      net.IP
 	desiredDsts []*net.IPNet
 	desiredGWs  map[string]net.IP
 }
 
 func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
-	nodeIP := net.ParseIP(cfg.Node.NodeIP)
-
 	m := &linuxRouteManager{
 		policyRouteTable: policyRouteTable{
 			table:    c2ccRouteTable,
 			proto:    c2ccRouteProto,
 			priority: c2ccRulePriority,
 		},
-		nodeIP:     nodeIP,
 		desiredGWs: make(map[string]net.IP),
 	}
 
@@ -51,19 +47,13 @@ func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 }
 
 func (m *linuxRouteManager) reconcile(ctx context.Context) error {
-	linkIdx, err := m.getOutgoingLinkIndex()
-	if err != nil {
-		return fmt.Errorf("get outgoing link: %w", err)
-	}
-
 	var desired []netlink.Route
 	for _, cidr := range m.desiredDsts {
 		desired = append(desired, netlink.Route{
-			Dst:       cidr,
-			Gw:        m.desiredGWs[cidr.String()],
-			Table:     m.table,
-			Protocol:  netlink.RouteProtocol(m.proto),
-			LinkIndex: linkIdx,
+			Dst:      cidr,
+			Gw:       m.desiredGWs[cidr.String()],
+			Table:    m.table,
+			Protocol: netlink.RouteProtocol(m.proto),
 		})
 	}
 
@@ -127,13 +117,3 @@ func (m *linuxRouteManager) cleanup(ctx context.Context) error {
 	return nil
 }
 
-func (m *linuxRouteManager) getOutgoingLinkIndex() (int, error) {
-	routes, err := netlink.RouteGet(m.nodeIP)
-	if err != nil {
-		return 0, fmt.Errorf("route get for %s: %w", m.nodeIP, err)
-	}
-	if len(routes) == 0 {
-		return 0, fmt.Errorf("no route to node IP %s", m.nodeIP)
-	}
-	return routes[0].LinkIndex, nil
-}
