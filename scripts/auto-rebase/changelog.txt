@@ -1,0 +1,66 @@
+- api embedded-component 34e60874783e455a38f466e1d0c572bbb3d17c51 to 4f63a40a2970d8bcc2f3767bc6b57e09880544fb
+  - b6544bf1 2026-04-21T11:16:04Z Remove UserNamespacesPodSecurityStandards and UserNamespacesSupport feature gates
+
+- cluster-ingress-operator embedded-component f40071e60c14be1ee12772a260c08adaadaf3e94 to 961ac218364fb5f6de970ade1161ece3b8195aed
+  - 2cdc405 2026-04-03T10:00:19-04:00 Fix race condition in internal-to-external LB migration test
+  - 28f66b0 2026-03-31T16:06:00-04:00 NE-2390: Add system context and strategic orientation to AGENTS.md
+  - 76aebbe 2026-03-02T13:02:31Z NE-2390: Address review comments on AGENTS.md
+  - 0e2bf51 2026-01-15T13:13:39Z NE-2390: Adding AGENTS.md file to
+
+- cluster-network-operator embedded-component bdbba59d992a4b2846591ac5260ea12fd14481e0 to 142432afacfb9cd11a9bd4e5e333bd6a4cdcd555
+  - 18ef2d9 2026-03-30T08:53:55+02:00 Allowlist controller: fix error handling in config map existence check
+  - f3abaf7 2026-03-30T08:53:55+02:00 Allowlist controller: inline single-use helper functions
+  - 01a4fc1 2026-03-30T08:53:55+02:00 Allowlist controller: remove unused scheme field
+  - 8682b2e 2026-03-30T08:53:55+02:00 Allowlist controller: remove unused configmap template
+  - 8f4d3bb 2026-03-30T08:53:55+02:00 Allowlist controller: refactor names in controller code
+
+- cluster-openshift-controller-manager-operator embedded-component e1c3674198c6c1274fd3fd3c3108eb4cade4eb0a to c941a99dd2b9200c0de23606c4372d33d656a756
+  - 2221135 2026-04-17T12:50:54-04:00 Add control-plane-approvers to OWNERS
+
+- kubernetes embedded-component 354a124256da76c98d191bf53149eb4578fee0d7 to 757ccdfcf9a1f89059acaba311c3625c495a6732
+  - 6cb4b77d1 2026-04-10T17:24:36+02:00 UPSTREAM: 138318: DRA: use full image name in test manifests
+  - 6bdaf8d14 2026-04-09T17:48:14+02:00 UPSTREAM: 136337: DRA E2E: use image utils to manage hostpath image
+  - 7158cad4a 2026-04-09T17:38:44+02:00 UPSTREAM: 136913: Update the csi-driver-host-path version to 1.17.1
+
+- machine-config-operator embedded-component c3a9db7663f116037e10ed526e35f1c20e5a6f3b to b5d168576877cda02f8c8764b49a98fda23df825
+  - fd094b02 2026-04-23T14:29:45+02:00 OCPBUGS-84218: Fix units rollback if update failure
+  - 7aeb7b85 2026-04-22T10:46:35-04:00 add RootCA cert to the sysContextBuilder certs
+  - 006070e7 2026-04-13T10:15:44-04:00 improve JSON unmarshalling for secret decoding
+
+- operator-framework-olm embedded-component e627823c743797da91b4ae8a318d2420a511b752 to 122728c856e9436ea5ab763bf57977047691bb90
+  - f31d8dec 2026-04-15T00:05:09Z Bump softprops/action-gh-release from 2 to 3 (#3815)
+  - fe2ab6f6 2026-04-15T00:04:22Z :seedling: Bump golang.org/x/net from 0.52.0 to 0.53.0 (#3814)
+  - 1001b6a7 2026-04-15T00:04:02Z remove stale owners (#3813)
+  - 24ea4fb7 2026-04-15T00:03:44Z :seedling: Bump go.opentelemetry.io/otel/sdk from 1.40.0 to 1.43.0 (#3811)
+
+- service-ca-operator embedded-component 7b3033bba87d7b40684b66f8f44a3525433d1ac7 to 95674f775bcff10cfec79a61a0e3451e4c48eb71
+  - 63ecf71 2026-03-03T10:22:22+01:00 controller/servingcerts: Align log verbosity
+
+- oc image-amd64 30bb6e56a38d49b6d646a260be79b072dc27dab1 to 6b8e30c5b39aa742147846341a203905e04834f3
+  - ad1b93fb 2026-04-21T22:31:23+05:30 Add support for groups via YAML/JSON
+
+- ovn-kubernetes image-amd64 90d101f8b4ebae811d1a0ea195d98a5a85ffaef1 to aaa4085f32001c72a7f02557aae8ded035deb341
+  - 85383e01 2026-04-21T15:44:44-07:00 OTE: tolerate missing OpenShift CRDs on MicroShift
+  - 5ae54ebf 2026-04-13T14:11:22+02:00 OTE: Wait for default sa to be provisioned in test namespace
+  - bf97aec4 2026-04-13T14:11:22+02:00 OTE: Add FeatureGate:EVPN label for EVPN E2Es
+  - f2653a31 2026-04-13T14:11:22+02:00 OTE: Extract external container networking to dedicated provider
+  - 924d6e3b 2026-04-13T14:11:22+02:00 OTE: Enable EVPN E2Es
+  - 73db83b9 2026-04-13T14:11:22+02:00 OTE: Add external container support to infra provider
+
+- kubernetes image-amd64 354a124256da76c98d191bf53149eb4578fee0d7 to 757ccdfcf9a1f89059acaba311c3625c495a6732
+  - 6cb4b77d1 2026-04-10T17:24:36+02:00 UPSTREAM: 138318: DRA: use full image name in test manifests
+  - 6bdaf8d14 2026-04-09T17:48:14+02:00 UPSTREAM: 136337: DRA E2E: use image utils to manage hostpath image
+  - 7158cad4a 2026-04-09T17:38:44+02:00 UPSTREAM: 136913: Update the csi-driver-host-path version to 1.17.1
+
+- service-ca-operator image-amd64 7b3033bba87d7b40684b66f8f44a3525433d1ac7 to 95674f775bcff10cfec79a61a0e3451e4c48eb71
+  - 63ecf71 2026-03-03T10:22:22+01:00 controller/servingcerts: Align log verbosity
+
+- oc image-arm64 30bb6e56a38d49b6d646a260be79b072dc27dab1 to 6b8e30c5b39aa742147846341a203905e04834f3
+  - ad1b93fb 2026-04-21T22:31:23+05:30 Add support for groups via YAML/JSON
+
+- ovn-kubernetes image-arm64 ad4056529c72b7c0cebdffa9b49ff04a7828748e to aaa4085f32001c72a7f02557aae8ded035deb341
+  - 85383e01 2026-04-21T15:44:44-07:00 OTE: tolerate missing OpenShift CRDs on MicroShift
+
+- service-ca-operator image-arm64 7b3033bba87d7b40684b66f8f44a3525433d1ac7 to 95674f775bcff10cfec79a61a0e3451e4c48eb71
+  - 63ecf71 2026-03-03T10:22:22+01:00 controller/servingcerts: Align log verbosity
+
