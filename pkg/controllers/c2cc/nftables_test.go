@@ -87,7 +87,6 @@ func TestNftablesManager_ReconcileIsIdempotent(t *testing.T) {
 	fake := setupFakeNFT(t)
 	ctx := context.Background()
 
-	cidrs := []*net.IPNet{parseCIDR(t, "10.45.0.0/16")}
 	mgr := &nftablesManager{
 		nft:          fake,
 		desiredCIDRs: map[string]string{"10.45.0.0/16": "ip daddr 10.45.0.0/16 return"},
@@ -99,8 +98,6 @@ func TestNftablesManager_ReconcileIsIdempotent(t *testing.T) {
 	rules, err := fake.ListRules(ctx, nftChain)
 	require.NoError(t, err)
 	assert.Len(t, rules, 1)
-
-	_ = cidrs
 }
 
 func TestNftablesManager_ReconcileRemovesStaleRules(t *testing.T) {

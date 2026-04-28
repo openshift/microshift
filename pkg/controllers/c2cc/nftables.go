@@ -167,6 +167,7 @@ func (m *nftablesManager) subscribe(reconcileCh chan<- string) (func(), error) {
 				msgType := int(msg.Header.Type) & 0xFF
 				if msgType == unix.NFT_MSG_NEWRULE ||
 					msgType == unix.NFT_MSG_DELRULE ||
+					msgType == unix.NFT_MSG_NEWCHAIN ||
 					msgType == unix.NFT_MSG_DELCHAIN {
 					select {
 					case reconcileCh <- "nftables-change":

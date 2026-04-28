@@ -79,6 +79,7 @@ func (m *linuxRouteManager) reconcileRules() error {
 		}
 	}
 
+	var errs []error
 	for _, cidr := range m.desiredDsts {
 		dst := cidr.String()
 		if _, exists := actualByDst[dst]; exists {
@@ -93,6 +94,7 @@ func (m *linuxRouteManager) reconcileRules() error {
 		if err := netlink.RuleAdd(rule); err != nil {
 			if !errors.Is(err, syscall.EEXIST) {
 				klog.Errorf("Failed to add ip rule for %s: %v", dst, err)
+				errs = append(errs, fmt.Errorf("add rule %s: %w", dst, err))
 			}
 			continue
 		}
@@ -103,12 +105,13 @@ func (m *linuxRouteManager) reconcileRules() error {
 		rule := r
 		if err := netlink.RuleDel(&rule); err != nil {
 			klog.Errorf("Failed to delete stale ip rule for %s: %v", dst, err)
+			errs = append(errs, fmt.Errorf("delete rule %s: %w", dst, err))
 			continue
 		}
 		klog.V(2).Infof("IP rule del: to %s (stale)", dst)
 	}
 
-	return nil
+	return errors.Join(errs...)
 }
 
 func (m *linuxRouteManager) cleanup(ctx context.Context) error {

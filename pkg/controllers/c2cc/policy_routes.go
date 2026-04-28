@@ -34,10 +34,10 @@ func (t *policyRouteTable) reconcileRoutes(desired []netlink.Route) error {
 	for _, r := range desired {
 		dst := r.Dst.String()
 		desiredByDst[dst] = true
-		if _, exists := actualByDst[dst]; exists {
+		route := r
+		if actual, exists := actualByDst[dst]; exists && actual.Gw.Equal(route.Gw) {
 			continue
 		}
-		route := r
 		if err := netlink.RouteReplace(&route); err != nil {
 			klog.Errorf("Failed to add route to %s via %s: %v", dst, route.Gw, err)
 			continue

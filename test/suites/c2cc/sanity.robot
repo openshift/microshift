@@ -73,7 +73,7 @@ Verify Cluster Is Running
 Verify All Pods Are Ready
     [Documentation]    Wait for all pods to be Ready on the given cluster.
     [Arguments]    ${alias}
-    Oc On Cluster    ${alias}    oc wait pods -A --all --for=condition=Ready --timeout=120s
+    Oc On Cluster    ${alias}    oc wait pods -A --all --for=condition=Ready --field-selector=status.phase!=Succeeded,status.phase!=Failed --timeout=120s
 
 Verify Cluster Has Node
     [Documentation]    Verify the given cluster has at least one node.

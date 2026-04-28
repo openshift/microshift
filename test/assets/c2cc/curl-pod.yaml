@@ -6,7 +6,7 @@ spec:
   terminationGracePeriodSeconds: 0
   containers:
   - name: curl
-    image: quay.io/curl/curl:latest
+    image: quay.io/curl/curl:8.14.1
     command: ["sleep", "infinity"]
     securityContext:
       allowPrivilegeEscalation: false

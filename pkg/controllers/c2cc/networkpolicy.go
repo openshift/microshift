@@ -75,8 +75,9 @@ func (m *networkPolicyManager) reconcile(ctx context.Context) error {
 		return fmt.Errorf("getting NetworkPolicy: %w", err)
 	}
 
-	m.desired.ResourceVersion = existing.ResourceVersion
-	_, err = client.Update(ctx, m.desired, metav1.UpdateOptions{})
+	toUpdate := m.desired.DeepCopy()
+	toUpdate.ResourceVersion = existing.ResourceVersion
+	_, err = client.Update(ctx, toUpdate, metav1.UpdateOptions{})
 	if err != nil {
 		return fmt.Errorf("updating NetworkPolicy: %w", err)
 	}

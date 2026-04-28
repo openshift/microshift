@@ -2,6 +2,7 @@ package c2cc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -156,6 +157,7 @@ func (m *ovnRouteManager) cleanup(ctx context.Context) error {
 		return err
 	}
 
+	var errs []error
 	for _, r := range routes {
 		route := r
 		router := &LogicalRouter{Name: m.gwRouter}
@@ -168,6 +170,7 @@ func (m *ovnRouteManager) cleanup(ctx context.Context) error {
 		})
 		if err != nil {
 			klog.Errorf("Failed to build mutate for route %s: %v", route.UUID, err)
+			errs = append(errs, err)
 			continue
 		}
 		ops = append(ops, mutateOps...)
@@ -175,15 +178,17 @@ func (m *ovnRouteManager) cleanup(ctx context.Context) error {
 		delOps, err := m.nbClient.Where(&route).Delete()
 		if err != nil {
 			klog.Errorf("Failed to build delete for route %s: %v", route.UUID, err)
+			errs = append(errs, err)
 			continue
 		}
 		ops = append(ops, delOps...)
 
 		if _, err := m.nbClient.Transact(ctx, ops...); err != nil {
 			klog.Errorf("Failed to remove OVN route %s: %v", route.UUID, err)
+			errs = append(errs, err)
 		}
 	}
-	return nil
+	return errors.Join(errs...)
 }
 
 func (m *ovnRouteManager) subscribe(ctx context.Context, reconcileCh chan<- string) {

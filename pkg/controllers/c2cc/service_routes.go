@@ -35,9 +35,11 @@ func newServiceRouteManager(cfg *config.Config) *serviceRouteManager {
 	var localSvcCIDRs []*net.IPNet
 	for _, s := range cfg.Network.ServiceNetwork {
 		_, ipNet, err := net.ParseCIDR(s)
-		if err == nil {
-			localSvcCIDRs = append(localSvcCIDRs, ipNet)
+		if err != nil {
+			klog.Warningf("Invalid service network CIDR %q: %v", s, err)
+			continue
 		}
+		localSvcCIDRs = append(localSvcCIDRs, ipNet)
 	}
 
 	return &serviceRouteManager{

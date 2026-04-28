@@ -85,6 +85,7 @@ func connectOVNNB(ctx context.Context) (client.Client, error) {
 	}
 
 	if err := nbClient.Connect(ctx); err != nil {
+		nbClient.Close()
 		return nil, fmt.Errorf("connecting to OVN NB: %w", err)
 	}
 

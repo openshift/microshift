@@ -47,7 +47,8 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 
 	if !c.cfg.C2CC.IsEnabled() {
 		klog.Infof("C2CC is disabled")
-		c.initForCleanup(ctx)
+		closeCleanup := c.initForCleanup(ctx)
+		defer closeCleanup()
 		c.cleanupAll(ctx)
 		close(ready)
 		return ctx.Err()
@@ -157,13 +158,16 @@ func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
 	return nil
 }
 
-func (c *C2CCRouteManager) initForCleanup(ctx context.Context) {
+func (c *C2CCRouteManager) initForCleanup(ctx context.Context) func() {
 	_ = c.initKubeClient()
+
+	var closers []func()
 
 	cleanupCtx, cancel := context.WithTimeout(ctx, connectTimeout)
 	defer cancel()
 	if nbClient, err := connectOVNNB(cleanupCtx); err == nil {
 		c.ovn = newOVNRouteManager(nbClient, c.nodeName, nil)
+		closers = append(closers, func() { nbClient.Close() })
 	} else {
 		klog.Warningf("Could not connect to OVN NB for cleanup, OVN routes will not be removed: %v", err)
 	}
@@ -173,11 +177,19 @@ func (c *C2CCRouteManager) initForCleanup(ctx context.Context) {
 
 	if nftMgr, err := newNftablesManager(nil); err == nil {
 		c.nftMgr = nftMgr
+	} else {
+		klog.Warningf("Could not init nftables manager for cleanup: %v", err)
 	}
 
 	if c.kubeClient != nil {
 		c.annotation = newAnnotationManager(c.kubeClient, c.nodeName, nil)
 		c.netpol = newNetworkPolicyManager(c.kubeClient, nil)
+	}
+
+	return func() {
+		for _, fn := range closers {
+			fn()
+		}
 	}
 }
 
