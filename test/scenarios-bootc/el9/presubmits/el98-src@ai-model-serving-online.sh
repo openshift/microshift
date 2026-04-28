@@ -6,6 +6,19 @@
 # Increase greenboot timeout for optional packages (more services to start)
 GREENBOOT_TIMEOUT=1200
 
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    cat <<EOF
+min_vcpus=4
+min_memory=4096
+min_disksize=30
+networks=default
+boot_image=rhel98-bootc-source-optionals
+fips=false
+vm_greenboot_timeout="${GREENBOOT_TIMEOUT}"
+EOF
+}
+
 # Currently, RHOAI is only available for x86_64
 check_platform() {
     local -r record_junit=${1:-false}

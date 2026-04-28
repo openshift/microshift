@@ -17,6 +17,13 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
 WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 
 start_image="rhel98-bootc-brew-lrel-tuned"
+SCENARIO_VCPUS=6
+SCENARIO_NETWORKS="${VM_IPV6_NETWORK}"
+
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    echo "boot_image=${start_image}"
+}
 
 scenario_create_vms() {
     if ! does_image_exist "${start_image}"; then
@@ -35,7 +42,7 @@ scenario_create_vms() {
     # Restore original MIRROR_REGISTRY_URL for runtime use
     MIRROR_REGISTRY_URL="${original_mirror_url}"
 
-    launch_vm rhel98-bootc --network "${VM_IPV6_NETWORK}" --vm_vcpus 6
+    launch_vm rhel98-bootc
 }
 
 scenario_remove_vms() {

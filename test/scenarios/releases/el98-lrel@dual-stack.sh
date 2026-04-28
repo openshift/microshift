@@ -3,12 +3,19 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 start_image="rhel98-brew-lrel-optional"
+SCENARIO_VCPUS=4
+SCENARIO_NETWORKS="${VM_DUAL_STACK_NETWORK}"
+
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    echo "boot_image=${start_image}"
+}
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm rhel-9.8 --network "${VM_DUAL_STACK_NETWORK}" --vm_vcpus 4
+    launch_vm rhel-9.8
 }
 
 scenario_remove_vms() {

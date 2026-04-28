@@ -2,9 +2,17 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+start_image="rhel-9.8-microshift-source"
+SCENARIO_NETWORKS="${VM_DUAL_STACK_NETWORK}"
+
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    echo "boot_image=${start_image}"
+}
+
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
-    launch_vm rhel-9.8 --network "${VM_DUAL_STACK_NETWORK}"
+    prepare_kickstart host1 kickstart.ks.template "${start_image}"
+    launch_vm rhel-9.8
 }
 
 scenario_remove_vms() {

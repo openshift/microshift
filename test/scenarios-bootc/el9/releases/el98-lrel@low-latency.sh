@@ -6,12 +6,18 @@ export TEST_RANDOMIZATION=none
 # Sourced from scenario.sh and uses functions defined there.
 
 start_image="rhel98-bootc-brew-lrel-tuned"
+SCENARIO_VCPUS=6
+
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    echo "boot_image=${start_image}"
+}
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}" true
-    launch_vm rhel98-bootc --vm_vcpus 6
+    launch_vm rhel98-bootc
 }
 
 scenario_remove_vms() {

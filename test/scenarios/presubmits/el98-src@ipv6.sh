@@ -10,10 +10,18 @@ WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 # shellcheck disable=SC2034  # used elsewhere
 MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
 
+start_image="rhel-9.8-microshift-source"
+SCENARIO_NETWORKS="${VM_IPV6_NETWORK}"
+
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    echo "boot_image=${start_image}"
+}
+
 scenario_create_vms() {
     # Enable IPv6 single stack in kickstart
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source false true
-    launch_vm rhel-9.8 --network "${VM_IPV6_NETWORK}"
+    prepare_kickstart host1 kickstart.ks.template "${start_image}" false true
+    launch_vm rhel-9.8
 }
 
 scenario_remove_vms() {

@@ -19,6 +19,14 @@ WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 
 # TODO: Consider using tuned image once it is enabled in the build system
 start_image="rhel98-brew-lrel-optional"
+SCENARIO_VCPUS=6
+SCENARIO_DISKSIZE=30
+SCENARIO_NETWORKS="${VM_IPV6_NETWORK}"
+
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    echo "boot_image=${start_image}"
+}
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
@@ -36,7 +44,7 @@ scenario_create_vms() {
     # shellcheck disable=SC2034  # used elsewhere
     MIRROR_REGISTRY_URL="${original_mirror_url}"
 
-    launch_vm rhel-9.8 --network "${VM_IPV6_NETWORK}" --vm_vcpus 6 --vm_disksize 30
+    launch_vm rhel-9.8
 }
 
 scenario_remove_vms() {

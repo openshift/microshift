@@ -11,13 +11,20 @@ WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
 
 start_image="rhel98-brew-lrel-optional"
+SCENARIO_VCPUS=4
+SCENARIO_NETWORKS="${VM_IPV6_NETWORK}"
+
+# Opt-in to dynamic VM scheduling by declaring requirements
+dynamic_schedule_requirements() {
+    echo "boot_image=${start_image}"
+}
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
 
     # Enable IPv6 single stack in kickstart
     prepare_kickstart host1 kickstart.ks.template "${start_image}" false true
-    launch_vm rhel-9.8 --network "${VM_IPV6_NETWORK}" --vm_vcpus 4
+    launch_vm rhel-9.8
 }
 
 scenario_remove_vms() {
