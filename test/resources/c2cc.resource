@@ -80,6 +80,22 @@ Command On Cluster
     Should Be Equal As Integers    ${rc}    0
     RETURN    ${stdout}
 
+Disruptive Command On Cluster
+    [Documentation]    Run a shell command on the specified cluster via SSH.
+    ...    Does NOT assert rc=0 — intended for fault-injection commands
+    ...    where the command may race with the controller's reconcile loop.
+    [Arguments]    ${alias}    ${command}    ${sudo_mode}=True
+    ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
+    SSHLibrary.Switch Connection    ${conn_id}
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    ${command}
+    ...    sudo=${sudo_mode}
+    ...    return_rc=True
+    ...    return_stderr=True
+    ...    return_stdout=True
+    Log    Disruptive command rc=${rc} stdout=${stdout} stderr=${stderr}
+    RETURN    ${stdout}
+
 Oc On Cluster
     [Documentation]    Run an oc command against the specified cluster using its kubeconfig.
     [Arguments]    ${alias}    ${cmd}
@@ -109,3 +125,63 @@ Oc Apply On Cluster
     ${ns_arg}=    Set Variable If    '${ns}'    -n ${ns}    ${EMPTY}
     ${stdout}=    Oc On Cluster    ${alias}    oc apply ${ns_arg} -f ${file}
     RETURN    ${stdout}
+
+Verify Routes In Table 200
+    [Documentation]    Check that routes for the given CIDRs exist in table 200.
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    ${stdout}=    Command On Cluster    ${alias}    ip route show table 200
+    Should Contain    ${stdout}    ${remote_pod_cidr}
+    Should Contain    ${stdout}    ${remote_svc_cidr}
+
+Verify IP Rules For Table 200
+    [Documentation]    Check that IP rules at priority 100 exist for the given CIDRs.
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    ${stdout}=    Command On Cluster    ${alias}    ip rule show
+    Should Contain    ${stdout}    to ${remote_pod_cidr} lookup 200
+    Should Contain    ${stdout}    to ${remote_svc_cidr} lookup 200
+
+Verify Routes In Table 201
+    [Documentation]    Check that service routes exist in table 201 for the local service CIDR.
+    [Arguments]    ${alias}    ${local_svc_cidr}
+    ${stdout}=    Command On Cluster    ${alias}    ip route show table 201
+    Should Contain    ${stdout}    ${local_svc_cidr}
+
+Verify Service IP Rules
+    [Documentation]    Check that IP rules at priority 99 exist for cross-cluster service routing.
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
+    ${stdout}=    Command On Cluster    ${alias}    ip rule show
+    Should Contain    ${stdout}    from ${remote_pod_cidr} to ${local_svc_cidr} lookup 201
+    Should Contain    ${stdout}    from ${remote_svc_cidr} to ${local_svc_cidr} lookup 201
+
+Verify NFTables Bypass Rules
+    [Documentation]    Check that nftables masquerade bypass rules exist for remote CIDRs.
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    ${stdout}=    Command On Cluster    ${alias}
+    ...    nft list chain inet ovn-kubernetes ovn-kube-pod-subnet-masq
+    Should Contain    ${stdout}    c2cc-no-masq:${remote_pod_cidr}
+    Should Contain    ${stdout}    c2cc-no-masq:${remote_svc_cidr}
+
+Verify OVN Static Routes
+    [Documentation]    Check that OVN NB static routes tagged with microshift-c2cc exist for remote CIDRs.
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    ${pod}=    Oc On Cluster    ${alias}
+    ...    oc get pod -n openshift-ovn-kubernetes -l app=ovnkube-master -o jsonpath='{.items[0].metadata.name}'
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc exec -n openshift-ovn-kubernetes ${pod} -- ovn-nbctl find Logical_Router_Static_Route external_ids:k8s.ovn.org/owner-controller=microshift-c2cc
+    Should Contain    ${stdout}    ${remote_pod_cidr}
+    Should Contain    ${stdout}    ${remote_svc_cidr}
+
+Verify Node SNAT Annotation
+    [Documentation]    Check that the node SNAT-exclude annotation contains the remote CIDRs.
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get node -o json | python3 -c "import json,sys; print(json.load(sys.stdin)['items'][0]['metadata']['annotations'].get('k8s.ovn.org/node-ingress-snat-exclude-subnets',''))"
+    Should Contain    ${stdout}    ${remote_pod_cidr}
+    Should Contain    ${stdout}    ${remote_svc_cidr}
+
+Verify C2CC Network Policy
+    [Documentation]    Check that the C2CC network policy exists in the default namespace.
+    [Arguments]    ${alias}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get networkpolicy c2cc-allow-remote-pods -n default -o jsonpath='{.metadata.labels.app\\.kubernetes\\.io/managed-by}'
+    Should Be Equal As Strings    ${stdout}    microshift-c2cc
