@@ -99,10 +99,10 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	close(ready)
 	klog.Infof("Ready, starting reconciliation loop")
 
+	c.fullReconcile(ctx)
+
 	ticker := time.NewTicker(reconcileInterval)
 	defer ticker.Stop()
-
-	c.fullReconcile(ctx)
 
 	for {
 		select {
@@ -195,9 +195,7 @@ func (c *C2CCRouteManager) fullReconcile(ctx context.Context) {
 	}
 	for _, s := range subsystems {
 		if err := s.fn(ctx); err != nil {
-			klog.Errorf("Reconcile %s failed: %v, rolling back all subsystems", s.name, err)
-			c.cleanupAll(ctx)
-			return
+			klog.Errorf("Reconcile %s failed: %v", s.name, err)
 		}
 	}
 }
