@@ -583,7 +583,7 @@ def main():
                         choices=["image-bootc", "containerfile", "container-encapsulate"],
                         help="Only build images of the specified type.")
     dirgroup = parser.add_mutually_exclusive_group(required=False)
-    dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
+    dirgroup.add_argument("-l", "--layer-dir", action="append", default=[], help="Path to the layer directory to process. Can be specified multiple times.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
     dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns (requires double qoutes).")
 
@@ -602,8 +602,12 @@ def main():
             args.group_dir = os.path.abspath(args.group_dir)
             dir2process = args.group_dir
         if args.layer_dir:
-            args.layer_dir = os.path.abspath(args.layer_dir)
-            dir2process = args.layer_dir
+            # Convert input layer directories to absolute paths
+            args.layer_dir = [os.path.abspath(d) for d in args.layer_dir]
+            # Validate each layer directory exists
+            for layer_dir in args.layer_dir:
+                if not os.path.isdir(layer_dir):
+                    raise Exception(f"The layer directory '{layer_dir}' does not exist")
         if args.template:
             args.template = os.path.abspath(args.template)
             dir2process = os.path.dirname(args.template)
@@ -677,11 +681,12 @@ def main():
         PULL_SECRET = opull_secret
         # Process layer directory contents sorted by length and then alphabetically
         if args.layer_dir:
-            for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
-                item_path = os.path.join(args.layer_dir, item)
-                # Check if this item is a directory
-                if os.path.isdir(item_path):
-                    process_group(item_path, args.build_type, dry_run=args.dry_run)
+            for layer_dir in args.layer_dir:
+                for item in sorted(os.listdir(layer_dir), key=lambda i: (len(i), i)):
+                    item_path = os.path.join(layer_dir, item)
+                    # Check if this item is a directory
+                    if os.path.isdir(item_path):
+                        process_group(item_path, args.build_type, dry_run=args.dry_run)
         else:
             # Process individual group directory or template
             process_group(dir2process, args.build_type, pattern, args.dry_run)
