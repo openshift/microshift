@@ -93,7 +93,6 @@ EOF"
     echo "INFO: Cleaning up LVMS workloads..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
 
-    # Run all standard1 tests except version (which requires RPM install verification)
     echo "INFO: Running validation tests for multi-config scenario..."
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:9.8" \

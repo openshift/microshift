@@ -7,14 +7,14 @@
 export TEST_RANDOMIZATION=none
 
 start_image="rhel96-bootc-brew-y2-with-optional"
-dest_image="rhel102-bootc-brew-lrel-optional"
+dest_image="rhel98-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
     exit_if_image_not_found "${dest_image}"
 
     prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm rhel96-bootc --vm_vcpus 4
+    launch_vm rhel96-bootc --vm_disksize 30 --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -58,8 +58,7 @@ scenario_run_tests() {
     echo "INFO: Cleaning up LVMS workloads..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
 
-    # Run standard1 suite for basic validation after upgrade
+    # Run standard2 suite for basic validation after upgrade
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:10.2" \
-        suites/standard1/
+        suites/standard2/
 }
