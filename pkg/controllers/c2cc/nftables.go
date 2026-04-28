@@ -6,6 +6,7 @@ import (
 	"net"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/vishvananda/netlink/nl"
 	"golang.org/x/sys/unix"
@@ -152,6 +153,11 @@ func (m *nftablesManager) subscribe(reconcileCh chan<- string) (func(), error) {
 		return nil, fmt.Errorf("subscribe to nftables events: %w", err)
 	}
 
+	// Debounce nftables events: reconcile() itself modifies nftables,
+	// which generates kernel netlink events back into this subscription.
+	// Without debouncing, this creates a tight reconcile→event→reconcile loop.
+	rawCh := make(chan struct{}, 1)
+
 	go func() {
 		for {
 			msgs, _, err := sock.Receive()
@@ -163,17 +169,35 @@ func (m *nftablesManager) subscribe(reconcileCh chan<- string) (func(), error) {
 				if msg.Header.Type == syscall.NLMSG_DONE || msg.Header.Type == syscall.NLMSG_ERROR {
 					continue
 				}
-				// nfnetlink message type = (subsys << 8) | msg_type
 				msgType := int(msg.Header.Type) & 0xFF
 				if msgType == unix.NFT_MSG_NEWRULE ||
 					msgType == unix.NFT_MSG_DELRULE ||
 					msgType == unix.NFT_MSG_NEWCHAIN ||
 					msgType == unix.NFT_MSG_DELCHAIN {
 					select {
-					case reconcileCh <- "nftables-change":
+					case rawCh <- struct{}{}:
 					default:
 					}
 				}
+			}
+		}
+	}()
+
+	go func() {
+		var debounce <-chan time.Time
+		for {
+			select {
+			case _, ok := <-rawCh:
+				if !ok {
+					return
+				}
+				debounce = time.After(2 * time.Second)
+			case <-debounce:
+				select {
+				case reconcileCh <- "nftables-change":
+				default:
+				}
+				debounce = nil
 			}
 		}
 	}()
