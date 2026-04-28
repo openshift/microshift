@@ -95,6 +95,9 @@ func (t *DNS) validateConfigFile() error {
 	} else if err != nil {
 		return fmt.Errorf("error checking dns config file %s: %v", t.ConfigFile, err)
 	}
+	if !fi.Mode().IsRegular() {
+		return fmt.Errorf("dns config file %s must be a regular file", t.ConfigFile)
+	}
 
 	if fi.Size() == 0 {
 		return fmt.Errorf("dns config file %s is empty", t.ConfigFile)

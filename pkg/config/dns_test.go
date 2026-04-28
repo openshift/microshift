@@ -68,6 +68,19 @@ func TestDNS_ValidateConfigFile_NonExistentFile(t *testing.T) {
 	assert.ErrorContains(t, err, "does not exist")
 }
 
+func TestDNS_ValidateConfigFile_Directory(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	dns := DNS{
+		ConfigFile: tmpDir,
+		Hosts: HostsConfig{
+			Status: HostsStatusDisabled,
+		},
+	}
+	err := dns.validate()
+	assert.ErrorContains(t, err, "must be a regular file")
+}
+
 func TestDNS_ValidateConfigFile_EmptyFile(t *testing.T) {
 	tmpFile := createTempCorefile(t, "")
 

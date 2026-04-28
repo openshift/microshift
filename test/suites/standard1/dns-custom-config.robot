@@ -87,9 +87,15 @@ Update Corefile With New Host
 Verify ConfigMap Uses Custom Corefile
     [Documentation]    Verify the dns-default ConfigMap contains custom content
     ...    rather than the default template-rendered Corefile.
+    Wait Until Keyword Succeeds    20x    5s
+    ...    ConfigMap Should Contain Hostname    ${HOSTNAME}
+
+ConfigMap Should Contain Hostname
+    [Documentation]    Check the dns-default ConfigMap Corefile data for the hostname
+    [Arguments]    ${hostname}
     ${corefile_data}=    Oc Get JsonPath
     ...    configmap    openshift-dns    dns-default    .data.Corefile
-    Should Contain    ${corefile_data}    ${HOSTNAME}
+    Should Contain    ${corefile_data}    ${hostname}
 
 Resolve Host From Pod
     [Documentation]    Verify DNS resolution from a pod using nslookup
@@ -101,7 +107,8 @@ Router Should Resolve Hostname
     [Documentation]    Check if the router pod resolves the given hostname
     [Arguments]    ${hostname}
     ${output}=    Oc Exec    router-default    nslookup ${hostname}    openshift-ingress    deployment
-    Should Contain    ${output}    Name:    ${hostname}
+    Should Contain    ${output}    Name:
+    Should Contain    ${output}    ${hostname}
 
 Teardown Custom Corefile
     [Documentation]    Remove custom Corefile, drop-in config, fake IP, and restart

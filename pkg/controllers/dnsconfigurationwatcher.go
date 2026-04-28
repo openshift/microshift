@@ -11,6 +11,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/openshift/microshift/pkg/config"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -115,6 +116,9 @@ func (s *DNSConfigurationWatcherManager) eventLoop(ctx context.Context, watcher 
 				return fmt.Errorf("%s watcher channel closed", s.Name())
 			}
 			if s.isRelevantEvent(event) {
+				if event.Op&fsnotify.Create == fsnotify.Create {
+					_ = watcher.Add(s.file)
+				}
 				updated, newHash, updateErr := s.handleChange(ctx, kubeClient, lastHash)
 				if updateErr != nil {
 					klog.Errorf("%s failed to process DNS config file change: %v", s.Name(), updateErr)
@@ -138,7 +142,8 @@ func (s *DNSConfigurationWatcherManager) isRelevantEvent(event fsnotify.Event) b
 	if event.Name != s.file {
 		return false
 	}
-	return event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Create == fsnotify.Create
+	const mask = fsnotify.Write | fsnotify.Create | fsnotify.Rename | fsnotify.Remove
+	return event.Op&mask != 0
 }
 
 func (s *DNSConfigurationWatcherManager) handleChange(ctx context.Context, kubeClient kubernetes.Interface, lastHash string) (bool, string, error) {
@@ -202,17 +207,23 @@ func (s *DNSConfigurationWatcherManager) createOrUpdateConfigMap(ctx context.Con
 	configMapsClient := client.CoreV1().ConfigMaps(dnsConfigMapNamespace)
 
 	existing, err := configMapsClient.Get(ctx, dnsConfigMapName, metav1.GetOptions{})
-	if err != nil {
-		_, err = configMapsClient.Create(ctx, configMap, metav1.CreateOptions{})
-		if err != nil {
+	switch {
+	case apierrors.IsNotFound(err):
+		if _, err = configMapsClient.Create(ctx, configMap, metav1.CreateOptions{}); err != nil {
 			return fmt.Errorf("failed to create ConfigMap: %w", err)
 		}
 		klog.Infof("%s created ConfigMap %s/%s", s.Name(), dnsConfigMapNamespace, dnsConfigMapName)
-	} else {
+	case err != nil:
+		return fmt.Errorf("failed to get ConfigMap: %w", err)
+	default:
 		existing.Data = configMap.Data
-		existing.Annotations = configMap.Annotations
-		_, err = configMapsClient.Update(ctx, existing, metav1.UpdateOptions{})
-		if err != nil {
+		if existing.Annotations == nil {
+			existing.Annotations = map[string]string{}
+		}
+		for k, v := range configMap.Annotations {
+			existing.Annotations[k] = v
+		}
+		if _, err = configMapsClient.Update(ctx, existing, metav1.UpdateOptions{}); err != nil {
 			return fmt.Errorf("failed to update ConfigMap: %w", err)
 		}
 		klog.V(2).Infof("%s updated ConfigMap %s/%s", s.Name(), dnsConfigMapNamespace, dnsConfigMapName)
