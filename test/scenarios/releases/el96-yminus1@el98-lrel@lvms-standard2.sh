@@ -6,7 +6,7 @@
 # ensure MicroShift is upgraded before running validation tests
 export TEST_RANDOMIZATION=none
 
-start_image="rhel-9.6-microshift-brew-optionals-4.${PREVIOUS_MINOR_VERSION}-zstream"
+start_image="rhel-9.6-microshift-brew-optionals-${PREVIOUS_MAJOR_VERSION}.${PREVIOUS_MINOR_VERSION}-zstream"
 dest_image="rhel98-brew-lrel-optional"
 
 scenario_create_vms() {
