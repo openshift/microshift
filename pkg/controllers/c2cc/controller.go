@@ -114,7 +114,21 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 			klog.V(4).Infof("Periodic resync")
 			c.fullReconcile(ctx)
 		case reason := <-reconcileCh:
-			klog.V(2).Infof("Event-triggered reconcile: %s", reason)
+			coalesced := 0
+			for {
+				select {
+				case <-reconcileCh:
+					coalesced++
+				default:
+					goto drained
+				}
+			}
+		drained:
+			if coalesced > 0 {
+				klog.V(2).Infof("Event-triggered reconcile: %s (+%d coalesced)", reason, coalesced)
+			} else {
+				klog.V(2).Infof("Event-triggered reconcile: %s", reason)
+			}
 			c.fullReconcile(ctx)
 		}
 	}
