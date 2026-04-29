@@ -1,4 +1,9 @@
-- ovn-kubernetes image-arm64 14b5022bad5b21334e3ad9d500763474016b2a9c to 72db5e8d8ec23d4108183a8c67b45cdfdb8057ba
+- kubernetes embedded-component 9193b12ab88e006723c8605bea1659bfcbe7d638 to b0a9fa695c85812aa5067be371ead2cd61de700d
+  - 304afc35f 2026-04-22T07:48:41Z UPSTREAM: 138318: DRA: use full image name in test manifests
+  - de621eda6 2026-04-22T07:48:41Z UPSTREAM: 136337: DRA E2E: use image utils to manage hostpath image
+  - b934bbcd0 2026-04-22T07:48:41Z UPSTREAM: 136913: Update the csi-driver-host-path version to 1.17.1
+
+- ovn-kubernetes image-amd64 14b5022bad5b21334e3ad9d500763474016b2a9c to 72db5e8d8ec23d4108183a8c67b45cdfdb8057ba
   - a0083859 2026-04-25T04:20:37+02:00 OTE: run few EVPN tests which use random VTEP subnet
   - d29546a4 2026-04-25T04:20:37+02:00 OTE: tolerate missing OpenShift CRDs on MicroShift
   - 64d59ffc 2026-04-25T04:20:37+02:00 OTE: Wait for default sa to be provisioned in test namespace
@@ -7,7 +12,7 @@
   - 9a05558b 2026-04-25T04:20:26+02:00 OTE: Enable EVPN E2Es
   - e529c793 2026-04-20T09:31:48+02:00 OTE: Add external container support to infra provider
 
-- kubernetes image-arm64 9193b12ab88e006723c8605bea1659bfcbe7d638 to b0a9fa695c85812aa5067be371ead2cd61de700d
+- kubernetes image-amd64 9193b12ab88e006723c8605bea1659bfcbe7d638 to b0a9fa695c85812aa5067be371ead2cd61de700d
   - 304afc35f 2026-04-22T07:48:41Z UPSTREAM: 138318: DRA: use full image name in test manifests
   - de621eda6 2026-04-22T07:48:41Z UPSTREAM: 136337: DRA E2E: use image utils to manage hostpath image
   - b934bbcd0 2026-04-22T07:48:41Z UPSTREAM: 136913: Update the csi-driver-host-path version to 1.17.1
