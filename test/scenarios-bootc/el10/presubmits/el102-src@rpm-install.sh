@@ -101,10 +101,10 @@ scenario_run_tests() {
     # Note that rhocp or beta dependencies repository may not yet exist
     # for the current version. Then, just use whatever we can get for
     # the previous minor version.
-    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y1}"      "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"       4 "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  4 "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1}"      4 "${PREVIOUS_MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" 4 "${PREVIOUS_MINOR_VERSION}"
     configure_microshift_mirror "${PREVIOUS_RELEASE_REPO}"
     run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-10-\$(uname -m)-rpms"
 
