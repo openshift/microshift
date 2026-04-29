@@ -1,6 +1,7 @@
 package c2cc
 
 import (
+	"errors"
 	"fmt"
 	"net"
 
@@ -30,16 +31,18 @@ func (t *policyRouteTable) reconcileRoutes(desired []netlink.Route) error {
 		}
 	}
 
+	var errs []error
 	desiredByDst := make(map[string]bool, len(desired))
 	for _, r := range desired {
 		dst := r.Dst.String()
 		desiredByDst[dst] = true
 		route := r
-		if actual, exists := actualByDst[dst]; exists && actual.Gw.Equal(route.Gw) {
+		if actual, exists := actualByDst[dst]; exists && actual.Gw.Equal(route.Gw) && (route.LinkIndex == 0 || actual.LinkIndex == route.LinkIndex) {
 			continue
 		}
 		if err := netlink.RouteReplace(&route); err != nil {
 			klog.Errorf("Failed to add route to %s via %s: %v", dst, route.Gw, err)
+			errs = append(errs, fmt.Errorf("add route %s: %w", dst, err))
 			continue
 		}
 		klog.V(2).Infof("Route add: %s via %s table %d", dst, route.Gw, t.table)
@@ -52,12 +55,13 @@ func (t *policyRouteTable) reconcileRoutes(desired []netlink.Route) error {
 		route := r
 		if err := netlink.RouteDel(&route); err != nil {
 			klog.Errorf("Failed to delete stale route %s: %v", dst, err)
+			errs = append(errs, fmt.Errorf("delete route %s: %w", dst, err))
 			continue
 		}
 		klog.V(2).Infof("Route del: %s table %d (stale)", dst, t.table)
 	}
 
-	return nil
+	return errors.Join(errs...)
 }
 
 func (t *policyRouteTable) cleanupRoutes() error {

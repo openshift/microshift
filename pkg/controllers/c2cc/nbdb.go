@@ -3,10 +3,10 @@ package c2cc
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
+	"github.com/openshift/microshift/pkg/util"
 	"github.com/ovn-kubernetes/libovsdb/client"
 	"github.com/ovn-kubernetes/libovsdb/model"
 	"k8s.io/klog/v2"
@@ -53,7 +53,11 @@ func nbdbModel() (model.ClientDBModel, error) {
 
 func waitForOVNSocket(ctx context.Context) error {
 	for {
-		if _, err := os.Stat(ovnNBSocketPath); err == nil {
+		exists, err := util.PathExists(ovnNBSocketPath)
+		if err != nil {
+			return fmt.Errorf("stat OVN NB socket %s: %w", ovnNBSocketPath, err)
+		}
+		if exists {
 			return nil
 		}
 		klog.V(2).Infof("Waiting for OVN NB socket at %s", ovnNBSocketPath)

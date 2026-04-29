@@ -91,8 +91,15 @@ func (a *annotationManager) subscribe(ctx context.Context, reconcileCh chan<- st
 					}
 				}
 			}
+			watcher.Stop()
 			if ctx.Err() != nil {
 				return
+			}
+			klog.V(4).Infof("Node watch closed unexpectedly, reconnecting")
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(1 * time.Second):
 			}
 		}
 	}()

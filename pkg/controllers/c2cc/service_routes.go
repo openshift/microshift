@@ -54,7 +54,7 @@ func newServiceRouteManager(cfg *config.Config) *serviceRouteManager {
 }
 
 func (m *serviceRouteManager) reconcile(ctx context.Context) error {
-	gwIP, linkIdx, err := getMgmtPortGateway()
+	gateways, err := getMgmtPortGateways()
 	if err != nil {
 		klog.V(4).Infof("Management port not ready: %v, will retry", err)
 		return nil
@@ -62,12 +62,18 @@ func (m *serviceRouteManager) reconcile(ctx context.Context) error {
 
 	var desired []netlink.Route
 	for _, svcCIDR := range m.localSvcCIDRs {
+		family := ipFamilyOf(svcCIDR)
+		gw, ok := gateways[family]
+		if !ok {
+			klog.V(4).Infof("No %s gateway on %s for service CIDR %s, skipping", familyName(family), mgmtPortInterface, svcCIDR)
+			continue
+		}
 		desired = append(desired, netlink.Route{
 			Dst:       svcCIDR,
-			Gw:        gwIP,
+			Gw:        gw.ip,
 			Table:     m.table,
 			Protocol:  netlink.RouteProtocol(m.proto),
-			LinkIndex: linkIdx,
+			LinkIndex: gw.linkIdx,
 		})
 	}
 
@@ -150,26 +156,52 @@ func (m *serviceRouteManager) cleanup(ctx context.Context) error {
 	return nil
 }
 
-func getMgmtPortGateway() (net.IP, int, error) {
+type mgmtPortGateway struct {
+	ip      net.IP
+	linkIdx int
+}
+
+func getMgmtPortGateways() (map[int]mgmtPortGateway, error) {
 	link, err := netlink.LinkByName(mgmtPortInterface)
 	if err != nil {
-		return nil, 0, fmt.Errorf("get %s: %w", mgmtPortInterface, err)
+		return nil, fmt.Errorf("get %s: %w", mgmtPortInterface, err)
 	}
 
 	addrs, err := netlink.AddrList(link, netlink.FAMILY_ALL)
 	if err != nil {
-		return nil, 0, fmt.Errorf("list addresses on %s: %w", mgmtPortInterface, err)
+		return nil, fmt.Errorf("list addresses on %s: %w", mgmtPortInterface, err)
 	}
+
+	gateways := make(map[int]mgmtPortGateway)
+	linkIdx := link.Attrs().Index
 
 	for _, addr := range addrs {
 		if addr.IP.To4() != nil {
-			gwIP := make(net.IP, len(addr.IP.To4()))
-			copy(gwIP, addr.IP.To4())
+			ip4 := addr.IP.To4()
+			gwIP := make(net.IP, len(ip4))
+			copy(gwIP, ip4)
 			gwIP = gwIP.Mask(addr.Mask)
 			gwIP[len(gwIP)-1] = 1
-			return gwIP, link.Attrs().Index, nil
+			gateways[netlink.FAMILY_V4] = mgmtPortGateway{ip: gwIP, linkIdx: linkIdx}
+		} else if addr.IP.To16() != nil {
+			ip6 := make(net.IP, len(addr.IP.To16()))
+			copy(ip6, addr.IP.To16())
+			ip6 = ip6.Mask(addr.Mask)
+			ip6[len(ip6)-1] = 1
+			gateways[netlink.FAMILY_V6] = mgmtPortGateway{ip: ip6, linkIdx: linkIdx}
 		}
 	}
 
-	return nil, 0, fmt.Errorf("no IPv4 address found on %s", mgmtPortInterface)
+	if len(gateways) == 0 {
+		return nil, fmt.Errorf("no addresses found on %s", mgmtPortInterface)
+	}
+
+	return gateways, nil
+}
+
+func familyName(family int) string {
+	if family == netlink.FAMILY_V4 {
+		return "IPv4"
+	}
+	return "IPv6"
 }

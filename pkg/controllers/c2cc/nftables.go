@@ -159,6 +159,7 @@ func (m *nftablesManager) subscribe(reconcileCh chan<- string) (func(), error) {
 	rawCh := make(chan struct{}, 1)
 
 	go func() {
+		defer close(rawCh)
 		for {
 			msgs, _, err := sock.Receive()
 			if err != nil {
