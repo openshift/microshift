@@ -443,7 +443,7 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		if err := restartMicroshiftEtcdScope(ctx); err != nil {
 			klog.Errorf("Failed to restart microshift-etcd.scope: %v", err)
 		}
-		return fmt.Errorf("RBAC bootstrap hook deadlock detected after %d seconds", rbacHookDeadlockTimeout)
+		return fmt.Errorf("RBAC bootstrap hook deadlock detected after %v", rbacHookDeadlockTimeout)
 	}
 }
 
