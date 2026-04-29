@@ -7,6 +7,7 @@ import (
 	"sort"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
@@ -84,11 +85,19 @@ func (a *annotationManager) subscribe(ctx context.Context, reconcileCh chan<- st
 				}
 			}
 			for event := range watcher.ResultChan() {
-				if event.Type == watch.Modified {
-					select {
-					case reconcileCh <- "node-annotation-changed":
-					default:
-					}
+				if event.Type != watch.Modified {
+					continue
+				}
+				node, ok := event.Object.(*corev1.Node)
+				if !ok {
+					continue
+				}
+				if node.Annotations[ovnNodeDontSNATSubnets] == a.desiredAnnotation {
+					continue
+				}
+				select {
+				case reconcileCh <- "node-annotation-changed":
+				default:
 				}
 			}
 			watcher.Stop()
