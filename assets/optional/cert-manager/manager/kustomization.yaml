@@ -75,3 +75,9 @@ patches:
         value:
           name: UNSUPPORTED_ADDON_FEATURES
           value: 'TrustManager=true'
+configMapGenerator:
+  - name: trusted-ca-bundle
+    files:
+      - ca-bundle.crt=tls-ca-bundle.pem
+generatorOptions:
+  disableNameSuffixHash: true
