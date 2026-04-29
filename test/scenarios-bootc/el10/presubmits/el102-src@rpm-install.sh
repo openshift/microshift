@@ -74,7 +74,7 @@ configure_rhocp_repo() {
     local -r rhocp=$1
     local -r major=$2
     local -r minor=$3
-    local -r arch=$4
+    local -r arch=${4:-$(uname -m)}
 
     # The repository may be empty if the beta mirror is not up yet
     if [[ -z "${rhocp}" ]] ; then
