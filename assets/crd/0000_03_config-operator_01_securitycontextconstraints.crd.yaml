@@ -147,7 +147,7 @@ spec:
             defaultAddCapabilities:
               description: |-
                 defaultAddCapabilities is the default set of capabilities that will be added to the container
-                unless the pod spec specifically drops the capability.  You may not list a capabiility in both
+                unless the pod spec specifically drops the capability.  You may not list a capability in both
                 DefaultAddCapabilities and RequiredDropCapabilities.
               items:
                 description: Capability represent POSIX capabilities type
@@ -294,7 +294,7 @@ spec:
                   type: string
               type: object
             seccompProfiles:
-              description: "seccompProfiles lists the allowed profiles that may be set for the pod or\ncontainer's seccomp annotations.  An unset (nil) or empty value means that no profiles may\nbe specifid by the pod or container.\tThe wildcard '*' may be used to allow all profiles.  When\nused to generate a value for a pod the first non-wildcard profile will be used as\nthe default."
+              description: "seccompProfiles lists the allowed profiles that may be set for the pod or\ncontainer's seccomp annotations.  An unset (nil) or empty value means that no profiles may\nbe specified by the pod or container.\tThe wildcard '*' may be used to allow all profiles.  When\nused to generate a value for a pod the first non-wildcard profile will be used as\nthe default."
               items:
                 type: string
               nullable: true

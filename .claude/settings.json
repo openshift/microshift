@@ -2,8 +2,7 @@
   "permissions": {
     "allow": [
       "Read(//tmp/**)",
-      "Write(//tmp/**)",
-      "WebFetch(domain:prow.ci.openshift.org)"
+      "Write(//tmp/**)"
     ],
     "deny": [],
     "ask": []

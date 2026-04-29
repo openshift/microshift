@@ -14,7 +14,7 @@ DEFAULT_HOST_PORT="3100"
 
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (start|stop) [port]
+${BASH_SOURCE[0]} (start|stop|restart) [port]
 
   -h           Show this help.
 
@@ -24,6 +24,8 @@ start [port]: Start Loki.
 
 stop: Stop Loki.
             The container name is assumed to be loki.
+
+restart: Restart the Loki container.
 
 EOF
 }
@@ -52,6 +54,13 @@ action_start() {
         "${LOKI_IMAGE}" > /dev/null
 }
 
+action_restart() {
+    local host_port="${1:-${DEFAULT_HOST_PORT}}"
+    echo "Restarting Loki container"
+    action_stop
+    action_start "${host_port}"
+}
+
 if [ $# -eq 0 ]; then
     usage
     exit 1
@@ -60,7 +69,7 @@ action="${1}"
 shift
 
 case "${action}" in
-    start|stop)
+    start|stop|restart)
         "action_${action}" "$@"
         ;;
     -h)

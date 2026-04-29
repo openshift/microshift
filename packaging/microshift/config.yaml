@@ -41,6 +41,20 @@ apiServer:
         # to serve from the API server. Allowed values: VersionTLS12, VersionTLS13.
         # Defaults to VersionTLS12.
         minVersion: VersionTLS12
+clusterToCluster:
+    # List of remote clusters to establish connectivity with.
+    # C2CC is disabled when this list is empty.
+    remoteClusters:
+        - # Pod CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
+          clusterNetwork: []
+          # DNS domain suffix for the remote cluster (e.g., "cluster-b.remote").
+          # Services are reachable as <svc>.<ns>.svc.<domain>.
+          # Optional — if empty, no DNS forwarding is configured for this remote.
+          domain: ""
+          # IP address of the remote cluster's node, used as next-hop for routing.
+          nextHop: ""
+          # Service CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
+          serviceNetwork: []
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll".
     # Defaults to "Normal".

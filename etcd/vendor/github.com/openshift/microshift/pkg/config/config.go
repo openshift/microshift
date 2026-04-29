@@ -62,6 +62,8 @@ type Config struct {
 
 	GenericDevicePlugin GenericDevicePlugin `json:"genericDevicePlugin"`
 
+	C2CC C2CC `json:"clusterToCluster"`
+
 	// Internal-only fields
 	userSettings *Config `json:"-"` // the values read from the config file
 
@@ -197,6 +199,7 @@ func (c *Config) fillDefaults() error {
 	c.GenericDevicePlugin = genericDevicePluginDefaults()
 	c.Telemetry = telemetryDefaults()
 	c.DNS = dnsDefaults()
+	c.C2CC = C2CC{}
 	return nil
 }
 
@@ -451,6 +454,10 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if len(u.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled) > 0 {
 		c.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled = u.ApiServer.FeatureGates.SpecialHandlingSupportExceptionRequired.Disabled
 	}
+
+	if u.C2CC.RemoteClusters != nil {
+		c.C2CC = u.C2CC
+	}
 }
 
 // updateComputedValues examins the existing settings and converts any
@@ -536,6 +543,8 @@ func (c *Config) updateComputedValues() error {
 	if versionInfo.BuildVariant == version.BuildVariantCommunity {
 		c.Telemetry = Telemetry{Status: StatusDisabled}
 	}
+
+	c.C2CC.stripEmptyRemoteClusters()
 
 	return nil
 }
@@ -689,6 +698,11 @@ func (c *Config) validate() error {
 	}
 	if err := c.Network.Multus.Validate(); err != nil {
 		return fmt.Errorf("error validating multus configuration: %v", err)
+	}
+	if c.C2CC.IsEnabled() {
+		if err := c.C2CC.validate(c); err != nil {
+			return fmt.Errorf("error validating clusterToCluster: %w", err)
+		}
 	}
 	return nil
 }

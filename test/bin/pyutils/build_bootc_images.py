@@ -34,6 +34,7 @@ PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 # Switch to quay.io/centos-bootc/bootc-image-builder:latest if any new upstream
 # features are required
 BIB_IMAGE = "registry.redhat.io/rhel9/bootc-image-builder:latest"
+IBC_IMAGE = "ghcr.io/osbuild/image-builder-cli:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
 FORCE_REBUILD = False
@@ -46,18 +47,19 @@ def cleanup_atexit(dry_run):
         common.print_msg(f"Terminating {pid} PID")
         common.terminate_process(pid)
 
-    # Terminate running bootc image builder containers
-    podman_args = [
-        "sudo", "podman", "ps",
-        "--filter", f"ancestor={BIB_IMAGE}",
-        "--format", "{{.ID}}"
-    ]
-    cids = common.run_command_in_shell(podman_args, dry_run)
-    if cids:
-        # Make sure the ids are normalized in a single line
-        cids = re.sub(r'\s+', ' ', cids)
-        common.print_msg(f"Terminating '{cids}' container(s)")
-        common.run_command_in_shell(["sudo", "podman", "stop", cids], dry_run)
+    # Terminate running image builder containers
+    for builder_image in [BIB_IMAGE, IBC_IMAGE]:
+        podman_args = [
+            "sudo", "podman", "ps",
+            "--filter", f"ancestor={builder_image}",
+            "--format", "{{.ID}}"
+        ]
+        cids = common.run_command_in_shell(podman_args, dry_run)
+        if cids:
+            # Make sure the ids are normalized in a single line
+            cids = re.sub(r'\s+', ' ', cids)
+            common.print_msg(f"Terminating '{cids}' container(s)")
+            common.run_command_in_shell(["sudo", "podman", "stop", cids], dry_run)
 
 
 def find_latest_rpm(repo_path, version=""):
@@ -452,6 +454,76 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
         os.rename(f"{bf_outdir}/bootiso/install.iso", bf_targetiso)
 
 
+def process_image_installer(groupdir, installerfile, dry_run):
+    ii_path, ii_outname, ii_outdir, ii_logfile = get_process_file_names(
+        groupdir, installerfile, BOOTC_ISO_DIR)
+    ii_targetiso = os.path.join(VM_DISK_BASEDIR, f"{ii_outname}.iso")
+
+    def should_skip(file):
+        if FORCE_REBUILD:
+            common.print_msg(f"Forcing rebuild of '{file}'")
+            return False
+        if not os.path.exists(file):
+            return False
+        common.print_msg(f"The '{file}' already exists, skipping")
+        return True
+
+    if should_skip(ii_targetiso):
+        common.record_junit(ii_path, "process-image-installer", "SKIPPED")
+        return
+
+    os.makedirs(ii_outdir, exist_ok=True)
+    os.makedirs(VM_DISK_BASEDIR, exist_ok=True)
+    ii_outfile = os.path.join(BOOTC_IMAGE_DIR, installerfile)
+    run_template_cmd(ii_path, ii_outfile, dry_run)
+    if not dry_run:
+        if not common.file_has_valid_lines(ii_outfile):
+            common.print_msg(f"Skipping an empty {installerfile} file")
+            return
+
+    common.print_msg(f"Processing {installerfile} with logs in {ii_logfile}")
+    start_process_image_installer = time.time()
+    try:
+        with open(ii_logfile, 'w') as logfile:
+            ii_distro = common.read_file_valid_lines(ii_outfile).strip()
+
+            build_args = [
+                "sudo", "podman", "run",
+                "--rm", "-i", "--privileged",
+                "--network", "host",
+                "--pull=newer",
+                "--security-opt", "label=type:unconfined_t",
+                "-v", f"{ii_outdir}:/output",
+            ]
+            if os.path.isdir("/etc/pki/entitlement"):
+                build_args += [
+                    "-v", "/etc/pki/entitlement:/etc/pki/entitlement:ro",
+                    "-v", "/etc/rhsm:/etc/rhsm:ro",
+                ]
+            build_args += [
+                IBC_IMAGE,
+                "build", "--distro", ii_distro,
+                "image-installer"
+            ]
+            start = time.time()
+            common.retry_on_exception(3, common.run_command_in_shell, build_args, dry_run, logfile, logfile)
+            common.record_junit(ii_path, "build-installer-image", "OK", start)
+    except Exception:
+        common.record_junit(ii_path, "process-image-installer", "FAILED", start_process_image_installer, log_filepath=ii_logfile)
+        raise
+    finally:
+        common.run_command(["sed", f"s/^/{ii_outname}: /", ii_logfile], dry_run)
+
+    if not dry_run:
+        common.run_command(
+            ["sudo", "chown", "-R", f"{getpass.getuser()}.", ii_outdir],
+            dry_run)
+        iso_candidates = glob.glob(f"{ii_outdir}/**/*.iso", recursive=True)
+        if not iso_candidates:
+            raise Exception(f"No ISO found in {ii_outdir}")
+        os.rename(iso_candidates[0], ii_targetiso)
+
+
 def process_container_encapsulate(groupdir, containerfile, dry_run):
     ce_path, ce_outname, _, ce_logfile = get_process_file_names(
         groupdir, containerfile, BOOTC_IMAGE_DIR)
@@ -568,6 +640,11 @@ def process_group(groupdir, build_type, pattern="*", dry_run=False):
                         common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
                         continue
                     futures.append(executor.submit(process_image_bootc, groupdir, file, dry_run))
+                elif file.endswith(".image-installer"):
+                    if build_type and build_type != "image-installer":
+                        common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
+                        continue
+                    futures.append(executor.submit(process_image_installer, groupdir, file, dry_run))
                 elif file.endswith(".container-encapsulate"):
                     if build_type and build_type != "container-encapsulate":
                         common.print_msg(f"Skipping '{file}' due to '{build_type}' filter")
@@ -602,10 +679,10 @@ def main():
     parser.add_argument("-E", "--no-extract-images", action="store_true", help="Skip container image extraction.")
     parser.add_argument("-X", "--skip-all-builds", action="store_true", help="Skip all image builds.")
     parser.add_argument("-b", "--build-type",
-                        choices=["image-bootc", "containerfile", "container-encapsulate"],
+                        choices=["image-bootc", "image-installer", "containerfile", "container-encapsulate"],
                         help="Only build images of the specified type.")
     dirgroup = parser.add_mutually_exclusive_group(required=False)
-    dirgroup.add_argument("-l", "--layer-dir", type=str, help="Path to the layer directory to process.")
+    dirgroup.add_argument("-l", "--layer-dir", action="append", default=[], help="Path to the layer directory to process. Can be specified multiple times.")
     dirgroup.add_argument("-g", "--group-dir", type=str, help="Path to the group directory to process.")
     dirgroup.add_argument("-t", "--template", type=str, help="Path to a template to build. Allows glob patterns (requires double qoutes).")
 
@@ -624,8 +701,12 @@ def main():
             args.group_dir = os.path.abspath(args.group_dir)
             dir2process = args.group_dir
         if args.layer_dir:
-            args.layer_dir = os.path.abspath(args.layer_dir)
-            dir2process = args.layer_dir
+            # Convert input layer directories to absolute paths
+            args.layer_dir = [os.path.abspath(d) for d in args.layer_dir]
+            # Validate each layer directory exists
+            for layer_dir in args.layer_dir:
+                if not os.path.isdir(layer_dir):
+                    raise Exception(f"The layer directory '{layer_dir}' does not exist")
         if args.template:
             args.template = os.path.abspath(args.template)
             dir2process = os.path.dirname(args.template)
@@ -699,11 +780,12 @@ def main():
         PULL_SECRET = opull_secret
         # Process layer directory contents sorted by length and then alphabetically
         if args.layer_dir:
-            for item in sorted(os.listdir(args.layer_dir), key=lambda i: (len(i), i)):
-                item_path = os.path.join(args.layer_dir, item)
-                # Check if this item is a directory
-                if os.path.isdir(item_path):
-                    process_group(item_path, args.build_type, dry_run=args.dry_run)
+            for layer_dir in args.layer_dir:
+                for item in sorted(os.listdir(layer_dir), key=lambda i: (len(i), i)):
+                    item_path = os.path.join(layer_dir, item)
+                    # Check if this item is a directory
+                    if os.path.isdir(item_path):
+                        process_group(item_path, args.build_type, dry_run=args.dry_run)
         else:
             # Process individual group directory or template
             process_group(dir2process, args.build_type, pattern, args.dry_run)
