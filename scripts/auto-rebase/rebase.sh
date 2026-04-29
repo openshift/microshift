@@ -1135,6 +1135,12 @@ update_olm_images() {
     sed -i -r 's,(image: [a-z./-]*)[@:].*,\1,' "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_07-olm-operator.deployment.yaml"
     sed -i -r 's,(image: [a-z./-]*)[@:].*,\1,' "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_08-catalog-operator.deployment.yaml"
 
+    # If the marketplace default-deny-all NetworkPolicy is not referenced in kustomization - add it.
+    # Downstream carry for OCPBUGS-59566 that upstream OLM does not include.
+    if ! grep -q "0000_50_olm_01-marketplace-networkpolicy.yaml" "${olm_kustomization}"; then
+        sed -i '/0000_50_olm_01-networkpolicies.yaml/a\  - 0000_50_olm_01-marketplace-networkpolicy.yaml' "${olm_kustomization}"
+    fi
+
     # If namespaces sourced from openshift/operator-lifecycle-manager do not contain openshift-marketplace - add it.
     # This conditional will make the transition easier when the namespace is added in upstream manifests.
     if ! grep -qw "openshift-marketplace" "${REPOROOT}/assets/optional/operator-lifecycle-manager/0000_50_olm_00-namespace.yaml"; then
