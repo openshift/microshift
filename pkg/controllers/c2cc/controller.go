@@ -89,7 +89,7 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 		defer close(svcRouteDone)
 	}
 
-	if nftClose, err := c.nftMgr.subscribe(reconcileCh); err != nil {
+	if nftClose, err := c.nftMgr.subscribe(ctx, reconcileCh); err != nil {
 		klog.Warningf("Could not subscribe to nftables events: %v", err)
 	} else {
 		defer nftClose()

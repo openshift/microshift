@@ -147,7 +147,7 @@ func (m *nftablesManager) cleanup(ctx context.Context) error {
 	return m.nft.Run(ctx, tx)
 }
 
-func (m *nftablesManager) subscribe(reconcileCh chan<- string) (func(), error) {
+func (m *nftablesManager) subscribe(ctx context.Context, reconcileCh chan<- string) (func(), error) {
 	sock, err := nl.Subscribe(unix.NETLINK_NETFILTER, unix.NFNLGRP_NFTABLES)
 	if err != nil {
 		return nil, fmt.Errorf("subscribe to nftables events: %w", err)
@@ -188,6 +188,8 @@ func (m *nftablesManager) subscribe(reconcileCh chan<- string) (func(), error) {
 		var debounce <-chan time.Time
 		for {
 			select {
+			case <-ctx.Done():
+				return
 			case _, ok := <-rawCh:
 				if !ok {
 					return
