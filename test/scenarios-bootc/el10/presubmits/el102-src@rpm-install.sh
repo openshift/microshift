@@ -41,10 +41,40 @@ EOF
     rm -f "${tmp_file}"
 }
 
+# On RHEL 10, rhocp and fast-datapath repos are not available via
+# subscription-manager. Create repo files pointing to the RHEL 9 CDN
+# using entitlement certificates as a workaround.
+configure_cdn_repo() {
+    local -r repo_id=$1
+    local -r repo_name=$2
+    local -r baseurl=$3
+
+    local -r cert=$(run_command_on_vm host1 "ls /etc/pki/entitlement/[0-9]*.pem | grep -v '\-key.pem' | head -n1")
+    local -r key=$(run_command_on_vm host1 "ls /etc/pki/entitlement/[0-9]*-key.pem | head -n1")
+    local -r tmp_file=$(mktemp)
+
+    tee "${tmp_file}" >/dev/null <<EOF
+[${repo_id}]
+name=${repo_name}
+baseurl=${baseurl}
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify=1
+sslcacert=/etc/rhsm/ca/redhat-uep.pem
+sslclientcert=${cert}
+sslclientkey=${key}
+EOF
+    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
+    run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${repo_id}.repo"
+    rm -f "${tmp_file}"
+}
+
 configure_rhocp_repo() {
     local -r rhocp=$1
     local -r major=$2
     local -r minor=$3
+    local -r arch=${4:-$(uname -m)}
 
     # The repository may be empty if the beta mirror is not up yet
     if [[ -z "${rhocp}" ]] ; then
@@ -52,7 +82,10 @@ configure_rhocp_repo() {
     fi
 
     if [[ "${rhocp}" =~ ^[0-9]{1,2}$ ]]; then
-        run_command_on_vm host1 "sudo subscription-manager repos --enable rhocp-${major}.${rhocp}-for-rhel-9-\$(uname -m)-rpms"
+        configure_cdn_repo \
+            "rhocp-${major}.${rhocp}" \
+            "Red Hat OpenShift ${major}.${rhocp} for RHEL 9" \
+            "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/rhocp/${major}.${rhocp}/os"
     elif [[ "${rhocp}" =~ ^http ]]; then
         local -r ocp_repo_name="rhocp-${major}.${minor}-for-rhel-9-mirrorbeta-rpms"
         local -r tmp_file=$(mktemp)
@@ -95,6 +128,7 @@ scenario_run_tests() {
     local -r source_reponame=$(basename "${LOCAL_REPO}")
     local -r source_repo_url="${WEB_SERVER_URL}/rpm-repos/${source_reponame}"
     local -r target_version=$(local_rpm_version)
+    local -r arch=$(uname -m)
 
     # Enable the rhocp and dependency repositories.
     #
@@ -106,7 +140,10 @@ scenario_run_tests() {
     configure_rhocp_repo "${RHOCP_MINOR_Y1}"      "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}"
     configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}"
     configure_microshift_mirror "${PREVIOUS_RELEASE_REPO}"
-    run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-10-\$(uname -m)-rpms"
+    configure_cdn_repo \
+        "fast-datapath" \
+        "Red Hat Fast Datapath for RHEL 9" \
+        "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/fast-datapath/os"
 
     run_tests host1 \
         --exitonfailure \
