@@ -1224,6 +1224,26 @@ USHIFT_USER: "${USHIFT_USER:-redhat}"
 SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
 EOF
+        # Populate variables for additional VMs in this scenario
+        local vms_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms"
+        for vm_dir in "${vms_dir}"/*/; do
+            [ -d "${vm_dir}" ] || continue
+            local other_vm
+            other_vm=$(basename "${vm_dir}")
+            [ "${other_vm}" = "${vmname}" ] && continue
+
+            local var_prefix
+            var_prefix=$(echo "${other_vm}" | tr '[:lower:]-' '[:upper:]_')
+            for prop in ip ssh_port api_port lb_port; do
+                local prop_file="${vm_dir}/${prop}"
+                [ -f "${prop_file}" ] || continue
+                local val
+                val=$(cat "${prop_file}")
+                local var_name="${var_prefix}_$(echo "${prop}" | tr '[:lower:]' '[:upper:]')"
+                echo "${var_name}: ${val}" | tee -a "${variable_file}"
+            done
+        done
+
         wait_for_microshift_to_be_ready "${vmname}"
     fi
 

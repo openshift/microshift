@@ -49,6 +49,15 @@ func (c *C2CC) IsEnabled() bool {
 	return len(c.RemoteClusters) > 0
 }
 
+func (c *C2CC) AllRemoteCIDRs() []string {
+	var cidrs []string
+	for _, rc := range c.RemoteClusters {
+		cidrs = append(cidrs, rc.ClusterNetwork...)
+		cidrs = append(cidrs, rc.ServiceNetwork...)
+	}
+	return cidrs
+}
+
 func (rc *RemoteCluster) isEmpty() bool {
 	return rc.NextHop == "" && len(rc.ClusterNetwork) == 0 && len(rc.ServiceNetwork) == 0 && rc.Domain == ""
 }

@@ -50,9 +50,19 @@ github.com/beorn7/perks/quantile
 # github.com/blang/semver/v4 v4.0.0
 ## explicit; go 1.14
 github.com/blang/semver/v4
+# github.com/cenkalti/backoff/v4 v4.3.0
+## explicit; go 1.18
+github.com/cenkalti/backoff/v4
 # github.com/cenkalti/backoff/v5 v5.0.3
 ## explicit; go 1.23
 github.com/cenkalti/backoff/v5
+# github.com/cenkalti/hub v1.0.2
+## explicit; go 1.20
+github.com/cenkalti/hub
+# github.com/cenkalti/rpc2 v1.0.5
+## explicit; go 1.20
+github.com/cenkalti/rpc2
+github.com/cenkalti/rpc2/jsonrpc
 # github.com/cespare/xxhash/v2 v2.3.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
@@ -155,6 +165,15 @@ github.com/fsnotify/fsnotify/internal
 # github.com/fxamacker/cbor/v2 v2.9.0
 ## explicit; go 1.20
 github.com/fxamacker/cbor/v2
+# github.com/gabriel-vasile/mimetype v1.4.10
+## explicit; go 1.21
+github.com/gabriel-vasile/mimetype
+github.com/gabriel-vasile/mimetype/internal/charset
+github.com/gabriel-vasile/mimetype/internal/csv
+github.com/gabriel-vasile/mimetype/internal/json
+github.com/gabriel-vasile/mimetype/internal/magic
+github.com/gabriel-vasile/mimetype/internal/markup
+github.com/gabriel-vasile/mimetype/internal/scan
 # github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667
 ## explicit; go 1.13
 github.com/go-asn1-ber/asn1-ber
@@ -227,6 +246,16 @@ github.com/go-openapi/swag/typeutils
 # github.com/go-openapi/swag/yamlutils v0.25.5
 ## explicit; go 1.24.0
 github.com/go-openapi/swag/yamlutils
+# github.com/go-playground/locales v0.14.1
+## explicit; go 1.17
+github.com/go-playground/locales
+github.com/go-playground/locales/currency
+# github.com/go-playground/universal-translator v0.18.1
+## explicit; go 1.18
+github.com/go-playground/universal-translator
+# github.com/go-playground/validator/v10 v10.28.0
+## explicit; go 1.24.0
+github.com/go-playground/validator/v10
 # github.com/go-stack/stack v1.8.1
 ## explicit; go 1.17
 # github.com/godbus/dbus/v5 v5.1.0
@@ -370,6 +399,10 @@ github.com/karrick/godirwalk
 # github.com/kylelemons/godebug v1.1.0
 ## explicit; go 1.11
 github.com/kylelemons/godebug/diff
+# github.com/leodido/go-urn v1.4.0
+## explicit; go 1.18
+github.com/leodido/go-urn
+github.com/leodido/go-urn/scim/schema
 # github.com/libopenstorage/openstorage v1.0.0
 ## explicit
 github.com/libopenstorage/openstorage/api
@@ -770,6 +803,16 @@ github.com/openshift/route-controller-manager/pkg/route/ingress
 github.com/openshift/route-controller-manager/pkg/route/ingressip
 github.com/openshift/route-controller-manager/pkg/routecontroller
 github.com/openshift/route-controller-manager/pkg/version
+# github.com/ovn-kubernetes/libovsdb v0.8.2-0.20260302130604-c07ce22366ac
+## explicit; go 1.24.0
+github.com/ovn-kubernetes/libovsdb/cache
+github.com/ovn-kubernetes/libovsdb/client
+github.com/ovn-kubernetes/libovsdb/database
+github.com/ovn-kubernetes/libovsdb/mapper
+github.com/ovn-kubernetes/libovsdb/model
+github.com/ovn-kubernetes/libovsdb/ovsdb
+github.com/ovn-kubernetes/libovsdb/ovsdb/serverdb
+github.com/ovn-kubernetes/libovsdb/updates
 # github.com/peterbourgon/diskv v2.0.1+incompatible
 ## explicit
 github.com/peterbourgon/diskv
@@ -994,6 +1037,7 @@ golang.org/x/crypto/md4
 golang.org/x/crypto/nacl/secretbox
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/salsa20/salsa
+golang.org/x/crypto/sha3
 # golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa
 ## explicit; go 1.25.0
 golang.org/x/exp/slices
@@ -3200,6 +3244,9 @@ sigs.k8s.io/apiserver-network-proxy/konnectivity-client/proto/client
 ## explicit; go 1.23
 sigs.k8s.io/json
 sigs.k8s.io/json/internal/golang/encoding/json
+# sigs.k8s.io/knftables v0.0.20
+## explicit; go 1.20
+sigs.k8s.io/knftables
 # sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96 => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260304192652-72835e43c775
 ## explicit; go 1.24.0
 sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1
