@@ -173,7 +173,9 @@ func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
 }
 
 func (c *C2CCRouteManager) initForCleanup(ctx context.Context) func() {
-	_ = c.initKubeClient()
+	if err := c.initKubeClient(); err != nil {
+		klog.Warningf("Could not init kube client for cleanup, Kubernetes C2CC state will not be removed: %v", err)
+	}
 
 	var closers []func()
 

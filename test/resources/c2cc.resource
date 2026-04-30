@@ -175,7 +175,7 @@ Verify Node SNAT Annotation
     [Documentation]    Check that the node SNAT-exclude annotation contains the remote CIDRs.
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
     ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc get node -o json | python3 -c "import json,sys; print(json.load(sys.stdin)['items'][0]['metadata']['annotations'].get('k8s.ovn.org/node-ingress-snat-exclude-subnets',''))"
+    ...    oc get node -o jsonpath='{.items[0].metadata.annotations.k8s\\.ovn\\.org/node-ingress-snat-exclude-subnets}'
     Should Contain    ${stdout}    ${remote_pod_cidr}
     Should Contain    ${stdout}    ${remote_svc_cidr}
 

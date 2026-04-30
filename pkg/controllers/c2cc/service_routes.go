@@ -94,6 +94,7 @@ func (m *serviceRouteManager) reconcileRules() error {
 
 	var desired []netlink.Rule
 	desiredKeys := make(map[ruleKey]bool)
+	var errs []error
 	for _, remoteCIDR := range m.remoteCIDRs {
 		for _, svcCIDR := range m.localSvcCIDRs {
 			if ipFamilyOf(remoteCIDR) != ipFamilyOf(svcCIDR) {
@@ -131,6 +132,7 @@ func (m *serviceRouteManager) reconcileRules() error {
 		if err := netlink.RuleAdd(&rule); err != nil {
 			if !errors.Is(err, syscall.EEXIST) {
 				klog.Errorf("Failed to add service ip rule from %s to %s: %v", rule.Src, rule.Dst, err)
+				errs = append(errs, fmt.Errorf("add service ip rule from %s to %s: %w", rule.Src, rule.Dst, err))
 			}
 			continue
 		}
@@ -144,10 +146,11 @@ func (m *serviceRouteManager) reconcileRules() error {
 		rule := r
 		if err := netlink.RuleDel(&rule); err != nil {
 			klog.Errorf("Failed to delete stale service rule from %s to %s: %v", k.src, k.dst, err)
+			errs = append(errs, fmt.Errorf("delete service ip rule from %s to %s: %w", k.src, k.dst, err))
 		}
 	}
 
-	return nil
+	return errors.Join(errs...)
 }
 
 func (m *serviceRouteManager) cleanup(ctx context.Context) error {
