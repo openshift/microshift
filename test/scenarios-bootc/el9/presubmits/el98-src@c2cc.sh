@@ -96,14 +96,13 @@ scenario_run_tests() {
 
     # Retrieve host2's kubeconfig
     local -r host2_ip=$(get_vm_property host2 ip)
-    local -r host2_ssh_port=$(get_vm_property host2 ssh_port)
     local -r kubeconfig_b="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-b"
 
     # Wait for host2 to be fully ready (run_tests only waits for host1)
     wait_for_microshift_to_be_ready host2
 
     run_command_on_vm host2 "sudo cp /var/lib/microshift/resources/kubeadmin/${host2_ip}/kubeconfig /tmp/kubeconfig-b && sudo chmod 644 /tmp/kubeconfig-b"
-    scp -P "${host2_ssh_port}" "redhat@${host2_ip}:/tmp/kubeconfig-b" "${kubeconfig_b}"
+    copy_file_from_vm host2 "/tmp/kubeconfig-b" "${kubeconfig_b}"
 
     run_tests host1 \
         --variable "CLUSTER_A_POD_CIDR:${CLUSTER_A_POD_CIDR}" \
