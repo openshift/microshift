@@ -137,8 +137,7 @@ run_bootc_image_build() {
 
             if [[ "${os}" == "el10" ]]; then
                 # Build el9 images for upgrade tests
-                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base
-                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit
+                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el10/layer5-upgrade
             fi
 
             if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
