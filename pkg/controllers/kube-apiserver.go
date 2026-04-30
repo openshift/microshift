@@ -23,6 +23,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -54,7 +55,18 @@ import (
 )
 
 const (
-	kubeAPIStartupTimeout = 60
+	kubeAPIStartupTimeout = 60 * time.Second
+	// rbacHookDeadlockTimeout is the time to wait for the RBAC bootstrap hook
+	// before declaring a deadlock. This is shorter than kubeAPIStartupTimeout
+	// to allow for faster recovery.
+	rbacHookDeadlockTimeout = 15 * time.Second
+	// rbacHookCheckInterval is how often to check the RBAC hook status
+	rbacHookPollDelayStart = 5 * time.Second
+	rbacHookCheckInterval  = 2 * time.Second
+	// rbacHookMaxWaitDuration is the absolute maximum time to wait for the RBAC hook
+	// regardless of etcd health state changes. This prevents flapping from extending
+	// detection indefinitely.
+	rbacHookMaxWaitDuration = 30 * time.Second
 )
 
 var (
@@ -348,9 +360,15 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return err
 	}
 
-	// run readiness check
+	// Channel to signal RBAC hook deadlock detection
+	rbacDeadlockDetected := make(chan struct{})
+
+	// Run RBAC hook deadlock detector
+	go s.detectRBACHookDeadlock(ctx, restClient, rbacDeadlockDetected)
+
+	// Run standard readiness check
 	go func() {
-		err := wait.PollUntilContextTimeout(ctx, time.Second, kubeAPIStartupTimeout*time.Second, true, func(ctx context.Context) (bool, error) {
+		err := wait.PollUntilContextTimeout(ctx, time.Second, kubeAPIStartupTimeout, true, func(ctx context.Context) (bool, error) {
 			var status int
 			if err := restClient.Get().AbsPath("/readyz").Do(ctx).StatusCode(&status).Error(); err != nil {
 				klog.Infof("%q not yet ready: %v", s.Name(), err)
@@ -420,7 +438,168 @@ func (s *KubeAPIServer) Run(ctx context.Context, ready chan<- struct{}, stopped 
 		return err
 	case perr := <-panicChannel:
 		panic(perr)
+	case <-rbacDeadlockDetected:
+		klog.Error("RBAC bootstrap hook deadlock detected - restarting microshift-etcd.scope to recover")
+		if err := restartMicroshiftEtcdScope(ctx); err != nil {
+			klog.Errorf("Failed to restart microshift-etcd.scope: %v", err)
+		}
+		return fmt.Errorf("RBAC bootstrap hook deadlock detected after %v", rbacHookDeadlockTimeout)
 	}
+}
+
+// detectRBACHookDeadlock monitors the RBAC bootstrap hook status and detects deadlock conditions.
+// A deadlock is detected when:
+// 1. The RBAC hook is not completing (stuck in "not finished" state)
+// 2. etcd is healthy and responsive
+// This indicates the circular dependency where the hook waits for API server
+// while API server waits for the hook.
+//
+// Closed upstream Kubernetes issues:
+// https://github.com/kubernetes/kubernetes/issues/86715
+// https://github.com/kubernetes/kubernetes/issues/97119
+func (s *KubeAPIServer) detectRBACHookDeadlock(ctx context.Context, restClient rest.Interface, deadlockDetected chan<- struct{}) {
+	// Wait a few seconds before starting detection to allow normal startup
+	select {
+	case <-ctx.Done():
+		return
+	case <-time.After(rbacHookPollDelayStart):
+	}
+
+	checkCount := 0
+	maxChecks := int((rbacHookDeadlockTimeout - rbacHookPollDelayStart) / rbacHookCheckInterval) // Account for initial delay
+	// Track wall-clock deadline to prevent flapping from extending detection indefinitely
+	startTime := time.Now()
+
+	for {
+		// Check absolute deadline first - this cannot be reset by etcd state changes
+		if time.Since(startTime) >= rbacHookMaxWaitDuration {
+			klog.Errorf("RBAC bootstrap hook exceeded maximum wait duration of %v", rbacHookMaxWaitDuration)
+			// Only trigger deadlock recovery if we've confirmed the predicate enough times
+			if checkCount >= maxChecks {
+				break // Fall through to close(deadlockDetected)
+			}
+			// Timeout but not confirmed deadlock - exit without triggering recovery
+			return
+		}
+
+		// Check if we've confirmed deadlock enough times
+		if checkCount >= maxChecks {
+			break // Fall through to close(deadlockDetected)
+		}
+
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(rbacHookCheckInterval * time.Second):
+		}
+
+		// Check RBAC hook status
+		probeCtx, cancel := context.WithTimeout(ctx, time.Second)
+		var status int
+		result := restClient.Get().
+			AbsPath("/readyz/poststarthook/rbac/bootstrap-roles").
+			Do(probeCtx).
+			StatusCode(&status)
+		err := result.Error()
+		cancel()
+
+		// If hook is ready, no deadlock
+		if err == nil && status == 200 {
+			klog.V(4).Info("RBAC bootstrap hook completed successfully")
+			return
+		}
+
+		// If no HTTP status was received, skip this iteration (transport/timeout).
+		if err != nil && status == 0 {
+			klog.V(4).Infof("RBAC probe error (not counting toward deadlock): %v", err)
+			continue
+		}
+
+		// Hook not ready (status != 200) - check if etcd is healthy
+		etcdHealthy, etcdErr := isEtcdHealthy(ctx)
+		if etcdErr != nil {
+			klog.V(4).Infof("Could not check etcd health (not counting toward deadlock): %v", etcdErr)
+			continue
+		}
+
+		if etcdHealthy {
+			// Only increment when BOTH conditions are met:
+			// RBAC probe returned not-ready AND etcd is healthy
+			checkCount++
+			klog.Warningf("RBAC bootstrap hook not ready (check %d/%d, elapsed %v), but etcd is healthy - potential deadlock",
+				checkCount, maxChecks, time.Since(startTime).Round(time.Second))
+		} else {
+			// etcd not healthy - not a deadlock, just waiting for etcd
+			klog.V(4).Infof("RBAC hook waiting, etcd not yet healthy (check %d/%d)", checkCount, maxChecks)
+			// Reset counter since this isn't a deadlock condition
+			// Note: wall-clock deadline (startTime) is NOT reset - flapping cannot extend indefinitely
+			checkCount = 0
+		}
+	}
+
+	// Only reached when checkCount >= maxChecks (deadlock confirmed)
+	klog.Errorf("RBAC bootstrap hook deadlock confirmed after %v: etcd healthy but hook not completing",
+		time.Since(startTime).Round(time.Second))
+	close(deadlockDetected)
+}
+
+// isEtcdHealthy checks if etcd is responsive by attempting to connect and get status.
+func isEtcdHealthy(ctx context.Context) (bool, error) {
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
+	etcdAPIServerClientCertDir := cryptomaterial.EtcdAPIServerClientCertDir(certsDir)
+
+	tlsInfo := transport.TLSInfo{
+		CertFile:      cryptomaterial.ClientCertPath(etcdAPIServerClientCertDir),
+		KeyFile:       cryptomaterial.ClientKeyPath(etcdAPIServerClientCertDir),
+		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
+	}
+	tlsConfig, err := tlsInfo.ClientConfig()
+	if err != nil {
+		return false, fmt.Errorf("failed to create TLS config: %w", err)
+	}
+
+	// Use a short timeout for health check
+	checkCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	client, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{"https://localhost:2379"},
+		DialTimeout: 1 * time.Second,
+		TLS:         tlsConfig,
+		Context:     checkCtx,
+	})
+	if err != nil {
+		return false, fmt.Errorf("failed to create etcd client: %w", err)
+	}
+	defer func() { _ = client.Close() }()
+
+	_, err = client.Status(checkCtx, "localhost:2379")
+	if err != nil {
+		return false, nil // etcd not healthy, but not an error condition
+	}
+
+	return true, nil
+}
+
+// restartMicroshiftEtcdScope restarts the microshift-etcd.scope to recover from deadlock.
+// This forces a clean restart of etcd which can help break the circular dependency.
+func restartMicroshiftEtcdScope(ctx context.Context) error {
+	klog.Info("Stopping microshift-etcd.scope for recovery")
+
+	// Set a timeout in case systemd or DBus stalls and the fail-fast recovery path hangs and Run never returns
+	cmdCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	stopCmd := exec.CommandContext(cmdCtx, "systemctl", "stop", "microshift-etcd.scope")
+	if out, err := stopCmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to stop microshift-etcd.scope: %w, output: %s", err, string(out))
+	}
+
+	// Wait briefly for cleanup
+	time.Sleep(1 * time.Second)
+
+	klog.Info("microshift-etcd.scope stopped - MicroShift will restart")
+	return nil
 }
 
 func discoverEtcdServers(ctx context.Context, kubeconfigPath string) ([]string, error) {
