@@ -245,6 +245,11 @@
           "default": "example.com",
           "example": "microshift.example.com"
         },
+        "configFile": {
+          "description": "configFile is the path to a custom CoreDNS Corefile on the host filesystem.\nWhen set, MicroShift uses this file as the Corefile in the dns-default ConfigMap,\nfully replacing the default template-rendered configuration.\nChanges to this file are detected at runtime and applied without restarting MicroShift.\nMutually exclusive with dns.hosts: setting both causes a startup error.",
+          "type": "string",
+          "example": "/etc/microshift/dns/Corefile"
+        },
         "hosts": {
           "description": "Hosts contains configuration for the hosts file.",
           "type": "object",

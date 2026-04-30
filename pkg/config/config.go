@@ -212,6 +212,9 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.DNS.BaseDomain != "" {
 		c.DNS.BaseDomain = u.DNS.BaseDomain
 	}
+	if u.DNS.ConfigFile != "" {
+		c.DNS.ConfigFile = u.DNS.ConfigFile
+	}
 
 	if u.Network.CNIPlugin != "" {
 		c.Network.CNIPlugin = u.Network.CNIPlugin

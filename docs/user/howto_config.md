@@ -40,6 +40,7 @@ debugging:
     logLevel: ""
 dns:
     baseDomain: ""
+    configFile: ""
     hosts:
         file: ""
         status: ""
@@ -198,6 +199,7 @@ debugging:
     logLevel: Normal
 dns:
     baseDomain: example.com
+    configFile: ""
     hosts:
         file: /etc/hosts
         status: Disabled
