@@ -21,7 +21,7 @@ func (t *policyRouteTable) reconcileRoutes(desired []netlink.Route) error {
 		Protocol: netlink.RouteProtocol(t.proto),
 	}, netlink.RT_FILTER_TABLE|netlink.RT_FILTER_PROTOCOL)
 	if err != nil {
-		return fmt.Errorf("listing table %d routes: %w", t.table, err)
+		return fmt.Errorf("failed to list table %d routes: %w", t.table, err)
 	}
 
 	actualByDst := make(map[string]netlink.Route, len(actual))
@@ -42,7 +42,7 @@ func (t *policyRouteTable) reconcileRoutes(desired []netlink.Route) error {
 		}
 		if err := netlink.RouteReplace(&route); err != nil {
 			klog.Errorf("Failed to add route to %s via %s: %v", dst, route.Gw, err)
-			errs = append(errs, fmt.Errorf("add route %s: %w", dst, err))
+			errs = append(errs, fmt.Errorf("failed to add route %s: %w", dst, err))
 			continue
 		}
 		klog.V(2).Infof("Route add: %s via %s table %d", dst, route.Gw, t.table)
@@ -55,7 +55,7 @@ func (t *policyRouteTable) reconcileRoutes(desired []netlink.Route) error {
 		route := r
 		if err := netlink.RouteDel(&route); err != nil {
 			klog.Errorf("Failed to delete stale route %s: %v", dst, err)
-			errs = append(errs, fmt.Errorf("delete route %s: %w", dst, err))
+			errs = append(errs, fmt.Errorf("failed to delete route %s: %w", dst, err))
 			continue
 		}
 		klog.V(2).Infof("Route del: %s table %d (stale)", dst, t.table)
@@ -70,7 +70,7 @@ func (t *policyRouteTable) cleanupRoutes() error {
 		Protocol: netlink.RouteProtocol(t.proto),
 	}, netlink.RT_FILTER_TABLE|netlink.RT_FILTER_PROTOCOL)
 	if err != nil {
-		return fmt.Errorf("listing table %d routes for cleanup: %w", t.table, err)
+		return fmt.Errorf("failed to list table %d routes for cleanup: %w", t.table, err)
 	}
 	for _, r := range routes {
 		route := r
@@ -84,7 +84,7 @@ func (t *policyRouteTable) cleanupRoutes() error {
 func (t *policyRouteTable) cleanupRules() error {
 	allRules, err := netlink.RuleList(netlink.FAMILY_ALL)
 	if err != nil {
-		return fmt.Errorf("listing ip rules for cleanup: %w", err)
+		return fmt.Errorf("failed to list ip rules for cleanup: %w", err)
 	}
 	for _, r := range allRules {
 		if r.Priority == t.priority && r.Table == t.table {
@@ -102,7 +102,7 @@ func (t *policyRouteTable) subscribe(reconcileCh chan<- string, reason string) (
 	done := make(chan struct{})
 
 	if err := netlink.RouteSubscribe(routeUpdates, done); err != nil {
-		return nil, fmt.Errorf("subscribe to route events: %w", err)
+		return nil, fmt.Errorf("failed to subscribe to route events: %w", err)
 	}
 
 	go func() {

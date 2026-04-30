@@ -28,7 +28,7 @@ type nftablesManager struct {
 func newNftablesManager(remoteCIDRs []*net.IPNet) (*nftablesManager, error) {
 	nft, err := knftables.New(knftables.InetFamily, nftTable)
 	if err != nil {
-		return nil, fmt.Errorf("creating knftables interface: %w", err)
+		return nil, fmt.Errorf("failed to create knftables interface: %w", err)
 	}
 
 	desired := make(map[string]string, len(remoteCIDRs))
@@ -64,7 +64,7 @@ func (m *nftablesManager) reconcile(ctx context.Context) error {
 			klog.V(4).Infof("nftables chain %s does not exist yet, will retry", nftChain)
 			return nil
 		}
-		return fmt.Errorf("listing nftables rules: %w", err)
+		return fmt.Errorf("failed to list nftables rules: %w", err)
 	}
 
 	actualCIDRs := make(map[string]*knftables.Rule, len(existing))
@@ -111,7 +111,7 @@ func (m *nftablesManager) reconcile(ctx context.Context) error {
 	}
 
 	if err := m.nft.Run(ctx, tx); err != nil {
-		return fmt.Errorf("running nftables transaction: %w", err)
+		return fmt.Errorf("failed to run nftables transaction: %w", err)
 	}
 	return nil
 }
@@ -122,7 +122,7 @@ func (m *nftablesManager) cleanup(ctx context.Context) error {
 		if knftables.IsNotFound(err) {
 			return nil
 		}
-		return fmt.Errorf("listing nftables rules: %w", err)
+		return fmt.Errorf("failed to list nftables rules: %w", err)
 	}
 
 	tx := m.nft.NewTransaction()
@@ -150,7 +150,7 @@ func (m *nftablesManager) cleanup(ctx context.Context) error {
 func (m *nftablesManager) subscribe(ctx context.Context, reconcileCh chan<- string) (func(), error) {
 	sock, err := nl.Subscribe(unix.NETLINK_NETFILTER, unix.NFNLGRP_NFTABLES)
 	if err != nil {
-		return nil, fmt.Errorf("subscribe to nftables events: %w", err)
+		return nil, fmt.Errorf("failed to subscribe to nftables events: %w", err)
 	}
 
 	// Debounce nftables events: reconcile() itself modifies nftables,

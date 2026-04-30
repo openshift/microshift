@@ -22,9 +22,9 @@ ${HOST2_IP}                 ${EMPTY}
 ${HOST2_SSH_PORT}           ${EMPTY}
 ${HOST2_API_PORT}           ${EMPTY}
 ${KUBECONFIG_B}             ${EMPTY}
-&{C2CC_KUBECONFIGS}
-&{C2CC_SSH_IDS}
-@{C2CC_REMOTE_ALIASES}
+&{C2CC_KUBECONFIGS}         &{EMPTY}
+&{C2CC_SSH_IDS}             &{EMPTY}
+@{C2CC_REMOTE_ALIASES}      @{EMPTY}
 
 
 *** Keywords ***
@@ -61,8 +61,7 @@ Teardown All Remote Clusters
         SSHLibrary.Switch Connection    ${alias}
         SSHLibrary.Close Connection
     END
-    @{C2CC_REMOTE_ALIASES}=    Create List
-    Set Suite Variable    @{C2CC_REMOTE_ALIASES}
+    VAR    @{C2CC_REMOTE_ALIASES}=    @{EMPTY}    scope=SUITE
     ${local_conn}=    Get From Dictionary    ${C2CC_SSH_IDS}    cluster-a
     SSHLibrary.Switch Connection    ${local_conn}
 
@@ -166,7 +165,8 @@ Verify OVN Static Routes
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
     ${pod}=    Oc On Cluster    ${alias}
     ...    oc get pod -n openshift-ovn-kubernetes -l app=ovnkube-master -o jsonpath='{.items[0].metadata.name}'
-    ${stdout}=    Oc On Cluster    ${alias}
+    ${stdout}=    Oc On Cluster
+    ...    ${alias}
     ...    oc exec -n openshift-ovn-kubernetes ${pod} -- ovn-nbctl find Logical_Router_Static_Route external_ids:k8s.ovn.org/owner-controller=microshift-c2cc
     Should Contain    ${stdout}    ${remote_pod_cidr}
     Should Contain    ${stdout}    ${remote_svc_cidr}
@@ -182,6 +182,7 @@ Verify Node SNAT Annotation
 Verify C2CC Network Policy
     [Documentation]    Check that the C2CC network policy exists in the default namespace.
     [Arguments]    ${alias}
-    ${stdout}=    Oc On Cluster    ${alias}
+    ${stdout}=    Oc On Cluster
+    ...    ${alias}
     ...    oc get networkpolicy c2cc-allow-remote-pods -n default -o jsonpath='{.metadata.labels.app\\.kubernetes\\.io/managed-by}'
     Should Be Equal As Strings    ${stdout}    microshift-c2cc

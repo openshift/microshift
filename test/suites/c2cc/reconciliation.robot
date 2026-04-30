@@ -3,8 +3,6 @@ Documentation       Negative/fault-injection tests for C2CC controller reconcili
 ...                 Each test deletes or corrupts a specific piece of C2CC networking state,
 ...                 then waits for the controller to detect the disruption and self-heal.
 
-Resource            ../../resources/common.resource
-Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/oc.resource
@@ -43,8 +41,14 @@ Reconcile Service Route In Table 201 After Deletion
 Reconcile Service IP Rule After Deletion
     [Documentation]    Delete a service IP rule, verify the controller restores it.
     Delete Service IP Rule On Cluster    cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_A_SVC_CIDR}
-    Wait Until Keyword Succeeds    ${RECONCILE_TIMEOUT}    ${RECONCILE_RETRY}
-    ...    Verify Service IP Rules    cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}    ${CLUSTER_A_SVC_CIDR}
+    Wait Until Keyword Succeeds
+    ...    ${RECONCILE_TIMEOUT}
+    ...    ${RECONCILE_RETRY}
+    ...    Verify Service IP Rules
+    ...    cluster-a
+    ...    ${CLUSTER_B_POD_CIDR}
+    ...    ${CLUSTER_B_SVC_CIDR}
+    ...    ${CLUSTER_A_SVC_CIDR}
 
 Reconcile NFTables Bypass Rule After Deletion
     [Documentation]    Delete an nftables bypass rule, verify the controller restores it.
@@ -117,7 +121,8 @@ Delete Service IP Rule On Cluster
 Delete NFTables C2CC Rule On Cluster
     [Documentation]    Delete an nftables bypass rule by discovering its handle.
     [Arguments]    ${alias}    ${cidr}
-    ${handle}=    Command On Cluster    ${alias}
+    ${handle}=    Command On Cluster
+    ...    ${alias}
     ...    nft list chain inet ovn-kubernetes ovn-kube-pod-subnet-masq -a | grep 'c2cc-no-masq:${cidr}' | awk '/# handle/{print $NF}'
     Disruptive Command On Cluster    ${alias}
     ...    nft delete rule inet ovn-kubernetes ovn-kube-pod-subnet-masq handle ${handle}

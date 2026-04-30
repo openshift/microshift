@@ -55,7 +55,7 @@ func waitForOVNSocket(ctx context.Context) error {
 	for {
 		exists, err := util.PathExists(ovnNBSocketPath)
 		if err != nil {
-			return fmt.Errorf("stat OVN NB socket %s: %w", ovnNBSocketPath, err)
+			return fmt.Errorf("failed to stat OVN NB socket %s: %w", ovnNBSocketPath, err)
 		}
 		if exists {
 			return nil
@@ -71,12 +71,12 @@ func waitForOVNSocket(ctx context.Context) error {
 
 func connectOVNNB(ctx context.Context) (client.Client, error) {
 	if err := waitForOVNSocket(ctx); err != nil {
-		return nil, fmt.Errorf("waiting for OVN NB socket: %w", err)
+		return nil, fmt.Errorf("failed to wait for OVN NB socket: %w", err)
 	}
 
 	dbModel, err := nbdbModel()
 	if err != nil {
-		return nil, fmt.Errorf("building OVN NB database model: %w", err)
+		return nil, fmt.Errorf("failed to build OVN NB database model: %w", err)
 	}
 
 	nbClient, err := client.NewOVSDBClient(
@@ -85,18 +85,18 @@ func connectOVNNB(ctx context.Context) (client.Client, error) {
 		client.WithReconnect(connectTimeout, backoff.NewExponentialBackOff()),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("creating OVN NB client: %w", err)
+		return nil, fmt.Errorf("failed to create OVN NB client: %w", err)
 	}
 
 	if err := nbClient.Connect(ctx); err != nil {
 		nbClient.Close()
-		return nil, fmt.Errorf("connecting to OVN NB: %w", err)
+		return nil, fmt.Errorf("failed to connect to OVN NB: %w", err)
 	}
 
 	_, err = nbClient.MonitorAll(ctx)
 	if err != nil {
 		nbClient.Close()
-		return nil, fmt.Errorf("setting up OVN NB monitor: %w", err)
+		return nil, fmt.Errorf("failed to set up OVN NB monitor: %w", err)
 	}
 
 	klog.Infof("Connected to OVN NB database at %s", ovnNBEndpoint)

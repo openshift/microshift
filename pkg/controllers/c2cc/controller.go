@@ -58,19 +58,19 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 
 	if err := c.initKubeClient(); err != nil {
 		close(ready)
-		return fmt.Errorf("create kube client: %w", err)
+		return fmt.Errorf("failed to create kube client: %w", err)
 	}
 
 	nbClient, err := connectOVNNB(ctx)
 	if err != nil {
 		close(ready)
-		return fmt.Errorf("connect OVN NB: %w", err)
+		return fmt.Errorf("failed to connect OVN NB: %w", err)
 	}
 	defer nbClient.Close()
 
 	if err := c.initSubsystems(nbClient); err != nil {
 		close(ready)
-		return fmt.Errorf("init subsystems: %w", err)
+		return fmt.Errorf("failed to init subsystems: %w", err)
 	}
 
 	reconcileCh := make(chan string, 10)
@@ -114,6 +114,8 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 			klog.V(4).Infof("Periodic resync")
 			c.fullReconcile(ctx)
 		case reason := <-reconcileCh:
+			// Drain the channel to debounce reconcile events and avoid queueing - each reconcile performs setup of all subsystems,
+			// so it's not necessary to reconcile several times in a row.
 			coalesced := 0
 			for {
 				select {
@@ -137,11 +139,11 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 func (c *C2CCRouteManager) initKubeClient() error {
 	restCfg, err := clientcmd.BuildConfigFromFlags("", c.kubeconfig)
 	if err != nil {
-		return fmt.Errorf("build kubeconfig: %w", err)
+		return fmt.Errorf("failed to build kubeconfig: %w", err)
 	}
 	kClient, err := kubernetes.NewForConfig(restCfg)
 	if err != nil {
-		return fmt.Errorf("create kubernetes client: %w", err)
+		return fmt.Errorf("failed to create kubernetes client: %w", err)
 	}
 	c.kubeClient = kClient
 	return nil
@@ -163,7 +165,7 @@ func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
 
 	nftMgr, err := newNftablesManager(allRemoteCIDRs)
 	if err != nil {
-		return fmt.Errorf("init nftables manager: %w", err)
+		return fmt.Errorf("failed to init nftables manager: %w", err)
 	}
 	c.nftMgr = nftMgr
 

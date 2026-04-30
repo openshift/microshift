@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Sourced from scenario.sh and uses functions defined there.
+export TEST_RANDOMIZATION=none
 
 # Cluster A (host1): default MicroShift CIDRs
 CLUSTER_A_POD_CIDR="10.42.0.0/16"
@@ -12,82 +13,54 @@ CLUSTER_B_POD_CIDR="10.45.0.0/16"
 CLUSTER_B_SVC_CIDR="10.46.0.0/16"
 CLUSTER_B_DOMAIN="cluster-b.remote"
 
+wait_for_greenboot_on_hosts() {
+    local junit_label=$1
+    local host
+    for host in host1 host2; do
+        local host_ip full_host
+        host_ip=$(get_vm_property "${host}" ip)
+        full_host=$(full_vm_name "${host}")
+        if ! wait_for_greenboot "${full_host}" "${host_ip}"; then
+            record_junit "${host}" "${junit_label}" "FAILED"
+            return 1
+        fi
+        record_junit "${host}" "${junit_label}" "OK"
+    done
+}
+
+configure_c2cc_host() {
+    local host=$1 remote_ip=$2 remote_pod_cidr=$3 remote_svc_cidr=$4 remote_domain=$5
+
+    run_command_on_vm "${host}" "sudo mkdir -p /etc/microshift/config.d"
+    run_command_on_vm "${host}" "sudo tee /etc/microshift/config.d/50-c2cc.yaml > /dev/null << EOF
+clusterToCluster:
+  remoteClusters:
+  - nextHop: ${remote_ip}
+    clusterNetwork:
+    - ${remote_pod_cidr}
+    serviceNetwork:
+    - ${remote_svc_cidr}
+    domain: ${remote_domain}
+EOF"
+
+    configure_vm_firewall "${host}"
+    run_command_on_vm "${host}" "sudo firewall-cmd --permanent --zone=trusted --add-source=${remote_pod_cidr}"
+    run_command_on_vm "${host}" "sudo firewall-cmd --permanent --zone=trusted --add-source=${remote_svc_cidr}"
+    run_command_on_vm "${host}" "sudo firewall-cmd --reload"
+
+    run_command_on_vm "${host}" "sudo systemctl restart microshift"
+}
+
 configure_c2cc_hosts() {
     local -r host1_ip=$(get_vm_property host1 ip)
     local -r host2_ip=$(get_vm_property host2 ip)
-    local -r full_host1=$(full_vm_name host1)
-    local -r full_host2=$(full_vm_name host2)
 
-    # Wait for greenboot to finish on both hosts before reconfiguring.
-    # Restarting MicroShift mid-healthcheck causes greenboot to reboot the host.
-    if ! wait_for_greenboot "${full_host1}" "${host1_ip}"; then
-        record_junit host1 "c2cc_pre_greenboot" "FAILED"
-        return 1
-    fi
-    record_junit host1 "c2cc_pre_greenboot" "OK"
+    wait_for_greenboot_on_hosts "c2cc_pre_greenboot"
 
-    if ! wait_for_greenboot "${full_host2}" "${host2_ip}"; then
-        record_junit host2 "c2cc_pre_greenboot" "FAILED"
-        return 1
-    fi
-    record_junit host2 "c2cc_pre_greenboot" "OK"
+    configure_c2cc_host host1 "${host2_ip}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}"
+    configure_c2cc_host host2 "${host1_ip}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}"
 
-    # host1 (Cluster A): C2CC config pointing to host2
-    run_command_on_vm host1 "sudo mkdir -p /etc/microshift/config.d"
-    run_command_on_vm host1 "sudo tee /etc/microshift/config.d/50-c2cc.yaml > /dev/null << EOF
-clusterToCluster:
-  remoteClusters:
-  - nextHop: ${host2_ip}
-    clusterNetwork:
-    - ${CLUSTER_B_POD_CIDR}
-    serviceNetwork:
-    - ${CLUSTER_B_SVC_CIDR}
-    domain: ${CLUSTER_B_DOMAIN}
-EOF"
-
-    # host2 (Cluster B): C2CC config pointing to host1.
-    # Network CIDRs are already set via kickstart (see scenario_create_vms).
-    run_command_on_vm host2 "sudo mkdir -p /etc/microshift/config.d"
-    run_command_on_vm host2 "sudo tee /etc/microshift/config.d/50-c2cc.yaml > /dev/null << EOF
-clusterToCluster:
-  remoteClusters:
-  - nextHop: ${host1_ip}
-    clusterNetwork:
-    - ${CLUSTER_A_POD_CIDR}
-    serviceNetwork:
-    - ${CLUSTER_A_SVC_CIDR}
-    domain: ${CLUSTER_A_DOMAIN}
-EOF"
-
-    # Standard firewall setup on both hosts
-    configure_vm_firewall host1
-    configure_vm_firewall host2
-
-    # Trust remote pod and service CIDRs
-    run_command_on_vm host1 "sudo firewall-cmd --permanent --zone=trusted --add-source=${CLUSTER_B_POD_CIDR}"
-    run_command_on_vm host1 "sudo firewall-cmd --permanent --zone=trusted --add-source=${CLUSTER_B_SVC_CIDR}"
-    run_command_on_vm host1 "sudo firewall-cmd --reload"
-
-    run_command_on_vm host2 "sudo firewall-cmd --permanent --zone=trusted --add-source=${CLUSTER_A_POD_CIDR}"
-    run_command_on_vm host2 "sudo firewall-cmd --permanent --zone=trusted --add-source=${CLUSTER_A_SVC_CIDR}"
-    run_command_on_vm host2 "sudo firewall-cmd --reload"
-
-    # Restart MicroShift on both hosts to pick up C2CC config
-    run_command_on_vm host1 "sudo systemctl restart microshift"
-    run_command_on_vm host2 "sudo systemctl restart microshift"
-
-    # Wait for greenboot on both hosts after C2CC restart
-    if ! wait_for_greenboot "${full_host1}" "${host1_ip}"; then
-        record_junit host1 "c2cc_greenboot" "FAILED"
-        return 1
-    fi
-    record_junit host1 "c2cc_greenboot" "OK"
-
-    if ! wait_for_greenboot "${full_host2}" "${host2_ip}"; then
-        record_junit host2 "c2cc_greenboot" "FAILED"
-        return 1
-    fi
-    record_junit host2 "c2cc_greenboot" "OK"
+    wait_for_greenboot_on_hosts "c2cc_greenboot"
 }
 
 scenario_create_vms() {
@@ -140,5 +113,8 @@ scenario_run_tests() {
         --variable "CLUSTER_B_SVC_CIDR:${CLUSTER_B_SVC_CIDR}" \
         --variable "CLUSTER_B_DOMAIN:${CLUSTER_B_DOMAIN}" \
         --variable "KUBECONFIG_B:${kubeconfig_b}" \
-        suites/c2cc/
+        suites/c2cc/sanity.robot \
+        suites/c2cc/infrastructure.robot \
+        suites/c2cc/connectivity.robot \
+        suites/c2cc/reconciliation.robot
 }

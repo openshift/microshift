@@ -78,10 +78,10 @@ func (m *serviceRouteManager) reconcile(ctx context.Context) error {
 	}
 
 	if err := m.reconcileRoutes(desired); err != nil {
-		return fmt.Errorf("service routes: %w", err)
+		return fmt.Errorf("failed to reconcile service routes: %w", err)
 	}
 	if err := m.reconcileRules(); err != nil {
-		return fmt.Errorf("service rules: %w", err)
+		return fmt.Errorf("failed to reconcile service rules: %w", err)
 	}
 	return nil
 }
@@ -113,7 +113,7 @@ func (m *serviceRouteManager) reconcileRules() error {
 
 	allRules, err := netlink.RuleList(netlink.FAMILY_ALL)
 	if err != nil {
-		return fmt.Errorf("listing ip rules: %w", err)
+		return fmt.Errorf("failed to list ip rules: %w", err)
 	}
 
 	actualKeys := make(map[ruleKey]netlink.Rule)
@@ -132,7 +132,7 @@ func (m *serviceRouteManager) reconcileRules() error {
 		if err := netlink.RuleAdd(&rule); err != nil {
 			if !errors.Is(err, syscall.EEXIST) {
 				klog.Errorf("Failed to add service ip rule from %s to %s: %v", rule.Src, rule.Dst, err)
-				errs = append(errs, fmt.Errorf("add service ip rule from %s to %s: %w", rule.Src, rule.Dst, err))
+				errs = append(errs, fmt.Errorf("failed to add service ip rule from %s to %s: %w", rule.Src, rule.Dst, err))
 			}
 			continue
 		}
@@ -146,7 +146,7 @@ func (m *serviceRouteManager) reconcileRules() error {
 		rule := r
 		if err := netlink.RuleDel(&rule); err != nil {
 			klog.Errorf("Failed to delete stale service rule from %s to %s: %v", k.src, k.dst, err)
-			errs = append(errs, fmt.Errorf("delete service ip rule from %s to %s: %w", k.src, k.dst, err))
+			errs = append(errs, fmt.Errorf("failed to delete service ip rule from %s to %s: %w", k.src, k.dst, err))
 		}
 	}
 
@@ -167,12 +167,12 @@ type mgmtPortGateway struct {
 func getMgmtPortGateways() (map[int]mgmtPortGateway, error) {
 	link, err := netlink.LinkByName(mgmtPortInterface)
 	if err != nil {
-		return nil, fmt.Errorf("get %s: %w", mgmtPortInterface, err)
+		return nil, fmt.Errorf("failed to get %s: %w", mgmtPortInterface, err)
 	}
 
 	addrs, err := netlink.AddrList(link, netlink.FAMILY_ALL)
 	if err != nil {
-		return nil, fmt.Errorf("list addresses on %s: %w", mgmtPortInterface, err)
+		return nil, fmt.Errorf("failed to list addresses on %s: %w", mgmtPortInterface, err)
 	}
 
 	gateways := make(map[int]mgmtPortGateway)
@@ -196,7 +196,7 @@ func getMgmtPortGateways() (map[int]mgmtPortGateway, error) {
 	}
 
 	if len(gateways) == 0 {
-		return nil, fmt.Errorf("no addresses found on %s", mgmtPortInterface)
+		return nil, fmt.Errorf("failed to find addresses on %s", mgmtPortInterface)
 	}
 
 	return gateways, nil

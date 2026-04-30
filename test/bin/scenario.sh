@@ -1239,7 +1239,8 @@ EOF
                 [ -f "${prop_file}" ] || continue
                 local val
                 val=$(cat "${prop_file}")
-                local var_name="${var_prefix}_$(echo "${prop}" | tr '[:lower:]' '[:upper:]')"
+                local var_name
+                var_name="${var_prefix}_$(echo "${prop}" | tr '[:lower:]' '[:upper:]')"
                 echo "${var_name}: ${val}" | tee -a "${variable_file}"
             done
         done

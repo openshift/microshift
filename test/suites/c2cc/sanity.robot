@@ -2,8 +2,6 @@
 Documentation       Sanity checks for a multi-cluster C2CC environment.
 ...                 Verifies that all clusters are running and MicroShift is healthy.
 
-Resource            ../../resources/common.resource
-Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/oc.resource
@@ -73,7 +71,9 @@ Verify Cluster Is Running
 Verify All Pods Are Ready
     [Documentation]    Wait for all pods to be Ready on the given cluster.
     [Arguments]    ${alias}
-    Oc On Cluster    ${alias}    oc wait pods -A --all --for=condition=Ready --field-selector=status.phase!=Succeeded,status.phase!=Failed --timeout=120s
+    Oc On Cluster
+    ...    ${alias}
+    ...    oc wait pods -A --all --for=condition=Ready --field-selector=status.phase!=Succeeded,status.phase!=Failed --timeout=120s
 
 Verify Cluster Has Node
     [Documentation]    Verify the given cluster has at least one node.

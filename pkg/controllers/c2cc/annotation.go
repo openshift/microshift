@@ -41,7 +41,7 @@ func newAnnotationManager(kubeClient kubernetes.Interface, nodeName string, remo
 func (a *annotationManager) reconcile(ctx context.Context) error {
 	node, err := a.kubeClient.CoreV1().Nodes().Get(ctx, a.nodeName, metav1.GetOptions{})
 	if err != nil {
-		return fmt.Errorf("get node %q: %w", a.nodeName, err)
+		return fmt.Errorf("failed to get node %q: %w", a.nodeName, err)
 	}
 
 	if node.Annotations[ovnNodeDontSNATSubnets] == a.desiredAnnotation {
@@ -52,7 +52,7 @@ func (a *annotationManager) reconcile(ctx context.Context) error {
 	_, err = a.kubeClient.CoreV1().Nodes().Patch(ctx, a.nodeName,
 		types.MergePatchType, []byte(patch), metav1.PatchOptions{})
 	if err != nil {
-		return fmt.Errorf("patch node annotation: %w", err)
+		return fmt.Errorf("failed to patch node annotation: %w", err)
 	}
 	klog.V(2).Infof("Updated node annotation %s = %s", ovnNodeDontSNATSubnets, a.desiredAnnotation)
 	return nil
@@ -63,7 +63,7 @@ func (a *annotationManager) cleanup(ctx context.Context) error {
 	_, err := a.kubeClient.CoreV1().Nodes().Patch(ctx, a.nodeName,
 		types.MergePatchType, []byte(patch), metav1.PatchOptions{})
 	if err != nil {
-		return fmt.Errorf("remove node annotation: %w", err)
+		return fmt.Errorf("failed to remove node annotation: %w", err)
 	}
 	klog.V(2).Infof("Removed node annotation %s", ovnNodeDontSNATSubnets)
 	return nil

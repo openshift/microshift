@@ -3,8 +3,6 @@ Documentation       Cross-cluster connectivity tests for C2CC.
 ...                 Deploys test workloads on both clusters and verifies pod-to-pod
 ...                 and pod-to-service communication in both directions.
 
-Resource            ../../resources/common.resource
-Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/oc.resource
@@ -17,7 +15,7 @@ Test Tags           c2cc
 
 
 *** Variables ***
-${NAMESPACE}        c2cc-test
+${NAMESPACE}    c2cc-test
 
 
 *** Test Cases ***
@@ -65,7 +63,7 @@ Teardown
 
 Deploy Test Workloads
     [Documentation]    Create namespace and deploy hello-microshift + curl-pod on both clusters.
-    ${assets}=    Set Variable    ${EXECDIR}/assets/c2cc
+    VAR    ${assets}=    ${EXECDIR}/assets/c2cc
     FOR    ${alias}    IN    cluster-a    cluster-b
         Oc On Cluster    ${alias}    oc create namespace ${NAMESPACE}
         Oc On Cluster    ${alias}    oc apply -n ${NAMESPACE} -f ${assets}/hello-microshift.yaml

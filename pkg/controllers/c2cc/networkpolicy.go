@@ -66,20 +66,20 @@ func (m *networkPolicyManager) reconcile(ctx context.Context) error {
 	if errors.IsNotFound(err) {
 		_, err = client.Create(ctx, m.desired, metav1.CreateOptions{})
 		if err != nil {
-			return fmt.Errorf("creating NetworkPolicy: %w", err)
+			return fmt.Errorf("failed to create NetworkPolicy: %w", err)
 		}
 		klog.V(2).Infof("Created NetworkPolicy %s/%s", c2ccNetworkPolicyNamespace, c2ccNetworkPolicyName)
 		return nil
 	}
 	if err != nil {
-		return fmt.Errorf("getting NetworkPolicy: %w", err)
+		return fmt.Errorf("failed to get NetworkPolicy: %w", err)
 	}
 
 	toUpdate := m.desired.DeepCopy()
 	toUpdate.ResourceVersion = existing.ResourceVersion
 	_, err = client.Update(ctx, toUpdate, metav1.UpdateOptions{})
 	if err != nil {
-		return fmt.Errorf("updating NetworkPolicy: %w", err)
+		return fmt.Errorf("failed to update NetworkPolicy: %w", err)
 	}
 	return nil
 }
@@ -91,7 +91,7 @@ func (m *networkPolicyManager) cleanup(ctx context.Context) error {
 		return nil
 	}
 	if err != nil {
-		return fmt.Errorf("deleting NetworkPolicy: %w", err)
+		return fmt.Errorf("failed to delete NetworkPolicy: %w", err)
 	}
 	klog.V(2).Infof("Deleted NetworkPolicy %s/%s", c2ccNetworkPolicyNamespace, c2ccNetworkPolicyName)
 	return nil

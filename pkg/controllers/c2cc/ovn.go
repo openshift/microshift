@@ -65,7 +65,7 @@ func newOVNRouteManager(nbClient client.Client, nodeName string, resolved []conf
 func (m *ovnRouteManager) reconcile(ctx context.Context) error {
 	actual, err := m.listC2CCRoutes(ctx)
 	if err != nil {
-		return fmt.Errorf("listing OVN routes: %w", err)
+		return fmt.Errorf("failed to list OVN routes: %w", err)
 	}
 
 	actualByKey := make(map[routeKey]*LogicalRouterStaticRoute, len(actual))
@@ -91,7 +91,7 @@ func (m *ovnRouteManager) reconcile(ctx context.Context) error {
 		route.UUID = buildNamedUUID("c2cc_route_", route.IPPrefix)
 		createOps, err := m.nbClient.Create(&route)
 		if err != nil {
-			return fmt.Errorf("creating route %s via %s: %w", route.IPPrefix, route.Nexthop, err)
+			return fmt.Errorf("failed to create route %s via %s: %w", route.IPPrefix, route.Nexthop, err)
 		}
 		ops = append(ops, createOps...)
 
@@ -102,7 +102,7 @@ func (m *ovnRouteManager) reconcile(ctx context.Context) error {
 			Value:   []string{route.UUID},
 		})
 		if err != nil {
-			return fmt.Errorf("mutating router for route %s: %w", route.IPPrefix, err)
+			return fmt.Errorf("failed to mutate router for route %s: %w", route.IPPrefix, err)
 		}
 		ops = append(ops, mutateOps...)
 
@@ -121,13 +121,13 @@ func (m *ovnRouteManager) reconcile(ctx context.Context) error {
 			Value:   []string{existing.UUID},
 		})
 		if err != nil {
-			return fmt.Errorf("mutating router to remove route %s: %w", existing.UUID, err)
+			return fmt.Errorf("failed to mutate router to remove route %s: %w", existing.UUID, err)
 		}
 		ops = append(ops, mutateOps...)
 
 		deleteOps, err := m.nbClient.Where(existing).Delete()
 		if err != nil {
-			return fmt.Errorf("deleting route %s: %w", existing.UUID, err)
+			return fmt.Errorf("failed to delete route %s: %w", existing.UUID, err)
 		}
 		ops = append(ops, deleteOps...)
 
@@ -140,11 +140,11 @@ func (m *ovnRouteManager) reconcile(ctx context.Context) error {
 
 	results, err := m.nbClient.Transact(ctx, ops...)
 	if err != nil {
-		return fmt.Errorf("OVN transact: %w", err)
+		return fmt.Errorf("failed to transact OVN: %w", err)
 	}
 	for _, r := range results {
 		if r.Error != "" {
-			return fmt.Errorf("OVN transact error: %s (%s)", r.Error, r.Details)
+			return fmt.Errorf("failed to transact OVN: %s (%s)", r.Error, r.Details)
 		}
 	}
 
