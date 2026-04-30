@@ -1,6 +1,6 @@
-- cluster-network-operator embedded-component c56dbe730979a72781c87e01bb5bccffe527e6c6 to b5f9806ed0aee267baa390c3e0e5943d73ad60ef
-  - 003d471 2026-04-17T19:35:02+05:30 Add config override for openflow-probe
+- cluster-kube-apiserver-operator embedded-component 4bbd3be9dfda4a08dca98648209151de2a869f25 to 1b48403438c3e0eb2ccb5cae331f12fe9abe169c
+  - 85bb270 2026-04-21T14:03:12+02:00 configobservation/auth: allow setting the oauthMetadata when auth type is None
 
-- machine-config-operator embedded-component df828dfef3bbadf24487359a688a42460abfa90c to 6ac8d2ebf66ea3d165d59117d19750594ab5fc00
-  - 6b3c082f 2026-04-21T19:46:01+00:00 chore: update AMIs
+- cluster-network-operator embedded-component b5f9806ed0aee267baa390c3e0e5943d73ad60ef to ca69ef09c1bba973b3806ecf4f01302b808e2edd
+  - 6394b07 2026-04-22T11:35:43-04:00 OCPBUGS-72411: use net.JoinHostPort for URL construction
 
