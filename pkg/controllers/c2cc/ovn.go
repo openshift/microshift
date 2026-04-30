@@ -183,9 +183,18 @@ func (m *ovnRouteManager) cleanup(ctx context.Context) error {
 		}
 		ops = append(ops, delOps...)
 
-		if _, err := m.nbClient.Transact(ctx, ops...); err != nil {
+		results, err := m.nbClient.Transact(ctx, ops...)
+		if err != nil {
 			klog.Errorf("Failed to remove OVN route %s: %v", route.UUID, err)
 			errs = append(errs, err)
+			continue
+		}
+		for _, res := range results {
+			if res.Error != "" {
+				opErr := fmt.Errorf("failed to remove OVN route %s: %s (%s)", route.UUID, res.Error, res.Details)
+				klog.Errorf("%v", opErr)
+				errs = append(errs, opErr)
+			}
 		}
 	}
 	return errors.Join(errs...)
