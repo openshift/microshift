@@ -92,7 +92,7 @@ fi
 rhoai_release="registry.redhat.io/rhoai/odh-operator-bundle:v2.25"
 # SR-IOV Operator is available through OLM and is not part of the OCP release.
 sriov_release="registry.redhat.io/openshift4/ose-sriov-network-operator-bundle:v4.21"
-opm_release="registry.redhat.io/redhat/redhat-operator-index:v4.20"
+opm_release="registry.redhat.io/redhat/redhat-operator-index:v4.22"
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
 ORG=${ORG:-openshift} \
