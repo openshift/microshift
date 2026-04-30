@@ -186,3 +186,47 @@ Verify C2CC Network Policy
     ...    ${alias}
     ...    oc get networkpolicy c2cc-allow-remote-pods -n default -o jsonpath='{.metadata.labels.app\\.kubernetes\\.io/managed-by}'
     Should Be Equal As Strings    ${stdout}    microshift-c2cc
+
+Verify C2CC Tracking Annotation
+    [Documentation]    Check that the C2CC tracking annotation exists and contains the remote CIDRs.
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get node -o jsonpath='{.items[0].metadata.annotations.microshift\\.io/c2cc-snat-subnets}'
+    Should Contain    ${stdout}    ${remote_pod_cidr}
+    Should Contain    ${stdout}    ${remote_svc_cidr}
+
+Get Node SNAT Annotation
+    [Documentation]    Return the raw value of the SNAT-exclude annotation.
+    [Arguments]    ${alias}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get node -o jsonpath='{.items[0].metadata.annotations.k8s\\.ovn\\.org/node-ingress-snat-exclude-subnets}'
+    RETURN    ${stdout}
+
+Inject Foreign Subnet Into SNAT Annotation
+    [Documentation]    Add a foreign (non-C2CC) subnet to the SNAT-exclude annotation.
+    ...    Reads the current value, appends the foreign CIDR, and patches the node.
+    [Arguments]    ${alias}    ${foreign_cidr}
+    ${node}=    Oc On Cluster    ${alias}
+    ...    oc get nodes -o jsonpath='{.items[0].metadata.name}'
+    ${current}=    Get Node SNAT Annotation    ${alias}
+    ${new_value}=    Command On Cluster
+    ...    ${alias}
+    ...    echo '${current}' | python3 -c "import sys,json; d=json.load(sys.stdin); d.append('${foreign_cidr}'); print(json.dumps(sorted(d)))"
+    ...    sudo_mode=False
+    Oc On Cluster    ${alias}
+    ...    oc annotate node ${node} k8s.ovn.org/node-ingress-snat-exclude-subnets='${new_value}' --overwrite
+
+Remove C2CC CIDRs From SNAT Annotation Keeping Foreign
+    [Documentation]    Remove C2CC CIDRs from the SNAT annotation, keeping only the foreign subnet.
+    ...    This simulates external modification that strips C2CC entries.
+    [Arguments]    ${alias}    ${foreign_cidr}
+    ${node}=    Oc On Cluster    ${alias}
+    ...    oc get nodes -o jsonpath='{.items[0].metadata.name}'
+    Oc On Cluster    ${alias}
+    ...    oc annotate node ${node} k8s.ovn.org/node-ingress-snat-exclude-subnets='["${foreign_cidr}"]' --overwrite
+
+Remove Foreign Subnet From SNAT Annotation
+    [Documentation]    Remove a foreign subnet from the SNAT annotation to restore clean state.
+    ...    Triggers a reconcile by briefly corrupting the annotation.
+    [Arguments]    ${alias}
+    Corrupt Node SNAT Annotation On Cluster    ${alias}

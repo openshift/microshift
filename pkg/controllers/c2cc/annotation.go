@@ -16,26 +16,50 @@ import (
 )
 
 const (
-	ovnNodeDontSNATSubnets = "k8s.ovn.org/node-ingress-snat-exclude-subnets"
+	ovnNodeDontSNATSubnets     = "k8s.ovn.org/node-ingress-snat-exclude-subnets"
+	c2ccSNATTrackingAnnotation = "microshift.io/c2cc-snat-subnets"
 )
 
 type annotationManager struct {
-	kubeClient        kubernetes.Interface
-	nodeName          string
-	desiredAnnotation string
+	kubeClient   kubernetes.Interface
+	nodeName     string
+	desiredCIDRs []string
 }
 
 func newAnnotationManager(kubeClient kubernetes.Interface, nodeName string, remoteCIDRs []string) *annotationManager {
 	sorted := make([]string, len(remoteCIDRs))
 	copy(sorted, remoteCIDRs)
 	sort.Strings(sorted)
-	data, _ := json.Marshal(sorted)
 
 	return &annotationManager{
-		kubeClient:        kubeClient,
-		nodeName:          nodeName,
-		desiredAnnotation: string(data),
+		kubeClient:   kubeClient,
+		nodeName:     nodeName,
+		desiredCIDRs: sorted,
 	}
+}
+
+func parseCIDRAnnotation(value string) []string {
+	if value == "" {
+		return nil
+	}
+	var cidrs []string
+	if err := json.Unmarshal([]byte(value), &cidrs); err != nil {
+		return nil
+	}
+	return cidrs
+}
+
+func cidrSetContainsAll(superset, subset []string) bool {
+	set := make(map[string]bool, len(superset))
+	for _, c := range superset {
+		set[c] = true
+	}
+	for _, c := range subset {
+		if !set[c] {
+			return false
+		}
+	}
+	return true
 }
 
 func (a *annotationManager) reconcile(ctx context.Context) error {
@@ -44,28 +68,95 @@ func (a *annotationManager) reconcile(ctx context.Context) error {
 		return fmt.Errorf("failed to get node %q: %w", a.nodeName, err)
 	}
 
-	if node.Annotations[ovnNodeDontSNATSubnets] == a.desiredAnnotation {
+	existing := parseCIDRAnnotation(node.Annotations[ovnNodeDontSNATSubnets])
+	previous := parseCIDRAnnotation(node.Annotations[c2ccSNATTrackingAnnotation])
+
+	// Target = (existing - previous) + desired
+	// This replaces only the CIDRs C2CC previously wrote, preserving anything added by other components.
+	foreignCIDRs := make(map[string]bool, len(existing))
+	for _, c := range existing {
+		foreignCIDRs[c] = true
+	}
+	for _, c := range previous {
+		delete(foreignCIDRs, c)
+	}
+
+	targetSet := make(map[string]bool, len(foreignCIDRs)+len(a.desiredCIDRs))
+	for c := range foreignCIDRs {
+		targetSet[c] = true
+	}
+	for _, c := range a.desiredCIDRs {
+		targetSet[c] = true
+	}
+
+	target := make([]string, 0, len(targetSet))
+	for c := range targetSet {
+		target = append(target, c)
+	}
+	sort.Strings(target)
+
+	targetJSON, _ := json.Marshal(target)
+	desiredJSON, _ := json.Marshal(a.desiredCIDRs)
+
+	if node.Annotations[ovnNodeDontSNATSubnets] == string(targetJSON) &&
+		node.Annotations[c2ccSNATTrackingAnnotation] == string(desiredJSON) {
 		return nil
 	}
 
-	patch := fmt.Sprintf(`{"metadata":{"annotations":{%q:%q}}}`, ovnNodeDontSNATSubnets, a.desiredAnnotation)
+	patch := fmt.Sprintf(`{"metadata":{"annotations":{%q:%q,%q:%q}}}`,
+		ovnNodeDontSNATSubnets, string(targetJSON),
+		c2ccSNATTrackingAnnotation, string(desiredJSON))
 	_, err = a.kubeClient.CoreV1().Nodes().Patch(ctx, a.nodeName,
 		types.MergePatchType, []byte(patch), metav1.PatchOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to patch node annotation: %w", err)
 	}
-	klog.V(2).Infof("Updated node annotation %s = %s", ovnNodeDontSNATSubnets, a.desiredAnnotation)
+	klog.V(2).Infof("Updated node annotation %s = %s (tracking: %s)", ovnNodeDontSNATSubnets, string(targetJSON), string(desiredJSON))
 	return nil
 }
 
 func (a *annotationManager) cleanup(ctx context.Context) error {
-	patch := fmt.Sprintf(`{"metadata":{"annotations":{%q:null}}}`, ovnNodeDontSNATSubnets)
-	_, err := a.kubeClient.CoreV1().Nodes().Patch(ctx, a.nodeName,
+	node, err := a.kubeClient.CoreV1().Nodes().Get(ctx, a.nodeName, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to get node %q for cleanup: %w", a.nodeName, err)
+	}
+
+	tracked := parseCIDRAnnotation(node.Annotations[c2ccSNATTrackingAnnotation])
+	if len(tracked) == 0 {
+		return nil
+	}
+
+	existing := parseCIDRAnnotation(node.Annotations[ovnNodeDontSNATSubnets])
+	trackedSet := make(map[string]bool, len(tracked))
+	for _, c := range tracked {
+		trackedSet[c] = true
+	}
+
+	var remaining []string
+	for _, c := range existing {
+		if !trackedSet[c] {
+			remaining = append(remaining, c)
+		}
+	}
+
+	var snatValue string
+	if len(remaining) == 0 {
+		snatValue = "null"
+	} else {
+		sort.Strings(remaining)
+		data, _ := json.Marshal(remaining)
+		snatValue = fmt.Sprintf("%q", string(data))
+	}
+
+	patch := fmt.Sprintf(`{"metadata":{"annotations":{%s:%s,%q:null}}}`,
+		fmt.Sprintf("%q", ovnNodeDontSNATSubnets), snatValue,
+		c2ccSNATTrackingAnnotation)
+	_, err = a.kubeClient.CoreV1().Nodes().Patch(ctx, a.nodeName,
 		types.MergePatchType, []byte(patch), metav1.PatchOptions{})
 	if err != nil {
-		return fmt.Errorf("failed to remove node annotation: %w", err)
+		return fmt.Errorf("failed to cleanup node annotation: %w", err)
 	}
-	klog.V(2).Infof("Removed node annotation %s", ovnNodeDontSNATSubnets)
+	klog.V(2).Infof("Cleaned up node annotation %s (removed %d C2CC CIDRs, %d remaining)", ovnNodeDontSNATSubnets, len(tracked), len(remaining))
 	return nil
 }
 
@@ -92,7 +183,8 @@ func (a *annotationManager) subscribe(ctx context.Context, reconcileCh chan<- st
 				if !ok {
 					continue
 				}
-				if node.Annotations[ovnNodeDontSNATSubnets] == a.desiredAnnotation {
+				current := parseCIDRAnnotation(node.Annotations[ovnNodeDontSNATSubnets])
+				if cidrSetContainsAll(current, a.desiredCIDRs) {
 					continue
 				}
 				select {

@@ -17,6 +17,7 @@ Test Tags           c2cc
 *** Variables ***
 ${RECONCILE_TIMEOUT}    30s
 ${RECONCILE_RETRY}      5s
+${FOREIGN_CIDR}         192.0.2.0/24
 
 
 *** Test Cases ***
@@ -73,6 +74,22 @@ Reconcile NetworkPolicy After Deletion
     Delete C2CC NetworkPolicy On Cluster    cluster-a
     Wait Until Keyword Succeeds    ${RECONCILE_TIMEOUT}    ${RECONCILE_RETRY}
     ...    Verify C2CC Network Policy    cluster-a
+
+C2CC Tracking Annotation Exists On Cluster A
+    [Documentation]    Verify the C2CC tracking annotation exists and tracks the desired CIDRs.
+    Verify C2CC Tracking Annotation    cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
+
+Reconcile SNAT Annotation Preserves Foreign Subnets
+    [Documentation]    Inject a foreign subnet into the SNAT annotation, then remove only
+    ...    the C2CC CIDRs. Verify the controller merges C2CC CIDRs back without
+    ...    removing the foreign subnet.
+    [Setup]    Inject Foreign Subnet Into SNAT Annotation    cluster-a    ${FOREIGN_CIDR}
+    Remove C2CC CIDRs From SNAT Annotation Keeping Foreign    cluster-a    ${FOREIGN_CIDR}
+    Wait Until Keyword Succeeds    ${RECONCILE_TIMEOUT}    ${RECONCILE_RETRY}
+    ...    Verify Node SNAT Annotation    cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
+    ${annotation}=    Get Node SNAT Annotation    cluster-a
+    Should Contain    ${annotation}    ${FOREIGN_CIDR}
+    [Teardown]    Remove Foreign Subnet From SNAT Annotation    cluster-a
 
 
 *** Keywords ***
