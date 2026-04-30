@@ -1,4 +1,17 @@
-- cluster-network-operator embedded-component c7c587b0d7cc0e9b344291bed5e66dc59e15c74e to 99c785cb3e5577067ff785ebad6344dc9b9bbc18
-  - 7da176f 2026-04-21T17:04:38+05:30 Add config override for openflow-probe
-  - 696e51c 2026-04-21T16:57:29+05:30 Allow overriding OVN-Kubernetes configuration
+- cluster-network-operator embedded-component 99c785cb3e5577067ff785ebad6344dc9b9bbc18 to b40233991fa420432a44fba510d59fc24d3aafd7
+  - 46c5557 2026-04-27T21:32:00+02:00 fix(hypershift): use net.JoinHostPort for URL construction
+
+- ovn-kubernetes image-amd64 6fe7a1f403388a7540aea240e8203c28b40728af to 2609f4261a2310228b926965b11b7b616c0bb418
+  - ab20d0a2 2026-03-31T16:41:42+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+  - 225848ac 2026-03-25T18:26:11+05:30 EgressFirewall: Use exponential backoff to refresh IP addresses for DNS names
+  - 679442da 2026-02-27T14:28:44+05:30 Add a e2e test for NodePort service
+  - 46ce09a9 2026-02-27T14:28:22+05:30 Clear stale conntrack UDP entries for nodePorts
+  - 8336fa03 2026-02-23T09:49:28+01:00 Minimize ACLs by combining ipBlocks into single ACL
+
+- ovn-kubernetes image-arm64 6fe7a1f403388a7540aea240e8203c28b40728af to 2609f4261a2310228b926965b11b7b616c0bb418
+  - ab20d0a2 2026-03-31T16:41:42+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+  - 225848ac 2026-03-25T18:26:11+05:30 EgressFirewall: Use exponential backoff to refresh IP addresses for DNS names
+  - 679442da 2026-02-27T14:28:44+05:30 Add a e2e test for NodePort service
+  - 46ce09a9 2026-02-27T14:28:22+05:30 Clear stale conntrack UDP entries for nodePorts
+  - 8336fa03 2026-02-23T09:49:28+01:00 Minimize ACLs by combining ipBlocks into single ACL
 
