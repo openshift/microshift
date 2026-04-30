@@ -1,8 +1,31 @@
-- oc image-arm64 64e778a55fbcdf295b671a7d4e701e7c8cc3a499 to 92a3a166a7f710a344a11bda0ad221e54583fccd
+- cluster-ingress-operator embedded-component 24ef5ae121b8f658b649bb555be827f114ead438 to 0aca1e80822b4d5690add409f354f991fe9c042e
+  - 43e01a0 2026-04-16T17:44:20Z don't use constant in unit test
+  - 6ba6a6e 2026-04-16T17:44:20Z set trustBundleName in Istio global values
+
+- cluster-kube-scheduler-operator embedded-component 7cac34952f982895b5fdae60b29376fba838be89 to 84eb8c5a73a730d6d08794e51da9c20013ca4304
+  - 046b59c 2026-04-17T18:54:54Z add /var/run/kubernetes as emptyDir
+
+- cluster-network-operator embedded-component d1ec37ecb90d74eccc8d8c3e0bc42a8c0fb5ac6a to 18558dbf31624b136a7d35b30ef99e551d2738ae
+  - 478bce2 2026-04-20T19:56:10Z wait for patch port to apply drop garp flows
+
+- machine-config-operator embedded-component 30c659cb9c2a39931bde3b48c6fc35f1c6ea1945 to c19e5dc0e5e2835f89befc42e4f8b89d869fc90c
+  - 4a173a4e 2026-04-22T17:31:47Z daemon: update systemd unit listing function to return all available units on disk
+  - b7e5ff96 2026-04-21T15:50:21Z chore: update AMIs
+  - 3c59411f 2026-04-14T21:23:27Z OCPBUGS-78154: Add GetDefaultLeaderElectionConfig for MCC
+  - 8583f91c 2026-04-14T21:23:27Z OCPBUGS-78154: Log when using HA default leader election timings
+  - 39be812d 2026-04-14T21:23:27Z OCPBUGS-78154: Add useDefaultTimings flag to GetLeaderElectionConfig
+  - 8635cd22 2026-04-14T21:23:27Z Trim comment in GetLeaderElectionConfig.
+  - 6c40d82e 2026-04-14T21:23:27Z OCPBUGS-78154: Use HA leader election defaults for MCO on SNO.
+
+- oc image-amd64 64e778a55fbcdf295b671a7d4e701e7c8cc3a499 to 92a3a166a7f710a344a11bda0ad221e54583fccd
   - 6c98139d 2026-02-23T18:59:56Z OCPBUGS-76394: Install subscription-manager in cli image
   - 83999321 2026-02-23T18:59:56Z images/tools: Install subscription-manager
   - 79716e32 2026-02-23T18:59:56Z OCPBUGS-76394: Ignore group ownership on rpm -V
 
-- ovn-kubernetes image-arm64 b8b321eb5f64e9ea776d56e5bec3e5d5bd1ef5b3 to 84bbd555d1b9c16f8eb34b0de1c90d68328def94
+- ovn-kubernetes image-amd64 b8b321eb5f64e9ea776d56e5bec3e5d5bd1ef5b3 to 8e88264292d35914db642556959e3193bb3ff05f
+  - ef7ea17c 2026-04-23T15:54:57+01:00 virt: fix SyncVirtualMachines deleting UDN DHCP options during startup
   - 8df3403f 2026-04-15T09:39:23Z Backport: Fix NAD Controller syncAll for networkID upgrade from node->NAD
+
+- ovn-kubernetes image-arm64 84bbd555d1b9c16f8eb34b0de1c90d68328def94 to 8e88264292d35914db642556959e3193bb3ff05f
+  - ef7ea17c 2026-04-23T15:54:57+01:00 virt: fix SyncVirtualMachines deleting UDN DHCP options during startup
 
