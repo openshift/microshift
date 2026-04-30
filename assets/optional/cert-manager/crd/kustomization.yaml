@@ -10,6 +10,8 @@ resources:
 - bases/issuers.cert-manager.io-crd.yaml
 - bases/orders.acme.cert-manager.io-crd.yaml
 - bases/operator.openshift.io_istiocsrs.yaml
+- bases/operator.openshift.io_trustmanagers.yaml
+- bases/customresourcedefinition_bundles.trust.cert-manager.io.yml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

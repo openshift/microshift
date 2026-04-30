@@ -562,7 +562,7 @@ install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd
 install -p -m644 assets/optional/cert-manager/crd/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/bases
-install -p -m644 assets/optional/cert-manager/crd/bases/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/bases
+install -p -m644 assets/optional/cert-manager/crd/bases/*.{yaml,yml} %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/bases
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/patches
 install -p -m644 assets/optional/cert-manager/crd/patches/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/patches
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
@@ -572,6 +572,11 @@ install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
 install -p -m644 assets/optional/cert-manager/manager/manager.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
 install -p -m644 assets/optional/cert-manager/manager/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager
+
+# cert-manager CA bundle update script and systemd drop-in
+install -p -m755 packaging/systemd/microshift-cert-manager-update-ca-bundle.sh %{buildroot}%{_bindir}/microshift-cert-manager-update-ca-bundle
+mkdir -p -m755 %{buildroot}%{_sysconfdir}/systemd/system/microshift.service.d
+install -p -m644 packaging/systemd/microshift-cert-manager-ca-bundle.conf %{buildroot}%{_sysconfdir}/systemd/system/microshift.service.d/microshift-cert-manager-ca-bundle.conf
 
 %ifarch %{arm} aarch64
 cat assets/optional/cert-manager/manager/images-aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/manager/images.yaml
@@ -781,6 +786,9 @@ fi
 %files cert-manager
 %dir %{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager
 %{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/*
+%{_bindir}/microshift-cert-manager-update-ca-bundle
+%dir %{_sysconfdir}/systemd/system/microshift.service.d
+%{_sysconfdir}/systemd/system/microshift.service.d/microshift-cert-manager-ca-bundle.conf
 
 %files cert-manager-release-info
 %{_datadir}/microshift/release/release-cert-manager-{x86_64,aarch64}.json

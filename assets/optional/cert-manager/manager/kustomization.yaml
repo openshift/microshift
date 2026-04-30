@@ -65,3 +65,19 @@ replacements:
           name: controller-manager
         fieldPaths:
           - spec.template.spec.containers.[name=cert-manager-operator].image
+patches:
+  - target:
+      kind: Deployment
+      name: controller-manager
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/16
+        value:
+          name: UNSUPPORTED_ADDON_FEATURES
+          value: 'TrustManager=true'
+configMapGenerator:
+  - name: trusted-ca-bundle
+    files:
+      - ca-bundle.crt=tls-ca-bundle.pem
+generatorOptions:
+  disableNameSuffixHash: true

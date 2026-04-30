@@ -226,6 +226,7 @@ rules:
   resources:
   - certmanagers/finalizers
   - istiocsrs/finalizers
+  - trustmanagers/finalizers
   verbs:
   - update
 - apiGroups:
@@ -233,6 +234,7 @@ rules:
   resources:
   - certmanagers/status
   - istiocsrs/status
+  - trustmanagers/status
   verbs:
   - get
   - patch
@@ -241,6 +243,7 @@ rules:
   - operator.openshift.io
   resources:
   - istiocsrs
+  - trustmanagers
   verbs:
   - get
   - list
@@ -275,3 +278,23 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - trust.cert-manager.io
+  resources:
+  - bundles
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - trust.cert-manager.io
+  resources:
+  - bundles/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - trust.cert-manager.io
+  resources:
+  - bundles/status
+  verbs:
+  - patch
