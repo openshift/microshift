@@ -1,0 +1,123 @@
+*** Settings ***
+Documentation       Verify C2CC cleanup when the feature is disabled.
+...                 Removes the C2CC config drop-in on Cluster A, restarts MicroShift,
+...                 and verifies all C2CC networking state has been cleaned up.
+
+Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/kubeconfig.resource
+Resource            ../../resources/oc.resource
+Resource            ../../resources/c2cc.resource
+
+Suite Setup         Setup
+Suite Teardown      Teardown
+
+Test Tags           c2cc
+
+
+*** Variables ***
+${CLEANUP_TIMEOUT}      60s
+${CLEANUP_RETRY}        5s
+${C2CC_CONFIG_PATH}     /etc/microshift/config.d/50-c2cc.yaml
+
+
+*** Test Cases ***
+No Linux Routes In Table 200 After Disable
+    [Documentation]    Routes to remote CIDRs in table 200 should be gone.
+    ${stdout}=    Command On Cluster    cluster-a    ip route show table 200
+    Should Not Contain    ${stdout}    ${CLUSTER_B_POD_CIDR}
+    Should Not Contain    ${stdout}    ${CLUSTER_B_SVC_CIDR}
+
+No IP Rules For Table 200 After Disable
+    [Documentation]    IP rules directing to table 200 should be gone.
+    ${stdout}=    Command On Cluster    cluster-a    ip rule show
+    Should Not Contain    ${stdout}    to ${CLUSTER_B_POD_CIDR} lookup 200
+    Should Not Contain    ${stdout}    to ${CLUSTER_B_SVC_CIDR} lookup 200
+
+No Service Routes In Table 201 After Disable
+    [Documentation]    Service routes in table 201 should be gone.
+    ${stdout}=    Command On Cluster    cluster-a    ip route show table 201
+    Should Not Contain    ${stdout}    ${CLUSTER_A_SVC_CIDR}
+
+No Service IP Rules After Disable
+    [Documentation]    Service IP rules for table 201 should be gone.
+    ${stdout}=    Command On Cluster    cluster-a    ip rule show
+    Should Not Contain    ${stdout}    from ${CLUSTER_B_POD_CIDR} to ${CLUSTER_A_SVC_CIDR} lookup 201
+    Should Not Contain    ${stdout}    from ${CLUSTER_B_SVC_CIDR} to ${CLUSTER_A_SVC_CIDR} lookup 201
+
+No NFTables Bypass Rules After Disable
+    [Documentation]    C2CC nftables masquerade bypass rules should be gone.
+    ${stdout}=    Command On Cluster    cluster-a
+    ...    nft list chain inet ovn-kubernetes ovn-kube-pod-subnet-masq
+    Should Not Contain    ${stdout}    c2cc-no-masq:
+
+No OVN Static Routes After Disable
+    [Documentation]    OVN static routes with microshift-c2cc tag should be gone.
+    ${pod}=    Oc On Cluster    cluster-a
+    ...    oc get pod -n openshift-ovn-kubernetes -l app=ovnkube-master -o jsonpath='{.items[0].metadata.name}'
+    ${stdout}=    Oc On Cluster
+    ...    cluster-a
+    ...    oc exec -n openshift-ovn-kubernetes ${pod} -- ovn-nbctl find Logical_Router_Static_Route external_ids:k8s.ovn.org/owner-controller=microshift-c2cc
+    Should Not Contain    ${stdout}    microshift-c2cc
+
+No Node SNAT Annotation After Disable
+    [Documentation]    The SNAT-exclude annotation should be absent.
+    ${stdout}=    Oc On Cluster    cluster-a
+    ...    oc get node -o jsonpath='{.items[0].metadata.annotations.k8s\\.ovn\\.org/node-ingress-snat-exclude-subnets}'
+    Should Be Empty    ${stdout}
+
+No C2CC Tracking Annotation After Disable
+    [Documentation]    The C2CC tracking annotation should be absent.
+    ${stdout}=    Oc On Cluster    cluster-a
+    ...    oc get node -o jsonpath='{.items[0].metadata.annotations.microshift\\.io/c2cc-snat-subnets}'
+    Should Be Empty    ${stdout}
+
+No C2CC NetworkPolicy After Disable
+    [Documentation]    The C2CC NetworkPolicy should not exist.
+    Run Keyword And Expect Error    *NotFound*
+    ...    Oc On Cluster    cluster-a    oc get networkpolicy c2cc-allow-remote-pods -n default
+
+C2CC Controller Logged Cleanup
+    [Documentation]    The controller should have logged that it is disabled and cleaning up.
+    ${stdout}=    Command On Cluster    cluster-a
+    ...    journalctl -u microshift --grep "C2CC is disabled" --no-pager -q
+    Should Contain    ${stdout}    C2CC is disabled
+
+
+*** Keywords ***
+Setup
+    [Documentation]    Register clusters, then disable C2CC on Cluster A and wait for restart.
+    Check Required Env Variables
+    Login MicroShift Host
+    Setup Kubeconfig
+    Register Local Cluster    cluster-a
+    Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
+    Disable C2CC On Cluster    cluster-a
+
+Teardown
+    [Documentation]    Re-enable C2CC on Cluster A, then close connections.
+    Enable C2CC On Cluster    cluster-a
+    Teardown All Remote Clusters
+    Remove Kubeconfig
+    Logout MicroShift Host
+
+Disable C2CC On Cluster
+    [Documentation]    Move the C2CC config drop-in aside and restart MicroShift.
+    [Arguments]    ${alias}
+    Command On Cluster    ${alias}    mv ${C2CC_CONFIG_PATH} ${C2CC_CONFIG_PATH}.bak
+    Command On Cluster    ${alias}    systemctl restart microshift
+    Wait Until Keyword Succeeds    ${CLEANUP_TIMEOUT}    ${CLEANUP_RETRY}
+    ...    Verify Cluster Is Healthy    ${alias}
+
+Enable C2CC On Cluster
+    [Documentation]    Restore the C2CC config drop-in and restart MicroShift.
+    [Arguments]    ${alias}
+    Command On Cluster    ${alias}    mv ${C2CC_CONFIG_PATH}.bak ${C2CC_CONFIG_PATH}
+    Command On Cluster    ${alias}    systemctl restart microshift
+    Wait Until Keyword Succeeds    ${CLEANUP_TIMEOUT}    ${CLEANUP_RETRY}
+    ...    Verify Cluster Is Healthy    ${alias}
+
+Verify Cluster Is Healthy
+    [Documentation]    Check the /readyz endpoint on the given cluster.
+    [Arguments]    ${alias}
+    ${stdout}=    Oc On Cluster    ${alias}    oc get --raw='/readyz'
+    Should Be Equal As Strings    ${stdout}    ok    strip_spaces=True

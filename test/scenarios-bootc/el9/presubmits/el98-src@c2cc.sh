@@ -116,5 +116,6 @@ scenario_run_tests() {
         suites/c2cc/sanity.robot \
         suites/c2cc/infrastructure.robot \
         suites/c2cc/connectivity.robot \
-        suites/c2cc/reconciliation.robot
+        suites/c2cc/reconciliation.robot \
+        suites/c2cc/cleanup.robot
 }
