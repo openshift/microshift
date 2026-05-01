@@ -1,0 +1,1 @@
+../../../el9/layer1-base/group2/rhel96-bootc-prel.containerfile
