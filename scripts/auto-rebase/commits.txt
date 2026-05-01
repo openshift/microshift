@@ -3,7 +3,7 @@ https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-c
 https://github.com/openshift/cluster-dns-operator embedded-component 3d2141182243cde1ec6417bd005c76d29aa88a01
 https://github.com/openshift/cluster-ingress-operator embedded-component 2c5b4ef0021db96ba6fecf630c53a15c12134578
 https://github.com/openshift/cluster-kube-apiserver-operator embedded-component e373e93ad5690ba5233512318005921ca5f47bd7
-https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component e2d54f2da0346309b329c34552d9896476683fc8
+https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 95150ed5dbf11370b4a06e6959c77efa13768561
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 51ea59abd057d0cef56b29b8a74efc28411d5427
 https://github.com/openshift/cluster-network-operator embedded-component e20b9cb9a0b3bc293e622ef1caf70a813710ffa8
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component e1c3674198c6c1274fd3fd3c3108eb4cade4eb0a
@@ -12,7 +12,7 @@ https://github.com/openshift/csi-external-snapshotter embedded-component d1bc3ff
 https://github.com/openshift/etcd embedded-component d8d67b8ce849f816d6d23c904098336632e2348f
 https://github.com/openshift/kubernetes embedded-component b0a9fa695c85812aa5067be371ead2cd61de700d
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component 72835e43c7754356645e41031f3a99926b4d42e6
-https://github.com/openshift/machine-config-operator embedded-component 467a64855a3af4691cbda016cffaa892508bc856
+https://github.com/openshift/machine-config-operator embedded-component f72cd29b7306dcb05effc3bceee1398942d97902
 https://github.com/openshift/openshift-controller-manager embedded-component 26d20feae8892f648f5b06ed3f5492fe6ffb4532
 https://github.com/openshift/operator-framework-olm embedded-component e627823c743797da91b4ae8a318d2420a511b752
 https://github.com/openshift/route-controller-manager embedded-component 624742d93f3a7885cf7f70985f1e23ff60da580d
