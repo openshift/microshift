@@ -1,13 +1,50 @@
-- api embedded-component 1180c0f5c3e91ef67dbef9b002256d2fb98cd7bd to 21ed4c20b1224808727253ff0a26ddedfec379dc
-  - bb49a7f3 2026-04-27T13:38:11+02:00 OCPBUGS-74506: Remove ConsolePluginSecurityPolicy featuregate
+- api embedded-component 21ed4c20b1224808727253ff0a26ddedfec379dc to a49973eaef537f281362e1ffa3abeacf7ed85c62
+  - a7411eef 2026-04-30T12:15:32-04:00 features: drop DRAPartitionableDevices awareness
+  - 291a26c1 2026-04-23T08:49:56-04:00 Updated vcenter logic to make sure no server switching occurs
+  - 9dd6a399 2026-04-22T09:11:32-04:00 Add CRD validation for registry entries in image config
+  - af78729b 2026-04-21T09:47:25-04:00 Added some ratcheting tests to cover change in min size of vCenters
+  - 7b21e9db 2026-04-21T09:47:25-04:00 Modified parent logic to not check size, but only changes in existence, and other review suggestions.
+  - 43def11d 2026-04-21T09:47:24-04:00 Added vSphere Day 2 tests
+  - 727806d1 2026-04-21T09:47:24-04:00 Added vSphere Day 2 logic to CRDs
 
-- cluster-ingress-operator embedded-component 961ac218364fb5f6de970ade1161ece3b8195aed to 9e5261e130d04cdb8e45836a84f3235857595c1f
-  - e187467 2026-04-22T16:15:29-03:00 change default timeout tunnel if using AWS NLB
+- cluster-ingress-operator embedded-component 9e5261e130d04cdb8e45836a84f3235857595c1f to 98ff1a6fedd18fbf2ed6fec9796104d7b4bc952c
+  - 0421456 2026-04-30T15:31:03-04:00 isFIPSEnabled: Check FIPS_ENABLED env. var. first
 
-- machine-config-operator embedded-component 89245a09d586bdbf8fb3a7adf3f0db7c2940a13b to b9964db4db07d84bebe0e0969e330df06868be76
-  - 0cbb7c6c 2026-04-29T08:12:57-04:00 tests: increase image mode test image build timeout to 25 minutes
-  - 30e3e492 2026-04-24T16:54:17-04:00 deploy-from-self when skopeo  < 1.22.2
+- cluster-kube-apiserver-operator embedded-component 7c44d03516fc5a2d013fed07b1cc5a03d474bd4c to 9b45cbafcea23be9c63e01947506495d030666d0
+  - 603c62f 2026-04-30T15:45:03+05:30 Removal of unuse suites
+  - af0eb66 2026-04-28T17:47:22+05:30 Migrate TestEncryptionTypeAESCBC to OTE
+  - 23e21f2 2026-03-17T11:00:39+01:00 rename ObserveServiceAccountIssuer variables
+  - 7cea799 2026-03-17T11:00:39+01:00 rename ServiceAccountIssuerController variables
+  - 4b93b80 2026-03-17T11:00:39+01:00 ObserveServiceAccountIssuer event should report an empty issuer during the
+  - 79b1098 2026-03-17T11:00:39+01:00 operator should not override authentication config serviceAccountIssuer with the default one during
 
-- oc image-arm64 6b8e30c5b39aa742147846341a203905e04834f3 to 066926c545b7762f8592beea658c4e70e5ee954a
+- cluster-network-operator embedded-component 142432afacfb9cd11a9bd4e5e333bd6a4cdcd555 to 23f002049008db9e852694ff2baaa68cd5b84525
+  - 15f93b1 2026-04-29T15:02:44+02:00 OCPBUGS-53187: Update self-referencing URLs from master to main
+  - d7eed00 2026-04-23T11:35:29+01:00 Add dedicated service account for cni-sysctl-allowlist-ds
+  - 4cd79a7 2026-03-11T11:32:48Z GCP-430: Wire GCP WIF credentials for CNCC in HyperShift HCP mode
+
+- machine-config-operator embedded-component b9964db4db07d84bebe0e0969e330df06868be76 to 374271f2dad6675f2986069b04ed5b65ead27e81
+  - 878399b9 2026-05-01T00:29:13Z chore: update AMIs
+  - 40f682ae 2026-04-30T13:58:10-04:00 OCPBUGS-84832: daemon: don't pull/extract extensions for all OS updates
+  - 5290ae73 2026-04-30T11:09:04-05:00 Fix stale MachineOSBuild annotation preventing pool updates
+  - 23424915 2026-04-29T12:14:48-04:00 node: custom pool boot must handle matchExpressions
+  - 5b83dbd2 2026-04-29T15:56:29+02:00 OCBPUGS-84652: Include RootCA in the temporal CC
+  - b26ef602 2026-04-29T18:33:46+05:30 Auto-append :ref suffix to additionalLayerStores in storage.conf
+  - 053ba38f 2026-04-29T17:21:21+05:30 Add SNO/Compact skip, step verification, and helper ordering conventions
+  - 2d1609e5 2026-04-28T13:47:01-04:00 daemon: support bootloader updates
+  - b6fe2a63 2026-04-28T10:39:05+02:00 OCPBUGS-84406: Fix CVE-2026-34986
+  - 3d98512a 2026-04-27T11:25:39+02:00 OCPBUGS-84332: Fix ssh and password rollbacks
+  - aac7274c 2026-04-21T12:58:15+05:30 Add /automate-test skill for generating e2e tests from specifications
+
+- operator-framework-olm embedded-component 122728c856e9436ea5ab763bf57977047691bb90 to 9941db6a69e1f5bab885e8ffaca54f59fcfafea4
+  - 4e8ff813 2026-04-28T00:03:14Z :seedling: Bump the k8s-dependencies group with 8 updates (#3816)
+
+- oc image-amd64 6b8e30c5b39aa742147846341a203905e04834f3 to 16d140aeefdc2b07f549945801c9cefab703ca68
+  - 59975c6f 2026-04-28T19:51:47-04:00 Add the new cases to the versions map
   - a2161876 2026-04-20T14:50:33+02:00 groupsync/ldap: skip filter validation for RFC2307 group query when groupUIDAttribute is "dn"
+  - 030a4e76 2026-03-11T17:38:31+08:00 pkg/cli/admin/upgrade/recommend/examples/4.22.0-extend-recommended-alert pkg/cli/admin/upgrade/recommend/examples/4.22.0-extend-recommended-critical-alert: Add Additional Alerts to the OCP Update Precheck
+
+- oc image-arm64 066926c545b7762f8592beea658c4e70e5ee954a to 16d140aeefdc2b07f549945801c9cefab703ca68
+  - 59975c6f 2026-04-28T19:51:47-04:00 Add the new cases to the versions map
+  - 030a4e76 2026-03-11T17:38:31+08:00 pkg/cli/admin/upgrade/recommend/examples/4.22.0-extend-recommended-alert pkg/cli/admin/upgrade/recommend/examples/4.22.0-extend-recommended-critical-alert: Add Additional Alerts to the OCP Update Precheck
 
