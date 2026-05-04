@@ -38,17 +38,17 @@ require (
 	github.com/prometheus/prometheus v0.302.1
 	github.com/squat/generic-device-plugin v0.0.0-20251019101956-043a51e18f31
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/api v1.34.6
-	k8s.io/apiextensions-apiserver v1.34.6
-	k8s.io/apimachinery v1.34.6
-	k8s.io/apiserver v1.34.6
-	k8s.io/cli-runtime v1.34.6
-	k8s.io/client-go v1.34.6
-	k8s.io/cloud-provider v1.34.6
-	k8s.io/component-base v1.34.6
-	k8s.io/kube-aggregator v1.34.6
-	k8s.io/kubectl v1.34.6
-	k8s.io/kubelet v1.34.6
+	k8s.io/api v1.34.7
+	k8s.io/apiextensions-apiserver v1.34.7
+	k8s.io/apimachinery v1.34.7
+	k8s.io/apiserver v1.34.7
+	k8s.io/cli-runtime v1.34.7
+	k8s.io/client-go v1.34.7
+	k8s.io/cloud-provider v1.34.7
+	k8s.io/component-base v1.34.7
+	k8s.io/kube-aggregator v1.34.7
+	k8s.io/kubectl v1.34.7
+	k8s.io/kubelet v1.34.7
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 	sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96
 	sigs.k8s.io/kustomize/api v0.20.1
@@ -113,7 +113,7 @@ require (
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/moby/spdystream v0.5.0 // indirect
+	github.com/moby/spdystream v0.5.1 // indirect
 	github.com/moby/sys/mountinfo v0.7.2 // indirect
 	github.com/moby/sys/userns v0.1.0 // indirect
 	github.com/moby/term v0.5.0 // indirect
@@ -142,12 +142,12 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful v0.44.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.59.0 // indirect
-	go.opentelemetry.io/otel v1.39.0 // indirect
+	go.opentelemetry.io/otel v1.41.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.34.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.34.0 // indirect
-	go.opentelemetry.io/otel/metric v1.39.0 // indirect
+	go.opentelemetry.io/otel/metric v1.41.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.39.0 // indirect
-	go.opentelemetry.io/otel/trace v1.39.0 // indirect
+	go.opentelemetry.io/otel/trace v1.41.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
@@ -161,21 +161,21 @@ require (
 	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
-	k8s.io/cluster-bootstrap v1.34.6 // indirect
-	k8s.io/component-helpers v1.34.6 // indirect
-	k8s.io/controller-manager v1.34.6 // indirect
-	k8s.io/cri-api v1.34.6 // indirect
-	k8s.io/cri-client v1.34.6 // indirect
-	k8s.io/csi-translation-lib v1.34.6 // indirect
-	k8s.io/dynamic-resource-allocation v1.34.6 // indirect
-	k8s.io/endpointslice v1.34.6 // indirect
-	k8s.io/externaljwt v1.34.6 // indirect
-	k8s.io/kms v1.34.6 // indirect
-	k8s.io/kube-controller-manager v1.34.6 // indirect
-	k8s.io/kube-scheduler v1.34.6 // indirect
-	k8s.io/metrics v1.34.6 // indirect
-	k8s.io/mount-utils v1.34.6 // indirect
-	k8s.io/pod-security-admission v1.34.6 // indirect
+	k8s.io/cluster-bootstrap v1.34.7 // indirect
+	k8s.io/component-helpers v1.34.7 // indirect
+	k8s.io/controller-manager v1.34.7 // indirect
+	k8s.io/cri-api v1.34.7 // indirect
+	k8s.io/cri-client v1.34.7 // indirect
+	k8s.io/csi-translation-lib v1.34.7 // indirect
+	k8s.io/dynamic-resource-allocation v1.34.7 // indirect
+	k8s.io/endpointslice v1.34.7 // indirect
+	k8s.io/externaljwt v1.34.7 // indirect
+	k8s.io/kms v1.34.7 // indirect
+	k8s.io/kube-controller-manager v1.34.7 // indirect
+	k8s.io/kube-scheduler v1.34.7 // indirect
+	k8s.io/metrics v1.34.7 // indirect
+	k8s.io/mount-utils v1.34.7 // indirect
+	k8s.io/pod-security-admission v1.34.7 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.2 // indirect
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
@@ -217,7 +217,7 @@ require (
 	google.golang.org/protobuf v1.36.10 // indirect
 	k8s.io/gengo/v2 v2.0.0-20250604051438-85fd79dbfd9f // indirect
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kubernetes v1.34.6
+	k8s.io/kubernetes v1.34.7
 )
 
 replace (
