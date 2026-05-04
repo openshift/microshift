@@ -304,8 +304,12 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 
 	hostsEnabled := cfg.DNS.Hosts.Status == config.HostsStatusEnabled
 	extraParams := assets.RenderParams{
-		"ClusterIP":    cfg.Network.DNS,
-		"HostsEnabled": hostsEnabled,
+		"ClusterIP":     cfg.Network.DNS,
+		"HostsEnabled":  hostsEnabled,
+		"C2CCDNSBlocks": "",
+	}
+	if cfg.C2CC.IsEnabled() {
+		extraParams["C2CCDNSBlocks"] = config.RenderC2CCDNSBlocks(cfg.C2CC.Resolved)
 	}
 
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {

@@ -12,6 +12,7 @@ type testRemoteConfig struct {
 	nextHop        string
 	clusterNetwork []string
 	serviceNetwork []string
+	domain         string
 }
 
 func testRemote(nextHop string, clusterNetwork, serviceNetwork []string) testRemoteConfig {
@@ -19,6 +20,15 @@ func testRemote(nextHop string, clusterNetwork, serviceNetwork []string) testRem
 		nextHop:        nextHop,
 		clusterNetwork: clusterNetwork,
 		serviceNetwork: serviceNetwork,
+	}
+}
+
+func testRemoteWithDomain(nextHop string, clusterNetwork, serviceNetwork []string, domain string) testRemoteConfig {
+	return testRemoteConfig{
+		nextHop:        nextHop,
+		clusterNetwork: clusterNetwork,
+		serviceNetwork: serviceNetwork,
+		domain:         domain,
 	}
 }
 
@@ -32,6 +42,7 @@ func testConfigWithRemotes(t *testing.T, remotes ...testRemoteConfig) *config.Co
 	for _, r := range remotes {
 		resolved := config.ResolvedRemoteCluster{
 			NextHop: net.ParseIP(r.nextHop),
+			Domain:  r.domain,
 		}
 		require.NotNil(t, resolved.NextHop, "invalid nextHop: %s", r.nextHop)
 

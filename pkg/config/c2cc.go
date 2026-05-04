@@ -39,6 +39,7 @@ type ResolvedRemoteCluster struct {
 	ClusterNetwork []*net.IPNet
 	ServiceNetwork []*net.IPNet
 	Domain         string
+	DNSIP          string // 10th IP of ServiceNetwork[0], computed during validation when Domain is set
 }
 
 func (rc *ResolvedRemoteCluster) AllCIDRs() []*net.IPNet {
@@ -264,6 +265,14 @@ func validateRemoteCluster(
 		} else {
 			seenRemoteDomains[rc.Domain] = i
 		}
+		if len(rc.ServiceNetwork) > 0 {
+			dnsIP, err := getClusterDNS(rc.ServiceNetwork[0])
+			if err != nil {
+				errs = append(errs, fmt.Errorf("%s: failed to compute DNS IP from serviceNetwork[0] %q: %w", label, rc.ServiceNetwork[0], err))
+			} else {
+				res.DNSIP = dnsIP
+			}
+		}
 	}
 
 	errs = append(errs, validateIPFamilyConsistencyNets(res.ClusterNetwork, label+".clusterNetwork")...)
@@ -344,4 +353,34 @@ func checkCIDRConflicts(cidr *net.IPNet, cidrStr, label string, seenCIDRs []labe
 
 func cidrsOverlap(a, b *net.IPNet) bool {
 	return a.Contains(b.IP) || b.Contains(a.IP)
+}
+
+// RenderC2CCDNSBlocks generates CoreDNS server blocks for cross-cluster DNS.
+func RenderC2CCDNSBlocks(resolved []ResolvedRemoteCluster) string {
+	var blocks []string
+	for _, rc := range resolved {
+		if rc.Domain == "" {
+			continue
+		}
+		blocks = append(blocks, formatDNSBlock(rc.Domain, rc.DNSIP))
+	}
+	if len(blocks) == 0 {
+		return ""
+	}
+	return "\n" + strings.Join(blocks, "\n")
+}
+
+func formatDNSBlock(domain, dnsIP string) string {
+	return fmt.Sprintf(`    %s:5353 {
+        bufsize 1232
+        errors
+        log . {
+            class error
+        }
+        rewrite stop name suffix .%s .cluster.local answer auto
+        forward . %s
+        cache 10 {
+            denial 9984 10
+        }
+    }`, domain, domain, dnsIP)
 }

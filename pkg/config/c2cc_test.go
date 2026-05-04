@@ -2,9 +2,11 @@ package config
 
 import (
 	"net"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestC2CC_IsEnabled(t *testing.T) {
@@ -539,5 +541,115 @@ func TestC2CC_ValidateDualStack(t *testing.T) {
 			}},
 		})
 		assert.NoError(t, cfg.C2CC.validate(cfg))
+	})
+}
+
+func TestC2CC_DNSIP(t *testing.T) {
+	stubHostIPs(t, nil)
+
+	t.Run("DNSIP populated when domain is set", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+				Domain:         "cluster-b.remote",
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		assert.Equal(t, "10.46.0.10", cfg.C2CC.Resolved[0].DNSIP)
+	})
+
+	t.Run("DNSIP empty when domain is not set", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		assert.Empty(t, cfg.C2CC.Resolved[0].DNSIP)
+	})
+
+	t.Run("DNSIP for IPv6 service network", func(t *testing.T) {
+		cfg := mkIPv6OnlyC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "fd00::2",
+				ClusterNetwork: []string{"fd03::/48"},
+				ServiceNetwork: []string{"fd04::/112"},
+				Domain:         "cluster-b.remote",
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		assert.Equal(t, "fd04::a", cfg.C2CC.Resolved[0].DNSIP)
+	})
+}
+
+func parseCIDR(t *testing.T, s string) *net.IPNet {
+	t.Helper()
+	_, ipNet, err := net.ParseCIDR(s)
+	require.NoError(t, err)
+	return ipNet
+}
+
+func TestRenderC2CCDNSBlocks(t *testing.T) {
+	t.Run("no domains configured", func(t *testing.T) {
+		resolved := []ResolvedRemoteCluster{{
+			NextHop:        net.ParseIP("10.100.0.2"),
+			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
+			ServiceNetwork: []*net.IPNet{parseCIDR(t, "10.46.0.0/16")},
+		}}
+		result := RenderC2CCDNSBlocks(resolved)
+		assert.Empty(t, result)
+	})
+
+	t.Run("single domain", func(t *testing.T) {
+		resolved := []ResolvedRemoteCluster{{
+			NextHop:        net.ParseIP("10.100.0.2"),
+			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
+			ServiceNetwork: []*net.IPNet{parseCIDR(t, "10.46.0.0/16")},
+			Domain:         "cluster-b.remote",
+			DNSIP:          "10.46.0.10",
+		}}
+		result := RenderC2CCDNSBlocks(resolved)
+		assert.True(t, strings.HasPrefix(result, "\n"), "result should start with newline for YAML block scalar")
+		assert.Contains(t, result, "cluster-b.remote:5353")
+		assert.Contains(t, result, "rewrite stop name suffix .cluster-b.remote .cluster.local answer auto")
+		assert.Contains(t, result, "forward . 10.46.0.10")
+		assert.Contains(t, result, "denial 9984 10")
+	})
+
+	t.Run("multiple domains", func(t *testing.T) {
+		resolved := []ResolvedRemoteCluster{
+			{
+				Domain: "cluster-b.remote",
+				DNSIP:  "10.46.0.10",
+			},
+			{
+				Domain: "cluster-c.remote",
+				DNSIP:  "10.56.0.10",
+			},
+		}
+		result := RenderC2CCDNSBlocks(resolved)
+		assert.Contains(t, result, "cluster-b.remote:5353")
+		assert.Contains(t, result, "forward . 10.46.0.10")
+		assert.Contains(t, result, "cluster-c.remote:5353")
+		assert.Contains(t, result, "forward . 10.56.0.10")
+	})
+
+	t.Run("mixed domain and no-domain", func(t *testing.T) {
+		resolved := []ResolvedRemoteCluster{
+			{
+				Domain: "cluster-b.remote",
+				DNSIP:  "10.46.0.10",
+			},
+			{
+				Domain: "",
+			},
+		}
+		result := RenderC2CCDNSBlocks(resolved)
+		assert.Contains(t, result, "cluster-b.remote:5353")
+		assert.NotContains(t, result, "cluster-c")
 	})
 }
