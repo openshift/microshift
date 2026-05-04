@@ -115,7 +115,12 @@ def run_command(cmd: list[str], failure_fatal=False) -> tuple[str, bool]:
 
 
 def get_profile_path(profile: str) -> str:
-    paths = [f"/etc/tuned/{profile}", f"/usr/lib/tuned/{profile}"]
+    paths = [
+        f"/etc/tuned/{profile}",
+        f"/etc/tuned/profiles/{profile}",
+        f"/usr/lib/tuned/{profile}",
+        f"/usr/lib/tuned/profiles/{profile}"
+    ]
     for path in paths:
         if os.path.exists(path):
             logging.debug(f"Found profile '{profile}' in '{path}'")
