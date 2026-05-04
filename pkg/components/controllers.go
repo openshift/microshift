@@ -27,6 +27,9 @@ const (
 	haproxyMaxTimeoutMilliseconds = 2147483647 * time.Millisecond
 )
 
+// isFIPSEnabled reports whether the cluster has FIPS enabled.
+var isFIPSEnabled = detectFIPS()
+
 var (
 	tlsVersion13Ciphers = sets.NewString(
 		"TLS_AES_128_GCM_SHA256",
@@ -36,6 +39,34 @@ var (
 		"TLS_AES_128_CCM_8_SHA256",
 	)
 )
+
+// detectFIPS reports whether the cluster is operating in FIPS
+// mode by checking the FIPS_ENABLED environment variable if set or
+// the /proc/sys/crypto/fips_enabled file otherwise.
+func detectFIPS() bool {
+	if v, ok := os.LookupEnv("FIPS_ENABLED"); ok {
+		if result, err := strconv.ParseBool(v); err != nil {
+			klog.Warningf("Failed to parse FIPS_ENABLED environment variable: %v; falling back to procfs", err)
+		} else {
+			klog.Infof("Found FIPS_ENABLED environment variable: value=%s, result=%v", v, result)
+			return result
+		}
+	}
+
+	result := false
+	data, err := os.ReadFile("/proc/sys/crypto/fips_enabled")
+	if err != nil {
+		klog.Warningf("Failed to read /proc/sys/crypto/fips_enabled: %v; assuming FIPS is not enabled", err)
+		return result
+	}
+	if len(data) == 0 {
+		klog.Warningf("Got empty /proc/sys/crypto/fips_enabled; assuming FIPS is not enabled")
+		return result
+	}
+	result = data[0] == '1'
+	klog.Infof("Read /proc/sys/crypto/fips_enabled: data=%s, result=%v", string(data), result)
+	return result
+}
 
 func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
