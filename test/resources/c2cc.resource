@@ -97,7 +97,7 @@ Disruptive Command On Cluster
 
 Oc On Cluster
     [Documentation]    Run an oc command against the specified cluster using its kubeconfig.
-    [Arguments]    ${alias}    ${cmd}
+    [Arguments]    ${alias}    ${cmd}    ${allow_fail}=${FALSE}
     ${kc}=    Get From Dictionary    ${C2CC_KUBECONFIGS}    ${alias}
     ${stdout_file}=    Create Random Temp File
     ${result}=    Process.Run Process    ${cmd}    env:KUBECONFIG=${kc}
@@ -106,7 +106,7 @@ Oc On Cluster
     ...    timeout=300s
     Log    ${result.stdout}
     Log    ${result.stderr}
-    Should Be Equal As Integers    ${result.rc}    0
+    IF    not ${allow_fail}    Should Be Equal As Integers    ${result.rc}    0
     ${stdout}=    OperatingSystem.Get File    ${stdout_file}
     ${stdout}=    Strip String    ${stdout}
     RETURN    ${stdout}

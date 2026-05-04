@@ -73,8 +73,9 @@ No C2CC Tracking Annotation After Disable
 
 No C2CC NetworkPolicy After Disable
     [Documentation]    The C2CC NetworkPolicy should not exist.
-    Run Keyword And Expect Error    *NotFound*
-    ...    Oc On Cluster    cluster-a    oc get networkpolicy c2cc-allow-remote-pods -n default
+    ${stdout}=    Oc On Cluster    cluster-a
+    ...    oc get networkpolicy c2cc-allow-remote-pods -n default    allow_fail=${TRUE}
+    Should Contain    ${stdout}    NotFound
 
 C2CC Controller Logged Cleanup
     [Documentation]    The controller should have logged that it is disabled and cleaning up.
