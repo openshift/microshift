@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component 1aca832fab45aceebe8026077d67ac6b82b51179 to ba7a5ec20d3b4cb620bae7bfa1363e34b9048563
+  - ed25c23 2026-04-29T11:12:44+02:00 fix(hypershift): use net.JoinHostPort for URL construction
+
