@@ -14,7 +14,7 @@ require (
 	github.com/moby/term v0.5.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	go.yaml.in/yaml/v2 v2.4.2
 	golang.org/x/sync v0.17.0
 	golang.org/x/text v0.29.0
@@ -37,7 +37,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-errors/errors v1.4.2 // indirect
-	github.com/go-logr/logr v1.4.2 // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
