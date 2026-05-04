@@ -46,15 +46,19 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	defer close(stopped)
 
 	if !c.cfg.C2CC.IsEnabled() {
-		klog.Infof("C2CC is disabled")
+		klog.Infof("C2CC is disabled - attempting best effort cleanup")
+		close(ready)
 		closeCleanup := c.initForCleanup(ctx)
 		defer closeCleanup()
 		c.cleanupAll(ctx)
-		close(ready)
 		return ctx.Err()
 	}
 
 	klog.Infof("C2CC is enabled with %d remote cluster(s)", len(c.cfg.C2CC.RemoteClusters))
+
+	// Declaring ready even before init because many of the components it tries to communicate with are not up yet
+	// and excessive waiting before readiness can cause them to never become ready resulting in MicroShift restart.
+	close(ready)
 
 	if err := c.initKubeClient(); err != nil {
 		close(ready)
@@ -96,9 +100,6 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	}
 
 	c.annotation.subscribe(ctx, reconcileCh)
-
-	close(ready)
-	klog.Infof("Ready, starting reconciliation loop")
 
 	c.fullReconcile(ctx)
 
