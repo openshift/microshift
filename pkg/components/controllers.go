@@ -548,6 +548,14 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		RouterCiphersSuites = strings.Join(tls13Ciphers, ":")
 	}
 
+	// Default TLS supportedGroups (curves) include X25519MLKEM768 for
+	// post-quantum readiness. In FIPS mode, ML-KEM and X25519 are not
+	// supported by OpenSSL FIPS 140-3.
+	tlsCurves := "X25519MLKEM768:X25519:P-256:P-384:P-521"
+	if isFIPSEnabled {
+		tlsCurves = "P-256:P-384:P-521"
+	}
+
 	var RouterSSLMinVersion string
 	switch tlsProfileSpec.MinTLSVersion {
 	// TLS 1.0 is not supported, convert to TLS 1.1.
@@ -639,6 +647,7 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		"RouterCiphers":               RouterCiphers,
 		"RouterCiphersSuites":         RouterCiphersSuites,
 		"RouterSSLMinVersion":         RouterSSLMinVersion,
+		"RouterTLSCurves":             tlsCurves,
 		"RouterAllowWildcardRoutes":   RouterAllowWildcardRoutes,
 		"ClientCAMapName":             clientCAMapName,
 		"ClientAuthPolicy":            clientAuthPolicy,
