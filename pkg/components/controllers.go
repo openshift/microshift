@@ -38,6 +38,11 @@ var (
 		"TLS_AES_128_CCM_SHA256",
 		"TLS_AES_128_CCM_8_SHA256",
 	)
+
+	fipsApprovedTLS13Ciphers = sets.NewString(
+		"TLS_AES_128_GCM_SHA256",
+		"TLS_AES_256_GCM_SHA384",
+	)
 )
 
 // detectFIPS reports whether the cluster is operating in FIPS
@@ -521,6 +526,20 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		} else {
 			otherCiphers = append(otherCiphers, cipher)
 		}
+	}
+
+	// On FIPS-enabled clusters, remove non-FIPS-compliant TLS 1.3 cipher
+	// suites (e.g. TLS_CHACHA20_POLY1305_SHA256). HAProxy would fail TLS
+	// handshakes when a client offers a non-FIPS cipher first if that cipher
+	// is listed in ssl-default-bind-ciphersuites but excluded by the OS FIPS policy.
+	if isFIPSEnabled {
+		fipsCiphers := tls13Ciphers[:0]
+		for _, c := range tls13Ciphers {
+			if fipsApprovedTLS13Ciphers.Has(c) {
+				fipsCiphers = append(fipsCiphers, c)
+			}
+		}
+		tls13Ciphers = fipsCiphers
 	}
 
 	RouterCiphers := strings.Join(otherCiphers, ":")
