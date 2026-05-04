@@ -25,7 +25,7 @@ type networkPolicyManager struct {
 }
 
 func newNetworkPolicyManager(kubeClient kubernetes.Interface, remotePodCIDRs []*net.IPNet) *networkPolicyManager {
-	var ingressPeers []networkingv1.NetworkPolicyPeer
+	ingressPeers := make([]networkingv1.NetworkPolicyPeer, 0, len(remotePodCIDRs))
 	for _, cidr := range remotePodCIDRs {
 		ingressPeers = append(ingressPeers, networkingv1.NetworkPolicyPeer{
 			IPBlock: &networkingv1.IPBlock{

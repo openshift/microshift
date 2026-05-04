@@ -50,7 +50,7 @@ func (c *C2CC) IsEnabled() bool {
 }
 
 func (c *C2CC) AllRemoteCIDRs() []string {
-	var cidrs []string
+	cidrs := make([]string, 0, len(c.RemoteClusters)*4)
 	for _, rc := range c.RemoteClusters {
 		cidrs = append(cidrs, rc.ClusterNetwork...)
 		cidrs = append(cidrs, rc.ServiceNetwork...)

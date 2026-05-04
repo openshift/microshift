@@ -155,8 +155,8 @@ func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
 	c.routes = newLinuxRouteManager(c.cfg)
 	c.svcRoutes = newServiceRouteManager(c.cfg)
 
-	var remotePodCIDRs []*net.IPNet
-	var allRemoteCIDRs []*net.IPNet
+	remotePodCIDRs := make([]*net.IPNet, 0, len(c.cfg.C2CC.Resolved)*2)
+	allRemoteCIDRs := make([]*net.IPNet, 0, len(c.cfg.C2CC.Resolved)*4)
 	for _, rc := range c.cfg.C2CC.Resolved {
 		remotePodCIDRs = append(remotePodCIDRs, rc.ClusterNetwork...)
 		allRemoteCIDRs = append(allRemoteCIDRs, rc.ClusterNetwork...)

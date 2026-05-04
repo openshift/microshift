@@ -20,6 +20,7 @@ const (
 
 type linuxRouteManager struct {
 	policyRouteTable
+
 	desiredDsts []*net.IPNet
 	desiredGWs  map[string]net.IP
 }
@@ -47,7 +48,7 @@ func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 }
 
 func (m *linuxRouteManager) reconcile(ctx context.Context) error {
-	var desired []netlink.Route
+	desired := make([]netlink.Route, 0, len(m.desiredDsts))
 	for _, cidr := range m.desiredDsts {
 		desired = append(desired, netlink.Route{
 			Dst:      cidr,

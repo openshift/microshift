@@ -69,7 +69,7 @@ func waitForOVNSocket(ctx context.Context) error {
 	}
 }
 
-func connectOVNNB(ctx context.Context) (client.Client, error) {
+func connectOVNNB(ctx context.Context) (client.Client, error) { //nolint:ireturn
 	if err := waitForOVNSocket(ctx); err != nil {
 		return nil, fmt.Errorf("failed to wait for OVN NB socket: %w", err)
 	}

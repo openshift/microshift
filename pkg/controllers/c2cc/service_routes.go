@@ -21,12 +21,13 @@ const (
 
 type serviceRouteManager struct {
 	policyRouteTable
+
 	remoteCIDRs   []*net.IPNet
 	localSvcCIDRs []*net.IPNet
 }
 
 func newServiceRouteManager(cfg *config.Config) *serviceRouteManager {
-	var remoteCIDRs []*net.IPNet
+	remoteCIDRs := make([]*net.IPNet, 0, len(cfg.C2CC.Resolved)*4)
 	for _, rc := range cfg.C2CC.Resolved {
 		remoteCIDRs = append(remoteCIDRs, rc.ClusterNetwork...)
 		remoteCIDRs = append(remoteCIDRs, rc.ServiceNetwork...)

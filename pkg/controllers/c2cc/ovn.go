@@ -162,7 +162,7 @@ func (m *ovnRouteManager) cleanup(ctx context.Context) error {
 		route := r
 		router := &LogicalRouter{Name: m.gwRouter}
 
-		var ops []ovsdb.Operation
+		ops := make([]ovsdb.Operation, 0, 2)
 		mutateOps, err := m.nbClient.Where(router).Mutate(router, model.Mutation{
 			Field:   &router.StaticRoutes,
 			Mutator: ovsdb.MutateOperationDelete,
@@ -202,11 +202,11 @@ func (m *ovnRouteManager) cleanup(ctx context.Context) error {
 
 func (m *ovnRouteManager) subscribe(ctx context.Context, reconcileCh chan<- string) {
 	m.nbClient.Cache().AddEventHandler(&cache.EventHandlerFuncs{
-		UpdateFunc: func(table string, old, new model.Model) {
+		UpdateFunc: func(table string, old, updated model.Model) {
 			if table != "Logical_Router_Static_Route" {
 				return
 			}
-			if route, ok := new.(*LogicalRouterStaticRoute); ok && route.ExternalIDs[ownerControllerKey] == c2ccOwnerController {
+			if route, ok := updated.(*LogicalRouterStaticRoute); ok && route.ExternalIDs[ownerControllerKey] == c2ccOwnerController {
 				select {
 				case reconcileCh <- "ovn-route-updated":
 				default:
