@@ -40,13 +40,15 @@ Resolve Remote Service DNS From Cluster B
 
 Curl Remote Service Via DNS From Cluster A
     [Documentation]    Verify pod on Cluster A can reach a service on Cluster B using the remote DNS name.
-    Curl DNS From Cluster    cluster-a
+    ${stdout}=    Curl DNS From Cluster    cluster-a
     ...    hello-microshift.${NAMESPACE}.svc.${CLUSTER_B_DOMAIN}    8080
+    Should Contain    ${stdout}    Hello from
 
 Curl Remote Service Via DNS From Cluster B
     [Documentation]    Verify pod on Cluster B can reach a service on Cluster A using the remote DNS name.
-    Curl DNS From Cluster    cluster-b
+    ${stdout}=    Curl DNS From Cluster    cluster-b
     ...    hello-microshift.${NAMESPACE}.svc.${CLUSTER_A_DOMAIN}    8080
+    Should Contain    ${stdout}    Hello from
 
 
 *** Keywords ***
@@ -106,13 +108,14 @@ DNS Lookup Should Succeed
 Curl DNS From Cluster
     [Documentation]    Curl a service by DNS name from curl-pod on the given cluster.
     [Arguments]    ${alias}    ${fqdn}    ${port}
-    Wait Until Keyword Succeeds    12x    5s
+    ${stdout}=    Wait Until Keyword Succeeds    12x    5s
     ...    Curl DNS Should Succeed    ${alias}    ${fqdn}    ${port}
+    RETURN    ${stdout}
 
 Curl DNS Should Succeed
     [Documentation]    Single attempt to curl a DNS name from curl-pod.
     [Arguments]    ${alias}    ${fqdn}    ${port}
     ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACE} -- curl -sS --max-time 10 http://${fqdn}:${port}
-    Should Contain    ${stdout}    Hello MicroShift
+    ...    oc exec curl-pod -n ${NAMESPACE} -- curl -sS --max-time 10 http://${fqdn}:${port}/cgi-bin/hello
+    Should Contain    ${stdout}    Hello from
     RETURN    ${stdout}
