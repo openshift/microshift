@@ -222,3 +222,18 @@ Remove Foreign Subnet From SNAT Annotation
     ...    Triggers a reconcile by briefly corrupting the annotation.
     [Arguments]    ${alias}
     Corrupt Node SNAT Annotation On Cluster    ${alias}
+
+Verify Corefile Contains C2CC Server Block
+    [Documentation]    Check that the CoreDNS Corefile configmap contains a server block for the given domain.
+    [Arguments]    ${alias}    ${domain}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get configmap dns-default -n openshift-dns -o jsonpath='{.data.Corefile}'
+    Should Contain    ${stdout}    ${domain}:5353
+    Should Contain    ${stdout}    rewrite stop name suffix .${domain} .cluster.local answer auto
+
+Verify Corefile Does Not Contain C2CC Server Block
+    [Documentation]    Check that the CoreDNS Corefile does NOT contain a server block for the given domain.
+    [Arguments]    ${alias}    ${domain}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get configmap dns-default -n openshift-dns -o jsonpath='{.data.Corefile}'
+    Should Not Contain    ${stdout}    ${domain}:5353
