@@ -14,7 +14,7 @@ patches:
         path: /spec/template/spec/containers/0/env/-
         value:
           name: SRIOV_DEVICE_PLUGIN_IMAGE
-          value: registry.redhat.io/openshift4/ose-sriov-network-device-plugin-rhel9@sha256:4f58b37aebf7848490658c8d72d05d58d06e81f3eb9294bf2f316822d6a9aadb
+          value: registry.redhat.io/openshift4/ose-sriov-network-device-plugin-rhel9@sha256:2daa9effeb92b7cbb1539ade29ba50244985b2be8238fdb17d0cb3ba66e265dc
       - op: add
         path: /spec/template/spec/containers/0/env/-
         value:
@@ -24,7 +24,7 @@ patches:
         path: /spec/template/spec/containers/0/env/-
         value:
           name: SRIOV_NETWORK_CONFIG_DAEMON_IMAGE
-          value: registry.redhat.io/openshift4/ose-sriov-network-config-daemon-rhel9@sha256:07dc6cb29c0fee69abf75b81a5de3e4a1a8ec65a68c7c2e6b540ff35cde70b80
+          value: registry.redhat.io/openshift4/ose-sriov-network-config-daemon-rhel9@sha256:f01c3e1b76bf1115dbef515be43b86f877a726160384ac8329ce1fb5d1f9da5c
       - op: add
         path: /spec/template/spec/containers/0/env/-
         value:
