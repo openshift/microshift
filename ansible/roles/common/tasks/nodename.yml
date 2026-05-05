@@ -1,0 +1,60 @@
+---
+# Resolve the Kubernetes NodeName MicroShift will advertise, matching the
+# expected MicroShift config layouts used by this playbook: read
+# /etc/microshift/config.yaml first, then YAML drop-ins under
+# /etc/microshift/config.d/ in lexical path order. Each explicit
+# hostnameOverride value (including empty string) updates the tracked
+# value, so a later drop-in setting it to "" reverts to the OS hostname,
+# matching pkg/config/config.go:250 which only applies non-empty overrides.
+# This does not emulate full RFC 7396 merge semantics (e.g. node: null
+# clearing the whole node object) — sufficient for normal drop-ins.
+#
+# become: yes — these files may be root-readable only; failed_when: false on
+# the slurps would otherwise silently mask permission errors and fall back
+# to ansible_hostname even when an override is configured.
+
+- name: Resolve kubernetes nodename
+  become: yes
+  block:
+    - name: Find microshift config drop-ins
+      ansible.builtin.find:
+        paths: /etc/microshift/config.d
+        patterns: "*.yaml"
+        recurse: true
+      register: _microshift_dropins
+      failed_when: false
+
+    - name: Build ordered list of microshift config paths
+      ansible.builtin.set_fact:
+        _microshift_config_paths: >-
+          {{ ['/etc/microshift/config.yaml']
+             + (_microshift_dropins.files | default([]) | map(attribute='path') | sort) }}
+
+    - name: Slurp microshift config files
+      ansible.builtin.slurp:
+        src: "{{ item }}"
+      register: _microshift_configs
+      loop: "{{ _microshift_config_paths }}"
+      failed_when: false
+
+    - name: Compute hostnameOverride from merged microshift config
+      ansible.builtin.set_fact:
+        _microshift_hostname_override: >-
+          {%- set ns = namespace(value='') -%}
+          {%- for r in _microshift_configs.results -%}
+          {%- if r.content is defined -%}
+          {%- set parsed = (r.content | b64decode | from_yaml) -%}
+          {%- if parsed is mapping
+                and (parsed.node | default(none)) is mapping
+                and 'hostnameOverride' in parsed.node -%}
+          {%- set ns.value = parsed.node.hostnameOverride | default('', true) -%}
+          {%- endif -%}
+          {%- endif -%}
+          {%- endfor -%}
+          {{ ns.value }}
+
+- name: Set kubernetes_nodename fact
+  ansible.builtin.set_fact:
+    kubernetes_nodename: "{{ ((_microshift_hostname_override | length > 0)
+                              | ternary(_microshift_hostname_override, ansible_hostname))
+                              | lower }}"
