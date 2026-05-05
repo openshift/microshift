@@ -61,19 +61,16 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	close(ready)
 
 	if err := c.initKubeClient(); err != nil {
-		close(ready)
 		return fmt.Errorf("failed to create kube client: %w", err)
 	}
 
 	nbClient, err := connectOVNNB(ctx)
 	if err != nil {
-		close(ready)
 		return fmt.Errorf("failed to connect OVN NB: %w", err)
 	}
 	defer nbClient.Close()
 
 	if err := c.initSubsystems(nbClient); err != nil {
-		close(ready)
 		return fmt.Errorf("failed to init subsystems: %w", err)
 	}
 

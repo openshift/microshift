@@ -155,9 +155,7 @@ func (m *serviceRouteManager) reconcileRules() error {
 }
 
 func (m *serviceRouteManager) cleanup(ctx context.Context) error {
-	_ = m.cleanupRoutes()
-	_ = m.cleanupRules()
-	return nil
+	return errors.Join(m.cleanupRoutes(), m.cleanupRules())
 }
 
 type mgmtPortGateway struct {

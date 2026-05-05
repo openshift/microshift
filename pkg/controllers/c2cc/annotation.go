@@ -44,9 +44,19 @@ func parseCIDRAnnotation(value string) []string {
 	}
 	var cidrs []string
 	if err := json.Unmarshal([]byte(value), &cidrs); err != nil {
+		klog.Warningf("Failed to parse SNAT annotation value %q: %v", value, err)
 		return nil
 	}
 	return cidrs
+}
+
+func buildAnnotationPatch(annotations map[string]interface{}) ([]byte, error) {
+	patch := map[string]interface{}{
+		"metadata": map[string]interface{}{
+			"annotations": annotations,
+		},
+	}
+	return json.Marshal(patch)
 }
 
 func cidrSetContainsAll(superset, subset []string) bool {
@@ -103,11 +113,15 @@ func (a *annotationManager) reconcile(ctx context.Context) error {
 		return nil
 	}
 
-	patch := fmt.Sprintf(`{"metadata":{"annotations":{%q:%q,%q:%q}}}`,
-		ovnNodeDontSNATSubnets, string(targetJSON),
-		c2ccSNATTrackingAnnotation, string(desiredJSON))
+	patch, err := buildAnnotationPatch(map[string]interface{}{
+		ovnNodeDontSNATSubnets:     string(targetJSON),
+		c2ccSNATTrackingAnnotation: string(desiredJSON),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to marshal annotation patch: %w", err)
+	}
 	_, err = a.kubeClient.CoreV1().Nodes().Patch(ctx, a.nodeName,
-		types.MergePatchType, []byte(patch), metav1.PatchOptions{})
+		types.MergePatchType, patch, metav1.PatchOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to patch node annotation: %w", err)
 	}
@@ -139,20 +153,22 @@ func (a *annotationManager) cleanup(ctx context.Context) error {
 		}
 	}
 
-	var snatValue string
-	if len(remaining) == 0 {
-		snatValue = "null"
-	} else {
+	var snatValue interface{}
+	if len(remaining) > 0 {
 		sort.Strings(remaining)
 		data, _ := json.Marshal(remaining)
-		snatValue = fmt.Sprintf("%q", string(data))
+		snatValue = string(data)
 	}
 
-	patch := fmt.Sprintf(`{"metadata":{"annotations":{%s:%s,%q:null}}}`,
-		fmt.Sprintf("%q", ovnNodeDontSNATSubnets), snatValue,
-		c2ccSNATTrackingAnnotation)
+	patch, err := buildAnnotationPatch(map[string]interface{}{
+		ovnNodeDontSNATSubnets:     snatValue,
+		c2ccSNATTrackingAnnotation: nil,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to marshal cleanup patch: %w", err)
+	}
 	_, err = a.kubeClient.CoreV1().Nodes().Patch(ctx, a.nodeName,
-		types.MergePatchType, []byte(patch), metav1.PatchOptions{})
+		types.MergePatchType, patch, metav1.PatchOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to cleanup node annotation: %w", err)
 	}

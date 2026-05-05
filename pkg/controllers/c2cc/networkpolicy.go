@@ -6,6 +6,7 @@ import (
 	"net"
 
 	networkingv1 "k8s.io/api/networking/v1"
+	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -75,12 +76,18 @@ func (m *networkPolicyManager) reconcile(ctx context.Context) error {
 		return fmt.Errorf("failed to get NetworkPolicy: %w", err)
 	}
 
+	if equality.Semantic.DeepEqual(existing.Spec, m.desired.Spec) &&
+		equality.Semantic.DeepEqual(existing.Labels, m.desired.Labels) {
+		return nil
+	}
+
 	toUpdate := m.desired.DeepCopy()
 	toUpdate.ResourceVersion = existing.ResourceVersion
 	_, err = client.Update(ctx, toUpdate, metav1.UpdateOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to update NetworkPolicy: %w", err)
 	}
+	klog.V(2).Infof("Updated NetworkPolicy %s/%s", c2ccNetworkPolicyNamespace, c2ccNetworkPolicyName)
 	return nil
 }
 
