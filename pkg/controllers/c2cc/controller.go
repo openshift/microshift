@@ -28,7 +28,6 @@ type C2CCRouteManager struct {
 	nftMgr     *nftablesManager
 	routes     *linuxRouteManager
 	svcRoutes  *serviceRouteManager
-	netpol     *networkPolicyManager
 }
 
 func NewC2CCRouteManager(cfg *config.Config) *C2CCRouteManager {
@@ -153,10 +152,8 @@ func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
 	c.routes = newLinuxRouteManager(c.cfg)
 	c.svcRoutes = newServiceRouteManager(c.cfg)
 
-	remotePodCIDRs := make([]*net.IPNet, 0, len(c.cfg.C2CC.Resolved)*2)
 	allRemoteCIDRs := make([]*net.IPNet, 0, len(c.cfg.C2CC.Resolved)*4)
 	for _, rc := range c.cfg.C2CC.Resolved {
-		remotePodCIDRs = append(remotePodCIDRs, rc.ClusterNetwork...)
 		allRemoteCIDRs = append(allRemoteCIDRs, rc.ClusterNetwork...)
 		allRemoteCIDRs = append(allRemoteCIDRs, rc.ServiceNetwork...)
 	}
@@ -166,8 +163,6 @@ func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
 		return fmt.Errorf("failed to init nftables manager: %w", err)
 	}
 	c.nftMgr = nftMgr
-
-	c.netpol = newNetworkPolicyManager(c.kubeClient, remotePodCIDRs)
 
 	return nil
 }
@@ -199,7 +194,6 @@ func (c *C2CCRouteManager) initForCleanup(ctx context.Context) func() {
 
 	if c.kubeClient != nil {
 		c.annotation = newAnnotationManager(c.kubeClient, c.nodeName, nil)
-		c.netpol = newNetworkPolicyManager(c.kubeClient, nil)
 	}
 
 	return func() {
@@ -219,7 +213,6 @@ func (c *C2CCRouteManager) fullReconcile(ctx context.Context) {
 		{"linux-routes", c.routes.reconcile},
 		{"service-routes", c.svcRoutes.reconcile},
 		{"nftables", c.nftMgr.reconcile},
-		{"network-policy", c.netpol.reconcile},
 	}
 	for _, s := range subsystems {
 		if err := s.fn(ctx); err != nil {
@@ -252,9 +245,6 @@ func (c *C2CCRouteManager) cleanupAll(ctx context.Context) {
 	}
 	if c.nftMgr != nil {
 		cleanups = append(cleanups, cleanable{"nftables", c.nftMgr.cleanup})
-	}
-	if c.netpol != nil {
-		cleanups = append(cleanups, cleanable{"network-policy", c.netpol.cleanup})
 	}
 
 	for _, cl := range cleanups {

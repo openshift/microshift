@@ -69,12 +69,6 @@ Reconcile Node SNAT Annotation After Corruption
     Wait Until Keyword Succeeds    ${RECONCILE_TIMEOUT}    ${RECONCILE_RETRY}
     ...    Verify Node SNAT Annotation    cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
 
-Reconcile NetworkPolicy After Deletion
-    [Documentation]    Delete the C2CC NetworkPolicy, verify the controller re-creates it.
-    Delete C2CC NetworkPolicy On Cluster    cluster-a
-    Wait Until Keyword Succeeds    ${RECONCILE_TIMEOUT}    ${RECONCILE_RETRY}
-    ...    Verify C2CC Network Policy    cluster-a
-
 C2CC Tracking Annotation Exists On Cluster A
     [Documentation]    Verify the C2CC tracking annotation exists and tracks the desired CIDRs.
     Verify C2CC Tracking Annotation    cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
@@ -159,9 +153,3 @@ Corrupt Node SNAT Annotation On Cluster
     ${node}=    Get Node Name On Cluster    ${alias}
     Oc On Cluster    ${alias}
     ...    oc annotate node ${node} k8s.ovn.org/node-ingress-snat-exclude-subnets='[]' --overwrite
-
-Delete C2CC NetworkPolicy On Cluster
-    [Documentation]    Delete the C2CC NetworkPolicy from the default namespace.
-    [Arguments]    ${alias}
-    Oc On Cluster    ${alias}
-    ...    oc delete networkpolicy c2cc-allow-remote-pods -n default

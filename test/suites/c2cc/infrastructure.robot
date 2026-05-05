@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation       Verify C2CC controller sets up all networking infrastructure correctly.
 ...                 Checks Linux routes, IP rules, nftables bypass, OVN static routes,
-...                 node annotations, and network policies on both clusters.
+...                 and node annotations on both clusters.
 
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/kubeconfig.resource
@@ -70,14 +70,6 @@ Node Annotation Set On Cluster A
 Node Annotation Set On Cluster B
     [Documentation]    Verify SNAT-exclude annotation contains remote CIDRs on Cluster B.
     Verify Node SNAT Annotation    cluster-b    ${CLUSTER_A_POD_CIDR}    ${CLUSTER_A_SVC_CIDR}
-
-Network Policy Exists On Cluster A
-    [Documentation]    Verify C2CC network policy exists in default namespace on Cluster A.
-    Verify C2CC Network Policy    cluster-a
-
-Network Policy Exists On Cluster B
-    [Documentation]    Verify C2CC network policy exists in default namespace on Cluster B.
-    Verify C2CC Network Policy    cluster-b
 
 
 *** Keywords ***

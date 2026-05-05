@@ -71,12 +71,6 @@ No C2CC Tracking Annotation After Disable
     ...    oc get node -o jsonpath='{.items[0].metadata.annotations.microshift\\.io/c2cc-snat-subnets}'
     Should Be Empty    ${stdout}
 
-No C2CC NetworkPolicy After Disable
-    [Documentation]    The C2CC NetworkPolicy should not exist.
-    ${stdout}=    Oc On Cluster    cluster-a
-    ...    oc get networkpolicy c2cc-allow-remote-pods -n default    allow_fail=${TRUE}
-    Should Contain    ${stdout}    NotFound
-
 C2CC Controller Logged Cleanup
     [Documentation]    The controller should have logged that it is disabled and cleaning up.
     ${stdout}=    Command On Cluster    cluster-a

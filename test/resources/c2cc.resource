@@ -179,14 +179,6 @@ Verify Node SNAT Annotation
     Should Contain    ${stdout}    ${remote_pod_cidr}
     Should Contain    ${stdout}    ${remote_svc_cidr}
 
-Verify C2CC Network Policy
-    [Documentation]    Check that the C2CC network policy exists in the default namespace.
-    [Arguments]    ${alias}
-    ${stdout}=    Oc On Cluster
-    ...    ${alias}
-    ...    oc get networkpolicy c2cc-allow-remote-pods -n default -o jsonpath='{.metadata.labels.app\\.kubernetes\\.io/managed-by}'
-    Should Be Equal As Strings    ${stdout}    microshift-c2cc
-
 Verify C2CC Tracking Annotation
     [Documentation]    Check that the C2CC tracking annotation exists and contains the remote CIDRs.
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
