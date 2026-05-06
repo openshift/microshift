@@ -169,33 +169,30 @@ func getMgmtPortGateways() (map[int]mgmtPortGateway, error) {
 		return nil, fmt.Errorf("failed to get %s: %w", mgmtPortInterface, err)
 	}
 
-	addrs, err := netlink.AddrList(link, netlink.FAMILY_ALL)
+	linkIdx := link.Attrs().Index
+	routes, err := netlink.RouteList(link, netlink.FAMILY_ALL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list addresses on %s: %w", mgmtPortInterface, err)
+		return nil, fmt.Errorf("failed to list routes on %s: %w", mgmtPortInterface, err)
 	}
 
 	gateways := make(map[int]mgmtPortGateway)
-	linkIdx := link.Attrs().Index
-
-	for _, addr := range addrs {
-		if addr.IP.To4() != nil {
-			ip4 := addr.IP.To4()
-			gwIP := make(net.IP, len(ip4))
-			copy(gwIP, ip4)
-			gwIP = gwIP.Mask(addr.Mask)
-			gwIP[len(gwIP)-1] = 1
-			gateways[netlink.FAMILY_V4] = mgmtPortGateway{ip: gwIP, linkIdx: linkIdx}
-		} else if addr.IP.To16() != nil {
-			ip6 := make(net.IP, len(addr.IP.To16()))
-			copy(ip6, addr.IP.To16())
-			ip6 = ip6.Mask(addr.Mask)
-			ip6[len(ip6)-1] = 1
-			gateways[netlink.FAMILY_V6] = mgmtPortGateway{ip: ip6, linkIdx: linkIdx}
+	for _, r := range routes {
+		if r.Gw == nil {
+			continue
+		}
+		if r.Gw.To4() != nil {
+			if _, exists := gateways[netlink.FAMILY_V4]; !exists {
+				gateways[netlink.FAMILY_V4] = mgmtPortGateway{ip: r.Gw, linkIdx: linkIdx}
+			}
+		} else {
+			if _, exists := gateways[netlink.FAMILY_V6]; !exists {
+				gateways[netlink.FAMILY_V6] = mgmtPortGateway{ip: r.Gw, linkIdx: linkIdx}
+			}
 		}
 	}
 
 	if len(gateways) == 0 {
-		return nil, fmt.Errorf("failed to find addresses on %s", mgmtPortInterface)
+		return nil, fmt.Errorf("no routes with gateway found on %s", mgmtPortInterface)
 	}
 
 	return gateways, nil
