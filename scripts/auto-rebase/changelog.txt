@@ -1,80 +1,12 @@
-- kubernetes embedded-component b0a9fa695c85812aa5067be371ead2cd61de700d to da4553e9f23c91c792094a1ddbba933784becce4
-  - 1a1cacf17 2026-04-17T15:00:31-07:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 938160a29 2026-04-16T17:03:39-07:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 7b8c6cf0e 2026-04-15T18:01:22Z Release commit for Kubernetes v1.35.4
-  - 1687aa8c9 2026-04-13T14:14:40-04:00 Update github.com/moby/spdystream from v0.5.0 to v0.5.1
-  - e87f6b927 2026-04-13T14:38:58Z update go.opentelemetry.io/otel to v1.41.0
-  - 97ccbdf2e 2026-04-09T21:52:20+02:00 Bump images and versions to go 1.25.9 and distroless iptables
-  - 46ba1c3c2 2026-03-31T12:33:40-04:00 Deflake TestPodSubresourceAuth by waiting for effective permissions before testing
-  - 1d5e94efa 2026-03-27T19:44:50Z podresources: filter out inactive pods in Get()
-  - 91a1e8b2d 2026-03-27T19:44:50Z e2e: node: podresources: fix expectations for Get() and terminated pods
-  - 9d8bbea59 2026-03-26T21:39:40Z Fix device plugin admission failure after container restart
-  - d8a562b64 2026-03-20T08:20:51Z Fix backport differences for 1.35 (remove WithOrigin and MarkAlpha)
-  - b6ee759d8 2026-03-20T08:17:42Z Add slice and map union member support with tests
-  - 3d39627cd 2026-03-20T08:16:18Z Use IsZero instead of IsNil for union ratcheting check
-  - 7b708cc7c 2026-03-20T08:16:18Z Add DRA test for device attribute with no value set
-  - 863ed56ac 2026-03-20T08:16:18Z Add nil OldValue test coverage for union doc_tests
-  - 9a39e5c49 2026-03-20T08:16:17Z Fix union validation ratcheting when oldObj is nil
-  - b0ec348c2 2026-03-20T08:53:35+01:00 KEP-961: demote maxUnavailable feature in statefulset to off by default
-  - 570f471d7 2026-03-19T19:08:41+08:00 kubelet: fix sidecar restart after kubelet restart
-  - 4c0429295 2026-03-18T18:41:39Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.3
-  - 93de120ed 2026-03-17T08:05:07-04:00 pkg/proxy/nftables: fix kube-proxy crash with newer nftables versions
-  - 6b5673451 2026-03-17T08:05:07-04:00 Update knftables to v0.0.21
-  - 38378d5df 2026-01-16T17:54:22Z Bugfix: calculate request latency properly in audit log filter
+- cluster-ingress-operator embedded-component 2c5b4ef0021db96ba6fecf630c53a15c12134578 to 6cf59c532a28e46ced7e18c5aa4b04283fea8f61
+  - 3f03fc1 2026-05-01T20:08:27Z isFIPSEnabled: Check FIPS_ENABLED env. var. first
 
-- machine-config-operator embedded-component f72cd29b7306dcb05effc3bceee1398942d97902 to abe61bbbcbffb8d86ffb783d12eac18c172f30b0
-  - 54754975 2026-05-01T14:12:42Z Fix stale MachineOSBuild annotation preventing pool updates
-  - d0bd4b30 2026-05-01T13:29:48Z chore: update AMIs
-  - 78c7d096 2026-04-30T22:32:25Z node: custom pool boot must handle matchExpressions
-  - 3d72058a 2026-04-30T22:32:10Z daemon: support bootloader updates
-  - 911d1262 2026-04-30T12:27:41Z Auto-append :ref suffix to additionalLayerStores in storage.conf
-  - 2df730ff 2026-04-29T23:37:17Z deploy-from-self when skopeo < 1.22.2
+- cluster-kube-apiserver-operator embedded-component e373e93ad5690ba5233512318005921ca5f47bd7 to d03062f8d205f1923362c008c86f9bcdd35f931c
+  - a1b09a2 2026-04-29T11:19:24-04:00 Bump library-go
 
-- kubernetes image-amd64 b0a9fa695c85812aa5067be371ead2cd61de700d to da4553e9f23c91c792094a1ddbba933784becce4
-  - 1a1cacf17 2026-04-17T15:00:31-07:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 938160a29 2026-04-16T17:03:39-07:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 7b8c6cf0e 2026-04-15T18:01:22Z Release commit for Kubernetes v1.35.4
-  - 1687aa8c9 2026-04-13T14:14:40-04:00 Update github.com/moby/spdystream from v0.5.0 to v0.5.1
-  - e87f6b927 2026-04-13T14:38:58Z update go.opentelemetry.io/otel to v1.41.0
-  - 97ccbdf2e 2026-04-09T21:52:20+02:00 Bump images and versions to go 1.25.9 and distroless iptables
-  - 46ba1c3c2 2026-03-31T12:33:40-04:00 Deflake TestPodSubresourceAuth by waiting for effective permissions before testing
-  - 1d5e94efa 2026-03-27T19:44:50Z podresources: filter out inactive pods in Get()
-  - 91a1e8b2d 2026-03-27T19:44:50Z e2e: node: podresources: fix expectations for Get() and terminated pods
-  - 9d8bbea59 2026-03-26T21:39:40Z Fix device plugin admission failure after container restart
-  - d8a562b64 2026-03-20T08:20:51Z Fix backport differences for 1.35 (remove WithOrigin and MarkAlpha)
-  - b6ee759d8 2026-03-20T08:17:42Z Add slice and map union member support with tests
-  - 3d39627cd 2026-03-20T08:16:18Z Use IsZero instead of IsNil for union ratcheting check
-  - 7b708cc7c 2026-03-20T08:16:18Z Add DRA test for device attribute with no value set
-  - 863ed56ac 2026-03-20T08:16:18Z Add nil OldValue test coverage for union doc_tests
-  - 9a39e5c49 2026-03-20T08:16:17Z Fix union validation ratcheting when oldObj is nil
-  - b0ec348c2 2026-03-20T08:53:35+01:00 KEP-961: demote maxUnavailable feature in statefulset to off by default
-  - 570f471d7 2026-03-19T19:08:41+08:00 kubelet: fix sidecar restart after kubelet restart
-  - 4c0429295 2026-03-18T18:41:39Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.3
-  - 93de120ed 2026-03-17T08:05:07-04:00 pkg/proxy/nftables: fix kube-proxy crash with newer nftables versions
-  - 6b5673451 2026-03-17T08:05:07-04:00 Update knftables to v0.0.21
-  - 38378d5df 2026-01-16T17:54:22Z Bugfix: calculate request latency properly in audit log filter
-
-- kubernetes image-arm64 b0a9fa695c85812aa5067be371ead2cd61de700d to da4553e9f23c91c792094a1ddbba933784becce4
-  - 1a1cacf17 2026-04-17T15:00:31-07:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 938160a29 2026-04-16T17:03:39-07:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 7b8c6cf0e 2026-04-15T18:01:22Z Release commit for Kubernetes v1.35.4
-  - 1687aa8c9 2026-04-13T14:14:40-04:00 Update github.com/moby/spdystream from v0.5.0 to v0.5.1
-  - e87f6b927 2026-04-13T14:38:58Z update go.opentelemetry.io/otel to v1.41.0
-  - 97ccbdf2e 2026-04-09T21:52:20+02:00 Bump images and versions to go 1.25.9 and distroless iptables
-  - 46ba1c3c2 2026-03-31T12:33:40-04:00 Deflake TestPodSubresourceAuth by waiting for effective permissions before testing
-  - 1d5e94efa 2026-03-27T19:44:50Z podresources: filter out inactive pods in Get()
-  - 91a1e8b2d 2026-03-27T19:44:50Z e2e: node: podresources: fix expectations for Get() and terminated pods
-  - 9d8bbea59 2026-03-26T21:39:40Z Fix device plugin admission failure after container restart
-  - d8a562b64 2026-03-20T08:20:51Z Fix backport differences for 1.35 (remove WithOrigin and MarkAlpha)
-  - b6ee759d8 2026-03-20T08:17:42Z Add slice and map union member support with tests
-  - 3d39627cd 2026-03-20T08:16:18Z Use IsZero instead of IsNil for union ratcheting check
-  - 7b708cc7c 2026-03-20T08:16:18Z Add DRA test for device attribute with no value set
-  - 863ed56ac 2026-03-20T08:16:18Z Add nil OldValue test coverage for union doc_tests
-  - 9a39e5c49 2026-03-20T08:16:17Z Fix union validation ratcheting when oldObj is nil
-  - b0ec348c2 2026-03-20T08:53:35+01:00 KEP-961: demote maxUnavailable feature in statefulset to off by default
-  - 570f471d7 2026-03-19T19:08:41+08:00 kubelet: fix sidecar restart after kubelet restart
-  - 4c0429295 2026-03-18T18:41:39Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.3
-  - 93de120ed 2026-03-17T08:05:07-04:00 pkg/proxy/nftables: fix kube-proxy crash with newer nftables versions
-  - 6b5673451 2026-03-17T08:05:07-04:00 Update knftables to v0.0.21
-  - 38378d5df 2026-01-16T17:54:22Z Bugfix: calculate request latency properly in audit log filter
+- machine-config-operator embedded-component abe61bbbcbffb8d86ffb783d12eac18c172f30b0 to 487334b7ed9bdd7c55e9eeb3a90027e5e1f927a2
+  - 6d0941eb 2026-05-04T14:40:51Z Fix OCL test to handle temporarily empty current-machine-os-build annotation
+  - 5dd2ef5c 2026-04-30T19:24:08Z OCPBUGS-84332: Fix ssh and password rollbacks
+  - bd713eb5 2026-04-29T09:53:06Z OCPBUGS-83859: Fix encapsulated IGN version
+  - 0c488d18 2026-04-27T09:22:41Z OCPBUGS-84218: Fix units rollback if update failure
 
