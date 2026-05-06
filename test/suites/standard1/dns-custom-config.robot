@@ -6,6 +6,7 @@ Resource            ../../resources/oc.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-network.resource
+Resource            ../../resources/dns.resource
 Resource            ../../resources/hosts.resource
 
 Suite Setup         Setup Suite With Namespace
@@ -97,19 +98,6 @@ ConfigMap Should Contain Hostname
     ...    configmap    openshift-dns    dns-default    .data.Corefile
     Should Contain    ${corefile_data}    ${hostname}
 
-Resolve Host From Pod
-    [Documentation]    Verify DNS resolution from a pod using nslookup
-    [Arguments]    ${hostname}
-    Wait Until Keyword Succeeds    40x    5s
-    ...    Router Should Resolve Hostname    ${hostname}
-
-Router Should Resolve Hostname
-    [Documentation]    Check if the router pod resolves the given hostname
-    [Arguments]    ${hostname}
-    ${output}=    Oc Exec    router-default    nslookup ${hostname}    openshift-ingress    deployment
-    Should Contain    ${output}    Name:
-    Should Contain    ${output}    ${hostname}
-
 Teardown Custom Corefile
     [Documentation]    Remove custom Corefile, drop-in config, fake IP, and restart
     Run Keywords
@@ -123,22 +111,4 @@ Remove Custom Corefile
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    rm -f ${CUSTOM_COREFILE_PATH}
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
-    Should Be Equal As Integers    0    ${rc}
-
-Add Fake IP To NIC
-    [Documentation]    Add the given IP to br-ex temporarily.
-    [Arguments]    ${ip_address}=${FAKE_LISTEN_IP}    ${nic_name}=br-ex
-    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
-    ...    ip address add ${ip_address}/32 dev ${nic_name}
-    ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=True
-    Log Many    ${stdout}    ${stderr}
-    Should Be Equal As Integers    0    ${rc}
-
-Remove Fake IP From NIC
-    [Documentation]    Remove the given IP from br-ex.
-    [Arguments]    ${ip_address}=${FAKE_LISTEN_IP}    ${nic_name}=br-ex
-    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
-    ...    ip address delete ${ip_address}/32 dev ${nic_name}
-    ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=True
-    Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
