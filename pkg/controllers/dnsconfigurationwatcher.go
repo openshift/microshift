@@ -37,7 +37,9 @@ func NewDNSConfigurationWatcherManager(cfg *config.Config) *DNSConfigurationWatc
 }
 
 func (s *DNSConfigurationWatcherManager) Name() string           { return "dns-configuration-watcher-manager" }
-func (s *DNSConfigurationWatcherManager) Dependencies() []string { return []string{"kube-apiserver"} }
+func (s *DNSConfigurationWatcherManager) Dependencies() []string {
+	return []string{"infrastructure-services-manager"}
+}
 
 func (s *DNSConfigurationWatcherManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
@@ -109,7 +111,7 @@ func (s *DNSConfigurationWatcherManager) eventLoop(ctx context.Context, watcher 
 		select {
 		case <-ctx.Done():
 			klog.Infof("%s stopping", s.Name())
-			return watcher.Close()
+			return ctx.Err()
 
 		case event, ok := <-watcher.Events:
 			if !ok {
@@ -159,7 +161,7 @@ func (s *DNSConfigurationWatcherManager) handleChange(ctx context.Context, kubeC
 	}
 	if err := s.updateConfigMap(ctx, kubeClient); err != nil {
 		klog.Errorf("%s failed to update ConfigMap: %v", s.Name(), err)
-		return false, currentHash, err
+		return false, lastHash, err
 	}
 	klog.Infof("%s successfully updated ConfigMap %s/%s", s.Name(), dnsConfigMapNamespace, dnsConfigMapName)
 	return true, currentHash, nil

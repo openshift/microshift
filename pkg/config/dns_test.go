@@ -108,7 +108,7 @@ func TestDNS_ValidateConfigFile_ExceedsSizeLimit(t *testing.T) {
 		},
 	}
 	err := dns.validate()
-	assert.ErrorContains(t, err, "exceeds 1MiB ConfigMap size limit")
+	assert.ErrorContains(t, err, "exceeds 1MiB size limit")
 }
 
 func TestDNS_ValidateConfigFile_ValidFile(t *testing.T) {
