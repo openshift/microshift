@@ -3,7 +3,6 @@ package c2cc
 import (
 	"context"
 	"fmt"
-	"net"
 	"time"
 
 	"github.com/openshift/microshift/pkg/config"
@@ -148,17 +147,11 @@ func (c *C2CCRouteManager) initKubeClient() error {
 
 func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
 	c.ovn = newOVNRouteManager(nbClient, c.nodeName, c.cfg.C2CC.Resolved)
-	c.annotation = newAnnotationManager(c.kubeClient, c.nodeName, c.cfg.C2CC.AllRemoteCIDRs())
+	c.annotation = newAnnotationManager(c.kubeClient, c.nodeName, c.cfg.C2CC.AllRemoteCIDRStrings())
 	c.routes = newLinuxRouteManager(c.cfg)
 	c.svcRoutes = newServiceRouteManager(c.cfg)
 
-	allRemoteCIDRs := make([]*net.IPNet, 0, len(c.cfg.C2CC.Resolved)*4)
-	for _, rc := range c.cfg.C2CC.Resolved {
-		allRemoteCIDRs = append(allRemoteCIDRs, rc.ClusterNetwork...)
-		allRemoteCIDRs = append(allRemoteCIDRs, rc.ServiceNetwork...)
-	}
-
-	nftMgr, err := newNftablesManager(allRemoteCIDRs)
+	nftMgr, err := newNftablesManager(c.cfg.C2CC.ResolvedAllCIDRs)
 	if err != nil {
 		return fmt.Errorf("failed to init nftables manager: %w", err)
 	}

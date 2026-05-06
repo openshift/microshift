@@ -35,12 +35,10 @@ func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 		desiredGWs: make(map[string]net.IP),
 	}
 
-	for _, rc := range cfg.C2CC.Resolved {
-		allCIDRs := append([]*net.IPNet{}, rc.ClusterNetwork...)
-		allCIDRs = append(allCIDRs, rc.ServiceNetwork...)
-		for _, cidr := range allCIDRs {
+	for i := range cfg.C2CC.Resolved {
+		for _, cidr := range cfg.C2CC.Resolved[i].AllCIDRs() {
 			m.desiredDsts = append(m.desiredDsts, cidr)
-			m.desiredGWs[cidr.String()] = rc.NextHop
+			m.desiredGWs[cidr.String()] = cfg.C2CC.Resolved[i].NextHop
 		}
 	}
 

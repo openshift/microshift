@@ -17,7 +17,8 @@ type C2CC struct {
 	RemoteClusters []RemoteCluster `json:"remoteClusters,omitempty"`
 
 	// Populated during validation with parsed network objects.
-	Resolved []ResolvedRemoteCluster `json:"-"`
+	Resolved         []ResolvedRemoteCluster `json:"-"`
+	ResolvedAllCIDRs []*net.IPNet            `json:"-"`
 }
 
 type RemoteCluster struct {
@@ -40,6 +41,13 @@ type ResolvedRemoteCluster struct {
 	Domain         string
 }
 
+func (rc *ResolvedRemoteCluster) AllCIDRs() []*net.IPNet {
+	all := make([]*net.IPNet, 0, len(rc.ClusterNetwork)+len(rc.ServiceNetwork))
+	all = append(all, rc.ClusterNetwork...)
+	all = append(all, rc.ServiceNetwork...)
+	return all
+}
+
 type labeledCIDR struct {
 	net *net.IPNet
 	str string
@@ -49,13 +57,12 @@ func (c *C2CC) IsEnabled() bool {
 	return len(c.RemoteClusters) > 0
 }
 
-func (c *C2CC) AllRemoteCIDRs() []string {
-	cidrs := make([]string, 0, len(c.RemoteClusters)*4)
-	for _, rc := range c.RemoteClusters {
-		cidrs = append(cidrs, rc.ClusterNetwork...)
-		cidrs = append(cidrs, rc.ServiceNetwork...)
+func (c *C2CC) AllRemoteCIDRStrings() []string {
+	strs := make([]string, len(c.ResolvedAllCIDRs))
+	for i, cidr := range c.ResolvedAllCIDRs {
+		strs[i] = cidr.String()
 	}
-	return cidrs
+	return strs
 }
 
 func (rc *RemoteCluster) isEmpty() bool {
@@ -211,6 +218,13 @@ func (c *C2CC) validate(cfg *Config) error {
 	}
 
 	c.Resolved = resolved
+
+	var allCIDRs []*net.IPNet
+	for i := range resolved {
+		allCIDRs = append(allCIDRs, resolved[i].AllCIDRs()...)
+	}
+	c.ResolvedAllCIDRs = allCIDRs
+
 	return nil
 }
 

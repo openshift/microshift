@@ -27,11 +27,7 @@ type serviceRouteManager struct {
 }
 
 func newServiceRouteManager(cfg *config.Config) *serviceRouteManager {
-	remoteCIDRs := make([]*net.IPNet, 0, len(cfg.C2CC.Resolved)*4)
-	for _, rc := range cfg.C2CC.Resolved {
-		remoteCIDRs = append(remoteCIDRs, rc.ClusterNetwork...)
-		remoteCIDRs = append(remoteCIDRs, rc.ServiceNetwork...)
-	}
+	remoteCIDRs := cfg.C2CC.ResolvedAllCIDRs
 
 	var localSvcCIDRs []*net.IPNet
 	for _, s := range cfg.Network.ServiceNetwork {

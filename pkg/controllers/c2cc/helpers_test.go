@@ -46,6 +46,7 @@ func testConfigWithRemotes(t *testing.T, remotes ...testRemoteConfig) *config.Co
 			resolved.ServiceNetwork = append(resolved.ServiceNetwork, ipNet)
 		}
 		cfg.C2CC.Resolved = append(cfg.C2CC.Resolved, resolved)
+		cfg.C2CC.ResolvedAllCIDRs = append(cfg.C2CC.ResolvedAllCIDRs, resolved.AllCIDRs()...)
 	}
 
 	return cfg

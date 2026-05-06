@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net"
 	"strings"
 	"time"
 
@@ -42,11 +41,9 @@ func newOVNRouteManager(nbClient client.Client, nodeName string, resolved []conf
 	gwRouter := gwRouterPrefix + nodeName
 
 	var desired []LogicalRouterStaticRoute
-	for _, rc := range resolved {
-		nexthop := rc.NextHop.String()
-		allCIDRs := append([]*net.IPNet{}, rc.ClusterNetwork...)
-		allCIDRs = append(allCIDRs, rc.ServiceNetwork...)
-		for _, cidr := range allCIDRs {
+	for i := range resolved {
+		nexthop := resolved[i].NextHop.String()
+		for _, cidr := range resolved[i].AllCIDRs() {
 			desired = append(desired, LogicalRouterStaticRoute{
 				IPPrefix:    cidr.String(),
 				Nexthop:     nexthop,
