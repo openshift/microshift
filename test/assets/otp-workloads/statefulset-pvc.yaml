@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: foo
+  labels:
+    app: hello-pod
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: hello-pod
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hello-statefulset
+spec:
+  serviceName: "foo"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-pod
+  template:
+    metadata:
+      labels:
+        app: hello-pod
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: quay.io/microshift/busybox:1.36
+          imagePullPolicy: IfNotPresent
+          name: hello-pod
+          command: ["sh", "-c", "sleep infinity"]
+          resources: {}
+          volumeMounts:
+            - mountPath: /tmp
+              name: www
+      restartPolicy: Always
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
