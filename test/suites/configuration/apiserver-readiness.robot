@@ -48,7 +48,7 @@ Poll For 429 During Startup
     VAR    ${found}=    ${FALSE}
     FOR    ${i}    IN RANGE    300
         ${stdout}    ${stderr}    ${rc}=    Execute Command
-        ...    curl -sk -o /dev/null -w "%{http_code}" -H "${READINESS_HEADER}" ${APIS_ENDPOINT}
+        ...    curl -sk -o /dev/null -w "\%{http_code}" -H "${READINESS_HEADER}" ${APIS_ENDPOINT}
         ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
         IF    "${stdout}" == "429"
             VAR    ${found}=    ${TRUE}

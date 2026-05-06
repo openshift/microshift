@@ -20,6 +20,11 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_image_not_found "${start_image}"
     run_tests host1 \
-        suites/ipv6/dualstack.robot \
-        suites/configuration/
+        suites/configuration/tls-configuration.robot \
+        suites/configuration/drop-in-config.robot \
+        suites/configuration/show-config.robot \
+        suites/configuration/logging.robot \
+        suites/configuration/data-dir.robot \
+        suites/configuration/apiserver-readiness.robot \
+        suites/configuration/audit-log.robot
 }

@@ -7,14 +7,21 @@ Resource            kubeconfig.resource
 
 *** Keywords ***
 Deploy Test Manifests
-    [Documentation]    Create a kustomization that deploys a configmap in the given namespace
+    [Documentation]    Create a kustomization that deploys a namespace and configmap
     [Arguments]    ${manifest_dir}    ${namespace}    ${configmap_name}=test-configmap
     Command Should Work    mkdir -p ${manifest_dir}
     ${kustomization}=    Catenate    SEPARATOR=\n
     ...    resources:
+    ...    - namespace.yaml
     ...    - configmap.yaml
     ...    namespace: ${namespace}
     Upload String To File    ${kustomization}    ${manifest_dir}/kustomization.yaml
+    ${ns_yaml}=    Catenate    SEPARATOR=\n
+    ...    apiVersion: v1
+    ...    kind: Namespace
+    ...    metadata:
+    ...    \ \ name: ${namespace}
+    Upload String To File    ${ns_yaml}    ${manifest_dir}/namespace.yaml
     ${configmap}=    Catenate    SEPARATOR=\n
     ...    apiVersion: v1
     ...    kind: ConfigMap
