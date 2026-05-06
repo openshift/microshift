@@ -43,6 +43,8 @@ Runtime Reload Without MicroShift Restart
     Resolve Host From Pod    ${HOSTNAME}
     ${updated_hostname}=    Generate Random HostName
     Update Corefile With New Host    ${updated_hostname}
+    Wait Until Keyword Succeeds    20x    5s
+    ...    ConfigMap Should Contain Hostname    ${updated_hostname}
     Resolve Host From Pod    ${updated_hostname}
     [Teardown]    Teardown Custom Corefile
 
