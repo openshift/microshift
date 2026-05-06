@@ -108,6 +108,20 @@ Disable MicroShift
     [Documentation]    Disable the MicroShift service
     Systemctl    disable    microshift.service
 
+Start MicroShift Without Waiting For Systemd Readiness
+    [Documentation]    Starts MicroShift without waiting for daemon readiness
+    ...    (which happens after all internal services/components declare ready
+    ...    (close ready channel)), so it can be interrupted (restarted) mid startup.
+
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    systemctl start microshift --no-block
+    ...    sudo=True
+    ...    return_stdout=True
+    ...    return_stderr=True
+    ...    return_rc=True
+    Log Many    ${stdout}    ${stderr}    ${rc}
+    Should Be Equal As Integers    ${rc}    0
+
 Cleanup MicroShift
     [Documentation]    Cleanup MicroShift data
     [Arguments]    ${cmd}="--all"    ${opt}=${EMPTY}
