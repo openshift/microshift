@@ -83,35 +83,7 @@ func (t *DNS) validateConfigFile() error {
 	if t.ConfigFile == "" {
 		return nil
 	}
-
-	cleanPath := filepath.Clean(t.ConfigFile)
-	if !filepath.IsAbs(cleanPath) {
-		return fmt.Errorf("dns config file path must be absolute: got %s", t.ConfigFile)
-	}
-
-	fi, err := os.Stat(cleanPath)
-	if os.IsNotExist(err) {
-		return fmt.Errorf("dns config file %s does not exist", t.ConfigFile)
-	} else if err != nil {
-		return fmt.Errorf("error checking dns config file %s: %v", t.ConfigFile, err)
-	}
-	if !fi.Mode().IsRegular() {
-		return fmt.Errorf("dns config file %s must be a regular file", t.ConfigFile)
-	}
-
-	if fi.Size() == 0 {
-		return fmt.Errorf("dns config file %s is empty", t.ConfigFile)
-	}
-
-	if fi.Size() > 1048576 {
-		return fmt.Errorf("dns config file %s exceeds 1MiB ConfigMap size limit (got %d bytes)", t.ConfigFile, fi.Size())
-	}
-
-	file, err := os.Open(cleanPath)
-	if err != nil {
-		return fmt.Errorf("dns config file %s is not readable: %v", t.ConfigFile, err)
-	}
-	return file.Close()
+	return validateFilePath(t.ConfigFile, "dns config file")
 }
 
 func (t *DNS) validateHosts() error {
@@ -120,34 +92,42 @@ func (t *DNS) validateHosts() error {
 		if t.Hosts.File == "" {
 			break
 		}
-
-		cleanPath := filepath.Clean(t.Hosts.File)
-
-		fi, err := os.Stat(cleanPath)
-		if err == nil && fi.Size() > 1048576 {
-			return fmt.Errorf("hosts file %s exceeds 1MiB ConfigMap (and internal buffer) size limit (got %d bytes)", t.Hosts.File, fi.Size())
-		}
-		if !filepath.IsAbs(cleanPath) {
-			return fmt.Errorf("hosts file path must be absolute: got %s", t.Hosts.File)
-		}
-
-		_, err = os.Stat(cleanPath)
-		if os.IsNotExist(err) {
-			return fmt.Errorf("hosts file %s does not exist", t.Hosts.File)
-		} else if err != nil {
-			return fmt.Errorf("error checking hosts file %s: %v", t.Hosts.File, err)
-		}
-
-		file, err := os.Open(t.Hosts.File)
-		if err != nil {
-			return fmt.Errorf("hosts file %s is not readable: %v", t.Hosts.File, err)
-		}
-		return file.Close()
-
+		return validateFilePath(t.Hosts.File, "hosts file")
 	case HostsStatusDisabled:
 		return nil
 	default:
 		return fmt.Errorf("invalid hosts status: %s", t.Hosts.Status)
 	}
 	return nil
+}
+
+func validateFilePath(path, label string) error {
+	cleanPath := filepath.Clean(path)
+	if !filepath.IsAbs(cleanPath) {
+		return fmt.Errorf("%s path must be absolute: got %s", label, path)
+	}
+
+	fi, err := os.Stat(cleanPath)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("%s %s does not exist", label, path)
+	} else if err != nil {
+		return fmt.Errorf("error checking %s %s: %v", label, path, err)
+	}
+	if !fi.Mode().IsRegular() {
+		return fmt.Errorf("%s %s must be a regular file", label, path)
+	}
+
+	if fi.Size() == 0 {
+		return fmt.Errorf("%s %s is empty", label, path)
+	}
+
+	if fi.Size() > 1048576 {
+		return fmt.Errorf("%s %s exceeds 1MiB size limit (got %d bytes)", label, path, fi.Size())
+	}
+
+	file, err := os.Open(cleanPath)
+	if err != nil {
+		return fmt.Errorf("%s %s is not readable: %v", label, path, err)
+	}
+	return file.Close()
 }
