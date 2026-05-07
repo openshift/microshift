@@ -150,6 +150,10 @@ func (fw *fileWatcher) isRelevantEvent(event fsnotify.Event) bool {
 
 func (fw *fileWatcher) handleChange(ctx context.Context, kubeClient kubernetes.Interface, lastHash string) (bool, string, error) {
 	klog.Infof("%s detected change in %s", fw.Name(), fw.cfg.file)
+	if _, err := os.Stat(fw.cfg.file); os.IsNotExist(err) {
+		klog.Warningf("%s watched file %s was removed, keeping last known ConfigMap content", fw.Name(), fw.cfg.file)
+		return false, lastHash, err
+	}
 	currentHash, err := fw.getFileHash()
 	if err != nil {
 		klog.Warningf("%s failed to get file hash after change: %v", fw.Name(), err)
