@@ -8,6 +8,7 @@ Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-network.resource
 Resource            ../../resources/dns.resource
 Resource            ../../resources/hosts.resource
+Library             ../../resources/journalctl.py
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -46,6 +47,18 @@ Runtime Reload Without MicroShift Restart
     Wait Until Keyword Succeeds    20x    5s
     ...    ConfigMap Should Contain Hostname    ${updated_hostname}
     Resolve Host From Pod    ${updated_hostname}
+    [Teardown]    Teardown Custom Corefile
+
+ConfigMap Unchanged After Corefile Removal
+    [Documentation]    Remove the custom Corefile while MicroShift is running
+    ...    and verify the ConfigMap retains the last known content.
+    [Setup]    Setup Custom Corefile With Hosts Entry
+    Verify ConfigMap Uses Custom Corefile
+    ${cursor}=    Get Journal Cursor
+    Remove Custom Corefile
+    Pattern Should Appear In Log Output
+    ...    ${cursor}    watched file.*was removed, keeping last known ConfigMap content
+    ConfigMap Should Contain Hostname    ${HOSTNAME}
     [Teardown]    Teardown Custom Corefile
 
 Cluster Local Resolution With Custom Corefile
