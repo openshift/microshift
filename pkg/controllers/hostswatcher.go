@@ -12,7 +12,7 @@ type HostsWatcherManager struct {
 func NewHostsWatcherManager(cfg *config.Config) *HostsWatcherManager {
 	return &HostsWatcherManager{fileWatcher{cfg: fileWatcherConfig{
 		serviceName:        "hosts-watcher-manager",
-		dependencies:       []string{"kube-apiserver"},
+		dependencies:       []string{"infrastructure-services-manager"},
 		file:               cfg.DNS.Hosts.File,
 		kubeconfig:         cfg.KubeConfigPath(config.KubeAdmin),
 		enabled:            cfg.DNS.Hosts.Status == config.HostsStatusEnabled,
