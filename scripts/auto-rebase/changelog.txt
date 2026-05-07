@@ -1,35 +1,57 @@
-- machine-config-operator embedded-component 374271f2dad6675f2986069b04ed5b65ead27e81 to 7eef4fdc72274bbf6845b1ea15d8af4723e42962
-  - 64f681e5 2026-04-30T14:33:39-05:00 Fix OCL test to handle temporarily empty current-machine-os-build annotation
+- api embedded-component a49973eaef537f281362e1ffa3abeacf7ed85c62 to 28b45b8020c71ad7c056b3ad1d569eff94d6b878
+  - e9c797fc 2026-05-01T11:53:18-04:00 Clarify cluster operator Progressing condition
+  - 3dd2dc4b 2026-04-29T11:06:20+02:00 MON-4561: API: Add softirqs node-exporter collector to ClusterMonitoring CRD
 
-- operator-framework-olm embedded-component 9941db6a69e1f5bab885e8ffaca54f59fcfafea4 to 4201d40dfc99de60e8791d02b89bc7aebeaae930
-  - 124fd130 2026-05-01T00:08:11Z prune unused dockerfiles & build targets (#1961)
-  - 109ac858 2026-05-01T00:07:33Z Bump github.com/docker/cli (#1962)
-  - c94a418e 2026-05-01T00:07:19Z Bump the k8s-dependencies group with 4 updates (#1960)
-  - 5214cb5f 2026-05-01T00:07:04Z fix: hex-encode OCI layout image name to avoid validation errors (#1954)
-  - c55403b1 2026-05-01T00:06:49Z Bump github.com/containerd/containerd from 1.7.30 to 1.7.31 (#1959)
-  - a888bd40 2026-05-01T00:06:35Z update owners (#1958)
-  - 7c9d0007 2026-05-01T00:06:20Z Bump the golang-x-deps group across 1 directory with 3 updates (#1957)
-  - b88daf3a 2026-05-01T00:06:05Z Bump github.com/distribution/distribution/v3 from 3.0.0 to 3.1.0 (#1951)
-  - e9180154 2026-05-01T00:05:44Z Bump github.com/mattn/go-sqlite3 from 1.14.38 to 1.14.42 (#1956)
-  - 32dc6fb7 2026-05-01T00:05:30Z Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.47 to 0.4.48 (#1952)
-  - aeb08326 2026-05-01T00:05:13Z Bump github.com/docker/cli (#1953)
-  - f240f35c 2026-05-01T00:04:56Z Bump go.podman.io/common from 0.67.0 to 0.67.1 (#1949)
-  - 6848fe3c 2026-05-01T00:04:39Z Bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.12.1 to 6.12.2 (#1946)
-  - 216ef9b9 2026-05-01T00:04:24Z substitutes template protects against reuse of base/candidate in same template (#1942)
-  - ea93bbc5 2026-05-01T00:04:09Z Bump google.golang.org/grpc from 1.79.3 to 1.80.0 (#1945)
-  - 44b63006 2026-05-01T00:03:53Z Bump github.com/mattn/go-sqlite3 from 1.14.37 to 1.14.38 (#1944)
-  - d65b7874 2026-05-01T00:03:39Z Add fgiudici as reviewer (#1943)
-  - 873a5b5d 2026-05-01T00:03:18Z :seedling: Bump github.com/onsi/ginkgo/v2 from 2.28.1 to 2.28.2 (#3818)
-  - ed1ab418 2026-05-01T00:02:58Z :seedling: Bump github.com/operator-framework/operator-registry (#3819)
+- cluster-ingress-operator embedded-component 98ff1a6fedd18fbf2ed6fec9796104d7b4bc952c to df64b34df475cd58b0342dd617c29a9180ea9e5e
+  - a846988 2026-04-10T00:51:18-04:00 waitForDeploymentEnvVar: Remove client parameter
+  - 9d2f210 2026-04-10T00:51:18-04:00 TestUnsupportedConfigOverride: Ignore featuregate
+  - 579b4de 2026-04-10T00:26:09-04:00 Add waitForDeploymentFunc test helper func
+  - 49371cb 2026-03-30T16:43:15-04:00 waitForDeploymentEnvVar: Fix godoc
 
-- router image-arm64 896390778ebe15f57f87e6ca78f11c96e64c2652 to dfaf1cb3116cd7e0a5ab2e23f4d371f3777f7853
-  - c223ef7 2026-05-04T11:25:19-03:00 fix handling of host conflict
+- cluster-network-operator embedded-component 23f002049008db9e852694ff2baaa68cd5b84525 to b1101d16e850319c488a47cb5c756402075900b8
+  - 7795779 2026-05-04T19:10:11+05:30 frr-k8s: enable BGP daemon to listen on standard port 179
+  - a09d0c1 2026-05-04T19:10:11+05:30 ovn-k: grant routeadvertisements CRUD to control-plane SA in managed routing mode
 
-- kubernetes image-arm64 2447118a5cf501f71c2da4b2f4ff14f3492aec10 to 5f099ccd1e8345f615d10381290909a8ca581b66
+- kubernetes embedded-component 2447118a5cf501f71c2da4b2f4ff14f3492aec10 to 5f099ccd1e8345f615d10381290909a8ca581b66
   - 739e2eb2c 2026-04-30T16:11:47+01:00 UPSTREAM: <drop>: bump openshift/api dependency
   - 568c860e4 2026-04-30T16:11:36+01:00 UPSTREAM: <carry>: authentication: enforce claims.email_verified usage when claims.email is used in username expression
   - 4bfac2def 2026-04-30T16:11:21+01:00 UPSTREAM: <carry>: Export email validation functions
 
-- service-ca-operator image-arm64 2aa88ace39a1abe7647bc5b03e6a599985b31605 to e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b
+- machine-config-operator embedded-component 7eef4fdc72274bbf6845b1ea15d8af4723e42962 to 9d3ee9d972ed9373db03a498ca6ab831093d2420
+  - 9c7c37f6 2026-04-29T23:26:51+08:00 AGENT-1443: Include platform VIPs in IRI cert SANs to match installer
+  - 95c47d22 2026-04-27T19:17:17+08:00 AGENT-1443: Add e2e test for IRI cert regeneration on MCS CA rotation
+  - da3b4783 2026-04-27T17:55:05+08:00 AGENT-1443: Add SAN validation to IRI cert rotation and wire mcfgClient
+  - 8be62adb 2026-04-27T17:55:05+08:00 AGENT-1443: Add feature gate, idempotency, and localhost SANs to IRI cert rotation
+  - 1c84abf9 2026-04-27T17:55:05+08:00 AGENT-1443: Add IRI certificate regeneration to MCS cert rotation controller
+  - 6c48b964 2026-04-24T12:19:32-04:00 crio: enable default_runtime metric
+  - 138f7a5e 2026-04-24T12:19:32-04:00 prom rules: add alert for nodes using runc
+  - 3d1f08bc 2026-04-22T13:20:08+05:30 Migrate MCO daemon test suite from openshift-tests-private
+
+- operator-framework-olm embedded-component 4201d40dfc99de60e8791d02b89bc7aebeaae930 to 2fcbb3e4a8a1445c2b557d3485ac3f63ba5127a1
+
+
+- service-ca-operator embedded-component 2aa88ace39a1abe7647bc5b03e6a599985b31605 to e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b
   - 73dd9f6 2026-04-27T14:48:36+05:30 test: network policy tests
+
+- router image-amd64 896390778ebe15f57f87e6ca78f11c96e64c2652 to dfaf1cb3116cd7e0a5ab2e23f4d371f3777f7853
+  - c223ef7 2026-05-04T11:25:19-03:00 fix handling of host conflict
+
+- kubernetes image-amd64 2447118a5cf501f71c2da4b2f4ff14f3492aec10 to 5f099ccd1e8345f615d10381290909a8ca581b66
+  - 739e2eb2c 2026-04-30T16:11:47+01:00 UPSTREAM: <drop>: bump openshift/api dependency
+  - 568c860e4 2026-04-30T16:11:36+01:00 UPSTREAM: <carry>: authentication: enforce claims.email_verified usage when claims.email is used in username expression
+  - 4bfac2def 2026-04-30T16:11:21+01:00 UPSTREAM: <carry>: Export email validation functions
+
+- service-ca-operator image-amd64 2aa88ace39a1abe7647bc5b03e6a599985b31605 to e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b
+  - 73dd9f6 2026-04-27T14:48:36+05:30 test: network policy tests
+
+- oc image-arm64 16d140aeefdc2b07f549945801c9cefab703ca68 to 6ac066994b962cb01886dab515d821720324ed52
+  - d1931c31 2026-04-22T17:32:51+01:00 OCPBUGS-62799: Add required-scc annotation to node-joiner pod to prevent third-party SCC interference
+
+- csi-external-snapshotter image-arm64 d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to 3219da7dcbb14fa762704746d21fb38131beb1f4
+  - 72eb399 2026-04-21T11:21:53+02:00 UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
+
+- router image-arm64 dfaf1cb3116cd7e0a5ab2e23f4d371f3777f7853 to 65271d2c19cb35fb5e802ee72fc4de502c5e16b6
+  - dc7e786 2026-04-23T15:52:51-03:00 move from option forwarded to manual header update
+  - 313daa6 2026-04-23T11:09:02-03:00 fix forwarded header for IPv6 on IPv4 stack
+  - 0500b49 2026-04-14T17:06:57-03:00 create self-signed crt if failing to read default
 
