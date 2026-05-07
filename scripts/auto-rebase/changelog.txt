@@ -1,12 +1,6 @@
-- cluster-ingress-operator embedded-component 2c5b4ef0021db96ba6fecf630c53a15c12134578 to 6cf59c532a28e46ced7e18c5aa4b04283fea8f61
-  - 3f03fc1 2026-05-01T20:08:27Z isFIPSEnabled: Check FIPS_ENABLED env. var. first
+- kubernetes image-arm64 da4553e9f23c91c792094a1ddbba933784becce4 to 80f28ac33ac111532fb8ba59b2e569085ee871b0
+  - d9dec3899 2026-04-28T17:11:27Z UPSTREAM: 138244: devicemanager: constrain topology hints to device NUMA nodes
 
-- cluster-kube-apiserver-operator embedded-component e373e93ad5690ba5233512318005921ca5f47bd7 to d03062f8d205f1923362c008c86f9bcdd35f931c
-  - a1b09a2 2026-04-29T11:19:24-04:00 Bump library-go
-
-- machine-config-operator embedded-component abe61bbbcbffb8d86ffb783d12eac18c172f30b0 to 487334b7ed9bdd7c55e9eeb3a90027e5e1f927a2
-  - 6d0941eb 2026-05-04T14:40:51Z Fix OCL test to handle temporarily empty current-machine-os-build annotation
-  - 5dd2ef5c 2026-04-30T19:24:08Z OCPBUGS-84332: Fix ssh and password rollbacks
-  - bd713eb5 2026-04-29T09:53:06Z OCPBUGS-83859: Fix encapsulated IGN version
-  - 0c488d18 2026-04-27T09:22:41Z OCPBUGS-84218: Fix units rollback if update failure
+- service-ca-operator image-arm64 7b3033bba87d7b40684b66f8f44a3525433d1ac7 to 9fff46a576033685f66fbb1121eb0a2f134a29be
+  - a3e8484 2026-05-04T14:13:16Z test: network policy tests
 
