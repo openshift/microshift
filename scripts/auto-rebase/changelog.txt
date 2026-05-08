@@ -1,6 +1,0 @@
-- kubernetes image-arm64 da4553e9f23c91c792094a1ddbba933784becce4 to 80f28ac33ac111532fb8ba59b2e569085ee871b0
-  - d9dec3899 2026-04-28T17:11:27Z UPSTREAM: 138244: devicemanager: constrain topology hints to device NUMA nodes
-
-- service-ca-operator image-arm64 7b3033bba87d7b40684b66f8f44a3525433d1ac7 to 9fff46a576033685f66fbb1121eb0a2f134a29be
-  - a3e8484 2026-05-04T14:13:16Z test: network policy tests
-
