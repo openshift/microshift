@@ -685,6 +685,49 @@ func TestC2CC_ProbeIntervalValidation(t *testing.T) {
 	})
 }
 
+func TestC2CC_ProbeIP(t *testing.T) {
+	stubHostIPs(t, nil)
+
+	t.Run("IPv4 service network", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		require.Len(t, cfg.C2CC.Resolved, 1)
+		assert.Equal(t, "10.46.0.11", cfg.C2CC.Resolved[0].ProbeIP)
+	})
+
+	t.Run("IPv6 service network", func(t *testing.T) {
+		cfg := mkIPv6OnlyC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "fd00::2",
+				ClusterNetwork: []string{"fd03::/48"},
+				ServiceNetwork: []string{"fd04::/112"},
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		require.Len(t, cfg.C2CC.Resolved, 1)
+		assert.Equal(t, "fd04::b", cfg.C2CC.Resolved[0].ProbeIP)
+	})
+
+	t.Run("dual-stack uses first service network", func(t *testing.T) {
+		cfg := mkDualStackC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
+				ServiceNetwork: []string{"10.46.0.0/16", "fd04::/112"},
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		require.Len(t, cfg.C2CC.Resolved, 1)
+		assert.Equal(t, "10.46.0.11", cfg.C2CC.Resolved[0].ProbeIP)
+	})
+}
+
 func TestC2CC_DNSIP(t *testing.T) {
 	stubHostIPs(t, nil)
 
