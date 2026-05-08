@@ -4,6 +4,7 @@ import (
 	"net"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -69,6 +70,9 @@ func withDNSDefaults(c2cc C2CC) C2CC {
 }
 
 func mkC2CCConfig(c2cc C2CC) *Config {
+	if c2cc.ProbeInterval == "" {
+		c2cc.ProbeInterval = "10s"
+	}
 	return &Config{
 		Network: Network{
 			CNIPlugin:      CniPluginOVNK,
@@ -83,6 +87,9 @@ func mkC2CCConfig(c2cc C2CC) *Config {
 }
 
 func mkDualStackC2CCConfig(c2cc C2CC) *Config {
+	if c2cc.ProbeInterval == "" {
+		c2cc.ProbeInterval = "10s"
+	}
 	return &Config{
 		Network: Network{
 			CNIPlugin:      CniPluginOVNK,
@@ -98,6 +105,9 @@ func mkDualStackC2CCConfig(c2cc C2CC) *Config {
 }
 
 func mkIPv6OnlyC2CCConfig(c2cc C2CC) *Config {
+	if c2cc.ProbeInterval == "" {
+		c2cc.ProbeInterval = "10s"
+	}
 	return &Config{
 		Network: Network{
 			CNIPlugin:      CniPluginOVNK,
@@ -592,6 +602,89 @@ func TestC2CC_ValidateDualStack(t *testing.T) {
 	})
 }
 
+func TestC2CC_ProbeIntervalValidation(t *testing.T) {
+	stubHostIPs(t, nil)
+
+	t.Run("too low", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			ProbeInterval: "500ms",
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+			}},
+		})
+		err := cfg.C2CC.validate(cfg)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "probeInterval must be between 1s and 5m")
+	})
+
+	t.Run("too high", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			ProbeInterval: "6m",
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+			}},
+		})
+		err := cfg.C2CC.validate(cfg)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "probeInterval must be between 1s and 5m")
+	})
+
+	t.Run("invalid duration string", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			ProbeInterval: "not-a-duration",
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+			}},
+		})
+		err := cfg.C2CC.validate(cfg)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "not a valid duration")
+	})
+
+	t.Run("minimum boundary", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			ProbeInterval: "1s",
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+			}},
+		})
+		assert.NoError(t, cfg.C2CC.validate(cfg))
+	})
+
+	t.Run("maximum boundary", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			ProbeInterval: "5m",
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+			}},
+		})
+		assert.NoError(t, cfg.C2CC.validate(cfg))
+	})
+
+	t.Run("valid mid-range value", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			ProbeInterval: "30s",
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        "10.100.0.2",
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		assert.Equal(t, 30*time.Second, cfg.C2CC.ResolvedProbeInterval)
+	})
+}
+
 func TestC2CC_DNSIP(t *testing.T) {
 	stubHostIPs(t, nil)
 
@@ -720,5 +813,44 @@ func TestRenderC2CCDNSBlocks(t *testing.T) {
 		result := RenderC2CCDNSBlocks(resolved, 10, 10)
 		assert.Contains(t, result, "cluster-b.remote:5353")
 		assert.NotContains(t, result, "cluster-c")
+	})
+}
+
+func TestC2CC_ProbeIntervalDefault(t *testing.T) {
+	cfg := &Config{}
+	require.NoError(t, cfg.fillDefaults())
+	assert.Equal(t, "10s", cfg.C2CC.ProbeInterval)
+}
+
+func TestC2CC_IncorporateUserSettings(t *testing.T) {
+	t.Run("user overrides probe interval", func(t *testing.T) {
+		cfg := &Config{}
+		require.NoError(t, cfg.fillDefaults())
+
+		user := &Config{
+			C2CC: C2CC{
+				ProbeInterval: "30s",
+			},
+		}
+		cfg.incorporateUserSettings(user)
+		assert.Equal(t, "30s", cfg.C2CC.ProbeInterval)
+	})
+
+	t.Run("user sets remoteClusters without probeInterval preserves default", func(t *testing.T) {
+		cfg := &Config{}
+		require.NoError(t, cfg.fillDefaults())
+
+		user := &Config{
+			C2CC: C2CC{
+				RemoteClusters: []RemoteCluster{{
+					NextHop:        "10.100.0.2",
+					ClusterNetwork: []string{"10.45.0.0/16"},
+					ServiceNetwork: []string{"10.46.0.0/16"},
+				}},
+			},
+		}
+		cfg.incorporateUserSettings(user)
+		assert.Equal(t, "10s", cfg.C2CC.ProbeInterval)
+		assert.Len(t, cfg.C2CC.RemoteClusters, 1)
 	})
 }

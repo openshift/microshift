@@ -50,6 +50,9 @@ clusterToCluster:
         # Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks
         # generated for remote clusters. Must be >= 0. Setting to 0 disables positive caching.
         cacheTTL: 10
+    # Interval between healthcheck probe attempts to each remote cluster.
+    # Parsed as a Go duration string (e.g. "10s", "1m"). Must be between 1s and 5m.
+    probeInterval: 10s
     # List of remote clusters to establish connectivity with.
     # C2CC is disabled when this list is empty.
     remoteClusters:

@@ -205,7 +205,8 @@
         },
         "probeInterval": {
           "description": "Interval between healthcheck probe attempts to each remote cluster.\nParsed as a Go duration string (e.g. \"10s\", \"1m\"). Must be between 1s and 5m.",
-          "type": "string"
+          "type": "string",
+          "default": "10s"
         },
         "remoteClusters": {
           "description": "List of remote clusters to establish connectivity with.\nC2CC is disabled when this list is empty.",
