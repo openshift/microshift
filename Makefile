@@ -346,6 +346,11 @@ generate-config:
 verify-config: generate-config
 	./scripts/verify/verify-config.sh
 
+.PHONY: generate-crds
+generate-crds:
+	./scripts/fetch_tools.sh controller-gen && \
+	./scripts/generate-crds.sh
+
 # Run all of the end to end tests
 .PHONY: e2e
 e2e:
