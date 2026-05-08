@@ -1,57 +1,72 @@
-- api embedded-component a49973eaef537f281362e1ffa3abeacf7ed85c62 to 28b45b8020c71ad7c056b3ad1d569eff94d6b878
-  - e9c797fc 2026-05-01T11:53:18-04:00 Clarify cluster operator Progressing condition
-  - 3dd2dc4b 2026-04-29T11:06:20+02:00 MON-4561: API: Add softirqs node-exporter collector to ClusterMonitoring CRD
+- api embedded-component 28b45b8020c71ad7c056b3ad1d569eff94d6b878 to ecec2e859bad0c9288c2fef3dded294c44c12c61
+  - ebfb8f08 2026-04-28T12:16:15+05:30 Revert "OCPBUGS-83492: Allow :ref suffix in additionalLayerStores path for stargz-store to support lazy image pulling"
+  - 51fe56c7 2026-04-08T20:43:45+02:00 Promote EVPN Feature Gate
 
-- cluster-ingress-operator embedded-component 98ff1a6fedd18fbf2ed6fec9796104d7b4bc952c to df64b34df475cd58b0342dd617c29a9180ea9e5e
-  - a846988 2026-04-10T00:51:18-04:00 waitForDeploymentEnvVar: Remove client parameter
-  - 9d2f210 2026-04-10T00:51:18-04:00 TestUnsupportedConfigOverride: Ignore featuregate
-  - 579b4de 2026-04-10T00:26:09-04:00 Add waitForDeploymentFunc test helper func
-  - 49371cb 2026-03-30T16:43:15-04:00 waitForDeploymentEnvVar: Fix godoc
+- cluster-ingress-operator embedded-component df64b34df475cd58b0342dd617c29a9180ea9e5e to 1a9e496df580ea7c3a0da6018a6713be4e187c85
+  - b99436e 2026-05-04T13:37:37-04:00 Allow host network connections to the ingress canary
 
-- cluster-network-operator embedded-component 23f002049008db9e852694ff2baaa68cd5b84525 to b1101d16e850319c488a47cb5c756402075900b8
-  - 7795779 2026-05-04T19:10:11+05:30 frr-k8s: enable BGP daemon to listen on standard port 179
-  - a09d0c1 2026-05-04T19:10:11+05:30 ovn-k: grant routeadvertisements CRUD to control-plane SA in managed routing mode
+- cluster-kube-apiserver-operator embedded-component 9b45cbafcea23be9c63e01947506495d030666d0 to 29c414767d458310f3bee40308cde49ffad73507
+  - ca5e71a 2026-04-28T11:50:35-04:00 vendor: bump library-go
+  - beb322c 2026-04-28T11:48:53-04:00 Use SkipInClusterAuthenticationLookup in check-endpoints
 
-- kubernetes embedded-component 2447118a5cf501f71c2da4b2f4ff14f3492aec10 to 5f099ccd1e8345f615d10381290909a8ca581b66
-  - 739e2eb2c 2026-04-30T16:11:47+01:00 UPSTREAM: <drop>: bump openshift/api dependency
-  - 568c860e4 2026-04-30T16:11:36+01:00 UPSTREAM: <carry>: authentication: enforce claims.email_verified usage when claims.email is used in username expression
-  - 4bfac2def 2026-04-30T16:11:21+01:00 UPSTREAM: <carry>: Export email validation functions
+- cluster-network-operator embedded-component b1101d16e850319c488a47cb5c756402075900b8 to cb1b119339370308f6ef69e0479a6b46f2f955aa
+  - f4734c5 2026-04-16T19:08:18-04:00 OCPBUGS-78731: Move enable-multicast from config maps to CLI flags
+  - 35ff348 2026-04-16T19:08:13-04:00 NVIDIA-554: DPU-host mode: use ConfigMap for OVN feature enablement instead of per-node script gating
+  - 411921c 2026-04-15T15:19:23-04:00 Remove dead OVN_MULTI_NETWORK_ENABLE template variable
 
-- machine-config-operator embedded-component 7eef4fdc72274bbf6845b1ea15d8af4723e42962 to 9d3ee9d972ed9373db03a498ca6ab831093d2420
-  - 9c7c37f6 2026-04-29T23:26:51+08:00 AGENT-1443: Include platform VIPs in IRI cert SANs to match installer
-  - 95c47d22 2026-04-27T19:17:17+08:00 AGENT-1443: Add e2e test for IRI cert regeneration on MCS CA rotation
-  - da3b4783 2026-04-27T17:55:05+08:00 AGENT-1443: Add SAN validation to IRI cert rotation and wire mcfgClient
-  - 8be62adb 2026-04-27T17:55:05+08:00 AGENT-1443: Add feature gate, idempotency, and localhost SANs to IRI cert rotation
-  - 1c84abf9 2026-04-27T17:55:05+08:00 AGENT-1443: Add IRI certificate regeneration to MCS cert rotation controller
-  - 6c48b964 2026-04-24T12:19:32-04:00 crio: enable default_runtime metric
-  - 138f7a5e 2026-04-24T12:19:32-04:00 prom rules: add alert for nodes using runc
-  - 3d1f08bc 2026-04-22T13:20:08+05:30 Migrate MCO daemon test suite from openshift-tests-private
-
-- operator-framework-olm embedded-component 4201d40dfc99de60e8791d02b89bc7aebeaae930 to 2fcbb3e4a8a1445c2b557d3485ac3f63ba5127a1
-
-
-- service-ca-operator embedded-component 2aa88ace39a1abe7647bc5b03e6a599985b31605 to e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b
-  - 73dd9f6 2026-04-27T14:48:36+05:30 test: network policy tests
-
-- router image-amd64 896390778ebe15f57f87e6ca78f11c96e64c2652 to dfaf1cb3116cd7e0a5ab2e23f4d371f3777f7853
-  - c223ef7 2026-05-04T11:25:19-03:00 fix handling of host conflict
-
-- kubernetes image-amd64 2447118a5cf501f71c2da4b2f4ff14f3492aec10 to 5f099ccd1e8345f615d10381290909a8ca581b66
-  - 739e2eb2c 2026-04-30T16:11:47+01:00 UPSTREAM: <drop>: bump openshift/api dependency
-  - 568c860e4 2026-04-30T16:11:36+01:00 UPSTREAM: <carry>: authentication: enforce claims.email_verified usage when claims.email is used in username expression
-  - 4bfac2def 2026-04-30T16:11:21+01:00 UPSTREAM: <carry>: Export email validation functions
-
-- service-ca-operator image-amd64 2aa88ace39a1abe7647bc5b03e6a599985b31605 to e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b
-  - 73dd9f6 2026-04-27T14:48:36+05:30 test: network policy tests
-
-- oc image-arm64 16d140aeefdc2b07f549945801c9cefab703ca68 to 6ac066994b962cb01886dab515d821720324ed52
-  - d1931c31 2026-04-22T17:32:51+01:00 OCPBUGS-62799: Add required-scc annotation to node-joiner pod to prevent third-party SCC interference
-
-- csi-external-snapshotter image-arm64 d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to 3219da7dcbb14fa762704746d21fb38131beb1f4
+- csi-external-snapshotter embedded-component d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to 3219da7dcbb14fa762704746d21fb38131beb1f4
   - 72eb399 2026-04-21T11:21:53+02:00 UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
 
-- router image-arm64 dfaf1cb3116cd7e0a5ab2e23f4d371f3777f7853 to 65271d2c19cb35fb5e802ee72fc4de502c5e16b6
+- machine-config-operator embedded-component 9d3ee9d972ed9373db03a498ca6ab831093d2420 to 66df1c1a7e660d698f5e1685c171769f96915e42
+  - c48e9be4 2026-05-06T11:37:52-04:00 daemon: skip bootupd when shim is safe
+  - 5e350d32 2026-05-06T10:24:44-04:00 Fix e2e-ocl-1of2 flake where MOSB is deleted by stale controller event
+  - ba342bf9 2026-05-06T10:24:26-04:00 Fix e2e-ocl-2of2 timeout flake for TestStaleAnnotationClearedOnLayerOnlyChange
+  - a5bc08d4 2026-05-05T10:18:48+02:00 OCPBUGS-84661: Fix wrong early exit during kubelet MCs regeneration
+  - 31427064 2026-05-04T14:16:26-04:00 controller: add terminationMessagePolicy to build pod containers
+  - d54b9b4b 2026-05-04T11:27:52-04:00 daemon: use --delete-if-present for karg removal
+
+- operator-framework-olm embedded-component 2fcbb3e4a8a1445c2b557d3485ac3f63ba5127a1 to d75c36f6b28fffa0da1ae2bb0fa9b7d1c0e546e8
+  - 5a9d6c44 2026-05-06T09:42:25+02:00 Fix lifecycle-server readiness probe to allow empty index
+
+- oc image-amd64 16d140aeefdc2b07f549945801c9cefab703ca68 to 6ac066994b962cb01886dab515d821720324ed52
+  - d1931c31 2026-04-22T17:32:51+01:00 OCPBUGS-62799: Add required-scc annotation to node-joiner pod to prevent third-party SCC interference
+
+- csi-external-snapshotter image-amd64 d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to 3219da7dcbb14fa762704746d21fb38131beb1f4
+  - 72eb399 2026-04-21T11:21:53+02:00 UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
+
+- router image-amd64 dfaf1cb3116cd7e0a5ab2e23f4d371f3777f7853 to 65271d2c19cb35fb5e802ee72fc4de502c5e16b6
   - dc7e786 2026-04-23T15:52:51-03:00 move from option forwarded to manual header update
   - 313daa6 2026-04-23T11:09:02-03:00 fix forwarded header for IPv6 on IPv4 stack
   - 0500b49 2026-04-14T17:06:57-03:00 create self-signed crt if failing to read default
+
+- router image-arm64 65271d2c19cb35fb5e802ee72fc4de502c5e16b6 to b75bab261392d5eacb115db408f121618a23e41d
+  - 6c4ca66 2025-09-22T15:38:07-04:00 Reapply "OCPBUGS-55506: Prevent startup failures due to name resolution"
+
+- ovn-kubernetes image-arm64 952886fd8af2ca3ecf1717a2cb69311a32f25c06 to 22e9487ee7060a85cfe20886b73e11fce3249e36
+  - 34cfe4e5 2026-04-30T10:09:06Z sync test annotations with upstream changes
+  - 0abdfe64 2026-04-30T10:06:55Z sync openshift/go.mod with upstream dependencies
+  - 3e586049 2026-04-29T11:24:31+02:00 Address set: add existing IPs check on setAddresses.
+  - ad46e42d 2026-04-28T08:54:17Z test: fix layer2 UDN controller test flake in kubevirt live-migration
+  - b66b0927 2026-04-28T10:05:39+02:00 fix UDN unit test to use new node controller constructor
+  - a0e535ac 2026-04-27T17:12:58Z EVPN: add allowas-in origin for BGP neighbors
+  - 4b7ffe0f 2026-04-27T16:49:36Z Bump the go_modules group across 3 directories with 2 updates
+  - 53822e35 2026-04-27T12:12:24-04:00 Fake NM: make it per network activity
+  - 5b9cf808 2026-04-27T12:12:24-04:00 cluster manager: integrate status manager with d-udn
+  - 726bdd19 2026-04-27T12:12:24-04:00 e2e egress fw: fixes for Dynamic UDN
+  - 267f18d2 2026-04-27T12:12:24-04:00 networkmanager: skip dynamic UDN for bare NADs
+  - 9c6e65bc 2026-04-27T12:12:24-04:00 cluster manager: fixes race with NAD deletion
+  - 9f7ece70 2026-04-27T12:12:24-04:00 Update e2e for Dynamic Subnet Allocation
+  - c1e81f8e 2026-04-27T12:12:24-04:00 Adds dynamic allocation for cluster manager
+  - 6760a289 2026-04-24T14:03:49-07:00 cleanup stale L2 primary UDN tunnel ID annotations on restart
+  - e1d509a8 2026-04-24T17:54:42+02:00 UT: get rid of the fake address set factory
+  - 7d049570 2026-04-24T17:54:38+02:00 Replace selectedNamespace = nil with more obvious struct.
+  - 960efda8 2026-04-24T17:18:18+02:00 Move hostNamespace handling to the addressset_manager.go
+  - f90bfac4 2026-04-24T11:07:08-04:00 Bump frr to 10.6.0 to pick up more coredump fixes
+  - caac89aa 2026-04-24T11:07:08-04:00 Bump metallb frr to 10.5.3
+  - d58942dd 2026-04-24T16:03:30+02:00 UT: stop setting HostNetworkNamespace across unrelated UTs
+  - 5b649e92 2026-04-24T16:03:30+02:00 addresssetManager: fix resetting address sets on restart.
+  - cc84bac9 2026-04-24T16:03:30+02:00 AddresssetManager: add legacy netpol mode.
+  - e4b71f53 2026-04-21T14:51:08-04:00 e2e: preload netshoot image for no_overlay suite
+  - 1b2426bf 2026-04-21T14:51:08-04:00 e2e: preload netshoot image for kubevirt tests instead of iperf
+  - fe163a70 2026-03-12T11:48:25+01:00 Fix invalid characters in e2e artifact directory paths
 
