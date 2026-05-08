@@ -15,7 +15,7 @@ Test Tags           c2cc
 
 
 *** Variables ***
-${NAMESPACE}    c2cc-test
+&{NAMESPACES}       cluster-a=${EMPTY}    cluster-b=${EMPTY}
 
 
 *** Test Cases ***
@@ -93,50 +93,52 @@ Deploy Test Workloads
     [Documentation]    Create namespace and deploy hello-microshift + curl-pod on both clusters.
     VAR    ${assets}=    ${EXECDIR}/assets/c2cc
     FOR    ${alias}    IN    cluster-a    cluster-b
-        Oc On Cluster    ${alias}    oc create namespace ${NAMESPACE}
-        Oc On Cluster    ${alias}    oc apply -n ${NAMESPACE} -f ${assets}/hello-microshift.yaml
-        Oc On Cluster    ${alias}    oc apply -n ${NAMESPACE} -f ${assets}/curl-pod.yaml
+        ${ns}=    Create Unique Namespace On Cluster    ${alias}
+        Set To Dictionary    ${NAMESPACES}    ${alias}    ${ns}
+        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/hello-microshift.yaml
+        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/curl-pod.yaml
     END
     Wait For Test Pods
 
 Wait For Test Pods
     [Documentation]    Wait for all test pods to be Ready on both clusters.
     FOR    ${alias}    IN    cluster-a    cluster-b
-        Oc On Cluster    ${alias}
-        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACE} --for=condition=Ready --timeout=120s
+        Oc On Cluster
+        ...    ${alias}
+        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACES}[${alias}] --for=condition=Ready --timeout=120s
     END
 
 Cleanup Test Workloads
     [Documentation]    Delete test namespace on both clusters. Ignores errors.
     FOR    ${alias}    IN    cluster-a    cluster-b
         Run Keyword And Ignore Error
-        ...    Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACE} --timeout=60s
+        ...    Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACES}[${alias}] --timeout=60s
     END
 
 Get Hello Pod IP
     [Documentation]    Get the pod IP of hello-microshift on the given cluster.
     [Arguments]    ${alias}
     ${ip}=    Oc On Cluster    ${alias}
-    ...    oc get pod hello-microshift -n ${NAMESPACE} -o jsonpath='{.status.podIP}'
+    ...    oc get pod hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIP}'
     RETURN    ${ip}
 
 Get Hello Service IP
     [Documentation]    Get the ClusterIP of the hello-microshift service on the given cluster.
     [Arguments]    ${alias}
     ${ip}=    Oc On Cluster    ${alias}
-    ...    oc get svc hello-microshift -n ${NAMESPACE} -o jsonpath='{.spec.clusterIP}'
+    ...    oc get svc hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.spec.clusterIP}'
     RETURN    ${ip}
 
 Get Curl Pod IP
     [Documentation]    Get the pod IP of curl-pod on the given cluster.
     [Arguments]    ${alias}
     ${ip}=    Oc On Cluster    ${alias}
-    ...    oc get pod curl-pod -n ${NAMESPACE} -o jsonpath='{.status.podIP}'
+    ...    oc get pod curl-pod -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIP}'
     RETURN    ${ip}
 
 Curl From Cluster
     [Documentation]    Exec curl from curl-pod on the given cluster to the target IP and port.
     [Arguments]    ${alias}    ${ip}    ${port}
     ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACE} -- curl -sS --max-time 10 http://${ip}:${port}/cgi-bin/hello
+    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 http://${ip}:${port}/cgi-bin/hello
     RETURN    ${stdout}

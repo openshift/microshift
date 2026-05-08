@@ -223,6 +223,16 @@ Remove Foreign Subnet From SNAT Annotation
     [Arguments]    ${alias}
     Corrupt Node SNAT Annotation On Cluster    ${alias}
 
+Create Unique Namespace On Cluster
+    [Documentation]    Creates a namespace with a unique suffix on the given cluster.
+    ...    Returns the namespace name.
+    [Arguments]    ${alias}
+    ${rand}=    Generate Random String
+    ${rand}=    Convert To Lower Case    ${rand}
+    ${ns}=    Catenate    SEPARATOR=-    test    ${rand}
+    Oc On Cluster    ${alias}    oc create namespace ${ns}
+    RETURN    ${ns}
+
 Verify Corefile Contains C2CC Server Block
     [Documentation]    Check that the CoreDNS Corefile configmap contains a server block for the given domain.
     [Arguments]    ${alias}    ${domain}

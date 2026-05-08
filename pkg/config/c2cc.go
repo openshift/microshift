@@ -265,13 +265,14 @@ func validateRemoteCluster(
 		} else {
 			seenRemoteDomains[rc.Domain] = i
 		}
-		if len(rc.ServiceNetwork) > 0 {
-			dnsIP, err := getClusterDNS(rc.ServiceNetwork[0])
-			if err != nil {
-				errs = append(errs, fmt.Errorf("%s: failed to compute DNS IP from serviceNetwork[0] %q: %w", label, rc.ServiceNetwork[0], err))
-			} else {
-				res.DNSIP = dnsIP
-			}
+	}
+
+	if rc.Domain != "" && len(rc.ServiceNetwork) > 0 {
+		dnsIP, err := getClusterDNS(rc.ServiceNetwork[0])
+		if err != nil {
+			errs = append(errs, fmt.Errorf("%s: failed to compute DNS IP from serviceNetwork[0] %q: %w", label, rc.ServiceNetwork[0], err))
+		} else {
+			res.DNSIP = dnsIP
 		}
 	}
 

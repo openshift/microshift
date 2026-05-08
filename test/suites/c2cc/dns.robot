@@ -16,7 +16,7 @@ Test Tags           c2cc
 
 
 *** Variables ***
-${NAMESPACE}    c2cc-dns-test
+&{NAMESPACES}       cluster-a=${EMPTY}    cluster-b=${EMPTY}
 
 
 *** Test Cases ***
@@ -31,23 +31,23 @@ Corefile Contains C2CC Server Block On Cluster B
 Resolve Remote Service DNS From Cluster A
     [Documentation]    Verify pod on Cluster A can resolve a service on Cluster B via DNS.
     DNS Resolve From Cluster    cluster-a
-    ...    hello-microshift.${NAMESPACE}.svc.${CLUSTER_B_DOMAIN}
+    ...    hello-microshift.${NAMESPACES}[cluster-b].svc.${CLUSTER_B_DOMAIN}
 
 Resolve Remote Service DNS From Cluster B
     [Documentation]    Verify pod on Cluster B can resolve a service on Cluster A via DNS.
     DNS Resolve From Cluster    cluster-b
-    ...    hello-microshift.${NAMESPACE}.svc.${CLUSTER_A_DOMAIN}
+    ...    hello-microshift.${NAMESPACES}[cluster-a].svc.${CLUSTER_A_DOMAIN}
 
 Curl Remote Service Via DNS From Cluster A
     [Documentation]    Verify pod on Cluster A can reach a service on Cluster B using the remote DNS name.
     ${stdout}=    Curl DNS From Cluster    cluster-a
-    ...    hello-microshift.${NAMESPACE}.svc.${CLUSTER_B_DOMAIN}    8080
+    ...    hello-microshift.${NAMESPACES}[cluster-b].svc.${CLUSTER_B_DOMAIN}    8080
     Should Contain    ${stdout}    Hello from
 
 Curl Remote Service Via DNS From Cluster B
     [Documentation]    Verify pod on Cluster B can reach a service on Cluster A using the remote DNS name.
     ${stdout}=    Curl DNS From Cluster    cluster-b
-    ...    hello-microshift.${NAMESPACE}.svc.${CLUSTER_A_DOMAIN}    8080
+    ...    hello-microshift.${NAMESPACES}[cluster-a].svc.${CLUSTER_A_DOMAIN}    8080
     Should Contain    ${stdout}    Hello from
 
 
@@ -72,24 +72,26 @@ Deploy DNS Test Workloads
     [Documentation]    Create namespace and deploy hello-microshift + curl-pod on both clusters.
     VAR    ${assets}=    ${EXECDIR}/assets/c2cc
     FOR    ${alias}    IN    cluster-a    cluster-b
-        Oc On Cluster    ${alias}    oc create namespace ${NAMESPACE}
-        Oc On Cluster    ${alias}    oc apply -n ${NAMESPACE} -f ${assets}/hello-microshift.yaml
-        Oc On Cluster    ${alias}    oc apply -n ${NAMESPACE} -f ${assets}/curl-pod.yaml
+        ${ns}=    Create Unique Namespace On Cluster    ${alias}
+        Set To Dictionary    ${NAMESPACES}    ${alias}    ${ns}
+        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/hello-microshift.yaml
+        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/curl-pod.yaml
     END
     Wait For DNS Test Pods
 
 Wait For DNS Test Pods
     [Documentation]    Wait for all test pods to be Ready on both clusters.
     FOR    ${alias}    IN    cluster-a    cluster-b
-        Oc On Cluster    ${alias}
-        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACE} --for=condition=Ready --timeout=120s
+        Oc On Cluster
+        ...    ${alias}
+        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACES}[${alias}] --for=condition=Ready --timeout=120s
     END
 
 Cleanup DNS Test Workloads
     [Documentation]    Delete test namespace on both clusters. Ignores errors.
     FOR    ${alias}    IN    cluster-a    cluster-b
         Run Keyword And Ignore Error
-        ...    Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACE} --timeout=60s
+        ...    Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACES}[${alias}] --timeout=60s
     END
 
 DNS Resolve From Cluster
@@ -102,7 +104,7 @@ DNS Lookup Should Succeed
     [Documentation]    Resolve a DNS name from curl-pod using getent hosts.
     [Arguments]    ${alias}    ${fqdn}
     ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACE} -- getent hosts ${fqdn}
+    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- getent hosts ${fqdn}
     Should Not Be Empty    ${stdout}
 
 Curl DNS From Cluster
@@ -116,6 +118,6 @@ Curl DNS Should Succeed
     [Documentation]    Single attempt to curl a DNS name from curl-pod.
     [Arguments]    ${alias}    ${fqdn}    ${port}
     ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACE} -- curl -sS --max-time 10 http://${fqdn}:${port}/cgi-bin/hello
+    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 http://${fqdn}:${port}/cgi-bin/hello
     Should Contain    ${stdout}    Hello from
     RETURN    ${stdout}
