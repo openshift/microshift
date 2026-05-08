@@ -75,7 +75,7 @@ Home Directory Config File Is Ignored
     Should Be Equal As Integers    180    ${config.etcd.memoryLimitMB}
 
     [Teardown]    Run Keywords
-    ...    Command Should Work    rm -f ${HOME_CONFIG_DIR}/config.yaml
+    ...    Command Should Work    rm -rf ${HOME_CONFIG_DIR}
     ...    AND
     ...    Remove Drop In MicroShift Config    10-memlimit
 

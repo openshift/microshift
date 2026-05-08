@@ -1,0 +1,7 @@
+apiVersion: ms.qe.com/v1
+kind: CronTab
+metadata:
+  name: test-crontab
+spec:
+  cronSpec: "* * * * */5"
+  image: test-image

@@ -1,0 +1,24 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: scc-test-pod-1
+  labels:
+    app: scc-test
+spec:
+  terminationGracePeriodSeconds: 0
+  securityContext:
+    runAsUser: 1000
+    fsGroup: 3000
+    supplementalGroups:
+      - 2000
+  containers:
+  - name: test
+    image: quay.io/microshift/busybox:1.36
+    command: ["/bin/sh", "-c", "sleep infinity"]
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      seccompProfile:
+        type: RuntimeDefault

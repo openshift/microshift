@@ -67,7 +67,8 @@ Invalid Audit Profile Prevents Startup
 
     [Teardown]    Run Keywords
     ...    Remove Drop In MicroShift Config    10-audit
-    ...    AND    Restart MicroShift
+    ...    AND
+    ...    Restart MicroShift
 
 Invalid Audit Rotation Values Prevent Startup
     [Documentation]    Non-integer rotation parameters should prevent MicroShift from starting.
@@ -77,7 +78,8 @@ Invalid Audit Rotation Values Prevent Startup
 
     [Teardown]    Run Keywords
     ...    Remove Drop In MicroShift Config    10-audit
-    ...    AND    Restart MicroShift
+    ...    AND
+    ...    Restart MicroShift
 
 Audit Profile None Produces No Logs
     [Documentation]    With profile None, no audit entries should be written.
@@ -92,8 +94,10 @@ Audit Profile None Produces No Logs
 
     [Teardown]    Run Keywords
     ...    Oc Delete    configmap ${cm_name} -n ${TEST_NS} --ignore-not-found
-    ...    AND    Remove Drop In MicroShift Config    10-audit
-    ...    AND    Restart MicroShift
+    ...    AND
+    ...    Remove Drop In MicroShift Config    10-audit
+    ...    AND
+    ...    Restart MicroShift
 
 Audit Profile Default Logs Metadata Only
     [Documentation]    Default profile should log metadata but not request/response bodies.
@@ -112,8 +116,10 @@ Audit Profile Default Logs Metadata Only
 
     [Teardown]    Run Keywords
     ...    Oc Delete    configmap ${cm_name} -n ${TEST_NS} --ignore-not-found
-    ...    AND    Remove Drop In MicroShift Config    10-audit
-    ...    AND    Restart MicroShift
+    ...    AND
+    ...    Remove Drop In MicroShift Config    10-audit
+    ...    AND
+    ...    Restart MicroShift
 
 Audit Profile WriteRequestBodies Logs Write Operations
     [Documentation]    WriteRequestBodies should log request bodies for write operations
@@ -133,8 +139,10 @@ Audit Profile WriteRequestBodies Logs Write Operations
 
     [Teardown]    Run Keywords
     ...    Oc Delete    configmap ${cm_name} -n ${TEST_NS} --ignore-not-found
-    ...    AND    Remove Drop In MicroShift Config    10-audit
-    ...    AND    Restart MicroShift
+    ...    AND
+    ...    Remove Drop In MicroShift Config    10-audit
+    ...    AND
+    ...    Restart MicroShift
 
 Audit Profile AllRequestBodies Logs All Operations
     [Documentation]    AllRequestBodies should log request bodies for all operations.
@@ -153,8 +161,17 @@ Audit Profile AllRequestBodies Logs All Operations
 
     [Teardown]    Run Keywords
     ...    Oc Delete    configmap ${cm_name} -n ${TEST_NS} --ignore-not-found
-    ...    AND    Remove Drop In MicroShift Config    10-audit
-    ...    AND    Restart MicroShift
+    ...    AND
+    ...    Remove Drop In MicroShift Config    10-audit
+    ...    AND
+    ...    Restart MicroShift
+
+Audit Log File Exists With Correct Permissions
+    [Documentation]    Verify the audit log file exists at the expected path with correct
+    ...    file permissions and root:root ownership.
+    ${output}=    Command Should Work    ls -l ${AUDIT_LOG}
+    Should Match Regexp    ${output}    ^-rw
+    Should Match Regexp    ${output}    root\\s+root
 
 Audit Log Rotation Respects Max File Size And Count
     [Documentation]    With maxFileSize=2 (MB) and maxFiles=2, audit log rotation should
@@ -167,7 +184,8 @@ Audit Log Rotation Respects Max File Size And Count
 
     [Teardown]    Run Keywords
     ...    Remove Drop In MicroShift Config    10-audit
-    ...    AND    Restart MicroShift
+    ...    AND
+    ...    Restart MicroShift
 
 
 *** Keywords ***
