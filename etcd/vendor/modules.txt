@@ -162,7 +162,7 @@ github.com/mailru/easyjson/jwriter
 # github.com/mitchellh/go-wordwrap v1.0.1
 ## explicit; go 1.14
 github.com/mitchellh/go-wordwrap
-# github.com/moby/spdystream v0.5.0
+# github.com/moby/spdystream v0.5.1
 ## explicit; go 1.13
 github.com/moby/spdystream
 github.com/moby/spdystream/spdy
@@ -384,7 +384,7 @@ go.opentelemetry.io/auto/sdk/internal/telemetry
 ## explicit; go 1.22.7
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc/internal
-# go.opentelemetry.io/otel v1.39.0
+# go.opentelemetry.io/otel v1.41.0
 ## explicit; go 1.24.0
 go.opentelemetry.io/otel
 go.opentelemetry.io/otel/attribute
@@ -393,12 +393,14 @@ go.opentelemetry.io/otel/attribute/internal/xxhash
 go.opentelemetry.io/otel/baggage
 go.opentelemetry.io/otel/codes
 go.opentelemetry.io/otel/internal/baggage
+go.opentelemetry.io/otel/internal/errorhandler
 go.opentelemetry.io/otel/internal/global
 go.opentelemetry.io/otel/propagation
 go.opentelemetry.io/otel/semconv/internal
 go.opentelemetry.io/otel/semconv/v1.17.0
 go.opentelemetry.io/otel/semconv/v1.37.0
 go.opentelemetry.io/otel/semconv/v1.37.0/otelconv
+go.opentelemetry.io/otel/semconv/v1.39.0
 go.opentelemetry.io/otel/semconv/v1.4.0
 # go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.34.0
 ## explicit; go 1.22.0
@@ -411,7 +413,7 @@ go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/envconfig
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/otlpconfig
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/retry
-# go.opentelemetry.io/otel/metric v1.39.0
+# go.opentelemetry.io/otel/metric v1.41.0
 ## explicit; go 1.24.0
 go.opentelemetry.io/otel/metric
 go.opentelemetry.io/otel/metric/embedded
@@ -425,7 +427,7 @@ go.opentelemetry.io/otel/sdk/resource
 go.opentelemetry.io/otel/sdk/trace
 go.opentelemetry.io/otel/sdk/trace/internal/env
 go.opentelemetry.io/otel/sdk/trace/internal/observ
-# go.opentelemetry.io/otel/trace v1.39.0
+# go.opentelemetry.io/otel/trace v1.41.0
 ## explicit; go 1.24.0
 go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/trace/embedded
@@ -642,7 +644,7 @@ gopkg.in/natefinch/lumberjack.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# k8s.io/api v1.33.10 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/api
+# k8s.io/api v1.33.11 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/api
 ## explicit; go 1.24.0
 k8s.io/api/admission/v1
 k8s.io/api/admission/v1beta1
@@ -704,7 +706,7 @@ k8s.io/api/storage/v1
 k8s.io/api/storage/v1alpha1
 k8s.io/api/storage/v1beta1
 k8s.io/api/storagemigration/v1alpha1
-# k8s.io/apimachinery v1.33.10 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery
+# k8s.io/apimachinery v1.33.11 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery
 ## explicit; go 1.24.0
 k8s.io/apimachinery/pkg/api/equality
 k8s.io/apimachinery/pkg/api/errors
@@ -767,18 +769,18 @@ k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/json
 k8s.io/apimachinery/third_party/forked/golang/netutil
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/apiserver v1.33.10 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apiserver
+# k8s.io/apiserver v1.33.11 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apiserver
 ## explicit; go 1.24.0
 k8s.io/apiserver/pkg/apis/audit
 k8s.io/apiserver/pkg/apis/audit/v1
 k8s.io/apiserver/pkg/authentication/user
-# k8s.io/cli-runtime v1.33.10 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime
+# k8s.io/cli-runtime v1.33.11 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/cli-runtime
 ## explicit; go 1.24.0
 k8s.io/cli-runtime/pkg/genericclioptions
 k8s.io/cli-runtime/pkg/genericiooptions
 k8s.io/cli-runtime/pkg/printers
 k8s.io/cli-runtime/pkg/resource
-# k8s.io/client-go v1.33.10 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/client-go
+# k8s.io/client-go v1.33.11 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/client-go
 ## explicit; go 1.24.0
 k8s.io/client-go/applyconfigurations/admissionregistration/v1
 k8s.io/client-go/applyconfigurations/admissionregistration/v1alpha1
@@ -939,7 +941,7 @@ k8s.io/client-go/util/jsonpath
 k8s.io/client-go/util/keyutil
 k8s.io/client-go/util/watchlist
 k8s.io/client-go/util/workqueue
-# k8s.io/component-base v1.33.10 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/component-base
+# k8s.io/component-base v1.33.11 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/component-base
 ## explicit; go 1.24.0
 k8s.io/component-base/cli
 k8s.io/component-base/cli/flag
@@ -976,7 +978,7 @@ k8s.io/kube-openapi/pkg/spec3
 k8s.io/kube-openapi/pkg/util/proto
 k8s.io/kube-openapi/pkg/util/proto/validation
 k8s.io/kube-openapi/pkg/validation/spec
-# k8s.io/kubectl v1.33.10 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/kubectl
+# k8s.io/kubectl v1.33.11 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/kubectl
 ## explicit; go 1.24.0
 k8s.io/kubectl/pkg/cmd/util
 k8s.io/kubectl/pkg/scheme
@@ -986,7 +988,7 @@ k8s.io/kubectl/pkg/util/openapi
 k8s.io/kubectl/pkg/util/templates
 k8s.io/kubectl/pkg/util/term
 k8s.io/kubectl/pkg/validation
-# k8s.io/kubelet v1.33.10 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/kubelet
+# k8s.io/kubelet v1.33.11 => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/kubelet
 ## explicit; go 1.24.0
 k8s.io/kubelet/pkg/apis/deviceplugin/v1beta1
 # k8s.io/utils v0.0.0-20250604170112-4c0f3b243397
