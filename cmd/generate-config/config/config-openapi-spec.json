@@ -292,6 +292,26 @@
               "example": "Enabled"
             }
           }
+        },
+        "resources": {
+          "description": "Resources configures the CPU and memory resources for the dns container.",
+          "type": "object",
+          "properties": {
+            "limits": {
+              "description": "Limits specifies the maximum resources the dns container can use.\nValid keys are \"cpu\" and \"memory\". Values must be valid Kubernetes resource quantities.\nWhen not set, no limits are applied.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "requests": {
+              "description": "Requests specifies the minimum resources required for the dns container.\nValid keys are \"cpu\" and \"memory\". Values must be valid Kubernetes resource quantities.\nWhen not set, defaults to cpu=50m, memory=70Mi.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },

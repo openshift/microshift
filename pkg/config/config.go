@@ -444,6 +444,24 @@ func (c *Config) incorporateUserSettings(u *Config) {
 			c.DNS.Hosts.File = u.DNS.Hosts.File
 		}
 	}
+
+	// DNS resource configuration - merge key-by-key to preserve defaults
+	if u.DNS.Resources.Requests != nil {
+		if c.DNS.Resources.Requests == nil {
+			c.DNS.Resources.Requests = make(map[string]string)
+		}
+		for k, v := range u.DNS.Resources.Requests {
+			c.DNS.Resources.Requests[k] = v
+		}
+	}
+	if u.DNS.Resources.Limits != nil {
+		if c.DNS.Resources.Limits == nil {
+			c.DNS.Resources.Limits = make(map[string]string)
+		}
+		for k, v := range u.DNS.Resources.Limits {
+			c.DNS.Resources.Limits[k] = v
+		}
+	}
 	if u.ApiServer.FeatureGates.FeatureSet != "" {
 		c.ApiServer.FeatureGates.FeatureSet = u.ApiServer.FeatureGates.FeatureSet
 	}

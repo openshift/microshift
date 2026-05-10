@@ -47,6 +47,9 @@ dns:
     hosts:
         file: ""
         status: ""
+    resources:
+        limits: {}
+        requests: {}
 etcd:
     memoryLimitMB: 0
 genericDevicePlugin:
@@ -209,6 +212,9 @@ dns:
     hosts:
         file: /etc/hosts
         status: Disabled
+    resources:
+        limits: {}
+        requests: {}
 etcd:
     memoryLimitMB: 0
 genericDevicePlugin:
