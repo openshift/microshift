@@ -12,7 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 \
-        suites/configuration/configuration.robot \
-        suites/configuration/kustomize-sources.robot
+    run_tests host1 suites/configuration1/
 }

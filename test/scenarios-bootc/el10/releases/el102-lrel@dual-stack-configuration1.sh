@@ -21,6 +21,5 @@ scenario_run_tests() {
     exit_if_image_not_found "${start_image}"
     run_tests host1 \
         suites/ipv6/dualstack.robot \
-        suites/configuration/configuration.robot \
-        suites/configuration/kustomize-sources.robot
+        suites/configuration1/
 }

@@ -2,23 +2,16 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel98-brew-lrel-optional"
-
 scenario_create_vms() {
-    exit_if_commit_not_found "${start_image}"
-
-    prepare_kickstart host1 kickstart.ks.template "${start_image}"
-    launch_vm rhel-9.8 --network "${VM_DUAL_STACK_NETWORK}" --vm_vcpus 4
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source
+    launch_vm rhel98-bootc
 }
 
 scenario_remove_vms() {
-    exit_if_commit_not_found "${start_image}"
-
     remove_vm host1
 }
 
 scenario_run_tests() {
-    exit_if_commit_not_found "${start_image}"
     run_tests host1 \
         suites/configuration2/apiserver-readiness.robot \
         suites/configuration2/audit-log.robot \
