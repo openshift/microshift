@@ -1,0 +1,28 @@
+- cluster-ingress-operator embedded-component 6cf59c532a28e46ced7e18c5aa4b04283fea8f61 to 52c2b0465ecf1dcdcd57c010b9b15ac28f62a2ba
+  - 80cc5ec 2026-05-05T22:34:34Z Allow host network connections to the ingress canary
+  - b1ed6a6 2026-05-05T14:28:30Z waitForDeploymentEnvVar: Remove client parameter
+  - ceee137 2026-05-05T14:28:30Z TestUnsupportedConfigOverride: Ignore featuregate
+  - a19ef82 2026-05-05T14:28:30Z Add waitForDeploymentFunc test helper func
+  - 2f68c38 2026-05-05T14:28:30Z waitForDeploymentEnvVar: Fix godoc
+
+- kubernetes embedded-component da4553e9f23c91c792094a1ddbba933784becce4 to 80f28ac33ac111532fb8ba59b2e569085ee871b0
+  - d9dec3899 2026-04-28T17:11:27Z UPSTREAM: 138244: devicemanager: constrain topology hints to device NUMA nodes
+
+- machine-config-operator embedded-component 487334b7ed9bdd7c55e9eeb3a90027e5e1f927a2 to b7a8bf128b2775ea19c8191efa774f0660b2be70
+  - 5a2dee70 2026-05-06T19:33:08Z daemon: skip bootupd when shim is safe
+  - 87366809 2026-05-05T13:38:58Z crio: enable default_runtime metric
+  - 185c923e 2026-05-05T13:38:58Z prom rules: add alert for nodes using runc
+  - 948f3c83 2026-05-04T08:05:21Z OCPBUGS-84406: Fix CVE-2026-34986
+
+- operator-framework-olm embedded-component e627823c743797da91b4ae8a318d2420a511b752 to de6260e53055e10e216ec668d692a35554ab0585
+  - f6cf1456 2026-05-06T10:40:17-04:00 Update github.com/go-jose/go-jose/v4 to v4.1.4
+
+- service-ca-operator embedded-component 7b3033bba87d7b40684b66f8f44a3525433d1ac7 to 9fff46a576033685f66fbb1121eb0a2f134a29be
+  - a3e8484 2026-05-04T14:13:16Z test: network policy tests
+
+- kubernetes image-amd64 da4553e9f23c91c792094a1ddbba933784becce4 to 80f28ac33ac111532fb8ba59b2e569085ee871b0
+  - d9dec3899 2026-04-28T17:11:27Z UPSTREAM: 138244: devicemanager: constrain topology hints to device NUMA nodes
+
+- service-ca-operator image-amd64 7b3033bba87d7b40684b66f8f44a3525433d1ac7 to 9fff46a576033685f66fbb1121eb0a2f134a29be
+  - a3e8484 2026-05-04T14:13:16Z test: network policy tests
+
