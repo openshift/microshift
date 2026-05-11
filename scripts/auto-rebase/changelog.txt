@@ -1,3 +1,9 @@
-- machine-config-operator embedded-component a2e5802f1b4d6e80a855c0995ba568fca6fe0546 to c178c8299d40c259699e326f180d9d9bba1130b0
-  - 5af67504 2026-05-01T18:12:13Z chore: update AMIs
+- machine-config-operator embedded-component c178c8299d40c259699e326f180d9d9bba1130b0 to 66a56d4b66a1f36655a5726a0b60e9bfff538db2
+  - 65804ea2 2026-05-07T15:46:14-04:00 operator: update admin-ack message link
+  - db8d40cc 2026-05-06T15:51:40Z OCPBUGS-84218: Fix units rollback if update failure
+  - 7fc70b56 2026-05-05T00:36:39Z OCPBUGS-83859: Fix encapsulated IGN version
+  - 50339692 2026-05-04T12:33:03Z OCPBUGS-84332: Fix ssh and password rollbacks
+
+- operator-framework-olm embedded-component d7462e05f60c0ad13a2dce6ea516cbc624cae203 to bed9d823d441b1722e023f9f7f9b2cd56f79e2b2
+  - b1aa933e 2026-05-05T17:18:16+05:30 Bump google.golang.org/grpc to v1.79.3 for CVE-2026-33186
 
