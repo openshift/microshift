@@ -1,57 +1,202 @@
-- api embedded-component a49973eaef537f281362e1ffa3abeacf7ed85c62 to 28b45b8020c71ad7c056b3ad1d569eff94d6b878
-  - e9c797fc 2026-05-01T11:53:18-04:00 Clarify cluster operator Progressing condition
-  - 3dd2dc4b 2026-04-29T11:06:20+02:00 MON-4561: API: Add softirqs node-exporter collector to ClusterMonitoring CRD
+- api embedded-component 28b45b8020c71ad7c056b3ad1d569eff94d6b878 to 49ae21b8502fc80a351dc17ca4f0a16056797ab4
+  - e0eecb43 2026-05-07T17:59:09+03:00 Rename KMSConfig Struct to KMSPluginConfig
+  - 223afd76 2026-05-07T13:27:50+05:30 chore: remove deprecated k8s.io/api packages removed in v0.36.0
+  - d03b52fb 2026-05-06T15:30:59-04:00 Promote MutatingAdmissionPolicy to Default
+  - 28e53981 2026-05-05T16:20:40+02:00 Add OLMLifecycleAndCompatibility feature gate
+  - ebfb8f08 2026-04-28T12:16:15+05:30 Revert "OCPBUGS-83492: Allow :ref suffix in additionalLayerStores path for stargz-store to support lazy image pulling"
+  - 51fe56c7 2026-04-08T20:43:45+02:00 Promote EVPN Feature Gate
 
-- cluster-ingress-operator embedded-component 98ff1a6fedd18fbf2ed6fec9796104d7b4bc952c to df64b34df475cd58b0342dd617c29a9180ea9e5e
-  - a846988 2026-04-10T00:51:18-04:00 waitForDeploymentEnvVar: Remove client parameter
-  - 9d2f210 2026-04-10T00:51:18-04:00 TestUnsupportedConfigOverride: Ignore featuregate
-  - 579b4de 2026-04-10T00:26:09-04:00 Add waitForDeploymentFunc test helper func
-  - 49371cb 2026-03-30T16:43:15-04:00 waitForDeploymentEnvVar: Fix godoc
+- cluster-ingress-operator embedded-component df64b34df475cd58b0342dd617c29a9180ea9e5e to b2e02207a61e7fa07c6a64969345413853bf28da
+  - b99436e 2026-05-04T13:37:37-04:00 Allow host network connections to the ingress canary
+  - 083925f 2026-04-01T12:25:25-07:00 Tighten PEM bundle tests
+  - 8cdace8 2026-03-26T16:19:58-07:00 Fix malformed PEM bundle when tls.crt lacks trailing newline
 
-- cluster-network-operator embedded-component 23f002049008db9e852694ff2baaa68cd5b84525 to b1101d16e850319c488a47cb5c756402075900b8
-  - 7795779 2026-05-04T19:10:11+05:30 frr-k8s: enable BGP daemon to listen on standard port 179
-  - a09d0c1 2026-05-04T19:10:11+05:30 ovn-k: grant routeadvertisements CRUD to control-plane SA in managed routing mode
+- cluster-kube-apiserver-operator embedded-component 9b45cbafcea23be9c63e01947506495d030666d0 to ee66dc7fb78d4166621b65a37791c6e1285a90ac
+  - 93680a0 2026-05-07T10:15:34+05:30 Migrate KMS encryption tests to OTE
+  - c89b281 2026-05-07T10:15:30+05:30 Update library-go to include KMS mock plugin deployer and testing.TB interface
+  - ca5e71a 2026-04-28T11:50:35-04:00 vendor: bump library-go
+  - beb322c 2026-04-28T11:48:53-04:00 Use SkipInClusterAuthenticationLookup in check-endpoints
 
-- kubernetes embedded-component 2447118a5cf501f71c2da4b2f4ff14f3492aec10 to 5f099ccd1e8345f615d10381290909a8ca581b66
-  - 739e2eb2c 2026-04-30T16:11:47+01:00 UPSTREAM: <drop>: bump openshift/api dependency
-  - 568c860e4 2026-04-30T16:11:36+01:00 UPSTREAM: <carry>: authentication: enforce claims.email_verified usage when claims.email is used in username expression
-  - 4bfac2def 2026-04-30T16:11:21+01:00 UPSTREAM: <carry>: Export email validation functions
+- cluster-network-operator embedded-component b1101d16e850319c488a47cb5c756402075900b8 to 57948830e6af1e0339d56bf9e22222f9c68f9199
+  - bf486f8 2026-05-07T23:47:16Z Revert "OCPBUGS-83800: add remaining CNO NetworkPolicies" (#2959)
+  - f21e69a 2026-05-01T11:08:14-04:00 Add missing CNCC NetworkPolicies
+  - cbb9f4f 2026-05-01T11:08:11-04:00 Add proper CVO annotations to CNO default-deny NP
+  - f4734c5 2026-04-16T19:08:18-04:00 OCPBUGS-78731: Move enable-multicast from config maps to CLI flags
+  - 35ff348 2026-04-16T19:08:13-04:00 NVIDIA-554: DPU-host mode: use ConfigMap for OVN feature enablement instead of per-node script gating
+  - 411921c 2026-04-15T15:19:23-04:00 Remove dead OVN_MULTI_NETWORK_ENABLE template variable
 
-- machine-config-operator embedded-component 7eef4fdc72274bbf6845b1ea15d8af4723e42962 to 9d3ee9d972ed9373db03a498ca6ab831093d2420
-  - 9c7c37f6 2026-04-29T23:26:51+08:00 AGENT-1443: Include platform VIPs in IRI cert SANs to match installer
-  - 95c47d22 2026-04-27T19:17:17+08:00 AGENT-1443: Add e2e test for IRI cert regeneration on MCS CA rotation
-  - da3b4783 2026-04-27T17:55:05+08:00 AGENT-1443: Add SAN validation to IRI cert rotation and wire mcfgClient
-  - 8be62adb 2026-04-27T17:55:05+08:00 AGENT-1443: Add feature gate, idempotency, and localhost SANs to IRI cert rotation
-  - 1c84abf9 2026-04-27T17:55:05+08:00 AGENT-1443: Add IRI certificate regeneration to MCS cert rotation controller
-  - 6c48b964 2026-04-24T12:19:32-04:00 crio: enable default_runtime metric
-  - 138f7a5e 2026-04-24T12:19:32-04:00 prom rules: add alert for nodes using runc
-  - 3d1f08bc 2026-04-22T13:20:08+05:30 Migrate MCO daemon test suite from openshift-tests-private
-
-- operator-framework-olm embedded-component 4201d40dfc99de60e8791d02b89bc7aebeaae930 to 2fcbb3e4a8a1445c2b557d3485ac3f63ba5127a1
-
-
-- service-ca-operator embedded-component 2aa88ace39a1abe7647bc5b03e6a599985b31605 to e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b
-  - 73dd9f6 2026-04-27T14:48:36+05:30 test: network policy tests
-
-- router image-amd64 896390778ebe15f57f87e6ca78f11c96e64c2652 to dfaf1cb3116cd7e0a5ab2e23f4d371f3777f7853
-  - c223ef7 2026-05-04T11:25:19-03:00 fix handling of host conflict
-
-- kubernetes image-amd64 2447118a5cf501f71c2da4b2f4ff14f3492aec10 to 5f099ccd1e8345f615d10381290909a8ca581b66
-  - 739e2eb2c 2026-04-30T16:11:47+01:00 UPSTREAM: <drop>: bump openshift/api dependency
-  - 568c860e4 2026-04-30T16:11:36+01:00 UPSTREAM: <carry>: authentication: enforce claims.email_verified usage when claims.email is used in username expression
-  - 4bfac2def 2026-04-30T16:11:21+01:00 UPSTREAM: <carry>: Export email validation functions
-
-- service-ca-operator image-amd64 2aa88ace39a1abe7647bc5b03e6a599985b31605 to e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b
-  - 73dd9f6 2026-04-27T14:48:36+05:30 test: network policy tests
-
-- oc image-arm64 16d140aeefdc2b07f549945801c9cefab703ca68 to 6ac066994b962cb01886dab515d821720324ed52
-  - d1931c31 2026-04-22T17:32:51+01:00 OCPBUGS-62799: Add required-scc annotation to node-joiner pod to prevent third-party SCC interference
-
-- csi-external-snapshotter image-arm64 d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to 3219da7dcbb14fa762704746d21fb38131beb1f4
+- csi-external-snapshotter embedded-component d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to 3219da7dcbb14fa762704746d21fb38131beb1f4
   - 72eb399 2026-04-21T11:21:53+02:00 UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
 
-- router image-arm64 dfaf1cb3116cd7e0a5ab2e23f4d371f3777f7853 to 65271d2c19cb35fb5e802ee72fc4de502c5e16b6
+- etcd embedded-component d8d67b8ce849f816d6d23c904098336632e2348f to c543fe15324510d13e896c31232ecd5d100d9de5
+  - 67297a50 2026-05-07T11:39:17-04:00 DOWNSTREAM: <drop>: update images
+  - ec166e22 2026-05-01T11:50:30-07:00 version: bump up to 3.6.11
+  - 633de82d 2026-04-29T10:12:10+01:00 Fix the 'read via PrevKv' and 'Put with lease' in TXN bypass rbac check issue
+  - fbbd0a16 2026-04-29T10:07:23+01:00 Add an integration test to reproduce the issue of PutWithLease in a TXN bypass RBAC check
+  - 3fe57463 2026-04-29T10:05:53+01:00 Add an integration test case to reproduce the read via PrevKv bypass rbac check issue
+  - c387fa54 2026-04-28T21:46:03+01:00 Get all Put related auth check into a separate function 'checkPutAuth'
+  - 20e6f233 2026-04-28T21:45:58+01:00 move function CheckTxnAuth from package txn to apply
+  - 3c521c33 2026-04-26T21:16:39+01:00 Bump golang.org/x/image to v0.39.0 to resolve GO-2026-4962
+  - e989219f 2026-04-26T20:31:03+01:00 Fix the issue of not being able to adding new member when one existing member is down
+  - 9daef7ff 2026-04-26T20:26:51+01:00 Add an e2e test to reproduce the adding member failure when one member is down
+  - 00e1bcaf 2026-04-13T16:27:28-04:00 DOWNSTREAM: <carry>: Increase snapshot test new member wait timeout
+  - d39bc8b2 2026-04-09T14:40:52-04:00 DOWNSTREAM: <drop>: update images
+  - 29e8bb53 2026-04-09T13:19:39-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - e25d4802 2026-04-08T14:59:10-04:00 *: bump go to 1.25.9
+  - eff7875e 2026-04-05T20:24:51+05:30 tests: Change max retries when removing a member from a cluster
+  - db8d13a5 2026-04-01T11:29:49-07:00 version: bump up to 3.6.10
+  - c99cf0c3 2026-03-31T08:50:34-04:00 etcdserver: allow non-admin to fetch member list and alarms
+  - f2173cd4 2026-03-27T16:12:46Z Bump golang.org/x/image to v0.38.0 to resolve GO-2026-4815
+  - e0f7af4d 2026-03-27T15:39:55Z Fix etcdctl endpoint command with option --cluster when auth is enabled
+  - 85651fa5 2026-03-20T11:04:03-07:00 version: bump up to 3.6.9
+  - 15263501 2026-03-19T17:36:13-04:00 tests/integration: fix flaky testcase
+  - f8998013 2026-03-19T13:26:23-07:00 dependency: Bump google.golang.org/grpc from v1.75.0 to 1.79.3
+  - 68551b32 2026-03-18T13:33:17-04:00 tests: update test for auth
+  - 7f73a57b 2026-03-18T12:25:41-04:00 server/etcdserver: guard unauthenticated endpoints with auth checks
+  - 3080527d 2026-03-18T12:09:02-04:00 server/etcdserver: enforce auth checks for nested txn ops
+  - fff31761 2026-03-08T12:54:43Z [release-3.6] devcontainer: remove devcontainer config
+  - cf9553d4 2026-03-06T15:20:21-08:00 Bump Go to 1.25.8
+  - 02bec62b 2026-03-06T20:10:13Z build(deps): bump distroless/static-debian12 from `3f2b64e` to `20bc6c0`
+  - d131ca7a 2026-03-06T10:00:50+01:00 Revert "Reuse events between sync loops"
+  - 00bd77f6 2026-03-06T12:06:23+05:30 Bump golang.org/x/net@ v0.51.0 fixes  GO-2026-4559
+  - 200dbea8 2026-03-03T10:17:41+01:00 Don't reuse same ReadIndex
+  - 928b3c6b 2026-03-02T18:17:37Z devcontainer: bump Go image to 1.25 for release-3.6
+  - 745da53a 2026-03-02T02:48:26+08:00 etcdctl: add license header
+  - 1d60990e 2026-03-02T02:47:54+08:00 etcdctl: add unit test for Argify
+  - 10068016 2026-03-02T02:47:02+08:00 etcdctl: fix slice bounds trimming single-quoted args
+  - 1f234c99 2026-03-01T08:21:54+08:00 [release-3.6] bump Go to 1.25.7
+  - 51d12afd 2026-02-27T13:28:22-08:00 Add defer-recover block to prevent panic when cc is nil
+  - a395a60f 2026-02-27T12:42:34-08:00 Bump golangci lint to v2
+  - a6e27ce8 2026-02-26T17:03:29Z Print the endpoint the grpc client connected to in unary interceptor
+  - fe194ee5 2026-02-26T15:56:32Z Fix unit test failure
+  - 179dcf87 2026-02-26T14:11:30Z Fix race berween read index and leader change causing a stale read
+  - d456631c 2026-02-24T01:01:42Z server/etcdmain: fix deadlock issue for grpcproxy
+  - e4522d80 2026-02-23T00:07:28+08:00 dependency: bump go.opentelemetry.io/otel/sdk from v1.34.0 to v1.40.0
+  - f8692e28 2026-02-18T19:00:20Z server/etcdserver/api/v3rpc: run metrics interceptors before handlers
+  - 4e814e20 2026-02-13T10:39:11-08:00 version: bump up to 3.6.8
+  - 2d3c79c3 2026-02-05T22:56:07-06:00 [release-3.6] Bump go version to 1.24.13
+  - bf783366 2026-02-03T09:55:46Z Remove the use of grpc-go's Metadata field
+  - ef879964 2026-01-30T10:13:09Z Bump go version to 1.24.11
+  - e8308218 2026-01-19T15:38:40Z Keep the --snapshot-count flag
+  - a8892448 2026-01-19T11:32:28Z Remove flag --max-snapshots in 3.8 rather than 3.7
+  - 81c32a40 2025-12-18T16:45:22-08:00 tools: explicitly require golang.org/x/tools/cmd/goimports
+  - f767aa25 2025-12-18T14:53:28-08:00 dependency: Bump golang.org/x/crypto from 0.42.0 to 0.45.0
+  - e838ef11 2025-12-18T03:39:29+08:00 version: bump up to 3.6.7
+  - 61af088e 2025-12-15T22:51:44-06:00 dependency: Bump golang.org/x/net from 0.38.0 to 0.45.0
+  - 97141e1f 2025-12-06T21:27:55+08:00 Bump go to 1.24.11
+  - 554dc70e 2025-11-17T17:51:06Z Print token fingerprint instead of the original tokens in log messages
+  - d2809cf0 2025-11-12T00:12:43-05:00 version: bump up to 3.6.6
+  - 145d927d 2025-11-07T15:41:12Z v3rpc: add and use getServerMetrics() with global metricsServerCached
+  - 2c0db321 2025-11-06T21:41:05-08:00 Bump from go1.24.9 to go1.24.10
+  - 523100b1 2025-11-06T19:19:48Z Fix the '--force-new-cluster' can't clean up learners issue
+  - 7d3fc029 2025-11-06T19:19:48Z Add an e2e test cases to reproduce the '--force-new-cluster' can't remove learner issue
+  - db6be4c1 2025-10-31T01:21:20Z tests: use WaitLeader() in memberPromoteWithAuth()
+  - 76ee0bc9 2025-10-31T01:21:20Z etcdserver: follow convention to extract auth token in cluster_util.go
+  - 5377bb9d 2025-10-31T01:21:20Z etcdserver: fix cannot promote with auth from follower
+  - e88e142c 2025-10-31T01:21:20Z test: add promote with auth e2e tests
+  - 1e023019 2025-10-15T11:31:08+08:00 Bump go to 1.24.9
+  - 4973fd42 2025-10-12T17:05:56+01:00 Fix endpoint status not retuning the correct storage quota
+  - ee85ed30 2025-10-01T15:39:50Z server/embed: Log EOF on DEBUG in TLS handshake
+  - 3bb44700 2025-09-23T17:47:02Z Reject watch request with -1 revision and make rangeEvents safe against negative revision
+
+- kubernetes embedded-component 5f099ccd1e8345f615d10381290909a8ca581b66 to f9b62a69d4a05e10b2b7cf8d40afa37f9dcd0938
+  - a035288c5 2026-04-15T09:35:48-07:00 UPSTREAM: 138401: Improve WatchList test robustness
+
+- machine-config-operator embedded-component 9d3ee9d972ed9373db03a498ca6ab831093d2420 to 3320406c26099d7395ce79417e5c7fd929aa895d
+  - c48e9be4 2026-05-06T11:37:52-04:00 daemon: skip bootupd when shim is safe
+  - 5e350d32 2026-05-06T10:24:44-04:00 Fix e2e-ocl-1of2 flake where MOSB is deleted by stale controller event
+  - ba342bf9 2026-05-06T10:24:26-04:00 Fix e2e-ocl-2of2 timeout flake for TestStaleAnnotationClearedOnLayerOnlyChange
+  - e0a0806e 2026-05-06T21:40:34+08:00 AGENT-1514: Add ML-KEM verification test for IRI registry
+  - a5bc08d4 2026-05-05T10:18:48+02:00 OCPBUGS-84661: Fix wrong early exit during kubelet MCs regeneration
+  - 31427064 2026-05-04T14:16:26-04:00 controller: add terminationMessagePolicy to build pod containers
+  - d54b9b4b 2026-05-04T11:27:52-04:00 daemon: use --delete-if-present for karg removal
+  - 867a618f 2026-04-29T12:37:55+02:00 OCPBUGS-83830: Apply password only if changes exist
+
+- operator-framework-olm embedded-component 2fcbb3e4a8a1445c2b557d3485ac3f63ba5127a1 to 12c665225e64d6c3b9d8f294299fc874ef080e4d
+  - 2b05ab25 2026-05-08T10:11:54+02:00 feat: use resource-based RBAC for lifecycle-server auth
+  - 6c8ec2f7 2026-05-07T00:05:48Z don't derive explicit release version from substitutesFor/buildMetadata in CSV (#1966)
+  - 266ce866 2026-05-07T00:05:07Z Bump github.com/mattn/go-sqlite3 from 1.14.42 to 1.14.44 (#1969)
+  - 528ad7a1 2026-05-07T00:04:51Z Bump github.com/onsi/ginkgo/v2 from 2.28.1 to 2.28.3 (#1968)
+  - 4eb5d1f7 2026-05-07T00:04:36Z Bump github.com/onsi/gomega from 1.39.1 to 1.40.0 (#1967)
+  - ec10cb22 2026-05-07T00:04:05Z :seedling: Bump google.golang.org/grpc from 1.80.0 to 1.81.0 (#3822)
+  - 67d2172d 2026-05-07T00:03:48Z :seedling: Bump github.com/fsnotify/fsnotify from 1.9.0 to 1.10.1 (#3825)
+  - fe602386 2026-05-07T00:03:32Z :seedling: Bump github.com/operator-framework/operator-registry (#3823)
+  - 5a9d6c44 2026-05-06T09:42:25+02:00 Fix lifecycle-server readiness probe to allow empty index
+
+- oc image-amd64 16d140aeefdc2b07f549945801c9cefab703ca68 to 6ac066994b962cb01886dab515d821720324ed52
+  - d1931c31 2026-04-22T17:32:51+01:00 OCPBUGS-62799: Add required-scc annotation to node-joiner pod to prevent third-party SCC interference
+
+- csi-external-snapshotter image-amd64 d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to 3219da7dcbb14fa762704746d21fb38131beb1f4
+  - 72eb399 2026-04-21T11:21:53+02:00 UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
+
+- router image-amd64 dfaf1cb3116cd7e0a5ab2e23f4d371f3777f7853 to b75bab261392d5eacb115db408f121618a23e41d
   - dc7e786 2026-04-23T15:52:51-03:00 move from option forwarded to manual header update
   - 313daa6 2026-04-23T11:09:02-03:00 fix forwarded header for IPv6 on IPv4 stack
   - 0500b49 2026-04-14T17:06:57-03:00 create self-signed crt if failing to read default
+  - 6c4ca66 2025-09-22T15:38:07-04:00 Reapply "OCPBUGS-55506: Prevent startup failures due to name resolution"
+
+- ovn-kubernetes image-amd64 952886fd8af2ca3ecf1717a2cb69311a32f25c06 to 22e9487ee7060a85cfe20886b73e11fce3249e36
+  - 34cfe4e5 2026-04-30T10:09:06Z sync test annotations with upstream changes
+  - 0abdfe64 2026-04-30T10:06:55Z sync openshift/go.mod with upstream dependencies
+  - 3e586049 2026-04-29T11:24:31+02:00 Address set: add existing IPs check on setAddresses.
+  - ad46e42d 2026-04-28T08:54:17Z test: fix layer2 UDN controller test flake in kubevirt live-migration
+  - b66b0927 2026-04-28T10:05:39+02:00 fix UDN unit test to use new node controller constructor
+  - a0e535ac 2026-04-27T17:12:58Z EVPN: add allowas-in origin for BGP neighbors
+  - 4b7ffe0f 2026-04-27T16:49:36Z Bump the go_modules group across 3 directories with 2 updates
+  - 53822e35 2026-04-27T12:12:24-04:00 Fake NM: make it per network activity
+  - 5b9cf808 2026-04-27T12:12:24-04:00 cluster manager: integrate status manager with d-udn
+  - 726bdd19 2026-04-27T12:12:24-04:00 e2e egress fw: fixes for Dynamic UDN
+  - 267f18d2 2026-04-27T12:12:24-04:00 networkmanager: skip dynamic UDN for bare NADs
+  - 9c6e65bc 2026-04-27T12:12:24-04:00 cluster manager: fixes race with NAD deletion
+  - 9f7ece70 2026-04-27T12:12:24-04:00 Update e2e for Dynamic Subnet Allocation
+  - c1e81f8e 2026-04-27T12:12:24-04:00 Adds dynamic allocation for cluster manager
+  - 6760a289 2026-04-24T14:03:49-07:00 cleanup stale L2 primary UDN tunnel ID annotations on restart
+  - e1d509a8 2026-04-24T17:54:42+02:00 UT: get rid of the fake address set factory
+  - 7d049570 2026-04-24T17:54:38+02:00 Replace selectedNamespace = nil with more obvious struct.
+  - 960efda8 2026-04-24T17:18:18+02:00 Move hostNamespace handling to the addressset_manager.go
+  - f90bfac4 2026-04-24T11:07:08-04:00 Bump frr to 10.6.0 to pick up more coredump fixes
+  - caac89aa 2026-04-24T11:07:08-04:00 Bump metallb frr to 10.5.3
+  - d58942dd 2026-04-24T16:03:30+02:00 UT: stop setting HostNetworkNamespace across unrelated UTs
+  - 5b649e92 2026-04-24T16:03:30+02:00 addresssetManager: fix resetting address sets on restart.
+  - cc84bac9 2026-04-24T16:03:30+02:00 AddresssetManager: add legacy netpol mode.
+  - e4b71f53 2026-04-21T14:51:08-04:00 e2e: preload netshoot image for no_overlay suite
+  - 1b2426bf 2026-04-21T14:51:08-04:00 e2e: preload netshoot image for kubevirt tests instead of iperf
+  - fe163a70 2026-03-12T11:48:25+01:00 Fix invalid characters in e2e artifact directory paths
+
+- kubernetes image-amd64 5f099ccd1e8345f615d10381290909a8ca581b66 to f9b62a69d4a05e10b2b7cf8d40afa37f9dcd0938
+  - a035288c5 2026-04-15T09:35:48-07:00 UPSTREAM: 138401: Improve WatchList test robustness
+
+- router image-arm64 65271d2c19cb35fb5e802ee72fc4de502c5e16b6 to b75bab261392d5eacb115db408f121618a23e41d
+  - 6c4ca66 2025-09-22T15:38:07-04:00 Reapply "OCPBUGS-55506: Prevent startup failures due to name resolution"
+
+- ovn-kubernetes image-arm64 952886fd8af2ca3ecf1717a2cb69311a32f25c06 to 22e9487ee7060a85cfe20886b73e11fce3249e36
+  - 34cfe4e5 2026-04-30T10:09:06Z sync test annotations with upstream changes
+  - 0abdfe64 2026-04-30T10:06:55Z sync openshift/go.mod with upstream dependencies
+  - 3e586049 2026-04-29T11:24:31+02:00 Address set: add existing IPs check on setAddresses.
+  - ad46e42d 2026-04-28T08:54:17Z test: fix layer2 UDN controller test flake in kubevirt live-migration
+  - b66b0927 2026-04-28T10:05:39+02:00 fix UDN unit test to use new node controller constructor
+  - a0e535ac 2026-04-27T17:12:58Z EVPN: add allowas-in origin for BGP neighbors
+  - 4b7ffe0f 2026-04-27T16:49:36Z Bump the go_modules group across 3 directories with 2 updates
+  - 53822e35 2026-04-27T12:12:24-04:00 Fake NM: make it per network activity
+  - 5b9cf808 2026-04-27T12:12:24-04:00 cluster manager: integrate status manager with d-udn
+  - 726bdd19 2026-04-27T12:12:24-04:00 e2e egress fw: fixes for Dynamic UDN
+  - 267f18d2 2026-04-27T12:12:24-04:00 networkmanager: skip dynamic UDN for bare NADs
+  - 9c6e65bc 2026-04-27T12:12:24-04:00 cluster manager: fixes race with NAD deletion
+  - 9f7ece70 2026-04-27T12:12:24-04:00 Update e2e for Dynamic Subnet Allocation
+  - c1e81f8e 2026-04-27T12:12:24-04:00 Adds dynamic allocation for cluster manager
+  - 6760a289 2026-04-24T14:03:49-07:00 cleanup stale L2 primary UDN tunnel ID annotations on restart
+  - e1d509a8 2026-04-24T17:54:42+02:00 UT: get rid of the fake address set factory
+  - 7d049570 2026-04-24T17:54:38+02:00 Replace selectedNamespace = nil with more obvious struct.
+  - 960efda8 2026-04-24T17:18:18+02:00 Move hostNamespace handling to the addressset_manager.go
+  - f90bfac4 2026-04-24T11:07:08-04:00 Bump frr to 10.6.0 to pick up more coredump fixes
+  - caac89aa 2026-04-24T11:07:08-04:00 Bump metallb frr to 10.5.3
+  - d58942dd 2026-04-24T16:03:30+02:00 UT: stop setting HostNetworkNamespace across unrelated UTs
+  - 5b649e92 2026-04-24T16:03:30+02:00 addresssetManager: fix resetting address sets on restart.
+  - cc84bac9 2026-04-24T16:03:30+02:00 AddresssetManager: add legacy netpol mode.
+  - e4b71f53 2026-04-21T14:51:08-04:00 e2e: preload netshoot image for no_overlay suite
+  - 1b2426bf 2026-04-21T14:51:08-04:00 e2e: preload netshoot image for kubevirt tests instead of iperf
+  - fe163a70 2026-03-12T11:48:25+01:00 Fix invalid characters in e2e artifact directory paths
+
+- kubernetes image-arm64 5f099ccd1e8345f615d10381290909a8ca581b66 to f9b62a69d4a05e10b2b7cf8d40afa37f9dcd0938
+  - a035288c5 2026-04-15T09:35:48-07:00 UPSTREAM: 138401: Improve WatchList test robustness
 
