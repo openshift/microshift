@@ -1,51 +1,7 @@
-- cluster-kube-apiserver-operator embedded-component b85497d2202b30ead006502767b96419c3a1c87e to 43b3cbe3654586ebbff06b942658c6f14aa01796
-  - df58a09 2026-04-21T14:03:25+02:00 configobservation/auth: allow setting the oauthMetadata when auth type is None
+- cluster-ingress-operator embedded-component 0aca1e80822b4d5690add409f354f991fe9c042e to d14c13be1685e74b898b93a3fa7e03e9b75aa174
+  - 91b9a5c 2026-05-06T13:40:16-03:00 [NE-2203] Add PrometheusRule for Gateway API gathering
 
-- kubernetes embedded-component 2d92ab7b3cb444e41ec6d5edf64dfe3b22d93142 to ba5f1e63e12c85b7d61d5de4a3bbde39e54d33b2
-  - 7c767e956 2026-04-20T17:02:56-07:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - fd1020170 2026-04-20T15:53:37-07:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 9efa99e5a 2026-04-15T18:09:55Z Release commit for Kubernetes v1.33.11
-  - 28b2a45d0 2026-04-13T14:30:03-04:00 Update github.com/moby/spdystream from v0.5.0 to v0.5.1
-  - 412848339 2026-04-13T15:04:41Z update go.opentelemetry.io/otel to v1.41.0
-  - ea46dad4d 2026-04-09T22:00:49+02:00 Bump images and versions to go 1.25.9 and distroless iptables
-  - a4cc2ce4c 2026-04-01T17:20:17-04:00 Bump to go 1.25
-  - 8489a1d82 2026-04-01T16:56:59-04:00 bump golang.org/x/vuln/cmd/govulncheck to v1.1.4
-  - a4f94edc3 2026-03-24T02:47:04-07:00 Fix flaking RunTestDelayedWatchDelivery
-  - ce78d2290 2026-03-18T18:40:20Z Update CHANGELOG/CHANGELOG-1.33.md for v1.33.10
-  - b5f44064e 2026-03-17T08:15:03-04:00 pkg/proxy/nftables: fix kube-proxy crash with newer nftables versions
-  - cdf6c7548 2026-03-17T08:15:03-04:00 Update knftables to v0.0.21
-  - 604645806 2026-03-12T13:10:38-07:00 Fix RepairIPAddress controller startup failure when namespace informer is not yet synced
-
-- machine-config-operator embedded-component c19e5dc0e5e2835f89befc42e4f8b89d869fc90c to 1421b8d8b061eccd0fe9248e5a854f163759c09d
-  - 8f6cf05a 2026-05-01T15:25:13-04:00 improve JSON unmarshalling for secret decoding
-
-- kubernetes image-amd64 2d92ab7b3cb444e41ec6d5edf64dfe3b22d93142 to ba5f1e63e12c85b7d61d5de4a3bbde39e54d33b2
-  - 7c767e956 2026-04-20T17:02:56-07:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - fd1020170 2026-04-20T15:53:37-07:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 9efa99e5a 2026-04-15T18:09:55Z Release commit for Kubernetes v1.33.11
-  - 28b2a45d0 2026-04-13T14:30:03-04:00 Update github.com/moby/spdystream from v0.5.0 to v0.5.1
-  - 412848339 2026-04-13T15:04:41Z update go.opentelemetry.io/otel to v1.41.0
-  - ea46dad4d 2026-04-09T22:00:49+02:00 Bump images and versions to go 1.25.9 and distroless iptables
-  - a4cc2ce4c 2026-04-01T17:20:17-04:00 Bump to go 1.25
-  - 8489a1d82 2026-04-01T16:56:59-04:00 bump golang.org/x/vuln/cmd/govulncheck to v1.1.4
-  - a4f94edc3 2026-03-24T02:47:04-07:00 Fix flaking RunTestDelayedWatchDelivery
-  - ce78d2290 2026-03-18T18:40:20Z Update CHANGELOG/CHANGELOG-1.33.md for v1.33.10
-  - b5f44064e 2026-03-17T08:15:03-04:00 pkg/proxy/nftables: fix kube-proxy crash with newer nftables versions
-  - cdf6c7548 2026-03-17T08:15:03-04:00 Update knftables to v0.0.21
-  - 604645806 2026-03-12T13:10:38-07:00 Fix RepairIPAddress controller startup failure when namespace informer is not yet synced
-
-- kubernetes image-arm64 2d92ab7b3cb444e41ec6d5edf64dfe3b22d93142 to ba5f1e63e12c85b7d61d5de4a3bbde39e54d33b2
-  - 7c767e956 2026-04-20T17:02:56-07:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - fd1020170 2026-04-20T15:53:37-07:00 UPSTREAM: <drop>: manually resolve conflicts
-  - 9efa99e5a 2026-04-15T18:09:55Z Release commit for Kubernetes v1.33.11
-  - 28b2a45d0 2026-04-13T14:30:03-04:00 Update github.com/moby/spdystream from v0.5.0 to v0.5.1
-  - 412848339 2026-04-13T15:04:41Z update go.opentelemetry.io/otel to v1.41.0
-  - ea46dad4d 2026-04-09T22:00:49+02:00 Bump images and versions to go 1.25.9 and distroless iptables
-  - a4cc2ce4c 2026-04-01T17:20:17-04:00 Bump to go 1.25
-  - 8489a1d82 2026-04-01T16:56:59-04:00 bump golang.org/x/vuln/cmd/govulncheck to v1.1.4
-  - a4f94edc3 2026-03-24T02:47:04-07:00 Fix flaking RunTestDelayedWatchDelivery
-  - ce78d2290 2026-03-18T18:40:20Z Update CHANGELOG/CHANGELOG-1.33.md for v1.33.10
-  - b5f44064e 2026-03-17T08:15:03-04:00 pkg/proxy/nftables: fix kube-proxy crash with newer nftables versions
-  - cdf6c7548 2026-03-17T08:15:03-04:00 Update knftables to v0.0.21
-  - 604645806 2026-03-12T13:10:38-07:00 Fix RepairIPAddress controller startup failure when namespace informer is not yet synced
+- machine-config-operator embedded-component 1421b8d8b061eccd0fe9248e5a854f163759c09d to 2d25c90c0dc60344479c5bcae395a5baa6ef9c77
+  - 13f907d7 2026-05-06T03:30:58Z OCPBUGS-83859: Fix encapsulated IGN version
+  - c675aef1 2026-05-04T17:57:07Z chore: update AMIs
 
