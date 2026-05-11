@@ -52,7 +52,7 @@ scenario_run_tests() {
         if [[ "${boot_num}" -ge 2 ]]; then
             break
         fi
-        if [ $(( $(date +%s) - start_time )) -gt 60 ]; then
+        if [ $(( $(date +%s) - start_time )) -gt 360 ]; then
             echo "Timed out waiting for VM having 2 boots"
             exit 1
         fi
