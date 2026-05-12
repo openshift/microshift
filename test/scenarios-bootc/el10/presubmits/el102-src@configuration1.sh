@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/osconfig-lifecycle/
+    run_tests host1 suites/configuration1/
 }
