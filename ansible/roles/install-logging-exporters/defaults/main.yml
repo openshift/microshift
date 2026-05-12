@@ -1,7 +1,3 @@
-cadvisor_external: false
-cadvisor_url: https://github.com/google/cadvisor/releases/download/v0.47.2/cadvisor-v0.47.2-linux-amd64
-cadvisor_checksum: sha256:30602f675e9bcd39b0d4cd4bd9e83c0849dd4bb3a60a0544b9f2a6451a3facfe
-
 process_exporter_url: https://github.com/ncabatoff/process-exporter/releases/download/v0.7.10/process-exporter_0.7.10_linux_amd64.rpm
 
 prometheus_services:
