@@ -97,6 +97,7 @@ Restore System Date
 Change System Date To
     [Documentation]    Move the system to a future date.
     [Arguments]    ${future_date}
+    Patch ImagePullPolicy For Date Change
     ${ushift_pid}=    MicroShift Process ID
     Systemctl    stop    chronyd
     Command Should Work    TZ=UTC timedatectl set-time "${future_date}"
@@ -158,3 +159,29 @@ Get Cert Fingerprint
     ${fingerprint}=    Command Should Work
     ...    openssl x509 -noout -fingerprint -sha256 -in ${cert_file}
     RETURN    ${fingerprint}
+
+Patch ImagePullPolicy For Date Change
+    [Documentation]    Patch all deployments with imagePullPolicy: Always -> IfNotPresent.
+    ...    Prevents image pull failures when the system clock is fast-forwarded past CDN
+    ...    TLS certificate expiry dates.
+    VAR    ${jq_filter}=
+    ...    .items[] | .metadata.namespace as $ns | .metadata.name as $d | .spec.template.spec.containers | to_entries[] | select(.value.imagePullPolicy == "Always") | "\\($ns) \\($d) \\(.key)"
+    ${stdout}=    Run With Kubeconfig
+    ...    oc get deploy -A -o json | jq -r '${jq_filter}'
+    ...    allow_fail=True
+    IF    '${stdout.strip()}' == '${EMPTY}'    RETURN
+    @{lines}=    Split String    ${stdout}    \n
+    FOR    ${line}    IN    @{lines}
+        IF    '${line.strip()}' == '${EMPTY}'    CONTINUE
+        @{parts}=    Split String    ${line}
+        Patch Deploy ImagePullPolicy To IfNotPresent    ${parts}[0]    ${parts}[1]    ${parts}[2]
+    END
+
+Patch Deploy ImagePullPolicy To IfNotPresent
+    [Documentation]    Patch a single deployment's container imagePullPolicy to IfNotPresent.
+    [Arguments]    ${ns}    ${deploy}    ${idx}
+    Log    Patching ${ns}/${deploy} container[${idx}] imagePullPolicy to IfNotPresent
+    Run With Kubeconfig
+    ...    oc patch deploy -n ${ns} ${deploy} --type=json -p '[{"op":"replace","path":"/spec/template/spec/containers/${idx}/imagePullPolicy","value":"IfNotPresent"}]'
+    Run With Kubeconfig
+    ...    oc rollout status deploy/${deploy} -n ${ns} --timeout=120s
