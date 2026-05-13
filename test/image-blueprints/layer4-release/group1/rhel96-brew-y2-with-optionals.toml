@@ -44,7 +44,7 @@ name = "pcp-zeroconf"
 version = "*"
 
 [customizations.services]
-enabled = ["microshift", "microshift-test-agent"]
+enabled = ["microshift", "microshift-test-agent", "pmcd", "pmlogger"]
 
 [customizations.firewall]
 ports = [
