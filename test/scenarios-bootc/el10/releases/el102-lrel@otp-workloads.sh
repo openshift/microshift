@@ -21,9 +21,6 @@ scenario_run_tests() {
     exit_if_image_not_found "${start_image}"
 
     run_tests host1 \
-        suites/osconfig/clusterid.robot \
-        suites/osconfig/systemd-resolved.robot \
-        suites/router/ \
-        suites/otp-workloads/oc-cli.robot \
-        suites/otp-workloads/statefulset-pvc.robot
+        suites/otp-workloads/sos-report-plugins.robot \
+        suites/otp-workloads/kcm-flags.robot
 }
