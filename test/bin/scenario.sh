@@ -293,32 +293,54 @@ sos_report_for_vm_offline() {
         "--filename" "*.log"
 }
 
-start_pcp_on_all_vms() {
-    if "${SKIP_PCP}"; then
-        echo "Skipping PCP collection"
+collect_pcp_reports_for_vm() {
+    local -r vmdir="${1}"
+    local -r vmname="${2}"
+
+    echo "Collecting PCP data from ${vmname}"
+    run_command_on_vm "${vmname}" "sudo systemctl stop pmlogger" || true
+
+    if ! run_command_on_vm "${vmname}" "test -d /var/log/pcp/pmlogger" ; then
+        echo "WARNING: No PCP data directory on ${vmname}, skipping collection"
         return 0
     fi
 
-    for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
-        if [ ! -d "${vmdir}" ]; then
-            continue
-        fi
+    run_command_on_vm "${vmname}" \
+        "sudo tar czf /tmp/pcp-archives.tar.gz -C /var/log/pcp/pmlogger ." || true
 
-        local vmname
-        vmname=$(basename "${vmdir}")
-        local ip
-        ip=$(cat "$(vm_property_filename "${vmname}" "ip")" 2>/dev/null) || true
+    mkdir -p "${vmdir}/pcp"
+    copy_file_from_vm "${vmname}" "/tmp/pcp-archives.tar.gz" "${vmdir}/pcp/" || {
+        echo "WARNING: Failed to collect PCP data from ${vmname}"
+    }
+}
 
-        if [ -z "${ip}" ]; then
-            continue
-        fi
+collect_pcp_reports_for_vm_offline() {
+    local -r vmdir="${1}"
+    local -r vmname="${2}"
+    local -r full_vmname="$(full_vm_name "${vmname}")"
 
-        echo "Starting PCP collection on ${vmname}"
-        run_command_on_vm "${vmname}" \
-            "sudo systemctl restart pmcd && \
-             sudo systemctl restart pmlogger" \
-            || echo "WARNING: Failed to start PCP on ${vmname}"
-    done
+    echo "Collecting PCP data offline from ${vmname}"
+
+    "${ROOTDIR}/scripts/fetch_tools.sh" "robotframework"
+
+    invoke_qemu_script "wait" \
+        "--vm" "${full_vmname}"
+
+    invoke_qemu_script "bash" \
+        "--vm" "${full_vmname}" \
+        "--args" "sudo systemctl stop pmlogger"
+
+    invoke_qemu_script "bash" \
+        "--vm" "${full_vmname}" \
+        "--args" "sudo tar czf /tmp/pcp-archives.tar.gz -C /var/log/pcp/pmlogger ."
+
+    mkdir -p "${vmdir}/pcp"
+
+    invoke_qemu_script "download" \
+        "--vm" "${full_vmname}" \
+        "--src_dir" "/tmp/" \
+        "--dst_dir" "${vmdir}/pcp/" \
+        "--filename" "pcp-archives.tar.gz"
 }
 
 collect_pcp_reports() {
@@ -338,23 +360,13 @@ collect_pcp_reports() {
         local ip
         ip=$(cat "$(vm_property_filename "${vmname}" "ip")" 2>/dev/null) || true
 
+        local pcp_func="collect_pcp_reports_for_vm"
         if [ -z "${ip}" ]; then
-            continue
+            echo "Collecting PCP reports offline"
+            pcp_func="collect_pcp_reports_for_vm_offline"
         fi
 
-        echo "Collecting PCP data from ${vmname}"
-        run_command_on_vm "${vmname}" "sudo systemctl stop pmlogger" || true
-
-        if ! run_command_on_vm "${vmname}" "test -d /var/log/pcp/pmlogger" ; then
-            echo "WARNING: No PCP data directory on ${vmname}, skipping collection"
-            continue
-        fi
-
-        run_command_on_vm "${vmname}" \
-            "sudo tar czf /tmp/pcp-archives.tar.gz -C /var/log/pcp/pmlogger ." || true
-
-        mkdir -p "${vmdir}/pcp"
-        copy_file_from_vm "${vmname}" "/tmp/pcp-archives.tar.gz" "${vmdir}/pcp/" || {
+        "${pcp_func}" "${vmdir}" "${vmname}" || {
             echo "WARNING: Failed to collect PCP data from ${vmname}"
         }
     done
@@ -1594,13 +1606,14 @@ action_create() {
     fi
     record_junit "setup" "load_scenario_script" "OK"
 
-    # Set the exit handler to attempt the sos report collection and error logging
+    # Set the exit handler to attempt PCP and SOS report collection and error logging
     # - Preserve the original exit code
     # - Log junit message on failure
     # - Override the exit code if sos report collection fails
     # shellcheck disable=SC2154
     trap 'rc=$? ; \
         [ "${rc}" -ne 0 ] && record_junit "setup" "scenario_create_vms" "FAILED" ; \
+        collect_pcp_reports || true ; \
         sos_report true || rc=1 ; \
         close_junit ; exit "${rc}"' EXIT
 
@@ -1669,7 +1682,6 @@ action_run() {
     else
         RUN_HOST_OVERRIDE="$1"
     fi
-    start_pcp_on_all_vms
     scenario_run_tests
     record_junit "run" "scenario_run_tests" "OK"
 }
