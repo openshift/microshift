@@ -25,6 +25,10 @@ version = "{{ env.Getenv "SOURCE_VERSION_BASE" }}"
 name = "microshift-test-agent"
 version = "*"
 
+[[packages]]
+name = "pcp-zeroconf"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent"]
 

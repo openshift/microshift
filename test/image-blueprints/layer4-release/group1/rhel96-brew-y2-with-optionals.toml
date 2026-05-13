@@ -39,6 +39,10 @@ version = "{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}"
 name = "microshift-test-agent"
 version = "*"
 
+[[packages]]
+name = "pcp-zeroconf"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent"]
 

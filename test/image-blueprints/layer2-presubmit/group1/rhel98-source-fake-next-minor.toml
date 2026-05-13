@@ -35,6 +35,10 @@ version = "{{ .Env.FAKE_NEXT_MAJOR_VERSION }}.{{ .Env.FAKE_NEXT_MINOR_VERSION }}
 name = "microshift-test-agent"
 version = "*"
 
+[[packages]]
+name = "pcp-zeroconf"
+version = "*"
+
 [customizations.services]
 enabled = ["microshift", "microshift-test-agent"]
 

@@ -16,6 +16,10 @@ name = "microshift-test-agent"
 version = "*"
 
 [[packages]]
+name = "pcp-zeroconf"
+version = "*"
+
+[[packages]]
 name = "qemu-guest-agent"
 version = "*"
 

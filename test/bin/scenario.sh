@@ -22,6 +22,7 @@ PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
 VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
 VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
+SKIP_PCP=${SKIP_PCP:-false}  # may be overridden in global settings file
 SKIP_GREENBOOT=${SKIP_GREENBOOT:-false}  # may be overridden in scenario file
 GREENBOOT_TIMEOUT=${GREENBOOT_TIMEOUT:-600}  # may be overridden in scenario file
 # Container image signature verification should be disabled by default in the
@@ -290,6 +291,73 @@ sos_report_for_vm_offline() {
         "--src_dir" "/tmp/var-log-anaconda/" \
         "--dst_dir" "${vmdir}/anaconda/" \
         "--filename" "*.log"
+}
+
+start_pcp_on_all_vms() {
+    if "${SKIP_PCP}"; then
+        echo "Skipping PCP collection"
+        return 0
+    fi
+
+    for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
+        if [ ! -d "${vmdir}" ]; then
+            continue
+        fi
+
+        local vmname
+        vmname=$(basename "${vmdir}")
+        local ip
+        ip=$(cat "$(vm_property_filename "${vmname}" "ip")" 2>/dev/null) || true
+
+        if [ -z "${ip}" ]; then
+            continue
+        fi
+
+        echo "Starting PCP collection on ${vmname}"
+        run_command_on_vm "${vmname}" \
+            "sudo systemctl restart pmcd && \
+             sudo systemctl restart pmlogger" \
+            || echo "WARNING: Failed to start PCP on ${vmname}"
+    done
+}
+
+collect_pcp_reports() {
+    if "${SKIP_PCP}"; then
+        echo "Skipping PCP collection"
+        return 0
+    fi
+
+    echo "Collecting PCP reports"
+    for vmdir in "${SCENARIO_INFO_DIR}"/"${SCENARIO}"/vms/*; do
+        if [ ! -d "${vmdir}" ]; then
+            continue
+        fi
+
+        local vmname
+        vmname=$(basename "${vmdir}")
+        local ip
+        ip=$(cat "$(vm_property_filename "${vmname}" "ip")" 2>/dev/null) || true
+
+        if [ -z "${ip}" ]; then
+            continue
+        fi
+
+        echo "Collecting PCP data from ${vmname}"
+        run_command_on_vm "${vmname}" "sudo systemctl stop pmlogger" || true
+
+        if ! run_command_on_vm "${vmname}" "test -d /var/log/pcp/pmlogger" ; then
+            echo "WARNING: No PCP data directory on ${vmname}, skipping collection"
+            continue
+        fi
+
+        run_command_on_vm "${vmname}" \
+            "sudo tar czf /tmp/pcp-archives.tar.gz -C /var/log/pcp/pmlogger ." || true
+
+        mkdir -p "${vmdir}/pcp"
+        copy_file_from_vm "${vmname}" "/tmp/pcp-archives.tar.gz" "${vmdir}/pcp/" || {
+            echo "WARNING: Failed to collect PCP data from ${vmname}"
+        }
+    done
 }
 
 get_lrel_release_image_url() {
@@ -1584,13 +1652,14 @@ action_run() {
     fi
     record_junit "run" "load_scenario_script" "OK"
 
-    # Set the exit handler to attempt the sos report collection and error logging
+    # Set the exit handler to attempt PCP and SOS report collection and error logging
     # - Preserve the original exit code
     # - Log junit message on failure
     # - Override the exit code if sos report collection fails
     # shellcheck disable=SC2154
     trap 'rc=$? ; \
         [ "${rc}" -ne 0 ] && record_junit "run" "scenario_run_tests" "FAILED" ; \
+        collect_pcp_reports || true ; \
         sos_report true || rc=1 ; \
         close_junit ; exit "${rc}"' EXIT
 
@@ -1600,6 +1669,7 @@ action_run() {
     else
         RUN_HOST_OVERRIDE="$1"
     fi
+    start_pcp_on_all_vms
     scenario_run_tests
     record_junit "run" "scenario_run_tests" "OK"
 }
