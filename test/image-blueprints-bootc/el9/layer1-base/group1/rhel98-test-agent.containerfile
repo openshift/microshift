@@ -23,7 +23,7 @@ COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo /etc/yum.repos.d/
 
 # Install the test agent and cleanup
 RUN dnf install -y microshift-test-agent pcp pcp-zeroconf && \
-    systemctl enable microshift-test-agent && \
+    systemctl enable microshift-test-agent pmcd pmlogger && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
