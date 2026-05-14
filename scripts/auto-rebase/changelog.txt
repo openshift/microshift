@@ -1,24 +1,3 @@
-- api embedded-component 49ae21b8502fc80a351dc17ca4f0a16056797ab4 to 9b69e5fa27e94ac3e4f61a94b56e8a0034ea4aee
-  - 2ca5bc5a 2026-05-07T15:04:57+02:00 update vault kms plugin api tests
-  - dc3d3163 2026-05-07T15:04:36+02:00 regenerate files
-  - fa8dbea6 2026-05-07T15:02:38+02:00 update vault kms plugin api validation
-
-- cluster-ingress-operator embedded-component b2e02207a61e7fa07c6a64969345413853bf28da to 10bbe5fa42c1203acd516e8f090df4954121c224
-  - d978f25 2026-05-04T21:04:01+02:00 use AlwaysAllow UnhealthyPodEvictionPolicy option in PDBs
-
-- machine-config-operator embedded-component 3320406c26099d7395ce79417e5c7fd929aa895d to 99cb8a46e6a31b2b72d6a8371c6cd4ee45393263
-  - 8f31748f 2026-05-08T18:55:32+05:30 Fix test 88814: osImageStream is empty when pool is degraded
-  - 47614dff 2026-05-08T18:46:21+05:30 Fix test 88814: use IGNITION_VERSION for degradation instead of invalid osImageURL
-  - b0f96612 2026-05-08T18:13:36+05:30 Fix test 88814: wait for degraded state to clear before waitForComplete
-  - 0f8586ba 2026-05-08T16:58:51+05:30 Remove OTP label and MCO-2025 prefix from test titles
-  - 4b984584 2026-05-08T16:53:54+05:30 Split OCP-88366: separate degraded pool test into OCP-88814
-  - f7ad0e23 2026-05-08T15:35:20+05:30 Add fix for ossImagestream status
-  - 360d0bd1 2026-05-08T14:18:12+05:30 Fix GetStatusOsImageStream to return stream name instead of full struct
-  - 331c00bd 2026-05-07T15:35:08+05:30 Migrate test OCP-88366: osImageStream should be empty when osImageURL is set
-
-- oc image-arm64 6ac066994b962cb01886dab515d821720324ed52 to ed344a94cfa3f4abe5f2aa0e67e4e016c2158003
-  - af054038 2026-04-27T13:44:30+05:30 Making oc cli case blocking
-
-- ovn-kubernetes image-arm64 22e9487ee7060a85cfe20886b73e11fce3249e36 to a9a7b4e7538cc49df30ee49ec2c4e2c3b98dffab
-  - 0e57b94c 2026-05-02T20:25:22+02:00 Allow info and list tests commands to work without KUBECONFIG
+- oc image-arm64 ed344a94cfa3f4abe5f2aa0e67e4e016c2158003 to 47f74288357be80d716e77e688a1a20278ef3c35
+  - 3b58b08e 2026-05-07T12:47:48-07:00 Bump go-jose dependency
 
