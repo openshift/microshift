@@ -1,7 +1,10 @@
-- cluster-ingress-operator embedded-component 0aca1e80822b4d5690add409f354f991fe9c042e to d14c13be1685e74b898b93a3fa7e03e9b75aa174
-  - 91b9a5c 2026-05-06T13:40:16-03:00 [NE-2203] Add PrometheusRule for Gateway API gathering
+- ovn-kubernetes image-amd64 8e88264292d35914db642556959e3193bb3ff05f to dbebe515c05e673ed62083e019e55aaf9bcebeab
+  - 80518a91 2026-05-04T09:30:51+02:00 fix(kubevirt): Use pod network subnet gateway IP for DHCP router option
+  - 3928ae07 2026-04-08T16:39:36+08:00 egressip: Skip bridge configuration for secondary network IPs
+  - 20b802cc 2026-03-31T13:15:36+02:00 CUDN: cleanup NADs in terminating namespaces without pods
 
-- machine-config-operator embedded-component 1421b8d8b061eccd0fe9248e5a854f163759c09d to 2d25c90c0dc60344479c5bcae395a5baa6ef9c77
-  - 13f907d7 2026-05-06T03:30:58Z OCPBUGS-83859: Fix encapsulated IGN version
-  - c675aef1 2026-05-04T17:57:07Z chore: update AMIs
+- ovn-kubernetes image-arm64 8e88264292d35914db642556959e3193bb3ff05f to dbebe515c05e673ed62083e019e55aaf9bcebeab
+  - 80518a91 2026-05-04T09:30:51+02:00 fix(kubevirt): Use pod network subnet gateway IP for DHCP router option
+  - 3928ae07 2026-04-08T16:39:36+08:00 egressip: Skip bridge configuration for secondary network IPs
+  - 20b802cc 2026-03-31T13:15:36+02:00 CUDN: cleanup NADs in terminating namespaces without pods
 
