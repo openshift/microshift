@@ -174,6 +174,11 @@ Patch ImagePullPolicy For Date Change
     FOR    ${line}    IN    @{lines}
         IF    '${line.strip()}' == '${EMPTY}'    CONTINUE
         @{parts}=    Split String    ${line}
+        ${parts_len}=    Get Length    ${parts}
+        IF    ${parts_len} != 3
+            Log    WARNING: Unexpected line format: ${line}
+            CONTINUE
+        END
         Patch Deploy ImagePullPolicy To IfNotPresent    ${parts}[0]    ${parts}[1]    ${parts}[2]
     END
 
