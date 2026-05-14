@@ -1,3 +1,0 @@
-- cluster-network-operator embedded-component b40233991fa420432a44fba510d59fc24d3aafd7 to c836773db43651d272644c12d47a8d70a118c1d7
-  - a1c7c77 2026-05-01T15:45:29+00:00 wait for patch port to apply drop garp flows
-
