@@ -13,7 +13,8 @@ EOF
 #
 # Note: CNI plugins are required for podman to operate normally on RHEL 9.x.
 # This package is no longer installed as cri-o dependency.
-RUN dnf install -y crypto-policies-scripts containernetworking-plugins dracut-fips && \
+RUN dnf install -y crypto-policies-scripts containernetworking-plugins && \
     update-crypto-policies --no-reload --set FIPS && \
+    echo 'add_dracutmodules+=" fips "' > /etc/dracut.conf.d/40-fips.conf && \
     dnf clean all
 # {{- end -}}
