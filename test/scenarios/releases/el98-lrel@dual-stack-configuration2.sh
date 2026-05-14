@@ -20,6 +20,10 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_commit_not_found "${start_image}"
     run_tests host1 \
-        suites/ipv6/dualstack.robot \
-        suites/configuration/
+        suites/configuration2/apiserver-readiness.robot \
+        suites/configuration2/audit-log.robot \
+        suites/configuration2/data-dir.robot \
+        suites/configuration2/drop-in-config.robot \
+        suites/configuration2/kustomize-sources.robot \
+        suites/configuration2/logging.robot
 }

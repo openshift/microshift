@@ -68,16 +68,3 @@ Restarting MicroShift Should Be Successful On First Try
     ...    return_stderr=True
     ...    return_rc=True
     Should Be Equal As Integers    0    ${rc}
-
-Start MicroShift Without Waiting For Systemd Readiness
-    [Documentation]    Starts MicroShift without waiting for daemon readiness
-    ...    (which happens after all internal services/components declare ready
-    ...    (close ready channel)), so it can be interrupted (restarted) mid startup.
-
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    systemctl start microshift --no-block
-    ...    sudo=True
-    ...    return_stdout=True
-    ...    return_stderr=True
-    ...    return_rc=True
-    Should Be Equal As Integers    0    ${rc}

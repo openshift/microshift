@@ -3,8 +3,8 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
-    launch_vm rhel-9.8
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel102-bootc-source
+    launch_vm rhel102-bootc
 }
 
 scenario_remove_vms() {
@@ -14,6 +14,5 @@ scenario_remove_vms() {
 scenario_run_tests() {
     run_tests host1 \
         suites/osconfig/lifecycle.robot \
-        suites/otp-workloads/oc-cli.robot \
-        suites/otp-workloads/statefulset-pvc.robot
+        suites/core-api/
 }

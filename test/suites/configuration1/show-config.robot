@@ -12,10 +12,17 @@ Suite Teardown      Teardown
 
 
 *** Variables ***
-${MEMLIMIT256}      SEPARATOR=\n
-...                 ---
-...                 etcd:
-...                 \ \ memoryLimitMB: 256
+${MEMLIMIT256}          SEPARATOR=\n
+...                     ---
+...                     etcd:
+...                     \ \ memoryLimitMB: 256
+
+${MEMLIMIT180}          SEPARATOR=\n
+...                     ---
+...                     etcd:
+...                     \ \ memoryLimitMB: 180
+
+${HOME_CONFIG_DIR}      /root/.microshift
 
 
 *** Test Cases ***
@@ -51,6 +58,26 @@ Mode Unknown
     ...    microshift show-config --mode no-such-mode
     ...    sudo=True    return_rc=True
     Should Not Be Equal As Integers    0    ${rc}
+
+Home Directory Config File Is Ignored
+    [Documentation]    MicroShift should not read config from ~/.microshift/config.yaml.
+    ...    Only /etc/microshift/config.yaml (and config.d/ drop-ins) should be used.
+    [Setup]    Run Keywords
+    ...    Command Should Work    mkdir -p ${HOME_CONFIG_DIR}
+    ...    AND
+    ...    Upload String To File    ${MEMLIMIT180}    ${HOME_CONFIG_DIR}/config.yaml
+
+    ${config}=    Show Config    effective
+    Should Not Be Equal As Integers    180    ${config.etcd.memoryLimitMB}
+
+    Drop In MicroShift Config    ${MEMLIMIT180}    10-memlimit
+    ${config}=    Show Config    effective
+    Should Be Equal As Integers    180    ${config.etcd.memoryLimitMB}
+
+    [Teardown]    Run Keywords
+    ...    Command Should Work    rm -rf ${HOME_CONFIG_DIR}
+    ...    AND
+    ...    Remove Drop In MicroShift Config    10-memlimit
 
 
 *** Keywords ***
