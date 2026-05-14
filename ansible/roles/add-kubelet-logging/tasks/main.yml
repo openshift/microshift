@@ -58,7 +58,9 @@
             insecure_skip_verify: true
           static_configs:
             - targets:
-              - {{ hostvars[host].ansible_host }}:10250
+                - {{ hostvars[host].ansible_host }}:10250
+              labels:
+                instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
 
         - job_name: kubelet-{{ host }}-cadvisor
           scheme: https
@@ -69,7 +71,9 @@
           metrics_path: /metrics/cadvisor
           static_configs:
             - targets:
-              - {{ hostvars[host].ansible_host }}:10250
+                - {{ hostvars[host].ansible_host }}:10250
+              labels:
+                instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
       {% endfor %}
 
 - name: Restart prometheus to pick up new target

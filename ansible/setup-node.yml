@@ -18,15 +18,6 @@
       when: (create_devenv | bool)
     - role: setup-localhost
 
-- name: Set up logging node
-  hosts: logging
-  become: yes
-  vars_files:
-  - vars/all.yml
-  roles:
-    - role: install-logging
-      when: (prometheus_logging | bool)
-
 - name: Entitle host and manage repos
   hosts: microshift
   become: yes
@@ -56,6 +47,23 @@
   roles:
     - role: install-microshift
       when: (install_microshift | bool)
+
+- name: Resolve microshift nodename
+  hosts: microshift
+  vars_files:
+    - vars/all.yml
+  tasks:
+    - name: resolve kubernetes nodename
+      include_tasks: roles/common/tasks/nodename.yml
+
+- name: Set up logging node
+  hosts: logging
+  become: yes
+  vars_files:
+  - vars/all.yml
+  roles:
+    - role: install-logging
+      when: (prometheus_logging | bool)
 
 - name: Capture microshift metrics
   hosts: microshift

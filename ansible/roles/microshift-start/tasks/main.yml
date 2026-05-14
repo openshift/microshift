@@ -1,6 +1,9 @@
 ---
 # microshift-start tasks
 
+- name: resolve kubernetes nodename
+  include_tasks: roles/common/tasks/nodename.yml
+
 - name: check if microshift has run
   ansible.builtin.shell: systemctl show -p ActiveEnterTimestampMonotonic microshift | awk -F"=" '{print $2}'
   register: microshift_active
@@ -153,14 +156,14 @@
               | default((groups['logging'] | default([]) | first))
             )
             if (groups['logging'] | default([]) | length > 0)
-            else 'zen3'
+            else 'prometheus'
           )
           ~ ':' ~ (prometheus_port | default(9091) | string),
           true
         )
       }}
-    prom_network_device: "{{ network_device | default(ansible_default_ipv4.interface | default('enp5s0'), true) }}"
-    prom_network_instance: "{{ inventory_hostname }}:9100"
+    prom_network_device: "{{ network_device | default(ansible_facts.default_ipv4.interface | default('enp5s0'), true) }}"
+    prom_network_instance: "{{ kubernetes_nodename }}"
   when: prometheus_logging | bool
 
 - name: query prometheus for network transfer

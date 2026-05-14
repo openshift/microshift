@@ -27,21 +27,24 @@ scrape_configs:
 
   - job_name: node
     static_configs:
-      - targets:
 {% for host in groups['microshift'] %}
-        - {{ host }}:9100
+      - targets: ['{{ host }}:9100']
+        labels:
+          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
 {% endfor %}
 
   - job_name: process
     static_configs:
-      - targets:
 {% for host in groups['microshift'] %}
-        - {{ host }}:9256
+      - targets: ['{{ host }}:9256']
+        labels:
+          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
 {% endfor %}
 
   - job_name: crio
     static_configs:
-      - targets:
 {% for host in groups['microshift'] %}
-        - {{ host }}:9537
+      - targets: ['{{ host }}:9537']
+        labels:
+          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
 {% endfor %}

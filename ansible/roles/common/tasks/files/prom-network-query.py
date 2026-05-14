@@ -7,8 +7,8 @@ Usage:
   prom-network-query.py [options]
 
 Options:
-  --prometheus URL        Prometheus base URL (default: http://zen3:9091)
-  --instance HOST:PORT    Prometheus instance label to filter by (e.g. microshift:9100)
+  --prometheus URL        Prometheus base URL (default: http://prometheus:9091)
+  --instance LABEL        Prometheus instance label to filter by (e.g. node hostname)
   --device IFACE          Network device (default: enp5s0)
   --step STEP             Range query step (default: 15s)
 
@@ -26,7 +26,7 @@ import urllib.parse
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-DEFAULT_PROMETHEUS = "http://zen3:9091"
+DEFAULT_PROMETHEUS = "http://prometheus:9091"
 DEFAULT_DEVICE = "enp5s0"
 DEFAULT_STEP = "15s"
 
@@ -55,9 +55,12 @@ class PrometheusEndpoint:
         return f"{self.scheme}://{self.display_host}:{self.port}{self.base_path}"
 
 
+_CGNAT_NETWORK = ipaddress.ip_network("100.64.0.0/10")
+
+
 def _is_local_or_private_ip(value):
     ip = ipaddress.ip_address(value)
-    return ip.is_private or ip.is_loopback or ip.is_link_local
+    return ip.is_private or ip.is_loopback or ip.is_link_local or ip in _CGNAT_NETWORK
 
 
 def _validate_prometheus_host(host):
@@ -145,7 +148,7 @@ def parse_window_args(argv):
     parser.add_argument(
         "--instance",
         default=None,
-        help="Prometheus instance label to filter by (e.g. microshift:9100)",
+        help="Prometheus instance label to filter by (e.g. node hostname)",
     )
     parser.add_argument(
         "--step",
