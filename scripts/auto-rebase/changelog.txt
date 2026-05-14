@@ -1,9 +1,14 @@
-- cluster-kube-apiserver-operator embedded-component d03062f8d205f1923362c008c86f9bcdd35f931c to 1741228b58952244aceb8e74d35f918431717191
-  - 8ea08a7 2026-05-07T15:29:17Z rename ObserveServiceAccountIssuer variables
-  - 0e1bd5d 2026-05-07T15:29:17Z rename ServiceAccountIssuerController variables
-  - c4ff14b 2026-05-07T15:29:17Z ObserveServiceAccountIssuer event should report an empty issuer during the
-  - ff54284 2026-05-07T15:29:17Z operator should not override authentication config serviceAccountIssuer with the default one during
+- api embedded-component e9fad7d4cba1537b8af99b972370e76370de72e9 to 694421e64aeeae4374e7e7394014ad40ab5a1f30
+  - 5a03f8a5 2026-05-06T15:20:52+02:00 Add labelSelector to MachineSet status for scale subresource
+  - ab1df8ca 2026-04-29T12:52:48+02:00 Promote EVPN Feature Gate
 
-- kubernetes image-arm64 80f28ac33ac111532fb8ba59b2e569085ee871b0 to 6b9ddbe6e09aa225e949baecde4145208bf94c8e
+- kubernetes embedded-component 80f28ac33ac111532fb8ba59b2e569085ee871b0 to 6b9ddbe6e09aa225e949baecde4145208bf94c8e
+  - 93426635f 2026-05-11T15:35:17Z UPSTREAM: 138401: Improve WatchList test robustness
+
+- machine-config-operator embedded-component b7a8bf128b2775ea19c8191efa774f0660b2be70 to 864d1bc04264397caddb7ff1ffa43fc5502aa5e7
+  - c1d06d81 2026-05-12T10:26:44Z Add fix for ossImagestream status
+  - d7901102 2026-04-30T16:16:01Z OCBPUGS-84652: Include RootCA in the temporal CC
+
+- kubernetes image-amd64 80f28ac33ac111532fb8ba59b2e569085ee871b0 to 6b9ddbe6e09aa225e949baecde4145208bf94c8e
   - 93426635f 2026-05-11T15:35:17Z UPSTREAM: 138401: Improve WatchList test robustness
 
