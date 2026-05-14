@@ -8,3 +8,8 @@ tone_instructions: "Be concise"
 reviews:
   in_progress_fortune: false
   poem: false
+  request_changes_workflow: true
+  auto_apply_labels: true
+  labeling_instructions:
+    - label: "ready-for-human-review"
+      instructions: "Apply when CodeRabbit approves the PR with no outstanding comments or requested changes."
