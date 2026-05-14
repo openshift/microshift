@@ -298,7 +298,7 @@ collect_pcp_reports_for_vm() {
     local -r vmname="${2}"
 
     echo "Collecting PCP data from ${vmname}"
-    run_command_on_vm "${vmname}" "sudo systemctl stop pmlogger" || true
+    run_command_on_vm "${vmname}" "sudo systemctl stop --now pmlogger" || true
 
     if ! run_command_on_vm "${vmname}" "test -d /var/log/pcp/pmlogger" ; then
         echo "WARNING: No PCP data directory on ${vmname}, skipping collection"
@@ -328,7 +328,7 @@ collect_pcp_reports_for_vm_offline() {
 
     invoke_qemu_script "bash" \
         "--vm" "${full_vmname}" \
-        "--args" "sudo systemctl stop pmlogger"
+        "--args" "sudo systemctl stop --now pmlogger"
 
     invoke_qemu_script "bash" \
         "--vm" "${full_vmname}" \
