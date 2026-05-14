@@ -16,7 +16,7 @@ action_verify() {
         # If the file was changed, regenerate it and compare - diff means that most likely the file was updated manually.
         "${ROOTDIR}/scripts/pyutils/create-venv.sh"
 
-        if [ "${SCENARIO_BUILD_BRANCH}" == "main" ]; then
+        if [ "${SCENARIO_BUILD_BRANCH}" = "main" ]; then
             y=$(awk -F'[ .]' '{print $3 "." $4}' < "${ROOTDIR}/Makefile.version.x86_64.var")
         else
             y=$(echo "${SCENARIO_BUILD_BRANCH}" | awk -F'[-]' '{ print $2 }')
