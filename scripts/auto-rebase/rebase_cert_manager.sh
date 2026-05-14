@@ -37,7 +37,7 @@ GO_MOD_DIRS=("$REPOROOT/" "$REPOROOT/etcd")
 
 PULL_SECRET_FILE="${HOME}/.pull-secret.json"
 
-OPERATOR_COMPONENTS="cert-manager-controller cert-manager-ca-injector cert-manager-webhook cert-manager-acmesolver cert-manager-istiocsr"
+OPERATOR_COMPONENTS="cert-manager-controller cert-manager-ca-injector cert-manager-webhook cert-manager-acmesolver cert-manager-istiocsr cert-manager-trust-manager"
 
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )

@@ -39,17 +39,9 @@ scrape_configs:
         - {{ host }}:9256
 {% endfor %}
 
-  - job_name: cadvisor
-    static_configs:
-      - targets:
-{% for host in groups['microshift'] %}
-        - {{ host }}:8082
-{% endfor %}
-
   - job_name: crio
     static_configs:
       - targets:
 {% for host in groups['microshift'] %}
         - {{ host }}:9537
 {% endfor %}
-

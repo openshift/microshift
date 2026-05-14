@@ -27,6 +27,15 @@ type DNS struct {
 	// +kubebuilder:example=microshift.example.com
 	BaseDomain string `json:"baseDomain"`
 
+	// configFile is the path to a custom CoreDNS Corefile on the host filesystem.
+	// When set, MicroShift uses this file as the Corefile in the dns-default ConfigMap,
+	// fully replacing the default template-rendered configuration.
+	// Changes to this file are detected at runtime and applied without restarting MicroShift.
+	// Mutually exclusive with dns.hosts: setting both causes a startup error.
+	// +optional
+	// +kubebuilder:example="/etc/microshift/dns/Corefile"
+	ConfigFile string `json:"configFile,omitempty"`
+
 	// Hosts contains configuration for the hosts file.
 	Hosts HostsConfig `json:"hosts,omitempty"`
 }
@@ -59,40 +68,66 @@ func dnsDefaults() DNS {
 }
 
 func (t *DNS) validate() error {
+	if t.ConfigFile != "" && t.Hosts.Status == HostsStatusEnabled {
+		return fmt.Errorf("dns.configFile and dns.hosts are mutually exclusive")
+	}
+
+	if err := t.validateConfigFile(); err != nil {
+		return err
+	}
+
+	return t.validateHosts()
+}
+
+func (t *DNS) validateConfigFile() error {
+	if t.ConfigFile == "" {
+		return nil
+	}
+	return validateFilePath(t.ConfigFile, "dns config file")
+}
+
+func (t *DNS) validateHosts() error {
 	switch t.Hosts.Status {
 	case HostsStatusEnabled:
 		if t.Hosts.File == "" {
 			break
 		}
-
-		cleanPath := filepath.Clean(t.Hosts.File)
-
-		fi, err := os.Stat(cleanPath)
-		// Enforce ConfigMap requirement: the file must not exceed 1MiB, as it will be mounted into a ConfigMap.
-		if err == nil && fi.Size() > 1048576 {
-			return fmt.Errorf("hosts file %s exceeds 1MiB ConfigMap (and internal buffer) size limit (got %d bytes)", t.Hosts.File, fi.Size())
-		}
-		if !filepath.IsAbs(cleanPath) {
-			return fmt.Errorf("hosts file path must be absolute: got %s", t.Hosts.File)
-		}
-
-		_, err = os.Stat(cleanPath)
-		if os.IsNotExist(err) {
-			return fmt.Errorf("hosts file %s does not exist", t.Hosts.File)
-		} else if err != nil {
-			return fmt.Errorf("error checking hosts file %s: %v", t.Hosts.File, err)
-		}
-
-		file, err := os.Open(t.Hosts.File)
-		if err != nil {
-			return fmt.Errorf("hosts file %s is not readable: %v", t.Hosts.File, err)
-		}
-		return file.Close()
-
+		return validateFilePath(t.Hosts.File, "hosts file")
 	case HostsStatusDisabled:
 		return nil
 	default:
 		return fmt.Errorf("invalid hosts status: %s", t.Hosts.Status)
 	}
 	return nil
+}
+
+func validateFilePath(path, label string) error {
+	cleanPath := filepath.Clean(path)
+	if !filepath.IsAbs(cleanPath) {
+		return fmt.Errorf("%s path must be absolute: got %s", label, path)
+	}
+
+	fi, err := os.Stat(cleanPath)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("%s %s does not exist", label, path)
+	} else if err != nil {
+		return fmt.Errorf("error checking %s %s: %v", label, path, err)
+	}
+	if !fi.Mode().IsRegular() {
+		return fmt.Errorf("%s %s must be a regular file", label, path)
+	}
+
+	if fi.Size() == 0 {
+		return fmt.Errorf("%s %s is empty", label, path)
+	}
+
+	if fi.Size() > 1048576 {
+		return fmt.Errorf("%s %s exceeds 1MiB size limit (got %d bytes)", label, path, fi.Size())
+	}
+
+	file, err := os.Open(cleanPath)
+	if err != nil {
+		return fmt.Errorf("%s %s is not readable: %v", label, path, err)
+	}
+	return file.Close()
 }

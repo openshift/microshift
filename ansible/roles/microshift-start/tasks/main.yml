@@ -79,11 +79,6 @@
   environment:
     PBENCH_TOOL_DATA_SINK: localhost:8081
 
-- name: check for cadvisor
-  ansible.builtin.command: which cadvisor
-  register: cadvisor_check
-  ignore_errors: true
-
 - name: record network measurement start epoch
   ansible.builtin.command: date +%s
   register: network_start_epoch

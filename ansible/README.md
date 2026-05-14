@@ -6,7 +6,7 @@ number of points in time as well as performance data for each of the two starts.
 
 ## Prerequisites
 
-We are using [Prometheus](https://prometheus.io/), [process-exporter](https://github.com/ncabatoff/process-exporter) and [cAdvisor](https://github.com/google/cadvisor) to capture a wide array of performance tool data.
+We are using [Prometheus](https://prometheus.io/) and [process-exporter](https://github.com/ncabatoff/process-exporter) to capture a wide array of performance tool data.
 
 It is necessary to have two hosts configured for running the benchmarks:
 * Ansible control node used to start the automation scripts

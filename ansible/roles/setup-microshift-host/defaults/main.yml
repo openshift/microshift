@@ -9,7 +9,7 @@ go_arch: arm64
 go_files:
   - go
   - gofmt
-go_version: 1.24.4
+go_version: 1.25.0
 go_install_dir: /usr/local/go{{ go_version }}
 
 install_packages:
@@ -29,6 +29,6 @@ install_packages:
   - tar
   - vnstat
 
-default_vg_name: microshift
+default_vg_name: rhel_microshift
 vg_name: "{{ default_vg_name }}"
 lvm_disk: /dev/xvdb

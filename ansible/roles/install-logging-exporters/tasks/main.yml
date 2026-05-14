@@ -10,29 +10,6 @@
     disable_gpg_check: true
     state: present
 
-- name: external cadvisor steps
-  block:
-    - name: download cadvisor
-      ansible.builtin.get_url:
-        url: "{{ cadvisor_url }}"
-        dest: /usr/bin/cadvisor
-        checksum: "{{ cadvisor_checksum }}"
-        mode: '0755'
-
-    - name: install systemd unit for cadvisor
-      ansible.builtin.template:
-        src: cadvisor.service.j2
-        dest: /usr/lib/systemd/system/cadvisor.service
-        backup: true
-
-    - name: start and enable cadvisor service
-      ansible.builtin.systemd:
-        name: cadvisor
-        daemon_reload: yes
-        state: started
-        enabled: yes
-  when: cadvisor_external | bool
-
 - name: start and enable prometheus exporter services
   ansible.builtin.systemd:
     name: "{{ item }}"

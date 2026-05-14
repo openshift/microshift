@@ -291,10 +291,9 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 			"components/openshift-dns/dns/service-account.yaml",
 			"components/openshift-dns/node-resolver/service-account.yaml",
 		}
-		cm = []string{
-			"components/openshift-dns/dns/configmap.yaml",
-		}
-		svc = []string{
+		cm     = "components/openshift-dns/dns/configmap.yaml"
+		cmList = []string{cm}
+		svc    = []string{
 			"components/openshift-dns/dns/service.yaml",
 		}
 	)
@@ -303,9 +302,10 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 		return err
 	}
 
+	hostsEnabled := cfg.DNS.Hosts.Status == config.HostsStatusEnabled
 	extraParams := assets.RenderParams{
 		"ClusterIP":    cfg.Network.DNS,
-		"HostsEnabled": cfg.DNS.Hosts.Status == config.HostsStatusEnabled,
+		"HostsEnabled": hostsEnabled,
 	}
 
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
@@ -333,10 +333,24 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 		klog.Warningf("Failed to apply serviceAccount %v %v", sa, err)
 		return err
 	}
-	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply configMap %v %v", cm, err)
-		return err
+
+	if cfg.DNS.ConfigFile != "" {
+		corefileContent, err := os.ReadFile(cfg.DNS.ConfigFile)
+		if err != nil {
+			klog.Warningf("Failed to read custom DNS config file %s: %v", cfg.DNS.ConfigFile, err)
+			return err
+		}
+		if err := assets.ApplyConfigMapWithData(ctx, cm, map[string]string{"Corefile": string(corefileContent)}, kubeconfigPath); err != nil {
+			klog.Warningf("Failed to apply custom DNS configMap: %v", err)
+			return err
+		}
+	} else {
+		if err := assets.ApplyConfigMaps(ctx, cmList, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+			klog.Warningf("Failed to apply configMap %v %v", cmList, err)
+			return err
+		}
 	}
+
 	if err := assets.ApplyDaemonSets(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v %v", apps, err)
 		return err
