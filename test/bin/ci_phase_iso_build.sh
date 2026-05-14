@@ -181,6 +181,7 @@ cd "${ROOTDIR}/test/"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
+# shellcheck source=test/bin/manage_common_versions.sh
 source "${SCRIPTDIR}/manage_common_versions.sh" verify
 
 if ${COMPOSER_CLI_BUILDS} ; then
