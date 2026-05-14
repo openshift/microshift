@@ -182,7 +182,7 @@ cd "${ROOTDIR}/test/"
 source "${SCRIPTDIR}/common.sh"
 
 # shellcheck source=test/bin/manage_common_versions.sh
-source "${SCRIPTDIR}/manage_common_versions.sh" verify
+"${SCRIPTDIR}/manage_common_versions.sh" verify
 
 if ${COMPOSER_CLI_BUILDS} ; then
     # Determine and create the ideal number of workers

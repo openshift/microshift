@@ -234,6 +234,7 @@ get_build_branch() {
 # i.e. <bucket_name>/<branch>
 # shellcheck disable=SC2034  # used elsewhere
 SCENARIO_BUILD_BRANCH="$(get_build_branch)"
+export SCENARIO_BUILD_BRANCH
 
 # The tag identifier of a scenario used in directory
 # names when caching today's build artifacts,
