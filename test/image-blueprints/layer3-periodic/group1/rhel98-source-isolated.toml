@@ -16,6 +16,10 @@ name = "microshift-test-agent"
 version = "*"
 
 [[packages]]
+name = "pcp-zeroconf"
+version = "*"
+
+[[packages]]
 name = "qemu-guest-agent"
 version = "*"
 
@@ -34,7 +38,7 @@ name = "skopeo"
 version = "*"
 
 [customizations.services]
-enabled = ["microshift", "microshift-test-agent", "qemu-guest-agent"]
+enabled = ["microshift", "microshift-test-agent", "qemu-guest-agent", "pmcd", "pmlogger"]
 
 [customizations.firewall]
 ports = ["22:tcp", "80:tcp", "443:tcp", "5353:udp", "6443:tcp", "30000-32767:tcp", "30000-32767:udp"]

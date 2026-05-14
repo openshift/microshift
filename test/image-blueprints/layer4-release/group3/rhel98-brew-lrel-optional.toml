@@ -44,11 +44,15 @@ name = "microshift-test-agent"
 version = "*"
 
 [[packages]]
+name = "pcp-zeroconf"
+version = "*"
+
+[[packages]]
 name = "systemd-resolved"
 version = "*"
 
 [customizations.services]
-enabled = ["microshift", "microshift-test-agent"]
+enabled = ["microshift", "microshift-test-agent", "pmcd", "pmlogger"]
 
 [customizations.firewall]
 ports = [
