@@ -1,14 +1,18 @@
-- api embedded-component e9fad7d4cba1537b8af99b972370e76370de72e9 to 694421e64aeeae4374e7e7394014ad40ab5a1f30
-  - 5a03f8a5 2026-05-06T15:20:52+02:00 Add labelSelector to MachineSet status for scale subresource
-  - ab1df8ca 2026-04-29T12:52:48+02:00 Promote EVPN Feature Gate
-
-- kubernetes embedded-component 80f28ac33ac111532fb8ba59b2e569085ee871b0 to 6b9ddbe6e09aa225e949baecde4145208bf94c8e
-  - 93426635f 2026-05-11T15:35:17Z UPSTREAM: 138401: Improve WatchList test robustness
-
-- machine-config-operator embedded-component b7a8bf128b2775ea19c8191efa774f0660b2be70 to 864d1bc04264397caddb7ff1ffa43fc5502aa5e7
-  - c1d06d81 2026-05-12T10:26:44Z Add fix for ossImagestream status
-  - d7901102 2026-04-30T16:16:01Z OCBPUGS-84652: Include RootCA in the temporal CC
-
-- kubernetes image-amd64 80f28ac33ac111532fb8ba59b2e569085ee871b0 to 6b9ddbe6e09aa225e949baecde4145208bf94c8e
-  - 93426635f 2026-05-11T15:35:17Z UPSTREAM: 138401: Improve WatchList test robustness
+- kubernetes image-arm64 6b9ddbe6e09aa225e949baecde4145208bf94c8e to c5ea727d19837f8a22cda5c0ba8899960b7777ff
+  - c3b2ba200 2026-05-12T17:01:37-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 6636cbce3 2026-05-12T09:50:49Z Release commit for Kubernetes v1.35.5
+  - b9ffe7c06 2026-05-11T11:25:41+02:00 kubeadm: use dedicated ClusterRole for apiserver kubelet client
+  - 7909267f8 2026-05-06T11:08:39+02:00 kubeadm: skip LocalAPIEndpoint defaulting on worker join
+  - f79279632 2026-04-29T17:39:56+02:00 kubeadm: use the localAPIEndpoint for all API calls in 'init'
+  - faa811285 2026-04-28T07:49:50Z kube-proxy: don't do full periodic syncs on large cluster mode
+  - 943d94194 2026-04-26T09:54:46Z Delete remote endpoint if it has same ip as local endpoint in the system.
+  - d550d458d 2026-04-26T09:54:46Z Delete remote endpoint if it has same ip as local endpoint in the system.
+  - 6d314b2fd 2026-04-23T09:15:12+01:00 Add a (*Client) addEndpoint method
+  - feb7fa111 2026-04-23T09:15:11+01:00 Evaluate etcd cluster health using quorum
+  - 1a7f0b3de 2026-04-21T10:55:12+02:00 Escape path inside the container
+  - 6953afbad 2026-04-17T06:40:11Z scheduler: address recreated pod review feedback
+  - bf14155eb 2026-04-17T06:39:06Z scheduler: skip requeueing recreated pods on scheduling failure
+  - 55f12e847 2026-04-17T06:36:28Z scheduler: fix inFlightPods leak when pod is recreated during scheduling failure
+  - 31d47ca37 2026-04-15T18:12:54Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.4
+  - 69dd59d5b 2026-04-01T11:11:34-07:00 podStartSLOduration excludes init container runtime and image pulling time, includes only stateless and immediately schedulable pods
 
