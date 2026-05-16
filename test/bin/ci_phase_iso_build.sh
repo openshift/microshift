@@ -181,8 +181,8 @@ cd "${ROOTDIR}/test/"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
 
-# shellcheck source=test/bin/common_versions_verify.sh
-source "${SCRIPTDIR}/common_versions_verify.sh"
+# shellcheck source=test/bin/manage_common_versions.sh
+$(dry_run) bash -x "${SCRIPTDIR}/manage_common_versions.sh" verify
 
 if ${COMPOSER_CLI_BUILDS} ; then
     # Determine and create the ideal number of workers
