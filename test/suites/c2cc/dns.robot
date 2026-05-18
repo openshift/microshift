@@ -59,40 +59,14 @@ Setup
     Setup Kubeconfig
     Register Local Cluster    cluster-a
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
-    Deploy DNS Test Workloads
+    Deploy Test Workloads
 
 Teardown
     [Documentation]    Remove test workloads and close connections.
-    Cleanup DNS Test Workloads
+    Cleanup Test Workloads
     Teardown All Remote Clusters
     Remove Kubeconfig
     Logout MicroShift Host
-
-Deploy DNS Test Workloads
-    [Documentation]    Create namespace and deploy hello-microshift + curl-pod on both clusters.
-    VAR    ${assets}=    ${EXECDIR}/assets/c2cc
-    FOR    ${alias}    IN    cluster-a    cluster-b
-        ${ns}=    Create Unique Namespace On Cluster    ${alias}
-        Set To Dictionary    ${NAMESPACES}    ${alias}    ${ns}
-        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/hello-microshift.yaml
-        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/curl-pod.yaml
-    END
-    Wait For DNS Test Pods
-
-Wait For DNS Test Pods
-    [Documentation]    Wait for all test pods to be Ready on both clusters.
-    FOR    ${alias}    IN    cluster-a    cluster-b
-        Oc On Cluster
-        ...    ${alias}
-        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACES}[${alias}] --for=condition=Ready --timeout=120s
-    END
-
-Cleanup DNS Test Workloads
-    [Documentation]    Delete test namespace on both clusters. Ignores errors.
-    FOR    ${alias}    IN    cluster-a    cluster-b
-        Run Keyword And Ignore Error
-        ...    Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACES}[${alias}] --timeout=60s
-    END
 
 DNS Resolve From Cluster
     [Documentation]    Resolve a DNS name from curl-pod on the given cluster. Retries for up to 60s.

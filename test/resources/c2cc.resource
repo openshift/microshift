@@ -247,3 +247,29 @@ Verify Corefile Does Not Contain C2CC Server Block
     ${stdout}=    Oc On Cluster    ${alias}
     ...    oc get configmap dns-default -n openshift-dns -o jsonpath='{.data.Corefile}'
     Should Not Contain    ${stdout}    ${domain}:5353
+
+Deploy Test Workloads
+    [Documentation]    Create namespace and deploy hello-microshift + curl-pod on both clusters.
+    VAR    ${assets}=    ${EXECDIR}/assets/c2cc
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        ${ns}=    Create Unique Namespace On Cluster    ${alias}
+        Set To Dictionary    ${NAMESPACES}    ${alias}    ${ns}
+        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/hello-microshift.yaml
+        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/curl-pod.yaml
+    END
+    Wait For Test Pods
+
+Wait For Test Pods
+    [Documentation]    Wait for all test pods to be Ready on both clusters.
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        Oc On Cluster
+        ...    ${alias}
+        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACES}[${alias}] --for=condition=Ready --timeout=120s
+    END
+
+Cleanup Test Workloads
+    [Documentation]    Delete test namespace on both clusters. Ignores errors.
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        Run Keyword And Ignore Error
+        ...    Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACES}[${alias}] --timeout=60s
+    END
