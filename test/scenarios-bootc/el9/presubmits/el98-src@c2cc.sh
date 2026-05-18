@@ -112,10 +112,5 @@ scenario_run_tests() {
         --variable "CLUSTER_B_SVC_CIDR:${CLUSTER_B_SVC_CIDR}" \
         --variable "CLUSTER_B_DOMAIN:${CLUSTER_B_DOMAIN}" \
         --variable "KUBECONFIG_B:${kubeconfig_b}" \
-        suites/c2cc/sanity.robot \
-        suites/c2cc/infrastructure.robot \
-        suites/c2cc/connectivity.robot \
-        suites/c2cc/dns.robot \
-        suites/c2cc/reconciliation.robot \
-        suites/c2cc/cleanup.robot
+        suites/c2cc/
 }
