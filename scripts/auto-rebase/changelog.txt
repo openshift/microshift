@@ -1,0 +1,7 @@
+- ovn-kubernetes image-arm64 2609f4261a2310228b926965b11b7b616c0bb418 to 0276ba1ace90f6182fc13894fc17150262974be6
+  - 80518a91 2026-05-04T09:30:51+02:00 fix(kubevirt): Use pod network subnet gateway IP for DHCP router option
+  - ef7ea17c 2026-04-23T15:54:57+01:00 virt: fix SyncVirtualMachines deleting UDN DHCP options during startup
+  - 8df3403f 2026-04-15T09:39:23+00:00 Backport: Fix NAD Controller syncAll for networkID upgrade from node->NAD
+  - 3928ae07 2026-04-08T16:39:36+08:00 egressip: Skip bridge configuration for secondary network IPs
+  - 2a5bf31c 2026-03-31T16:31:32+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+
