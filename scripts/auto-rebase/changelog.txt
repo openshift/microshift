@@ -1,10 +1,10 @@
-- ovn-kubernetes image-amd64 8e88264292d35914db642556959e3193bb3ff05f to dbebe515c05e673ed62083e019e55aaf9bcebeab
-  - 80518a91 2026-05-04T09:30:51+02:00 fix(kubevirt): Use pod network subnet gateway IP for DHCP router option
-  - 3928ae07 2026-04-08T16:39:36+08:00 egressip: Skip bridge configuration for secondary network IPs
-  - 20b802cc 2026-03-31T13:15:36+02:00 CUDN: cleanup NADs in terminating namespaces without pods
-
-- ovn-kubernetes image-arm64 8e88264292d35914db642556959e3193bb3ff05f to dbebe515c05e673ed62083e019e55aaf9bcebeab
-  - 80518a91 2026-05-04T09:30:51+02:00 fix(kubevirt): Use pod network subnet gateway IP for DHCP router option
-  - 3928ae07 2026-04-08T16:39:36+08:00 egressip: Skip bridge configuration for secondary network IPs
-  - 20b802cc 2026-03-31T13:15:36+02:00 CUDN: cleanup NADs in terminating namespaces without pods
+- kubernetes image-arm64 ba5f1e63e12c85b7d61d5de4a3bbde39e54d33b2 to 2a0461f5d0e21c5b74371626fad32f9632920caa
+  - 6ad6fcfa4 2026-05-12T18:28:20-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 1f348c8e8 2026-05-12T09:43:17Z Release commit for Kubernetes v1.33.12
+  - 5ea68035b 2026-05-11T14:34:27+02:00 kubeadm: use dedicated ClusterRole for apiserver kubelet client
+  - a051bd7fc 2026-05-06T11:09:36+02:00 kubeadm: skip LocalAPIEndpoint defaulting on worker join
+  - be0a49b22 2026-04-29T17:48:03+02:00 kubeadm: use the localAPIEndpoint for all API calls in 'init'
+  - f7077de30 2026-04-23T09:16:24+01:00 Add a (*Client) addEndpoint method
+  - cd70e54c5 2026-04-23T09:16:24+01:00 Evaluate etcd cluster health using quorum
+  - 2ff801658 2026-04-15T18:21:56Z Update CHANGELOG/CHANGELOG-1.33.md for v1.33.11
 
