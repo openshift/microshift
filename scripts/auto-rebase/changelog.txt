@@ -1,0 +1,19 @@
+- kubernetes image-arm64 ae1604b0cb7cc72e353d0b8311c6d62c34143661 to eab2218b931d0c20740d6259df59f242abf32ef7
+  - a69eea964 2026-05-12T18:03:43-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 1f328c5e9 2026-05-12T09:50:01Z Release commit for Kubernetes v1.34.8
+  - 3eb96fe62 2026-05-11T11:26:00+02:00 kubeadm: use dedicated ClusterRole for apiserver kubelet client
+  - 8e92749f0 2026-05-06T11:09:13+02:00 kubeadm: skip LocalAPIEndpoint defaulting on worker join
+  - d0c333c3d 2026-04-29T17:43:52+02:00 kubeadm: use the localAPIEndpoint for all API calls in 'init'
+  - 2df712822 2026-04-28T07:50:06Z kube-proxy: don't do full periodic syncs on large cluster mode
+  - ce035f3a1 2026-04-26T09:52:12Z Delete remote endpoint if it has same ip as local endpoint in the system.
+  - b13bd4704 2026-04-26T09:52:12Z Delete remote endpoint if it has same ip as local endpoint in the system.
+  - a15a8c979 2026-04-23T09:15:42+01:00 Add a (*Client) addEndpoint method
+  - ca1b77448 2026-04-23T09:15:42+01:00 Evaluate etcd cluster health using quorum
+  - 8aebf0222 2026-04-21T10:55:43+02:00 Escape path inside the container
+  - df429e255 2026-04-17T07:09:19Z scheduler: address recreated pod review feedback
+  - d7fec8909 2026-04-17T07:06:31Z scheduler: skip requeueing recreated pods on scheduling failure
+  - 0fbabbac9 2026-04-17T07:04:00Z scheduler: fix inFlightPods leak when pod is recreated during scheduling failure
+  - 96119999d 2026-04-15T18:20:20Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.7
+  - da7c39f84 2026-04-14T13:20:04-07:00 Fix IPv6 allocator for /64 CIDRs
+  - 00bd02c98 2026-04-01T11:58:38-07:00 podStartSLOduration excludes init container runtime and image pulling time, includes only stateless and immediately schedulable pods
+
