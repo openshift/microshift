@@ -1,6 +1,7 @@
 package healthcheck
 
 import (
+	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
 )
@@ -40,16 +41,39 @@ var optionalWorkloadPaths = map[string]optionalWorkloads{
 }
 
 // fillOptionalMicroShiftWorkloads assembles list of optional MicroShift workloads
-// existing on the filesystem as manifests (in comparison to Multus which
-// manifests are part of MicroShift binary).
+// that are both present on the filesystem and included in the configured
+// kustomizePaths. This ensures the healthcheck only waits for optional
+// components that MicroShift was configured to deploy.
 func fillOptionalMicroShiftWorkloads(workloadsToCheck map[string]NamespaceWorkloads) error {
+	cfg, err := config.ActiveConfig()
+	if err != nil {
+		return err
+	}
+
+	configuredPaths, err := cfg.Manifests.GetKustomizationPaths()
+	if err != nil {
+		return err
+	}
+
+	configuredSet := make(map[string]bool, len(configuredPaths))
+	for _, p := range configuredPaths {
+		configuredSet[p] = true
+	}
+
 	for path, ow := range optionalWorkloadPaths {
 		if exists, err := util.PathExists(path); err != nil {
 			return err
-		} else if exists {
-			klog.Infof("Optional component path exists: %s - expecting %v in namespace %q", path, ow.Workloads.String(), ow.Namespace)
-			workloadsToCheck[ow.Namespace] = ow.Workloads
+		} else if !exists {
+			continue
 		}
+
+		if !configuredSet[path] {
+			klog.Infof("Optional component path exists but is not in configured kustomizePaths: %s - skipping", path)
+			continue
+		}
+
+		klog.Infof("Optional component path exists and is configured: %s - expecting %v in namespace %q", path, ow.Workloads.String(), ow.Namespace)
+		workloadsToCheck[ow.Namespace] = ow.Workloads
 	}
 	return nil
 }
