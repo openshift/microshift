@@ -1,0 +1,3 @@
+- oc image-arm64 47f74288357be80d716e77e688a1a20278ef3c35 to a052bd4018333201e48f7370b2263db2dc6a5c99
+  - a052bd40 2026-05-15T18:47:14Z RFE-5434: Add cluster ID and timestamp to must-gather directory name (#2252)
+
