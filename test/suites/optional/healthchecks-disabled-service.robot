@@ -3,10 +3,11 @@ Documentation       Test if healthcheck exits quickly when MicroShift service is
 
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/optional-config.resource
 Library             DateTime
 
-Suite Setup         Setup Suite
-Suite Teardown      Teardown Suite
+Suite Setup         Setup
+Suite Teardown      Teardown
 
 
 *** Test Cases ***
@@ -36,3 +37,15 @@ Healthchecks Should Exit Fast And Successful When MicroShift Is Disabled
         Should Contain    ${stderr}    microshift.service is not enabled
     END
     [Teardown]    Enable MicroShift
+
+
+*** Keywords ***
+Setup
+    [Documentation]    Setup suite with base MicroShift only (no optional components)
+    Setup Suite
+    Setup MicroShift With Optionals
+
+Teardown
+    [Documentation]    Restore config and teardown suite
+    Teardown MicroShift With Optionals
+    Teardown Suite
