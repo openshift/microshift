@@ -11,7 +11,20 @@ import (
 	netutils "k8s.io/utils/net"
 )
 
+type C2CCDNS struct {
+	// Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks
+	// generated for remote clusters. Must be >= 0. Setting to 0 disables positive caching.
+	// +kubebuilder:validation:Minimum=0
+	CacheTTL *int `json:"cacheTTL,omitempty"`
+	// Maximum TTL (seconds) for denial (NXDOMAIN/NODATA) DNS cache entries in CoreDNS
+	// server blocks generated for remote clusters. Must be >= 0. Setting to 0 disables denial caching.
+	// +kubebuilder:validation:Minimum=0
+	CacheNegativeTTL *int `json:"cacheNegativeTTL,omitempty"`
+}
+
 type C2CC struct {
+	// DNS cache settings for CoreDNS server blocks generated for remote clusters.
+	DNS C2CCDNS `json:"dns"`
 	// List of remote clusters to establish connectivity with.
 	// C2CC is disabled when this list is empty.
 	RemoteClusters []RemoteCluster `json:"remoteClusters,omitempty"`
@@ -163,6 +176,13 @@ func parseAndValidateCIDR(cidr, field string, errs *[]error) *net.IPNet {
 func (c *C2CC) validate(cfg *Config) error {
 	if cfg.Network.CNIPlugin != CniPluginUnset && cfg.Network.CNIPlugin != CniPluginOVNK {
 		return fmt.Errorf("cluster to cluster requires OVN-Kubernetes CNI (network.cniPlugin must be \"\" or \"ovnk\", got %q)", cfg.Network.CNIPlugin)
+	}
+
+	if *c.DNS.CacheTTL < 0 {
+		return fmt.Errorf("dns.cacheTTL must be >= 0, got %d", *c.DNS.CacheTTL)
+	}
+	if *c.DNS.CacheNegativeTTL < 0 {
+		return fmt.Errorf("dns.cacheNegativeTTL must be >= 0, got %d", *c.DNS.CacheNegativeTTL)
 	}
 
 	resolved, parseErrs := c.parseRemoteClusters()
@@ -357,13 +377,13 @@ func cidrsOverlap(a, b *net.IPNet) bool {
 }
 
 // RenderC2CCDNSBlocks generates CoreDNS server blocks for cross-cluster DNS.
-func RenderC2CCDNSBlocks(resolved []ResolvedRemoteCluster) string {
+func RenderC2CCDNSBlocks(resolved []ResolvedRemoteCluster, cacheTTL, cacheNegativeTTL int) string {
 	var blocks []string
 	for _, rc := range resolved {
 		if rc.Domain == "" {
 			continue
 		}
-		blocks = append(blocks, formatDNSBlock(rc.Domain, rc.DNSIP))
+		blocks = append(blocks, formatDNSBlock(rc.Domain, rc.DNSIP, cacheTTL, cacheNegativeTTL))
 	}
 	if len(blocks) == 0 {
 		return ""
@@ -371,7 +391,7 @@ func RenderC2CCDNSBlocks(resolved []ResolvedRemoteCluster) string {
 	return "\n" + strings.Join(blocks, "\n")
 }
 
-func formatDNSBlock(domain, dnsIP string) string {
+func formatDNSBlock(domain, dnsIP string, cacheTTL, cacheNegativeTTL int) string {
 	return fmt.Sprintf(`    %s:5353 {
         bufsize 1232
         errors
@@ -380,8 +400,8 @@ func formatDNSBlock(domain, dnsIP string) string {
         }
         rewrite stop name suffix .%s .cluster.local answer auto
         forward . %s
-        cache 10 {
-            denial 9984 10
+        cache %d {
+            denial 9984 %d
         }
-    }`, domain, domain, dnsIP)
+    }`, domain, domain, dnsIP, cacheTTL, cacheNegativeTTL)
 }

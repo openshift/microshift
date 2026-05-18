@@ -309,7 +309,7 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 		"C2CCDNSBlocks": "",
 	}
 	if cfg.C2CC.IsEnabled() {
-		extraParams["C2CCDNSBlocks"] = config.RenderC2CCDNSBlocks(cfg.C2CC.Resolved)
+		extraParams["C2CCDNSBlocks"] = config.RenderC2CCDNSBlocks(cfg.C2CC.Resolved, *cfg.C2CC.DNS.CacheTTL, *cfg.C2CC.DNS.CacheNegativeTTL)
 	}
 
 	if err := assets.ApplyServices(ctx, svc, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
