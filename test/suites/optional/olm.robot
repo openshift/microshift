@@ -4,6 +4,7 @@ Documentation       Operator Lifecycle Manager on MicroShift
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-rpm.resource
+Resource            ../../resources/optional-config.resource
 Resource            ../../resources/oc.resource
 Library             DataFormats.py
 
@@ -46,6 +47,7 @@ Setup
     Login MicroShift Host
     Setup Kubeconfig
     Verify MicroShift RPM Install
+    Setup MicroShift With Optionals    001-microshift-olm
 
 Setup Test
     [Documentation]    Test setup
@@ -62,6 +64,7 @@ Setup Test
 
 Teardown
     [Documentation]    Test suite teardown
+    Teardown MicroShift With Optionals
     Logout MicroShift Host
     Remove Kubeconfig
 

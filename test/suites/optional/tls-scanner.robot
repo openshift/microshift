@@ -10,10 +10,12 @@ Library             Process
 Library             String
 Resource            ../../resources/common.resource
 Resource            ../../resources/kubeconfig.resource
+Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/optional-config.resource
 Resource            ../../resources/oc.resource
 
-Suite Setup         Setup Suite With Namespace
-Suite Teardown      Teardown Suite With Namespace
+Suite Setup         Setup
+Suite Teardown      Teardown
 
 Test Tags           tls-scanner    security    optional
 
@@ -51,6 +53,18 @@ TLS Scanner Host Scan Completes And Produces Artifacts
 
 
 *** Keywords ***
+Setup
+    [Documentation]    Setup suite with base MicroShift only (no optional components)
+    Setup Suite
+    Setup MicroShift With Optionals
+    ${ns}=    Create Unique Namespace
+    VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
+
+Teardown
+    [Documentation]    Restore config and teardown suite
+    Teardown MicroShift With Optionals
+    Teardown Suite With Namespace
+
 Check Required Scanner Variables
     [Documentation]    Fail if SCANNER_IMAGE is not set.
     Should Not Be Empty    ${SCANNER_IMAGE}
