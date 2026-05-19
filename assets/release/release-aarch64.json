@@ -1,11 +1,11 @@
 {
   "release": {
-    "base": "5.0.0-0.nightly-arm64-2026-05-18-005007"
+    "base": "5.0.0-0.nightly-arm64-2026-05-18-185007"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:0d6326a9545c73331c0bf69abef5788f3386613d0e478eda4a8df9a11154b1f8",
     "coredns": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:b0ba4204d533ef88359e60d61a4e42ecd07c4bfa0d256572c5bebb131708245b",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:023ba77301775562ee2c816ab1c1a7aa487f236c57e0dd1f10a9bdb0ca9753bf",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:233c606cbb0d20110cbbbc4b60d604eaeeab1ca043ccbb67ace115d1da7b34b2",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:0d6a1c6ebba722e09ff2850010cb8114a8d097ccee1198c1f59680c8c7581d48",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:ae65312801b5023c8096ff09f403def6b907bfd906e62a8381a99fd69d85b9f4",
     "pod": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:8f1f8a7f2bca9e349f62ec6655c9763a7cd24c838e878162d81c145e5e770eec",
