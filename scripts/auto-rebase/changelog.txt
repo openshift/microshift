@@ -1,3 +1,39 @@
-- oc image-arm64 47f74288357be80d716e77e688a1a20278ef3c35 to a052bd4018333201e48f7370b2263db2dc6a5c99
+- api embedded-component 9b69e5fa27e94ac3e4f61a94b56e8a0034ea4aee to 73d7ca93df6d0a1b02f5533ce20f68d27869a1fe
+  - d1b1bd58 2026-05-12T10:20:34-03:00 remove RouteExternalCertificate feature gate
+
+- cluster-kube-apiserver-operator embedded-component ee66dc7fb78d4166621b65a37791c6e1285a90ac to 167ca3228ab415157eeca5de6cef451c0bfe4db2
+  - 5011204 2026-05-15T15:59:13+05:30 bump library-go to pick up KMS plugin lifecycle changes
+  - abc60f8 2026-05-13T15:16:57+02:00 adjust code after bump
+  - 5396243 2026-05-13T15:16:50+02:00 bump (*)
+  - a9e712c 2026-05-11T17:29:44-04:00 Temporarily extend MutatingAdmissionPolicy runtime-config range to <1.37.0
+
+- machine-config-operator embedded-component 99cb8a46e6a31b2b72d6a8371c6cd4ee45393263 to 61fdd56c3fa546cee22d4420f330e68956f61fd8
+  - 84b08213 2026-05-14T10:52:17-04:00 daemon: expand os image presence check
+  - e4948035 2026-05-13T15:12:06-04:00 e2e: fix up baremetal skew test
+  - 749f4e30 2026-05-12T15:28:23-04:00 TestNoReboot should only consider password hash in /etc/shadow
+  - 7fbe5dc4 2026-05-12T14:50:19+05:30 Migrate mco_observability and mco_daemon tests from openshift-tests-private
+  - 0431fe7f 2026-04-28T17:47:12+05:30 OCPBUGS-79502: Re-enable AutoSizingReserved for Hypershift workers
+  - 6fdf32ef 2026-02-25T07:14:16-05:00 OCPBUGS-63650: configure-ovs: copy lldp mode to br-ex port
+
+- operator-framework-olm embedded-component 12c665225e64d6c3b9d8f294299fc874ef080e4d to 754d45a5855c46aad0842bedbca0780bb5184f68
+  - a1777fe6 2026-05-13T19:24:36Z fix(declcfg): WriteFS now preserves Others and Deprecations (#1979)
+  - 776eaae6 2026-05-13T19:22:35Z Bump google.golang.org/grpc/cmd/protoc-gen-go-grpc from 1.6.1 to 1.6.2 (#1980)
+  - d42b5f16 2026-05-13T19:21:32Z Bump the golang-x-deps group with 3 updates (#1977)
+  - 062089ff 2026-05-13T19:20:57Z Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.48 to 0.4.49 (#1976)
+  - f8711964 2026-05-13T19:20:27Z OPRUN-4548: bundle version increased type safety / serialization support (#1938)
+  - f9a867cf 2026-05-13T19:19:48Z Bump google.golang.org/grpc from 1.80.0 to 1.81.0 (#1974)
+  - c85f16f1 2026-05-13T19:18:45Z Bump github.com/docker/cli (#1975)
+  - c5a41422 2026-05-13T19:17:36Z Bump github.com/distribution/distribution/v3 from 3.1.0 to 3.1.1 (#1973)
+  - 0fc43c41 2026-05-13T19:17:02Z Bump github.com/docker/cli (#1972)
+  - 25654f8c 2026-05-13T19:16:31Z :seedling: add structured output from validation with 'output' option (#1971)
+  - 0141e1d2 2026-05-13T19:15:55Z :seedling: Bump golang.org/x/net from 0.53.0 to 0.54.0 (#3829)
+  - ba49d408 2026-05-13T19:15:18Z Update operator-registry to v1.68.0 (#3830)
+
+- oc image-amd64 6ac066994b962cb01886dab515d821720324ed52 to a052bd4018333201e48f7370b2263db2dc6a5c99
   - a052bd40 2026-05-15T18:47:14Z RFE-5434: Add cluster ID and timestamp to must-gather directory name (#2252)
+  - 3b58b08e 2026-05-07T12:47:48-07:00 Bump go-jose dependency
+  - af054038 2026-04-27T13:44:30+05:30 Making oc cli case blocking
+
+- ovn-kubernetes image-amd64 22e9487ee7060a85cfe20886b73e11fce3249e36 to a9a7b4e7538cc49df30ee49ec2c4e2c3b98dffab
+  - 0e57b94c 2026-05-02T20:25:22+02:00 Allow info and list tests commands to work without KUBECONFIG
 
