@@ -558,13 +558,13 @@ spec:
                 - termination
                 type: object
                 x-kubernetes-validations:
-                - message: cannot have both spec.tls.certificate and spec.tls.externalCertificate
-                  rule: '!(has(self.certificate) && has(self.externalCertificate))'
                 - message: 'cannot have both spec.tls.termination: passthrough and
                     spec.tls.insecureEdgeTerminationPolicy: Allow'
                   rule: 'has(self.termination) && has(self.insecureEdgeTerminationPolicy)
                     ? !((self.termination==''passthrough'') && (self.insecureEdgeTerminationPolicy==''Allow''))
                     : true'
+                - message: cannot have both spec.tls.certificate and spec.tls.externalCertificate
+                  rule: '!(has(self.certificate) && has(self.externalCertificate))'
               to:
                 description: |-
                   to is an object the route should use as the primary backend. Only the Service kind
