@@ -15,10 +15,12 @@ type C2CCDNS struct {
 	// Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks
 	// generated for remote clusters. Must be >= 0. Setting to 0 disables positive caching.
 	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:default=10
 	CacheTTL *int `json:"cacheTTL,omitempty"`
 	// Maximum TTL (seconds) for denial (NXDOMAIN/NODATA) DNS cache entries in CoreDNS
 	// server blocks generated for remote clusters. Must be >= 0. Setting to 0 disables denial caching.
 	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:default=10
 	CacheNegativeTTL *int `json:"cacheNegativeTTL,omitempty"`
 }
 

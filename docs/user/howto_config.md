@@ -194,8 +194,8 @@ apiServer:
         minVersion: VersionTLS12
 clusterToCluster:
     dns:
-        cacheNegativeTTL: 0
-        cacheTTL: 0
+        cacheNegativeTTL: 10
+        cacheTTL: 10
     remoteClusters:
         - clusterNetwork: []
           domain: ""

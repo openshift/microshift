@@ -46,10 +46,10 @@ clusterToCluster:
     dns:
         # Maximum TTL (seconds) for denial (NXDOMAIN/NODATA) DNS cache entries in CoreDNS
         # server blocks generated for remote clusters. Must be >= 0. Setting to 0 disables denial caching.
-        cacheNegativeTTL: 0
+        cacheNegativeTTL: 10
         # Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks
         # generated for remote clusters. Must be >= 0. Setting to 0 disables positive caching.
-        cacheTTL: 0
+        cacheTTL: 10
     # List of remote clusters to establish connectivity with.
     # C2CC is disabled when this list is empty.
     remoteClusters:
