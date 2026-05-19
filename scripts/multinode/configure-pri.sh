@@ -107,8 +107,10 @@ function generate_service_certs() {
             exit 1
     esac
 
-    curl -s -L -o "${cfssl}"      "https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_${cfssl_arch}"
-    curl -s -L -o "${cfssl_json}" "https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_${cfssl_arch}"
+    curl -sS -L --fail --retry 5 --retry-delay 5 --retry-all-errors -o "${cfssl}" \
+        "https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_${cfssl_arch}"
+    curl -sS -L --fail --retry 5 --retry-delay 5 --retry-all-errors -o "${cfssl_json}" \
+        "https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_${cfssl_arch}"
     cat <<EOF > "${cfssl_sha}"
 ${cfssl_map[cfssl]} ${cfssl}
 ${cfssl_map[cfssl_json]} ${cfssl_json}
