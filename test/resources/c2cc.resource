@@ -270,6 +270,5 @@ Wait For Test Pods
 Cleanup Test Workloads
     [Documentation]    Delete test namespace on both clusters. Ignores errors.
     FOR    ${alias}    IN    cluster-a    cluster-b
-        Run Keyword And Ignore Error
-        ...    Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACES}[${alias}] --timeout=60s
+        Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACES}[${alias}] --timeout=60s
     END

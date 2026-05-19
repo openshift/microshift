@@ -180,10 +180,10 @@ func (c *C2CC) validate(cfg *Config) error {
 		return fmt.Errorf("cluster to cluster requires OVN-Kubernetes CNI (network.cniPlugin must be \"\" or \"ovnk\", got %q)", cfg.Network.CNIPlugin)
 	}
 
-	if *c.DNS.CacheTTL < 0 {
+	if c.DNS.CacheTTL != nil && *c.DNS.CacheTTL < 0 {
 		return fmt.Errorf("dns.cacheTTL must be >= 0, got %d", *c.DNS.CacheTTL)
 	}
-	if *c.DNS.CacheNegativeTTL < 0 {
+	if c.DNS.CacheNegativeTTL != nil && *c.DNS.CacheNegativeTTL < 0 {
 		return fmt.Errorf("dns.cacheNegativeTTL must be >= 0, got %d", *c.DNS.CacheNegativeTTL)
 	}
 
@@ -281,6 +281,9 @@ func validateRemoteCluster(
 	if rc.Domain != "" {
 		if domainErrs := validation.IsDNS1123Subdomain(rc.Domain); len(domainErrs) > 0 {
 			errs = append(errs, fmt.Errorf("%s.domain %q is not a valid DNS name: %s", label, rc.Domain, strings.Join(domainErrs, ", ")))
+		}
+		if rc.Domain == "cluster.local" {
+			errs = append(errs, fmt.Errorf("%s.domain cannot be cluster.local", label))
 		}
 		if prev, ok := seenRemoteDomains[rc.Domain]; ok {
 			errs = append(errs, fmt.Errorf("%s.domain %q duplicates remoteClusters[%d]", label, rc.Domain, prev))
