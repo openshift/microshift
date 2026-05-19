@@ -653,6 +653,7 @@ func NewMainKubelet(ctx context.Context,
 		nodeStatusMaxImages:          nodeStatusMaxImages,
 		tracer:                       tracer,
 		nodeStartupLatencyTracker:    kubeDeps.NodeStartupLatencyTracker,
+		podStartupLatencyTracker:     kubeDeps.PodStartupLatencyTracker,
 		healthChecker:                kubeDeps.HealthChecker,
 		flagz:                        kubeDeps.Flagz,
 	}
@@ -815,10 +816,11 @@ func NewMainKubelet(ctx context.Context,
 		kubeCfg.MemorySwap.SwapBehavior,
 		kubeDeps.ContainerManager.GetNodeAllocatableAbsolute,
 		*kubeCfg.MemoryThrottlingFactor,
-		kubeDeps.PodStartupLatencyTracker,
+		klet.podStartupLatencyTracker,
 		kubeDeps.TracerProvider,
 		tokenManager,
 		getServiceAccount,
+		klet.podStartupLatencyTracker,
 	)
 	if err != nil {
 		return nil, err
@@ -1529,6 +1531,9 @@ type Kubelet struct {
 
 	// Track node startup latencies
 	nodeStartupLatencyTracker util.NodeStartupLatencyTracker
+
+	// Track pod startup latencies
+	podStartupLatencyTracker util.PodStartupLatencyTracker
 
 	// Health check kubelet
 	healthChecker watchdog.HealthChecker
