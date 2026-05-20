@@ -51,6 +51,7 @@ Setup
     Setup Kubeconfig
     Register Local Cluster    cluster-a
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
+    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
 
 Teardown
     [Documentation]    Close all connections and clean up kubeconfigs.

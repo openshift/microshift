@@ -37,7 +37,7 @@ configure_c2cc_host() {
     local host=$1 remote_ip=$2 remote_pod_cidr=$3 remote_svc_cidr=$4 remote_domain=$5
 
     run_command_on_vm "${host}" "sudo mkdir -p /etc/microshift/config.d"
-    run_command_on_vm "${host}" "sudo tee /etc/microshift/config.d/50-c2cc.yaml > /dev/null << EOF
+    run_command_on_vm "${host}" "sudo tee /etc/microshift/config.d/50-c2cc-${remote_domain}.yaml > /dev/null << EOF
 clusterToCluster:
   remoteClusters:
   - nextHop: ${remote_ip}
