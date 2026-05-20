@@ -9,6 +9,8 @@ Library             ../../resources/prometheus.py
 Library             ../../resources/loki.py
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/common.resource
+Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/optional-config.resource
 Resource            ../../resources/systemd.resource
 Resource            ../../resources/observability.resource
 Resource            ../../resources/microshift-network.resource
@@ -68,19 +70,23 @@ Logs Should Not Contain Receiver Errors
 Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
-    Setup Suite With Namespace
-    # Configure the firewall for the Prometheus exporter
-    Command Should Work    sudo firewall-cmd --permanent --zone=public --add-port=8889/tcp
-    Command Should Work    sudo firewall-cmd --reload
-    # Configure observability settings
-    Check Required Observability Variables
-    Ensure Loki Is Ready
-    Set Test OTEL Configuration
-    # We need to do something to the cluster to generate new kube events
+    Setup Suite
+    Setup MicroShift With Optionals    003-microshift-observability
+    ${ns}    Create Unique Namespace
+    VAR    ${NAMESPACE}    ${ns}    scope=SUITE
+    Configure Firewall And Observability
     Create Hello MicroShift Pod
     Expose Hello MicroShift
     ${cur}    Get Journal Cursor    unit=microshift-observability
     VAR    ${JOURNAL_CUR}    ${cur}    scope=SUITE
+
+Configure Firewall And Observability
+    [Documentation]    Configure firewall for Prometheus exporter and set up observability
+    Command Should Work    sudo firewall-cmd --permanent --zone=public --add-port=8889/tcp
+    Command Should Work    sudo firewall-cmd --reload
+    Check Required Observability Variables
+    Ensure Loki Is Ready
+    Set Test OTEL Configuration
 
 Check Required Observability Variables
     [Documentation]    Check if the required proxy variables are set
@@ -124,6 +130,7 @@ Set Test OTEL Configuration
 Teardown Suite And Revert Test Host
     [Documentation]    Set back original OTEL config and teardown Suite
     Set Back Original OTEL Configuration
+    Teardown MicroShift With Optionals
     Teardown Suite With Namespace
 
 Set Back Original OTEL Configuration

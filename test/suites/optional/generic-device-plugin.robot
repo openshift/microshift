@@ -3,12 +3,13 @@ Documentation       Generic Device Plugin
 
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/optional-config.resource
 Resource            ../../resources/ostree-health.resource
 Variables           strings.py
 Library             strings.py
 
-Suite Setup         Setup Suite With Namespace
-Suite Teardown      Teardown Suite With GDP Cleanup
+Suite Setup         Setup Suite With Optionals
+Suite Teardown      Teardown Suite With GDP Cleanup And Optionals
 
 Test Tags           generic-device-plugin
 
@@ -244,11 +245,17 @@ Create Pod And Verify Allocation
     # Verify node shows correct allocation
     Verify Node Device Allocation    ${expected_total_allocated}
 
-Teardown Suite With GDP Cleanup
-    [Documentation]    Suite teardown that cleans up GDP configuration and restarts MicroShift
-    # Clean up any remaining GDP configuration
+Setup Suite With Optionals
+    [Documentation]    Setup suite with base MicroShift only (no optional components)
+    Setup Suite
+    Setup MicroShift With Optionals
+    ${ns}=    Create Unique Namespace
+    VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
+
+Teardown Suite With GDP Cleanup And Optionals
+    [Documentation]    Suite teardown that cleans up GDP configuration and restores optionals config
     Remove Drop In MicroShift Config    10-gdp
-    # Restart MicroShift to clean state for next suite
     Restart MicroShift
     Wait For MicroShift Healthcheck Success
+    Teardown MicroShift With Optionals
     Teardown Suite With Namespace
