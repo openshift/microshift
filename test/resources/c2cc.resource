@@ -258,6 +258,7 @@ Deploy Test Workloads
         Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/curl-pod.yaml
     END
     Wait For Test Pods
+    Wait For Service Endpoints
 
 Wait For Test Pods
     [Documentation]    Wait for all test pods to be Ready on both clusters.
@@ -266,6 +267,21 @@ Wait For Test Pods
         ...    ${alias}
         ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACES}[${alias}] --for=condition=Ready --timeout=120s
     END
+
+Wait For Service Endpoints
+    [Documentation]    Wait for hello-microshift service to have endpoints on both clusters.
+    ...    Ensures OVN-K has synced the EndpointSlice and programmed the OVN load balancer.
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        Wait Until Keyword Succeeds    120s    5s
+        ...    Service Endpoints Should Exist    ${alias}    ${NAMESPACES}[${alias}]
+    END
+
+Service Endpoints Should Exist
+    [Documentation]    Verify the hello-microshift endpoint has at least one address.
+    [Arguments]    ${alias}    ${ns}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get endpoints hello-microshift -n ${ns} -o jsonpath='{.subsets[0].addresses[0].ip}'
+    Should Not Be Empty    ${stdout}
 
 Cleanup Test Workloads
     [Documentation]    Delete test namespace on both clusters. Ignores errors.
