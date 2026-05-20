@@ -72,7 +72,7 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 		return fmt.Errorf("failed to init subsystems: %w", err)
 	}
 
-	reconcileCh := make(chan string, 10)
+	reconcileCh := make(chan string, 50)
 
 	c.ovn.subscribe(ctx, reconcileCh)
 
