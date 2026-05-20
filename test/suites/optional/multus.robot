@@ -5,9 +5,10 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/multus.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-rpm.resource
+Resource            ../../resources/optional-config.resource
 
 Suite Setup         Setup
-Suite Teardown      Teardown Suite With Namespace
+Suite Teardown      Teardown
 
 Test Tags           vm-only
 
@@ -111,15 +112,26 @@ Ipvlan
 *** Keywords ***
 Setup
     [Documentation]    Setup test suite
-    Setup Suite With Namespace
+    Setup Suite
+    Setup MicroShift With Optionals
+    ${ns}=    Create Unique Namespace
+    VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
+    Setup Network Interfaces
+    Verify MicroShift RPM Install
 
+Setup Network Interfaces
+    [Documentation]    Detect network interfaces for macvlan and ipvlan tests
     ${out}=    Command Should Work    ip route list default | cut -d' ' -f5
     @{enps}=    String.Split To Lines    ${out}
     ${len}=    Get Length    ${enps}
     Should Be True    ${len}>=2
     VAR    ${MACVLAN_MASTER}=    ${enps[0]}    scope=SUITE
     VAR    ${IPVLAN_MASTER}=    ${enps[1]}    scope=SUITE
-    Verify MicroShift RPM Install
+
+Teardown
+    [Documentation]    Restore config and teardown suite
+    Teardown MicroShift With Optionals
+    Teardown Suite With Namespace
 
 Template And Create NAD And Pod
     [Documentation]    Template NAD and create it along with Pod

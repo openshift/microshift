@@ -2,10 +2,12 @@
 Documentation       Test Gateway API functionality
 
 Resource            ../../resources/microshift-network.resource
+Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/optional-config.resource
 Resource            ../../resources/oc.resource
 
-Suite Setup         Setup Suite With Namespace
-Suite Teardown      Teardown Suite With Namespace
+Suite Setup         Setup
+Suite Teardown      Teardown
 
 Test Tags           optional    gateway-api
 
@@ -38,6 +40,18 @@ Test Simple HTTP Route
 
 
 *** Keywords ***
+Setup
+    [Documentation]    Setup gateway-api suite with only its required optionals
+    Setup Suite
+    Setup MicroShift With Optionals    000-microshift-gateway-api
+    ${ns}    Create Unique Namespace
+    VAR    ${NAMESPACE}    ${ns}    scope=SUITE
+
+Teardown
+    [Documentation]    Restore config and teardown suite
+    Teardown MicroShift With Optionals
+    Teardown Suite With Namespace
+
 Deploy Hello MicroShift
     [Documentation]    Deploys the hello microshift application (service included)
     ...    in the given namespace.
