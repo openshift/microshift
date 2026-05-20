@@ -19,6 +19,20 @@ Test Tags           c2cc
 
 
 *** Test Cases ***
+Test Cross Cluster Connectivity
+    [Template]    Test Connectivity Between Clusters
+    cluster-a    cluster-b    pod
+    cluster-a    cluster-b    service
+    cluster-a    cluster-c    pod
+    cluster-a    cluster-c    service
+    cluster-b    cluster-a    pod
+    cluster-b    cluster-a    service
+    cluster-b    cluster-c    pod
+    cluster-b    cluster-c    service
+    cluster-c    cluster-a    pod
+    cluster-c    cluster-a    service
+    cluster-c    cluster-b    pod
+    cluster-c    cluster-b    service
 Pod To Pod From Cluster A To Cluster B
     [Documentation]    Verify pod on Cluster A can reach pod IP on Cluster B.
     ${pod_ip_b}=    Get Hello Pod IP    cluster-b
@@ -80,6 +94,7 @@ Setup
     Setup Kubeconfig
     Register Local Cluster    cluster-a
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
+    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
     Deploy Test Workloads
 
 Teardown
@@ -88,6 +103,46 @@ Teardown
     Teardown All Remote Clusters
     Remove Kubeconfig
     Logout MicroShift Host
+
+Test Connectivity Between Clusters
+    [Documentation]    Verify pod on ${source} can reach ${endpoint_type} IP on ${destination}
+    [Arguments]    ${source}    ${destination}    ${endpoint_type}
+    IF    '${endpoint_type}' == 'pod'
+        ${ip_dest}=    Get Hello Pod IP    ${destination}
+    ELSE IF    '${endpoint_type}' == 'service'
+        ${ip_dest}=    Get Hello Service IP    ${destination}
+    ELSE
+        Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
+    END
+    
+    ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
+    Should Contain    ${stdout}    Hello MicroShift
+
+    
+
+Deploy Test Workloads
+    [Documentation]    Create namespace and deploy hello-microshift + curl-pod on both clusters.
+    VAR    ${assets}=    ${EXECDIR}/assets/c2cc
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
+        Oc On Cluster    ${alias}    oc create namespace ${NAMESPACE}
+        Oc On Cluster    ${alias}    oc apply -n ${NAMESPACE} -f ${assets}/hello-microshift.yaml
+        Oc On Cluster    ${alias}    oc apply -n ${NAMESPACE} -f ${assets}/curl-pod.yaml
+    END
+    Wait For Test Pods
+
+Wait For Test Pods
+    [Documentation]    Wait for all test pods to be Ready on both clusters.
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
+        Oc On Cluster    ${alias}
+        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACE} --for=condition=Ready --timeout=120s
+    END
+
+Cleanup Test Workloads
+    [Documentation]    Delete test namespace on both clusters. Ignores errors.
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
+        Run Keyword And Ignore Error
+        ...    Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACE} --timeout=60s
+    END
 
 Get Hello Pod IP
     [Documentation]    Get the pod IP of hello-microshift on the given cluster.

@@ -22,6 +22,13 @@ ${HOST2_IP}                 ${EMPTY}
 ${HOST2_SSH_PORT}           ${EMPTY}
 ${HOST2_API_PORT}           ${EMPTY}
 ${KUBECONFIG_B}             ${EMPTY}
+${CLUSTER_C_POD_CIDR}       ${EMPTY}
+${CLUSTER_C_SVC_CIDR}       ${EMPTY}
+${CLUSTER_C_DOMAIN}         ${EMPTY}
+${HOST3_IP}                 ${EMPTY}
+${HOST3_SSH_PORT}           ${EMPTY}
+${HOST3_API_PORT}           ${EMPTY}
+${KUBECONFIG_C}             ${EMPTY}
 &{C2CC_KUBECONFIGS}         &{EMPTY}
 &{C2CC_SSH_IDS}             &{EMPTY}
 @{C2CC_REMOTE_ALIASES}      @{EMPTY}
