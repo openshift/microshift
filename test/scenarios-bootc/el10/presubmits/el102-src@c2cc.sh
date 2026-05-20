@@ -14,8 +14,8 @@ CLUSTER_B_SVC_CIDR="10.46.0.0/16"
 CLUSTER_B_DOMAIN="cluster-b.remote"
 
 # Cluster C (host3): non-overlapping CIDRs
-CLUSTER_C_POD_CIDR="10.47.0.0/16"
-CLUSTER_C_SVC_CIDR="10.48.0.0/16"
+CLUSTER_C_POD_CIDR="10.48.0.0/16"
+CLUSTER_C_SVC_CIDR="10.49.0.0/16"
 CLUSTER_C_DOMAIN="cluster-c.remote"
 
 wait_for_greenboot_on_hosts() {
