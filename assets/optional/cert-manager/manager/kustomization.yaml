@@ -65,3 +65,9 @@ replacements:
           name: controller-manager
         fieldPaths:
           - spec.template.spec.containers.[name=cert-manager-operator].image
+configMapGenerator:
+  - name: trusted-ca-bundle
+    files:
+      - ca-bundle.crt=tls-ca-bundle.pem
+generatorOptions:
+  disableNameSuffixHash: true
