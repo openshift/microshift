@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	reconcileInterval = 10 * time.Second
+	reconcileInterval = 2 * time.Second
 )
 
 type C2CCRouteManager struct {
