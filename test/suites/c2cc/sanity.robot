@@ -15,24 +15,28 @@ Test Tags           c2cc
 
 *** Test Cases ***
 Cluster Is Running
+    [Documentation]    Verify all clusters are healthy.
     [Template]    Verify Cluster Is Running
     cluster-a
     cluster-b
     cluster-c
 
 All Pods On Cluster Are Ready
+    [Documentation]    Verify all pods reach Ready state on all clusters.
     [Template]    Verify All Pods Are Ready
     cluster-a
     cluster-b
     cluster-c
 
 Cluster Has Expected Node
+    [Documentation]    Verify all clusters have a node.
     [Template]    Verify Cluster Has Node
     cluster-a
     cluster-b
     cluster-c
 
 C2CC Controller Is Running On Cluster
+    [Documentation]    Verify c2cc-route-manager logged startup on all clusters.
     [Template]    Verify C2CC Controller Is Running
     cluster-a
     cluster-b

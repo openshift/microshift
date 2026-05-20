@@ -20,6 +20,7 @@ Test Tags           c2cc
 
 *** Test Cases ***
 Test Cross Cluster Connectivity
+    [Documentation]    Verify pods on all clusters can reach pods/services on all other clusters.
     [Template]    Test Connectivity Between Clusters
     cluster-a    cluster-b    pod
     cluster-a    cluster-b    service
@@ -114,11 +115,9 @@ Test Connectivity Between Clusters
     ELSE
         Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
     END
-    
+
     ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
     Should Contain    ${stdout}    Hello MicroShift
-
-    
 
 Deploy Test Workloads
     [Documentation]    Create namespace and deploy hello-microshift + curl-pod on both clusters.

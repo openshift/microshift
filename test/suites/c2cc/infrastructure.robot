@@ -16,6 +16,7 @@ Test Tags           c2cc
 
 *** Test Cases ***
 Linux Routes Table 200 Exist
+    [Documentation]    Verify routes to remote CIDRs exist in policy routing table 200 between all clusters.
     [Template]    Verify Routes In Table 200
     cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
     cluster-a    ${CLUSTER_C_POD_CIDR}    ${CLUSTER_C_SVC_CIDR}
@@ -25,6 +26,7 @@ Linux Routes Table 200 Exist
     cluster-c    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
 
 IP Rules For Remote CIDRs Exist
+    [Documentation]    Verify IP rules at priority 100 direct remote CIDRs to table 200 between all clusters.
     [Template]    Verify IP Rules For Table 200
     cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
     cluster-a    ${CLUSTER_C_POD_CIDR}    ${CLUSTER_C_SVC_CIDR}
@@ -34,12 +36,14 @@ IP Rules For Remote CIDRs Exist
     cluster-c    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
 
 Service Routes Table 201 Exist
+    [Documentation]    Verify service routes exist in table 201 on all clusters.
     [Template]    Verify Routes In Table 201
     cluster-a    ${CLUSTER_A_SVC_CIDR}
     cluster-b    ${CLUSTER_B_SVC_CIDR}
     cluster-c    ${CLUSTER_C_SVC_CIDR}
 
 Service IP Rules Exist
+    [Documentation]    Verify IP rules at priority 99 for service routing on all clusters.
     [Template]    Verify Service IP Rules
     cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}    ${CLUSTER_A_SVC_CIDR}
     cluster-a    ${CLUSTER_C_POD_CIDR}    ${CLUSTER_C_SVC_CIDR}    ${CLUSTER_A_SVC_CIDR}
@@ -49,6 +53,7 @@ Service IP Rules Exist
     cluster-c    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}    ${CLUSTER_C_SVC_CIDR}
 
 NFTables Bypass Rules Exist
+    [Documentation]    Verify nftables masquerade bypass rules for remote CIDRs on all clusters.
     [Template]    Verify NFTables Bypass Rules
     cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
     cluster-a    ${CLUSTER_C_POD_CIDR}    ${CLUSTER_C_SVC_CIDR}
@@ -58,6 +63,7 @@ NFTables Bypass Rules Exist
     cluster-c    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
 
 OVN Static Routes Exist
+    [Documentation]    Verify OVN NB static routes tagged with microshift-c2cc on all clusters.
     [Template]    Verify OVN Static Routes
     cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
     cluster-a    ${CLUSTER_C_POD_CIDR}    ${CLUSTER_C_SVC_CIDR}
@@ -67,6 +73,7 @@ OVN Static Routes Exist
     cluster-c    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
 
 Node Annotation Set
+    [Documentation]    Verify SNAT-exclude annotation contains remote CIDRs on all clusters.
     [Template]    Verify Node SNAT Annotation
     cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}
     cluster-a    ${CLUSTER_C_POD_CIDR}    ${CLUSTER_C_SVC_CIDR}
