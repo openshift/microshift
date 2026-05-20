@@ -1,44 +1,8 @@
-- cluster-kube-apiserver-operator embedded-component 1741228b58952244aceb8e74d35f918431717191 to fb68eab51544f9dffac9916796723f6cee4faf3c
-  - 9bac764 2026-05-12T15:08:27-04:00 vendor: bump library-go for atomicdir fsync fix
+- machine-config-operator embedded-component c7abfa0bd88d48bc7a8d8b70d982127d2b6a9158 to 6ff546c6bf38055a335625191c60dcc9c7c714d2
+  - 37e6da35 2026-05-06T15:34:10Z daemon: use --delete-if-present for karg removal
 
-- kubernetes embedded-component 6b9ddbe6e09aa225e949baecde4145208bf94c8e to c5ea727d19837f8a22cda5c0ba8899960b7777ff
-  - c3b2ba200 2026-05-12T17:01:37-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 6636cbce3 2026-05-12T09:50:49Z Release commit for Kubernetes v1.35.5
-  - b9ffe7c06 2026-05-11T11:25:41+02:00 kubeadm: use dedicated ClusterRole for apiserver kubelet client
-  - 7909267f8 2026-05-06T11:08:39+02:00 kubeadm: skip LocalAPIEndpoint defaulting on worker join
-  - f79279632 2026-04-29T17:39:56+02:00 kubeadm: use the localAPIEndpoint for all API calls in 'init'
-  - faa811285 2026-04-28T07:49:50Z kube-proxy: don't do full periodic syncs on large cluster mode
-  - 943d94194 2026-04-26T09:54:46Z Delete remote endpoint if it has same ip as local endpoint in the system.
-  - d550d458d 2026-04-26T09:54:46Z Delete remote endpoint if it has same ip as local endpoint in the system.
-  - 6d314b2fd 2026-04-23T09:15:12+01:00 Add a (*Client) addEndpoint method
-  - feb7fa111 2026-04-23T09:15:11+01:00 Evaluate etcd cluster health using quorum
-  - 1a7f0b3de 2026-04-21T10:55:12+02:00 Escape path inside the container
-  - 6953afbad 2026-04-17T06:40:11Z scheduler: address recreated pod review feedback
-  - bf14155eb 2026-04-17T06:39:06Z scheduler: skip requeueing recreated pods on scheduling failure
-  - 55f12e847 2026-04-17T06:36:28Z scheduler: fix inFlightPods leak when pod is recreated during scheduling failure
-  - 31d47ca37 2026-04-15T18:12:54Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.4
-  - 69dd59d5b 2026-04-01T11:11:34-07:00 podStartSLOduration excludes init container runtime and image pulling time, includes only stateless and immediately schedulable pods
-
-- machine-config-operator embedded-component 864d1bc04264397caddb7ff1ffa43fc5502aa5e7 to c7abfa0bd88d48bc7a8d8b70d982127d2b6a9158
-  - 1c422991 2026-05-14T14:12:56Z e2e: fix up baremetal skew test
-  - 3f9451c5 2026-05-14T10:09:12Z TestNoReboot should only consider password hash in /etc/shadow
-  - 267488fe 2026-05-07T06:24:30Z controller: add terminationMessagePolicy to build pod containers
-
-- kubernetes image-amd64 6b9ddbe6e09aa225e949baecde4145208bf94c8e to c5ea727d19837f8a22cda5c0ba8899960b7777ff
-  - c3b2ba200 2026-05-12T17:01:37-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 6636cbce3 2026-05-12T09:50:49Z Release commit for Kubernetes v1.35.5
-  - b9ffe7c06 2026-05-11T11:25:41+02:00 kubeadm: use dedicated ClusterRole for apiserver kubelet client
-  - 7909267f8 2026-05-06T11:08:39+02:00 kubeadm: skip LocalAPIEndpoint defaulting on worker join
-  - f79279632 2026-04-29T17:39:56+02:00 kubeadm: use the localAPIEndpoint for all API calls in 'init'
-  - faa811285 2026-04-28T07:49:50Z kube-proxy: don't do full periodic syncs on large cluster mode
-  - 943d94194 2026-04-26T09:54:46Z Delete remote endpoint if it has same ip as local endpoint in the system.
-  - d550d458d 2026-04-26T09:54:46Z Delete remote endpoint if it has same ip as local endpoint in the system.
-  - 6d314b2fd 2026-04-23T09:15:12+01:00 Add a (*Client) addEndpoint method
-  - feb7fa111 2026-04-23T09:15:11+01:00 Evaluate etcd cluster health using quorum
-  - 1a7f0b3de 2026-04-21T10:55:12+02:00 Escape path inside the container
-  - 6953afbad 2026-04-17T06:40:11Z scheduler: address recreated pod review feedback
-  - bf14155eb 2026-04-17T06:39:06Z scheduler: skip requeueing recreated pods on scheduling failure
-  - 55f12e847 2026-04-17T06:36:28Z scheduler: fix inFlightPods leak when pod is recreated during scheduling failure
-  - 31d47ca37 2026-04-15T18:12:54Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.4
-  - 69dd59d5b 2026-04-01T11:11:34-07:00 podStartSLOduration excludes init container runtime and image pulling time, includes only stateless and immediately schedulable pods
+- coredns image-arm64 0dded2d232dab43c107b1dab9d0d9fdfd8259622 to 9a71d9a6b788437e755b5ed3bfad78c63fa7c6f4
+  - 7db70e5 2026-05-19T10:46:26-04:00 Fix GO-2026-4918: Bump golang.org/x/net to v0.53.0
+  - 8316b33 2026-05-19T10:46:26-04:00 Fix GO-2025-4245: Bump github.com/expr-lang/expr to v1.17.7
+  - 38d839a 2026-05-19T10:46:26-04:00 OCPBUGS-83943: Bump gRPC to v1.79.3 to resolve CVE-2026-33186
 
