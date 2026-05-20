@@ -53,8 +53,28 @@ spec:
             - probeTarget
             type: object
           status:
-            description: RemoteClusterStatus is populated by the probe pod in a future
-              ticket.
+            description: RemoteClusterStatus is populated by the probe pod with health
+              probe results.
+            properties:
+              errors:
+                items:
+                  type: string
+                type: array
+              lastProbeTime:
+                format: date-time
+                type: string
+              lastSuccessfulProbe:
+                format: date-time
+                type: string
+              state:
+                default: NeverProbed
+                enum:
+                - NeverProbed
+                - Healthy
+                - Unhealthy
+                type: string
+            required:
+            - state
             type: object
         required:
         - spec
