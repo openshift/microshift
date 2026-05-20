@@ -39,6 +39,7 @@ data:
   Nvidia_mlx5_ConnectX-6_Dx: 15b3 101d 101e
   Nvidia_mlx5_ConnectX-6_Lx: 15b3 101f 101e
   Nvidia_mlx5_ConnectX-7: 15b3 1021 101e
+  Nvidia_mlx5_ConnectX-8: 15b3 1023 101e
   Pensando_ionic_DSC: 1dd8 1002 1003
   Qlogic_qede_QL41000: 1077 8070 8090
   Qlogic_qede_QL45000_25G: 1077 1656 1664
