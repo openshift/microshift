@@ -92,6 +92,11 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
+    if [[ -z "${BREW_LREL_RELEASE_VERSION}" ]]; then
+        echo "WARNING: No brew RPMs available for ${MAJOR_VERSION}.${MINOR_VERSION}, skipping RPM tests"
+        return 0
+    fi
+
     local -r reponame=$(basename "${BREW_REPO}")
     local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
 
