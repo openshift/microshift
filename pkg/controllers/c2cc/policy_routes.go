@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"syscall"
 
 	"github.com/vishvananda/netlink"
 	"k8s.io/klog/v2"
@@ -110,9 +111,13 @@ func (t *policyRouteTable) subscribe(reconcileCh chan<- string, reason string) (
 			if update.Table != t.table {
 				continue
 			}
+			if update.Type == syscall.RTM_DELROUTE {
+				klog.V(2).Infof("Detected external deletion of route in table %d: %v", t.table, update.Route)
+			}
 			select {
 			case reconcileCh <- reason:
 			default:
+				klog.V(4).Infof("Reconcile channel full, dropping %s event for table %d", reason, t.table)
 			}
 		}
 	}()

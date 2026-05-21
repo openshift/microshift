@@ -15,8 +15,8 @@ Test Tags           c2cc
 
 
 *** Variables ***
-${CLEANUP_TIMEOUT}      60s
-${CLEANUP_RETRY}        5s
+${CLEANUP_TIMEOUT}      360s
+${CLEANUP_RETRY}        30s
 ${C2CC_CONFIG_PATH}     /etc/microshift/config.d/50-c2cc.yaml
 
 
@@ -112,7 +112,6 @@ Enable C2CC On Cluster
     ...    Verify Cluster Is Healthy    ${alias}
 
 Verify Cluster Is Healthy
-    [Documentation]    Check the /readyz endpoint on the given cluster.
+    [Documentation]    Verify MicroShift and all core workloads (including OVN-K) are ready.
     [Arguments]    ${alias}
-    ${stdout}=    Oc On Cluster    ${alias}    oc get --raw='/readyz'
-    Should Be Equal As Strings    ${stdout}    ok    strip_spaces=True
+    Command On Cluster    ${alias}    microshift healthcheck --timeout=300s

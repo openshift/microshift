@@ -181,7 +181,28 @@
     },
     "clusterToCluster": {
       "type": "object",
+      "required": [
+        "dns"
+      ],
       "properties": {
+        "dns": {
+          "description": "DNS cache settings for CoreDNS server blocks generated for remote clusters.",
+          "type": "object",
+          "properties": {
+            "cacheNegativeTTL": {
+              "description": "Maximum TTL (seconds) for denial (NXDOMAIN/NODATA) DNS cache entries in CoreDNS\nserver blocks generated for remote clusters. Must be \u003e= 0. Setting to 0 disables denial caching.",
+              "type": "integer",
+              "default": 10,
+              "minimum": 0
+            },
+            "cacheTTL": {
+              "description": "Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks\ngenerated for remote clusters. Must be \u003e= 0. Setting to 0 disables positive caching.",
+              "type": "integer",
+              "default": 10,
+              "minimum": 0
+            }
+          }
+        },
         "remoteClusters": {
           "description": "List of remote clusters to establish connectivity with.\nC2CC is disabled when this list is empty.",
           "type": "array",

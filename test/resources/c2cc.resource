@@ -222,3 +222,69 @@ Remove Foreign Subnet From SNAT Annotation
     ...    Triggers a reconcile by briefly corrupting the annotation.
     [Arguments]    ${alias}
     Corrupt Node SNAT Annotation On Cluster    ${alias}
+
+Create Unique Namespace On Cluster
+    [Documentation]    Creates a namespace with a unique suffix on the given cluster.
+    ...    Returns the namespace name.
+    [Arguments]    ${alias}
+    ${rand}=    Generate Random String
+    ${rand}=    Convert To Lower Case    ${rand}
+    ${ns}=    Catenate    SEPARATOR=-    test    ${rand}
+    Oc On Cluster    ${alias}    oc create namespace ${ns}
+    RETURN    ${ns}
+
+Verify Corefile Contains C2CC Server Block
+    [Documentation]    Check that the CoreDNS Corefile configmap contains a server block for the given domain.
+    [Arguments]    ${alias}    ${domain}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get configmap dns-default -n openshift-dns -o jsonpath='{.data.Corefile}'
+    Should Contain    ${stdout}    ${domain}:5353
+    Should Contain    ${stdout}    rewrite stop name suffix .${domain} .cluster.local answer auto
+
+Verify Corefile Does Not Contain C2CC Server Block
+    [Documentation]    Check that the CoreDNS Corefile does NOT contain a server block for the given domain.
+    [Arguments]    ${alias}    ${domain}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get configmap dns-default -n openshift-dns -o jsonpath='{.data.Corefile}'
+    Should Not Contain    ${stdout}    ${domain}:5353
+
+Deploy Test Workloads
+    [Documentation]    Create namespace and deploy hello-microshift + curl-pod on both clusters.
+    VAR    ${assets}=    ${EXECDIR}/assets/c2cc
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        ${ns}=    Create Unique Namespace On Cluster    ${alias}
+        Set To Dictionary    ${NAMESPACES}    ${alias}    ${ns}
+        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/hello-microshift.yaml
+        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/curl-pod.yaml
+    END
+    Wait For Test Pods
+    Wait For Service Endpoints
+
+Wait For Test Pods
+    [Documentation]    Wait for all test pods to be Ready on both clusters.
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        Oc On Cluster
+        ...    ${alias}
+        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACES}[${alias}] --for=condition=Ready --timeout=120s
+    END
+
+Wait For Service Endpoints
+    [Documentation]    Wait for hello-microshift service to have endpoints on both clusters.
+    ...    Ensures OVN-K has synced the EndpointSlice and programmed the OVN load balancer.
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        Wait Until Keyword Succeeds    120s    5s
+        ...    Service Endpoints Should Exist    ${alias}    ${NAMESPACES}[${alias}]
+    END
+
+Service Endpoints Should Exist
+    [Documentation]    Verify the hello-microshift endpoint has at least one address.
+    [Arguments]    ${alias}    ${ns}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get endpoints hello-microshift -n ${ns} -o jsonpath='{.subsets[0].addresses[0].ip}'
+    Should Not Be Empty    ${stdout}
+
+Cleanup Test Workloads
+    [Documentation]    Delete test namespace on both clusters. Ignores errors.
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACES}[${alias}] --timeout=60s
+    END
