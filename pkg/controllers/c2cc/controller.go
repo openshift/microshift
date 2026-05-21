@@ -262,6 +262,15 @@ func (c *C2CCRouteManager) cleanupAll(ctx context.Context) {
 	if c.nftMgr != nil {
 		cleanups = append(cleanups, cleanable{"nftables", c.nftMgr.cleanup})
 	}
+	cleanups = append(cleanups, cleanable{"probe-namespace", func(ctx context.Context) error {
+		return assets.DeleteNamespaces(ctx, c2ccNamespace, c.kubeconfig)
+	}})
+	cleanups = append(cleanups, cleanable{"probe-clusterrolebinding", func(ctx context.Context) error {
+		return assets.DeleteClusterRoleBindings(ctx, c2ccClusterRoleBinding, c.kubeconfig)
+	}})
+	cleanups = append(cleanups, cleanable{"probe-clusterrole", func(ctx context.Context) error {
+		return assets.DeleteClusterRoles(ctx, c2ccClusterRole, c.kubeconfig)
+	}})
 	cleanups = append(cleanups, cleanable{"healthcheck-crd", func(ctx context.Context) error {
 		return assets.DeleteCRDs(ctx, healthcheckCRD, c.kubeconfig)
 	}})
