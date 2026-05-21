@@ -41,7 +41,8 @@ configure_c2cc_host() {
     run_command_on_vm "${host}" "sudo mkdir -p /etc/microshift/config.d"
 
     # Build the YAML config with all remote clusters
-    local yaml_content="clusterToCluster:\n  remoteClusters:"
+    local yaml_content
+    yaml_content="clusterToCluster:"$'\n'"  remoteClusters:"
     local firewall_cidrs=()
 
     while [ $# -gt 0 ]; do
@@ -51,17 +52,17 @@ configure_c2cc_host() {
         local remote_domain=$4
         shift 4
 
-        yaml_content+="\n  - nextHop: ${remote_ip}"
-        yaml_content+="\n    clusterNetwork:"
-        yaml_content+="\n    - ${remote_pod_cidr}"
-        yaml_content+="\n    serviceNetwork:"
-        yaml_content+="\n    - ${remote_svc_cidr}"
-        yaml_content+="\n    domain: ${remote_domain}"
+        yaml_content+=$'\n'"  - nextHop: ${remote_ip}"
+        yaml_content+=$'\n'"    clusterNetwork:"
+        yaml_content+=$'\n'"    - ${remote_pod_cidr}"
+        yaml_content+=$'\n'"    serviceNetwork:"
+        yaml_content+=$'\n'"    - ${remote_svc_cidr}"
+        yaml_content+=$'\n'"    domain: ${remote_domain}"
 
         firewall_cidrs+=("${remote_pod_cidr}" "${remote_svc_cidr}")
     done
 
-    run_command_on_vm "${host}" "sudo tee /etc/microshift/config.d/50-c2cc.yaml > /dev/null << 'EOF'
+    run_command_on_vm "${host}" "sudo tee /etc/microshift/config.d/50-c2cc.yaml > /dev/null <<EOF
 ${yaml_content}
 EOF"
 
