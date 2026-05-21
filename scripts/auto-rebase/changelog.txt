@@ -1,150 +1,21 @@
-- cluster-ingress-operator embedded-component 10bbe5fa42c1203acd516e8f090df4954121c224 to 8360b3561fd7fd9abcd67064d3604f6f57f3c3b0
-  - 97a8117 2026-05-18T11:21:30-03:00 OCPBUGS-83923: Vendor updates for grpc-go and x/net
-  - 2cb6bc1 2026-05-18T11:21:12-03:00 OCPBUGS-83923: Update grpc-go and x/net
+- api embedded-component 73d7ca93df6d0a1b02f5533ce20f68d27869a1fe to dcaca8e0fec1334470b1ebdcb647198929f638d3
+  - 6e3710f5 2026-05-11T10:43:32+02:00 generated files
+  - 5ed90d74 2026-05-11T10:32:28+02:00 config/v1: add networkObservability field for day-0 installation
 
-- cluster-kube-apiserver-operator embedded-component 167ca3228ab415157eeca5de6cef451c0bfe4db2 to 51b3e923b0fa74b36bd60b21db8c8202d358d0b6
-  - 8abc0cd 2026-05-18T17:05:08+05:30 Add new suites of KMS
+- machine-config-operator embedded-component 08fa2f9eb306145b50245f3b226332644072091c to 75c3b83d07006f8f7e6e06098442b75793ad4b1a
+  - d944ccbc 2026-05-18T10:15:55-04:00 iri: disable iri-registry service on IRI delete
+  - 60d59828 2026-05-13T21:04:01-04:00 OCPBUGS-84814: Skip chrony-wait on first node join
+  - df0c8fac 2026-05-11T18:31:33+05:30 Migrate remaining TCs from mco.go to mco.go, mco_units.go, mco_kubelet_and_containerruntime.go
 
-- cluster-openshift-controller-manager-operator embedded-component c941a99dd2b9200c0de23606c4372d33d656a756 to 34f95b07f4afbc47558e54e4fa2710fd692e615e
-  - dadca9d 2026-05-18T14:21:21+05:30 CNTRLPLANE-2907:e2e network policy tests
-  - 6c6625a 2026-04-28T16:52:39+05:30 CNTRLPLANE-2907:add dependencies for Ginkgo tests
+- operator-framework-olm embedded-component 754d45a5855c46aad0842bedbca0780bb5184f68 to f4b8ef2caae5fdc4b6fc930b1a8d720c4a3ee65a
+  - 96bf609f 2026-05-11T18:58:06+05:30 OCPBUGS-54790: Fix packageserver PDB annotation for HyperShift
+  - e99debc6 2026-04-23T23:58:32+02:00 use AlwaysAllow UnhealthyPodEvictionPolicy option in PDBs
 
-- kubernetes embedded-component f9b62a69d4a05e10b2b7cf8d40afa37f9dcd0938 to 73359c58edaa0a838b8557b8743ad5860a955272
-  - 7ef18c231 2026-03-09T14:56:44-04:00 UPSTREAM: <carry>: test: skip private registry test
-
-- machine-config-operator embedded-component 61fdd56c3fa546cee22d4420f330e68956f61fd8 to 08fa2f9eb306145b50245f3b226332644072091c
-  - ae83093b 2026-05-15T09:57:53-04:00 daemon: verify extension packages are staged pre-reboot and installed pst-reboot
-  - 25d9c6dc 2026-05-12T13:19:11-04:00 drain: fix re-cordon detection
-  - e962e923 2026-05-12T09:30:00-04:00 mcc: replace wildcard permissions with explicit verbs and resources in MCC ClusterRole & scope configmap access to target namespace via Role instead of ClusterRole
-
-- route-controller-manager embedded-component 624742d93f3a7885cf7f70985f1e23ff60da580d to 6a87600a4c82f2a822a2f88ab81b968bac858205
-  - bdeacd0 2026-05-18T11:30:16-03:00 OCPBUGS-83892: Vendor updates for grpc-go and x/net
-  - 3fd6ff6 2026-05-18T11:29:51-03:00 OCPBUGS-83892: Update grpc-go and x/net
-
-- ovn-kubernetes image-amd64 a9a7b4e7538cc49df30ee49ec2c4e2c3b98dffab to 55b65f2f9188a975fe2a127243ddc07bb0ed74d9
-  - 8448b28e 2026-05-07T08:12:34Z sync test annotations with upstream changes
-  - 03d5ae45 2026-05-06T08:52:55+02:00 e2e(virt): run iperf-server.sh in foreground after VM restart
-  - 907659a2 2026-05-06T08:52:55+02:00 e2e(virt): randomize CUDN subnets to avoid BGP route collisions
-  - 6858dcd1 2026-05-06T08:52:55+02:00 gh(virt): enable EVPN feature gate for kv-live-migration lane
-  - 545c0da5 2026-05-06T08:52:55+02:00 gh(virt): Add LGW + IC + BGP + EVPN lane
-  - 94c82fad 2026-05-06T08:52:55+02:00 e2e(virt): add EVPN live migration tests
-  - 6aa25e0e 2026-05-06T08:52:55+02:00 e2e(evpn): allow custom container image for EVPN external containers
-  - f4f3ad32 2026-05-05T14:37:39Z docs: add EVPN design doc
-  - 9b7d64bb 2026-05-05T06:46:53-04:00 Delete etc directory
-  - c19e900d 2026-05-05T09:07:48+02:00 Replace fast-slow rate limiters with exponential backoff
-  - fe2e8203 2026-05-04T17:29:46-04:00 Allow CI workflow dispatcher on release branches
-  - f96bfb13 2026-05-04T17:29:46-04:00 Update release docs for 1.3 release
-  - 1cc9eefa 2026-05-04T17:29:46-04:00 Change OVN_DAEMONSET_VERSION to 1.3.0
-  - 18f51409 2026-05-04T17:29:46-04:00 OVN-Kubernetes 1.3 release
-  - 4f17b5ef 2026-05-04T17:27:41-04:00 Hint that one should git add LICENSES after make third-party-licenses
-  - 7b5f868b 2026-05-04T17:04:41-04:00 Bump ovnkube-id webhook server MinTLS version from 1.0 to 1.2
-  - 8c54e459 2026-05-04T21:38:30+02:00 Run make -C go-controller third-party-licenses && git add LICENSES
-  - 3ec476de 2026-05-04T23:58:33+05:30 Resolves mismatched and broken links
-  - cfc76224 2026-05-04T14:23:34-04:00 Mount /var/lib/ovn for DB persistence with Debian/Ubuntu packages
-  - c06aa645 2026-05-04T17:17:32Z docs: use dummy interfaces instead of loopback for VTEP IP in EVPN okep
-  - f60bbac9 2026-05-04T14:21:57Z docs: add L2 SVI and static FDB/neighbor entries to EVPN okep
-  - 6426a2c7 2026-05-04T14:22:34+02:00 Fix managed BGP empty-cluster test race
-  - 3778429c 2026-05-04T14:11:19+02:00 docs: add no-overlay feature documentation
-  - bafdd335 2026-05-04T11:53:02+02:00 Rename VID allocation functions to ID allocation
-  - 684b496d 2026-05-04T11:53:02+02:00 Enforce VNI uniqueness per VTEP in EVPN networks
-  - a8a4597d 2026-05-04T09:12:49Z evpn e2e: return errors on cleanup functions
-  - f414dad9 2026-05-04T09:12:49Z evpn e2e: cleanup unused function
-  - e2da0a21 2026-05-04T09:12:49Z evpn e2e: create L2 SVI for MACVRFs on external FRR
-  - c3e1ee2c 2026-05-02T14:24:49+02:00 vtep: deduplicate warning events in handleManagedModeNotSupported
-  - 2600a631 2026-05-02T14:24:26+02:00 routeadvertisements: set GE field in vtepCIDRPrefixSelectors to restrict ToReceive filter to exact host routes
-  - 36db9e62 2026-05-01T14:34:28+05:30 Fixing unneccesary spaces
-  - a2896b16 2026-04-30T16:59:24-07:00 docs: Clarify helm install doc / fix basic-deploy.sh
-  - d7fc5d0f 2026-04-30T15:02:47-07:00 cni: remove incorrect DPU-host flow-check path from waitForPodInterface
-  - 872fcdac 2026-04-30T10:25:44-04:00 chassis-id: relax uuid requirement
-  - 29b9f2d5 2026-04-30T16:21:06+02:00 BGP e2e: avoid reuse of CUDN VRF names
-  - 084ef870 2026-04-30T16:17:09+02:00 BGP e2e: check CUDN GR routes in BGP pod-to-external test
-  - c62708e0 2026-04-30T10:07:09-04:00 UDN docs: clarify how to enable the feature
-  - b750fadf 2026-04-30T09:59:36-04:00 Adds Dynamic UDN docs
-  - b3f9f16a 2026-04-30T13:15:48+02:00 E2E: handle empty EgressIP status in service e2e tests
-  - d5307076 2026-04-30T11:28:58+02:00 Add user facing docs for ClusterNetworkConnect
-  - 74e347fa 2026-04-30T10:18:34+02:00 Move ovnPodAnnotationName from util to const
-  - b06057cc 2026-04-30T10:18:34+02:00 Simplify pod creation in some other files.
-  - 23237c22 2026-04-30T10:18:30+02:00 AddresssetManager: add multinetwork UT
-  - 9ca91e95 2026-04-30T10:18:27+02:00 Cleanup UTs from namespace address set.
-  - a6f37a70 2026-04-30T10:05:26+02:00 Remove and deprecate namespace address set.
-  - 1ccc1c0d 2026-04-29T14:30:39-07:00 docs: remove extra content from helm/ovn-kubernetes/README.md.gotmpl
-  - 7aba0ef7 2026-04-29T11:54:10-07:00 docs: refresh kubeadm install guide
-  - 254397cc 2026-04-29T10:17:20-07:00 Update docs regarding helm install
-  - 7a1ba299 2026-04-29T13:40:36+02:00 Enable IPsec for interconnect deployments
-  - 185d76d9 2026-04-29T12:06:32+02:00 Skip _stackmanager execution for libreswan 5.3+
-  - 5e7908c2 2026-04-28T12:41:05-04:00 Update retest-action base image from Alpine 3.10 to 3.21
-  - 6c894184 2026-04-24T14:15:06-04:00 Add a note suggesting we should continue skipping frr coredumps
-  - ed9dc927 2026-04-24T14:14:58-04:00 Revert "e2e: do not skip frr service coredumps"
-  - fbb03f8c 2026-04-23T14:14:42+05:30 Fix namespace handle leak in VRF manager
-  - 5b1ee08e 2026-04-21T14:56:44-04:00 Include license files in container images
-  - 9b87f69b 2026-04-21T14:56:43-04:00 Add third-party license generation
-
-- kubernetes image-amd64 f9b62a69d4a05e10b2b7cf8d40afa37f9dcd0938 to 73359c58edaa0a838b8557b8743ad5860a955272
-  - 7ef18c231 2026-03-09T14:56:44-04:00 UPSTREAM: <carry>: test: skip private registry test
-
-- coredns image-arm64 0dded2d232dab43c107b1dab9d0d9fdfd8259622 to 3c21b066c9bd86caa06f790dcd1c046667875d46
+- coredns image-amd64 0dded2d232dab43c107b1dab9d0d9fdfd8259622 to 3c21b066c9bd86caa06f790dcd1c046667875d46
   - b396057 2026-05-18T11:56:10-04:00 Fix GO-2026-4918: Bump golang.org/x/net to v0.53.0
   - 33fcf0c 2026-05-18T11:55:49-04:00 Fix GO-2025-4245: Bump github.com/expr-lang/expr to v1.17.7
   - 5202700 2026-05-15T16:13:52-04:00 OCPBUGS-83943: Bump gRPC to v1.79.3 to resolve CVE-2026-33186
 
-- ovn-kubernetes image-arm64 a9a7b4e7538cc49df30ee49ec2c4e2c3b98dffab to 55b65f2f9188a975fe2a127243ddc07bb0ed74d9
-  - 8448b28e 2026-05-07T08:12:34Z sync test annotations with upstream changes
-  - 03d5ae45 2026-05-06T08:52:55+02:00 e2e(virt): run iperf-server.sh in foreground after VM restart
-  - 907659a2 2026-05-06T08:52:55+02:00 e2e(virt): randomize CUDN subnets to avoid BGP route collisions
-  - 6858dcd1 2026-05-06T08:52:55+02:00 gh(virt): enable EVPN feature gate for kv-live-migration lane
-  - 545c0da5 2026-05-06T08:52:55+02:00 gh(virt): Add LGW + IC + BGP + EVPN lane
-  - 94c82fad 2026-05-06T08:52:55+02:00 e2e(virt): add EVPN live migration tests
-  - 6aa25e0e 2026-05-06T08:52:55+02:00 e2e(evpn): allow custom container image for EVPN external containers
-  - f4f3ad32 2026-05-05T14:37:39Z docs: add EVPN design doc
-  - 9b7d64bb 2026-05-05T06:46:53-04:00 Delete etc directory
-  - c19e900d 2026-05-05T09:07:48+02:00 Replace fast-slow rate limiters with exponential backoff
-  - fe2e8203 2026-05-04T17:29:46-04:00 Allow CI workflow dispatcher on release branches
-  - f96bfb13 2026-05-04T17:29:46-04:00 Update release docs for 1.3 release
-  - 1cc9eefa 2026-05-04T17:29:46-04:00 Change OVN_DAEMONSET_VERSION to 1.3.0
-  - 18f51409 2026-05-04T17:29:46-04:00 OVN-Kubernetes 1.3 release
-  - 4f17b5ef 2026-05-04T17:27:41-04:00 Hint that one should git add LICENSES after make third-party-licenses
-  - 7b5f868b 2026-05-04T17:04:41-04:00 Bump ovnkube-id webhook server MinTLS version from 1.0 to 1.2
-  - 8c54e459 2026-05-04T21:38:30+02:00 Run make -C go-controller third-party-licenses && git add LICENSES
-  - 3ec476de 2026-05-04T23:58:33+05:30 Resolves mismatched and broken links
-  - cfc76224 2026-05-04T14:23:34-04:00 Mount /var/lib/ovn for DB persistence with Debian/Ubuntu packages
-  - c06aa645 2026-05-04T17:17:32Z docs: use dummy interfaces instead of loopback for VTEP IP in EVPN okep
-  - f60bbac9 2026-05-04T14:21:57Z docs: add L2 SVI and static FDB/neighbor entries to EVPN okep
-  - 6426a2c7 2026-05-04T14:22:34+02:00 Fix managed BGP empty-cluster test race
-  - 3778429c 2026-05-04T14:11:19+02:00 docs: add no-overlay feature documentation
-  - bafdd335 2026-05-04T11:53:02+02:00 Rename VID allocation functions to ID allocation
-  - 684b496d 2026-05-04T11:53:02+02:00 Enforce VNI uniqueness per VTEP in EVPN networks
-  - a8a4597d 2026-05-04T09:12:49Z evpn e2e: return errors on cleanup functions
-  - f414dad9 2026-05-04T09:12:49Z evpn e2e: cleanup unused function
-  - e2da0a21 2026-05-04T09:12:49Z evpn e2e: create L2 SVI for MACVRFs on external FRR
-  - c3e1ee2c 2026-05-02T14:24:49+02:00 vtep: deduplicate warning events in handleManagedModeNotSupported
-  - 2600a631 2026-05-02T14:24:26+02:00 routeadvertisements: set GE field in vtepCIDRPrefixSelectors to restrict ToReceive filter to exact host routes
-  - 36db9e62 2026-05-01T14:34:28+05:30 Fixing unneccesary spaces
-  - a2896b16 2026-04-30T16:59:24-07:00 docs: Clarify helm install doc / fix basic-deploy.sh
-  - d7fc5d0f 2026-04-30T15:02:47-07:00 cni: remove incorrect DPU-host flow-check path from waitForPodInterface
-  - 872fcdac 2026-04-30T10:25:44-04:00 chassis-id: relax uuid requirement
-  - 29b9f2d5 2026-04-30T16:21:06+02:00 BGP e2e: avoid reuse of CUDN VRF names
-  - 084ef870 2026-04-30T16:17:09+02:00 BGP e2e: check CUDN GR routes in BGP pod-to-external test
-  - c62708e0 2026-04-30T10:07:09-04:00 UDN docs: clarify how to enable the feature
-  - b750fadf 2026-04-30T09:59:36-04:00 Adds Dynamic UDN docs
-  - b3f9f16a 2026-04-30T13:15:48+02:00 E2E: handle empty EgressIP status in service e2e tests
-  - d5307076 2026-04-30T11:28:58+02:00 Add user facing docs for ClusterNetworkConnect
-  - 74e347fa 2026-04-30T10:18:34+02:00 Move ovnPodAnnotationName from util to const
-  - b06057cc 2026-04-30T10:18:34+02:00 Simplify pod creation in some other files.
-  - 23237c22 2026-04-30T10:18:30+02:00 AddresssetManager: add multinetwork UT
-  - 9ca91e95 2026-04-30T10:18:27+02:00 Cleanup UTs from namespace address set.
-  - a6f37a70 2026-04-30T10:05:26+02:00 Remove and deprecate namespace address set.
-  - 1ccc1c0d 2026-04-29T14:30:39-07:00 docs: remove extra content from helm/ovn-kubernetes/README.md.gotmpl
-  - 7aba0ef7 2026-04-29T11:54:10-07:00 docs: refresh kubeadm install guide
-  - 254397cc 2026-04-29T10:17:20-07:00 Update docs regarding helm install
-  - 7a1ba299 2026-04-29T13:40:36+02:00 Enable IPsec for interconnect deployments
-  - 185d76d9 2026-04-29T12:06:32+02:00 Skip _stackmanager execution for libreswan 5.3+
-  - 5e7908c2 2026-04-28T12:41:05-04:00 Update retest-action base image from Alpine 3.10 to 3.21
-  - 6c894184 2026-04-24T14:15:06-04:00 Add a note suggesting we should continue skipping frr coredumps
-  - ed9dc927 2026-04-24T14:14:58-04:00 Revert "e2e: do not skip frr service coredumps"
-  - fbb03f8c 2026-04-23T14:14:42+05:30 Fix namespace handle leak in VRF manager
-  - 5b1ee08e 2026-04-21T14:56:44-04:00 Include license files in container images
-  - 9b87f69b 2026-04-21T14:56:43-04:00 Add third-party license generation
-
-- kubernetes image-arm64 f9b62a69d4a05e10b2b7cf8d40afa37f9dcd0938 to 73359c58edaa0a838b8557b8743ad5860a955272
-  - 7ef18c231 2026-03-09T14:56:44-04:00 UPSTREAM: <carry>: test: skip private registry test
+- router image-arm64 b75bab261392d5eacb115db408f121618a23e41d to 35c9eaa00a6520df664a9fa3bb7ebd3e8714edc1
+  - 6c516c5 2026-05-19T14:43:16-04:00 Bump google.golang.org/grpc to v1.79.3
 
