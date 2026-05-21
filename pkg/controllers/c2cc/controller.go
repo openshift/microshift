@@ -106,10 +106,6 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 		return fmt.Errorf("failed to apply C2CC healthcheck CRD: %w", err)
 	}
 
-	if err := c.deployProbe(ctx); err != nil {
-		return fmt.Errorf("failed to deploy C2CC probe: %w", err)
-	}
-
 	c.fullReconcile(ctx)
 
 	ticker := time.NewTicker(reconcileInterval)
@@ -229,6 +225,7 @@ func (c *C2CCRouteManager) fullReconcile(ctx context.Context) {
 		{"service-routes", c.svcRoutes.reconcile},
 		{"nftables", c.nftMgr.reconcile},
 		{"healthcheck-crs", c.healthcheck.reconcile},
+		{"probe-deployment", c.deployProbe},
 	}
 	for _, s := range subsystems {
 		if err := s.fn(ctx); err != nil {
