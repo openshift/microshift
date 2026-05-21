@@ -34,25 +34,42 @@ wait_for_greenboot_on_hosts() {
 }
 
 configure_c2cc_host() {
-    local host=$1 remote_ip=$2 remote_pod_cidr=$3 remote_svc_cidr=$4 remote_domain=$5
+    local host=$1
+    shift
+    # Remaining args are sets of 4: remote_ip remote_pod_cidr remote_svc_cidr remote_domain (repeat)
 
     run_command_on_vm "${host}" "sudo mkdir -p /etc/microshift/config.d"
-    run_command_on_vm "${host}" "sudo tee /etc/microshift/config.d/50-c2cc-${remote_domain}.yaml > /dev/null << EOF
-clusterToCluster:
-  remoteClusters:
-  - nextHop: ${remote_ip}
-    clusterNetwork:
-    - ${remote_pod_cidr}
-    serviceNetwork:
-    - ${remote_svc_cidr}
-    domain: ${remote_domain}
+
+    # Build the YAML config with all remote clusters
+    local yaml_content="clusterToCluster:\n  remoteClusters:"
+    local firewall_cidrs=()
+
+    while [ $# -gt 0 ]; do
+        local remote_ip=$1
+        local remote_pod_cidr=$2
+        local remote_svc_cidr=$3
+        local remote_domain=$4
+        shift 4
+
+        yaml_content+="\n  - nextHop: ${remote_ip}"
+        yaml_content+="\n    clusterNetwork:"
+        yaml_content+="\n    - ${remote_pod_cidr}"
+        yaml_content+="\n    serviceNetwork:"
+        yaml_content+="\n    - ${remote_svc_cidr}"
+        yaml_content+="\n    domain: ${remote_domain}"
+
+        firewall_cidrs+=("${remote_pod_cidr}" "${remote_svc_cidr}")
+    done
+
+    run_command_on_vm "${host}" "sudo tee /etc/microshift/config.d/50-c2cc.yaml > /dev/null << 'EOF'
+${yaml_content}
 EOF"
 
     configure_vm_firewall "${host}"
-    run_command_on_vm "${host}" "sudo firewall-cmd --permanent --zone=trusted --add-source=${remote_pod_cidr}"
-    run_command_on_vm "${host}" "sudo firewall-cmd --permanent --zone=trusted --add-source=${remote_svc_cidr}"
+    for cidr in "${firewall_cidrs[@]}"; do
+        run_command_on_vm "${host}" "sudo firewall-cmd --permanent --zone=trusted --add-source=${cidr}"
+    done
     run_command_on_vm "${host}" "sudo firewall-cmd --reload"
-
     run_command_on_vm "${host}" "sudo systemctl restart microshift"
 }
 
@@ -63,12 +80,17 @@ configure_c2cc_hosts() {
 
     wait_for_greenboot_on_hosts "c2cc_pre_greenboot"
 
-    configure_c2cc_host host1 "${host2_ip}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}"
-    configure_c2cc_host host1 "${host3_ip}" "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" "${CLUSTER_C_DOMAIN}"
-    configure_c2cc_host host2 "${host1_ip}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}"
-    configure_c2cc_host host2 "${host3_ip}" "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" "${CLUSTER_C_DOMAIN}"
-    configure_c2cc_host host3 "${host1_ip}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}"
-    configure_c2cc_host host3 "${host2_ip}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}"
+    configure_c2cc_host host1 \
+        "${host2_ip}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}" \
+        "${host3_ip}" "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" "${CLUSTER_C_DOMAIN}"
+
+    configure_c2cc_host host2 \
+        "${host1_ip}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}" \
+        "${host3_ip}" "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" "${CLUSTER_C_DOMAIN}"
+
+    configure_c2cc_host host3 \
+        "${host1_ip}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}" \
+        "${host2_ip}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}"
 
     wait_for_greenboot_on_hosts "c2cc_greenboot"
 }
