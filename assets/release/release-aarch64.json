@@ -1,16 +1,16 @@
 {
   "release": {
-    "base": "4.20.0-0.nightly-arm64-2026-05-18-013811"
+    "base": "4.20.0-0.nightly-arm64-2026-05-20-225417"
   },
   "images": {
-    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b012f16e6082594724eafbfe6591dcf04d42e6edc53c022ff9f9844a183f129b",
-    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cc2aef81872324803f75601170e6d279d5b85ba3d9ee3852e5c2e84d6c1bc172",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4150d6ed577723f808003995f93aade83a0ed48660c9c7b78a06b331035c99b6",
-    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f77679548f0cf47e11adffb9a1fdaa4a0447fd386add2e5ac9be0da833134e18",
-    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d4de6102ade4949239ae29d6185f93d88eae7405e557a616153f3f17b24fa843",
-    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dd2a9c3aba5a0040ec632f766ebd05324f4d56d2e5f84e760ee1a103c162ea86",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:98b1079376f6e63ac388d02cb1665590755eabb9cbca9afc0121bd632a64fe6e",
+    "cli": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c6c156f14a60bf8eaea2e9c104c831e2379c15c688d9faff2b6df30b0068aa2b",
+    "coredns": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:516371adbca97c3b11121125dbe1c263b403cb81b5835ea299cfc3a3e93c9bc7",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5dffc405d30eb580cdfb5a035db7656a0c0902863bb4206ab101aa4ad9077625",
+    "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9ca987b5b4384ce4bdcbd7b91df77a09bad61edbffe60ecf7515c8e759578d9f",
+    "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5524ab6eb1983d6ca145c40093769c0b27bd6119829e805d0463258e3a5966ac",
+    "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8033bae117ce095a55c8431db73b1f550c3c1779f8ddeb8d341e0c67a098edac",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b2e42e9ae5d5fe343dd3f9ed19c64292c661df7ca720dc3c2f5bcb3bbc74386b",
     "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:08d006ce7dc8e9c433082cf19a4650700deba41f8c2d8e5477c9d7fd6e0f640a",
-    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:410e866c1d0f66dd2f61692c06d4ac339eaf643987af5259e3653374f059aed4"
+    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8af7573c2955df8ec06d8d2529214d211733f6bb25fbd5c416292071b3a7d115"
   }
 }
