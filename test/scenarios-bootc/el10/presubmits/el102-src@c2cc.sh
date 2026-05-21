@@ -78,7 +78,7 @@ scenario_create_vms() {
     prepare_kickstart host2 kickstart-bootc.ks.template rhel102-bootc-source
     prepare_kickstart host3 kickstart-bootc.ks.template rhel102-bootc-source
 
-    # Inject host2's non-default CIDRs into its kickstart config so MicroShift
+    # Inject host2's and host3's non-default CIDRs into its kickstart config so MicroShift
     # boots with the correct network from the start (no cleanup-data needed).
     local -r host2_ks_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2"
     cat >> "${host2_ks_dir}/post-microshift.cfg" <<EOF
