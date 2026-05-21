@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Sourced from scenario.sh and uses functions defined there.
-export TEST_RANDOMIZATION=none
+export TEST_RANDOMIZATION=suites
 
 # Cluster A (host1): default MicroShift CIDRs
 CLUSTER_A_POD_CIDR="10.42.0.0/16"
