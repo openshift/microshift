@@ -1,7 +1,16 @@
-- machine-config-operator embedded-component c7abfa0bd88d48bc7a8d8b70d982127d2b6a9158 to 6ff546c6bf38055a335625191c60dcc9c7c714d2
-  - 37e6da35 2026-05-06T15:34:10Z daemon: use --delete-if-present for karg removal
+- cluster-openshift-controller-manager-operator embedded-component e1c3674198c6c1274fd3fd3c3108eb4cade4eb0a to 2d2699e4f3fabc80e402f4c090c8cf80c4517977
+  - daf771d 2026-05-19T10:34:34+05:30 CNTRLPLANE-2907:e2e network policy tests
+  - f0d07bd 2026-05-19T10:34:26+05:30 CNTRLPLANE-2907:add dependencies for Ginkgo tests
 
-- coredns image-arm64 0dded2d232dab43c107b1dab9d0d9fdfd8259622 to 9a71d9a6b788437e755b5ed3bfad78c63fa7c6f4
+- machine-config-operator embedded-component 6ff546c6bf38055a335625191c60dcc9c7c714d2 to ab81640d1510800b1be795066ef4d392dbcdf470
+  - 327db855 2026-05-18T20:00:05Z drain: fix re-cordon detection
+  - b384040e 2026-05-18T10:38:39+02:00 OCPBUGS-83830: Apply password only if changes exist
+
+- route-controller-manager embedded-component 624742d93f3a7885cf7f70985f1e23ff60da580d to 55f77ca4cf0328b7c4fd7736bce79ebe171a9b6b
+  - da1aade 2026-05-19T11:45:48-03:00 OCPBUGS-83892: Vendor updates for grpc-go and x/net
+  - e162d33 2026-05-19T11:45:17-03:00 OCPBUGS-83892: Update grpc-go and x/net
+
+- coredns image-amd64 0dded2d232dab43c107b1dab9d0d9fdfd8259622 to 9a71d9a6b788437e755b5ed3bfad78c63fa7c6f4
   - 7db70e5 2026-05-19T10:46:26-04:00 Fix GO-2026-4918: Bump golang.org/x/net to v0.53.0
   - 8316b33 2026-05-19T10:46:26-04:00 Fix GO-2025-4245: Bump github.com/expr-lang/expr to v1.17.7
   - 38d839a 2026-05-19T10:46:26-04:00 OCPBUGS-83943: Bump gRPC to v1.79.3 to resolve CVE-2026-33186
