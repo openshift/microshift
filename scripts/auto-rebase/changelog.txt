@@ -1,32 +1,10 @@
-- cluster-network-operator embedded-component 18558dbf31624b136a7d35b30ef99e551d2738ae to 56c830ea4487e978a2697d065217b8851ed6cbd9
-  - bfc78f2 2026-04-24T11:53:29-04:00 Address CodeRabbit review: add docstring and assertion messages
-  - 64f0040 2026-04-24T11:53:29-04:00 Handle zero-worker HyperShift clusters in daemonset rollout
+- cluster-kube-apiserver-operator embedded-component 43b3cbe3654586ebbff06b942658c6f14aa01796 to 645cb9f8bb9171c390cad9eb3fdeb9a1be30ca8a
+  - e033101 2026-05-13T18:18:45+02:00 ObserveServiceAccountIssuer event should report an empty issuer during the
+  - 7b840f9 2026-05-13T18:18:40+02:00 operator should not override authentication config serviceAccountIssuer with the default one during
 
-- kubernetes embedded-component ba5f1e63e12c85b7d61d5de4a3bbde39e54d33b2 to 2a0461f5d0e21c5b74371626fad32f9632920caa
-  - 6ad6fcfa4 2026-05-12T18:28:20-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 1f348c8e8 2026-05-12T09:43:17Z Release commit for Kubernetes v1.33.12
-  - 5ea68035b 2026-05-11T14:34:27+02:00 kubeadm: use dedicated ClusterRole for apiserver kubelet client
-  - a051bd7fc 2026-05-06T11:09:36+02:00 kubeadm: skip LocalAPIEndpoint defaulting on worker join
-  - be0a49b22 2026-04-29T17:48:03+02:00 kubeadm: use the localAPIEndpoint for all API calls in 'init'
-  - f7077de30 2026-04-23T09:16:24+01:00 Add a (*Client) addEndpoint method
-  - cd70e54c5 2026-04-23T09:16:24+01:00 Evaluate etcd cluster health using quorum
-  - 2ff801658 2026-04-15T18:21:56Z Update CHANGELOG/CHANGELOG-1.33.md for v1.33.11
+- oc image-amd64 92a3a166a7f710a344a11bda0ad221e54583fccd to 02b0b2d9994a35535b710dd51ac604ed47b29bc9
+  - a7611c38 2026-05-20T12:05:18Z OCPBUGS-81981: Bump go-jose/go-jose/v4 to v4.1.4
 
-- machine-config-operator embedded-component 2d25c90c0dc60344479c5bcae395a5baa6ef9c77 to 99791082afbf27ade177005ba673ec023bc16051
-  - 7f24467d 2026-05-18T15:51:25Z controller: add terminationMessagePolicy to build pod containers
-  - e40a2d55 2026-05-08T13:33:32Z OCPBUGS-84218: Fix units rollback if update failure
-  - 682d45ce 2026-05-06T05:48:12Z OCPBUGS-84332: Fix ssh and password rollbacks
-
-- operator-framework-olm embedded-component 72a01f66530d38330e9442d2238ab30aa90dcb39 to ead54afde546d8c2ead94256d2d13c46b9b257b5
-  - bfaa566f 2026-05-08T17:18:48+05:30 Bump github.com/go-jose/go-jose/v4@v4.1.0 to v4.1.4 to fix CVE-2026-34986
-
-- kubernetes image-amd64 ba5f1e63e12c85b7d61d5de4a3bbde39e54d33b2 to 2a0461f5d0e21c5b74371626fad32f9632920caa
-  - 6ad6fcfa4 2026-05-12T18:28:20-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - 1f348c8e8 2026-05-12T09:43:17Z Release commit for Kubernetes v1.33.12
-  - 5ea68035b 2026-05-11T14:34:27+02:00 kubeadm: use dedicated ClusterRole for apiserver kubelet client
-  - a051bd7fc 2026-05-06T11:09:36+02:00 kubeadm: skip LocalAPIEndpoint defaulting on worker join
-  - be0a49b22 2026-04-29T17:48:03+02:00 kubeadm: use the localAPIEndpoint for all API calls in 'init'
-  - f7077de30 2026-04-23T09:16:24+01:00 Add a (*Client) addEndpoint method
-  - cd70e54c5 2026-04-23T09:16:24+01:00 Evaluate etcd cluster health using quorum
-  - 2ff801658 2026-04-15T18:21:56Z Update CHANGELOG/CHANGELOG-1.33.md for v1.33.11
+- oc image-arm64 92a3a166a7f710a344a11bda0ad221e54583fccd to 02b0b2d9994a35535b710dd51ac604ed47b29bc9
+  - a7611c38 2026-05-20T12:05:18Z OCPBUGS-81981: Bump go-jose/go-jose/v4 to v4.1.4
 
