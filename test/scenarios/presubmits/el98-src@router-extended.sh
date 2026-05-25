@@ -3,8 +3,8 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source
-    launch_vm rhel98-bootc
+    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
+    launch_vm rhel-9.8
 }
 
 scenario_remove_vms() {
@@ -13,5 +13,6 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     run_tests host1 \
-        suites/router/router.robot
+        suites/router/router-routes.robot \
+        suites/router/router-config.robot
 }
