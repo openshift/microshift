@@ -1,17 +1,16 @@
-- cluster-openshift-controller-manager-operator embedded-component e1c3674198c6c1274fd3fd3c3108eb4cade4eb0a to 2d2699e4f3fabc80e402f4c090c8cf80c4517977
-  - daf771d 2026-05-19T10:34:34+05:30 CNTRLPLANE-2907:e2e network policy tests
-  - f0d07bd 2026-05-19T10:34:26+05:30 CNTRLPLANE-2907:add dependencies for Ginkgo tests
+- cluster-ingress-operator embedded-component 52c2b0465ecf1dcdcd57c010b9b15ac28f62a2ba to 8ae91f62ca9e6ca1f210b815ab54edbae856ac4c
+  - 76744ed 2026-05-19T09:11:15Z OCPBUGS-83923: Vendor updates for grpc-go and x/net
+  - a0d7041 2026-05-19T09:11:15Z OCPBUGS-83923: Update grpc-go and x/net
 
-- machine-config-operator embedded-component 6ff546c6bf38055a335625191c60dcc9c7c714d2 to ab81640d1510800b1be795066ef4d392dbcdf470
-  - 327db855 2026-05-18T20:00:05Z drain: fix re-cordon detection
-  - b384040e 2026-05-18T10:38:39+02:00 OCPBUGS-83830: Apply password only if changes exist
+- oc image-amd64 66dee73f66c4f048c333c6a77d76871872027896 to 062bc5449c4987c92c76da4d315ef4969c22d638
+  - 1582d6c0 2026-05-06T01:05:51Z OCPBUGS-62799: Add required-scc annotation to node-joiner pod to prevent third-party SCC interference
 
-- route-controller-manager embedded-component 624742d93f3a7885cf7f70985f1e23ff60da580d to 55f77ca4cf0328b7c4fd7736bce79ebe171a9b6b
-  - da1aade 2026-05-19T11:45:48-03:00 OCPBUGS-83892: Vendor updates for grpc-go and x/net
-  - e162d33 2026-05-19T11:45:17-03:00 OCPBUGS-83892: Update grpc-go and x/net
+- router image-amd64 896390778ebe15f57f87e6ca78f11c96e64c2652 to 1d980e1d4c65832893e91150df92fc6ad1932d89
+  - 39e7d40 2026-05-19T12:50:01-04:00 Bump google.golang.org/grpc to v1.79.3
 
-- coredns image-amd64 0dded2d232dab43c107b1dab9d0d9fdfd8259622 to 9a71d9a6b788437e755b5ed3bfad78c63fa7c6f4
-  - 7db70e5 2026-05-19T10:46:26-04:00 Fix GO-2026-4918: Bump golang.org/x/net to v0.53.0
-  - 8316b33 2026-05-19T10:46:26-04:00 Fix GO-2025-4245: Bump github.com/expr-lang/expr to v1.17.7
-  - 38d839a 2026-05-19T10:46:26-04:00 OCPBUGS-83943: Bump gRPC to v1.79.3 to resolve CVE-2026-33186
+- oc image-arm64 66dee73f66c4f048c333c6a77d76871872027896 to 062bc5449c4987c92c76da4d315ef4969c22d638
+  - 1582d6c0 2026-05-06T01:05:51Z OCPBUGS-62799: Add required-scc annotation to node-joiner pod to prevent third-party SCC interference
+
+- router image-arm64 896390778ebe15f57f87e6ca78f11c96e64c2652 to 1d980e1d4c65832893e91150df92fc6ad1932d89
+  - 39e7d40 2026-05-19T12:50:01-04:00 Bump google.golang.org/grpc to v1.79.3
 
