@@ -88,33 +88,114 @@ Route Admission Status Should Be
     ...    .status.ingress[0].conditions[0].status
     Should Be Equal As Strings    ${status}    ${expected}
 
+Create And Admit Four Route Types
+    [Documentation]    Create HTTP, edge, passthrough, and reencrypt routes and wait for reencrypt to be admitted.
+    [Arguments]    ${http_host}    ${edge_host}    ${pass_host}    ${reen_host}
+    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${http_host}
+    Create OC Route    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${edge_host}
+    Create OC Route    ${NAMESPACE}    passthrough    route-passth    service-secure    --hostname=${pass_host}
+    Create OC Route    ${NAMESPACE}    reencrypt    route-reen    service-secure    --hostname=${reen_host}
+    Route Should Be Admitted    route-reen
+
 Curl From Pod
     [Documentation]    Run curl from a pod via oc exec. Returns stdout.
-    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    @{extra_flags}
-    ${flags}=    Catenate    SEPARATOR=${SPACE}    @{extra_flags}
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${flags}=${EMPTY}
     ${output}=    Run With Kubeconfig
     ...    oc exec -n ${ns} ${pod_name} -- curl ${url} -sI --resolve ${resolve} --connect-timeout 10 ${flags}
     RETURN    ${output}
 
-Wait Until Curl Succeeds From Pod
-    [Documentation]    Retry curl from a pod until response contains expected string.
-    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}=200    ${timeout}=120s    @{extra_flags}
-    Wait Until Keyword Succeeds
-    ...    ${timeout}
-    ...    2s
-    ...    Curl From Pod Should Contain
-    ...    ${pod_name}
-    ...    ${ns}
-    ...    ${url}
-    ...    ${resolve}
-    ...    ${expected}
-    ...    @{extra_flags}
-
 Curl From Pod Should Contain
-    [Documentation]    Helper: curl from pod and assert response contains expected string.
-    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}    @{extra_flags}
-    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}    @{extra_flags}
+    [Documentation]    Curl from a pod and assert response contains expected string (no extra flags).
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}=200
+    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}
     Should Contain    ${output}    ${expected}
+
+Wait Until Curl Succeeds From Pod
+    [Documentation]    Retry curl from a pod (no extra flags) until response contains expected string.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}=200
+    Wait Until Keyword Succeeds    120s    2s
+    ...    Curl From Pod Should Contain    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}
+
+Curl HTTPS From Pod Should Contain
+    [Documentation]    Curl HTTPS from a pod using -k, assert response contains expected string.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}=200
+    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}    -k
+    Should Contain    ${output}    ${expected}
+
+Wait Until HTTPS Curl Succeeds From Pod
+    [Documentation]    Retry HTTPS curl (with -k) from a pod until response contains expected string.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}=200
+    Wait Until Keyword Succeeds    120s    2s
+    ...    Curl HTTPS From Pod Should Contain    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}
+
+Curl With Cookie Should Return 200
+    [Documentation]    Curl from a pod with a cookie and assert 200 response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cookie}
+    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}    -b ${cookie}
+    Should Contain    ${output}    200
+
+Wait Until Curl With Cookie Succeeds From Pod
+    [Documentation]    Retry curl with a cookie until 200 response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cookie}
+    Wait Until Keyword Succeeds    120s    2s
+    ...    Curl With Cookie Should Return 200    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cookie}
+
+HTTPS Curl With Cookie Should Return 200
+    [Documentation]    Curl HTTPS from a pod with a cookie (using -k) and assert 200 response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cookie}
+    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}    -k -b ${cookie}
+    Should Contain    ${output}    200
+
+Wait Until HTTPS Curl With Cookie Succeeds From Pod
+    [Documentation]    Retry HTTPS curl with a cookie until 200 response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cookie}
+    Wait Until Keyword Succeeds    120s    2s
+    ...    HTTPS Curl With Cookie Should Return 200    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cookie}
+
+Curl With Client Cert Should Return
+    [Documentation]    Curl with client cert from /data/certs/ and assert expected response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}=200 OK
+    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}
+    ...    --cacert /data/certs/ca.crt --cert /data/certs/usr.crt --key /data/certs/usr.key
+    Should Contain    ${output}    ${expected}
+
+Wait Until Curl With Client Cert Succeeds
+    [Documentation]    Retry curl with client cert until expected response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}=200 OK
+    Wait Until Keyword Succeeds    120s    2s
+    ...    Curl With Client Cert Should Return    ${pod_name}    ${ns}    ${url}    ${resolve}    ${expected}
+
+Curl With Cert File Should Return 200
+    [Documentation]    Curl with a specific cert file prefix from /data/certs/ and assert 200 response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cert_prefix}
+    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}
+    ...    --cacert /data/certs/ca.crt --cert /data/certs/${cert_prefix}.crt --key /data/certs/${cert_prefix}.key
+    Should Contain    ${output}    200 OK
+
+Wait Until Curl With Cert File Succeeds
+    [Documentation]    Retry curl with specific cert file until 200 response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cert_prefix}
+    Wait Until Keyword Succeeds    120s    2s
+    ...    Curl With Cert File Should Return 200    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cert_prefix}
+
+Curl With Cert File Should Return 403
+    [Documentation]    Curl with a specific cert file prefix from /data/certs/ and assert 403 response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cert_prefix}
+    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}
+    ...    --cacert /data/certs/ca.crt --cert /data/certs/${cert_prefix}.crt --key /data/certs/${cert_prefix}.key
+    Should Contain    ${output}    403
+
+Wait Until Curl With Cert File Returns 403
+    [Documentation]    Retry curl with specific cert file until 403 response.
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cert_prefix}
+    Wait Until Keyword Succeeds    120s    2s
+    ...    Curl With Cert File Should Return 403    ${pod_name}    ${ns}    ${url}    ${resolve}    ${cert_prefix}
+
+Curl Without Cert Should Return SSL Error
+    [Documentation]    Curl without a client cert and assert SSL handshake error (for mTLS Required).
+    [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}
+    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}    -skv
+    Should Contain    ${output}    SSL_read
 
 Get Router Pod Name
     [Documentation]    Get the name of the router-default pod.
@@ -245,6 +326,26 @@ Sign CSR With CA
         ...    shell=True
     END
     Should Be Equal As Integers    ${result.rc}    0
+
+Generate MTLS Client Cert
+    [Documentation]    Generate a CA and a single client cert in the given directory.
+    [Arguments]    ${tmpdir}    ${edge_host}
+    Generate CA Certificate    ${tmpdir}/ca.key    ${tmpdir}/ca.crt    /CN=MS-Test-Root-CA
+    Generate CSR And Key    ${tmpdir}/usr.key    ${tmpdir}/usr.csr    /CN=example-test.com
+    VAR    ${san}=    subjectAltName = DNS.1:*.${BASE_DOMAIN},DNS.2:${edge_host}
+    Sign CSR With CA    ${tmpdir}/usr.csr    ${tmpdir}/ca.crt    ${tmpdir}/ca.key    ${tmpdir}/usr.crt    ${san}
+
+Generate Client Cert File In Dir
+    [Documentation]    Generate a CSR, key, and signed cert in the given directory using a name prefix.
+    [Arguments]    ${tmpdir}    ${host}    ${cn}    ${cert_prefix}
+    Generate CSR And Key    ${tmpdir}/${cert_prefix}.key    ${tmpdir}/${cert_prefix}.csr    /CN=${cn}
+    VAR    ${san}=    subjectAltName = DNS.1:*.${BASE_DOMAIN},DNS.2:${host}
+    Sign CSR With CA
+    ...    ${tmpdir}/${cert_prefix}.csr
+    ...    ${tmpdir}/ca.crt
+    ...    ${tmpdir}/ca.key
+    ...    ${tmpdir}/${cert_prefix}.crt
+    ...    ${san}
 
 Get First LB IP
     [Documentation]    Get the first load balancer IP of the router-default service.

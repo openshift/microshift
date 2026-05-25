@@ -27,10 +27,9 @@ Reencrypt Route Via Ingress With Destination CA
 
     ${router_ip}=    Get Router Pod IP
     ${srv_pod}=    Get Web Server Pod Name
-    Wait Until Curl Succeeds From Pod
+    Wait Until HTTPS Curl Succeeds From Pod
     ...    ${srv_pod}    ${NAMESPACE}
     ...    https://service-secure-test.example.com:443    service-secure-test.example.com:443:${router_ip}
-    ...    200    -k
     ${haproxy}=    Read Haproxy Config
     Should Contain    ${haproxy}    backend be_secure:${NAMESPACE}:ingress-ms-reen
     [Teardown]    Teardown Reencrypt Ingress Test
@@ -45,26 +44,19 @@ Edge And Passthrough Routes
     VAR    ${pass_host}=    route-pass-60266.${BASE_DOMAIN}
     VAR    ${edge_host}=    route-edge-60266.${BASE_DOMAIN}
 
-    Create OC Route    ${NAMESPACE}    passthrough    ms-pass    service-secure
-    ...    --hostname=${pass_host}
+    Create OC Route    ${NAMESPACE}    passthrough    ms-pass    service-secure    --hostname=${pass_host}
     Route Should Be Admitted    ms-pass
-    Wait Until Curl Succeeds From Pod
-    ...    ${srv_pod}    ${NAMESPACE}
-    ...    https://${pass_host}:443    ${pass_host}:443:${router_ip}
-    ...    200    -k
+    Wait Until HTTPS Curl Succeeds From Pod
+    ...    ${srv_pod}    ${NAMESPACE}    https://${pass_host}:443    ${pass_host}:443:${router_ip}
     ${haproxy}=    Read Haproxy Config
     Should Contain    ${haproxy}    backend be_tcp:${NAMESPACE}:ms-pass
 
-    Create OC Route    ${NAMESPACE}    edge    ms-edge    service-unsecure
-    ...    --hostname=${edge_host}
+    Create OC Route    ${NAMESPACE}    edge    ms-edge    service-unsecure    --hostname=${edge_host}
     Route Should Be Admitted    ms-edge
-    Wait Until Curl Succeeds From Pod
-    ...    ${srv_pod}    ${NAMESPACE}
-    ...    https://${edge_host}:443    ${edge_host}:443:${router_ip}
-    ...    200    -k
+    Wait Until HTTPS Curl Succeeds From Pod
+    ...    ${srv_pod}    ${NAMESPACE}    https://${edge_host}:443    ${edge_host}:443:${router_ip}
     ${haproxy}=    Read Haproxy Config
     Should Contain    ${haproxy}    backend be_edge_http:${NAMESPACE}:ms-edge
-
     [Teardown]    Run Keywords
     ...    Oc Delete    route/ms-pass route/ms-edge -n ${NAMESPACE}
     ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE}
@@ -79,26 +71,19 @@ HTTP And Reencrypt Routes
     VAR    ${http_host}=    route-http-60283.${BASE_DOMAIN}
     VAR    ${reen_host}=    route-reen-60283.${BASE_DOMAIN}
 
-    Create OC Route    ${NAMESPACE}    http    ms-http    service-unsecure
-    ...    --hostname=${http_host}
+    Create OC Route    ${NAMESPACE}    http    ms-http    service-unsecure    --hostname=${http_host}
     Route Should Be Admitted    ms-http
     Wait Until Curl Succeeds From Pod
-    ...    ${srv_pod}    ${NAMESPACE}
-    ...    http://${http_host}:80    ${http_host}:80:${router_ip}
-    ...    200
+    ...    ${srv_pod}    ${NAMESPACE}    http://${http_host}:80    ${http_host}:80:${router_ip}
     ${haproxy}=    Read Haproxy Config
     Should Contain    ${haproxy}    backend be_http:${NAMESPACE}:ms-http
 
-    Create OC Route    ${NAMESPACE}    reencrypt    ms-reen    service-secure
-    ...    --hostname=${reen_host}
+    Create OC Route    ${NAMESPACE}    reencrypt    ms-reen    service-secure    --hostname=${reen_host}
     Route Should Be Admitted    ms-reen
-    Wait Until Curl Succeeds From Pod
-    ...    ${srv_pod}    ${NAMESPACE}
-    ...    https://${reen_host}:443    ${reen_host}:443:${router_ip}
-    ...    200    -k
+    Wait Until HTTPS Curl Succeeds From Pod
+    ...    ${srv_pod}    ${NAMESPACE}    https://${reen_host}:443    ${reen_host}:443:${router_ip}
     ${haproxy}=    Read Haproxy Config
     Should Contain    ${haproxy}    backend be_secure:${NAMESPACE}:ms-reen
-
     [Teardown]    Run Keywords
     ...    Oc Delete    route/ms-http route/ms-reen -n ${NAMESPACE}
     ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE}
@@ -110,44 +95,22 @@ Namespace Ownership Default Config
     [Setup]    Setup Two Namespace Test
 
     ${router_ip}=    Get Router Pod IP
-    VAR    ${http_host}=    service-unsecure-ocp72802.${BASE_DOMAIN}
-    VAR    ${edge_host}=    route-edge-ocp72802.${BASE_DOMAIN}
-    VAR    ${reen_host}=    route-reen-ocp72802.${BASE_DOMAIN}
+    VAR    ${HTTP_HOST}=    service-unsecure-ocp72802.${BASE_DOMAIN}    scope=TEST
+    VAR    ${EDGE_HOST}=    route-edge-ocp72802.${BASE_DOMAIN}    scope=TEST
+    VAR    ${REEN_HOST}=    route-reen-ocp72802.${BASE_DOMAIN}    scope=TEST
 
     ${env}=    Oc Get JsonPath
     ...    pod    ${ROUTER_NS}    ${EMPTY}
     ...    .items[*].spec.containers[*].env[?(@.name=="ROUTER_DISABLE_NAMESPACE_OWNERSHIP_CHECK")].value
     Should Be Equal As Strings    ${env}    true
 
-    Create OC Route    ${NS1}    http    service-unsecure    service-unsecure
-    ...    --hostname=${http_host}    --path=/path
-    Create OC Route    ${NS1}    edge    route-edge    service-unsecure
-    ...    --hostname=${edge_host}    --path=/path
-    Create OC Route    ${NS1}    reencrypt    route-reen    service-secure
-    ...    --hostname=${reen_host}    --path=/path
-    Create OC Route    ${NS2}    http    service-unsecure    service-unsecure
-    ...    --hostname=${http_host}    --path=/test
-    Create OC Route    ${NS2}    edge    route-edge    service-unsecure
-    ...    --hostname=${edge_host}    --path=/test
-    Create OC Route    ${NS2}    reencrypt    route-reen    service-secure
-    ...    --hostname=${reen_host}    --path=/test
-
-    Route Should Be Admitted    service-unsecure    ${NS1}
-    Route Should Be Admitted    route-edge    ${NS1}
-    Route Should Be Admitted    route-reen    ${NS1}
-    Route Should Be Admitted    service-unsecure    ${NS2}
-    Route Should Be Admitted    route-edge    ${NS2}
-    Route Should Be Admitted    route-reen    ${NS2}
+    Create NS Ownership Routes
+    All NS Ownership Routes Should Be Admitted
 
     Wait Until Curl Succeeds From Pod
-    ...    ${CLIENT_POD_NAME}    ${NS1}
-    ...    http://${http_host}/path/index.html    ${http_host}:80:${router_ip}
-    ...    200
+    ...    ${CLIENT_POD_NAME}    ${NS1}    http://${HTTP_HOST}/path/index.html    ${HTTP_HOST}:80:${router_ip}
     Wait Until Curl Succeeds From Pod
-    ...    ${CLIENT_POD_NAME}    ${NS1}
-    ...    http://${http_host}/test/index.html    ${http_host}:80:${router_ip}
-    ...    200
-
+    ...    ${CLIENT_POD_NAME}    ${NS1}    http://${HTTP_HOST}/test/index.html    ${HTTP_HOST}:80:${router_ip}
     [Teardown]    Teardown Two Namespace Test
 
 Router Load Balancer Service Type
@@ -163,40 +126,15 @@ Router Load Balancer Service Type
     ${lb_ips}=    Get LB IPs
     Should Not Be Empty    ${lb_ips}
 
-    VAR    ${http_host}=    service-unsecure-ocp73152.${BASE_DOMAIN}
-    VAR    ${edge_host}=    route-edge-ocp73152.${BASE_DOMAIN}
-    VAR    ${pass_host}=    route-passth-ocp73152.${BASE_DOMAIN}
-    VAR    ${reen_host}=    route-reen-ocp73152.${BASE_DOMAIN}
+    VAR    ${HTTP_HOST}=    service-unsecure-ocp73152.${BASE_DOMAIN}    scope=TEST
+    VAR    ${EDGE_HOST}=    route-edge-ocp73152.${BASE_DOMAIN}    scope=TEST
+    VAR    ${PASS_HOST}=    route-passth-ocp73152.${BASE_DOMAIN}    scope=TEST
+    VAR    ${REEN_HOST}=    route-reen-ocp73152.${BASE_DOMAIN}    scope=TEST
 
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure
-    ...    --hostname=${http_host}
-    Create OC Route    ${NAMESPACE}    edge    route-edge    service-unsecure
-    ...    --hostname=${edge_host}
-    Create OC Route    ${NAMESPACE}    passthrough    route-passth    service-secure
-    ...    --hostname=${pass_host}
-    Create OC Route    ${NAMESPACE}    reencrypt    route-reen    service-secure
-    ...    --hostname=${reen_host}
-    Route Should Be Admitted    route-reen
+    Create And Admit Four Route Types    ${HTTP_HOST}    ${EDGE_HOST}    ${PASS_HOST}    ${REEN_HOST}
 
     ${lb_ip}=    Fetch From Left    ${lb_ips}    ${SPACE}
-
-    Wait Until Curl Succeeds From Pod
-    ...    ${CLIENT_POD_NAME}    ${NAMESPACE}
-    ...    http://${http_host}    ${http_host}:80:${lb_ip}
-    ...    200
-    Wait Until Curl Succeeds From Pod
-    ...    ${CLIENT_POD_NAME}    ${NAMESPACE}
-    ...    https://${edge_host}    ${edge_host}:443:${lb_ip}
-    ...    200    -k
-    Wait Until Curl Succeeds From Pod
-    ...    ${CLIENT_POD_NAME}    ${NAMESPACE}
-    ...    https://${pass_host}    ${pass_host}:443:${lb_ip}
-    ...    200    -k
-    Wait Until Curl Succeeds From Pod
-    ...    ${CLIENT_POD_NAME}    ${NAMESPACE}
-    ...    https://${reen_host}    ${reen_host}:443:${lb_ip}
-    ...    200    -k
-
+    Curl All LB Route Types Via IP    ${lb_ip}
     [Teardown]    Run Keywords
     ...    Oc Delete    route/route-http route/route-edge route/route-passth route/route-reen -n ${NAMESPACE}
     ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE}
@@ -210,53 +148,20 @@ Default Listening IPs And Ports
     ...    Deploy Web Server Signed
     ...    AND    Deploy Test Client Pod
 
-    ${http_port}=    Get LB Port    http
-    Should Be Equal As Strings    ${http_port}    80
-    ${https_port}=    Get LB Port    https
-    Should Be Equal As Strings    ${https_port}    443
+    Verify Default LB IPs And Ports
+
+    VAR    ${HTTP_HOST}=    service-unsecure-ocp73202.${BASE_DOMAIN}    scope=TEST
+    VAR    ${EDGE_HOST}=    route-edge-ocp73202.${BASE_DOMAIN}    scope=TEST
+    VAR    ${PASS_HOST}=    route-passth-ocp73202.${BASE_DOMAIN}    scope=TEST
+    VAR    ${REEN_HOST}=    route-reen-ocp73202.${BASE_DOMAIN}    scope=TEST
+
+    Create And Admit Four Route Types    ${HTTP_HOST}    ${EDGE_HOST}    ${PASS_HOST}    ${REEN_HOST}
 
     ${lb_ips}=    Get LB IPs
-    Should Not Be Empty    ${lb_ips}
-    @{host_ips}=    Get Host IPs Via SSH
-    ${sorted_host_ips}=    Evaluate    " ".join(sorted(${host_ips}))
-    ${sorted_lb_ips}=    Evaluate    " ".join(sorted("${lb_ips}".split()))
-    Should Be Equal As Strings    ${sorted_lb_ips}    ${sorted_host_ips}
-
-    VAR    ${http_host}=    service-unsecure-ocp73202.${BASE_DOMAIN}
-    VAR    ${edge_host}=    route-edge-ocp73202.${BASE_DOMAIN}
-    VAR    ${pass_host}=    route-passth-ocp73202.${BASE_DOMAIN}
-    VAR    ${reen_host}=    route-reen-ocp73202.${BASE_DOMAIN}
-
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure
-    ...    --hostname=${http_host}
-    Create OC Route    ${NAMESPACE}    edge    route-edge    service-unsecure
-    ...    --hostname=${edge_host}
-    Create OC Route    ${NAMESPACE}    passthrough    route-passth    service-secure
-    ...    --hostname=${pass_host}
-    Create OC Route    ${NAMESPACE}    reencrypt    route-reen    service-secure
-    ...    --hostname=${reen_host}
-    Route Should Be Admitted    route-reen
-
     @{ips}=    Split String    ${lb_ips}
     FOR    ${lb_ip}    IN    @{ips}
-        Wait Until Curl Succeeds From Pod
-        ...    ${CLIENT_POD_NAME}    ${NAMESPACE}
-        ...    http://${http_host}    ${http_host}:80:${lb_ip}
-        ...    200
-        Wait Until Curl Succeeds From Pod
-        ...    ${CLIENT_POD_NAME}    ${NAMESPACE}
-        ...    https://${edge_host}    ${edge_host}:443:${lb_ip}
-        ...    200    -k
-        Wait Until Curl Succeeds From Pod
-        ...    ${CLIENT_POD_NAME}    ${NAMESPACE}
-        ...    https://${pass_host}    ${pass_host}:443:${lb_ip}
-        ...    200    -k
-        Wait Until Curl Succeeds From Pod
-        ...    ${CLIENT_POD_NAME}    ${NAMESPACE}
-        ...    https://${reen_host}    ${reen_host}:443:${lb_ip}
-        ...    200    -k
+        Curl All LB Route Types Via IP    ${lb_ip}
     END
-
     [Teardown]    Run Keywords
     ...    Oc Delete    route/route-http route/route-edge route/route-passth route/route-reen -n ${NAMESPACE}
     ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE}
@@ -277,10 +182,8 @@ Teardown Reencrypt Ingress Test
 
 Setup Two Namespace Test
     [Documentation]    Create two extra namespaces and deploy workloads in each.
-    VAR    ${NS1}=    ${NAMESPACE}-ocp72802-1
-    VAR    ${NS2}=    ${NAMESPACE}-ocp72802-2
-    VAR    ${NS1}=    ${NS1}    scope=TEST
-    VAR    ${NS2}=    ${NS2}    scope=TEST
+    VAR    ${NS1}=    ${NAMESPACE}-ocp72802-1    scope=TEST
+    VAR    ${NS2}=    ${NAMESPACE}-ocp72802-2    scope=TEST
     Create Namespace    ${NS1}
     Create Namespace    ${NS2}
     Deploy Test Client Pod    ${NS1}
@@ -292,3 +195,55 @@ Teardown Two Namespace Test
     [Documentation]    Delete the extra namespaces.
     Remove Namespace    ${NS1}
     Remove Namespace    ${NS2}
+
+Create NS Ownership Routes
+    [Documentation]    Create HTTP, edge, and reencrypt routes in both test namespaces.
+    Create OC Route    ${NS1}    http    service-unsecure    service-unsecure
+    ...    --hostname=${HTTP_HOST}    --path=/path
+    Create OC Route    ${NS1}    edge    route-edge    service-unsecure
+    ...    --hostname=${EDGE_HOST}    --path=/path
+    Create OC Route    ${NS1}    reencrypt    route-reen    service-secure
+    ...    --hostname=${REEN_HOST}    --path=/path
+    Create OC Route    ${NS2}    http    service-unsecure    service-unsecure
+    ...    --hostname=${HTTP_HOST}    --path=/test
+    Create OC Route    ${NS2}    edge    route-edge    service-unsecure
+    ...    --hostname=${EDGE_HOST}    --path=/test
+    Create OC Route    ${NS2}    reencrypt    route-reen    service-secure
+    ...    --hostname=${REEN_HOST}    --path=/test
+
+All NS Ownership Routes Should Be Admitted
+    [Documentation]    Verify all six routes across both namespaces are admitted.
+    Route Should Be Admitted    service-unsecure    ${NS1}
+    Route Should Be Admitted    route-edge    ${NS1}
+    Route Should Be Admitted    route-reen    ${NS1}
+    Route Should Be Admitted    service-unsecure    ${NS2}
+    Route Should Be Admitted    route-edge    ${NS2}
+    Route Should Be Admitted    route-reen    ${NS2}
+
+Curl All LB Route Types Via IP
+    [Documentation]    Curl all four route types through a single LB IP.
+    [Arguments]    ${ip}
+    Wait Until Curl Succeeds From Pod
+    ...    ${CLIENT_POD_NAME}
+    ...    ${NAMESPACE}
+    ...    http://${HTTP_HOST}
+    ...    ${HTTP_HOST}:80:${ip}
+    Wait Until HTTPS Curl Succeeds From Pod
+    ...    ${CLIENT_POD_NAME}    ${NAMESPACE}    https://${EDGE_HOST}    ${EDGE_HOST}:443:${ip}
+    Wait Until HTTPS Curl Succeeds From Pod
+    ...    ${CLIENT_POD_NAME}    ${NAMESPACE}    https://${PASS_HOST}    ${PASS_HOST}:443:${ip}
+    Wait Until HTTPS Curl Succeeds From Pod
+    ...    ${CLIENT_POD_NAME}    ${NAMESPACE}    https://${REEN_HOST}    ${REEN_HOST}:443:${ip}
+
+Verify Default LB IPs And Ports
+    [Documentation]    Verify the router-default service LB IPs match all host IPs and ports are 80/443.
+    ${http_port}=    Get LB Port    http
+    Should Be Equal As Strings    ${http_port}    80
+    ${https_port}=    Get LB Port    https
+    Should Be Equal As Strings    ${https_port}    443
+    ${lb_ips}=    Get LB IPs
+    Should Not Be Empty    ${lb_ips}
+    @{host_ips}=    Get Host IPs Via SSH
+    ${sorted_host_ips}=    Evaluate    " ".join(sorted(${host_ips}))
+    ${sorted_lb_ips}=    Evaluate    " ".join(sorted("${lb_ips}".split()))
+    Should Be Equal As Strings    ${sorted_lb_ips}    ${sorted_host_ips}
