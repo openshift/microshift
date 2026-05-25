@@ -753,9 +753,9 @@ Verify Custom Router Tuning Env Vars
     [Documentation]    Verify the custom tuning environment variable values after config change.
     Router Pod Env Should Have Value    ROUTER_BUF_SIZE    65536
     Router Pod Env Should Have Value    ROUTER_MAX_REWRITE_SIZE    16384
-    Router Pod Env Should Have Value    ROUTER_DEFAULT_CLIENT_TIMEOUT    60s
+    Router Pod Env Should Have Value    ROUTER_DEFAULT_CLIENT_TIMEOUT    1m
     Router Pod Env Should Have Value    ROUTER_CLIENT_FIN_TIMEOUT    2s
-    Router Pod Env Should Have Value    ROUTER_DEFAULT_SERVER_TIMEOUT    60s
+    Router Pod Env Should Have Value    ROUTER_DEFAULT_SERVER_TIMEOUT    1m
     Router Pod Env Should Have Value    ROUTER_DEFAULT_SERVER_FIN_TIMEOUT    2s
     Router Pod Env Should Have Value    ROUTER_DEFAULT_TUNNEL_TIMEOUT    2h
     Router Pod Env Should Have Value    ROUTER_INSPECT_DELAY    10s
@@ -767,8 +767,8 @@ Verify Custom Router Tuning Haproxy
     ${haproxy}=    Read Haproxy Config
     Should Contain    ${haproxy}    tune.bufsize 65536
     Should Contain    ${haproxy}    tune.maxrewrite 16384
-    Should Contain    ${haproxy}    timeout client 60s
-    Should Contain    ${haproxy}    timeout server 60s
+    Should Contain    ${haproxy}    timeout client 1m
+    Should Contain    ${haproxy}    timeout server 1m
     Should Contain    ${haproxy}    timeout tunnel 2h
     Should Contain    ${haproxy}    nbthread 8
     Should Contain    ${haproxy}    maxconn 100000
@@ -823,8 +823,8 @@ Prepare Two MTLS Certs For Test
     VAR    ${MTLS2_HOST1}=    ${host1}    scope=TEST
     VAR    ${MTLS2_HOST2}=    ${host2}    scope=TEST
     Generate CA Certificate    ${tmpdir}/ca.key    ${tmpdir}/ca.crt    /CN=MS-Test-Root-CA
-    Generate Client Cert File In Dir    ${tmpdir}    ${host1}    /CN=example-test.com    usr1
-    Generate Client Cert File In Dir    ${tmpdir}    ${host2}    /CN=example-test2.com    usr2
+    Generate Client Cert File In Dir    ${tmpdir}    ${host1}    example-test.com    usr1
+    Generate Client Cert File In Dir    ${tmpdir}    ${host2}    example-test2.com    usr2
 
 Deploy MTLS Test Workloads
     [Documentation]    Deploy workloads and create the mTLS edge route.
@@ -912,9 +912,15 @@ Verify Custom Error Pages
     ...    oc exec -n ${NAMESPACE} ${CLIENT_POD_NAME} -- curl http://${noexist_host} -s --resolve ${noexist_host}:80:${router_ip} --connect-timeout 10
     Should Contain    ${output}    Custom:Not Found
     Scale Deployment    ${NAMESPACE}    web-server-deploy    0
-    Wait Until Curl Succeeds From Pod
-    ...    ${CLIENT_POD_NAME}    ${NAMESPACE}    http://${routehost}    ${routehost}:80:${router_ip}
-    ...    Custom:Application Unavailable
+    Wait Until Keyword Succeeds    60s    2s
+    ...    Custom 503 Body Should Contain    ${routehost}    ${router_ip}
+
+Custom 503 Body Should Contain
+    [Documentation]    Curl a route (GET, full response body) and assert the custom 503 error page body is returned.
+    [Arguments]    ${routehost}    ${router_ip}
+    ${output}=    Run With Kubeconfig
+    ...    oc exec -n ${NAMESPACE} ${CLIENT_POD_NAME} -- curl http://${routehost} -s --resolve ${routehost}:80:${router_ip} --connect-timeout 10
+    Should Contain    ${output}    Custom:Application Unavailable
 
 Verify Syslog Logging
     [Documentation]    Apply syslog config and verify log delivery, then verify facility change.
