@@ -199,7 +199,9 @@ func (c *Config) fillDefaults() error {
 	c.GenericDevicePlugin = genericDevicePluginDefaults()
 	c.Telemetry = telemetryDefaults()
 	c.DNS = dnsDefaults()
-	c.C2CC = C2CC{}
+	c.C2CC = C2CC{
+		DNS: C2CCDNS{CacheTTL: ptr.To(10), CacheNegativeTTL: ptr.To(10)},
+	}
 	return nil
 }
 
@@ -459,7 +461,13 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 
 	if u.C2CC.RemoteClusters != nil {
-		c.C2CC = u.C2CC
+		c.C2CC.RemoteClusters = u.C2CC.RemoteClusters
+	}
+	if u.C2CC.DNS.CacheTTL != nil {
+		c.C2CC.DNS.CacheTTL = u.C2CC.DNS.CacheTTL
+	}
+	if u.C2CC.DNS.CacheNegativeTTL != nil {
+		c.C2CC.DNS.CacheNegativeTTL = u.C2CC.DNS.CacheNegativeTTL
 	}
 }
 
