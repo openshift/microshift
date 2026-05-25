@@ -64,9 +64,12 @@ func RunProbe(ctx context.Context) error {
 				pm.startProbe(ctx, rc)
 			}
 		},
-		UpdateFunc: func(_, newObj interface{}) {
-			if rc, ok := newObj.(*microshiftv1alpha1.RemoteCluster); ok {
-				pm.restartProbe(ctx, rc)
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			oldRC, ok1 := oldObj.(*microshiftv1alpha1.RemoteCluster)
+			newRC, ok2 := newObj.(*microshiftv1alpha1.RemoteCluster)
+			if ok1 && ok2 && (oldRC.Spec.ProbeTarget != newRC.Spec.ProbeTarget ||
+				oldRC.Spec.ProbeInterval != newRC.Spec.ProbeInterval) {
+				pm.restartProbe(ctx, newRC)
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
