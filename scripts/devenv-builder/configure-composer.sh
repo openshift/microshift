@@ -4,22 +4,11 @@ set -euxo pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DNF_RETRY="${SCRIPTDIR}/../dnf_retry.sh"
 
-enable_copr_repositories() {
-    local -r version_id=$1
-    local -r version_id_major="$(awk -F. '{print $1}' <<< "${version_id}")"
-
-    sudo dnf copr enable -y @osbuild/osbuild-composer "rhel-${version_id_major}-$(uname -m)"
-    sudo dnf copr enable -y @osbuild/osbuild          "epel-${version_id_major}-$(uname -m)"
-}
-
 install_and_configure_composer() {
     local -r version_id=$1
     local -r version_id_major="$(awk -F. '{print $1}' <<< "${version_id}")"
 
-    # The osbuild packages may come from 'copr' repositories.
-    # They are installed separately to resolve potential RPM package dependency
-    # conflicts with the system packages.
-    "${DNF_RETRY}" "install" "--nobest osbuild osbuild-composer"
+    "${DNF_RETRY}" "install" "osbuild osbuild-composer"
     "${DNF_RETRY}" "install" \
         "git composer-cli ostree rpm-ostree \
         cockpit-composer bash-completion podman runc genisoimage \
@@ -144,59 +133,6 @@ EOF
     fi
 }
 
-disable_gpg_check() {
-    local -r composer_config=$1
-
-    sudo cp "${composer_config}" "${composer_config}.with-gpg-check"
-    sudo sed -i 's;"check_gpg": true;"check_gpg": false;g' "${composer_config}"
-}
-
-enable_ocp_mirror_repositories() {
-    local -r version_id=$1
-    local -r composer_config=$3
-
-    local version_id_ocp=$2
-    if [ "$(uname -m)" = "aarch64" ]; then
-        version_id_ocp="${version_id_ocp}_aarch64"
-    fi
-
-    # Check if OCP mirror credentials are present
-    local -r ocp_mirror_ufile="${HOME}/.ocp_mirror_username"
-    local -r ocp_mirror_pfile="${HOME}/.ocp_mirror_password"
-    if ! [ -f "${ocp_mirror_ufile}" ] || ! [ -f "${ocp_mirror_pfile}" ]; then
-        echo "WARNING: OCP mirror credentials are not present"
-        return
-    fi
-
-    # Read the OCP mirror credentials from the files
-    local -r ocp_mirror_username=$(cat "${ocp_mirror_ufile}")
-    local -r ocp_mirror_password=$(cat "${ocp_mirror_pfile}")
-    local -r version_id_short="$(tr -d '.' <<< "${version_id}")"
-
-    # Create the configuration file in the composer configuration directory
-    sudo mkdir -p "$(dirname "${composer_config}")"
-    sudo tee "${composer_config}" &>/dev/null <<EOF
-{
-  "$(uname -m)": [
-    {
-      "name": "baseos",
-      "baseurl": "https://${ocp_mirror_username}:${ocp_mirror_password}@mirror2.openshift.com/enterprise/reposync/${version_id_ocp}/rhel-${version_id_short}-baseos/",
-      "rhsm": false,
-      "check_gpg": false
-    },
-    {
-      "name": "appstream",
-      "baseurl": "https://${ocp_mirror_username}:${ocp_mirror_password}@mirror2.openshift.com/enterprise/reposync/${version_id_ocp}/rhel-${version_id_short}-appstream/",
-      "rhsm": false,
-      "check_gpg": false
-    }
-  ]
-}
-EOF
-    sudo chmod 0640 "${composer_config}"
-    sudo chgrp _osbuild-composer "${composer_config}"
-}
-
 #
 # Main
 #
@@ -205,7 +141,6 @@ EOF
 source /etc/os-release
 
 # shellcheck disable=SC2153
-enable_copr_repositories       "${VERSION_ID}"
 install_and_configure_composer "${VERSION_ID}"
 check_umask_and_permissions
 
@@ -213,12 +148,16 @@ check_umask_and_permissions
 enable_rt_repositories          "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
 enable_beta_or_eus_repositories "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
 
-# Disable GPG check for all repositories to work around the issue with signing
-# across different OS versions due to the introduction of post-quantum keys
-disable_gpg_check "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
-
-# Configure OCP mirror repositories for pre-release versions
-enable_ocp_mirror_repositories "9.8" "4.22" "/etc/osbuild-composer/repositories/rhel-9.8.json"
+# Create the RHEL 9.8 composer configuration from the host OS template when
+# the host is not yet running RHEL 9.8, so osbuild-composer can build 9.8 images.
+if [[ "${VERSION_ID}" != "9.8" ]]; then
+    sudo cp "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json" \
+            "/etc/osbuild-composer/repositories/rhel-9.8.json"
+    sudo sed -i "s|/${VERSION_ID}/|/9.8/|g" "/etc/osbuild-composer/repositories/rhel-9.8.json"
+    # Disable GPG check for 9.8 repos — the RHEL 9.6 host's rpmkeys cannot
+    # handle RHEL 9.8's post-quantum key 4 until the host is upgraded.
+    sudo sed -i 's/"check_gpg": true/"check_gpg": false/g' "/etc/osbuild-composer/repositories/rhel-9.8.json"
+fi
 
 # This step must come in the end to make sure all the potential configuration
 # changes are picked up by the service
