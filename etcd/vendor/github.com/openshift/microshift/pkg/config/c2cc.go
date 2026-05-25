@@ -11,7 +11,22 @@ import (
 	netutils "k8s.io/utils/net"
 )
 
+type C2CCDNS struct {
+	// Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks
+	// generated for remote clusters. Must be >= 0. Setting to 0 disables positive caching.
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:default=10
+	CacheTTL *int `json:"cacheTTL,omitempty"`
+	// Maximum TTL (seconds) for denial (NXDOMAIN/NODATA) DNS cache entries in CoreDNS
+	// server blocks generated for remote clusters. Must be >= 0. Setting to 0 disables denial caching.
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:default=10
+	CacheNegativeTTL *int `json:"cacheNegativeTTL,omitempty"`
+}
+
 type C2CC struct {
+	// DNS cache settings for CoreDNS server blocks generated for remote clusters.
+	DNS C2CCDNS `json:"dns"`
 	// List of remote clusters to establish connectivity with.
 	// C2CC is disabled when this list is empty.
 	RemoteClusters []RemoteCluster `json:"remoteClusters,omitempty"`
@@ -39,6 +54,7 @@ type ResolvedRemoteCluster struct {
 	ClusterNetwork []*net.IPNet
 	ServiceNetwork []*net.IPNet
 	Domain         string
+	DNSIP          string // 10th IP of ServiceNetwork[0], computed during validation when Domain is set
 }
 
 func (rc *ResolvedRemoteCluster) AllCIDRs() []*net.IPNet {
@@ -164,6 +180,13 @@ func (c *C2CC) validate(cfg *Config) error {
 		return fmt.Errorf("cluster to cluster requires OVN-Kubernetes CNI (network.cniPlugin must be \"\" or \"ovnk\", got %q)", cfg.Network.CNIPlugin)
 	}
 
+	if c.DNS.CacheTTL != nil && *c.DNS.CacheTTL < 0 {
+		return fmt.Errorf("dns.cacheTTL must be >= 0, got %d", *c.DNS.CacheTTL)
+	}
+	if c.DNS.CacheNegativeTTL != nil && *c.DNS.CacheNegativeTTL < 0 {
+		return fmt.Errorf("dns.cacheNegativeTTL must be >= 0, got %d", *c.DNS.CacheNegativeTTL)
+	}
+
 	resolved, parseErrs := c.parseRemoteClusters()
 	if len(parseErrs) > 0 {
 		return errors.Join(parseErrs...)
@@ -259,10 +282,22 @@ func validateRemoteCluster(
 		if domainErrs := validation.IsDNS1123Subdomain(rc.Domain); len(domainErrs) > 0 {
 			errs = append(errs, fmt.Errorf("%s.domain %q is not a valid DNS name: %s", label, rc.Domain, strings.Join(domainErrs, ", ")))
 		}
+		if rc.Domain == "cluster.local" {
+			errs = append(errs, fmt.Errorf("%s.domain cannot be cluster.local", label))
+		}
 		if prev, ok := seenRemoteDomains[rc.Domain]; ok {
 			errs = append(errs, fmt.Errorf("%s.domain %q duplicates remoteClusters[%d]", label, rc.Domain, prev))
 		} else {
 			seenRemoteDomains[rc.Domain] = i
+		}
+	}
+
+	if rc.Domain != "" && len(rc.ServiceNetwork) > 0 {
+		dnsIP, err := getClusterDNS(rc.ServiceNetwork[0])
+		if err != nil {
+			errs = append(errs, fmt.Errorf("%s: failed to compute DNS IP from serviceNetwork[0] %q: %w", label, rc.ServiceNetwork[0], err))
+		} else {
+			res.DNSIP = dnsIP
 		}
 	}
 
@@ -344,4 +379,34 @@ func checkCIDRConflicts(cidr *net.IPNet, cidrStr, label string, seenCIDRs []labe
 
 func cidrsOverlap(a, b *net.IPNet) bool {
 	return a.Contains(b.IP) || b.Contains(a.IP)
+}
+
+// RenderC2CCDNSBlocks generates CoreDNS server blocks for cross-cluster DNS.
+func RenderC2CCDNSBlocks(resolved []ResolvedRemoteCluster, cacheTTL, cacheNegativeTTL int) string {
+	var blocks []string
+	for _, rc := range resolved {
+		if rc.Domain == "" {
+			continue
+		}
+		blocks = append(blocks, formatDNSBlock(rc.Domain, rc.DNSIP, cacheTTL, cacheNegativeTTL))
+	}
+	if len(blocks) == 0 {
+		return ""
+	}
+	return "\n" + strings.Join(blocks, "\n")
+}
+
+func formatDNSBlock(domain, dnsIP string, cacheTTL, cacheNegativeTTL int) string {
+	return fmt.Sprintf(`    %s:5353 {
+        bufsize 1232
+        errors
+        log . {
+            class error
+        }
+        rewrite stop name suffix .%s .cluster.local answer auto
+        forward . %s
+        cache %d {
+            denial 9984 %d
+        }
+    }`, domain, domain, dnsIP, cacheTTL, cacheNegativeTTL)
 }
