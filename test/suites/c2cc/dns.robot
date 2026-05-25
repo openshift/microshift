@@ -17,7 +17,7 @@ Test Tags           c2cc
 
 *** Variables ***
 &{NAMESPACES}       cluster-a=${EMPTY}    cluster-b=${EMPTY}    cluster-c=${EMPTY}
-&{DOMAIN_MAP}    cluster-a=${CLUSTER_A_DOMAIN}    cluster-b=${CLUSTER_B_DOMAIN}    cluster-c=${CLUSTER_C_DOMAIN}
+&{DOMAIN_MAP}       cluster-a=${CLUSTER_A_DOMAIN}    cluster-b=${CLUSTER_B_DOMAIN}    cluster-c=${CLUSTER_C_DOMAIN}
 
 
 *** Test Cases ***
