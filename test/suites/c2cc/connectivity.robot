@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation       Cross-cluster connectivity tests for C2CC.
-...                 Deploys test workloads on both clusters and verifies pod-to-pod
+...                 Deploys test workloads on all clusters and verifies pod-to-pod
 ...                 and pod-to-service communication in both directions.
 
 Resource            ../../resources/microshift-process.resource
@@ -98,30 +98,6 @@ Test Source IP Preserved Between Clusters
 
     ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
     Should Contain    ${stdout}    source: ${curl_pod_ip}
-
-Deploy Test Workloads
-    [Documentation]    Create namespace and deploy hello-microshift + curl-pod on all clusters.
-    VAR    ${assets}=    ${EXECDIR}/assets/c2cc
-    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
-        Oc On Cluster    ${alias}    oc create namespace ${NAMESPACE}
-        Oc On Cluster    ${alias}    oc apply -n ${NAMESPACE} -f ${assets}/hello-microshift.yaml
-        Oc On Cluster    ${alias}    oc apply -n ${NAMESPACE} -f ${assets}/curl-pod.yaml
-    END
-    Wait For Test Pods
-
-Wait For Test Pods
-    [Documentation]    Wait for all test pods to be Ready on all clusters.
-    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
-        Oc On Cluster    ${alias}
-        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACE} --for=condition=Ready --timeout=120s
-    END
-
-Cleanup Test Workloads
-    [Documentation]    Delete test namespace on all clusters. Ignores errors.
-    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
-        Run Keyword And Ignore Error
-        ...    Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACE} --timeout=60s
-    END
 
 Get Hello Pod IP
     [Documentation]    Get the pod IP of hello-microshift on the given cluster.
