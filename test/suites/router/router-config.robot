@@ -595,8 +595,8 @@ HTTP Capture Headers MaxLength Adherence
     ${router_ip}=    Get Router Pod IP
     Wait Until Curl Succeeds From Pod
     ...    ${CLIENT_POD_NAME}    ${NAMESPACE}    http://${routehost}/index.html    ${routehost}:80:${router_ip}
-    # route-unsec82003.apps.e is 16 chars, so the full hostname should not appear
-    Wait For Router Logs To Contain    route-unsec82003.ap
+    # maxLength is 16, so hostname is truncated to exactly 16 chars: route-unsec82003
+    Wait For Router Logs To Contain    route-unsec82003
     ${logs}=    Get Router Access Logs
     Should Not Contain    ${logs}    ${routehost}
     # nginx server version is 5+ chars, so only "nginx" should appear without the version
@@ -703,7 +703,7 @@ Verify Custom LB Ports And IP
     [Documentation]    Check the router-default LB has the expected IP and custom port numbers.
     [Arguments]    ${host_ip}
     ${lb_ips}=    Get LB IPs
-    Should Contain    ${lb_ips}    ${host_ip}
+    Should Be Equal As Strings    ${lb_ips}    ${host_ip}
     ${http_port}=    Get LB Port    http
     Should Be Equal As Strings    ${http_port}    ${ALT_HTTP_PORT}
     ${https_port}=    Get LB Port    https

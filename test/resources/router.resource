@@ -95,6 +95,9 @@ Create And Admit Four Route Types
     Create OC Route    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${edge_host}
     Create OC Route    ${NAMESPACE}    passthrough    route-passth    service-secure    --hostname=${pass_host}
     Create OC Route    ${NAMESPACE}    reencrypt    route-reen    service-secure    --hostname=${reen_host}
+    Route Should Be Admitted    route-http
+    Route Should Be Admitted    route-edge
+    Route Should Be Admitted    route-passth
     Route Should Be Admitted    route-reen
 
 Curl From Pod
