@@ -123,12 +123,3 @@ Verify RemoteCluster State
     FOR    ${state}    IN    @{states}
         Should Be Equal As Strings    ${state}    ${expected_state}
     END
-
-Compute 11th IP
-    [Documentation]    Return the 11th host address in a CIDR (e.g. 10.43.0.0/16 -> 10.43.0.11).
-    [Arguments]    ${cidr}
-    VAR    ${cmd}=    import ipaddress; n=ipaddress.ip_network('${cidr}', strict=False); print(n[11])
-    ${result}=    Process.Run Process    python3    -c    ${cmd}
-    Should Be Equal As Integers    ${result.rc}    0
-    ${ip}=    Strip String    ${result.stdout}
-    RETURN    ${ip}
