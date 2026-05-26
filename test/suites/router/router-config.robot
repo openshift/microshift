@@ -216,6 +216,7 @@ Custom Listening IPs And Ports
     ...    causes the router LB to expose only that IP on the custom ports, and routes
     ...    are reachable through those ports.
     ...    OCP-73203
+    [Tags]    router-infra
 
     ${iface}    ${host_ip}=    Get First Host Interface And IP Via SSH
     ${config}=    Catenate    SEPARATOR=\n
@@ -244,6 +245,7 @@ Enable Disable Router
     [Documentation]    Verify setting ingress status to Removed deletes the openshift-ingress namespace,
     ...    and setting it back to Managed restores the router LB with correct IPs and ports.
     ...    OCP-73209
+    [Tags]    router-infra
 
     ${config_removed}=    Catenate    SEPARATOR=\n
     ...    ---
@@ -272,6 +274,7 @@ Tuning Options Customization
     [Documentation]    Verify default tuning env vars and haproxy config values, then apply
     ...    custom tuning and verify all values are updated.
     ...    OCP-77349
+    [Tags]    router-policies
 
     VAR    ${http_host}=    service-unsecure-ocp77349.${BASE_DOMAIN}
     Deploy Web Server
@@ -287,6 +290,7 @@ Custom Default Certificate
     [Documentation]    Verify a custom TLS certificate secret can be configured as the default
     ...    ingress certificate, and that routes use the custom cert for TLS.
     ...    OCP-80508
+    [Tags]    router-tls
     [Setup]    Prepare Custom Cert For Test    80508    route-edge80508.${BASE_DOMAIN}
 
     ${config}=    Catenate    SEPARATOR=\n
@@ -314,6 +318,7 @@ Old And Intermediate TLS Profiles
     [Documentation]    Verify the default Intermediate TLS profile cipher settings, then apply Old
     ...    profile and verify updated cipher settings, then restore Intermediate.
     ...    OCP-80510
+    [Tags]    router-tls
 
     Router Pod Env Should Have Value    SSL_MIN_VERSION    TLSv1.2
     ${ciphers}=    Oc Get JsonPath
@@ -337,6 +342,7 @@ Modern And Custom TLS Profiles
     [Documentation]    Verify Modern TLS profile enforces TLSv1.3 in env vars and haproxy config,
     ...    then apply a Custom profile with specific ciphers.
     ...    OCP-80514
+    [Tags]    router-tls
 
     Setup Router Config And Restart    ${CONFIG_MODERN_TLS}
     Router Pod Env Should Have Value    SSL_MIN_VERSION    TLSv1.3
@@ -357,10 +363,10 @@ MTLS Optional And Required Policy
     [Documentation]    Verify mTLS with clientCertificatePolicy Required rejects connections without
     ...    client cert, and Optional policy allows them.
     ...    OCP-80517
+    [Tags]    router-tls
     [Setup]    Prepare MTLS Cert For Test    80517    route-edge80517.${BASE_DOMAIN}
 
     Run With Kubeconfig    oc create configmap ocp80517 --from-file=ca-bundle.pem=${MTLS_TMPDIR}/ca.crt -n ${ROUTER_NS}
-
     Setup Router Config And Restart    ${CONFIG_MTLS17_REQUIRED}
     Router Pod Env Should Have Value    ROUTER_MUTUAL_TLS_AUTH    required
     Deploy MTLS Test Workloads
@@ -399,6 +405,7 @@ MTLS Subject Filter
     [Documentation]    Verify mTLS with allowedSubjectPatterns allows a cert matching the CN filter
     ...    and blocks a cert not matching it.
     ...    OCP-80518
+    [Tags]    router-policies
     [Setup]    Prepare Two MTLS Certs For Test    80518    route-edge80518.${BASE_DOMAIN}    route2-edge80518.${BASE_DOMAIN}
 
     Run With Kubeconfig
@@ -435,6 +442,7 @@ Wildcard Route Admission Policy
     [Documentation]    Verify WildcardsDisallowed rejects wildcard routes, WildcardsAllowed admits them,
     ...    and reverting to WildcardsDisallowed rejects them again.
     ...    OCP-80520
+    [Tags]    router-policies
     [Setup]    Run Keywords
     ...    Deploy Web Server
     ...    AND    Deploy Test Client Pod
@@ -470,6 +478,7 @@ HTTP Capture Cookies Prefix Match
     [Documentation]    Verify httpCaptureCookies with Prefix match captures cookies matching the
     ...    prefix in router logs across HTTP, edge, and reencrypt routes.
     ...    OCP-81996
+    [Tags]    router-logging
 
     ${config}=    Catenate    SEPARATOR=\n
     ...    ---
@@ -501,6 +510,7 @@ HTTP Capture Cookies Exact Match And MaxLength
     [Documentation]    Verify httpCaptureCookies with Exact match captures only exact-named cookies,
     ...    and maxLength truncates cookie values in logs.
     ...    OCP-81997
+    [Tags]    router-logging
 
     Setup Router Config And Restart    ${CONFIG_COOKIE_EXACT_100}
     Deploy Web Server
@@ -540,6 +550,7 @@ HTTP Capture Headers Request And Response
     [Documentation]    Verify httpCaptureHeaders captures request Host and response Server headers
     ...    in router logs, including for edge and reencrypt routes.
     ...    OCP-82000
+    [Tags]    router-logging
 
     ${config}=    Catenate    SEPARATOR=\n
     ...    ---
@@ -572,6 +583,7 @@ HTTP Capture Headers Request And Response
 HTTP Capture Headers MaxLength Adherence
     [Documentation]    Verify httpCaptureHeaders maxLength truncates captured header values in logs.
     ...    OCP-82003
+    [Tags]    router-logging
 
     VAR    ${routehost}=    route-unsec82003.${BASE_DOMAIN}
     ${config}=    Catenate    SEPARATOR=\n
@@ -608,6 +620,7 @@ Custom HTTP Error Pages
     [Documentation]    Verify custom 503 and 404 error pages are served when configured via
     ...    httpErrorCodePages configmap.
     ...    OCP-82004
+    [Tags]    router-logging
 
     Create Configmap From Files    ${ROUTER_NS}    custom-82004-error-code-pages
     ...    --from-file=./assets/router/error-page-503.http    --from-file=./assets/router/error-page-404.http
@@ -633,6 +646,7 @@ HTTP Log Format
     [Documentation]    Verify httpLogFormat with HAProxy format directives produces structured log
     ...    output with the correct format.
     ...    OCP-82014
+    [Tags]    router-policies
 
     Setup Router Config And Restart    ${CONFIG_LOG_FORMAT_1}
     Deploy Web Server
@@ -667,6 +681,7 @@ Syslog Logging Destination
     [Documentation]    Verify logging to a syslog server delivers router access logs to the syslog pod,
     ...    and changing the facility is reflected in the haproxy global config.
     ...    OCP-82015
+    [Tags]    router-infra
 
     Privileged Namespace
     Deploy Rsyslogd Pod
@@ -680,6 +695,7 @@ Negative Logging Config Validation
     [Documentation]    Verify invalid logging configurations are rejected by microshift show-config,
     ...    and that setting httpCaptureCookies without status: Enabled does not activate logging.
     ...    OCP-84260
+    [Tags]    router-infra
 
     Show Invalid Drop In Config Should Fail With    ${LOGGING_INVALID_MAXLENGTH_NEG1}    Must be between 1 and 1024
     Show Invalid Drop In Config Should Fail With    ${LOGGING_INVALID_MAXLENGTH_ZERO}    Must be between 1 and 1024
