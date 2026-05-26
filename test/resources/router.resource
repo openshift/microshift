@@ -197,7 +197,9 @@ Wait Until Curl With Cert File Returns 403
 Curl Without Cert Should Return SSL Error
     [Documentation]    Curl without a client cert and assert SSL handshake error (for mTLS Required).
     [Arguments]    ${pod_name}    ${ns}    ${url}    ${resolve}
-    ${output}=    Curl From Pod    ${pod_name}    ${ns}    ${url}    ${resolve}    -skv
+    ${output}=    Run With Kubeconfig
+    ...    oc exec -n ${ns} ${pod_name} -- curl ${url} -sIkv --resolve ${resolve} --connect-timeout 10
+    ...    allow_fail=True
     Should Contain    ${output}    SSL_read
 
 Get Router Pod Name

@@ -112,7 +112,10 @@ Custom Listening IPs And Ports
     VAR    ${REEN_HOST}=    route-reen-ocp73203.${BASE_DOMAIN}    scope=TEST
     Create And Admit Four Route Types    ${HTTP_HOST}    ${EDGE_HOST}    ${PASS_HOST}    ${REEN_HOST}
     Curl Four Routes Via Custom Ports    ${host_ip}
-    [Teardown]    Remove Router Config And Restart
+    [Teardown]    Run Keywords
+    ...    Remove Router Config And Restart
+    ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
 
 Enable Disable Router
     [Documentation]    Verify setting ingress status to Removed deletes the openshift-ingress namespace,
@@ -153,7 +156,11 @@ Syslog Logging Destination
     Deploy Test Client Pod
     ${syslog_ip}=    Oc Get JsonPath    pod    ${NAMESPACE}    rsyslogd-pod    .status.podIP
     Verify Syslog Logging    ${syslog_ip}
-    [Teardown]    Remove Router Config And Restart
+    [Teardown]    Run Keywords
+    ...    Remove Router Config And Restart
+    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${RSYSLOGD_POD} -n ${NAMESPACE} --ignore-not-found
 
 Negative Logging Config Validation
     [Documentation]    Verify invalid logging configurations are rejected by microshift show-config,

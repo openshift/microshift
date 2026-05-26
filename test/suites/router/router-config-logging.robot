@@ -70,7 +70,10 @@ HTTP Capture Cookies Prefix Match
     Route Should Be Admitted    route-reen
     ${router_ip}=    Get Router Pod IP
     Curl All Cookie Routes And Verify Logs    ${routehost}    ${edge_host}    ${reen_host}    ${router_ip}
-    [Teardown]    Remove Router Config And Restart
+    [Teardown]    Run Keywords
+    ...    Remove Router Config And Restart
+    ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
 
 HTTP Capture Cookies Exact Match And MaxLength
     [Documentation]    Verify httpCaptureCookies with Exact match captures only exact-named cookies,
@@ -109,7 +112,10 @@ HTTP Capture Cookies Exact Match And MaxLength
     ...    foo=bar89abdef
     Wait For Router Logs To Contain    foo=bar89a
     Router Logs Should Not Contain    foo=bar89ab
-    [Teardown]    Remove Router Config And Restart
+    [Teardown]    Run Keywords
+    ...    Remove Router Config And Restart
+    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
 
 HTTP Capture Headers Request And Response
     [Documentation]    Verify httpCaptureHeaders captures request Host and response Server headers
@@ -142,7 +148,10 @@ HTTP Capture Headers Request And Response
     Create OC Route    ${NAMESPACE}    reencrypt    route-reen    service-secure    --hostname=${reen_host}
     Route Should Be Admitted    route-reen
     Verify Header Capture Config And Logs    ${routehost}    ${edge_host}    ${reen_host}
-    [Teardown]    Remove Router Config And Restart
+    [Teardown]    Run Keywords
+    ...    Remove Router Config And Restart
+    ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
 
 HTTP Capture Headers MaxLength Adherence
     [Documentation]    Verify httpCaptureHeaders maxLength truncates captured header values in logs.
@@ -177,7 +186,10 @@ HTTP Capture Headers MaxLength Adherence
     # nginx server version is 5+ chars, so only "nginx" should appear without the version
     Should Contain    ${logs}    nginx
     Should Not Contain    ${logs}    nginx/
-    [Teardown]    Remove Router Config And Restart
+    [Teardown]    Run Keywords
+    ...    Remove Router Config And Restart
+    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
 
 Custom HTTP Error Pages
     [Documentation]    Verify custom 503 and 404 error pages are served when configured via
@@ -203,6 +215,8 @@ Custom HTTP Error Pages
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
     ...    AND    Run With Kubeconfig    oc delete configmap custom-82004-error-code-pages -n ${ROUTER_NS} --ignore-not-found
+    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
 
 
 *** Keywords ***

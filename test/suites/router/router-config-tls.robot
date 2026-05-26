@@ -95,6 +95,8 @@ Custom Default Certificate
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
     ...    AND    Run With Kubeconfig    oc delete secret router-test-cert -n ${ROUTER_NS} --ignore-not-found
+    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
 
 Old And Intermediate TLS Profiles
     [Documentation]    Verify the default Intermediate TLS profile cipher settings, then apply Old
@@ -167,6 +169,8 @@ MTLS Optional And Required Policy
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
     ...    AND    Run With Kubeconfig    oc delete configmap ocp80517 -n ${ROUTER_NS} --ignore-not-found
+    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
 
 
 *** Keywords ***
