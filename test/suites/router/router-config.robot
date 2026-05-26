@@ -940,7 +940,7 @@ Verify Syslog Logging
     Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
     Route Should Be Admitted    route-http
     Verify Syslog Haproxy Config    ${syslog_ip}    local1
-    Verify Syslog Log Delivery    ${routehost}    ${syslog_ip}
+    Verify Syslog Log Delivery    ${routehost}
     VAR    ${config2}=    SEPARATOR=\n
     ...    ---
     ...    ingress:
@@ -963,7 +963,7 @@ Verify Syslog Haproxy Config
 
 Verify Syslog Log Delivery
     [Documentation]    Curl a route and verify the log entry appears in the syslog pod.
-    [Arguments]    ${routehost}    ${syslog_ip}
+    [Arguments]    ${routehost}
     ${router_ip}=    Get Router Pod IP
     Wait Until Curl Succeeds From Pod
     ...    ${CLIENT_POD_NAME}    ${NAMESPACE}
