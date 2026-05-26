@@ -42,6 +42,19 @@ type RemoteClusterStatus struct {
 	LastProbeTime *metav1.Time `json:"lastProbeTime,omitempty"`
 	// +optional
 	Errors []string `json:"errors,omitempty"`
+	// Latency statistics from recent probes (rolling window of 20 samples).
+	// +optional
+	Latency *LatencyStats `json:"latency,omitempty"`
+}
+
+// LatencyStats contains latency statistics computed from a rolling window of probe samples.
+// All duration values are serialized as Go duration strings (e.g. "1.234ms").
+type LatencyStats struct {
+	Avg    metav1.Duration `json:"avg"`
+	Min    metav1.Duration `json:"min"`
+	Max    metav1.Duration `json:"max"`
+	Last   metav1.Duration `json:"last"`
+	Stddev metav1.Duration `json:"stddev"`
 }
 
 // +kubebuilder:object:root=true
