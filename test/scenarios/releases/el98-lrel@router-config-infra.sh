@@ -21,5 +21,5 @@ scenario_run_tests() {
     exit_if_commit_not_found "${start_image}"
 
     run_tests host1 \
-        --include router-infra suites/router/router-config.robot
+        suites/router/router-config-infra.robot
 }
