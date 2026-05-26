@@ -1,0 +1,10 @@
+---
+schema: olm.package
+name: hello-microshift-operator
+defaultChannel: alpha
+---
+schema: olm.channel
+name: alpha
+package: hello-microshift-operator
+entries:
+  - name: hello-microshift-operator.v0.1.0
