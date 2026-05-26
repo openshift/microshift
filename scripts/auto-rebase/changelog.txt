@@ -1,7 +1,17 @@
-- ovn-kubernetes image-arm64 2609f4261a2310228b926965b11b7b616c0bb418 to 0276ba1ace90f6182fc13894fc17150262974be6
+- cluster-network-operator embedded-component c836773db43651d272644c12d47a8d70a118c1d7 to bd2181ac81fe75f9ad611d99ec0a932624a63eaa
+  - d1612a3 2026-05-12T11:28:31+00:00 OCPBUGS-74401: Remove duplicated openssl parameter
+
+- machine-config-operator embedded-component 7d117b24b0419a2297f4f087d52b12a72cc89c88 to 1dd69a37a6a840654e2558c9cc26b8fa762ab312
+  - a0fab6f4 2026-05-18T10:58:53+00:00 OCPBUGS-84218: Fix units rollback if update failure
+
+- ovn-kubernetes image-amd64 2609f4261a2310228b926965b11b7b616c0bb418 to 7e6b238838bc25c546022ba4ef3316fa98926d79
   - 80518a91 2026-05-04T09:30:51+02:00 fix(kubevirt): Use pod network subnet gateway IP for DHCP router option
   - ef7ea17c 2026-04-23T15:54:57+01:00 virt: fix SyncVirtualMachines deleting UDN DHCP options during startup
   - 8df3403f 2026-04-15T09:39:23+00:00 Backport: Fix NAD Controller syncAll for networkID upgrade from node->NAD
   - 3928ae07 2026-04-08T16:39:36+08:00 egressip: Skip bridge configuration for secondary network IPs
+  - 20b802cc 2026-03-31T13:15:36+02:00 CUDN: cleanup NADs in terminating namespaces without pods
   - 2a5bf31c 2026-03-31T16:31:32+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+
+- ovn-kubernetes image-arm64 0276ba1ace90f6182fc13894fc17150262974be6 to 7e6b238838bc25c546022ba4ef3316fa98926d79
+  - 20b802cc 2026-03-31T13:15:36+02:00 CUDN: cleanup NADs in terminating namespaces without pods
 
