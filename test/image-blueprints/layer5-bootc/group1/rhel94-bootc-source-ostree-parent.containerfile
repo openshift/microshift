@@ -12,6 +12,16 @@ RUN ln -sr /run/secrets/etc-pki-entitlement /etc/pki/entitlement-host && \
     ln -sr /run/secrets/rhsm /etc/rhsm-host && \
     mkdir -p /var/opt
 
+# Lock the OS release version and enable EUS repositories to prevent
+# the installation of packages belonging to a newer OS release
+# hadolint ignore=SC1091
+RUN source /etc/os-release && \
+    echo "${VERSION_ID}" > /etc/dnf/vars/releasever && \
+    dnf config-manager --set-disabled '*' && \
+    dnf config-manager --set-enabled \
+        "rhel-9-for-$(uname -m)-baseos-eus-rpms" \
+        "rhel-9-for-$(uname -m)-appstream-eus-rpms"
+
 # Copy the repository configuration script
 COPY --chmod=755 ./bootc-images/microshift_repo_config.sh ${REPO_CONFIG_SCRIPT}
 
