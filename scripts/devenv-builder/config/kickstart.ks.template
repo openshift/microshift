@@ -22,7 +22,7 @@ network --bootproto=dhcp --device=link --activate --onboot=on --hostname=REPLACE
 zerombr
 clearpart --all --initlabel
 part /boot/efi --fstype=efi --size=200
-part /boot --fstype=xfs --asprimary --size=800
+part /boot --fstype=xfs --size=800
 part swap --fstype=swap --size=REPLACE_SWAP_SIZE
 part pv.01 --grow
 volgroup rhel pv.01

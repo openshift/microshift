@@ -261,6 +261,26 @@ The microshift-cert-manager-release-info package provides release information fi
 release. These files contain the list of container image references used by Cert Manager
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
+%package metrics
+Summary: Kubernetes metrics exporters for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description metrics
+The microshift-metrics package provides metrics-server, node-exporter, and
+kube-state-metrics for MicroShift. Install this package to enable kubectl top
+and expose host and cluster metrics via secure endpoints.
+
+%package metrics-release-info
+Summary: Release information for metrics exporters for MicroShift
+BuildArch: noarch
+Requires: microshift-release-info = %{version}
+
+%description metrics-release-info
+The microshift-metrics-release-info package provides release information files for this
+release. These files contain the list of container image references used by the metrics
+exporters and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+
 %package sriov
 Summary: SR-IOV Network Operator for MicroShift
 ExclusiveArch: x86_64 aarch64
@@ -599,6 +619,46 @@ cat assets/optional/cert-manager/manager/images-x86_64.yaml >> %{buildroot}/%{_p
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/cert-manager/release-cert-manager-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+# metrics-server
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/0*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+
+%ifarch %{arm} aarch64
+cat assets/optional/metrics-server/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/metrics-server/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/kustomization.yaml
+%endif
+
+# kube-state-metrics
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/0*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+
+%ifarch %{arm} aarch64
+cat assets/optional/kube-state-metrics/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/kube-state-metrics/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/kustomization.yaml
+%endif
+
+# node-exporter
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/0*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+
+%ifarch %{arm} aarch64
+cat assets/optional/node-exporter/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/node-exporter/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/kustomization.yaml
+%endif
+
+# metrics-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/metrics-server/release-metrics-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
 # sriov
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd
@@ -801,6 +861,17 @@ fi
 
 %files cert-manager-release-info
 %{_datadir}/microshift/release/release-cert-manager-{x86_64,aarch64}.json
+
+%files metrics
+%dir %{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/*
+%dir %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/*
+%dir %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/*
+
+%files metrics-release-info
+%{_datadir}/microshift/release/release-metrics-{x86_64,aarch64}.json
 
 %files sriov
 %dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov

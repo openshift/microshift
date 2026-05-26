@@ -54,6 +54,14 @@ if [ "${SWAPSIZE}" -eq 0 ] ; then
     sed -i "s;^part swap;#part swap;" "${KICKSTART_FILE}"
 fi
 
+
+# RHEL 10+ requires UEFI boot
+BOOT_OPTS=""
+RHEL_MAJOR=$(echo "${VMNAME}" | grep -oP '(\d+)\.\d+' | cut -d. -f1)
+if [ "${RHEL_MAJOR:-0}" -ge 10 ]; then
+    BOOT_OPTS="--boot uefi"
+fi
+
 sudo bash -c " \
 cd ${VMDISKDIR} && \
 virt-install \
@@ -63,6 +71,7 @@ virt-install \
     --disk pool=${MICROSHIFT_VOL_POOL},path=./${VMNAME}.qcow2,size=${DISKSIZE} \
     --network network=${NETWORK},model=virtio \
     --events on_reboot=restart \
+    ${BOOT_OPTS} \
     --location ${ISOFILE} \
     --initrd-inject=${KICKSTART_FILE} \
     --extra-args \"inst.ks=file:/$(basename "${KICKSTART_FILE}")\" \

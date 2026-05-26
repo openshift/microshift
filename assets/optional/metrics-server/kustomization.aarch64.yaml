@@ -1,0 +1,4 @@
+images:
+  - name: quay.io/openshift/metrics-server
+    newName: registry.redhat.io/openshift4/ose-metrics-server-rhel9
+    digest: sha256:placeholder

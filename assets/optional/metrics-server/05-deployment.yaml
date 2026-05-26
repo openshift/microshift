@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-server
+  namespace: openshift-monitoring
+  labels:
+    app.kubernetes.io/name: metrics-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: metrics-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: metrics-server
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+        openshift.io/required-scc: hostmount-anyuid
+    spec:
+      serviceAccountName: metrics-server
+      priorityClassName: system-cluster-critical
+      containers:
+        - name: metrics-server
+          image: quay.io/openshift/metrics-server:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --secure-port=4443
+            - --kubelet-preferred-address-types=Hostname,InternalIP
+            - --kubelet-use-node-status-port
+            - --metric-resolution=15s
+            - --tls-cert-file=/etc/tls/serving/tls.crt
+            - --tls-private-key-file=/etc/tls/serving/tls.key
+            - --kubelet-client-certificate=/etc/tls/kubelet-client/client.crt
+            - --kubelet-client-key=/etc/tls/kubelet-client/client.key
+            - --kubelet-certificate-authority=/etc/tls/kubelet-ca/ca-bundle.crt
+          ports:
+            - containerPort: 4443
+              name: https
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: https
+              scheme: HTTPS
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: https
+              scheme: HTTPS
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: serving-cert
+              mountPath: /etc/tls/serving
+              readOnly: true
+            - name: kubelet-client-cert
+              mountPath: /etc/tls/kubelet-client
+              readOnly: true
+            - name: kubelet-ca
+              mountPath: /etc/tls/kubelet-ca
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: serving-cert
+          secret:
+            secretName: metrics-server-tls
+        - name: kubelet-client-cert
+          hostPath:
+            path: /var/lib/microshift/certs/kube-apiserver-to-kubelet-client-signer/kube-apiserver-to-kubelet-client
+            type: DirectoryOrCreate
+        - name: kubelet-ca
+          hostPath:
+            path: /var/lib/microshift/certs/kubelet-csr-signer-signer/csr-signer
+            type: DirectoryOrCreate
+        - name: tmp
+          emptyDir: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists

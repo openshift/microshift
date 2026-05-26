@@ -61,6 +61,12 @@ function get_base_isofile {
         9.*)
             echo "rhel-${rhel_version}-$(uname -m)-dvd.iso"
             ;;
+        10)
+            echo "rhel-10.2-$(uname -m)-dvd.iso"
+            ;;
+        10.*)
+            echo "rhel-${rhel_version}-$(uname -m)-dvd.iso"
+            ;;
         *)
             echo "Unknown RHEL version ${rhel_version}" 1>&2
             exit 1

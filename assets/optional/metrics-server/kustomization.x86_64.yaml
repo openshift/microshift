@@ -1,0 +1,4 @@
+images:
+  - name: quay.io/openshift/metrics-server
+    newName: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+    digest: sha256:b09f284fccdb9d3f5c699ef0573ab9a2242ebf6c222303b270dd80d19d730dfa

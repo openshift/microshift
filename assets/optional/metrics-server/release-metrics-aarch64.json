@@ -1,0 +1,10 @@
+{
+  "release": {
+    "base": "placeholder"
+  },
+  "images": {
+    "metrics_server": "registry.redhat.io/openshift4/ose-metrics-server-rhel9@sha256:placeholder",
+    "node_exporter": "registry.redhat.io/openshift4/ose-prometheus-node-exporter-rhel9@sha256:placeholder",
+    "kube_state_metrics": "registry.redhat.io/openshift4/ose-kube-state-metrics-rhel9@sha256:placeholder"
+  }
+}

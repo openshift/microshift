@@ -38,6 +38,19 @@ var optionalWorkloadPaths = map[string]optionalWorkloads{
 		Namespace: "sriov-network-operator",
 		Workloads: NamespaceWorkloads{Deployments: []string{"sriov-network-operator"}},
 	},
+
+	"/usr/lib/microshift/manifests.d/080-microshift-metrics-server": {
+		Namespace: "openshift-monitoring",
+		Workloads: NamespaceWorkloads{Deployments: []string{"metrics-server"}},
+	},
+	"/usr/lib/microshift/manifests.d/081-microshift-kube-state-metrics": {
+		Namespace: "openshift-monitoring",
+		Workloads: NamespaceWorkloads{Deployments: []string{"kube-state-metrics"}},
+	},
+	"/usr/lib/microshift/manifests.d/082-microshift-node-exporter": {
+		Namespace: "openshift-monitoring",
+		Workloads: NamespaceWorkloads{DaemonSets: []string{"node-exporter"}},
+	},
 }
 
 // fillOptionalMicroShiftWorkloads assembles list of optional MicroShift workloads

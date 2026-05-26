@@ -1,0 +1,7 @@
+images:
+  - name: quay.io/openshift/kube-state-metrics
+    newName: registry.redhat.io/openshift4/ose-kube-state-metrics-rhel9
+    digest: sha256:placeholder
+  - name: quay.io/openshift/kube-rbac-proxy
+    newName: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
+    digest: sha256:placeholder

@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-state-metrics
+  namespace: openshift-monitoring
+  labels:
+    app.kubernetes.io/name: kube-state-metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-state-metrics
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kube-state-metrics
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+        openshift.io/required-scc: restricted-v2
+    spec:
+      serviceAccountName: kube-state-metrics
+      priorityClassName: system-cluster-critical
+      containers:
+        - name: kube-state-metrics
+          image: quay.io/openshift/kube-state-metrics:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --host=127.0.0.1
+            - --port=8081
+            - --telemetry-host=127.0.0.1
+            - --telemetry-port=8082
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+        - name: kube-rbac-proxy-main
+          image: quay.io/openshift/kube-rbac-proxy:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --secure-listen-address=:8443
+            - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+            - --tls-min-version=VersionTLS12
+            - --upstream=http://127.0.0.1:8081/
+            - --tls-cert-file=/etc/tls/private/tls.crt
+            - --tls-private-key-file=/etc/tls/private/tls.key
+          ports:
+            - containerPort: 8443
+              name: https-main
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 40Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          volumeMounts:
+            - name: metrics-tls
+              mountPath: /etc/tls/private
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+        - name: kube-rbac-proxy-self
+          image: quay.io/openshift/kube-rbac-proxy:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - --secure-listen-address=:9443
+            - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+            - --tls-min-version=VersionTLS12
+            - --upstream=http://127.0.0.1:8082/
+            - --tls-cert-file=/etc/tls/private/tls.crt
+            - --tls-private-key-file=/etc/tls/private/tls.key
+          ports:
+            - containerPort: 9443
+              name: https-self
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 40Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          volumeMounts:
+            - name: metrics-tls
+              mountPath: /etc/tls/private
+              readOnly: true
+            - name: tmp-self
+              mountPath: /tmp
+      volumes:
+        - name: metrics-tls
+          secret:
+            secretName: kube-state-metrics-tls
+        - name: tmp
+          emptyDir: {}
+        - name: tmp-self
+          emptyDir: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
