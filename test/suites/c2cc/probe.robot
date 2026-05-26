@@ -78,6 +78,28 @@ RemoteCluster Status Has LastSuccessfulProbe
         END
     END
 
+RemoteCluster Status Has Latency Stats
+    [Documentation]    Verify that latency statistics are populated after probes have run.
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        Wait Until Keyword Succeeds    2m    10s
+        ...    Verify Latency Stats Populated    ${alias}
+    END
+
+Latency Stats Fields Are Populated
+    [Documentation]    Verify all latency stat fields (avg/min/max/last/stddev) are present and non-empty.
+    FOR    ${alias}    IN    cluster-a    cluster-b
+        ${avg}=    Get Latency Field    ${alias}    avg
+        ${min}=    Get Latency Field    ${alias}    min
+        ${max}=    Get Latency Field    ${alias}    max
+        ${last}=    Get Latency Field    ${alias}    last
+        ${stddev}=    Get Latency Field    ${alias}    stddev
+        Should Not Be Empty    ${avg}
+        Should Not Be Empty    ${min}
+        Should Not Be Empty    ${max}
+        Should Not Be Empty    ${last}
+        Should Not Be Empty    ${stddev}
+    END
+
 Probe Deployment Self-Heals After Deletion
     [Documentation]    Delete the probe deployment and verify it is recreated by the controller.
     Oc On Cluster    cluster-a
@@ -208,3 +230,16 @@ Delete Probe Deny Policy
     [Arguments]    ${alias}
     Oc On Cluster    ${alias}
     ...    oc delete networkpolicy deny-probe-ingress -n ${C2CC_NAMESPACE} --ignore-not-found
+
+Verify Latency Stats Populated
+    [Documentation]    Check that latency stats are present and avg is non-empty.
+    [Arguments]    ${alias}
+    ${avg}=    Get Latency Field    ${alias}    avg
+    Should Not Be Empty    ${avg}
+
+Get Latency Field
+    [Documentation]    Return a single latency stat field from the first RemoteCluster CR.
+    [Arguments]    ${alias}    ${field}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[0].status.latency.${field}}'
+    RETURN    ${stdout}
