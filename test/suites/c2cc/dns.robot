@@ -16,49 +16,51 @@ Test Tags           c2cc
 
 
 *** Variables ***
-&{NAMESPACES}       cluster-a=${EMPTY}    cluster-b=${EMPTY}
+&{NAMESPACES}       cluster-a=${EMPTY}    cluster-b=${EMPTY}    cluster-c=${EMPTY}
+&{DOMAIN_MAP}       cluster-a=${CLUSTER_A_DOMAIN}    cluster-b=${CLUSTER_B_DOMAIN}    cluster-c=${CLUSTER_C_DOMAIN}
 
 
 *** Test Cases ***
-Corefile Contains C2CC Server Block On Cluster A
-    [Documentation]    Verify Cluster A's Corefile has a server block for Cluster B's domain.
-    Verify Corefile Contains C2CC Server Block    cluster-a    ${CLUSTER_B_DOMAIN}
+Test Corefile Contains C2CC Server Block
+    [Documentation]    Verify every cluster's Corefile has a server block for every other cluster domain.
+    [Template]    Verify Corefile Contains C2CC Server Block
+    cluster-a    ${CLUSTER_B_DOMAIN}
+    cluster-a    ${CLUSTER_C_DOMAIN}
+    cluster-b    ${CLUSTER_A_DOMAIN}
+    cluster-b    ${CLUSTER_C_DOMAIN}
+    cluster-c    ${CLUSTER_A_DOMAIN}
+    cluster-c    ${CLUSTER_B_DOMAIN}
 
-Corefile Contains C2CC Server Block On Cluster B
-    [Documentation]    Verify Cluster B's Corefile has a server block for Cluster A's domain.
-    Verify Corefile Contains C2CC Server Block    cluster-b    ${CLUSTER_A_DOMAIN}
+Test Resolve Remote Service DNS
+    [Documentation]    Verify pods can resolve a service on all clusters via DNS.
+    [Template]    DNS Resolve From Cluster
+    cluster-a    hello-microshift.${NAMESPACES}[cluster-b].svc.${DOMAIN_MAP}[cluster-b]
+    cluster-a    hello-microshift.${NAMESPACES}[cluster-c].svc.${DOMAIN_MAP}[cluster-c]
+    cluster-b    hello-microshift.${NAMESPACES}[cluster-a].svc.${DOMAIN_MAP}[cluster-a]
+    cluster-b    hello-microshift.${NAMESPACES}[cluster-c].svc.${DOMAIN_MAP}[cluster-c]
+    cluster-c    hello-microshift.${NAMESPACES}[cluster-a].svc.${DOMAIN_MAP}[cluster-a]
+    cluster-c    hello-microshift.${NAMESPACES}[cluster-b].svc.${DOMAIN_MAP}[cluster-b]
 
-Resolve Remote Service DNS From Cluster A
-    [Documentation]    Verify pod on Cluster A can resolve a service on Cluster B via DNS.
-    DNS Resolve From Cluster    cluster-a
-    ...    hello-microshift.${NAMESPACES}[cluster-b].svc.${CLUSTER_B_DOMAIN}
-
-Resolve Remote Service DNS From Cluster B
-    [Documentation]    Verify pod on Cluster B can resolve a service on Cluster A via DNS.
-    DNS Resolve From Cluster    cluster-b
-    ...    hello-microshift.${NAMESPACES}[cluster-a].svc.${CLUSTER_A_DOMAIN}
-
-Curl Remote Service Via DNS From Cluster A
-    [Documentation]    Verify pod on Cluster A can reach a service on Cluster B using the remote DNS name.
-    ${stdout}=    Curl DNS From Cluster    cluster-a
-    ...    hello-microshift.${NAMESPACES}[cluster-b].svc.${CLUSTER_B_DOMAIN}    8080
-    Should Contain    ${stdout}    Hello from
-
-Curl Remote Service Via DNS From Cluster B
-    [Documentation]    Verify pod on Cluster B can reach a service on Cluster A using the remote DNS name.
-    ${stdout}=    Curl DNS From Cluster    cluster-b
-    ...    hello-microshift.${NAMESPACES}[cluster-a].svc.${CLUSTER_A_DOMAIN}    8080
-    Should Contain    ${stdout}    Hello from
+Test Curl Remote Service Via DNS
+    [Documentation]    Verify pod on a cluster can reach a service on all clusters using the remote DNS name.
+    [Template]    Curl Remote Service Via DNS
+    cluster-a    cluster-b
+    cluster-a    cluster-c
+    cluster-b    cluster-a
+    cluster-b    cluster-c
+    cluster-c    cluster-a
+    cluster-c    cluster-b
 
 
 *** Keywords ***
 Setup
-    [Documentation]    Set up clusters and deploy test workloads on both.
+    [Documentation]    Set up clusters and deploy test workloads on all.
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig
     Register Local Cluster    cluster-a
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
+    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
     Deploy Test Workloads
 
 Teardown
@@ -67,6 +69,13 @@ Teardown
     Teardown All Remote Clusters
     Remove Kubeconfig
     Logout MicroShift Host
+
+Curl Remote Service Via DNS
+    [Documentation]    Verify pod on ${source} can reach a service on ${destination} using the remote DNS name.
+    [Arguments]    ${source}    ${destination}
+    ${stdout}=    Curl DNS From Cluster    ${source}
+    ...    hello-microshift.${NAMESPACES}[${destination}].svc.${DOMAIN_MAP}[${destination}]    8080
+    Should Contain    ${stdout}    Hello from
 
 DNS Resolve From Cluster
     [Documentation]    Resolve a DNS name from curl-pod on the given cluster. Retries for up to 60s.

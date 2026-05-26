@@ -24,14 +24,24 @@ ${C2CC_CONFIG_PATH}     /etc/microshift/config.d/50-c2cc.yaml
 No Linux Routes In Table 200 After Disable
     [Documentation]    Routes to remote CIDRs in table 200 should be gone.
     ${stdout}=    Command On Cluster    cluster-a    ip route show table 200
-    Should Not Contain    ${stdout}    ${CLUSTER_B_POD_CIDR}
-    Should Not Contain    ${stdout}    ${CLUSTER_B_SVC_CIDR}
+    FOR    ${cidr}    IN
+    ...    ${CLUSTER_B_POD_CIDR}
+    ...    ${CLUSTER_B_SVC_CIDR}
+    ...    ${CLUSTER_C_POD_CIDR}
+    ...    ${CLUSTER_C_SVC_CIDR}
+        Should Not Contain    ${stdout}    ${cidr}
+    END
 
 No IP Rules For Table 200 After Disable
     [Documentation]    IP rules directing to table 200 should be gone.
     ${stdout}=    Command On Cluster    cluster-a    ip rule show
-    Should Not Contain    ${stdout}    to ${CLUSTER_B_POD_CIDR} lookup 200
-    Should Not Contain    ${stdout}    to ${CLUSTER_B_SVC_CIDR} lookup 200
+    FOR    ${cidr}    IN
+    ...    ${CLUSTER_B_POD_CIDR}
+    ...    ${CLUSTER_B_SVC_CIDR}
+    ...    ${CLUSTER_C_POD_CIDR}
+    ...    ${CLUSTER_C_SVC_CIDR}
+        Should Not Contain    ${stdout}    to ${cidr} lookup 200
+    END
 
 No Service Routes In Table 201 After Disable
     [Documentation]    Service routes in table 201 should be gone.
@@ -41,8 +51,13 @@ No Service Routes In Table 201 After Disable
 No Service IP Rules After Disable
     [Documentation]    Service IP rules for table 201 should be gone.
     ${stdout}=    Command On Cluster    cluster-a    ip rule show
-    Should Not Contain    ${stdout}    from ${CLUSTER_B_POD_CIDR} to ${CLUSTER_A_SVC_CIDR} lookup 201
-    Should Not Contain    ${stdout}    from ${CLUSTER_B_SVC_CIDR} to ${CLUSTER_A_SVC_CIDR} lookup 201
+    FOR    ${cidr}    IN
+    ...    ${CLUSTER_B_POD_CIDR}
+    ...    ${CLUSTER_B_SVC_CIDR}
+    ...    ${CLUSTER_C_POD_CIDR}
+    ...    ${CLUSTER_C_SVC_CIDR}
+        Should Not Contain    ${stdout}    from ${cidr} to ${CLUSTER_A_SVC_CIDR} lookup 201
+    END
 
 No NFTables Bypass Rules After Disable
     [Documentation]    C2CC nftables masquerade bypass rules should be gone.
@@ -86,6 +101,7 @@ Setup
     Setup Kubeconfig
     Register Local Cluster    cluster-a
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
+    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
     Disable C2CC On Cluster    cluster-a
 
 Teardown

@@ -14,37 +14,33 @@ Test Tags           c2cc
 
 
 *** Test Cases ***
-Cluster A Is Running
-    [Documentation]    Verify MicroShift on Cluster A is healthy.
-    Verify Cluster Is Running    cluster-a
+Cluster Is Running
+    [Documentation]    Verify all clusters are healthy.
+    [Template]    Verify Cluster Is Running
+    cluster-a
+    cluster-b
+    cluster-c
 
-Cluster B Is Running
-    [Documentation]    Verify MicroShift on Cluster B is healthy.
-    Verify Cluster Is Running    cluster-b
+All Pods On Cluster Are Ready
+    [Documentation]    Verify all pods reach Ready state on all clusters.
+    [Template]    Verify All Pods Are Ready
+    cluster-a
+    cluster-b
+    cluster-c
 
-All Pods On Cluster A Are Ready
-    [Documentation]    All pods on Cluster A reach Ready state.
-    Verify All Pods Are Ready    cluster-a
+Cluster Has Expected Node
+    [Documentation]    Verify all clusters have a node.
+    [Template]    Verify Cluster Has Node
+    cluster-a
+    cluster-b
+    cluster-c
 
-All Pods On Cluster B Are Ready
-    [Documentation]    All pods on Cluster B reach Ready state.
-    Verify All Pods Are Ready    cluster-b
-
-Cluster A Has Expected Node
-    [Documentation]    Verify Cluster A has a node.
-    Verify Cluster Has Node    cluster-a
-
-Cluster B Has Expected Node
-    [Documentation]    Verify Cluster B has a node.
-    Verify Cluster Has Node    cluster-b
-
-C2CC Controller Is Running On Cluster A
-    [Documentation]    Verify c2cc-route-manager logged startup on Cluster A.
-    Verify C2CC Controller Is Running    cluster-a
-
-C2CC Controller Is Running On Cluster B
-    [Documentation]    Verify c2cc-route-manager logged startup on Cluster B.
-    Verify C2CC Controller Is Running    cluster-b
+C2CC Controller Is Running On Cluster
+    [Documentation]    Verify c2cc-route-manager logged startup on all clusters.
+    [Template]    Verify C2CC Controller Is Running
+    cluster-a
+    cluster-b
+    cluster-c
 
 
 *** Keywords ***
@@ -55,6 +51,7 @@ Setup
     Setup Kubeconfig
     Register Local Cluster    cluster-a
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
+    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
 
 Teardown
     [Documentation]    Close all connections and clean up kubeconfigs.

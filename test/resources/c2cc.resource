@@ -22,6 +22,13 @@ ${HOST2_IP}                 ${EMPTY}
 ${HOST2_SSH_PORT}           ${EMPTY}
 ${HOST2_API_PORT}           ${EMPTY}
 ${KUBECONFIG_B}             ${EMPTY}
+${CLUSTER_C_POD_CIDR}       ${EMPTY}
+${CLUSTER_C_SVC_CIDR}       ${EMPTY}
+${CLUSTER_C_DOMAIN}         ${EMPTY}
+${HOST3_IP}                 ${EMPTY}
+${HOST3_SSH_PORT}           ${EMPTY}
+${HOST3_API_PORT}           ${EMPTY}
+${KUBECONFIG_C}             ${EMPTY}
 &{C2CC_KUBECONFIGS}         &{EMPTY}
 &{C2CC_SSH_IDS}             &{EMPTY}
 @{C2CC_REMOTE_ALIASES}      @{EMPTY}
@@ -249,9 +256,9 @@ Verify Corefile Does Not Contain C2CC Server Block
     Should Not Contain    ${stdout}    ${domain}:5353
 
 Deploy Test Workloads
-    [Documentation]    Create namespace and deploy hello-microshift + curl-pod on both clusters.
+    [Documentation]    Create namespace and deploy hello-microshift + curl-pod on all clusters.
     VAR    ${assets}=    ${EXECDIR}/assets/c2cc
-    FOR    ${alias}    IN    cluster-a    cluster-b
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         ${ns}=    Create Unique Namespace On Cluster    ${alias}
         Set To Dictionary    ${NAMESPACES}    ${alias}    ${ns}
         Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/hello-microshift.yaml
@@ -261,17 +268,17 @@ Deploy Test Workloads
     Wait For Service Endpoints
 
 Wait For Test Pods
-    [Documentation]    Wait for all test pods to be Ready on both clusters.
-    FOR    ${alias}    IN    cluster-a    cluster-b
+    [Documentation]    Wait for all test pods to be Ready on all clusters.
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         Oc On Cluster
         ...    ${alias}
         ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACES}[${alias}] --for=condition=Ready --timeout=120s
     END
 
 Wait For Service Endpoints
-    [Documentation]    Wait for hello-microshift service to have endpoints on both clusters.
+    [Documentation]    Wait for hello-microshift service to have endpoints on all clusters.
     ...    Ensures OVN-K has synced the EndpointSlice and programmed the OVN load balancer.
-    FOR    ${alias}    IN    cluster-a    cluster-b
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         Wait Until Keyword Succeeds    120s    5s
         ...    Service Endpoints Should Exist    ${alias}    ${NAMESPACES}[${alias}]
     END
@@ -284,7 +291,7 @@ Service Endpoints Should Exist
     Should Not Be Empty    ${stdout}
 
 Cleanup Test Workloads
-    [Documentation]    Delete test namespace on both clusters. Ignores errors.
-    FOR    ${alias}    IN    cluster-a    cluster-b
+    [Documentation]    Delete test namespace on all clusters. Ignores errors.
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACES}[${alias}] --timeout=60s
     END
