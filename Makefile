@@ -138,7 +138,7 @@ verify: verify-fast
 
 # Fast verification checks that developers can/should run locally
 .PHONY: verify-fast
-verify-fast: verify-go verify-assets verify-sh verify-py verify-config verify-rf
+verify-fast: verify-go verify-assets verify-sh verify-py verify-config verify-crds verify-rf
 
 # Full verification checks that should run in CI
 # Note that jobs using podman (e.g. verify-containers) cannot run as part of
@@ -350,6 +350,10 @@ verify-config: generate-config
 generate-crds:
 	./scripts/fetch_tools.sh controller-gen && \
 	./scripts/generate-crds.sh
+
+.PHONY: verify-crds
+verify-crds: generate-crds
+	./scripts/verify/verify-crds.sh
 
 # Run all of the end to end tests
 .PHONY: e2e
