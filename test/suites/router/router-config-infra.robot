@@ -114,8 +114,7 @@ Custom Listening IPs And Ports
     Curl Four Routes Via Custom Ports    ${host_ip}
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
-    ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 Enable Disable Router
     [Documentation]    Verify setting ingress status to Removed deletes the openshift-ingress namespace,
@@ -158,9 +157,7 @@ Syslog Logging Destination
     Verify Syslog Logging    ${syslog_ip}
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
-    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${RSYSLOGD_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 Negative Logging Config Validation
     [Documentation]    Verify invalid logging configurations are rejected by microshift show-config,

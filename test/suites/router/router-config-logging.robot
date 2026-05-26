@@ -72,8 +72,7 @@ HTTP Capture Cookies Prefix Match
     Curl All Cookie Routes And Verify Logs    ${routehost}    ${edge_host}    ${reen_host}    ${router_ip}
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
-    ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 HTTP Capture Cookies Exact Match And MaxLength
     [Documentation]    Verify httpCaptureCookies with Exact match captures only exact-named cookies,
@@ -114,8 +113,7 @@ HTTP Capture Cookies Exact Match And MaxLength
     Router Logs Should Not Contain    foo=bar89ab
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
-    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 HTTP Capture Headers Request And Response
     [Documentation]    Verify httpCaptureHeaders captures request Host and response Server headers
@@ -150,8 +148,7 @@ HTTP Capture Headers Request And Response
     Verify Header Capture Config And Logs    ${routehost}    ${edge_host}    ${reen_host}
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
-    ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 HTTP Capture Headers MaxLength Adherence
     [Documentation]    Verify httpCaptureHeaders maxLength truncates captured header values in logs.
@@ -188,8 +185,7 @@ HTTP Capture Headers MaxLength Adherence
     Should Not Contain    ${logs}    nginx/
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
-    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 Custom HTTP Error Pages
     [Documentation]    Verify custom 503 and 404 error pages are served when configured via
@@ -215,8 +211,7 @@ Custom HTTP Error Pages
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
     ...    AND    Run With Kubeconfig    oc delete configmap custom-82004-error-code-pages -n ${ROUTER_NS} --ignore-not-found
-    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 
 *** Keywords ***

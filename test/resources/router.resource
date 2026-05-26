@@ -1,6 +1,7 @@
 *** Settings ***
 Documentation       Keywords for router end-to-end testing
 
+Library             Collections
 Library             OperatingSystem
 Library             Process
 Library             String
@@ -263,6 +264,11 @@ Remove Router Config And Restart
     Remove Drop In MicroShift Config    10-router
     Restart MicroShift
     Wait For Router Ready
+
+Cleanup Test Workloads
+    [Documentation]    Delete all routes, deployments, services, configmaps, and pods created by tests in the namespace.
+    Run With Kubeconfig    oc delete route,deployment,service,configmap,pod --all -n ${NAMESPACE} --ignore-not-found
+    ...    allow_fail=True
 
 Get LB IPs
     [Documentation]    Get all load balancer IPs of the router-default service as a space-separated string.

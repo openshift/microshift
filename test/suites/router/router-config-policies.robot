@@ -92,7 +92,7 @@ Tuning Options Customization
     Verify Custom Router Tuning Haproxy
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
-    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 MTLS Subject Filter
     [Documentation]    Verify mTLS with allowedSubjectPatterns allows a cert matching the CN filter
@@ -129,8 +129,7 @@ MTLS Subject Filter
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
     ...    AND    Run With Kubeconfig    oc delete configmap ocp80518 -n ${ROUTER_NS} --ignore-not-found
-    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 Wildcard Route Admission Policy
     [Documentation]    Verify WildcardsDisallowed rejects wildcard routes, WildcardsAllowed admits them,
@@ -167,8 +166,7 @@ Wildcard Route Admission Policy
     Route Should Not Be Admitted    unsecure80520
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
-    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 HTTP Log Format
     [Documentation]    Verify httpLogFormat with HAProxy format directives produces structured log
@@ -200,8 +198,7 @@ HTTP Log Format
     ...    haproxy\\[[0-9]+\\]: [0-9\\.a-fA-F:]+:[0-9]+ [0-9\\.a-fA-F:]+:8080 /path/second/index.html 200
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
-    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
-    ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Cleanup Test Workloads
 
 
 *** Keywords ***
