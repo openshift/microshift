@@ -111,7 +111,12 @@ run_command_on_vm() {
         # Necessary in devenv for entering input i.e. system registration, etc.
         term_opt="-t"
     fi
-    ssh "redhat@${ip}" -p "${ssh_port}" ${term_opt} "${command}"
+
+    # Must return normally so local variables are cleaned up on command failure,
+    # otherwise stale values and readonly attributes break SOS collection
+    local rc=0
+    ssh "redhat@${ip}" -p "${ssh_port}" ${term_opt} "${command}" || rc=$?
+    return "${rc}"
 }
 
 copy_file_to_vm() {
@@ -126,7 +131,11 @@ copy_file_to_vm() {
     fi
     local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
 
-    scp -P "${ssh_port}" "${local_filename}" "redhat@${ip}:${remote_filename}"
+    # Must return normally so local variables are cleaned up on command failure,
+    # otherwise stale values and readonly attributes break SOS collection
+    local rc=0
+    scp -P "${ssh_port}" "${local_filename}" "redhat@${ip}:${remote_filename}" || rc=$?
+    return "${rc}"
 }
 
 copy_file_from_vm() {
@@ -141,7 +150,11 @@ copy_file_from_vm() {
     fi
     local -r ssh_port=$(get_vm_property "${vmname}" ssh_port)
 
-    scp -P "${ssh_port}" "redhat@${ip}:${remote_filename}" "${local_filename}"
+    # Must return normally so local variables are cleaned up on command failure,
+    # otherwise stale values and readonly attributes break SOS collection
+    local rc=0
+    scp -P "${ssh_port}" "redhat@${ip}:${remote_filename}" "${local_filename}" || rc=$?
+    return "${rc}"
 }
 
 sos_report() {
