@@ -74,6 +74,10 @@ func AdminKubeconfigClientCertDir(certsDir string) string {
 	return filepath.Join(AdminKubeconfigSignerDir(certsDir), "admin-kubeconfig-client")
 }
 
+func MetricsServerKubeletClientCertDir(certsDir string) string {
+	return filepath.Join(KubeAPIServerToKubeletSignerCertDir(certsDir), "metrics-server-kubelet-client")
+}
+
 // KubeletCSRSignerSignerCertDir returns path to the signer that signs kubelet CSRs
 // and the signer that signs CSRs of the CSR API
 func KubeletCSRSignerSignerCertDir(certsDir string) string {

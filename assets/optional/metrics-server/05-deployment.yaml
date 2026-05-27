@@ -18,7 +18,7 @@ spec:
         app.kubernetes.io/name: metrics-server
       annotations:
         target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
-        openshift.io/required-scc: hostmount-anyuid
+        openshift.io/required-scc: restricted-v2
     spec:
       serviceAccountName: metrics-server
       priorityClassName: system-cluster-critical
@@ -28,13 +28,13 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - --secure-port=4443
-            - --kubelet-preferred-address-types=Hostname,InternalIP
+            - --kubelet-preferred-address-types=InternalIP,Hostname
             - --kubelet-use-node-status-port
             - --metric-resolution=15s
             - --tls-cert-file=/etc/tls/serving/tls.crt
             - --tls-private-key-file=/etc/tls/serving/tls.key
-            - --kubelet-client-certificate=/etc/tls/kubelet-client/client.crt
-            - --kubelet-client-key=/etc/tls/kubelet-client/client.key
+            - --kubelet-client-certificate=/etc/tls/kubelet-client/tls.crt
+            - --kubelet-client-key=/etc/tls/kubelet-client/tls.key
             - --kubelet-certificate-authority=/etc/tls/kubelet-ca/ca-bundle.crt
           ports:
             - containerPort: 4443
@@ -78,13 +78,14 @@ spec:
           secret:
             secretName: metrics-server-tls
         - name: kubelet-client-cert
-          hostPath:
-            path: /var/lib/microshift/certs/kube-apiserver-to-kubelet-client-signer/kube-apiserver-to-kubelet-client
-            type: DirectoryOrCreate
+          secret:
+            secretName: metrics-server-kubelet-client
         - name: kubelet-ca
-          hostPath:
-            path: /var/lib/microshift/certs/kubelet-csr-signer-signer/csr-signer
-            type: DirectoryOrCreate
+          configMap:
+            name: metrics-server-kubelet-ca
+            items:
+              - key: ca-bundle.crt
+                path: ca-bundle.crt
         - name: tmp
           emptyDir: {}
       nodeSelector:

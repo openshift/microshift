@@ -17,13 +17,6 @@ rules:
       - get
       - list
       - watch
-  - apiGroups: ["security.openshift.io"]
-    resources:
-      - securitycontextconstraints
-    resourceNames:
-      - hostmount-anyuid
-    verbs:
-      - use
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

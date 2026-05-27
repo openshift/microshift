@@ -155,6 +155,13 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:kube-apiserver", Groups: []string{"kube-master"}},
+			}).WithClientCertificates(
+			&certchains.ClientCertificateSigningRequestInfo{
+				CSRMeta: certchains.CSRMeta{
+					Name:     "metrics-server-kubelet-client",
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+				},
+				UserInfo: &user.DefaultInfo{Name: "system:metrics-server", Groups: []string{""}},
 			}),
 
 		// admin-kubeconfig-signer
