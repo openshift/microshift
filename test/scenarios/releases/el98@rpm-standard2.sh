@@ -80,6 +80,7 @@ scenario_run_tests() {
     # the previous minor version.
     configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
     configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
+    run_command_on_vm host1 "sudo subscription-manager release --set 9.8"
     run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
 
     run_tests host1 \
