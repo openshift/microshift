@@ -261,9 +261,14 @@ func loadCSIPluginConfig(ctx context.Context,
 					copyUserCfg(usrCfg, runtimeCfg, cancel)
 				}
 				if event.Has(fsnotify.Remove) {
-					klog.Warningf("lvmd config file %q was removed, this may be due to a reset user configuration or by mistake; "+
-						"now, the new config will be applied from inbuilt defaults", event.Name)
-					copyDefaultCfg(runtimeCfg, cancel)
+					if _, statErr := os.Stat(usrCfg); statErr != nil {
+						klog.Warningf("lvmd config file %q was removed, this may be due to a reset user configuration or by mistake; "+
+							"now, the new config will be applied from inbuilt defaults", event.Name)
+						copyDefaultCfg(runtimeCfg, cancel)
+					} else {
+						klog.Infof("lvmd config file %q received remove event but file still exists, re-applying user config", event.Name)
+						copyUserCfg(usrCfg, runtimeCfg, cancel)
+					}
 				}
 				if event.Has(fsnotify.Chmod) {
 					klog.Warningf("permissions were modified for %q, this may cause side-effects", event.Name)
