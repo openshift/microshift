@@ -15,6 +15,7 @@ export TEST_RANDOMIZATION=none
 
 scenario_create_vms() {
     exit_if_zprel_not_exist
+    exit_if_brew_rpms_not_found
 
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
     launch_vm --boot_blueprint rhel-9.8
@@ -32,12 +33,14 @@ scenario_create_vms() {
 
 scenario_remove_vms() {
     exit_if_zprel_not_exist
+    exit_if_brew_rpms_not_found
 
     remove_vm host1
 }
 
 scenario_run_tests() {
     exit_if_zprel_not_exist
+    exit_if_brew_rpms_not_found
 
     # Enable the rhocp repo for the current minor version to install previous Z-stream version
     run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
