@@ -1,45 +1,15 @@
-- api embedded-component dcaca8e0fec1334470b1ebdcb647198929f638d3 to 09730f85d8835712c0412a585685ddadb01e171b
-  - 086efcd9 2026-05-18T15:49:31+02:00 update encryption tests
-  - 16210cce 2026-05-18T15:49:27+02:00 regenerate files
-  - 5c688f09 2026-05-18T15:28:25+02:00 types_kmsencryption: make transitMount field required
-  - a00a24ec 2026-05-18T13:51:07+02:00 types_kmsencryption: reword reference types go docs
-  - 796e97d2 2026-05-14T14:50:07+02:00 Remove NodeSelector and Tolerations from NodeExporterConfig
+- operator-framework-olm embedded-component 3f946ada3a1e2515fcade5c9604ef33198ff3f00 to 328957caa46b4d822ff39dc823bc5e28f7f2bf80
+  - aa437b99 2026-05-22T00:05:24Z Improve bundle unpack failure handling and user experience (#3832)
 
-- cluster-kube-apiserver-operator embedded-component 51b3e923b0fa74b36bd60b21db8c8202d358d0b6 to 3f0fc12dd47751683491e66b7da4c3afafe83ba2
-  - 900e745 2026-05-21T11:29:53+05:30 Add KMS dummy case
-  - 568ff6c 2026-05-20T19:03:39+05:30 go mod update
-  - 82c74a1 2026-05-20T19:03:24+05:30 update test
+- router image-amd64 35c9eaa00a6520df664a9fa3bb7ebd3e8714edc1 to 676113436feb61e5c89376d6a7ae66fdaefe8e98
+  - 4acfdcd 2026-05-21T16:10:24-03:00 handle comments
+  - 39dcde1 2026-05-21T16:10:24-03:00 use add/del haproxy api calls
 
-- cluster-kube-scheduler-operator embedded-component a0495853f80d38e19d07b98a225e1aa0e7972ac9 to d43423b583269eea8236040424609c3f108ac9c4
-  - b3e14bd 2026-05-19T18:16:25+05:30 WRKLDS-1126:e2e network policy tests
+- csi-external-snapshotter image-arm64 3219da7dcbb14fa762704746d21fb38131beb1f4 to 77d02e52a442c1a98457797bf8eb5777489aabae
+  - 6316ddd 2026-05-25T12:29:32+01:00 UPSTREAM: <drop>: vendor changes
+  - 84b0745 2026-05-25T12:29:20+01:00 UPSTREAM: 1403: Bump google.golang.org/grpc to v1.79.3
 
-- cluster-network-operator embedded-component 6f47993888c3e88153028f22023ad5b36f710b9b to bea98c0a2a0ff2cc7c642f72feefddbf42f5e28f
-  - 5294721 2026-05-19T13:06:48-04:00 OCPBUGS-83863: Copy only files in cnibincopy.sh, skip subdirectories
-  - 5b39e01 2026-05-18T22:33:51-04:00 OCPBUGS-83863: Remove version-specific CNI binary copy logic
-  - aef9a47 2026-05-10T16:30:34-07:00 Add terminationMessagePolicy to missing ovn-kubernetes containers
-
-- machine-config-operator embedded-component 75c3b83d07006f8f7e6e06098442b75793ad4b1a to f9bc3c89294762591088e83762f7bda188243729
-  - abdbdaad 2026-05-19T15:58:19+02:00 OCPBUGS-83987: Fix CVE-2026-33186
-
-- openshift-controller-manager embedded-component 731d7429a788e0d70e3556e40f82c1ba9d55abe7 to 5631cf493b006cbc72a8600a7435813272d71940
-  - 5abed52 2026-04-30T13:44:19-05:00 Migrate away from deprecated ioutil
-
-- operator-framework-olm embedded-component f4b8ef2caae5fdc4b6fc930b1a8d720c4a3ee65a to 3f946ada3a1e2515fcade5c9604ef33198ff3f00
-  - 7a13d110 2026-05-21T00:05:07Z :seedling: Bump github.com/onsi/ginkgo/v2 from 2.28.3 to 2.29.0 (#3834)
-  - ed012265 2026-05-21T00:04:22Z :seedling: Bump github.com/onsi/gomega from 1.40.0 to 1.41.0 (#3833)
-  - fcbf94b7 2026-05-21T00:04:06Z Update google.golang.org/grpc to v1.81.1 (#3831)
-  - 4d966802 2026-05-19T09:52:26+02:00 Revert "Merge pull request #1286 from openshift-bot/synchronize-upstream"
-  - 466abd2b 2026-05-19T09:25:35+02:00 Revert "Fix lifecycle-server readiness probe to allow empty index"
-  - c8eae1fa 2026-05-19T09:25:27+02:00 Revert "feat: use resource-based RBAC for lifecycle-server auth"
-
-- router image-amd64 b75bab261392d5eacb115db408f121618a23e41d to 35c9eaa00a6520df664a9fa3bb7ebd3e8714edc1
-  - 6c516c5 2026-05-19T14:43:16-04:00 Bump google.golang.org/grpc to v1.79.3
-
-- ovn-kubernetes image-amd64 55b65f2f9188a975fe2a127243ddc07bb0ed74d9 to 3ce6353a1ed2962dc8aabe96dcef0e5bd7a40555
-  - a6783282 2026-05-15T12:36:05+02:00 Remove ovndbchecker from payload
-  - 6fcd9718 2026-05-15T11:36:20+02:00 Revert "OCPBUGS-61065: Adding ovndb-raft-functions.sh to ovnk image"
-
-- ovn-kubernetes image-arm64 55b65f2f9188a975fe2a127243ddc07bb0ed74d9 to 3ce6353a1ed2962dc8aabe96dcef0e5bd7a40555
-  - a6783282 2026-05-15T12:36:05+02:00 Remove ovndbchecker from payload
-  - 6fcd9718 2026-05-15T11:36:20+02:00 Revert "OCPBUGS-61065: Adding ovndb-raft-functions.sh to ovnk image"
+- router image-arm64 35c9eaa00a6520df664a9fa3bb7ebd3e8714edc1 to 676113436feb61e5c89376d6a7ae66fdaefe8e98
+  - 4acfdcd 2026-05-21T16:10:24-03:00 handle comments
+  - 39dcde1 2026-05-21T16:10:24-03:00 use add/del haproxy api calls
 
