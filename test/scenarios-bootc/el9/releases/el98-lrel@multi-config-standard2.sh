@@ -68,6 +68,9 @@ scenario_run_tests() {
         sleep 5
     done
 
+    # Stop MicroShift to before applying TLS configuration
+    run_command_on_vm host1 "sudo systemctl stop microshift" || true
+
     # Apply TLSv1.3 configuration via drop-in config
     echo "INFO: Configuring TLSv1.3..."
     run_command_on_vm host1 "sudo mkdir -p /etc/microshift/config.d"
@@ -77,8 +80,8 @@ apiServer:
     minVersion: VersionTLS13
 EOF"
 
-    # Restart MicroShift to apply TLS configuration
-    run_command_on_vm host1 "sudo systemctl restart microshift"
+    # Start MicroShift to apply TLS configuration
+    run_command_on_vm host1 "sudo systemctl start microshift"
 
     # Wait for MicroShift to be ready
     wait_for_microshift_to_be_ready host1
