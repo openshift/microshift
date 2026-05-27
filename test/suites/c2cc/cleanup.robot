@@ -23,7 +23,8 @@ ${C2CC_CONFIG_PATH}     /etc/microshift/config.d/50-c2cc.yaml
 *** Test Cases ***
 No Linux Routes In Table 200 After Disable
     [Documentation]    Routes to remote CIDRs in table 200 should be gone.
-    ${stdout}=    Command On Cluster    cluster-a    ip route show table 200
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    ${stdout}=    Command On Cluster    cluster-a    ${ip_cmd} route show table 200
     FOR    ${cidr}    IN
     ...    ${CLUSTER_B_POD_CIDR}
     ...    ${CLUSTER_B_SVC_CIDR}
@@ -34,7 +35,8 @@ No Linux Routes In Table 200 After Disable
 
 No IP Rules For Table 200 After Disable
     [Documentation]    IP rules directing to table 200 should be gone.
-    ${stdout}=    Command On Cluster    cluster-a    ip rule show
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    ${stdout}=    Command On Cluster    cluster-a    ${ip_cmd} rule show
     FOR    ${cidr}    IN
     ...    ${CLUSTER_B_POD_CIDR}
     ...    ${CLUSTER_B_SVC_CIDR}
@@ -45,12 +47,14 @@ No IP Rules For Table 200 After Disable
 
 No Service Routes In Table 201 After Disable
     [Documentation]    Service routes in table 201 should be gone.
-    ${stdout}=    Command On Cluster    cluster-a    ip route show table 201
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    ${stdout}=    Command On Cluster    cluster-a    ${ip_cmd} route show table 201
     Should Not Contain    ${stdout}    ${CLUSTER_A_SVC_CIDR}
 
 No Service IP Rules After Disable
     [Documentation]    Service IP rules for table 201 should be gone.
-    ${stdout}=    Command On Cluster    cluster-a    ip rule show
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    ${stdout}=    Command On Cluster    cluster-a    ${ip_cmd} rule show
     FOR    ${cidr}    IN
     ...    ${CLUSTER_B_POD_CIDR}
     ...    ${CLUSTER_B_SVC_CIDR}

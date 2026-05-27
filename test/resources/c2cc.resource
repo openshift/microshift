@@ -32,6 +32,7 @@ ${KUBECONFIG_C}             ${EMPTY}
 &{C2CC_KUBECONFIGS}         &{EMPTY}
 &{C2CC_SSH_IDS}             &{EMPTY}
 @{C2CC_REMOTE_ALIASES}      @{EMPTY}
+${IP_FAMILY}                ipv4
 
 
 *** Keywords ***
@@ -135,27 +136,31 @@ Oc Apply On Cluster
 Verify Routes In Table 200
     [Documentation]    Check that routes for the given CIDRs exist in table 200.
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ip route show table 200
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    ${stdout}=    Command On Cluster    ${alias}    ${ip_cmd} route show table 200
     Should Contain    ${stdout}    ${remote_pod_cidr}
     Should Contain    ${stdout}    ${remote_svc_cidr}
 
 Verify IP Rules For Table 200
     [Documentation]    Check that IP rules at priority 100 exist for the given CIDRs.
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ip rule show
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    ${stdout}=    Command On Cluster    ${alias}    ${ip_cmd} rule show
     Should Contain    ${stdout}    to ${remote_pod_cidr} lookup 200
     Should Contain    ${stdout}    to ${remote_svc_cidr} lookup 200
 
 Verify Routes In Table 201
     [Documentation]    Check that service routes exist in table 201 for the local service CIDR.
     [Arguments]    ${alias}    ${local_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ip route show table 201
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    ${stdout}=    Command On Cluster    ${alias}    ${ip_cmd} route show table 201
     Should Contain    ${stdout}    ${local_svc_cidr}
 
 Verify Service IP Rules
     [Documentation]    Check that IP rules at priority 99 exist for cross-cluster service routing.
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ip rule show
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    ${stdout}=    Command On Cluster    ${alias}    ${ip_cmd} rule show
     Should Contain    ${stdout}    from ${remote_pod_cidr} to ${local_svc_cidr} lookup 201
     Should Contain    ${stdout}    from ${remote_svc_cidr} to ${local_svc_cidr} lookup 201
 

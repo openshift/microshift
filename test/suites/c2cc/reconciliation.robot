@@ -17,7 +17,7 @@ Test Tags           c2cc
 *** Variables ***
 ${RECONCILE_TIMEOUT}    30s
 ${RECONCILE_RETRY}      5s
-${FOREIGN_CIDR}         192.0.2.0/24
+${FOREIGN_CIDR}         ${EMPTY}
 
 
 *** Test Cases ***
@@ -111,23 +111,27 @@ Get Node Name On Cluster
 Delete Route From Table 200 On Cluster
     [Documentation]    Delete a specific route from policy routing table 200.
     [Arguments]    ${alias}    ${cidr}
-    Disruptive Command On Cluster    ${alias}    ip route del ${cidr} table 200
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    Disruptive Command On Cluster    ${alias}    ${ip_cmd} route del ${cidr} table 200
 
 Delete IP Rule For Table 200 On Cluster
     [Documentation]    Delete an IP rule directing traffic to table 200.
     [Arguments]    ${alias}    ${cidr}
-    Disruptive Command On Cluster    ${alias}    ip rule del to ${cidr} lookup 200
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    Disruptive Command On Cluster    ${alias}    ${ip_cmd} rule del to ${cidr} lookup 200
 
 Delete Service Route From Table 201 On Cluster
     [Documentation]    Delete a service route from table 201.
     [Arguments]    ${alias}    ${cidr}
-    Disruptive Command On Cluster    ${alias}    ip route del ${cidr} table 201
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
+    Disruptive Command On Cluster    ${alias}    ${ip_cmd} route del ${cidr} table 201
 
 Delete Service IP Rule On Cluster
     [Documentation]    Delete a service IP rule from table 201.
     [Arguments]    ${alias}    ${from_cidr}    ${to_cidr}
+    ${ip_cmd}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    ip -6    ip -4
     Disruptive Command On Cluster    ${alias}
-    ...    ip rule del from ${from_cidr} to ${to_cidr} lookup 201
+    ...    ${ip_cmd} rule del from ${from_cidr} to ${to_cidr} lookup 201
 
 Delete NFTables C2CC Rule On Cluster
     [Documentation]    Delete an nftables bypass rule by discovering its handle.
