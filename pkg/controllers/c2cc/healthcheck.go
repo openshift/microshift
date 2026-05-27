@@ -2,6 +2,7 @@ package c2cc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -46,13 +47,16 @@ func (h *healthcheckCRManager) reconcile(ctx context.Context) error {
 		existingByName[existing.Items[i].Name] = &existing.Items[i]
 	}
 
+	var errs []error
+
 	for name, want := range desired {
 		got, ok := existingByName[name]
 		if !ok {
 			if _, err := h.client.RemoteClusters().Create(ctx, want, metav1.CreateOptions{}); err != nil {
-				return fmt.Errorf("creating RemoteCluster %q: %w", name, err)
+				errs = append(errs, fmt.Errorf("creating RemoteCluster %q: %w", name, err))
+			} else {
+				klog.Infof("Created RemoteCluster CR %q", name)
 			}
-			klog.Infof("Created RemoteCluster CR %q", name)
 			continue
 		}
 
@@ -64,19 +68,21 @@ func (h *healthcheckCRManager) reconcile(ctx context.Context) error {
 
 		got.Spec = want.Spec
 		if _, err := h.client.RemoteClusters().Update(ctx, got, metav1.UpdateOptions{}); err != nil {
-			return fmt.Errorf("updating RemoteCluster %q: %w", name, err)
+			errs = append(errs, fmt.Errorf("updating RemoteCluster %q: %w", name, err))
+		} else {
+			klog.V(2).Infof("Updated RemoteCluster CR %q", name)
 		}
-		klog.V(2).Infof("Updated RemoteCluster CR %q", name)
 	}
 
 	for name := range existingByName {
 		if err := h.client.RemoteClusters().Delete(ctx, name, metav1.DeleteOptions{}); err != nil {
-			return fmt.Errorf("deleting stale RemoteCluster %q: %w", name, err)
+			errs = append(errs, fmt.Errorf("deleting stale RemoteCluster %q: %w", name, err))
+		} else {
+			klog.Infof("Deleted stale RemoteCluster CR %q", name)
 		}
-		klog.Infof("Deleted stale RemoteCluster CR %q", name)
 	}
 
-	return nil
+	return errors.Join(errs...)
 }
 
 func (h *healthcheckCRManager) buildDesiredCRs() map[string]*microshiftv1alpha1.RemoteCluster {
