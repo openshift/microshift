@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
+	microshiftclient "github.com/openshift/microshift/pkg/generated/clientset/versioned/typed/microshift/v1alpha1"
 	"github.com/ovn-kubernetes/libovsdb/client"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -16,17 +18,21 @@ const (
 	reconcileInterval = 2 * time.Second
 )
 
+var healthcheckCRD = []string{"crd/microshift.io_remoteclusters.yaml"}
+
 type C2CCRouteManager struct {
 	cfg        *config.Config
 	nodeName   string
 	kubeconfig string
 
-	kubeClient kubernetes.Interface
-	ovn        *ovnRouteManager
-	annotation *annotationManager
-	nftMgr     *nftablesManager
-	routes     *linuxRouteManager
-	svcRoutes  *serviceRouteManager
+	kubeClient       kubernetes.Interface
+	microshiftClient microshiftclient.MicroshiftV1alpha1Interface
+	ovn              *ovnRouteManager
+	annotation       *annotationManager
+	nftMgr           *nftablesManager
+	routes           *linuxRouteManager
+	svcRoutes        *serviceRouteManager
+	healthcheck      *healthcheckCRManager
 }
 
 func NewC2CCRouteManager(cfg *config.Config) *C2CCRouteManager {
@@ -96,6 +102,10 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 
 	c.annotation.subscribe(ctx, reconcileCh)
 
+	if err := assets.ApplyCRDAndWaitForEstablish(ctx, healthcheckCRD, c.kubeconfig); err != nil {
+		return fmt.Errorf("failed to apply C2CC healthcheck CRD: %w", err)
+	}
+
 	c.fullReconcile(ctx)
 
 	ticker := time.NewTicker(reconcileInterval)
@@ -142,6 +152,13 @@ func (c *C2CCRouteManager) initKubeClient() error {
 		return fmt.Errorf("failed to create kubernetes client: %w", err)
 	}
 	c.kubeClient = kClient
+
+	msClient, err := microshiftclient.NewForConfig(restCfg)
+	if err != nil {
+		return fmt.Errorf("failed to create microshift client: %w", err)
+	}
+	c.microshiftClient = msClient
+
 	return nil
 }
 
@@ -156,6 +173,7 @@ func (c *C2CCRouteManager) initSubsystems(nbClient client.Client) error {
 		return fmt.Errorf("failed to init nftables manager: %w", err)
 	}
 	c.nftMgr = nftMgr
+	c.healthcheck = newHealthcheckCRManager(c.microshiftClient, c.cfg)
 
 	return nil
 }
@@ -206,6 +224,7 @@ func (c *C2CCRouteManager) fullReconcile(ctx context.Context) {
 		{"linux-routes", c.routes.reconcile},
 		{"service-routes", c.svcRoutes.reconcile},
 		{"nftables", c.nftMgr.reconcile},
+		{"healthcheck-crs", c.healthcheck.reconcile},
 	}
 	for _, s := range subsystems {
 		if err := s.fn(ctx); err != nil {
@@ -239,6 +258,9 @@ func (c *C2CCRouteManager) cleanupAll(ctx context.Context) {
 	if c.nftMgr != nil {
 		cleanups = append(cleanups, cleanable{"nftables", c.nftMgr.cleanup})
 	}
+	cleanups = append(cleanups, cleanable{"healthcheck-crd", func(ctx context.Context) error {
+		return assets.DeleteCRDs(ctx, healthcheckCRD, c.kubeconfig)
+	}})
 
 	for _, cl := range cleanups {
 		if err := cl.fn(ctx); err != nil {
