@@ -62,7 +62,7 @@ scenario_run_tests() {
         sleep 5
     done
 
-    # Stop MicroShift to before applying TLS configuration
+    # Stop MicroShift before applying TLS configuration
     run_command_on_vm host1 "sudo systemctl stop microshift" || true
 
     # Apply TLSv1.3 configuration via drop-in config
