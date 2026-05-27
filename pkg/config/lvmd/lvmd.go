@@ -41,6 +41,9 @@ func NewLvmdConfigFromFile(p string) (*Lvmd, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unmarshalling lvmd file: %w", err)
 	}
+	if l == nil {
+		return nil, fmt.Errorf("lvmd config file %q is empty", p)
+	}
 	if l.SocketName == "" {
 		l.SocketName = defaultSockName
 	}
