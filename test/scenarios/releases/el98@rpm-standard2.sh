@@ -44,6 +44,8 @@ EOF
 }
 
 scenario_create_vms() {
+    exit_if_brew_rpms_not_found
+
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
     launch_vm rhel-9.8
 
@@ -60,10 +62,14 @@ scenario_create_vms() {
 }
 
 scenario_remove_vms() {
+    exit_if_brew_rpms_not_found
+
     remove_vm host1
 }
 
 scenario_run_tests() {
+    exit_if_brew_rpms_not_found
+
     local -r reponame=$(basename "${BREW_REPO}")
     local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
 
