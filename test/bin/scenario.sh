@@ -581,6 +581,15 @@ exit_if_image_not_found() {
     fi
 }
 
+# Exit the script if Brew RPMs are not found.
+exit_if_brew_rpms_not_found() {
+    if [[ -z "${BREW_LREL_RELEASE_VERSION}" ]]; then
+        echo "Brew RPM release version is not set - VM can't be created"
+        record_junit "BREW_LREL_RELEASE_VERSION is not set" "brew_rpms_not_found" "SKIPPED"
+        exit 0
+    fi
+}
+
 # Exit the script if the latest release image is not set.
 exit_if_image_not_set() {
     local -r release_image_url="${1}"
