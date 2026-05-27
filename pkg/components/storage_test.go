@@ -11,11 +11,11 @@ import (
 	"github.com/openshift/microshift/pkg/config/lvmd"
 )
 
-// runtimeCfgUpdateDelay is the delay to wait for the runtime config to be updated via the watch
-// in the tests. This is a bit of a hack to avoid having to wait for the watch to trigger.
-// In case of failures on loads, consider increasing this value.
-// In a normal I/O environment, this value should never be a problem.
-var runtimeCfgUpdateDelay = 50 * time.Millisecond
+const (
+	runtimeCfgPollInterval = 50 * time.Millisecond
+	runtimeCfgPollTimeout  = 5 * time.Second
+	runtimeCfgSettleDelay  = 500 * time.Millisecond
+)
 
 func Test_loadCSIPluginConfig(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -34,15 +34,33 @@ func Test_loadCSIPluginConfig(t *testing.T) {
 		SocketName: "the socket should not matter!",
 	}
 
-	getRuntimeCfgAfterDelay := func() *lvmd.Lvmd {
-		// wait for the runtime config to be updated via the watch
-		time.Sleep(runtimeCfgUpdateDelay)
-		runtimeLvmd, err := lvmd.NewLvmdConfigFromFile(testRuntimeCfg)
+	waitForRuntimeCfg := func(expected *lvmd.Lvmd) *lvmd.Lvmd {
+		t.Helper()
+		deadline := time.Now().Add(runtimeCfgPollTimeout)
+		for {
+			cfg, err := lvmd.NewLvmdConfigFromFile(testRuntimeCfg)
+			if err == nil {
+				cfg.Message = ""
+				if reflect.DeepEqual(cfg, expected) {
+					return cfg
+				}
+			}
+			if time.Now().After(deadline) {
+				t.Fatalf("Timed out waiting for runtime config to match expected config")
+			}
+			time.Sleep(runtimeCfgPollInterval)
+		}
+	}
+
+	readRuntimeCfgAfterSettle := func() *lvmd.Lvmd {
+		t.Helper()
+		time.Sleep(runtimeCfgSettleDelay)
+		cfg, err := lvmd.NewLvmdConfigFromFile(testRuntimeCfg)
 		if err != nil {
 			t.Fatalf("Failed to load runtime config: %v", err)
 		}
-		runtimeLvmd.Message = "" // ignore message field
-		return runtimeLvmd
+		cfg.Message = ""
+		return cfg
 	}
 
 	previousCfgLoader := defaultCfgLoader
@@ -71,11 +89,7 @@ func Test_loadCSIPluginConfig(t *testing.T) {
 			t.Fatalf("Failed to open runtime config file: %v", err)
 		}
 
-		runtimeLvmd = getRuntimeCfgAfterDelay()
-
-		if !reflect.DeepEqual(runtimeLvmd, testDefaultCfgLvmd) {
-			t.Fatalf("Expected runtime config to match default config")
-		}
+		runtimeLvmd = waitForRuntimeCfg(testDefaultCfgLvmd)
 	})
 
 	var usrLvmd *lvmd.Lvmd
@@ -101,12 +115,13 @@ func Test_loadCSIPluginConfig(t *testing.T) {
 		}
 
 		t.Run("chmod to write only should not affect the watch", func(t *testing.T) {
-			// wait for the runtime config to be updated via the watch but it should not trigger anything
+			runtimeLvmd = waitForRuntimeCfg(usrLvmd)
+
 			if err := os.Chmod(testUsrCfg, 0400); err != nil {
 				t.Fatalf("Failed to change user config permissions: %v", err)
 			}
 
-			runtimeLvmd = getRuntimeCfgAfterDelay()
+			runtimeLvmd = readRuntimeCfgAfterSettle()
 			if !reflect.DeepEqual(runtimeLvmd, usrLvmd) {
 				t.Fatalf("Expected runtime config to match user config")
 			}
@@ -115,14 +130,12 @@ func Test_loadCSIPluginConfig(t *testing.T) {
 				t.Fatalf("expected usr config to have been updated to Readonly from Chmod (400) and not be writable: %v", err)
 			}
 
-			// wait for the runtime config to be updated via the watch but it should not trigger anything
 			if err := os.Chmod(testUsrCfg, 0600); err != nil {
 				t.Fatalf("Failed to change user config permissions: %v", err)
 			}
 		})
 
 		t.Run("user config update should trigger a reload", func(t *testing.T) {
-			// switch the defaults to trigger a reload
 			usrLvmd.DeviceClasses[1].Default = true
 			usrLvmd.DeviceClasses[0].Default = false
 
@@ -130,10 +143,7 @@ func Test_loadCSIPluginConfig(t *testing.T) {
 				t.Fatalf("Failed to save user config: %v", err)
 			}
 
-			runtimeLvmd = getRuntimeCfgAfterDelay()
-			if !reflect.DeepEqual(runtimeLvmd, usrLvmd) {
-				t.Fatalf("Expected runtime config to match user config")
-			}
+			runtimeLvmd = waitForRuntimeCfg(usrLvmd)
 		})
 	})
 
@@ -141,13 +151,7 @@ func Test_loadCSIPluginConfig(t *testing.T) {
 		if err := os.Remove(testUsrCfg); err != nil {
 			t.Fatalf("Failed to remove user config: %v", err)
 		}
-		runtimeLvmd = getRuntimeCfgAfterDelay()
-		if reflect.DeepEqual(runtimeLvmd, usrLvmd) {
-			t.Fatalf("Expected runtime config to now match default config again, but was equal to old usr config")
-		}
-		if !reflect.DeepEqual(runtimeLvmd, testDefaultCfgLvmd) {
-			t.Fatalf("Expected runtime config to now match default config again, but was not equal to the default cfg")
-		}
+		runtimeLvmd = waitForRuntimeCfg(testDefaultCfgLvmd)
 	})
 
 	t.Run("user config watch should be stopped after shutdown", func(t *testing.T) {
@@ -158,7 +162,7 @@ func Test_loadCSIPluginConfig(t *testing.T) {
 			t.Fatalf("Failed to save user config after watch shutdown: %v", err)
 		}
 
-		runtimeLvmd = getRuntimeCfgAfterDelay()
+		runtimeLvmd = readRuntimeCfgAfterSettle()
 		if reflect.DeepEqual(runtimeLvmd, usrLvmd) {
 			t.Fatalf("Expected runtime config to not have been updated after watch shutdown, but was equal to new usr config")
 		}
