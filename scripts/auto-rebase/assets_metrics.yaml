@@ -1,0 +1,77 @@
+assets:
+  - dir: optional/metrics-server/
+    no_clean: True
+    src: cluster-monitoring-operator/assets/metrics-server/
+    files:
+      - file: 00-namespace.yaml
+        git_restore: True
+      - file: 01-serviceaccount.yaml
+        src: service-account.yaml
+      - file: 02-clusterrole.yaml
+        src: cluster-role.yaml
+      - file: 03-clusterrolebinding.yaml
+        src: cluster-role-binding.yaml
+        git_restore: True
+      - file: 04-rolebinding.yaml
+        src: role-binding-auth-reader.yaml
+      - file: 05-deployment.yaml
+        src: deployment.yaml
+        git_restore: True
+      - file: 06-service.yaml
+        src: service.yaml
+      - file: 07-apiservice.yaml
+        src: api-service.yaml
+      - file: kustomization.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.x86_64.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.aarch64.yaml
+        ignore: "Provided by MicroShift"
+      - file: release-metrics-aarch64.json
+        ignore: "Provided by MicroShift"
+      - file: release-metrics-x86_64.json
+        ignore: "Provided by MicroShift"
+
+  - dir: optional/node-exporter/
+    no_clean: True
+    src: cluster-monitoring-operator/assets/node-exporter/
+    files:
+      - file: 01-serviceaccount.yaml
+        src: service-account.yaml
+      - file: 02-clusterrole.yaml
+        src: cluster-role.yaml
+      - file: 03-clusterrolebinding.yaml
+        src: cluster-role-binding.yaml
+      - file: 04-daemonset.yaml
+        src: daemonset.yaml
+        git_restore: True
+      - file: 05-service.yaml
+        src: service.yaml
+      - file: kustomization.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.x86_64.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.aarch64.yaml
+        ignore: "Provided by MicroShift"
+
+  - dir: optional/kube-state-metrics/
+    no_clean: True
+    src: cluster-monitoring-operator/assets/kube-state-metrics/
+    files:
+      - file: 01-serviceaccount.yaml
+        src: service-account.yaml
+      - file: 02-clusterrole.yaml
+        src: cluster-role.yaml
+      - file: 03-clusterrolebinding.yaml
+        src: cluster-role-binding.yaml
+      - file: 04-deployment.yaml
+        src: deployment.yaml
+        git_restore: True
+      - file: 05-service.yaml
+        src: service.yaml
+      - file: kustomization.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.x86_64.yaml
+        ignore: "Provided by MicroShift"
+      - file: kustomization.aarch64.yaml
+        ignore: "Provided by MicroShift"

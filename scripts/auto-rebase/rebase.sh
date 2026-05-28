@@ -38,6 +38,7 @@ REBASE_USE_SSH="${REBASE_USE_SSH:-false}"
 EMBEDDED_COMPONENTS="route-controller-manager cluster-policy-controller hyperkube etcd kube-storage-version-migrator cluster-config-api"
 EMBEDDED_COMPONENT_OPERATORS="cluster-kube-apiserver-operator cluster-kube-controller-manager-operator cluster-openshift-controller-manager-operator cluster-kube-scheduler-operator machine-config-operator operator-lifecycle-manager"
 LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-operator cluster-network-operator cluster-csi-snapshot-controller-operator"
+OPTIONAL_COMPONENTS="cluster-monitoring-operator"
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
@@ -200,7 +201,7 @@ download_release() {
         component=$(echo "${line}" | cut -d ' ' -f 1)
         repo=$(echo "${line}" | cut -d ' ' -f 2)
         commit=$(echo "${line}" | cut -d ' ' -f 3)
-        if [[ "${EMBEDDED_COMPONENTS}" == *"${component}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${component}"* ]] || [[ "${EMBEDDED_COMPONENT_OPERATORS}" == *"${component}"* ]]; then
+        if [[ "${EMBEDDED_COMPONENTS}" == *"${component}"* ]] || [[ "${LOADED_COMPONENTS}" == *"${component}"* ]] || [[ "${EMBEDDED_COMPONENT_OPERATORS}" == *"${component}"* ]] || [[ "${OPTIONAL_COMPONENTS}" == *"${component}"* ]]; then
             clone_repo "${repo}" "${commit}" "."
             echo "${repo} embedded-component ${commit}" >> "${new_commits_file}"
             echo
@@ -661,6 +662,15 @@ copy_manifests() {
     fi
     title "Copying manifests"
     "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets.yaml"
+}
+
+copy_metrics_manifests() {
+    if [ ! -d "${STAGING_DIR}/cluster-monitoring-operator" ]; then
+        >&2 echo "cluster-monitoring-operator not found in ${STAGING_DIR}, you need to download the release first."
+        exit 1
+    fi
+    title "Copying metrics manifests"
+    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_metrics.yaml"
 }
 
 
@@ -1303,6 +1313,7 @@ rebase_to() {
     fi
 
     copy_manifests
+    copy_metrics_manifests
     update_openshift_manifests
     if [[ -n "$(git status -s assets)" ]]; then
         if [[ -n "${FAIL_ON_MANIFEST_CHANGE+x}" ]] && [[ "${FAIL_ON_MANIFEST_CHANGE}" == "1" ]]; then
@@ -1394,6 +1405,7 @@ case "$command" in
         ;;
     manifests)
         copy_manifests
+        copy_metrics_manifests
         update_openshift_manifests
         ;;
     *) usage;;
