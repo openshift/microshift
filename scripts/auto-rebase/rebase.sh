@@ -931,6 +931,7 @@ EOF
 
     update_olm_images
     update_multus_images
+    update_metrics_images
 
     popd >/dev/null
 }
@@ -1119,6 +1120,77 @@ EOF
             yq -i -o json ".images += {\"${container}\": \"${new_image}\"}" "${multus_release_json}"
         done  # for container
     done  # for goarch
+}
+
+update_metrics_images() {
+    title "Rebasing metrics component images"
+
+    # Maps kustomization image name -> OCP release tag name
+    declare -A METRICS_IMAGE_MAP=(
+        ["quay.io/openshift/metrics-server"]="metrics-server"
+        ["quay.io/openshift/kube-state-metrics"]="kube-state-metrics"
+        ["quay.io/openshift/node-exporter"]="prometheus-node-exporter"
+        ["quay.io/openshift/kube-rbac-proxy"]="kube-rbac-proxy"
+    )
+
+    # Maps release JSON key -> OCP release tag name
+    declare -A METRICS_JSON_MAP=(
+        ["metrics_server"]="metrics-server"
+        ["kube_state_metrics"]="kube-state-metrics"
+        ["node_exporter"]="prometheus-node-exporter"
+    )
+
+    for goarch in amd64 arm64; do
+        arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
+
+        local release_file="${STAGING_DIR}/release_${goarch}.json"
+        local metrics_release_json="${REPOROOT}/assets/optional/metrics-server/release-metrics-${arch}.json"
+
+        local base_release
+        base_release=$(jq -r ".metadata.version" "${release_file}")
+        jq -n "{\"release\": {\"base\": \"$base_release\"}, \"images\": {}}" > "${metrics_release_json}"
+
+        # Update release-metrics-${arch}.json
+        for json_key in "${!METRICS_JSON_MAP[@]}"; do
+            local release_tag="${METRICS_JSON_MAP[$json_key]}"
+            local new_image
+            new_image=$(jq -r ".references.spec.tags[] | select(.name == \"${release_tag}\") | .from.name" "${release_file}")
+            yq -i -o json ".images += {\"${json_key}\": \"${new_image}\"}" "${metrics_release_json}"
+        done
+
+        # Update per-component kustomization.${arch}.yaml
+        for component_dir in metrics-server kube-state-metrics node-exporter; do
+            local kustomization_arch_file="${REPOROOT}/assets/optional/${component_dir}/kustomization.${arch}.yaml"
+
+            cat <<EOF > "${kustomization_arch_file}"
+images:
+EOF
+
+            # Read image names from the base kustomization and deployment/daemonset
+            local image_names
+            image_names=$(grep -h 'image:' "${REPOROOT}/assets/optional/${component_dir}/"*.yaml 2>/dev/null \
+                | sed 's/.*image: *//; s/:.*//; s/@.*//' | sort -u)
+
+            for orig_image in ${image_names}; do
+                local release_tag="${METRICS_IMAGE_MAP[$orig_image]:-}"
+                if [[ -z "${release_tag}" ]]; then
+                    >&2 echo "WARNING: Unknown metrics image '${orig_image}' in ${component_dir}, skipping"
+                    continue
+                fi
+
+                local new_image
+                new_image=$(jq -r ".references.spec.tags[] | select(.name == \"${release_tag}\") | .from.name" "${release_file}")
+                local new_image_name="${new_image%@*}"
+                local new_image_digest="${new_image#*@}"
+
+                cat <<EOF >> "${kustomization_arch_file}"
+  - name: ${orig_image}
+    newName: ${new_image_name}
+    digest: ${new_image_digest}
+EOF
+            done
+        done
+    done
 }
 
 update_olm_images() {
