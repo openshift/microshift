@@ -200,7 +200,8 @@ func (c *Config) fillDefaults() error {
 	c.Telemetry = telemetryDefaults()
 	c.DNS = dnsDefaults()
 	c.C2CC = C2CC{
-		DNS: C2CCDNS{CacheTTL: ptr.To(10), CacheNegativeTTL: ptr.To(10)},
+		DNS:           C2CCDNS{CacheTTL: ptr.To(10), CacheNegativeTTL: ptr.To(10)},
+		ProbeInterval: "10s",
 	}
 	return nil
 }
@@ -468,6 +469,9 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.C2CC.DNS.CacheNegativeTTL != nil {
 		c.C2CC.DNS.CacheNegativeTTL = u.C2CC.DNS.CacheNegativeTTL
+	}
+	if u.C2CC.ProbeInterval != "" {
+		c.C2CC.ProbeInterval = u.C2CC.ProbeInterval
 	}
 }
 

@@ -197,7 +197,7 @@ github.com/munnerz/goautoneg
 # github.com/oklog/run v1.2.0
 ## explicit; go 1.20
 github.com/oklog/run
-# github.com/openshift/api v0.0.0-20260424174501-4f63a40a2970
+# github.com/openshift/api v0.0.0-20260511191110-9b69e5fa27e9
 ## explicit; go 1.25.0
 github.com/openshift/api/config/v1
 github.com/openshift/api/operator/v1
@@ -211,7 +211,7 @@ github.com/openshift/build-machinery-go/make/targets/golang
 github.com/openshift/build-machinery-go/make/targets/openshift
 github.com/openshift/build-machinery-go/make/targets/openshift/operator
 github.com/openshift/build-machinery-go/scripts
-# github.com/openshift/library-go v0.0.0-20260303171201-5d9eb6295ff6
+# github.com/openshift/library-go v0.0.0-20260520180710-3a6f949c22c3
 ## explicit; go 1.25.0
 github.com/openshift/library-go/pkg/crypto
 github.com/openshift/library-go/pkg/operator/apiserver/audit

@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
+	"github.com/apparentlymart/go-cidr/cidr"
 	"github.com/vishvananda/netlink"
 	"k8s.io/apimachinery/pkg/util/validation"
 	netutils "k8s.io/utils/net"
@@ -31,9 +33,15 @@ type C2CC struct {
 	// C2CC is disabled when this list is empty.
 	RemoteClusters []RemoteCluster `json:"remoteClusters,omitempty"`
 
+	// Interval between healthcheck probe attempts to each remote cluster.
+	// Parsed as a Go duration string (e.g. "10s", "1m"). Must be between 1s and 5m.
+	// +kubebuilder:default="10s"
+	ProbeInterval string `json:"probeInterval,omitempty"`
+
 	// Populated during validation with parsed network objects.
-	Resolved         []ResolvedRemoteCluster `json:"-"`
-	ResolvedAllCIDRs []*net.IPNet            `json:"-"`
+	Resolved              []ResolvedRemoteCluster `json:"-"`
+	ResolvedAllCIDRs      []*net.IPNet            `json:"-"`
+	ResolvedProbeInterval time.Duration           `json:"-"`
 }
 
 type RemoteCluster struct {
@@ -55,6 +63,7 @@ type ResolvedRemoteCluster struct {
 	ServiceNetwork []*net.IPNet
 	Domain         string
 	DNSIP          string // 10th IP of ServiceNetwork[0], computed during validation when Domain is set
+	ProbeIP        string // 11th IP of ServiceNetwork[0], deterministic probe service ClusterIP
 }
 
 func (rc *ResolvedRemoteCluster) AllCIDRs() []*net.IPNet {
@@ -148,6 +157,15 @@ func (c *C2CC) parseRemoteClusters() ([]ResolvedRemoteCluster, []error) {
 		}
 
 		resolved[i].Domain = rc.Domain
+
+		if len(resolved[i].ServiceNetwork) > 0 {
+			probeIP, err := cidr.Host(resolved[i].ServiceNetwork[0], 11)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("%s: failed to compute probe IP from serviceNetwork[0]: %w", label, err))
+			} else {
+				resolved[i].ProbeIP = probeIP.String()
+			}
+		}
 	}
 
 	return resolved, errs
@@ -236,11 +254,17 @@ func (c *C2CC) validate(cfg *Config) error {
 			seenNextHops, seenRemoteDomains, &seenCIDRs)...)
 	}
 
+	probeInterval, err := c.validateProbeInterval()
+	if err != nil {
+		errs = append(errs, err)
+	}
+
 	if err := errors.Join(errs...); err != nil {
 		return err
 	}
 
 	c.Resolved = resolved
+	c.ResolvedProbeInterval = probeInterval
 
 	var allCIDRs []*net.IPNet
 	for i := range resolved {
@@ -249,6 +273,17 @@ func (c *C2CC) validate(cfg *Config) error {
 	c.ResolvedAllCIDRs = allCIDRs
 
 	return nil
+}
+
+func (c *C2CC) validateProbeInterval() (time.Duration, error) {
+	d, err := time.ParseDuration(c.ProbeInterval)
+	if err != nil {
+		return 0, fmt.Errorf("probeInterval %q is not a valid duration: %w", c.ProbeInterval, err)
+	}
+	if d < 1*time.Second || d > 5*time.Minute {
+		return 0, fmt.Errorf("probeInterval must be between 1s and 5m, got %s", d)
+	}
+	return d, nil
 }
 
 func validateRemoteCluster(
