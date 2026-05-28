@@ -1,19 +1,15 @@
-- csi-external-snapshotter embedded-component 9098db0e434e0d986eeadd2ebe69119540a550d1 to 7503ea30886b6e5565ffa02935cf8d2ca299f281
-  - b91d3f6 2026-05-07T13:37:17+01:00 UPSTREAM: <drop>: vendor update
-  - ec917c6 2026-05-07T13:36:29+01:00 UPSTREAM: 1403: OCPBUGS-80788, OCPBUGS-80791: Bump google.golang.org/grpc to v1.79.3
+- api embedded-component d6cd612317218735862945e2bafc4a4054be2798 to b66d75611553df4827e899e5eaa4d6321ed9f44c
+  - 54d28823 2026-05-25T20:45:20+02:00 Add labelSelector to MachineSet status for scale subresource
 
-- machine-config-operator embedded-component 0e0d3ab9356fb65cb7e1bfee9528d0253807775b to 2ba5a372f051e770dd1c87132e9f6e77562706d6
-  - 7f094c16 2026-05-20T08:48:30+02:00 OCPBUGS-83830: Apply password only if changes exist
-  - e42077f7 2026-05-20T08:48:10+02:00 TestNoReboot should only consider password hash in /etc/shadow
+- machine-config-operator embedded-component 2ba5a372f051e770dd1c87132e9f6e77562706d6 to 5aabf7ccb1f54f0c889a87b1670827f9b2d23461
+  - fcaf4353 2026-05-12T13:38:15-04:00 drain: fix re-cordon detection
 
-- oc image-amd64 9d9df34c46c9deba8c291a2a084de5724c0bd820 to fdf8dabaedf6cf89f60547f57cc5f5f3e8d8798b
-  - 40363be0 2026-05-18T18:04:16+01:00 [release-4.21] OCPBUGS-81981: Bump go-jose/go-jose/v4 to v4.1.4
+- route-controller-manager embedded-component 559b7122d1a0cad4ff475b496c2896b39eed8c08 to 166a3e96f8151d9e789b3951ae75b03cdede5081
+  - e932033 2026-04-30T19:46:32Z OCPBUGS-80726: Bump google.golang.org/grpc to v1.79.3
 
-- csi-external-snapshotter image-amd64 9098db0e434e0d986eeadd2ebe69119540a550d1 to 7503ea30886b6e5565ffa02935cf8d2ca299f281
-  - b91d3f6 2026-05-07T13:37:17+01:00 UPSTREAM: <drop>: vendor update
-  - ec917c6 2026-05-07T13:36:29+01:00 UPSTREAM: 1403: OCPBUGS-80788, OCPBUGS-80791: Bump google.golang.org/grpc to v1.79.3
+- router image-amd64 5949f713517b3cc158cd78b34d71d5a9084d2e1c to b17085c57b2f55ad0317fe665655e76ba46999df
+  - 23f2da9 2026-05-05T15:18:00Z OCPBUGS-80810: Bump google.golang.org/grpc to v1.79.3
 
-- csi-external-snapshotter image-arm64 9098db0e434e0d986eeadd2ebe69119540a550d1 to 7503ea30886b6e5565ffa02935cf8d2ca299f281
-  - b91d3f6 2026-05-07T13:37:17+01:00 UPSTREAM: <drop>: vendor update
-  - ec917c6 2026-05-07T13:36:29+01:00 UPSTREAM: 1403: OCPBUGS-80788, OCPBUGS-80791: Bump google.golang.org/grpc to v1.79.3
+- router image-arm64 5949f713517b3cc158cd78b34d71d5a9084d2e1c to b17085c57b2f55ad0317fe665655e76ba46999df
+  - 23f2da9 2026-05-05T15:18:00Z OCPBUGS-80810: Bump google.golang.org/grpc to v1.79.3
 
