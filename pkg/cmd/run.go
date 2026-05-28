@@ -300,13 +300,20 @@ func RunMicroshift(cfg *config.Config) error {
 			klog.Info("service does not support sd_notify readiness messages")
 		}
 
-		// Provision certs for optional components before kustomize applies their manifests.
-		if err := provisionMetricsServerCerts(runCtx, cfg); err != nil {
-			klog.Warningf("Failed to provision metrics-server certs: %v", err)
-		}
-
 		// After MicroShift's core becomes ready, run the kustomizer (delete and/or apply manifests).
 		kustomize.NewKustomizer(cfg).RunStandalone(runCtx)
+
+		// Provision certs for optional components after kustomize creates their namespaces.
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					klog.Errorf("Panic in metrics-server cert provisioning: %v", r)
+				}
+			}()
+			if err := provisionMetricsServerCerts(runCtx, cfg); err != nil {
+				klog.Warningf("Failed to provision metrics-server certs: %v", err)
+			}
+		}()
 
 		// Watch for SIGTERM or service error to exit, now that we are ready.
 		select {

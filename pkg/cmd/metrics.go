@@ -2,12 +2,18 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 )
 
@@ -23,8 +29,30 @@ func provisionMetricsServerCerts(ctx context.Context, cfg *config.Config) error 
 		return nil
 	}
 
-	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
+
+	restCfg, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	if err != nil {
+		return fmt.Errorf("building kubeconfig: %w", err)
+	}
+	clientset, err := kubernetes.NewForConfig(restCfg)
+	if err != nil {
+		return fmt.Errorf("creating clientset: %w", err)
+	}
+	const ns = "openshift-monitoring"
+	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, 5*time.Minute, true, func(ctx context.Context) (bool, error) {
+		_, err := clientset.CoreV1().Namespaces().Get(ctx, ns, metav1.GetOptions{})
+		if err == nil {
+			return true, nil
+		}
+		klog.V(2).Infof("Waiting for namespace %s to be created by kustomize", ns)
+		return false, nil
+	})
+	if err != nil {
+		return fmt.Errorf("waiting for namespace %s: %w", ns, err)
+	}
+
+	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
 
 	certDir := cryptomaterial.MetricsServerKubeletClientCertDir(certsDir)
 	certPEM, err := os.ReadFile(cryptomaterial.ClientCertPath(certDir))

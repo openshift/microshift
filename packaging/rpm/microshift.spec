@@ -582,6 +582,7 @@ install -p -m644 assets/optional/ai-model-serving/release-ai-model-serving-x86_6
 
 # observability
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability/otelcol.d
 install -p -m644 packaging/observability/*.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/
 # Explicit copy of large config as default. Not using symlink to avoid accidental package upgrade overwriting user config if the user edits the config without copying (i.e. edits the target of symlink).
 install -p -m644 packaging/observability/opentelemetry-collector-large.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/opentelemetry-collector.yaml
@@ -654,6 +655,10 @@ cat assets/optional/node-exporter/kustomization.aarch64.yaml >> %{buildroot}/%{_
 %ifarch x86_64
 cat assets/optional/node-exporter/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/kustomization.yaml
 %endif
+
+# otel-collector drop-in for metrics exporters
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability/otelcol.d
+install -p -m644 packaging/observability/otelcol.d/microshift-metrics.yaml %{buildroot}%{_sysconfdir}/microshift/observability/otelcol.d/
 
 # metrics-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
@@ -850,6 +855,7 @@ fi
 %files observability
 %dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
 %dir %{_sysconfdir}/microshift/observability/
+%dir %{_sysconfdir}/microshift/observability/otelcol.d
 %{_unitdir}/microshift-observability.service
 %config(noreplace) %{_sysconfdir}/microshift/observability/opentelemetry-collector.yaml
 %{_sysconfdir}/microshift/observability/opentelemetry-collector-*.yaml
@@ -869,6 +875,7 @@ fi
 %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/*
 %dir %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
 %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/*
+%config(noreplace) %{_sysconfdir}/microshift/observability/otelcol.d/microshift-metrics.yaml
 
 %files metrics-release-info
 %{_datadir}/microshift/release/release-metrics-{x86_64,aarch64}.json

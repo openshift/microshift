@@ -8,7 +8,7 @@ ConditionPathExists=/var/lib/microshift/resources/observability-client/kubeconfi
 Environment=KUBECONFIG=/var/lib/microshift/resources/observability-client/kubeconfig
 Environment=K8S_NODE_NAME="%l"
 ExecStartPre=/usr/bin/mkdir -p /var/lib/microshift-observability
-ExecStart=/usr/bin/opentelemetry-collector --config=/etc/microshift/observability/opentelemetry-collector.yaml
+ExecStart=/bin/bash -c 'ARGS="--config=file:/etc/microshift/observability/opentelemetry-collector.yaml"; for f in /etc/microshift/observability/otelcol.d/*.yaml; do [ -f "$$f" ] && ARGS="$$ARGS --config=file:$$f"; done; exec /usr/bin/opentelemetry-collector $$ARGS'
 Restart=always
 User=root
 
