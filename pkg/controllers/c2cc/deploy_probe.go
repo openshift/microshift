@@ -56,7 +56,7 @@ func (c *C2CCRouteManager) deployProbe(ctx context.Context) error {
 		return fmt.Errorf("failed to apply c2cc service: %w", err)
 	}
 
-	klog.Infof("C2CC probe assets deployed (probe ClusterIP=%s)", probeIP)
+	klog.V(4).Infof("C2CC probe assets deployed (probe ClusterIP=%s)", probeIP)
 	return nil
 }
 

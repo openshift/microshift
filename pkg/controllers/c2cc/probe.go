@@ -41,7 +41,11 @@ func RunProbe(ctx context.Context) error {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, "ok")
 	})
-	server := &http.Server{Addr: ":8080", Handler: mux}
+	server := &http.Server{
+		Addr:              ":8080",
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
+	}
 
 	go func() {
 		klog.Infof("Starting probe target HTTP server on :8080")
@@ -58,7 +62,7 @@ func RunProbe(ctx context.Context) error {
 	factory := microshiftinformers.NewSharedInformerFactory(msClient, informerResync)
 	informer := factory.Microshift().V1alpha1().RemoteClusters().Informer()
 
-	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	if _, err := informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			if rc, ok := obj.(*microshiftv1alpha1.RemoteCluster); ok {
 				pm.startProbe(ctx, rc)
@@ -83,7 +87,9 @@ func RunProbe(ctx context.Context) error {
 				pm.stopProbe(rc.Name)
 			}
 		},
-	})
+	}); err != nil {
+		return fmt.Errorf("failed to add RemoteCluster informer handlers: %w", err)
+	}
 
 	factory.Start(ctx.Done())
 	factory.WaitForCacheSync(ctx.Done())
