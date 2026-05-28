@@ -71,7 +71,7 @@ DOCKERFILE
 ARCHES=(amd64 arm64)
 
 echo "Creating manifest ${IMAGE}..."
-podman manifest rm "${IMAGE}" 2>/dev/null || true
+podman rmi -f "${IMAGE}" 2>/dev/null || true
 podman manifest create "${IMAGE}"
 
 for arch in "${ARCHES[@]}"; do
