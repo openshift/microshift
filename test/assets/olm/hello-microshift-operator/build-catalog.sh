@@ -63,7 +63,7 @@ echo "Validating file-based catalog..."
 cat > "${WORK_DIR}/catalog.Dockerfile" <<'DOCKERFILE'
 FROM quay.io/operator-framework/opm:latest
 ENTRYPOINT ["/bin/opm"]
-CMD ["serve", "/configs", "--cache-dir=/tmp/cache"]
+CMD ["serve", "/configs", "--cache-dir=/tmp/cache", "--cache-enforce-integrity=false"]
 COPY catalog/hello-microshift-operator /configs/hello-microshift-operator
 LABEL operators.operatorframework.io.index.configs.v1=/configs
 DOCKERFILE
