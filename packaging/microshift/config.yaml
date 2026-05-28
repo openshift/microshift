@@ -104,6 +104,16 @@ dns:
         # example:
         #   Enabled
         status: Disabled
+    # Resources configures the CPU and memory resources for the dns container.
+    resources:
+        # Limits specifies the maximum resources the dns container can use.
+        # Valid keys are "cpu" and "memory". Values must be valid Kubernetes resource quantities.
+        # When not set, no limits are applied.
+        limits: {}
+        # Requests specifies the minimum resources required for the dns container.
+        # Valid keys are "cpu" and "memory". Values must be valid Kubernetes resource quantities.
+        # When not set, defaults to cpu=50m, memory=70Mi.
+        requests: {}
 etcd:
     # Set a memory limit on the etcd process; etcd will begin paging
     # memory when it gets to this value. 0 means no limit.

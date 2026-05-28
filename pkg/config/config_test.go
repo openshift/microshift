@@ -80,6 +80,81 @@ func TestGetActiveConfigFromYAML(t *testing.T) {
 			}(),
 		},
 		{
+			name: "dns-resources-requests",
+			config: dedent(`
+            dns:
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "150Mi"
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests = map[string]string{
+					"cpu":    "100m",
+					"memory": "150Mi",
+				}
+				return c
+			}(),
+		},
+		{
+			name: "dns-resources-partial-request",
+			config: dedent(`
+            dns:
+              resources:
+                requests:
+                  cpu: "100m"
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["cpu"] = "100m"
+				return c
+			}(),
+		},
+		{
+			name: "dns-resources-with-limits",
+			config: dedent(`
+            dns:
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "150Mi"
+                limits:
+                  cpu: "200m"
+                  memory: "256Mi"
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests = map[string]string{
+					"cpu":    "100m",
+					"memory": "150Mi",
+				}
+				c.DNS.Resources.Limits = map[string]string{
+					"cpu":    "200m",
+					"memory": "256Mi",
+				}
+				return c
+			}(),
+		},
+		{
+			name: "dns-resources-limits-only",
+			config: dedent(`
+            dns:
+              resources:
+                limits:
+                  cpu: "200m"
+                  memory: "256Mi"
+            `),
+			expected: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Limits = map[string]string{
+					"cpu":    "200m",
+					"memory": "256Mi",
+				}
+				return c
+			}(),
+		},
+		{
 			name: "network",
 			config: dedent(`
             network:
@@ -900,6 +975,149 @@ func TestValidate(t *testing.T) {
 			config: func() *Config {
 				c := mkDefaultConfig()
 				c.ApiServer.FeatureGates.FeatureSet = "TechPreviewNoUpgrade"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-valid-quantities",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests = map[string]string{
+					"cpu":    "100m",
+					"memory": "128Mi",
+				}
+				c.DNS.Resources.Limits = map[string]string{
+					"cpu":    "200m",
+					"memory": "256Mi",
+				}
+				return c
+			}(),
+			expectErr: false,
+		},
+		{
+			name: "dns-resources-invalid-request",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["cpu"] = "abc"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-invalid-limit",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Limits = map[string]string{
+					"cpu": "not-a-quantity",
+				}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-limit-less-than-request",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["cpu"] = "200m"
+				c.DNS.Resources.Limits = map[string]string{
+					"cpu": "50m",
+				}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-limit-without-request",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Limits = map[string]string{
+					"cpu": "200m",
+				}
+				return c
+			}(),
+			expectErr: false,
+		},
+		{
+			name: "dns-resources-unsupported-request-key",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["gpu"] = "1"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-unsupported-limit-key",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Limits = map[string]string{
+					"ephemeral-storage": "1Gi",
+				}
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-cpu-below-minimum",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["cpu"] = "10m"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-memory-below-minimum",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["memory"] = "30Mi"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-at-minimum",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["cpu"] = "50m"
+				c.DNS.Resources.Requests["memory"] = "70Mi"
+				return c
+			}(),
+			expectErr: false,
+		},
+		{
+			name: "dns-resources-zero-cpu-request",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["cpu"] = "0"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-zero-memory-request",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["memory"] = "0"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-negative-cpu-request",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["cpu"] = "-50m"
+				return c
+			}(),
+			expectErr: true,
+		},
+		{
+			name: "dns-resources-negative-memory-request",
+			config: func() *Config {
+				c := mkDefaultConfig()
+				c.DNS.Resources.Requests["memory"] = "-70Mi"
 				return c
 			}(),
 			expectErr: true,
