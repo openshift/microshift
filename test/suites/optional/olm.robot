@@ -15,7 +15,7 @@ Suite Teardown      Teardown
 *** Variables ***
 ${CATALOG_SOURCE}           ./assets/olm/catalog-source.yaml
 ${SUBSCRIPTION}             ./assets/olm/subscription.yaml
-${SUBSCRIPTION_NAME}        amq-broker
+${SUBSCRIPTION_NAME}        hello-microshift-operator
 ${MARKETPLACE_NAMESPACE}    openshift-marketplace
 ${OPERATORS_NAMESPACE}      openshift-operators
 ${OLM_NAMESPACE}            openshift-operator-lifecycle-manager
@@ -39,8 +39,8 @@ ${ALL_SUB_NAME}             nginx-ok2-1399
 
 
 *** Test Cases ***
-Deploy AmqBroker From Red Hat Operators catalog
-    [Documentation]    Deploy AMQ Broker from Red Hat Operators catalog.
+Deploy Hello MicroShift Operator From Catalog
+    [Documentation]    Deploy hello-microshift operator from a self-contained catalog.
     [Setup]    Setup Test
 
     ${csv}=    Get CSV Name From Subscription    ${OPERATORS_NAMESPACE}    ${SUBSCRIPTION_NAME}
@@ -176,8 +176,8 @@ OLM Should Be Ready
     Named Deployment Should Be Available    olm-operator    openshift-operator-lifecycle-manager
 
 Download CatalogSource Image
-    [Documentation]    CatalogSource container image contains a few gigabytes of data.
-    ...    Preload it to avoid timeouts during the CatalogSource resource creation.
+    [Documentation]    Preload the CatalogSource container image to avoid
+    ...    timeouts during the CatalogSource resource creation.
     ${yaml_content}=    OperatingSystem.Get File    ${CATALOG_SOURCE}
     ${yaml_data}=    Yaml Parse    ${yaml_content}
     VAR    ${image}=    ${yaml_data.spec.image}
@@ -188,10 +188,10 @@ Download CatalogSource Image
     Should Be Equal As Integers    0    ${rc}
 
 Create CatalogSource
-    [Documentation]    Create CatalogSource resource with Red Hat Community Catalog Index.
+    [Documentation]    Create CatalogSource resource with the hello-microshift catalog.
     Oc Create    -f ${CATALOG_SOURCE}
     Wait Until Keyword Succeeds    10m    15s
-    ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    redhat-operators
+    ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    hello-microshift-catalog
 
 CatalogSource Should Be Ready
     [Documentation]    Checks if CatalogSource is ready.
