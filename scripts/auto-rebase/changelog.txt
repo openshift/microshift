@@ -1,4 +1,8 @@
-- csi-external-snapshotter image-arm64 d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to a61a123b742684b2f37998872d9cb3a507917208
+- csi-external-snapshotter embedded-component d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to a61a123b742684b2f37998872d9cb3a507917208
+  - 45601b0 2026-05-25T12:37:08+01:00 UPSTREAM: <drop>: vendor changes
+  - 6f85ec4 2026-05-25T12:36:58+01:00 UPSTREAM: 1403: Bump google.golang.org/grpc to v1.79.3
+
+- csi-external-snapshotter image-amd64 d1bc3ffaa9759c13a06c2ec61c541342e71bd109 to a61a123b742684b2f37998872d9cb3a507917208
   - 45601b0 2026-05-25T12:37:08+01:00 UPSTREAM: <drop>: vendor changes
   - 6f85ec4 2026-05-25T12:36:58+01:00 UPSTREAM: 1403: Bump google.golang.org/grpc to v1.79.3
 
