@@ -34,15 +34,25 @@ def get_rpm_releases():
         # Disable all repos (in the memory, not on the host) to just query RHOCP repos and make operation faster.
         base.repos.all().disable()
 
-        # Enable RHOCP repos starting from 4.14 to the current-2 (inclusive; range() stops before the second argument).
+        # Enable RHOCP repos starting from 4.14 up to current-2 (inclusive).
         # E.g., for 4.21 it's 4.14-4.19 because when 4.21 development started, the 4.20 wasn't released yet.
-        # For major version 5, start from 5.0; for major version 4, start from 4.14.
+        # The -2 gap spans across major boundaries: versions form a linear sequence
+        # (4.14, ..., 4.22, 5.0, 5.1, ...) and current-1 is handled by the try block below.
+        repo_versions = []
+        if int(current_major) >= 5:
+            for m in range(14, common.LAST_MINOR_FOR_MAJOR[4] + 1):
+                repo_versions.append(("4", m))
         start_minor = 0 if int(current_major) >= 5 else 14
-        for minor in range(start_minor, int(current_minor)-1):
-            repo_id = f"rhocp-{current_major}.{minor}-for-rhel-9-{arch}-rpms"
-            r = base.repos.get_matching(repo_id)
+        for m in range(start_minor, int(current_minor)):
+            repo_versions.append((current_major, m))
+        repo_versions = repo_versions[:-1]
+
+        logging.info(f"Based on provided version {current_major}.{current_minor} calculated versions: {', '.join(f'{t[0]}.{t[1]}' for t in repo_versions)}")
+        for major, minor in repo_versions:
+            repo_id = f"rhocp-{major}.{minor}-for-rhel-9-{arch}-rpms"
+            r = base.repos.get(repo_id)
             r.enable()
-            logging.info(f'Enabled repo: {r.id} - {r.name}')
+            logging.info(f'Enabled repo: {repo_id}')
 
         # It's faster to enable bunch of repos at once and fill the sack once rather than filling it after enabling each repo.
         base.fill_sack()
