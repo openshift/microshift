@@ -140,6 +140,7 @@ scenario_run_tests() {
     configure_rhocp_repo "${RHOCP_MINOR_Y1}"      4 "${PREVIOUS_MINOR_VERSION}" "${arch}"
     configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" 4 "${PREVIOUS_MINOR_VERSION}" "${arch}"
     configure_microshift_mirror "${PREVIOUS_RELEASE_REPO}"
+    run_command_on_vm host1 "sudo subscription-manager release --set 10.2"
     configure_cdn_repo \
         "fast-datapath" \
         "Red Hat Fast Datapath for RHEL 9" \
