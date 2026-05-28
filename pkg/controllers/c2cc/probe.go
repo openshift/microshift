@@ -39,7 +39,9 @@ func RunProbe(ctx context.Context) error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "ok")
+		if _, err := fmt.Fprint(w, "ok"); err != nil {
+			klog.Errorf("Failed to write probe response: %v", err)
+		}
 	})
 	server := &http.Server{
 		Addr:              ":8080",
@@ -97,7 +99,11 @@ func RunProbe(ctx context.Context) error {
 
 	<-ctx.Done()
 	pm.stopAll()
-	server.Shutdown(context.Background()) //nolint:errcheck
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := server.Shutdown(shutdownCtx); err != nil { //nolint:contextcheck // parent ctx is already cancelled
+		klog.Errorf("Probe HTTP server shutdown error: %v", err)
+	}
 	klog.Infof("Probe manager shut down")
 	return nil
 }
@@ -204,11 +210,15 @@ func doProbe(ctx context.Context, client *http.Client, url string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
-	resp, err := client.Do(req)
+	resp, err := client.Do(req) // #nosec G704 -- URL built from trusted RemoteCluster CR spec
 	if err != nil {
 		return fmt.Errorf("failed to execute probe request: %w", err)
 	}
-	resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			klog.Errorf("Failed to close probe response body: %v", err)
+		}
+	}()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed with unexpected status %d", resp.StatusCode)
 	}
