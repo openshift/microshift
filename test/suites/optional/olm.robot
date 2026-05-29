@@ -12,14 +12,14 @@ Suite Teardown      Teardown
 *** Variables ***
 ${CATALOG_SOURCE}           ./assets/olm/catalog-source.yaml
 ${SUBSCRIPTION}             ./assets/olm/subscription.yaml
-${SUBSCRIPTION_NAME}        amq-broker
+${SUBSCRIPTION_NAME}        hello-microshift-operator
 ${MARKETPLACE_NAMESPACE}    openshift-marketplace
 ${OPERATORS_NAMESPACE}      openshift-operators
 
 
 *** Test Cases ***
-Deploy AmqBroker From Red Hat Operators catalog
-    [Documentation]    Deploy AMQ Broker from Red Hat Operators catalog.
+Deploy Hello MicroShift Operator From Catalog
+    [Documentation]    Deploy hello-microshift operator from a self-contained catalog.
     [Setup]    Run Keywords
     ...    OLM Should Be Ready
     ...    Create CatalogSource
@@ -59,10 +59,10 @@ OLM Should Be Ready
     Named Deployment Should Be Available    olm-operator    openshift-operator-lifecycle-manager
 
 Create CatalogSource
-    [Documentation]    Create CatalogSource resource with Red Hat Community Catalog Index.
+    [Documentation]    Create CatalogSource resource with the hello-microshift catalog.
     Oc Create    -f ${CATALOG_SOURCE}
     Wait Until Keyword Succeeds    5m    10s
-    ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    redhat-operators
+    ...    CatalogSource Should Be Ready    ${MARKETPLACE_NAMESPACE}    hello-microshift-catalog
 
 CatalogSource Should Be Ready
     [Documentation]    Checks if CatalogSource is ready.
