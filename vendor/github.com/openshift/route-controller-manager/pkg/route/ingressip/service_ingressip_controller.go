@@ -589,14 +589,23 @@ func (ic *IngressIPController) clearPersistedAllocation(service *v1.Service, key
 	// corresponding status exists, so update the spec first to avoid
 	// failing admission control.
 	ingressIP := service.Status.LoadBalancer.Ingress[0].IP
-	for i, ip := range service.Spec.ExternalIPs {
-		if ip == ingressIP {
-			klog.V(5).Infof("Removing ip %v from the external ips of service %v", ingressIP, key)
-			service.Spec.ExternalIPs = append(service.Spec.ExternalIPs[:i], service.Spec.ExternalIPs[i+1:]...)
-			if err := ic.persistServiceSpec(service); err != nil {
-				return err
-			}
-			break
+	// Remove every occurrence of the ingress ip from spec.ExternalIPs.
+	// The ingress ip can appear more than once if two changes for the
+	// same service are processed before the cache reflects the first
+	// persisted spec.ExternalIPs update (see OCPBUGS-39598); a single
+	// removal would leave a stale duplicate behind that the controller
+	// can no longer reclaim once the status is cleared.
+	filtered := service.Spec.ExternalIPs[:0]
+	for _, ip := range service.Spec.ExternalIPs {
+		if ip != ingressIP {
+			filtered = append(filtered, ip)
+		}
+	}
+	if len(filtered) != len(service.Spec.ExternalIPs) {
+		klog.V(5).Infof("Removing ip %v from the external ips of service %v", ingressIP, key)
+		service.Spec.ExternalIPs = filtered
+		if err := ic.persistServiceSpec(service); err != nil {
+			return err
 		}
 	}
 
