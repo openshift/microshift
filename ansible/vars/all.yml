@@ -6,18 +6,19 @@ prometheus_logging: "{{ prometheus_logging_arg | default('true')  }}"
 results_base_dir: "{{ playbook_dir }}/results"
 
 # RHEL subscription and repository management
-manage_subscription: false
+manage_subscription: true
 rhel_username:
 rhel_password:
 rhel_pool_id:
-manage_repos: false
+manage_repos: true
 
 # MicroShift installation options
-setup_microshift_host: false
-install_microshift: "{{ install_microshift_arg | default('false') }}"
+setup_microshift_host: true
+install_microshift: "{{ install_microshift_arg | default('true') }}"
 build_etcd_binary: false
 build_microshift: false
-microshift_version: "4.20"
+microshift_version: "4.22"
+rhel_target_version: "9.8"
 
 # Service account
 sa_token_file: sa-token

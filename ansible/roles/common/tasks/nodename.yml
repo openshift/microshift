@@ -11,7 +11,7 @@
 #
 # become: yes — these files may be root-readable only; failed_when: false on
 # the slurps would otherwise silently mask permission errors and fall back
-# to ansible_hostname even when an override is configured.
+# to ansible_facts.hostname even when an override is configured.
 
 - name: Resolve kubernetes nodename
   become: yes
@@ -56,5 +56,5 @@
 - name: Set kubernetes_nodename fact
   ansible.builtin.set_fact:
     kubernetes_nodename: "{{ ((_microshift_hostname_override | length > 0)
-                              | ternary(_microshift_hostname_override, ansible_hostname))
+                              | ternary(_microshift_hostname_override, ansible_facts.hostname))
                               | lower }}"

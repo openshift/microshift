@@ -12,9 +12,11 @@ repo_list:
     repo_url: "https://mirror.openshift.com/pub/openshift-v4/{{ ansible_facts.architecture }}/dependencies/rpms/{{ ocp_version }}-el9-beta/"
 
 rhel_beta: ''
-rhel_repos:
+rhel_base_repos:
   - rhel-{{ ansible_facts.distribution_major_version }}-for-{{ ansible_facts.architecture }}-baseos-{{ rhel_beta }}rpms
   - rhel-{{ ansible_facts.distribution_major_version }}-for-{{ ansible_facts.architecture }}-appstream-{{ rhel_beta }}rpms
   - codeready-builder-{{ rhel_beta }}for-rhel-{{ ansible_facts.distribution_major_version }}-{{ ansible_facts.architecture }}-rpms
   - fast-datapath-{{ rhel_beta }}for-rhel-{{ ansible_facts.distribution_major_version }}-{{ ansible_facts.architecture }}-rpms
+rhel_ocp_repos:
   - rhocp-{{ ocp_version }}-for-rhel-{{ ansible_facts.distribution_major_version }}-{{ ansible_facts.architecture }}-rpms
+rhel_repos: "{{ rhel_base_repos + rhel_ocp_repos }}"

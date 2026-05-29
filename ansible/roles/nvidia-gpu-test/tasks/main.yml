@@ -137,7 +137,7 @@
     - name: Save host nvidia-smi output to file
       ansible.builtin.copy:
         content: "{{ host_nvidia_smi.stdout }}"
-        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/host-nvidia-smi-{{ ansible_date_time.epoch }}.log"
+        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/host-nvidia-smi-{{ ansible_facts.date_time.epoch }}.log"
         mode: '0644'
       delegate_to: localhost
       become: no
@@ -145,7 +145,7 @@
     - name: Save pod nvidia-smi output to file
       ansible.builtin.copy:
         content: "{{ pod_nvidia_smi_logs.stdout }}"
-        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/pod-nvidia-smi-{{ ansible_date_time.epoch }}.log"
+        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/pod-nvidia-smi-{{ ansible_facts.date_time.epoch }}.log"
         mode: '0644'
       delegate_to: localhost
       become: no
@@ -153,7 +153,7 @@
     - name: Save cuda-vector-add output to file
       ansible.builtin.copy:
         content: "{{ cuda_vector_add_logs.stdout }}"
-        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/cuda-vector-add-{{ ansible_date_time.epoch }}.log"
+        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/cuda-vector-add-{{ ansible_facts.date_time.epoch }}.log"
         mode: '0644'
       delegate_to: localhost
       become: no
@@ -161,7 +161,7 @@
     - name: Save test summary to file
       ansible.builtin.copy:
         content: |
-          GPU Test Summary - {{ ansible_date_time.iso8601 }}
+          GPU Test Summary - {{ ansible_facts.date_time.iso8601 }}
           ========================================
           Host: {{ hostvars[groups['microshift'][0]]['ansible_host'] }}
           Host GPUs Detected: {{ gpu_count.stdout | trim }}
@@ -170,7 +170,7 @@
           nvidia-smi Status: {{ 'PASSED' if pod_nvidia_smi_logs.rc == 0 else 'FAILED' }}
           cuda-vector-add Status: {{ 'PASSED' if 'Test PASSED' in cuda_vector_add_logs.stdout else 'FAILED' }}
           CUDA Test Result: {{ 'Success' if 'Test PASSED' in cuda_vector_add_logs.stdout else 'Failed' }}
-        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/test-summary-{{ ansible_date_time.epoch }}.log"
+        dest: "{{ gpu_test_logs_dir | default('./gpu-test-logs') }}/test-summary-{{ ansible_facts.date_time.epoch }}.log"
         mode: '0644'
       delegate_to: localhost
       become: no
