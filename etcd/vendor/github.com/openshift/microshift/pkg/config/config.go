@@ -200,7 +200,8 @@ func (c *Config) fillDefaults() error {
 	c.Telemetry = telemetryDefaults()
 	c.DNS = dnsDefaults()
 	c.C2CC = C2CC{
-		DNS: C2CCDNS{CacheTTL: ptr.To(10), CacheNegativeTTL: ptr.To(10)},
+		DNS:           C2CCDNS{CacheTTL: ptr.To(10), CacheNegativeTTL: ptr.To(10)},
+		ProbeInterval: "10s",
 	}
 	return nil
 }
@@ -444,6 +445,24 @@ func (c *Config) incorporateUserSettings(u *Config) {
 			c.DNS.Hosts.File = u.DNS.Hosts.File
 		}
 	}
+
+	// DNS resource configuration - merge key-by-key to preserve defaults
+	if u.DNS.Resources.Requests != nil {
+		if c.DNS.Resources.Requests == nil {
+			c.DNS.Resources.Requests = make(map[string]string)
+		}
+		for k, v := range u.DNS.Resources.Requests {
+			c.DNS.Resources.Requests[k] = v
+		}
+	}
+	if u.DNS.Resources.Limits != nil {
+		if c.DNS.Resources.Limits == nil {
+			c.DNS.Resources.Limits = make(map[string]string)
+		}
+		for k, v := range u.DNS.Resources.Limits {
+			c.DNS.Resources.Limits[k] = v
+		}
+	}
 	if u.ApiServer.FeatureGates.FeatureSet != "" {
 		c.ApiServer.FeatureGates.FeatureSet = u.ApiServer.FeatureGates.FeatureSet
 	}
@@ -468,6 +487,9 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 	if u.C2CC.DNS.CacheNegativeTTL != nil {
 		c.C2CC.DNS.CacheNegativeTTL = u.C2CC.DNS.CacheNegativeTTL
+	}
+	if u.C2CC.ProbeInterval != "" {
+		c.C2CC.ProbeInterval = u.C2CC.ProbeInterval
 	}
 }
 
