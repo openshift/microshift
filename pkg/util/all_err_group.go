@@ -10,11 +10,10 @@ import (
 // AllErrGroup is a helper to wait for all goroutines and get all errors that occurred.
 // It's based on sync.WaitGroup (which doesn't capture any errors) and errgroup.Group (which only captures the first error).
 type AllErrGroup struct {
-	wg   sync.WaitGroup
-	mu   sync.Mutex
-	errs []error
-
+	errs   []error
+	wg     sync.WaitGroup
 	amount int
+	mu     sync.Mutex
 }
 
 func (g *AllErrGroup) Go(f func() error) {

@@ -24,6 +24,7 @@ type CSRMeta struct {
 	Validity time.Duration
 }
 
+//nolint:govet // fieldalignment: keep the embedded CSR metadata first.
 type ClientCertificateSigningRequestInfo struct {
 	CSRMeta
 
@@ -50,15 +51,13 @@ type PeerCertificateSigningRequestInfo struct {
 func (i *PeerCertificateSigningRequestInfo) GetMeta() CSRMeta { return i.CSRMeta }
 
 type CertificateSigner struct {
-	signerName     string
-	signerConfig   *crypto.CA
-	signerDir      string
-	signerValidity time.Duration
-
+	signerConfig       *crypto.CA
 	subCAs             map[string]*CertificateSigner
 	signedCertificates map[string]*signedCertificateInfo
-
-	caBundlePaths sets.Set[string]
+	caBundlePaths      sets.Set[string]
+	signerName         string
+	signerDir          string
+	signerValidity     time.Duration
 }
 
 type signedCertificateInfo struct {

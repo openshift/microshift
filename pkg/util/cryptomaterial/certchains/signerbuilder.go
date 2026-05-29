@@ -29,18 +29,16 @@ type CertificateSignerBuilder interface {
 }
 
 type certificateSigner struct {
-	signerName     string
-	signerDir      string
-	signerValidity time.Duration
-
 	// signerConfig should only be used in case this is a sub-ca signer
 	// It should be populated during CertificateSigner.SignSubCA()
 	signerConfig       *crypto.CA
+	signerName         string
+	signerDir          string
 	subCAs             []CertificateSignerBuilder
 	certificatesToSign []CSRInfo
-
 	// locations of bundles where this signer appears
-	caBundlePaths []string
+	caBundlePaths  []string
+	signerValidity time.Duration
 }
 
 // NewCertificateSigner returns a builder object for a certificate chain for the given signer

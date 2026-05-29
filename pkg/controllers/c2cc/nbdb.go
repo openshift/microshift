@@ -69,7 +69,8 @@ func waitForOVNSocket(ctx context.Context) error {
 	}
 }
 
-func connectOVNNB(ctx context.Context) (client.Client, error) { //nolint:ireturn
+//nolint:ireturn // libovsdb exposes client.Client as the public connection interface.
+func connectOVNNB(ctx context.Context) (client.Client, error) {
 	if err := waitForOVNSocket(ctx); err != nil {
 		return nil, fmt.Errorf("failed to wait for OVN NB socket: %w", err)
 	}

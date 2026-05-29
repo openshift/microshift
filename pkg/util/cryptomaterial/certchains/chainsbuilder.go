@@ -12,11 +12,10 @@ type CertificateChainsBuilder interface {
 }
 
 type certificateChains struct {
-	signers []CertificateSignerBuilder
-
 	// fileBundles maps fileName -> signers, where fileName is the filename of a CA bundle
 	// where PEM certificates should be stored
 	fileBundles map[string][][]string
+	signers     []CertificateSignerBuilder
 }
 
 func NewCertificateChains(signers ...CertificateSignerBuilder) CertificateChainsBuilder {

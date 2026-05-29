@@ -21,18 +21,17 @@ const (
 var healthcheckCRD = []string{"crd/microshift.io_remoteclusters.yaml"}
 
 type C2CCRouteManager struct {
-	cfg        *config.Config
-	nodeName   string
-	kubeconfig string
-
 	kubeClient       kubernetes.Interface
 	microshiftClient microshiftclient.MicroshiftV1alpha1Interface
+	cfg              *config.Config
 	ovn              *ovnRouteManager
 	annotation       *annotationManager
 	nftMgr           *nftablesManager
 	routes           *linuxRouteManager
 	svcRoutes        *serviceRouteManager
 	healthcheck      *healthcheckCRManager
+	nodeName         string
+	kubeconfig       string
 }
 
 func NewC2CCRouteManager(cfg *config.Config) *C2CCRouteManager {
@@ -215,6 +214,7 @@ func (c *C2CCRouteManager) initForCleanup(ctx context.Context) func() {
 }
 
 func (c *C2CCRouteManager) fullReconcile(ctx context.Context) {
+	//nolint:govet // fieldalignment: keep positional composite literal order.
 	subsystems := []struct {
 		name string
 		fn   func(context.Context) error
@@ -236,6 +236,7 @@ func (c *C2CCRouteManager) fullReconcile(ctx context.Context) {
 func (c *C2CCRouteManager) cleanupAll(ctx context.Context) {
 	klog.V(2).Infof("Cleaning up any leftover C2CC state")
 
+	//nolint:govet // fieldalignment: keep positional composite literal order.
 	type cleanable struct {
 		name string
 		fn   func(context.Context) error

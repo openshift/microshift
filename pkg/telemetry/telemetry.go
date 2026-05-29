@@ -69,14 +69,14 @@ type MetricLabel struct {
 }
 
 type TelemetryClient struct {
+	// For proxy configuration.
+	transport http.RoundTripper
 	endpoint  string
 	clusterId string
 	// next two attributes are required to compute the cpu usage based
 	// on the cpu seconds we get from kubelet.
 	previousCPUSeconds   float64
 	previousCPUtimestamp int64
-	// For proxy configuration.
-	transport http.RoundTripper
 }
 
 func NewTelemetryClient(endpoint, clusterId, proxy string) *TelemetryClient {

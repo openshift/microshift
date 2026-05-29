@@ -75,13 +75,12 @@ func init() {
 }
 
 type KubeAPIServer struct {
-	kasConfigBytes []byte
-	verbosity      int
-	configuration  *config.Config
-
+	configuration    *config.Config
 	masterURL        string
 	servingCAPath    string
 	advertiseAddress string
+	kasConfigBytes   []byte
+	verbosity        int
 }
 
 func NewKubeAPIServer(cfg *config.Config) *KubeAPIServer {

@@ -39,11 +39,10 @@ import (
 )
 
 type OCPRouteControllerManager struct {
+	configErr     error
 	run           func(context.Context) error
 	kubeconfig    string
 	kubeadmconfig string
-
-	configErr error
 }
 
 const (

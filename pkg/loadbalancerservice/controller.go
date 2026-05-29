@@ -28,16 +28,16 @@ const (
 )
 
 type LoadbalancerServiceController struct {
-	IPAddresses []string
-	NICNames    []string
-	NodeIP      string
-	KubeConfig  string
-	Ipv4        bool
-	Ipv6        bool
-	client      *kubernetes.Clientset
 	indexer     cache.Indexer
 	queue       workqueue.TypedRateLimitingInterface[string]
 	informer    cache.SharedIndexInformer
+	client      *kubernetes.Clientset
+	NodeIP      string
+	KubeConfig  string
+	IPAddresses []string
+	NICNames    []string
+	Ipv4        bool
+	Ipv6        bool
 }
 
 var _ servicemanager.Service = &LoadbalancerServiceController{}
