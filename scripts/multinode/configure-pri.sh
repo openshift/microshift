@@ -115,7 +115,13 @@ function generate_service_certs() {
 ${cfssl_map[cfssl]} ${cfssl}
 ${cfssl_map[cfssl_json]} ${cfssl_json}
 EOF
+    set -x
+    cat "${cfssl_sha}"
+    sha256sum "${cfssl}" || true
+    sha256sum "${cfssl_json}" || true
+
     sha256sum --check "${cfssl_sha}"
+    set +x
     chmod +x "${cfssl}" "${cfssl_json}"
 
     # Generate serving certs for secondary node's kubelet
