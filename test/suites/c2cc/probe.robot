@@ -16,14 +16,14 @@ Test Tags           c2cc
 
 
 *** Variables ***
-${C2CC_NAMESPACE}       microshift-c2cc
+${C2CC_NAMESPACE}       openshift-c2cc
 ${PROBE_DEPLOYMENT}     c2cc-probe
 ${PROBE_PORT}           8080
 
 
 *** Test Cases ***
 Probe Namespace Exists
-    [Documentation]    Verify the microshift-c2cc namespace exists on all clusters.
+    [Documentation]    Verify the openshift-c2cc namespace exists on all clusters.
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         ${stdout}=    Oc On Cluster    ${alias}    oc get namespace ${C2CC_NAMESPACE} -o name
         Should Contain    ${stdout}    namespace/${C2CC_NAMESPACE}

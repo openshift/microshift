@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: microshift-c2cc
+  namespace: openshift-c2cc
   name: c2cc-probe
 spec:
   clusterIP: '{{ .ProbeServiceClusterIP }}'

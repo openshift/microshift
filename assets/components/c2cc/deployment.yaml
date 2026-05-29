@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: microshift-c2cc
+  namespace: openshift-c2cc
   name: c2cc-probe
   labels:
     app: c2cc-probe

@@ -8,5 +8,5 @@ roleRef:
   name: microshift-c2cc-probe
 subjects:
 - kind: ServiceAccount
-  namespace: microshift-c2cc
+  namespace: openshift-c2cc
   name: c2cc-probe
