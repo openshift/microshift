@@ -57,15 +57,8 @@ spec:
             failureThreshold: 5
           resources:
             requests:
-              {{- range $key, $value := .DNSRequests }}
-              {{ $key }}: {{ $value }}
-              {{- end }}
-            {{- if .DNSLimits }}
-            limits:
-              {{- range $key, $value := .DNSLimits }}
-              {{ $key }}: {{ $value }}
-              {{- end }}
-            {{- end }}
+              cpu: 50m
+              memory: 70Mi
           securityContext:
             readOnlyRootFilesystem: true
           image: '{{ .ReleaseImage.coredns }}'
