@@ -93,8 +93,8 @@ fi
 #
 # For a release branch, the current release repository should come from the
 # official 'rhocp' stream.
-CURRENT_RELEASE_REPO=""
-CURRENT_RELEASE_VERSION=""
+CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/microshift/ocp-dev-preview/latest-5.0/el9/os"
+CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
 
