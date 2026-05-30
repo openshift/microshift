@@ -2,6 +2,16 @@
 
 set -xeuo pipefail
 
+retries=30
+while [ ${retries} -gt 0 ] ; do
+    ((retries-=1))
+    if oc get daemonset/nvidia-device-plugin-daemonset -n nvidia-device-plugin &>/dev/null; then
+        break
+    fi
+    echo "Waiting for nvidia-device-plugin daemonset to be created... (${retries} retries remaining)"
+    sleep 10
+done
+
 oc rollout status -n nvidia-device-plugin daemonset/nvidia-device-plugin-daemonset
 
 retries=20
