@@ -35,6 +35,7 @@
     state: restarted
     enabled: true
   loop: "{{ logging_services }}"
+  when: item != 'grafana-server' or (grafana_setup | bool)
 
 - name: Configure Grafana dashboards and datasources
   when: grafana_setup | bool
@@ -49,7 +50,7 @@
 
     - name: Create prometheus datasource in grafana
       ansible.builtin.uri:
-        url: http://{{ grafana_host_address | default(ansible_default_ipv4.address) }}:{{ grafana_port }}/api/datasources
+        url: http://{{ grafana_host_address | default(ansible_facts.default_ipv4.address) }}:{{ grafana_port }}/api/datasources
         url_username: "{{ grafana_username }}"
         url_password: "{{ grafana_password }}"
         status_code: [200, 409]
@@ -64,7 +65,7 @@
 
     - name: Create microshift perf dashboard in grafana
       ansible.builtin.uri:
-        url: http://{{ grafana_host_address | default(ansible_default_ipv4.address) }}:{{ grafana_port }}/api/dashboards/db
+        url: http://{{ grafana_host_address | default(ansible_facts.default_ipv4.address) }}:{{ grafana_port }}/api/dashboards/db
         url_username: "{{ grafana_username }}"
         url_password: "{{ grafana_password }}"
         force_basic_auth: true

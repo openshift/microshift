@@ -3,13 +3,13 @@
 
 crio_metrics_conf: 01-crio-metrics.conf
 crio_metrics_path: "/etc/crio/crio.conf.d/{{ crio_metrics_conf }}"
-etcd_dir: "{{ ansible_env.HOME }}/etcd"
+etcd_dir: "{{ ansible_facts.env.HOME }}/etcd"
 etcd_repo: https://github.com/openshift/etcd.git
 
-microshift_dir: "{{ ansible_env.HOME }}/microshift"
+microshift_dir: "{{ ansible_facts.env.HOME }}/microshift"
 microshift_repo: https://github.com/openshift/microshift.git
 microshift_rpms: []
-microshift_version: 4.17.1
+microshift_version: 4.22.0
 
 du_dirs:
   - /
