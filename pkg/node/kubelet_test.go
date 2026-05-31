@@ -43,8 +43,7 @@ reservedMemory:
     memory: 1100Mi
   numaNode: 0`
 
-	kubelet := &KubeletServer{}
-	data, err := kubelet.generateConfig(cfg)
+	data, err := generateConfig(cfg)
 	assert.NoError(t, err)
 	assert.Contains(t, string(data), expectedConfigPart)
 }
