@@ -123,6 +123,7 @@ Get Curl Pod IP
 Curl From Cluster
     [Documentation]    Exec curl from curl-pod on the given cluster to the target IP and port.
     [Arguments]    ${alias}    ${ip}    ${port}
+    ${url}=    Set Variable If    '${IP_FAMILY}' == 'ipv6'    http://[${ip}]:${port}/cgi-bin/hello    http://${ip}:${port}/cgi-bin/hello
     ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 http://${ip}:${port}/cgi-bin/hello
+    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 ${url}
     RETURN    ${stdout}
