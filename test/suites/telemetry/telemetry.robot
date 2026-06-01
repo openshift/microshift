@@ -110,6 +110,7 @@ Setup
 
 Teardown
     [Documentation]    Test suite teardown
+    Restart Greenboot And Wait For Success
     Logout MicroShift Host
     Remove Kubeconfig
 
