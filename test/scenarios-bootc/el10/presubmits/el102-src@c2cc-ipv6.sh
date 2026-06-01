@@ -17,17 +17,17 @@ MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}/microshift"
 
 # Cluster A (host1): non-overlapping CIDRs
 CLUSTER_A_POD_CIDR="fd01::/48"
-CLUSTER_A_SVC_CIDR="fd02::/48"
+CLUSTER_A_SVC_CIDR="fd02::/112"
 CLUSTER_A_DOMAIN="cluster-a.remote"
 
 # Cluster B (host2): non-overlapping CIDRs
 CLUSTER_B_POD_CIDR="fd04::/48"
-CLUSTER_B_SVC_CIDR="fd05::/48"
+CLUSTER_B_SVC_CIDR="fd05::/112"
 CLUSTER_B_DOMAIN="cluster-b.remote"
 
 # Cluster C (host3): non-overlapping CIDRs
 CLUSTER_C_POD_CIDR="fd07::/48"
-CLUSTER_C_SVC_CIDR="fd08::/48"
+CLUSTER_C_SVC_CIDR="fd08::/112"
 CLUSTER_C_DOMAIN="cluster-c.remote"
 
 wait_for_greenboot_on_hosts() {
