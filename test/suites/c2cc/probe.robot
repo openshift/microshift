@@ -51,19 +51,31 @@ RemoteCluster Status Becomes Healthy
     ...    Verify RemoteCluster State    cluster-c    Healthy
 
 RemoteCluster Status Has LastProbeTime
-    [Documentation]    Verify that LastProbeTime is populated after probing starts.
+    [Documentation]    Verify that LastProbeTime is populated on all RemoteCluster CRs.
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         ${stdout}=    Oc On Cluster    ${alias}
-        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[0].status.lastProbeTime}'
+        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.lastProbeTime}'
         Should Not Be Empty    ${stdout}
+        @{timestamps}=    Split String    ${stdout}
+        ${count}=    Get Length    ${timestamps}
+        Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster states, got ${count}
+        FOR    ${t}    IN    @{timestamps}
+            Should Not Be Empty    ${t}
+        END
     END
 
 RemoteCluster Status Has LastSuccessfulProbe
-    [Documentation]    Verify that LastSuccessfulProbe is populated when state is Healthy.
+    [Documentation]    Verify that LastSuccessfulProbe is populated on all RemoteCluster CRs.
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         ${stdout}=    Oc On Cluster    ${alias}
-        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[0].status.lastSuccessfulProbe}'
+        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.lastSuccessfulProbe}'
         Should Not Be Empty    ${stdout}
+        @{timestamps}=    Split String    ${stdout}
+        ${count}=    Get Length    ${timestamps}
+        Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster states, got ${count}
+        FOR    ${t}    IN    @{timestamps}
+            Should Not Be Empty    ${t}
+        END
     END
 
 Probe Deployment Self-Heals After Deletion
@@ -138,6 +150,8 @@ Verify RemoteCluster State
     ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.state}'
     Should Not Be Empty    ${stdout}
     @{states}=    Split String    ${stdout}
+    ${count}=    Get Length    ${states}
+    Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster states, got ${count}
     FOR    ${state}    IN    @{states}
         Should Be Equal As Strings    ${state}    ${expected_state}
     END
