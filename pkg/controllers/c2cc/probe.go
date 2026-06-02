@@ -13,6 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/retry"
 	"k8s.io/klog/v2"
 )
 
@@ -222,17 +223,19 @@ func doProbe(ctx context.Context, client *http.Client, url string) error {
 func (pm *probeManager) updateStatus(ctx context.Context, name string, status microshiftv1alpha1.RemoteClusterStatus) error {
 	rcClient := pm.client.MicroshiftV1alpha1().RemoteClusters()
 
-	rc, err := rcClient.Get(ctx, name, metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to get RemoteCluster %q: %w", name, err)
-	}
+	return retry.RetryOnConflict(retry.DefaultBackoff, func() error {
+		rc, err := rcClient.Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to get RemoteCluster %q: %w", name, err)
+		}
 
-	// Preserve LastSuccessfulProbe from the existing status if this probe failed
-	if rc.Status.LastSuccessfulProbe != nil && status.LastSuccessfulProbe == nil {
-		status.LastSuccessfulProbe = rc.Status.LastSuccessfulProbe
-	}
+		// Preserve LastSuccessfulProbe from the existing status if this probe failed
+		if rc.Status.LastSuccessfulProbe != nil && status.LastSuccessfulProbe == nil {
+			status.LastSuccessfulProbe = rc.Status.LastSuccessfulProbe
+		}
 
-	rc.Status = status
-	_, err = rcClient.UpdateStatus(ctx, rc, metav1.UpdateOptions{})
-	return err
+		rc.Status = status
+		_, err = rcClient.UpdateStatus(ctx, rc, metav1.UpdateOptions{})
+		return err
+	})
 }
