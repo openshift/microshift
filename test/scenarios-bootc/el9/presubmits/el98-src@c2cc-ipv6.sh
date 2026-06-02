@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Sourced from scenario.sh and uses functions defined there.
-export TEST_RANDOMIZATION=none
+export TEST_RANDOMIZATION=suites
 
 # Redefine network-related settings to use the dedicated IPv6 network bridge
 # shellcheck disable=SC2034  # used elsewhere
