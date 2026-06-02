@@ -15,11 +15,6 @@ Suite Teardown      Teardown
 Test Tags           c2cc
 
 
-*** Variables ***
-&{NAMESPACES}       cluster-a=${EMPTY}    cluster-b=${EMPTY}    cluster-c=${EMPTY}
-&{DOMAIN_MAP}       cluster-a=${CLUSTER_A_DOMAIN}    cluster-b=${CLUSTER_B_DOMAIN}    cluster-c=${CLUSTER_C_DOMAIN}
-
-
 *** Test Cases ***
 Test Corefile Contains C2CC Server Block
     [Documentation]    Verify every cluster's Corefile has a server block for every other cluster domain.
@@ -69,38 +64,3 @@ Teardown
     Teardown All Remote Clusters
     Remove Kubeconfig
     Logout MicroShift Host
-
-Curl Remote Service Via DNS
-    [Documentation]    Verify pod on ${source} can reach a service on ${destination} using the remote DNS name.
-    [Arguments]    ${source}    ${destination}
-    ${stdout}=    Curl DNS From Cluster    ${source}
-    ...    hello-microshift.${NAMESPACES}[${destination}].svc.${DOMAIN_MAP}[${destination}]    8080
-    Should Contain    ${stdout}    Hello from
-
-DNS Resolve From Cluster
-    [Documentation]    Resolve a DNS name from curl-pod on the given cluster. Retries for up to 60s.
-    [Arguments]    ${alias}    ${fqdn}
-    Wait Until Keyword Succeeds    12x    5s
-    ...    DNS Lookup Should Succeed    ${alias}    ${fqdn}
-
-DNS Lookup Should Succeed
-    [Documentation]    Resolve a DNS name from curl-pod using getent hosts.
-    [Arguments]    ${alias}    ${fqdn}
-    ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- getent hosts ${fqdn}
-    Should Not Be Empty    ${stdout}
-
-Curl DNS From Cluster
-    [Documentation]    Curl a service by DNS name from curl-pod on the given cluster.
-    [Arguments]    ${alias}    ${fqdn}    ${port}
-    ${stdout}=    Wait Until Keyword Succeeds    12x    5s
-    ...    Curl DNS Should Succeed    ${alias}    ${fqdn}    ${port}
-    RETURN    ${stdout}
-
-Curl DNS Should Succeed
-    [Documentation]    Single attempt to curl a DNS name from curl-pod.
-    [Arguments]    ${alias}    ${fqdn}    ${port}
-    ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 http://${fqdn}:${port}/cgi-bin/hello
-    Should Contain    ${stdout}    Hello from
-    RETURN    ${stdout}

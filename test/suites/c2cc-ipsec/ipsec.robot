@@ -19,10 +19,6 @@ Suite Teardown      Teardown
 Test Tags           c2cc    ipsec
 
 
-*** Variables ***
-&{NAMESPACES}       cluster-a=${EMPTY}    cluster-b=${EMPTY}    cluster-c=${EMPTY}
-
-
 *** Test Cases ***
 IPsec Tunnels Established On All Clusters
     [Documentation]    Verify all 3 hosts have 8 IPsec tunnel SAs each.
@@ -107,6 +103,39 @@ Near MTU Packet Through IPsec Tunnel
     Send Large Payload And Verify    cluster-a    ${ip_dest}    1300
     Send Large Payload And Verify    cluster-a    ${ip_dest}    1400
 
+Cross Cluster DNS Through IPsec
+    [Documentation]    Verify pods can resolve and reach services on remote
+    ...    clusters via DNS name through the IPsec tunnel.
+    [Template]    Curl Remote Service Via DNS
+    cluster-a    cluster-b
+    cluster-a    cluster-c
+    cluster-b    cluster-a
+    cluster-b    cluster-c
+    cluster-c    cluster-a
+    cluster-c    cluster-b
+
+IPsec Tunnel Recovers After Local Restart
+    [Documentation]    Restart IPsec on cluster-a and verify tunnels recover
+    ...    and cross-cluster connectivity is restored.
+    Restart IPsec Service On Cluster    cluster-a
+    Wait For IPsec Tunnel Reestablishment    cluster-a    expected_count=8
+    Wait For IPsec Tunnel Reestablishment    cluster-b    expected_count=8
+    Wait For IPsec Tunnel Reestablishment    cluster-c    expected_count=8
+    ${ip_dest}=    Get Hello Pod IP    cluster-b
+    Curl From Cluster    cluster-a    ${ip_dest}    8080
+
+IPsec Tunnel Recovers After Remote Stop Start
+    [Documentation]    Stop IPsec on cluster-b, start it back, and verify
+    ...    tunnels recover and cross-cluster connectivity is restored.
+    Stop IPsec Service On Cluster    cluster-b
+    Sleep    5s    reason=Wait for tunnel to go down
+    Start IPsec Service On Cluster    cluster-b
+    Wait For IPsec Tunnel Reestablishment    cluster-a    expected_count=8
+    Wait For IPsec Tunnel Reestablishment    cluster-b    expected_count=8
+    Wait For IPsec Tunnel Reestablishment    cluster-c    expected_count=8
+    ${ip_dest}=    Get Hello Pod IP    cluster-b
+    Curl From Cluster    cluster-a    ${ip_dest}    8080
+
 
 *** Keywords ***
 Setup
@@ -146,61 +175,6 @@ Restore IPsec With Enforcement Cleanup
     Remove NFTables IPsec Enforcement Rules    ${enforcement_alias}
     Start IPsec Service On Cluster    ${ipsec_alias}
     Wait For IPsec Tunnel Reestablishment    ${ipsec_alias}    expected_count=8
-
-Get Hello Pod IP
-    [Documentation]    Get the pod IP of hello-microshift on the given cluster.
-    [Arguments]    ${alias}
-    ${ip}=    Oc On Cluster    ${alias}
-    ...    oc get pod hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIP}'
-    RETURN    ${ip}
-
-Get Hello Service IP
-    [Documentation]    Get the ClusterIP of the hello-microshift service on the given cluster.
-    [Arguments]    ${alias}
-    ${ip}=    Oc On Cluster    ${alias}
-    ...    oc get svc hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.spec.clusterIP}'
-    RETURN    ${ip}
-
-Get Curl Pod IP
-    [Documentation]    Get the pod IP of curl-pod on the given cluster.
-    [Arguments]    ${alias}
-    ${ip}=    Oc On Cluster    ${alias}
-    ...    oc get pod curl-pod -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIP}'
-    RETURN    ${ip}
-
-Curl From Cluster
-    [Documentation]    Exec curl from curl-pod on the given cluster.
-    [Arguments]    ${alias}    ${ip}    ${port}
-    ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 http://${ip}:${port}/cgi-bin/hello
-    RETURN    ${stdout}
-
-Test Connectivity Between Clusters
-    [Documentation]    Verify pod on source can reach endpoint on destination.
-    [Arguments]    ${source}    ${destination}    ${endpoint_type}
-    IF    '${endpoint_type}' == 'pod'
-        ${ip_dest}=    Get Hello Pod IP    ${destination}
-    ELSE IF    '${endpoint_type}' == 'service'
-        ${ip_dest}=    Get Hello Service IP    ${destination}
-    ELSE
-        Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
-    END
-    ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
-    Should Contain    ${stdout}    Hello from
-
-Test Source IP Preserved Between Clusters
-    [Documentation]    Verify source pod IP is preserved through IPsec tunnel (no SNAT).
-    [Arguments]    ${source}    ${destination}    ${endpoint_type}
-    ${curl_pod_ip}=    Get Curl Pod IP    ${source}
-    IF    '${endpoint_type}' == 'pod'
-        ${ip_dest}=    Get Hello Pod IP    ${destination}
-    ELSE IF    '${endpoint_type}' == 'service'
-        ${ip_dest}=    Get Hello Service IP    ${destination}
-    ELSE
-        Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
-    END
-    ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
-    Should Contain    ${stdout}    source: ${curl_pod_ip}
 
 Send Large Payload And Verify
     [Documentation]    Send a large payload via curl POST and verify it succeeds.

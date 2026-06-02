@@ -14,10 +14,6 @@ Suite Teardown      Teardown
 Test Tags           c2cc
 
 
-*** Variables ***
-&{NAMESPACES}       cluster-a=${EMPTY}    cluster-b=${EMPTY}    cluster-c=${EMPTY}
-
-
 *** Test Cases ***
 Test Cross Cluster Connectivity
     [Documentation]    Verify pods on all clusters can reach pods/services on all other clusters.
@@ -69,64 +65,3 @@ Teardown
     Teardown All Remote Clusters
     Remove Kubeconfig
     Logout MicroShift Host
-
-Test Connectivity Between Clusters
-    [Documentation]    Verify pod on ${source} can reach ${endpoint_type} IP on ${destination}
-    [Arguments]    ${source}    ${destination}    ${endpoint_type}
-    IF    '${endpoint_type}' == 'pod'
-        ${ip_dest}=    Get Hello Pod IP    ${destination}
-    ELSE IF    '${endpoint_type}' == 'service'
-        ${ip_dest}=    Get Hello Service IP    ${destination}
-    ELSE
-        Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
-    END
-
-    ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
-    Should Contain    ${stdout}    Hello from
-
-Test Source IP Preserved Between Clusters
-    [Documentation]    Verify ${source} to ${destination} pod-to-${endpoint_type} traffic preserves the source pod IP (no SNAT).
-    [Arguments]    ${source}    ${destination}    ${endpoint_type}
-    ${curl_pod_ip}=    Get Curl Pod IP    ${source}
-    IF    '${endpoint_type}' == 'pod'
-        ${ip_dest}=    Get Hello Pod IP    ${destination}
-    ELSE IF    '${endpoint_type}' == 'service'
-        ${ip_dest}=    Get Hello Service IP    ${destination}
-    ELSE
-        Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
-    END
-
-    ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
-    Should Contain    ${stdout}    source: ${curl_pod_ip}
-
-Get Hello Pod IP
-    [Documentation]    Get the pod IP of hello-microshift on the given cluster.
-    [Arguments]    ${alias}
-    ${ip}=    Oc On Cluster    ${alias}
-    ...    oc get pod hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIP}'
-    RETURN    ${ip}
-
-Get Hello Service IP
-    [Documentation]    Get the ClusterIP of the hello-microshift service on the given cluster.
-    [Arguments]    ${alias}
-    ${ip}=    Oc On Cluster    ${alias}
-    ...    oc get svc hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.spec.clusterIP}'
-    RETURN    ${ip}
-
-Get Curl Pod IP
-    [Documentation]    Get the pod IP of curl-pod on the given cluster.
-    [Arguments]    ${alias}
-    ${ip}=    Oc On Cluster    ${alias}
-    ...    oc get pod curl-pod -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIP}'
-    RETURN    ${ip}
-
-Curl From Cluster
-    [Documentation]    Exec curl from curl-pod on the given cluster to the target IP and port.
-    [Arguments]    ${alias}    ${ip}    ${port}
-    ${url}=    Set Variable If
-    ...    '${IP_FAMILY}' == 'ipv6'
-    ...    http://[${ip}]:${port}/cgi-bin/hello
-    ...    http://${ip}:${port}/cgi-bin/hello
-    ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 ${url}
-    RETURN    ${stdout}
