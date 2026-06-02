@@ -131,13 +131,7 @@ func (pm *probeManager) startProbe(ctx context.Context, rc *microshiftv1alpha1.R
 }
 
 func (pm *probeManager) restartProbe(ctx context.Context, rc *microshiftv1alpha1.RemoteCluster) {
-	pm.mu.Lock()
-	if cancel, exists := pm.probes[rc.Name]; exists {
-		cancel()
-		delete(pm.probes, rc.Name)
-	}
-	pm.mu.Unlock()
-
+	pm.stopProbe(rc.Name)
 	pm.startProbe(ctx, rc)
 }
 
