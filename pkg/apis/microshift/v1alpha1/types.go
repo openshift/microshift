@@ -31,8 +31,18 @@ type RemoteClusterSpec struct {
 	ProbeInterval metav1.Duration `json:"probeInterval"`
 }
 
-// RemoteClusterStatus is populated by the probe pod in a future ticket.
-type RemoteClusterStatus struct{}
+// RemoteClusterStatus is populated by the probe pod with health probe results.
+type RemoteClusterStatus struct {
+	// +kubebuilder:validation:Enum=NeverProbed;Healthy;Unhealthy
+	// +kubebuilder:default="NeverProbed"
+	State string `json:"state"`
+	// +optional
+	LastSuccessfulProbe *metav1.Time `json:"lastSuccessfulProbe,omitempty"`
+	// +optional
+	LastProbeTime *metav1.Time `json:"lastProbeTime,omitempty"`
+	// +optional
+	Errors []string `json:"errors,omitempty"`
+}
 
 // +kubebuilder:object:root=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
