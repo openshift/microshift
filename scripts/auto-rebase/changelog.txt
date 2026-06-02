@@ -1,0 +1,7 @@
+- machine-config-operator embedded-component ab81640d1510800b1be795066ef4d392dbcdf470 to 6202afb0547a4b81bd862e9a9ea1b45f32ed75ff
+  - 689efbfd 2026-05-29T10:23:01Z MCO-2288: Adapt test '54922 - daemon: add check before updating kernelArgs'. Use --delete-if-present
+  - 4b0b24ba 2026-05-20T14:01:37Z OCPBUGS-83987: Fix CVE-2026-33186
+  - d54693d8 2026-05-20T12:46:43Z daemon: verify extension packages are staged pre-reboot and installed pst-reboot
+  - b7749418 2026-05-06T15:54:24Z OCPBUGS-84661: Fix wrong early exit during kubelet MCs regeneration
+  - 07b35298 2026-04-20T12:53:01Z Add Kernel test-cases
+
