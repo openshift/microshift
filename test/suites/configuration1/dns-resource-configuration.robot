@@ -67,55 +67,40 @@ ${DNS_LIMIT_LESS_THAN_REQUEST}      SEPARATOR=\n
 Default DNS Resources
     [Documentation]    Verify default DNS resources when no custom config is applied
     [Setup]    Remove DNS Resource Config
-    ${cpu}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.cpu
-    ${memory}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.memory
-    Should Be Equal As Strings    ${cpu}    50m
-    Should Be Equal As Strings    ${memory}    70Mi
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.cpu    50m
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.memory    70Mi
 
 Custom DNS Resources With Requests And Limits
     [Documentation]    Configure custom CPU and memory requests and limits via drop-in config
     [Setup]    Apply DNS Resource Config    ${DNS_CUSTOM_RESOURCES}
-    ${cpu_req}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.cpu
-    ${mem_req}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.memory
-    ${cpu_lim}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.limits.cpu
-    ${mem_lim}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.limits.memory
-    Should Be Equal As Strings    ${cpu_req}    100m
-    Should Be Equal As Strings    ${mem_req}    150Mi
-    Should Be Equal As Strings    ${cpu_lim}    200m
-    Should Be Equal As Strings    ${mem_lim}    256Mi
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.cpu    100m
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.memory    150Mi
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.limits.cpu    200m
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.limits.memory    256Mi
     [Teardown]    Remove DNS Resource Config
 
 Requests Only Without Limits
     [Documentation]    Configure only requests without limits and verify no limits are injected
     [Setup]    Apply DNS Resource Config    ${DNS_REQUESTS_ONLY}
-    ${cpu}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.cpu
-    ${memory}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.memory
-    ${limits}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.limits
-    Should Be Equal As Strings    ${cpu}    100m
-    Should Be Equal As Strings    ${memory}    150Mi
-    Should Be Empty    ${limits}
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.cpu    100m
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.memory    150Mi
+    DNS Resource Value Should Be Empty    ${DNS_RESOURCE_PATH}.limits
     [Teardown]    Remove DNS Resource Config
 
 Partial Requests Preserves Defaults
     [Documentation]    Configure only CPU request and verify memory default is preserved
     [Setup]    Apply DNS Resource Config    ${DNS_PARTIAL_REQUESTS}
-    ${cpu}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.cpu
-    ${memory}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.memory
-    Should Be Equal As Strings    ${cpu}    100m
-    Should Be Equal As Strings    ${memory}    70Mi
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.cpu    100m
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.memory    70Mi
     [Teardown]    Remove DNS Resource Config
 
 Limits Only Preserves Default Requests
     [Documentation]    Configure only limits and verify default requests are preserved
     [Setup]    Apply DNS Resource Config    ${DNS_LIMITS_ONLY}
-    ${cpu_req}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.cpu
-    ${mem_req}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.requests.memory
-    ${cpu_lim}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.limits.cpu
-    ${mem_lim}=    Get DNS Resource Value    ${DNS_RESOURCE_PATH}.limits.memory
-    Should Be Equal As Strings    ${cpu_req}    50m
-    Should Be Equal As Strings    ${mem_req}    70Mi
-    Should Be Equal As Strings    ${cpu_lim}    200m
-    Should Be Equal As Strings    ${mem_lim}    256Mi
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.cpu    50m
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.memory    70Mi
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.limits.cpu    200m
+    DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.limits.memory    256Mi
     [Teardown]    Remove DNS Resource Config
 
 Invalid Resource Quantity Prevents Start
@@ -156,6 +141,30 @@ Get DNS Resource Value
     [Arguments]    ${jsonpath}
     ${value}=    Oc Get JsonPath    daemonset    openshift-dns    dns-default    ${jsonpath}
     RETURN    ${value}
+
+DNS Resource Value Should Be
+    [Documentation]    Wait for the dns-default DaemonSet resource value to match expected
+    [Arguments]    ${jsonpath}    ${expected}
+    Wait Until Keyword Succeeds    10x    5s
+    ...    DNS Resource Value Should Match    ${jsonpath}    ${expected}
+
+DNS Resource Value Should Be Empty
+    [Documentation]    Wait for the dns-default DaemonSet resource value to be empty
+    [Arguments]    ${jsonpath}
+    Wait Until Keyword Succeeds    10x    5s
+    ...    DNS Resource Value Should Match Empty    ${jsonpath}
+
+DNS Resource Value Should Match
+    [Documentation]    Assert a dns-default DaemonSet resource value matches expected
+    [Arguments]    ${jsonpath}    ${expected}
+    ${value}=    Get DNS Resource Value    ${jsonpath}
+    Should Be Equal As Strings    ${value}    ${expected}
+
+DNS Resource Value Should Match Empty
+    [Documentation]    Assert a dns-default DaemonSet resource value is empty
+    [Arguments]    ${jsonpath}
+    ${value}=    Get DNS Resource Value    ${jsonpath}
+    Should Be Empty    ${value}
 
 Apply DNS Resource Config
     [Documentation]    Remove any existing drop-in, apply a new DNS resource config and restart MicroShift
