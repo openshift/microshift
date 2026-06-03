@@ -278,7 +278,7 @@ function install_build_deps() {
     # run only if booted with systemd
     [[ -d /run/systemd/system ]] &&  sudo systemctl enable --now cockpit.socket
 
-    GO_VER=1.24.4
+    GO_VER=1.26.3
     GO_ARCH=$([ "$(uname -m)" == "x86_64" ] && echo "amd64" || echo "arm64")
     GO_INSTALL_DIR="/usr/local/go${GO_VER}"
     if [ ! -d "${GO_INSTALL_DIR}" ]; then
