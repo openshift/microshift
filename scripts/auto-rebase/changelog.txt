@@ -1,57 +1,47 @@
-- csi-external-snapshotter embedded-component 3219da7dcbb14fa762704746d21fb38131beb1f4 to 77d02e52a442c1a98457797bf8eb5777489aabae
-  - 6316ddd 2026-05-25T12:29:32+01:00 UPSTREAM: <drop>: vendor changes
-  - 84b0745 2026-05-25T12:29:20+01:00 UPSTREAM: 1403: Bump google.golang.org/grpc to v1.79.3
+- api embedded-component 09730f85d8835712c0412a585685ddadb01e171b to 70f01b82bb532c61086160b6033575b65540f73e
+  - f2ddf1eb 2026-05-29T16:37:40+02:00 Clarify groups ordering semantics and switch to listType=set
+  - ae470e8a 2026-05-27T17:18:37+02:00 Revert "Merge pull request #2693 from jcmoraisjr/OCPBUGS-74511-remove-featuregate"
+  - e20bc37e 2026-05-21T16:38:42+02:00 make update after rebase
+  - 816b38ee 2026-05-21T16:25:06+02:00 Update TLS profiles to Mozilla 5.8 and make groups order preferential
+  - 74741caf 2026-05-21T16:25:02+02:00 make update after rebase
+  - b982f1bd 2026-05-21T16:24:58+02:00 make update after rebase
+  - b2deea37 2026-05-21T16:24:58+02:00 Add secp521r1 to default TLS profile groups and new PQ hybrid group constants
+  - ef4567a8 2026-05-21T16:24:55+02:00 make update after rebase
+  - 277d26dc 2026-05-21T16:24:51+02:00 Rename TLS "curves" to "groups" to align with IANA terminology
+  - 1c876b46 2026-05-21T16:24:47+02:00 make update after rebase
+  - 70e2c818 2026-05-21T16:24:47+02:00 make update after rebase
+  - 3c908fd2 2026-05-21T16:24:43+02:00 make update
+  - 15cee049 2026-05-21T16:24:34+02:00 Add feature gate test to verify that curves could be omitted
+  - 90a0cf19 2026-05-21T16:24:34+02:00 Update config/v1/types_tlssecurityprofile.go
+  - e11c7699 2026-05-21T16:24:34+02:00 NE-2334: Implement enhancement in OpenShift API to support for TLS curves in TLSProfile
+  - b2c31788 2026-05-21T08:51:16-04:00 feat: configv1/authentication: add fields for sourcing claims from external sources
+  - 0ed3b012 2026-05-20T16:04:48+02:00 Add new fields to ThanosQuerierConfig
 
-- kubernetes embedded-component 73359c58edaa0a838b8557b8743ad5860a955272 to 99b75aa92a7f60c4446ee29f54d511f140a8aed0
-  - 0c487fdcc 2026-05-20T17:48:11-03:00 UPSTREAM: <drop>: bump library-go
-  - 91e515568 2026-05-20T16:21:31-03:00 UPSTREAM: <carry>: remove RouteExternalCertificate feature gate
+- cluster-ingress-operator embedded-component 8360b3561fd7fd9abcd67064d3604f6f57f3c3b0 to 53b8a64230fb27b820297d6dcd1b90cf0c176573
+  - 59010aa 2026-05-26T09:34:28-04:00 OCPBUGS-84491: Set terminationMessagePolicy on gateway proxy containers
+  - 3b56a6d 2026-05-26T14:24:58+01:00 Add referencegrants and backendtlspolicies to Gateway API RBAC
+  - a8365c2 2026-05-26T12:04:10+02:00 OCPBUGS-74497: Add UserAgent telemetry to Azure SDK clients
 
-- machine-config-operator embedded-component f9bc3c89294762591088e83762f7bda188243729 to 78e9e0e35b20d538b5b27c2fbb061612d5675d1f
-  - 8ad800fe 2026-05-25T14:49:35Z OCPBUGS-86474: Tests using realtime kernel should not be limited to aws and gcp platforms
-  - 70e8d896 2026-05-25T09:28:09Z OCPBUGS-86332: remove tests using base images older than 4.13
-  - 3d844adf 2026-05-21T16:47:04-04:00 fix iri test
-  - e8bd3e07 2026-05-20T08:25:12-04:00 fix iri deletion test
-  - 286bd6c0 2026-05-19T20:19:48-04:00 additional unit tests/e2e test, simplified watcher methods
-  - b1d4753e 2026-05-19T13:48:42-04:00 add acceptance tests and skill
-  - 354b9a5d 2026-05-19T13:48:42-04:00 Use CA certificate for TLS validation in registry ping
-  - 00c5a2c2 2026-05-19T13:48:40-04:00 AGENT-1488: Aggregate IRI status from MachineConfigNodes
-  - 433e6c8f 2026-05-18T14:11:47Z MCO-2288: Adapt test '54922 - daemon: add check before updating kernelArgs'. Use --delete-if-present
-  - 27197e06 2026-05-05T05:16:35-04:00 reclaim disk space from the node when IRI resource is deleted
-  - 80f0f0d4 2026-03-03T10:58:50-05:00 unify GOTAGS behavior and remove unneded build tags
+- cluster-kube-apiserver-operator embedded-component 3f0fc12dd47751683491e66b7da4c3afafe83ba2 to 7547b7c84d27699706e1746428f4d0d82bf1ce7e
+  - 8f92575 2026-06-01T14:41:10+05:30 Bump latest libray-go changes
+  - 95a110a 2026-05-28T19:41:17+05:30 removed old plugin deployment
+  - f8de9aa 2026-05-27T16:25:52-04:00 kms: use DefaultFakeVaultEncryptionProvider to ensure AppRole secret setup
+  - 2a7a874 2026-05-27T20:03:30+02:00 render: fall back to Authentication CR
+  - d2f42de 2026-05-27T11:48:17-04:00 bump(openshift/library-go): fitting
+  - 4ba8ba0 2026-05-27T11:33:15-04:00 bump(openshift/library-go): to get KMS plugin lifecycle changes
+  - ab50385 2026-05-27T11:31:11-04:00 kms: support deploying Vault mock plugin
 
-- operator-framework-olm embedded-component 328957caa46b4d822ff39dc823bc5e28f7f2bf80 to bc60033b299368309e8d3ca001cba75970c227c9
-  - 462501c5 2026-05-27T00:03:01Z fix: bypass system registries.conf in image-canonical-ref tool (#3839)
-  - b8100d2c 2026-05-26T14:02:57Z Bump go.podman.io/common from 0.67.1 to 0.68.0 (#1996)
-  - 97b5a649 2026-05-26T14:02:18Z Bump golang.org/x/sys from 0.44.0 to 0.45.0 in the golang-x-deps group (#1995)
-  - 3f8d5aba 2026-05-26T14:02:03Z Store custom schema metas as proto binary in pogreb cache (#1994)
-  - ab5cb366 2026-05-26T14:01:48Z Add ExperimentalListPackageCustomSchemas streaming gRPC endpoint (#1981)
-  - 22cfa0f7 2026-05-26T14:01:34Z Bump go.podman.io/image/v5 from 5.39.2 to 5.40.0 (#1991)
-  - 7f3df3d9 2026-05-26T14:01:19Z Bump github.com/containerd/containerd from 1.7.31 to 1.7.32 (#1993)
-  - dcd2f9c0 2026-05-26T14:01:05Z Bump github.com/docker/cli (#1992)
-  - cf6a1c58 2026-05-26T14:00:50Z fix(validate): validate skipRange with blang/semver ParseRange (#1987)
-  - ef26e896 2026-05-26T14:00:35Z Bump github.com/docker/cli (#1990)
-  - f830b8e3 2026-05-26T14:00:20Z Bump github.com/onsi/ginkgo/v2 from 2.28.3 to 2.29.0 (#1989)
-  - 02b8f26f 2026-05-26T14:00:06Z Bump github.com/onsi/gomega from 1.40.0 to 1.41.0 (#1988)
-  - 02a9fdba 2026-05-26T13:59:51Z Bump google.golang.org/grpc from 1.81.0 to 1.81.1 (#1985)
-  - 92849157 2026-05-26T13:59:36Z Bump github.com/docker/cli (#1984)
-  - 404922d6 2026-05-26T13:59:21Z Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.49 to 0.4.50 (#1982)
-  - 67f67108 2026-05-26T13:59:04Z chore(dep): bump operator-registry to v1.69.0 (#3838)
-  - 10c3e662 2026-05-26T13:58:47Z :seedling: Bump go.podman.io/image/v5 from 5.39.2 to 5.40.0 (#3837)
-  - 975f6974 2026-05-26T13:58:30Z :seedling: Bump golang.org/x/net from 0.54.0 to 0.55.0 (#3836)
-  - 92264f8e 2026-05-26T13:58:12Z :seedling: Bump github.com/containerd/containerd from 1.7.31 to 1.7.32 (#3835)
+- cluster-network-operator embedded-component bea98c0a2a0ff2cc7c642f72feefddbf42f5e28f to 7d4c17ac28ac25d47be68694956a693c15b80939
+  - 1c1868b 2026-05-20T14:36:52-04:00 Fix debounce timer for OperatorConfig level being incorrectly cleared
+  - c2241d4 2026-05-15T15:25:37+02:00 DROP: detect --enable-interconnect support at runtime
+  - 09b660b 2026-05-15T15:25:37+02:00 Remove --enable-interconnect flag from OVN-K manifests
 
-- route-controller-manager embedded-component 6a87600a4c82f2a822a2f88ab81b968bac858205 to 1916ceb059f500f06e8552f88bf38cd09f9522fd
-  - 0bc1316 2026-05-19T16:32:54Z OCPBUGS-39598: remove all duplicate ingress IPs in clearPersistedAllocation
+- machine-config-operator embedded-component 78e9e0e35b20d538b5b27c2fbb061612d5675d1f to d72b715f8f9e0fad5d27a45420ea074ea2628207
+  - 78cf83b5 2026-05-28T09:09:46-04:00 OCPBUGS-86671: Fix InternalReleaseImage URL transform
 
-- csi-external-snapshotter image-amd64 3219da7dcbb14fa762704746d21fb38131beb1f4 to 77d02e52a442c1a98457797bf8eb5777489aabae
-  - 6316ddd 2026-05-25T12:29:32+01:00 UPSTREAM: <drop>: vendor changes
-  - 84b0745 2026-05-25T12:29:20+01:00 UPSTREAM: 1403: Bump google.golang.org/grpc to v1.79.3
+- oc image-amd64 a052bd4018333201e48f7370b2263db2dc6a5c99 to 9557cf3d482ecbc4e271eb4eefeefff5eaf4bdac
+  - b3d656c3 2026-05-26T13:10:41-07:00 Switch container dependencies to Podman monorepo
 
-- kubernetes image-amd64 73359c58edaa0a838b8557b8743ad5860a955272 to 99b75aa92a7f60c4446ee29f54d511f140a8aed0
-  - 0c487fdcc 2026-05-20T17:48:11-03:00 UPSTREAM: <drop>: bump library-go
-  - 91e515568 2026-05-20T16:21:31-03:00 UPSTREAM: <carry>: remove RouteExternalCertificate feature gate
-
-- kubernetes image-arm64 73359c58edaa0a838b8557b8743ad5860a955272 to 99b75aa92a7f60c4446ee29f54d511f140a8aed0
-  - 0c487fdcc 2026-05-20T17:48:11-03:00 UPSTREAM: <drop>: bump library-go
-  - 91e515568 2026-05-20T16:21:31-03:00 UPSTREAM: <carry>: remove RouteExternalCertificate feature gate
+- oc image-arm64 a052bd4018333201e48f7370b2263db2dc6a5c99 to 9557cf3d482ecbc4e271eb4eefeefff5eaf4bdac
+  - b3d656c3 2026-05-26T13:10:41-07:00 Switch container dependencies to Podman monorepo
 
