@@ -5,22 +5,22 @@ assets:
     files:
       - file: 00-namespace.yaml
         ignore: "Provided by MicroShift"
-      - file: service-account.yaml
+      - file: 01-service-account.yaml
         ignore: "Provided by MicroShift"
-      - file: cluster-role.yaml
+      - file: 01-cluster-role.yaml
         ignore: "Provided by MicroShift"
       - file: clusterrole-aggregated-metrics-reader.yaml
         ignore: "Provided by MicroShift"
-      - file: cluster-role-binding.yaml
+      - file: 01-cluster-role-binding.yaml
         ignore: "MicroShift adds User: system:metrics-server subject for dedicated kubelet client cert"
-      - file: cluster-role-binding-auth-delegator.yaml
-      - file: role-binding-auth-reader.yaml
-      - file: configmap-audit-profiles.yaml
-      - file: deployment.yaml
+      - file: 01-cluster-role-binding-auth-delegator.yaml
+      - file: 01-role-binding-auth-reader.yaml
+      - file: 02-configmap-audit-profiles.yaml
+      - file: 03-deployment.yaml
         ignore: "MicroShift customizes replicas, strategy, image placeholder, and cert volumes"
-      - file: service.yaml
+      - file: 04-service.yaml
         ignore: "MicroShift uses service-ca annotation for serving cert"
-      - file: api-service.yaml
+      - file: 04-api-service.yaml
       - file: kustomization.yaml
         ignore: "Provided by MicroShift"
       - file: kustomization.x86_64.yaml
