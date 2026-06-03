@@ -36,15 +36,15 @@ assets:
     no_clean: True
     src: cluster-monitoring-operator/assets/node-exporter/
     files:
-      - file: service-account.yaml
-      - file: cluster-role.yaml
-      - file: cluster-role-binding.yaml
-      - file: security-context-constraints.yaml
-      - file: kube-rbac-proxy-secret.yaml
-      - file: accelerators-collector-configmap.yaml
-      - file: daemonset.yaml
+      - file: 01-service-account.yaml
+      - file: 01-cluster-role.yaml
+      - file: 01-cluster-role-binding.yaml
+      - file: 01-security-context-constraints.yaml
+      - file: 02-kube-rbac-proxy-secret.yaml
+      - file: 02-accelerators-collector-configmap.yaml
+      - file: 03-daemonset.yaml
         ignore: "MicroShift removes metrics-client-ca volume/mount/arg (populated by CMO at runtime)"
-      - file: service.yaml
+      - file: 04-service.yaml
       - file: kustomization.yaml
         ignore: "Provided by MicroShift"
       - file: kustomization.x86_64.yaml
