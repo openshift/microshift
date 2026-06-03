@@ -645,7 +645,10 @@ cat assets/optional/metrics-server/kustomization.x86_64.yaml >> %{buildroot}/%{_
 
 # kube-state-metrics
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
-install -p -m644 assets/optional/kube-state-metrics/0*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+for f in assets/optional/kube-state-metrics/*.yaml; do
+  case "$(basename "$f")" in kustomization*|release-*) continue;; esac
+  install -p -m644 "$f" %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+done
 install -p -m644 assets/optional/kube-state-metrics/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
 
 %ifarch %{arm} aarch64
