@@ -1,0 +1,15 @@
+receivers:
+  prometheus/node_exporter:
+    config:
+      scrape_configs:
+        - job_name: node-exporter
+          scrape_interval: 30s
+          static_configs:
+            - targets: ["127.0.0.1:9100"]
+
+service:
+  pipelines:
+    metrics/node_exporter:
+      receivers: [prometheus/node_exporter]
+      processors: [batch]
+      exporters: [otlp]

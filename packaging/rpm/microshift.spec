@@ -261,25 +261,42 @@ The microshift-cert-manager-release-info package provides release information fi
 release. These files contain the list of container image references used by Cert Manager
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
-%package metrics
-Summary: Kubernetes metrics exporters for MicroShift
+%package metrics-server
+Summary: Kubernetes metrics-server for MicroShift
 ExclusiveArch: x86_64 aarch64
 Requires: microshift = %{version}
 
-%description metrics
-The microshift-metrics package provides metrics-server, node-exporter, and
-kube-state-metrics for MicroShift. Install this package to enable kubectl top
-and expose host and cluster metrics via secure endpoints.
+%description metrics-server
+The microshift-metrics-server package provides the metrics-server for MicroShift.
+Install this package to enable kubectl top and resource metrics via the Metrics API.
 
-%package metrics-release-info
-Summary: Release information for metrics exporters for MicroShift
+%package metrics-server-release-info
+Summary: Release information for metrics-server for MicroShift
 BuildArch: noarch
 Requires: microshift-release-info = %{version}
 
-%description metrics-release-info
-The microshift-metrics-release-info package provides release information files for this
-release. These files contain the list of container image references used by the metrics
-exporters and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+%description metrics-server-release-info
+The microshift-metrics-server-release-info package provides release information files for this
+release. These files contain the list of container image references used by the metrics-server
+and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+
+%package metrics-kube-state-metrics
+Summary: Kubernetes kube-state-metrics for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description metrics-kube-state-metrics
+The microshift-metrics-kube-state-metrics package provides kube-state-metrics for MicroShift.
+Install this package to expose Kubernetes object state metrics via a secure endpoint.
+
+%package metrics-node-exporter
+Summary: Prometheus node-exporter for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description metrics-node-exporter
+The microshift-metrics-node-exporter package provides the Prometheus node-exporter for MicroShift.
+Install this package to expose host-level hardware and OS metrics.
 
 %package sriov
 Summary: SR-IOV Network Operator for MicroShift
@@ -623,15 +640,15 @@ install -p -m644 assets/optional/cert-manager/release-cert-manager-{x86_64,aarch
 # metrics-server
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
 install -p -m644 assets/optional/metrics-server/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/cluster-role-binding-auth-delegator.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/role-binding-auth-reader.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/configmap-audit-profiles.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/deployment.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/api-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-cluster-role-binding-auth-delegator.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-role-binding-auth-reader.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/02-configmap-audit-profiles.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/03-deployment.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/04-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/04-api-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
 install -p -m644 assets/optional/metrics-server/network-policy-downstream.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
 install -p -m644 assets/optional/metrics-server/pod-disruption-budget.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
 install -p -m644 assets/optional/metrics-server/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
@@ -645,10 +662,13 @@ cat assets/optional/metrics-server/kustomization.x86_64.yaml >> %{buildroot}/%{_
 
 # kube-state-metrics
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
-for f in assets/optional/kube-state-metrics/*.yaml; do
-  case "$(basename "$f")" in kustomization*|release-*) continue;; esac
-  install -p -m644 "$f" %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
-done
+install -p -m644 assets/optional/kube-state-metrics/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/01-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/01-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/02-kube-rbac-proxy-secret.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/02-custom-resource-state-configmap.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/03-deployment.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/04-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
 install -p -m644 assets/optional/kube-state-metrics/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
 
 %ifarch %{arm} aarch64
@@ -660,14 +680,14 @@ cat assets/optional/kube-state-metrics/kustomization.x86_64.yaml >> %{buildroot}
 
 # node-exporter
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
-install -p -m644 assets/optional/node-exporter/service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
-install -p -m644 assets/optional/node-exporter/cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
-install -p -m644 assets/optional/node-exporter/cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
-install -p -m644 assets/optional/node-exporter/security-context-constraints.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
-install -p -m644 assets/optional/node-exporter/kube-rbac-proxy-secret.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
-install -p -m644 assets/optional/node-exporter/accelerators-collector-configmap.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
-install -p -m644 assets/optional/node-exporter/daemonset.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
-install -p -m644 assets/optional/node-exporter/service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-security-context-constraints.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/02-kube-rbac-proxy-secret.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/02-accelerators-collector-configmap.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/03-daemonset.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/04-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
 install -p -m644 assets/optional/node-exporter/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
 
 %ifarch %{arm} aarch64
@@ -677,11 +697,13 @@ cat assets/optional/node-exporter/kustomization.aarch64.yaml >> %{buildroot}/%{_
 cat assets/optional/node-exporter/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/kustomization.yaml
 %endif
 
-# otel-collector drop-in for metrics exporters
+# otel-collector drop-ins for metrics exporters
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability/otelcol.d
-install -p -m644 packaging/observability/otelcol.d/microshift-metrics.yaml %{buildroot}%{_sysconfdir}/microshift/observability/otelcol.d/
+install -p -m644 packaging/observability/otelcol.d/microshift-metrics-server.yaml %{buildroot}%{_sysconfdir}/microshift/observability/otelcol.d/
+install -p -m644 packaging/observability/otelcol.d/microshift-metrics-kube-state-metrics.yaml %{buildroot}%{_sysconfdir}/microshift/observability/otelcol.d/
+install -p -m644 packaging/observability/otelcol.d/microshift-metrics-node-exporter.yaml %{buildroot}%{_sysconfdir}/microshift/observability/otelcol.d/
 
-# metrics-release-info
+# metrics-server-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/metrics-server/release-metrics-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
@@ -889,17 +911,23 @@ fi
 %files cert-manager-release-info
 %{_datadir}/microshift/release/release-cert-manager-{x86_64,aarch64}.json
 
-%files metrics
+%files metrics-server
 %dir %{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
 %{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/*
+%config(noreplace) %{_sysconfdir}/microshift/observability/otelcol.d/microshift-metrics-server.yaml
+
+%files metrics-server-release-info
+%{_datadir}/microshift/release/release-metrics-{x86_64,aarch64}.json
+
+%files metrics-kube-state-metrics
 %dir %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
 %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/*
+%config(noreplace) %{_sysconfdir}/microshift/observability/otelcol.d/microshift-metrics-kube-state-metrics.yaml
+
+%files metrics-node-exporter
 %dir %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
 %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/*
-%config(noreplace) %{_sysconfdir}/microshift/observability/otelcol.d/microshift-metrics.yaml
-
-%files metrics-release-info
-%{_datadir}/microshift/release/release-metrics-{x86_64,aarch64}.json
+%config(noreplace) %{_sysconfdir}/microshift/observability/otelcol.d/microshift-metrics-node-exporter.yaml
 
 %files sriov
 %dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
