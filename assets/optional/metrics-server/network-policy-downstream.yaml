@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: cluster-monitoring-operator
+    app.kubernetes.io/part-of: openshift-monitoring
+  name: metrics-server
+  namespace: openshift-monitoring
+spec:
+  egress:
+  - {}
+  ingress:
+  - ports:
+    - port: 10250
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: metrics-server
+      app.kubernetes.io/part-of: openshift-monitoring
+  policyTypes:
+  - Ingress
+  - Egress

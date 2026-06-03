@@ -1,0 +1,18 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/component: metrics-server
+    app.kubernetes.io/managed-by: cluster-monitoring-operator
+    app.kubernetes.io/name: metrics-server
+    app.kubernetes.io/part-of: openshift-monitoring
+  name: metrics-server
+  namespace: openshift-monitoring
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: metrics-server
+      app.kubernetes.io/name: metrics-server
+      app.kubernetes.io/part-of: openshift-monitoring
+  unhealthyPodEvictionPolicy: AlwaysAllow

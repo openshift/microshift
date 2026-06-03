@@ -1,0 +1,21 @@
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+  labels:
+    app.kubernetes.io/component: metrics-server
+    app.kubernetes.io/managed-by: cluster-monitoring-operator
+    app.kubernetes.io/name: metrics-server
+    app.kubernetes.io/part-of: openshift-monitoring
+  name: v1beta1.metrics.k8s.io
+spec:
+  group: metrics.k8s.io
+  groupPriorityMinimum: 100
+  insecureSkipTLSVerify: false
+  service:
+    name: metrics-server
+    namespace: openshift-monitoring
+    port: 443
+  version: v1beta1
+  versionPriority: 100

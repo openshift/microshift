@@ -4,23 +4,23 @@ assets:
     src: cluster-monitoring-operator/assets/metrics-server/
     files:
       - file: 00-namespace.yaml
-        git_restore: True
-      - file: 01-serviceaccount.yaml
-        src: service-account.yaml
-      - file: 02-clusterrole.yaml
-        src: cluster-role.yaml
-      - file: 03-clusterrolebinding.yaml
-        src: cluster-role-binding.yaml
-        git_restore: True
-      - file: 04-rolebinding.yaml
-        src: role-binding-auth-reader.yaml
-      - file: 05-deployment.yaml
-        src: deployment.yaml
-        git_restore: True
-      - file: 06-service.yaml
-        src: service.yaml
-      - file: 07-apiservice.yaml
-        src: api-service.yaml
+        ignore: "Provided by MicroShift"
+      - file: service-account.yaml
+        ignore: "Provided by MicroShift"
+      - file: cluster-role.yaml
+        ignore: "Provided by MicroShift"
+      - file: clusterrole-aggregated-metrics-reader.yaml
+        ignore: "Provided by MicroShift"
+      - file: cluster-role-binding.yaml
+        ignore: "MicroShift adds User: system:metrics-server subject for dedicated kubelet client cert"
+      - file: cluster-role-binding-auth-delegator.yaml
+      - file: role-binding-auth-reader.yaml
+      - file: configmap-audit-profiles.yaml
+      - file: deployment.yaml
+        ignore: "MicroShift customizes replicas, strategy, image placeholder, and cert volumes"
+      - file: service.yaml
+        ignore: "MicroShift uses service-ca annotation for serving cert"
+      - file: api-service.yaml
       - file: kustomization.yaml
         ignore: "Provided by MicroShift"
       - file: kustomization.x86_64.yaml
@@ -36,17 +36,15 @@ assets:
     no_clean: True
     src: cluster-monitoring-operator/assets/node-exporter/
     files:
-      - file: 01-serviceaccount.yaml
-        src: service-account.yaml
-      - file: 02-clusterrole.yaml
-        src: cluster-role.yaml
-      - file: 03-clusterrolebinding.yaml
-        src: cluster-role-binding.yaml
-      - file: 04-daemonset.yaml
-        src: daemonset.yaml
-        git_restore: True
-      - file: 05-service.yaml
-        src: service.yaml
+      - file: service-account.yaml
+      - file: cluster-role.yaml
+      - file: cluster-role-binding.yaml
+      - file: security-context-constraints.yaml
+      - file: kube-rbac-proxy-secret.yaml
+      - file: accelerators-collector-configmap.yaml
+      - file: daemonset.yaml
+        ignore: "MicroShift removes metrics-client-ca volume/mount/arg (populated by CMO at runtime)"
+      - file: service.yaml
       - file: kustomization.yaml
         ignore: "Provided by MicroShift"
       - file: kustomization.x86_64.yaml
@@ -66,7 +64,7 @@ assets:
         src: cluster-role-binding.yaml
       - file: 04-deployment.yaml
         src: deployment.yaml
-        git_restore: True
+        ignore: "MicroShift customizes replicas, strategy, image placeholders, and security context"
       - file: 05-service.yaml
         src: service.yaml
       - file: kustomization.yaml

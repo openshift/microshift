@@ -622,7 +622,18 @@ install -p -m644 assets/optional/cert-manager/release-cert-manager-{x86_64,aarch
 
 # metrics-server
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
-install -p -m644 assets/optional/metrics-server/0*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/cluster-role-binding-auth-delegator.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/role-binding-auth-reader.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/configmap-audit-profiles.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/deployment.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/api-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/network-policy-downstream.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/pod-disruption-budget.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
 install -p -m644 assets/optional/metrics-server/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
 
 %ifarch %{arm} aarch64
@@ -646,7 +657,14 @@ cat assets/optional/kube-state-metrics/kustomization.x86_64.yaml >> %{buildroot}
 
 # node-exporter
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
-install -p -m644 assets/optional/node-exporter/0*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/security-context-constraints.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/kube-rbac-proxy-secret.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/accelerators-collector-configmap.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/daemonset.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
 install -p -m644 assets/optional/node-exporter/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
 
 %ifarch %{arm} aarch64
