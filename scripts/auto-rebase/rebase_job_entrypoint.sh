@@ -43,7 +43,7 @@ fi
 # It's before rebase.py because we want this to be part of the rebase PR.
 # Go version in go.mods are updated in rebase.sh.
 go_version=$(go version 2>/dev/null | awk '{print $3}' | tr -d '[a-z]')
-sed -i "s/^GO_VER=.*/GO_VER=${go_version}/" ./scripts/devenv-builder/configure-vm.sh
+sed -i "s/GO_VER=.*/GO_VER=${go_version}/" ./scripts/devenv-builder/configure-vm.sh
 go_version_xy="$(echo "${go_version}" | cut -f1-2 -d.)"
 sed -i "s/^%global golang_version .*/%global golang_version ${go_version_xy}/" ./packaging/rpm/microshift.spec
 
