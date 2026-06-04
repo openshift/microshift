@@ -23,30 +23,36 @@ Test Tags           cert-manager    certificates    tls
 
 
 *** Variables ***
-${CERT_NAME}                    test-certificate
-${SECRET_NAME}                  test-cert-secret
-${ISSUER_NAME}                  test-issuer
-${CERT_COMMON_NAME}             example.com
-${CERT_DNS_NAME}                example.com
-${ROUTE_NAME}                   hello-app
-${CERT_ISSUER_YAML}             SEPARATOR=\n
-...                             ---
-...                             apiVersion: cert-manager.io/v1
-...                             kind: ClusterIssuer
-...                             metadata:
-...                             \ \ name: ${ISSUER_NAME}
-...                             spec:
-...                             \ \ selfSigned: {}
+${CERT_NAME}                        test-certificate
+${SECRET_NAME}                      test-cert-secret
+${ISSUER_NAME}                      test-issuer
+${CERT_COMMON_NAME}                 example.com
+${CERT_DNS_NAME}                    example.com
+${ROUTE_NAME}                       hello-app
+${CERT_ISSUER_YAML}                 SEPARATOR=\n
+...                                 ---
+...                                 apiVersion: cert-manager.io/v1
+...                                 kind: ClusterIssuer
+...                                 metadata:
+...                                 \ \ name: ${ISSUER_NAME}
+...                                 spec:
+...                                 \ \ selfSigned: {}
 
-${HTTP01_ISSUER_NAME}           letsencrypt-http01
-${HTTP01_CERT_NAME}             cert-from-${HTTP01_ISSUER_NAME}
-${HTTP01_SECRET_NAME}           ${HTTP01_CERT_NAME}
-${PEBBLE_DEPLOYMENT_FILE}       ./assets/cert-manager/pebble-server.yaml
-${HOSTSFILE_ENABLED}            SEPARATOR=\n
-...                             ---
-...                             dns:
-...                             \ \ hosts:
-...                             \ \ \ \ status: Enabled
+${HTTP01_ISSUER_NAME}               letsencrypt-http01
+${HTTP01_CERT_NAME}                 cert-from-${HTTP01_ISSUER_NAME}
+${HTTP01_SECRET_NAME}               ${HTTP01_CERT_NAME}
+${PEBBLE_DEPLOYMENT_FILE}           ./assets/cert-manager/pebble-server.yaml
+${HOSTSFILE_ENABLED}                SEPARATOR=\n
+...                                 ---
+...                                 dns:
+...                                 \ \ hosts:
+...                                 \ \ \ \ status: Enabled
+
+${TRUST_MANAGER_BUNDLE_NAME}        test-trust-bundle
+${TRUST_MANAGER_OPERATOR_NS}        cert-manager-operator
+${TRUST_MANAGER_NS}                 cert-manager
+${TRUST_MANAGER_DEPLOYMENT}         cert-manager-operator-controller-manager
+${TRUST_MANAGER_MANIFESTS_DIR}      /etc/microshift/manifests.d/trust-manager
 
 
 *** Test Cases ***
@@ -94,6 +100,72 @@ Test Cert manager with local acme server
     [Teardown]    Run Keywords
     ...    Cleanup HTTP01 Resources
     ...    AND    Cleanup DNS For Test    ${dns_name}
+
+Trust Manager Deployment
+    [Documentation]    Verify trust-manager can be enabled and deploys successfully
+    [Tags]    trust-manager
+    [Setup]    Enable Trust Manager
+    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
+    ${status}=    Oc Get JsonPath    trustmanager    ${EMPTY}    cluster
+    ...    .status.conditions[?(@.type=="Ready")].status
+    Should Be Equal    ${status}    True    msg=TrustManager CR is not ready
+    [Teardown]    Disable Trust Manager
+
+Trust Manager Bundle Creates ConfigMap
+    [Documentation]    Verify trust-manager Bundle CR syncs a CA cert into a ConfigMap
+    [Tags]    trust-manager
+    [Setup]    Enable Trust Manager
+
+    Create CA Secret For Trust Manager
+    ${bundle_yaml}=    Create Trust Bundle From Source Secret YAML
+    Apply Trust Manager YAML    ${bundle_yaml}
+    Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    --for=jsonpath='{.status.conditions[0].reason}'=Synced --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${cm_data}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${NAMESPACE}
+    ...    ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    .data.ca-bundle\\.crt
+    Should Contain    ${cm_data}    BEGIN CERTIFICATE    msg=ConfigMap does not contain CA certificate data
+
+    [Teardown]    Run Keywords
+    ...    Cleanup Trust Bundle
+    ...    AND    Run With Kubeconfig    oc delete secret ca-source-secret -n ${TRUST_MANAGER_NS} --ignore-not-found
+    ...    AND    Disable Trust Manager
+
+Trust Manager Bundle With Cert Manager CA
+    [Documentation]    Verify trust-manager Bundle can use a cert-manager CA secret as a source
+    [Tags]    trust-manager
+    [Setup]    Enable Trust Manager
+
+    ${issuer_yaml}=    Create Cert Issuer YAML
+    Apply Trust Manager YAML    ${issuer_yaml}
+    Oc Wait    -n ${NAMESPACE} clusterissuer ${ISSUER_NAME}
+    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${ca_cert_yaml}=    Create CA Certificate YAML
+    Apply Trust Manager YAML    ${ca_cert_yaml}
+    Oc Wait    -n ${TRUST_MANAGER_NS} certificate ca-certificate
+    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${bundle_yaml}=    Create Trust Bundle From Secret YAML
+    Apply Trust Manager YAML    ${bundle_yaml}
+    Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    --for=jsonpath='{.status.conditions[0].reason}'=Synced --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${cm_data}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${NAMESPACE}
+    ...    ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    .data.ca-bundle\\.crt
+    Should Contain    ${cm_data}    BEGIN CERTIFICATE    msg=ConfigMap does not contain CA certificate data
+
+    [Teardown]    Run Keywords
+    ...    Cleanup Trust Bundle
+    ...    AND    Oc Delete    certificate/ca-certificate -n ${TRUST_MANAGER_NS}
+    ...    AND    Remove ClusterIssuer
+    ...    AND    Disable Trust Manager
 
 
 *** Keywords ***
@@ -432,3 +504,143 @@ Cleanup DNS For Test
     Remove Entry From Hosts    ${dns_name}
     Remove Drop In MicroShift Config    20-dns
     Restart MicroShift
+
+Enable Trust Manager
+    [Documentation]    Deploy trust-manager by creating a TrustManager CR via manifests.d
+    ...    and restarting MicroShift. The UNSUPPORTED_ADDON_FEATURES=TrustManager=true
+    ...    feature gate is already set in the system cert-manager kustomization.
+    Create Trust Manager CR Manifests
+    Restart MicroShift
+    Wait Until Keyword Succeeds    30x    10s
+    ...    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
+
+Disable Trust Manager
+    [Documentation]    Remove the TrustManager CR manifests.d and restart MicroShift.
+    Run With Kubeconfig    oc delete trustmanager cluster --ignore-not-found
+    Run With Kubeconfig    oc delete bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
+    Run With Kubeconfig    oc delete deployment trust-manager -n ${TRUST_MANAGER_NS} --ignore-not-found
+    Remove Trust Manager CR Manifests
+    Restart MicroShift
+    Wait Until Keyword Succeeds    12x    10s
+    ...    Trust Manager Pod Should Not Exist
+
+Trust Manager Pod Should Not Exist
+    [Documentation]    Verify trust-manager pod no longer exists in cert-manager namespace
+    ${output}=    Run With Kubeconfig
+    ...    oc get pods -n ${TRUST_MANAGER_NS} -l app.kubernetes.io/name\=cert-manager-trust-manager --no-headers
+    ...    allow_fail=True
+    Should Be Empty    ${output}    msg=trust-manager pod still exists
+
+Create Trust Manager CR Manifests
+    [Documentation]    Create the manifests.d kustomization with the TrustManager CR
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    mkdir -p ${TRUST_MANAGER_MANIFESTS_DIR}
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    ${rc}    0
+    ${kustomization}=    CATENATE    SEPARATOR=\n
+    ...    apiVersion: kustomize.config.k8s.io/v1beta1
+    ...    kind: Kustomization
+    ...    resources:
+    ...    \ \ - trust-manager-cr.yaml
+    Upload String To File    ${kustomization}    ${TRUST_MANAGER_MANIFESTS_DIR}/kustomization.yaml
+    ${tm_cr}=    CATENATE    SEPARATOR=\n
+    ...    apiVersion: operator.openshift.io/v1alpha1
+    ...    kind: TrustManager
+    ...    metadata:
+    ...    \ \ name: cluster
+    ...    spec:
+    ...    \ \ trustManagerConfig: {}
+    Upload String To File    ${tm_cr}    ${TRUST_MANAGER_MANIFESTS_DIR}/trust-manager-cr.yaml
+
+Remove Trust Manager CR Manifests
+    [Documentation]    Remove the trust-manager manifests.d directory
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    rm -rf ${TRUST_MANAGER_MANIFESTS_DIR}
+    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    ${rc}    0
+
+Create CA Secret For Trust Manager
+    [Documentation]    Generate a self-signed CA cert locally and create a secret in the trust namespace
+    ${cert_file}=    Create Random Temp File
+    ${result}=    Process.Run Process
+    ...    openssl    req    -x509    -newkey    ec    -pkeyopt    ec_paramgen_curve:prime256v1
+    ...    -nodes    -keyout    /dev/null    -out    ${cert_file}    -days    365
+    ...    -subj    /CN\=test-ca.example.com
+    ...    stderr=STDOUT
+    Should Be Equal As Integers    ${result.rc}    0
+    Run With Kubeconfig
+    ...    oc create secret generic ca-source-secret -n ${TRUST_MANAGER_NS} --from-file=tls.crt=${cert_file}
+    Remove File    ${cert_file}
+
+Create Trust Bundle From Source Secret YAML
+    [Documentation]    Creates a Bundle CR YAML sourced from a manually created secret in the trust namespace
+    ${yaml}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiVersion: trust.cert-manager.io/v1alpha1
+    ...    kind: Bundle
+    ...    metadata:
+    ...    \ \ name: ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    spec:
+    ...    \ \ sources:
+    ...    \ \ \ \ - secret:
+    ...    \ \ \ \ \ \ \ \ name: ca-source-secret
+    ...    \ \ \ \ \ \ \ \ key: tls.crt
+    ...    \ \ target:
+    ...    \ \ \ \ configMap:
+    ...    \ \ \ \ \ \ key: ca-bundle.crt
+    ...    \ \ \ \ namespaceSelector:
+    ...    \ \ \ \ \ \ matchLabels:
+    ...    \ \ \ \ \ \ \ \ kubernetes.io/metadata.name: ${NAMESPACE}
+    RETURN    ${yaml}
+
+Create CA Certificate YAML
+    [Documentation]    Creates a cert-manager CA Certificate in the trust namespace
+    ${yaml}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiVersion: cert-manager.io/v1
+    ...    kind: Certificate
+    ...    metadata:
+    ...    \ \ name: ca-certificate
+    ...    \ \ namespace: ${TRUST_MANAGER_NS}
+    ...    spec:
+    ...    \ \ isCA: true
+    ...    \ \ commonName: test-ca.example.com
+    ...    \ \ secretName: ca-certificate-secret
+    ...    \ \ issuerRef:
+    ...    \ \ \ \ name: ${ISSUER_NAME}
+    ...    \ \ \ \ kind: ClusterIssuer
+    RETURN    ${yaml}
+
+Create Trust Bundle From Secret YAML
+    [Documentation]    Creates a Bundle CR YAML sourced from a cert-manager CA secret in the trust namespace
+    ${yaml}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiVersion: trust.cert-manager.io/v1alpha1
+    ...    kind: Bundle
+    ...    metadata:
+    ...    \ \ name: ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    spec:
+    ...    \ \ sources:
+    ...    \ \ \ \ - secret:
+    ...    \ \ \ \ \ \ \ \ name: ca-certificate-secret
+    ...    \ \ \ \ \ \ \ \ key: tls.crt
+    ...    \ \ target:
+    ...    \ \ \ \ configMap:
+    ...    \ \ \ \ \ \ key: ca-bundle.crt
+    ...    \ \ \ \ namespaceSelector:
+    ...    \ \ \ \ \ \ matchLabels:
+    ...    \ \ \ \ \ \ \ \ kubernetes.io/metadata.name: ${NAMESPACE}
+    RETURN    ${yaml}
+
+Apply Trust Manager YAML
+    [Documentation]    Apply YAML manifest, allowing both created and configured/unchanged results
+    [Arguments]    ${yaml_content}
+    ${temp_file}=    Create Random Temp File    ${yaml_content}
+    ${result}=    Oc Apply    -f ${temp_file}
+    Remove File    ${temp_file}
+    Log    Applied manifest: ${result}
+
+Cleanup Trust Bundle
+    [Documentation]    Remove the test trust-manager Bundle CR and its target ConfigMap
+    Run With Kubeconfig    oc delete bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
+    Run With Kubeconfig    oc delete configmap ${TRUST_MANAGER_BUNDLE_NAME} -n ${NAMESPACE} --ignore-not-found
