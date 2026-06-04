@@ -3,19 +3,31 @@
 # Sourced from scenario.sh and uses functions defined there.
 export TEST_RANDOMIZATION=suites
 
-# Cluster A (host1): default MicroShift CIDRs
-CLUSTER_A_POD_CIDR="10.42.0.0/16"
-CLUSTER_A_SVC_CIDR="10.43.0.0/16"
+# Redefine network-related settings to use the dedicated IPv6 network bridge
+# shellcheck disable=SC2034  # used elsewhere
+VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
+# shellcheck disable=SC2034  # used elsewhere
+WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
+# Using `hostname` here instead of a raw ip because skopeo only allows either
+# ipv4 or fqdn's, but not ipv6. Since the registry is hosted on the ipv6
+# network gateway in the host, we need to use a combination of the hostname
+# plus /etc/hosts resolution (which is taken care of by kickstart).
+# shellcheck disable=SC2034  # used elsewhere
+MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}/microshift"
+
+# Cluster A (host1): non-overlapping CIDRs
+CLUSTER_A_POD_CIDR="fd01::/48"
+CLUSTER_A_SVC_CIDR="fd02::/112"
 CLUSTER_A_DOMAIN="cluster-a.remote"
 
 # Cluster B (host2): non-overlapping CIDRs
-CLUSTER_B_POD_CIDR="10.45.0.0/16"
-CLUSTER_B_SVC_CIDR="10.46.0.0/16"
+CLUSTER_B_POD_CIDR="fd04::/48"
+CLUSTER_B_SVC_CIDR="fd05::/112"
 CLUSTER_B_DOMAIN="cluster-b.remote"
 
 # Cluster C (host3): non-overlapping CIDRs
-CLUSTER_C_POD_CIDR="10.48.0.0/16"
-CLUSTER_C_SVC_CIDR="10.49.0.0/16"
+CLUSTER_C_POD_CIDR="fd07::/48"
+CLUSTER_C_SVC_CIDR="fd08::/112"
 CLUSTER_C_DOMAIN="cluster-c.remote"
 
 wait_for_greenboot_on_hosts() {
@@ -97,9 +109,9 @@ configure_c2cc_hosts() {
 }
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel102-bootc-source
-    prepare_kickstart host2 kickstart-bootc.ks.template rhel102-bootc-source
-    prepare_kickstart host3 kickstart-bootc.ks.template rhel102-bootc-source
+    prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source false true
+    prepare_kickstart host2 kickstart-bootc.ks.template rhel98-bootc-source false true 
+    prepare_kickstart host3 kickstart-bootc.ks.template rhel98-bootc-source false true
 
     # Inject host2's and host3's non-default CIDRs into its kickstart config so MicroShift
     # boots with the correct network from the start (no cleanup-data needed).
@@ -124,9 +136,9 @@ network:
 IEOF
 EOF
 
-    launch_vm rhel102-bootc --vmname host1
-    launch_vm rhel102-bootc --vmname host2
-    launch_vm rhel102-bootc --vmname host3
+    launch_vm rhel98-bootc --vmname host1 --network "${VM_IPV6_NETWORK}"
+    launch_vm rhel98-bootc --vmname host2 --network "${VM_IPV6_NETWORK}"
+    launch_vm rhel98-bootc --vmname host3 --network "${VM_IPV6_NETWORK}"
 }
 
 scenario_remove_vms() {
@@ -169,6 +181,7 @@ scenario_run_tests() {
         --variable "CLUSTER_C_SVC_CIDR:${CLUSTER_C_SVC_CIDR}" \
         --variable "CLUSTER_C_DOMAIN:${CLUSTER_C_DOMAIN}" \
         --variable "KUBECONFIG_C:${kubeconfig_c}" \
-        --variable "FOREIGN_CIDR:192.0.2.0/24" \
+        --variable "FOREIGN_CIDR:2001:db8::/64" \
+        --variable "IP_FAMILY:ipv6" \
         suites/c2cc/
 }

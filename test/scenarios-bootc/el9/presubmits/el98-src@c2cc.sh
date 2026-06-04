@@ -169,5 +169,6 @@ scenario_run_tests() {
         --variable "CLUSTER_C_SVC_CIDR:${CLUSTER_C_SVC_CIDR}" \
         --variable "CLUSTER_C_DOMAIN:${CLUSTER_C_DOMAIN}" \
         --variable "KUBECONFIG_C:${kubeconfig_c}" \
+        --variable "FOREIGN_CIDR:192.0.2.0/24" \
         suites/c2cc/
 }
