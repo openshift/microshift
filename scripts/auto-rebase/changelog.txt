@@ -1,25 +1,46 @@
-- cluster-kube-apiserver-operator embedded-component 4bbd3be9dfda4a08dca98648209151de2a869f25 to 1b48403438c3e0eb2ccb5cae331f12fe9abe169c
-  - 85bb270 2026-04-21T14:03:12+02:00 configobservation/auth: allow setting the oauthMetadata when auth type is None
+- cluster-network-operator embedded-component 3084be080a60dedded177ea4accbd0d30335ebf5 to 945b31bdb28f5654dfadba0169185c95588f46b0
+  - 5c27d9c 2026-04-24T11:54:53-04:00 Address CodeRabbit review: add docstring and assertion messages
+  - 2fadf87 2026-04-24T11:54:53-04:00 Handle zero-worker HyperShift clusters in daemonset rollout
 
-- cluster-network-operator embedded-component b5f9806ed0aee267baa390c3e0e5943d73ad60ef to 3084be080a60dedded177ea4accbd0d30335ebf5
-  - dde89a1 2026-05-11T15:59:27+00:00 OCPBUGS-74401: Remove duplicated openssl parameter
-  - f2d18eb 2026-04-22T19:34:26+00:00 wait for patch port to apply drop garp flows
-  - 6394b07 2026-04-22T11:35:43-04:00 OCPBUGS-72411: use net.JoinHostPort for URL construction
+- csi-external-snapshotter embedded-component 580c6960cd665dfdc3d77538bb7744b8754aca26 to 8a319b5b9df2d4f596b4619f73cf5a65eab031c1
+  - 18645c7 2026-05-20T14:59:21+01:00 UPSTREAM: 1403: Replace google.golang.org/grpc with a fork to address CVE-2026-33186
+  - 4831ad0 2026-05-20T14:56:29+01:00 UPSTREAM: <drop>: vendor changes
 
-- machine-config-operator embedded-component 6ac8d2ebf66ea3d165d59117d19750594ab5fc00 to 8ae22ee4b3a0e83ae20550aebcbd4c39178c83b8
-  - 08d3e387 2026-05-05T13:05:19+00:00 chore: update AMIs
+- machine-config-operator embedded-component 8ae22ee4b3a0e83ae20550aebcbd4c39178c83b8 to 09ddec72f4ebeec4b2615da078c65e49b79bbe36
+  - e62a6238 2026-05-28T09:30:26+02:00 TestNoReboot should only consider password hash in /etc/shadow
+  - c74d91d4 2026-05-28T09:12:27+02:00 OCPBUGS-83830: Apply password only if changes exist
+  - 25a34f60 2026-05-27T15:05:53+00:00 drain: fix re-cordon detection
+  - 573fa7bf 2026-05-26T18:36:49+00:00 daemon: use --delete-if-present for karg removal
+  - 577d3ad9 2026-05-20T06:59:34+00:00 OCPBUGS-84332: Fix ssh and password rollbacks
+  - 6e1f4067 2026-05-19T09:04:10-04:00 controller: add terminationMessagePolicy to build pod containers
+  - 2ab26b1c 2026-05-13T20:21:34+00:00 OCPBUGS-84218: Fix units rollback if update failure
+  - 6eab77a8 2025-12-02T22:01:21+00:00 OCPBUGS-62232: Set -fin timeouts in HAProxy config
 
-- ovn-kubernetes image-amd64 cf0c520c07d7aaa3494122b7332e8dc017d47772 to ef09b1d4678c0bd9670ce99f23a6f958f9f4e306
-  - 80518a91 2026-05-04T09:30:51+02:00 fix(kubevirt): Use pod network subnet gateway IP for DHCP router option
-  - ef7ea17c 2026-04-23T15:54:57+01:00 virt: fix SyncVirtualMachines deleting UDN DHCP options during startup
-  - 8df3403f 2026-04-15T09:39:23+00:00 Backport: Fix NAD Controller syncAll for networkID upgrade from node->NAD
-  - 3928ae07 2026-04-08T16:39:36+08:00 egressip: Skip bridge configuration for secondary network IPs
-  - 2a5bf31c 2026-03-31T16:31:32+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+- operator-framework-olm embedded-component 93649380ab6fdccf8ec1716f89162b506c7de172 to c606498ade273e9392d6b10713a1e926c09095b0
+  - 50846aff 2026-05-29T12:02:49+05:30 Fix CVE-2026-33186 with openshift-sustaining/grpc-go v1.75.1-sec.1 for Go 1.23
 
-- ovn-kubernetes image-arm64 cf0c520c07d7aaa3494122b7332e8dc017d47772 to ef09b1d4678c0bd9670ce99f23a6f958f9f4e306
-  - 80518a91 2026-05-04T09:30:51+02:00 fix(kubevirt): Use pod network subnet gateway IP for DHCP router option
-  - ef7ea17c 2026-04-23T15:54:57+01:00 virt: fix SyncVirtualMachines deleting UDN DHCP options during startup
-  - 8df3403f 2026-04-15T09:39:23+00:00 Backport: Fix NAD Controller syncAll for networkID upgrade from node->NAD
-  - 3928ae07 2026-04-08T16:39:36+08:00 egressip: Skip bridge configuration for secondary network IPs
-  - 2a5bf31c 2026-03-31T16:31:32+08:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+- route-controller-manager embedded-component 25d79fdf101f3d41f4583a970e5f324b79fb42d8 to 6068e2c71fc1efb67324a91f48c1470c647f1344
+  - a4a64d3 2026-05-01T14:53:36+00:00 OCPBUGS-80378: Bump google.golang.org/grpc to v1.79.3
+
+- csi-external-snapshotter image-amd64 580c6960cd665dfdc3d77538bb7744b8754aca26 to 8a319b5b9df2d4f596b4619f73cf5a65eab031c1
+  - 18645c7 2026-05-20T14:59:21+01:00 UPSTREAM: 1403: Replace google.golang.org/grpc with a fork to address CVE-2026-33186
+  - 4831ad0 2026-05-20T14:56:29+01:00 UPSTREAM: <drop>: vendor changes
+
+- router image-amd64 5fe8cc069b2f44b3393545ac92c3201e8a87d82b to 0b3d3db1b41dde99861efcd35b4ea4f5ee0d360f
+  - 272a35b 2026-05-01T16:13:07+00:00 OCPBUGS-80456: Bump google.golang.org/grpc to v1.79.3
+  - 8c9e82a 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
+
+- ovn-kubernetes image-amd64 ef09b1d4678c0bd9670ce99f23a6f958f9f4e306 to cb4cebc4fe27b0e07d0eb3c4411470a520373e5c
+  - 20b802cc 2026-03-31T13:15:36+02:00 CUDN: cleanup NADs in terminating namespaces without pods
+
+- csi-external-snapshotter image-arm64 580c6960cd665dfdc3d77538bb7744b8754aca26 to 8a319b5b9df2d4f596b4619f73cf5a65eab031c1
+  - 18645c7 2026-05-20T14:59:21+01:00 UPSTREAM: 1403: Replace google.golang.org/grpc with a fork to address CVE-2026-33186
+  - 4831ad0 2026-05-20T14:56:29+01:00 UPSTREAM: <drop>: vendor changes
+
+- router image-arm64 5fe8cc069b2f44b3393545ac92c3201e8a87d82b to 0b3d3db1b41dde99861efcd35b4ea4f5ee0d360f
+  - 272a35b 2026-05-01T16:13:07+00:00 OCPBUGS-80456: Bump google.golang.org/grpc to v1.79.3
+  - 8c9e82a 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
+
+- ovn-kubernetes image-arm64 ef09b1d4678c0bd9670ce99f23a6f958f9f4e306 to cb4cebc4fe27b0e07d0eb3c4411470a520373e5c
+  - 20b802cc 2026-03-31T13:15:36+02:00 CUDN: cleanup NADs in terminating namespaces without pods
 
