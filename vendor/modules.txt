@@ -734,7 +734,7 @@ github.com/openshift/library-go/pkg/route/validation
 github.com/openshift/library-go/pkg/security/ldaputil
 github.com/openshift/library-go/pkg/security/uid
 github.com/openshift/library-go/pkg/serviceability
-# github.com/openshift/route-controller-manager v0.0.0-20250508130306-ce6ffa24dac3 => ./deps/github.com/openshift/route-controller-manager
+# github.com/openshift/route-controller-manager v0.0.0-20260601152317-2484b3e8e7fb => ./deps/github.com/openshift/route-controller-manager
 ## explicit; go 1.22.0
 github.com/openshift/route-controller-manager/pkg/cmd/controller
 github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager
