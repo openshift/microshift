@@ -1,0 +1,29 @@
+- csi-external-snapshotter embedded-component 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95 to 59c396dfa5bd6f1cb42c42cbc3ad66dd5898348c
+  - c96977c 2026-05-20T14:14:52+00:00 UPSTREAM: 1403: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+  - 155194d 2026-05-20T14:14:51+00:00 UPSTREAM: <drop>: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+
+- route-controller-manager embedded-component 02bbf80ada3d5acaf36873b1fe69c71badc6d8d7 to 1e53205fa2e239df3c39a78bb50fddce77b4f3e1
+  - 5b11b80 2026-05-04T19:16:39+00:00 OCPBUGS-80022: Bump google.golang.org/grpc to v1.79.3
+
+- csi-external-snapshotter image-amd64 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95 to 59c396dfa5bd6f1cb42c42cbc3ad66dd5898348c
+  - c96977c 2026-05-20T14:14:52+00:00 UPSTREAM: 1403: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+  - 155194d 2026-05-20T14:14:51+00:00 UPSTREAM: <drop>: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+
+- csi-external-snapshotter image-amd64 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95 to 59c396dfa5bd6f1cb42c42cbc3ad66dd5898348c
+  - c96977c 2026-05-20T14:14:52+00:00 UPSTREAM: 1403: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+  - 155194d 2026-05-20T14:14:51+00:00 UPSTREAM: <drop>: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+
+- router image-amd64 1e29d8cc87a1c9e6645a4b9aa01197d90e366152 to 97662a3ac26c88d51b4e81bd794c33671868480d
+  - c45703d 2026-04-27T17:00:58+01:00 Adding escapeHAProxySingleQuotes for sanitize
+
+- csi-external-snapshotter image-arm64 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95 to 59c396dfa5bd6f1cb42c42cbc3ad66dd5898348c
+  - c96977c 2026-05-20T14:14:52+00:00 UPSTREAM: 1403: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+  - 155194d 2026-05-20T14:14:51+00:00 UPSTREAM: <drop>: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+
+- csi-external-snapshotter image-arm64 080f6bdb8ffdbfe2556370ce5bc95ac973e1ad95 to 59c396dfa5bd6f1cb42c42cbc3ad66dd5898348c
+  - c96977c 2026-05-20T14:14:52+00:00 UPSTREAM: 1403: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+  - 155194d 2026-05-20T14:14:51+00:00 UPSTREAM: <drop>: OCPBUGS-80089, OCPBUGS-80085, OCPBUGS-80088: Bump google.golang.org/grpc to v1.79.3
+
+- router image-arm64 1e29d8cc87a1c9e6645a4b9aa01197d90e366152 to 97662a3ac26c88d51b4e81bd794c33671868480d
+  - c45703d 2026-04-27T17:00:58+01:00 Adding escapeHAProxySingleQuotes for sanitize
+
