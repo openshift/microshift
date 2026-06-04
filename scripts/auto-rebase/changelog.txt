@@ -1,30 +1,15 @@
-- csi-external-snapshotter embedded-component 42604822c25eb2aa0ecb017c24e328221b238eb9 to 433cf89b4e4d1b437a8a446ece28b217ccf9bd06
-  - 0a1936f 2026-05-20T14:53:26+01:00 UPSTREAM: <drop>: vendor changes
-  - f70a7d3 2026-05-20T14:52:21+01:00 UPSTREAM: 1403: OCPBUGS-80788, OCPBUGS-80791: Bump google.golang.org/grpc to v1.79.3
-  - 8ca6178 2026-05-20T14:40:16+01:00 UPSTREAM: <drop>: vendor changes
+- machine-config-operator embedded-component fbb572bf57164f6a1b131392b7b66e3a751d8b10 to a271df11d1323435cdf0f4aac925640c42fedccd
+  - 8c35d30a 2026-05-26T15:13:45Z drain: fix re-cordon detection
+  - 1473263e 2026-05-15T17:39:58+05:30 Removed isDefaultPool helper function
+  - ca8a44ff 2026-05-13T05:31:40Z OCPBUGS-84406: Fix CVE-2026-34986
+  - f772a2cc 2026-04-27T13:42:22+05:30 Update test cases
+  - 59c31ebe 2026-04-27T12:31:12+05:30 OCPBUGS-83862: Generate autosizing-disabled machineconfig only for master and worker nodes on OCP 4.20
 
-- machine-config-operator embedded-component 99791082afbf27ade177005ba673ec023bc16051 to fbb572bf57164f6a1b131392b7b66e3a751d8b10
-  - aa8bbcd9 2026-05-21T06:10:17Z OCPBUGS-83830: Apply password only if changes exist
-  - 829de0c5 2026-05-21T06:10:17Z TestNoReboot should only consider password hash in /etc/shadow
-  - 092a51b2 2026-05-19T12:18:57Z daemon: use --delete-if-present for karg removal
+- router image-amd64 3c365cad8c7037e4aa64a694994ea393abc4d9a2 to cdfa172b2373257fdca5b8e7546378a2e762411c
+  - a4ea78c 2026-04-30T21:51:18Z OCPBUGS-80633: Bump google.golang.org/grpc to v1.79.3
+  - d3614f0 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
 
-- operator-framework-olm embedded-component ead54afde546d8c2ead94256d2d13c46b9b257b5 to 1628e53777871f6c264d41a870cc4ee7248106f2
-  - b1d404f1 2026-05-08T12:53:25+05:30 Bump google.golang.org/grpc to v1.79.3 for CVE-2026-33186; remove obsolete grpc replace
-
-- route-controller-manager embedded-component ec18e9be0ebcbd7cb262d31f50148f81d0edd48f to 1a0229e40e5c569c6c59f6b10c26584bccd084b5
-  - 9822d1d 2026-04-30T21:44:56Z OCPBUGS-80554: Bump google.golang.org/grpc to v1.79.3
-
-- csi-external-snapshotter image-amd64 42604822c25eb2aa0ecb017c24e328221b238eb9 to 433cf89b4e4d1b437a8a446ece28b217ccf9bd06
-  - 0a1936f 2026-05-20T14:53:26+01:00 UPSTREAM: <drop>: vendor changes
-  - f70a7d3 2026-05-20T14:52:21+01:00 UPSTREAM: 1403: OCPBUGS-80788, OCPBUGS-80791: Bump google.golang.org/grpc to v1.79.3
-  - 8ca6178 2026-05-20T14:40:16+01:00 UPSTREAM: <drop>: vendor changes
-
-- csi-external-snapshotter image-arm64 42604822c25eb2aa0ecb017c24e328221b238eb9 to 433cf89b4e4d1b437a8a446ece28b217ccf9bd06
-  - 0a1936f 2026-05-20T14:53:26+01:00 UPSTREAM: <drop>: vendor changes
-  - f70a7d3 2026-05-20T14:52:21+01:00 UPSTREAM: 1403: OCPBUGS-80788, OCPBUGS-80791: Bump google.golang.org/grpc to v1.79.3
-  - 8ca6178 2026-05-20T14:40:16+01:00 UPSTREAM: <drop>: vendor changes
-
-- ovn-kubernetes image-arm64 dbebe515c05e673ed62083e019e55aaf9bcebeab to 1dce328f5ea3cba8bbabfcaaabb38aa4208f90b3
+- ovn-kubernetes image-amd64 dbebe515c05e673ed62083e019e55aaf9bcebeab to 1dce328f5ea3cba8bbabfcaaabb38aa4208f90b3
   - a24dbcc9 2026-01-08T21:34:03+02:00 test/e2e/kubevirt: Check IPAMClaim status update
   - d8bc99f8 2026-01-08T21:33:55+02:00 allocator, persistentips: update IPAM claim status for both success and failure
   - 40e63c67 2026-01-08T20:31:13+02:00 test/e2e:: Fix duplicate IP validation test for IP family enforcement
@@ -32,4 +17,8 @@
   - 9ae71681 2026-01-08T20:31:13+02:00 test/e2e: Move createVMWithStaticIP helper function
   - cd875aa0 2026-01-08T20:31:12+02:00 test/e2e/kubevirt: Refactor duplicate VM pod err event waiter to shared helper
   - 48f13641 2026-01-08T20:31:12+02:00 allocator/pod: add IP family validation for layer2 primary networks
+
+- router image-arm64 3c365cad8c7037e4aa64a694994ea393abc4d9a2 to cdfa172b2373257fdca5b8e7546378a2e762411c
+  - a4ea78c 2026-04-30T21:51:18Z OCPBUGS-80633: Bump google.golang.org/grpc to v1.79.3
+  - d3614f0 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
 
