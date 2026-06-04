@@ -1,15 +1,19 @@
-- api embedded-component d6cd612317218735862945e2bafc4a4054be2798 to b66d75611553df4827e899e5eaa4d6321ed9f44c
-  - 54d28823 2026-05-25T20:45:20+02:00 Add labelSelector to MachineSet status for scale subresource
+- api embedded-component b66d75611553df4827e899e5eaa4d6321ed9f44c to 1d79f30d4668393dc34e9b423ec6904645503c58
+  - 4b25e2db 2026-06-01T13:57:13-04:00 OCPBUGS-85149: Backport GatewayAPIWithoutOLM feature gate as disabled
 
-- machine-config-operator embedded-component 2ba5a372f051e770dd1c87132e9f6e77562706d6 to 5aabf7ccb1f54f0c889a87b1670827f9b2d23461
-  - fcaf4353 2026-05-12T13:38:15-04:00 drain: fix re-cordon detection
+- cluster-ingress-operator embedded-component 6c70966cd2011f861843e85efb8bf08c3a938fe1 to 3a861ed50a5755aa9eaf58d4e6c86d02729dd9c0
+  - 5f92040 2026-05-18T15:16:09Z Fix logging for unmanaged controllers
+  - cbafa18 2026-05-14T14:32:59-03:00 address comments
+  - c375474 2026-05-14T14:32:45-03:00 NE-2376: Remove restriction of unmanaged x-k8s.io
+  - 36eb999 2026-05-08T09:23:11+05:30  Fix raised to bump gRPC with patched fork
 
-- route-controller-manager embedded-component 559b7122d1a0cad4ff475b496c2896b39eed8c08 to 166a3e96f8151d9e789b3951ae75b03cdede5081
-  - e932033 2026-04-30T19:46:32Z OCPBUGS-80726: Bump google.golang.org/grpc to v1.79.3
+- machine-config-operator embedded-component 5aabf7ccb1f54f0c889a87b1670827f9b2d23461 to 340c3847f293b8914ebef26d1e9b0a8ce2d2abd5
+  - f56be538 2026-05-26T20:59:27Z daemon: verify extension packages are staged pre-reboot and installed pst-reboot
+  - c24449d9 2026-04-27T09:23:45Z MCO-2182: MCS fallback to latest v3
 
-- router image-amd64 5949f713517b3cc158cd78b34d71d5a9084d2e1c to b17085c57b2f55ad0317fe665655e76ba46999df
-  - 23f2da9 2026-05-05T15:18:00Z OCPBUGS-80810: Bump google.golang.org/grpc to v1.79.3
+- router image-amd64 b17085c57b2f55ad0317fe665655e76ba46999df to cffbbab7d26f76620a099ee86d9e5d987de9aa56
+  - 334eebf 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
 
-- router image-arm64 5949f713517b3cc158cd78b34d71d5a9084d2e1c to b17085c57b2f55ad0317fe665655e76ba46999df
-  - 23f2da9 2026-05-05T15:18:00Z OCPBUGS-80810: Bump google.golang.org/grpc to v1.79.3
+- router image-arm64 b17085c57b2f55ad0317fe665655e76ba46999df to cffbbab7d26f76620a099ee86d9e5d987de9aa56
+  - 334eebf 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
 
