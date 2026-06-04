@@ -1,7 +1,13 @@
-- machine-config-operator embedded-component ab81640d1510800b1be795066ef4d392dbcdf470 to 6202afb0547a4b81bd862e9a9ea1b45f32ed75ff
-  - 689efbfd 2026-05-29T10:23:01Z MCO-2288: Adapt test '54922 - daemon: add check before updating kernelArgs'. Use --delete-if-present
-  - 4b0b24ba 2026-05-20T14:01:37Z OCPBUGS-83987: Fix CVE-2026-33186
-  - d54693d8 2026-05-20T12:46:43Z daemon: verify extension packages are staged pre-reboot and installed pst-reboot
-  - b7749418 2026-05-06T15:54:24Z OCPBUGS-84661: Fix wrong early exit during kubelet MCs regeneration
-  - 07b35298 2026-04-20T12:53:01Z Add Kernel test-cases
+- machine-config-operator embedded-component 6202afb0547a4b81bd862e9a9ea1b45f32ed75ff to 08af7a3d3d9408cb8dcf6f48f48687860357b022
+  - d4aa6ee0 2026-06-03T09:32:49Z Migrate remaining TCs from mco.go to mco.go, mco_units.go, mco_kubelet_and_containerruntime.go
+  - f3fea8b0 2026-06-02T18:37:11Z render: guard OSImageStream ver before generation
+  - 761f4855 2026-06-02T14:44:27Z chore: update AMIs
+  - 2d94e365 2026-05-29T10:42:43Z OCPBUGS-86332: remove tests using base images older than 4.13
+  - b78ee6ce 2026-05-20T18:41:53Z OCPBUGS-63650: configure-ovs: copy lldp mode to br-ex port
+
+- router image-amd64 1d980e1d4c65832893e91150df92fc6ad1932d89 to 1d5bda670148779d9186c0b2394c5795c14aca80
+  - 3dffacb 2026-05-26T15:53:31+01:00 Adding escapeHAProxySingleQuotes for sanitize
+
+- router image-arm64 1d980e1d4c65832893e91150df92fc6ad1932d89 to 1d5bda670148779d9186c0b2394c5795c14aca80
+  - 3dffacb 2026-05-26T15:53:31+01:00 Adding escapeHAProxySingleQuotes for sanitize
 
