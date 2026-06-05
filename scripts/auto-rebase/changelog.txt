@@ -1,13 +1,5 @@
-- machine-config-operator embedded-component 6202afb0547a4b81bd862e9a9ea1b45f32ed75ff to 08af7a3d3d9408cb8dcf6f48f48687860357b022
-  - d4aa6ee0 2026-06-03T09:32:49Z Migrate remaining TCs from mco.go to mco.go, mco_units.go, mco_kubelet_and_containerruntime.go
-  - f3fea8b0 2026-06-02T18:37:11Z render: guard OSImageStream ver before generation
-  - 761f4855 2026-06-02T14:44:27Z chore: update AMIs
-  - 2d94e365 2026-05-29T10:42:43Z OCPBUGS-86332: remove tests using base images older than 4.13
-  - b78ee6ce 2026-05-20T18:41:53Z OCPBUGS-63650: configure-ovs: copy lldp mode to br-ex port
-
-- router image-amd64 1d980e1d4c65832893e91150df92fc6ad1932d89 to 1d5bda670148779d9186c0b2394c5795c14aca80
-  - 3dffacb 2026-05-26T15:53:31+01:00 Adding escapeHAProxySingleQuotes for sanitize
-
-- router image-arm64 1d980e1d4c65832893e91150df92fc6ad1932d89 to 1d5bda670148779d9186c0b2394c5795c14aca80
-  - 3dffacb 2026-05-26T15:53:31+01:00 Adding escapeHAProxySingleQuotes for sanitize
+- kubernetes image-arm64 c5ea727d19837f8a22cda5c0ba8899960b7777ff to 7250fd5b9e6ffa2f127d4ae559e4adf1100d10b9
+  - 70140335d 2026-06-03T05:03:08Z UPSTREAM: 138981: Cache selinux conflicts
+  - ca371c7a4 2026-06-03T05:03:08Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
+  - a284a7e54 2026-06-03T05:03:08Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
 
