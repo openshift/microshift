@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 const (
@@ -12,6 +14,20 @@ const (
 )
 
 type HostsStatusEnum string
+
+// DNSResources configures the CPU and memory resources for the dns container
+// in the dns-default DaemonSet.
+type DNSResources struct {
+	// Requests specifies the minimum resources required for the dns container.
+	// Valid keys are "cpu" and "memory". Values must be valid Kubernetes resource quantities.
+	// When not set, defaults to cpu=50m, memory=70Mi.
+	Requests map[string]string `json:"requests,omitempty"`
+
+	// Limits specifies the maximum resources the dns container can use.
+	// Valid keys are "cpu" and "memory". Values must be valid Kubernetes resource quantities.
+	// When not set, no limits are applied.
+	Limits map[string]string `json:"limits,omitempty"`
+}
 
 type DNS struct {
 	// baseDomain is the base domain of the cluster. All managed DNS records will
@@ -38,6 +54,9 @@ type DNS struct {
 
 	// Hosts contains configuration for the hosts file.
 	Hosts HostsConfig `json:"hosts,omitempty"`
+
+	// Resources configures the CPU and memory resources for the dns container.
+	Resources DNSResources `json:"resources,omitempty"`
 }
 
 // HostsConfig contains configuration for the hosts file .
@@ -64,6 +83,12 @@ func dnsDefaults() DNS {
 			File:   "/etc/hosts",
 			Status: HostsStatusDisabled,
 		},
+		Resources: DNSResources{
+			Requests: map[string]string{
+				"cpu":    "50m",
+				"memory": "70Mi",
+			},
+		},
 	}
 }
 
@@ -76,7 +101,10 @@ func (t *DNS) validate() error {
 		return err
 	}
 
-	return t.validateHosts()
+	if err := t.validateHosts(); err != nil {
+		return err
+	}
+	return t.validateResources()
 }
 
 func (t *DNS) validateConfigFile() error {
@@ -90,13 +118,61 @@ func (t *DNS) validateHosts() error {
 	switch t.Hosts.Status {
 	case HostsStatusEnabled:
 		if t.Hosts.File == "" {
-			break
+			return nil
 		}
 		return validateFilePath(t.Hosts.File, "hosts file")
 	case HostsStatusDisabled:
 		return nil
 	default:
 		return fmt.Errorf("invalid hosts status: %s", t.Hosts.Status)
+	}
+}
+
+func dnsMinimumRequests() map[string]resource.Quantity {
+	defaults := dnsDefaults()
+	mins := make(map[string]resource.Quantity, len(defaults.Resources.Requests))
+	for k, v := range defaults.Resources.Requests {
+		mins[k] = resource.MustParse(v)
+	}
+	return mins
+}
+
+func (t *DNS) validateResources() error {
+	allowed := map[string]struct{}{
+		"cpu":    {},
+		"memory": {},
+	}
+	mins := dnsMinimumRequests()
+	for key, val := range t.Resources.Requests {
+		if _, ok := allowed[key]; !ok {
+			return fmt.Errorf("unsupported dns resource request key %q: allowed keys are cpu, memory", key)
+		}
+		qty, err := resource.ParseQuantity(val)
+		if err != nil {
+			return fmt.Errorf("invalid dns resource request %s=%q: %v", key, val, err)
+		}
+		if minQty, ok := mins[key]; ok && qty.Cmp(minQty) < 0 {
+			return fmt.Errorf("dns resource request %s=%q is below minimum %s", key, val, minQty.String())
+		}
+	}
+	for key, val := range t.Resources.Limits {
+		if _, ok := allowed[key]; !ok {
+			return fmt.Errorf("unsupported dns resource limit key %q: allowed keys are cpu, memory", key)
+		}
+		if _, err := resource.ParseQuantity(val); err != nil {
+			return fmt.Errorf("invalid dns resource limit %s=%q: %v", key, val, err)
+		}
+	}
+	for key, limitVal := range t.Resources.Limits {
+		reqVal, ok := t.Resources.Requests[key]
+		if !ok {
+			continue
+		}
+		limit := resource.MustParse(limitVal)
+		req := resource.MustParse(reqVal)
+		if limit.Cmp(req) < 0 {
+			return fmt.Errorf("dns resource limit %s=%q must be greater than or equal to request %s=%q", key, limitVal, key, reqVal)
+		}
 	}
 	return nil
 }
