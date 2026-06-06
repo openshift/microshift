@@ -258,6 +258,10 @@ Cleanup And Create NS
     VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
 
 Setup Suite And Wait For Healthcheck
-    [Documentation]    Run setup suit and wait for healthcheck to succeed
-    Setup Suite
+    [Documentation]    Wait for MicroShift to be healthy before setting up kubeconfig.
+    ...    After the preceding Tuned suite triggers a reboot in its teardown,
+    ...    MicroShift may not have fully started when this suite begins.
+    Check Required Env Variables
+    Login MicroShift Host
     Wait For MicroShift Healthcheck Success
+    Setup Kubeconfig
