@@ -24,17 +24,21 @@ Root CA ConfigMap Contains All Signers
     [Documentation]    Verify that the kube-root-ca.crt ConfigMap contains certificates
     ...    from all required signers: kube-apiserver-localhost-signer,
     ...    kube-apiserver-service-network-signer, and kube-apiserver-external-signer
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Verify Root CA ConfigMap Has All Signers
+
+
+*** Keywords ***
+Verify Root CA ConfigMap Has All Signers
+    [Documentation]    Fetch the kube-root-ca.crt ConfigMap and verify it contains all expected signers.
     ${configmap}=    Oc Get    configmap    ${NAMESPACE}    ${ROOT_CA_CONFIGMAP_NAME}
     VAR    ${ca_bundle}=    ${configmap.data['ca.crt']}
     Should Not Be Empty    ${ca_bundle}
-
     ${subjects}=    Get Certificate Subjects From Bundle    ${ca_bundle}
     Should Contain    ${subjects}    kube-apiserver-localhost-signer
     Should Contain    ${subjects}    kube-apiserver-service-network-signer
     Should Contain    ${subjects}    kube-apiserver-external-signer
 
-
-*** Keywords ***
 Get Certificate Subjects From Bundle
     [Documentation]    Extract all certificate subjects from a PEM-encoded CA bundle string.
     ...    For CA certificates, the Subject field contains the signer name.
