@@ -34,6 +34,11 @@ ${KUBECONFIG_C}             ${EMPTY}
 @{C2CC_REMOTE_ALIASES}      @{EMPTY}
 ${IP_FAMILY}                ${EMPTY}
 ${IP_CMD}                   ${{'ip -6' if '${IP_FAMILY}' == 'ipv6' else 'ip -4'}}
+&{NAMESPACES}               cluster-a=${EMPTY}    cluster-b=${EMPTY}    cluster-c=${EMPTY}
+&{DOMAIN_MAP}
+...                         cluster-a=${CLUSTER_A_DOMAIN}
+...                         cluster-b=${CLUSTER_B_DOMAIN}
+...                         cluster-c=${CLUSTER_C_DOMAIN}
 
 
 *** Keywords ***
@@ -306,3 +311,97 @@ Cleanup Test Workloads
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         Oc On Cluster    ${alias}    oc delete namespace ${NAMESPACES}[${alias}] --timeout=60s
     END
+
+Get Hello Pod IP
+    [Documentation]    Get the pod IP of hello-microshift on the given cluster.
+    [Arguments]    ${alias}
+    ${ip}=    Oc On Cluster    ${alias}
+    ...    oc get pod hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIP}'
+    RETURN    ${ip}
+
+Get Hello Service IP
+    [Documentation]    Get the ClusterIP of the hello-microshift service on the given cluster.
+    [Arguments]    ${alias}
+    ${ip}=    Oc On Cluster    ${alias}
+    ...    oc get svc hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.spec.clusterIP}'
+    RETURN    ${ip}
+
+Get Curl Pod IP
+    [Documentation]    Get the pod IP of curl-pod on the given cluster.
+    [Arguments]    ${alias}
+    ${ip}=    Oc On Cluster    ${alias}
+    ...    oc get pod curl-pod -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIP}'
+    RETURN    ${ip}
+
+Curl From Cluster
+    [Documentation]    Exec curl from curl-pod on the given cluster to the target IP and port.
+    [Arguments]    ${alias}    ${ip}    ${port}
+    ${url}=    Set Variable If
+    ...    '${IP_FAMILY}' == 'ipv6'
+    ...    http://[${ip}]:${port}/cgi-bin/hello
+    ...    http://${ip}:${port}/cgi-bin/hello
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 ${url}
+    RETURN    ${stdout}
+
+Test Connectivity Between Clusters
+    [Documentation]    Verify pod on ${source} can reach ${endpoint_type} IP on ${destination}.
+    [Arguments]    ${source}    ${destination}    ${endpoint_type}
+    IF    '${endpoint_type}' == 'pod'
+        ${ip_dest}=    Get Hello Pod IP    ${destination}
+    ELSE IF    '${endpoint_type}' == 'service'
+        ${ip_dest}=    Get Hello Service IP    ${destination}
+    ELSE
+        Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
+    END
+    ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
+    Should Contain    ${stdout}    Hello from
+
+Test Source IP Preserved Between Clusters
+    [Documentation]    Verify ${source} to ${destination} pod-to-${endpoint_type} traffic preserves the source pod IP (no SNAT).
+    [Arguments]    ${source}    ${destination}    ${endpoint_type}
+    ${curl_pod_ip}=    Get Curl Pod IP    ${source}
+    IF    '${endpoint_type}' == 'pod'
+        ${ip_dest}=    Get Hello Pod IP    ${destination}
+    ELSE IF    '${endpoint_type}' == 'service'
+        ${ip_dest}=    Get Hello Service IP    ${destination}
+    ELSE
+        Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
+    END
+    ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
+    Should Contain    ${stdout}    source: ${curl_pod_ip}
+
+DNS Resolve From Cluster
+    [Documentation]    Resolve a DNS name from curl-pod on the given cluster. Retries for up to 60s.
+    [Arguments]    ${alias}    ${fqdn}
+    Wait Until Keyword Succeeds    12x    5s
+    ...    DNS Lookup Should Succeed    ${alias}    ${fqdn}
+
+DNS Lookup Should Succeed
+    [Documentation]    Resolve a DNS name from curl-pod using getent hosts.
+    [Arguments]    ${alias}    ${fqdn}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- getent hosts ${fqdn}
+    Should Not Be Empty    ${stdout}
+
+Curl DNS From Cluster
+    [Documentation]    Curl a service by DNS name from curl-pod on the given cluster.
+    [Arguments]    ${alias}    ${fqdn}    ${port}
+    ${stdout}=    Wait Until Keyword Succeeds    12x    5s
+    ...    Curl DNS Should Succeed    ${alias}    ${fqdn}    ${port}
+    RETURN    ${stdout}
+
+Curl DNS Should Succeed
+    [Documentation]    Single attempt to curl a DNS name from curl-pod.
+    [Arguments]    ${alias}    ${fqdn}    ${port}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 http://${fqdn}:${port}/cgi-bin/hello
+    Should Contain    ${stdout}    Hello from
+    RETURN    ${stdout}
+
+Curl Remote Service Via DNS
+    [Documentation]    Verify pod on ${source} can reach a service on ${destination} using the remote DNS name.
+    [Arguments]    ${source}    ${destination}
+    ${stdout}=    Curl DNS From Cluster    ${source}
+    ...    hello-microshift.${NAMESPACES}[${destination}].svc.${DOMAIN_MAP}[${destination}]    8080
+    Should Contain    ${stdout}    Hello from
