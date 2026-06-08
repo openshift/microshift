@@ -2716,6 +2716,7 @@ k8s.io/kubernetes/pkg/controller/volume/pvcprotection
 k8s.io/kubernetes/pkg/controller/volume/pvprotection
 k8s.io/kubernetes/pkg/controller/volume/selinuxwarning
 k8s.io/kubernetes/pkg/controller/volume/selinuxwarning/cache
+k8s.io/kubernetes/pkg/controller/volume/selinuxwarning/internal/parse
 k8s.io/kubernetes/pkg/controller/volume/selinuxwarning/translator
 k8s.io/kubernetes/pkg/controller/volume/vacprotection
 k8s.io/kubernetes/pkg/controlplane
