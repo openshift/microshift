@@ -1,24 +1,10 @@
-- machine-config-operator embedded-component fbb572bf57164f6a1b131392b7b66e3a751d8b10 to a271df11d1323435cdf0f4aac925640c42fedccd
-  - 8c35d30a 2026-05-26T15:13:45Z drain: fix re-cordon detection
-  - 1473263e 2026-05-15T17:39:58+05:30 Removed isDefaultPool helper function
-  - ca8a44ff 2026-05-13T05:31:40Z OCPBUGS-84406: Fix CVE-2026-34986
-  - f772a2cc 2026-04-27T13:42:22+05:30 Update test cases
-  - 59c31ebe 2026-04-27T12:31:12+05:30 OCPBUGS-83862: Generate autosizing-disabled machineconfig only for master and worker nodes on OCP 4.20
+- api embedded-component 50517c6f4bfdbf9fc2cb291fd97cce150a3237ca to 6755619009c291e10c1903d20c579eae4bac9854
+  - 30108b30 2026-06-02T20:40:18-04:00 OCPBUGS-85149: Backport GatewayAPIWithoutOLM feature gate as disabled
+  - 69ef4c57 2026-06-02T09:03:47Z Add labelSelector to MachineSet status for scale subresource
 
-- router image-amd64 3c365cad8c7037e4aa64a694994ea393abc4d9a2 to cdfa172b2373257fdca5b8e7546378a2e762411c
-  - a4ea78c 2026-04-30T21:51:18Z OCPBUGS-80633: Bump google.golang.org/grpc to v1.79.3
-  - d3614f0 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
+- cluster-kube-apiserver-operator embedded-component 645cb9f8bb9171c390cad9eb3fdeb9a1be30ca8a to aa9bd6a74ac8b3c9918581b5e49f8e7cf0109862
+  - 264900e 2026-05-21T11:17:56-04:00 vendor: bump library-go for atomicdir fsync fix
 
-- ovn-kubernetes image-amd64 dbebe515c05e673ed62083e019e55aaf9bcebeab to 1dce328f5ea3cba8bbabfcaaabb38aa4208f90b3
-  - a24dbcc9 2026-01-08T21:34:03+02:00 test/e2e/kubevirt: Check IPAMClaim status update
-  - d8bc99f8 2026-01-08T21:33:55+02:00 allocator, persistentips: update IPAM claim status for both success and failure
-  - 40e63c67 2026-01-08T20:31:13+02:00 test/e2e:: Fix duplicate IP validation test for IP family enforcement
-  - e3beead7 2026-01-08T20:31:13+02:00 test/e2e: add IP family validation tests for layer2 primary networks
-  - 9ae71681 2026-01-08T20:31:13+02:00 test/e2e: Move createVMWithStaticIP helper function
-  - cd875aa0 2026-01-08T20:31:12+02:00 test/e2e/kubevirt: Refactor duplicate VM pod err event waiter to shared helper
-  - 48f13641 2026-01-08T20:31:12+02:00 allocator/pod: add IP family validation for layer2 primary networks
-
-- router image-arm64 3c365cad8c7037e4aa64a694994ea393abc4d9a2 to cdfa172b2373257fdca5b8e7546378a2e762411c
-  - a4ea78c 2026-04-30T21:51:18Z OCPBUGS-80633: Bump google.golang.org/grpc to v1.79.3
-  - d3614f0 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
+- machine-config-operator embedded-component a271df11d1323435cdf0f4aac925640c42fedccd to 1bee530c4d08401d07454a259a5ee430edb5216b
+  - 1aec4fb6 2026-06-03T14:08:26Z chore: update AMIs
 
