@@ -99,7 +99,7 @@ Change System Date To
     [Arguments]    ${future_date}
     ${ushift_pid}=    MicroShift Process ID
     Systemctl    stop    chronyd
-    Command Should Work    TZ=UTC timedatectl set-time "${future_date}"
+    Command Should Work    timedatectl set-time "${future_date}"
     Sleep    5s
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     All Certificates Should Be Valid For Current Time
@@ -110,7 +110,7 @@ Compute Date After Days
     [Documentation]    return system date after number of days elapsed from midnight tomorrow
     [Arguments]    ${number_of_days}    ${date_format}
     # Certificates are aligned to expire at midnight of the next day + validity
-    ${future_date}=    Command Should Work    TZ=UTC date "+${date_format}" -d "tomorrow + ${number_of_days} day"
+    ${future_date}=    Command Should Work    date "+${date_format}" -d "tomorrow + ${number_of_days} day"
     RETURN    ${future_date}
 
 Certs Should Expire On
