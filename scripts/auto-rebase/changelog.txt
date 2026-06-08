@@ -1,29 +1,7 @@
-- csi-external-snapshotter embedded-component 8ddbcd381bf5317c1d1a93db3b5760681a33cb27 to 70500bf5ddedfc38ce3010e8007e07ac98569c56
-  - 81b18c6 2026-05-20T15:02:17+01:00 UPSTREAM: 1403: Replace google.golang.org/grpc with a fork to address CVE-2026-33186
-  - 8aea85d 2026-05-20T15:02:03+01:00 UPSTREAM: <drop>: vendor changes
+- machine-config-operator embedded-component cfdb3056fd93f26cabd596ce66cfcd9519805684 to 33b3550f9b402d1716f1362149f4bee0ac01d245
+  - b43c0b11 2026-06-02T07:15:35+00:00 TestNoReboot should only consider password hash in /etc/shadow
+  - efe705fa 2026-06-02T07:15:35+00:00 OCPBUGS-83830: Apply password only if changes exist
 
-- machine-config-operator embedded-component 1dd69a37a6a840654e2558c9cc26b8fa762ab312 to cfdb3056fd93f26cabd596ce66cfcd9519805684
-  - cd2545bd 2026-05-28T17:56:30+00:00 daemon: use --delete-if-present for karg removal
-  - c1175daa 2026-05-28T12:59:59-04:00 drain: fix re-cordon detection
-  - 8b1d7cf0 2026-05-28T06:58:12+00:00 OCPBUGS-84332: Fix ssh and password rollbacks
-  - 2c8f903c 2026-05-20T18:51:49+00:00 controller: add terminationMessagePolicy to build pod containers
-
-- route-controller-manager embedded-component ce6ffa24dac3a5f49f70818e1159e40eaf27a6a3 to 2484b3e8e7fbb8bf14f930a71f56781289276dfa
-  - a8417d9 2026-05-04T14:36:57+00:00 OCPBUGS-80199: Bump google.golang.org/grpc to v1.79.3
-
-- csi-external-snapshotter image-amd64 8ddbcd381bf5317c1d1a93db3b5760681a33cb27 to 70500bf5ddedfc38ce3010e8007e07ac98569c56
-  - 81b18c6 2026-05-20T15:02:17+01:00 UPSTREAM: 1403: Replace google.golang.org/grpc with a fork to address CVE-2026-33186
-  - 8aea85d 2026-05-20T15:02:03+01:00 UPSTREAM: <drop>: vendor changes
-
-- router image-amd64 ccd9551702a89cac27e38ebb63801ddb6823d101 to 8f68a7349a85ac34dc9de9c88767c60000713575
-  - a4a670b 2026-05-04T15:13:31+00:00 OCPBUGS-80275: Bump google.golang.org/grpc to v1.79.3
-  - cdda47f 2026-04-27T17:00:58+01:00 Adding escapeHAProxySingleQuotes for sanitize
-
-- csi-external-snapshotter image-arm64 8ddbcd381bf5317c1d1a93db3b5760681a33cb27 to 70500bf5ddedfc38ce3010e8007e07ac98569c56
-  - 81b18c6 2026-05-20T15:02:17+01:00 UPSTREAM: 1403: Replace google.golang.org/grpc with a fork to address CVE-2026-33186
-  - 8aea85d 2026-05-20T15:02:03+01:00 UPSTREAM: <drop>: vendor changes
-
-- router image-arm64 ccd9551702a89cac27e38ebb63801ddb6823d101 to 8f68a7349a85ac34dc9de9c88767c60000713575
-  - a4a670b 2026-05-04T15:13:31+00:00 OCPBUGS-80275: Bump google.golang.org/grpc to v1.79.3
-  - cdda47f 2026-04-27T17:00:58+01:00 Adding escapeHAProxySingleQuotes for sanitize
+- operator-framework-olm embedded-component 4680ec1ee00e1af34e29ec598ac983bf74d2e523 to f3a32b076b409a9be12ca8082ef758f4ddffd41e
+  - 5cb586d6 2026-06-03T11:27:52+05:30 Fix CVE-2026-33186 with openshift-sustaining/grpc-go v1.71.3-sec.1 for Go 1.22
 
