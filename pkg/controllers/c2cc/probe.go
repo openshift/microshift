@@ -58,8 +58,9 @@ func RunProbe(ctx context.Context) error {
 	}()
 
 	pm := &probeManager{
-		client: msClient,
-		probes: make(map[string]context.CancelFunc),
+		client:    msClient,
+		probes:    make(map[string]context.CancelFunc),
+		latencies: make(map[string]*latencyWindow),
 	}
 
 	factory := microshiftinformers.NewSharedInformerFactory(msClient, informerResync)
@@ -110,9 +111,10 @@ func RunProbe(ctx context.Context) error {
 }
 
 type probeManager struct {
-	client microshiftclientset.Interface
-	mu     sync.Mutex
-	probes map[string]context.CancelFunc
+	client    microshiftclientset.Interface
+	mu        sync.Mutex
+	probes    map[string]context.CancelFunc
+	latencies map[string]*latencyWindow
 }
 
 func (pm *probeManager) startProbe(ctx context.Context, rc *microshiftv1alpha1.RemoteCluster) {
@@ -125,10 +127,11 @@ func (pm *probeManager) startProbe(ctx context.Context, rc *microshiftv1alpha1.R
 
 	probeCtx, cancel := context.WithCancel(ctx)
 	pm.probes[rc.Name] = cancel
+	pm.latencies[rc.Name] = &latencyWindow{}
 
 	klog.Infof("Starting probe for %q (target=%s, interval=%s)",
 		rc.Name, rc.Spec.ProbeTarget, rc.Spec.ProbeInterval.Duration)
-	go pm.runProbeLoop(probeCtx, rc.Name, rc.Spec.ProbeTarget, rc.Spec.ProbeInterval.Duration)
+	go pm.runProbeLoop(probeCtx, rc.Name, rc.Spec.ProbeTarget, rc.Spec.ProbeInterval.Duration, pm.latencies[rc.Name])
 }
 
 func (pm *probeManager) restartProbe(ctx context.Context, rc *microshiftv1alpha1.RemoteCluster) {
@@ -143,6 +146,7 @@ func (pm *probeManager) stopProbe(name string) {
 	if cancel, exists := pm.probes[name]; exists {
 		cancel()
 		delete(pm.probes, name)
+		delete(pm.latencies, name)
 		klog.Infof("Stopped probe for %q", name)
 	}
 }
@@ -154,10 +158,11 @@ func (pm *probeManager) stopAll() {
 	for name, cancel := range pm.probes {
 		cancel()
 		delete(pm.probes, name)
+		delete(pm.latencies, name)
 	}
 }
 
-func (pm *probeManager) runProbeLoop(ctx context.Context, name, target string, interval time.Duration) {
+func (pm *probeManager) runProbeLoop(ctx context.Context, name, target string, interval time.Duration, window *latencyWindow) {
 	httpClient := &http.Client{Timeout: probeHTTPTimeout}
 	consecutiveFailures := 0
 	url := "http://" + target + "/"
@@ -170,7 +175,7 @@ func (pm *probeManager) runProbeLoop(ctx context.Context, name, target string, i
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			probeErr := doProbe(ctx, httpClient, url)
+			rtt, probeErr := doProbe(ctx, httpClient, url)
 			now := metav1.Now()
 
 			status := microshiftv1alpha1.RemoteClusterStatus{
@@ -191,7 +196,10 @@ func (pm *probeManager) runProbeLoop(ctx context.Context, name, target string, i
 				consecutiveFailures = 0
 				status.State = "Healthy"
 				status.LastSuccessfulProbe = &now
+				window.add(rtt)
 			}
+
+			status.Latency = window.stats()
 
 			if err := pm.updateStatus(ctx, name, status); err != nil {
 				klog.Errorf("Failed to update status for %q: %v", name, err)
@@ -200,14 +208,16 @@ func (pm *probeManager) runProbeLoop(ctx context.Context, name, target string, i
 	}
 }
 
-func doProbe(ctx context.Context, client *http.Client, url string) error {
+func doProbe(ctx context.Context, client *http.Client, url string) (time.Duration, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
+		return 0, fmt.Errorf("failed to create request: %w", err)
 	}
+	start := time.Now()
 	resp, err := client.Do(req) // #nosec G704 -- URL built from trusted RemoteCluster CR spec
+	rtt := time.Since(start)
 	if err != nil {
-		return fmt.Errorf("failed to execute probe request: %w", err)
+		return 0, fmt.Errorf("failed to execute probe request: %w", err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
@@ -215,9 +225,9 @@ func doProbe(ctx context.Context, client *http.Client, url string) error {
 		}
 	}()
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed with unexpected status %d", resp.StatusCode)
+		return 0, fmt.Errorf("failed with unexpected status %d", resp.StatusCode)
 	}
-	return nil
+	return rtt, nil
 }
 
 func (pm *probeManager) updateStatus(ctx context.Context, name string, status microshiftv1alpha1.RemoteClusterStatus) error {
@@ -229,9 +239,12 @@ func (pm *probeManager) updateStatus(ctx context.Context, name string, status mi
 			return fmt.Errorf("failed to get RemoteCluster %q: %w", name, err)
 		}
 
-		// Preserve LastSuccessfulProbe from the existing status if this probe failed
+		// Preserve LastSuccessfulProbe & Latency from the existing status if this probe failed
 		if rc.Status.LastSuccessfulProbe != nil && status.LastSuccessfulProbe == nil {
 			status.LastSuccessfulProbe = rc.Status.LastSuccessfulProbe
+		}
+		if rc.Status.Latency != nil && status.Latency == nil {
+			status.Latency = rc.Status.Latency
 		}
 
 		rc.Status = status

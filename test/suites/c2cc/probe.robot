@@ -78,6 +78,14 @@ RemoteCluster Status Has LastSuccessfulProbe
         END
     END
 
+RemoteCluster Status Has Latency Stats
+    [Documentation]    Verify that all latency stat fields (avg/min/max/last/stddev) are populated
+    ...    on all RemoteCluster CRs across all clusters.
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
+        Wait Until Keyword Succeeds    2m    10s
+        ...    Verify Latency Stats Populated    ${alias}
+    END
+
 Probe Deployment Self-Heals After Deletion
     [Documentation]    Delete the probe deployment and verify it is recreated by the controller.
     Oc On Cluster    cluster-a
@@ -208,3 +216,21 @@ Delete Probe Deny Policy
     [Arguments]    ${alias}
     Oc On Cluster    ${alias}
     ...    oc delete networkpolicy deny-probe-ingress -n ${C2CC_NAMESPACE} --ignore-not-found
+
+Verify Latency Stats Populated
+    [Documentation]    Check that all latency fields (avg/min/max/last/stddev) are populated
+    ...    on all RemoteCluster CRs for the given cluster.
+    [Arguments]    ${alias}
+    FOR    ${field}    IN    avg    min    max    last    stddev
+        ${stdout}=    Oc On Cluster    ${alias}
+        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.latency.${field}}'
+        Should Not Be Empty    ${stdout}
+        @{values}=    Split String    ${stdout}
+        ${count}=    Get Length    ${values}
+        # "2" is expected because there are two remote clusters,
+        # so the above jsonpath provides values from both remote cluster CR.
+        Should Be Equal As Integers    ${count}    2    Expected 2 latency ${field} values, got ${count}
+        FOR    ${v}    IN    @{values}
+            Should Not Be Empty    ${v}
+        END
+    END

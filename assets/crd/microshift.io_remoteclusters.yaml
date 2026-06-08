@@ -66,6 +66,27 @@ spec:
               lastSuccessfulProbe:
                 format: date-time
                 type: string
+              latency:
+                description: Latency statistics from recent probes (rolling window
+                  of 20 samples).
+                properties:
+                  avg:
+                    type: string
+                  last:
+                    type: string
+                  max:
+                    type: string
+                  min:
+                    type: string
+                  stddev:
+                    type: string
+                required:
+                - avg
+                - last
+                - max
+                - min
+                - stddev
+                type: object
               state:
                 default: NeverProbed
                 enum:
