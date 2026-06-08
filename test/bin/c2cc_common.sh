@@ -83,8 +83,8 @@ configure_c2cc_hosts() {
 c2cc_create_vms() {
     local -r boot_commit_ref="${1}"
     local -r boot_blueprint="${2}"
-    local -r network="${3-default}"
-    local -r ip_family="${4-ipv4}" 
+    local -r network="${3:-default}"
+    local -r ip_family="${4:-ipv4}" 
 
     # Prepare kickstart for all hosts
     local ipv6_args=""
@@ -132,7 +132,7 @@ c2cc_remove_vms() {
 
 c2cc_run_tests() {
     local -r foreign_cidr="${1}"
-    local -r ip_family="${2-ipv4}"
+    local -r ip_family="${2:-ipv4}"
 
     if ! configure_c2cc_hosts; then
         return 1
