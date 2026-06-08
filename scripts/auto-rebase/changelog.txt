@@ -1,19 +1,25 @@
-- api embedded-component b66d75611553df4827e899e5eaa4d6321ed9f44c to 1d79f30d4668393dc34e9b423ec6904645503c58
-  - 4b25e2db 2026-06-01T13:57:13-04:00 OCPBUGS-85149: Backport GatewayAPIWithoutOLM feature gate as disabled
+- cluster-ingress-operator embedded-component 3a861ed50a5755aa9eaf58d4e6c86d02729dd9c0 to f7a3395618f0925fbe626b18cc8173d19ab30dac
+  - 872e33d 2026-05-06T17:51:02Z Add additional validation to AWS managed zone
+  - 04902c5 2026-05-06T17:51:02Z Address review comments on on-prem test
+  - 38f5d32 2026-05-06T17:51:02Z NE-2395: Fix e2e tests to work on platforms with unmanaged DNS
 
-- cluster-ingress-operator embedded-component 6c70966cd2011f861843e85efb8bf08c3a938fe1 to 3a861ed50a5755aa9eaf58d4e6c86d02729dd9c0
-  - 5f92040 2026-05-18T15:16:09Z Fix logging for unmanaged controllers
-  - cbafa18 2026-05-14T14:32:59-03:00 address comments
-  - c375474 2026-05-14T14:32:45-03:00 NE-2376: Remove restriction of unmanaged x-k8s.io
-  - 36eb999 2026-05-08T09:23:11+05:30  Fix raised to bump gRPC with patched fork
+- kubernetes embedded-component eab2218b931d0c20740d6259df59f242abf32ef7 to a8c502a90d898d46e989ddeb5f00b0f1a4f02298
+  - 0480a4c2d 2026-06-03T21:52:30-04:00 UPSTREAM: 133509: fix flake race in VAP e2e case
 
-- machine-config-operator embedded-component 5aabf7ccb1f54f0c889a87b1670827f9b2d23461 to 340c3847f293b8914ebef26d1e9b0a8ce2d2abd5
-  - f56be538 2026-05-26T20:59:27Z daemon: verify extension packages are staged pre-reboot and installed pst-reboot
-  - c24449d9 2026-04-27T09:23:45Z MCO-2182: MCS fallback to latest v3
+- machine-config-operator embedded-component 340c3847f293b8914ebef26d1e9b0a8ce2d2abd5 to 67bc7c608b3454ded13055bc642a169aa1dcf207
+  - 5016427b 2026-06-03T13:00:03Z chore: update AMIs
 
-- router image-amd64 b17085c57b2f55ad0317fe665655e76ba46999df to cffbbab7d26f76620a099ee86d9e5d987de9aa56
-  - 334eebf 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
+- router image-amd64 cffbbab7d26f76620a099ee86d9e5d987de9aa56 to f4c2ba80abb1fb3694a6b2ae0be2e5c898572632
+  - 545e68b 2026-06-03T15:11:34Z OCPBUGS-67161: Define admin socket URL in a single place
+  - f375f54 2026-06-03T15:11:34Z OCPBUGS-67161: Replace HTTP backend liveness check with admin socket check
 
-- router image-arm64 b17085c57b2f55ad0317fe665655e76ba46999df to cffbbab7d26f76620a099ee86d9e5d987de9aa56
-  - 334eebf 2026-04-27T17:00:57+01:00 Adding escapeHAProxySingleQuotes for sanitize
+- kubernetes image-amd64 eab2218b931d0c20740d6259df59f242abf32ef7 to a8c502a90d898d46e989ddeb5f00b0f1a4f02298
+  - 0480a4c2d 2026-06-03T21:52:30-04:00 UPSTREAM: 133509: fix flake race in VAP e2e case
+
+- router image-arm64 cffbbab7d26f76620a099ee86d9e5d987de9aa56 to f4c2ba80abb1fb3694a6b2ae0be2e5c898572632
+  - 545e68b 2026-06-03T15:11:34Z OCPBUGS-67161: Define admin socket URL in a single place
+  - f375f54 2026-06-03T15:11:34Z OCPBUGS-67161: Replace HTTP backend liveness check with admin socket check
+
+- kubernetes image-arm64 eab2218b931d0c20740d6259df59f242abf32ef7 to a8c502a90d898d46e989ddeb5f00b0f1a4f02298
+  - 0480a4c2d 2026-06-03T21:52:30-04:00 UPSTREAM: 133509: fix flake race in VAP e2e case
 
