@@ -2,6 +2,7 @@
 Documentation       Tests for Telemetry
 
 Resource            ../../resources/common.resource
+Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
