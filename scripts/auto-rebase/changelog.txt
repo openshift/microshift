@@ -1,4 +1,12 @@
-- kubernetes image-arm64 c5ea727d19837f8a22cda5c0ba8899960b7777ff to 7250fd5b9e6ffa2f127d4ae559e4adf1100d10b9
+- kubernetes embedded-component c5ea727d19837f8a22cda5c0ba8899960b7777ff to 7250fd5b9e6ffa2f127d4ae559e4adf1100d10b9
+  - 70140335d 2026-06-03T05:03:08Z UPSTREAM: 138981: Cache selinux conflicts
+  - ca371c7a4 2026-06-03T05:03:08Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
+  - a284a7e54 2026-06-03T05:03:08Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
+
+- machine-config-operator embedded-component 08af7a3d3d9408cb8dcf6f48f48687860357b022 to a250b82705e39c7920df66303c4fc66e1dccc9f6
+  - ededbe91 2026-06-04T15:39:40Z Remove trailing newline (\n) characters in klog message strings
+
+- kubernetes image-amd64 c5ea727d19837f8a22cda5c0ba8899960b7777ff to 7250fd5b9e6ffa2f127d4ae559e4adf1100d10b9
   - 70140335d 2026-06-03T05:03:08Z UPSTREAM: 138981: Cache selinux conflicts
   - ca371c7a4 2026-06-03T05:03:08Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
   - a284a7e54 2026-06-03T05:03:08Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
