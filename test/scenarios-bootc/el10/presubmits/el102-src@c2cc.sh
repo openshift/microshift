@@ -136,14 +136,12 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    if ! configure_c2cc_hosts; then
-        return 1
-    fi
+    configure_c2cc_hosts
 
     # Retrieve host2's kubeconfig
     local -r host2_ip=$(get_vm_property host2 ip)
     local -r kubeconfig_b="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-b"
-    
+
     # Retrieve host3's kubeconfig
     local -r host3_ip=$(get_vm_property host3 ip)
     local -r kubeconfig_c="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-c"
