@@ -1,13 +1,12 @@
-- kubernetes embedded-component c5ea727d19837f8a22cda5c0ba8899960b7777ff to 7250fd5b9e6ffa2f127d4ae559e4adf1100d10b9
-  - 70140335d 2026-06-03T05:03:08Z UPSTREAM: 138981: Cache selinux conflicts
-  - ca371c7a4 2026-06-03T05:03:08Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
-  - a284a7e54 2026-06-03T05:03:08Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
-
-- machine-config-operator embedded-component 08af7a3d3d9408cb8dcf6f48f48687860357b022 to a250b82705e39c7920df66303c4fc66e1dccc9f6
-  - ededbe91 2026-06-04T15:39:40Z Remove trailing newline (\n) characters in klog message strings
-
-- kubernetes image-amd64 c5ea727d19837f8a22cda5c0ba8899960b7777ff to 7250fd5b9e6ffa2f127d4ae559e4adf1100d10b9
-  - 70140335d 2026-06-03T05:03:08Z UPSTREAM: 138981: Cache selinux conflicts
-  - ca371c7a4 2026-06-03T05:03:08Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
-  - a284a7e54 2026-06-03T05:03:08Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
+- machine-config-operator embedded-component a250b82705e39c7920df66303c4fc66e1dccc9f6 to 78a9eabe11a818eec75f1c5355a08b5204ba5b7b
+  - 18a6a6f4 2026-06-04T11:12:14+05:30 Migrate mco_observability and mco_daemon tests from openshift-tests-private
+  - faeab0bf 2026-06-03T10:26:21-04:00 Fix e2e-ocl-2of2 timeout flake for TestStaleAnnotationClearedOnLayerOnlyChange
+  - cdc473d3 2026-06-03T10:26:21-04:00 Remove monolithic e2e-ocl test suite
+  - 039fd6b1 2026-06-03T10:26:21-04:00 Fix e2e-ocl-1of2 flake where MOSB is deleted by stale controller event
+  - 7df892b3 2026-05-25T04:58:36Z Fix test 88814: osImageStream is empty when pool is degraded
+  - bdcaed42 2026-05-25T04:58:36Z Fix test 88814: use IGNITION_VERSION for degradation instead of invalid osImageURL
+  - 42f32218 2026-05-25T04:58:36Z Fix test 88814: wait for degraded state to clear before waitForComplete
+  - ae61da12 2026-05-25T04:58:36Z Remove OTP label and MCO-2025 prefix from test titles
+  - 69871bb3 2026-05-25T04:58:36Z Split OCP-88366: separate degraded pool test into OCP-88814
+  - 0d6cf803 2026-05-25T04:58:36Z Migrate test OCP-88366: osImageStream should be empty when osImageURL is set
 
