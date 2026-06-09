@@ -71,7 +71,7 @@ Start Tcpdump For ESP On Cluster
     VAR    ${pcap_file}=    /tmp/esp-capture-${alias}.pcap
     Disruptive Command On Cluster    ${alias}    rm -f ${pcap_file}
     Command On Cluster    ${alias}
-    ...    nohup timeout ${timeout} tcpdump -i ${iface} -w ${pcap_file} esp &>/dev/null &
+    ...    nohup timeout ${timeout} tcpdump -U -i ${iface} -w ${pcap_file} esp &>/dev/null &
     Sleep    2s    reason=Wait for tcpdump to initialize packet capture
     RETURN    ${pcap_file}
 
