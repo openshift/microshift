@@ -172,12 +172,15 @@ c2cc_run_tests() {
         ip_family_var="--variable IP_FAMILY:${ip_family}"
     fi
 
+    local host2_ip host3_ip
+    host2_ip=$(get_host_ip host2) || return 1
+    host3_ip=$(get_host_ip host3) || return 1
+    readonly host2_ip host3_ip
+
     # Retrieve host2's kubeconfig
-    local -r host2_ip=$(get_vm_property host2 ip)
     local -r kubeconfig_b="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-b"
     
     # Retrieve host3's kubeconfig
-    local -r host3_ip=$(get_vm_property host3 ip)
     local -r kubeconfig_c="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-c"
 
     # Wait for host2 and host3 to be fully ready (run_tests only waits for host1)
