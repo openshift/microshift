@@ -43,5 +43,6 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    c2cc_run_tests "2001:db8::/64" ipv6
+    configure_c2cc_hosts
+    c2cc_run_tests "suites/c2cc/" "2001:db8::/64" ipv6
 }

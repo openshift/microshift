@@ -59,11 +59,16 @@ EOF"
 }
 
 configure_c2cc_hosts() {
-    local -r host1_ip=$(get_vm_property host1 ip)
-    local -r host2_ip=$(get_vm_property host2 ip)
-    local -r host3_ip=$(get_vm_property host3 ip)
+    local -r pre_junit_label="${1:-c2cc_pre_greenboot}"
+    local -r post_junit_label="${2:-c2cc_greenboot}"
 
-    wait_for_greenboot_on_hosts "c2cc_pre_greenboot"
+    local host1_ip host2_ip host3_ip
+    host1_ip=$(get_vm_property host1 ip) || { echo "failed to get host1 ip" >&2; return 1; }
+    host2_ip=$(get_vm_property host2 ip) || { echo "failed to get host2 ip" >&2; return 1; }
+    host3_ip=$(get_vm_property host3 ip) || { echo "failed to get host3 ip" >&2; return 1; }
+    readonly host1_ip host2_ip host3_ip
+
+    wait_for_greenboot_on_hosts "${pre_junit_label}"
 
     configure_c2cc_host host1 \
         "${host2_ip}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}" \
@@ -77,7 +82,7 @@ configure_c2cc_hosts() {
         "${host1_ip}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}" \
         "${host2_ip}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}"
 
-    wait_for_greenboot_on_hosts "c2cc_greenboot"
+    wait_for_greenboot_on_hosts "${post_junit_label}"
 }
 
 c2cc_create_vms() {
@@ -131,11 +136,18 @@ c2cc_remove_vms() {
 }
 
 c2cc_run_tests() {
-    local -r foreign_cidr="${1}"
-    local -r ip_family="${2:-ipv4}"
+    local -r suites_dir="${1}"
+    local -r foreign_cidr="${2}"
+    local -r ip_family="${3}"
 
-    if ! configure_c2cc_hosts; then
-        return 1
+    local foreign_cidr_var=""
+    if [ -n "${foreign_cidr}" ]; then
+        foreign_cidr_var="--variable FOREIGN_CIDR:${foreign_cidr}"
+    fi
+
+    local ip_family_var=""
+    if [ -n "${ip_family}" ]; then
+        ip_family_var="--variable IP_FAMILY:${ip_family}"
     fi
 
     # Retrieve host2's kubeconfig
@@ -155,6 +167,7 @@ c2cc_run_tests() {
     copy_file_from_vm host2 "/tmp/kubeconfig-b" "${kubeconfig_b}"
     copy_file_from_vm host3 "/tmp/kubeconfig-c" "${kubeconfig_c}"
 
+    # shellcheck disable=SC2086
     run_tests host1 \
         --variable "CLUSTER_A_POD_CIDR:${CLUSTER_A_POD_CIDR}" \
         --variable "CLUSTER_A_SVC_CIDR:${CLUSTER_A_SVC_CIDR}" \
@@ -167,7 +180,7 @@ c2cc_run_tests() {
         --variable "CLUSTER_C_SVC_CIDR:${CLUSTER_C_SVC_CIDR}" \
         --variable "CLUSTER_C_DOMAIN:${CLUSTER_C_DOMAIN}" \
         --variable "KUBECONFIG_C:${kubeconfig_c}" \
-        --variable "FOREIGN_CIDR:${foreign_cidr}" \
-        --variable "IP_FAMILY:${ip_family}" \
-        suites/c2cc/
+        ${foreign_cidr_var} \
+        ${ip_family_var} \
+        "${suites_dir}"
 }

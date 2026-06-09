@@ -31,5 +31,6 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    c2cc_run_tests "192.0.2.0/24"
+    configure_c2cc_hosts
+    c2cc_run_tests "suites/c2cc/" "192.0.2.0/24"
 }
