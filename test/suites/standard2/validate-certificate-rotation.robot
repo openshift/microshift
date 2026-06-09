@@ -114,11 +114,17 @@ Compute Date After Days
     RETURN    ${future_date}
 
 Certs Should Expire On
-    [Documentation]    verify if the certificate expires at given date.
+    [Documentation]    verify if the certificate expires within ±1 day of the expected date.
+    ...    Allows tolerance for midnight boundary timing between the test's
+    ...    date computation and MicroShift's alignValidity() anchor point.
     [Arguments]    ${cert_file}    ${cert_expected_date}
     ${expiration_date}=    Command Should Work
     ...    ${OSSL_CMD} ${cert_file} | grep notAfter | cut -f2 -d'=' | awk '{printf ("%s %02d %d",$1,$2,$4)}'
-    Should Be Equal As Strings    ${cert_expected_date}    ${expiration_date}
+    ${expected_epoch}=    Command Should Work    TZ=UTC date -d "${cert_expected_date}" +%s
+    ${actual_epoch}=    Command Should Work    TZ=UTC date -d "${expiration_date}" +%s
+    ${diff}=    Evaluate    abs(int($actual_epoch) - int($expected_epoch))
+    Should Be True    ${diff} <= 86400
+    ...    msg=Certificate expiry ${expiration_date} differs from expected ${cert_expected_date} by more than 1 day (${diff}s)
 
 All Certificates Should Be Valid For Current Time
     [Documentation]    Wait for multiple certificate files to be regenerated and valid
