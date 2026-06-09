@@ -46,7 +46,7 @@ download_build_cache() {
     if ./bin/manage_build_cache.sh verify -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}" ; then
         # Download the cached images
         ./bin/manage_build_cache.sh download -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}"
-        return 0
+        return $?
     fi
     return 1
 }
