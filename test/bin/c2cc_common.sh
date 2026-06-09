@@ -19,6 +19,11 @@ CLUSTER_C_DOMAIN="cluster-c.remote"
 
 export TEST_RANDOMIZATION=suites
 
+get_host_ip() {
+    local host=$1
+    get_vm_property "${host}" ip || { echo "failed to get ${host} ip" >&2; return 1; }
+}
+
 wait_for_greenboot_on_hosts() {
     local junit_label=$1
     local host
@@ -80,9 +85,9 @@ configure_c2cc_hosts() {
     local -r post_junit_label="${2:-c2cc_greenboot}"
 
     local host1_ip host2_ip host3_ip
-    host1_ip=$(get_vm_property host1 ip) || { echo "failed to get host1 ip" >&2; return 1; }
-    host2_ip=$(get_vm_property host2 ip) || { echo "failed to get host2 ip" >&2; return 1; }
-    host3_ip=$(get_vm_property host3 ip) || { echo "failed to get host3 ip" >&2; return 1; }
+    host1_ip=$(get_host_ip host1) || return 1
+    host2_ip=$(get_host_ip host2) || return 1
+    host3_ip=$(get_host_ip host3) || return 1
     readonly host1_ip host2_ip host3_ip
 
     wait_for_greenboot_on_hosts "${pre_junit_label}"
@@ -289,9 +294,9 @@ wait_for_ipsec_tunnels() {
 
 configure_ipsec() {
     local host1_ip host2_ip host3_ip
-    host1_ip=$(get_vm_property host1 ip) || { echo "failed to get host1 ip" >&2; return 1; }
-    host2_ip=$(get_vm_property host2 ip) || { echo "failed to get host2 ip" >&2; return 1; }
-    host3_ip=$(get_vm_property host3 ip) || { echo "failed to get host3 ip" >&2; return 1; }
+    host1_ip=$(get_host_ip host1) || return 1
+    host2_ip=$(get_host_ip host2) || return 1
+    host3_ip=$(get_host_ip host3) || return 1
     readonly host1_ip host2_ip host3_ip
 
     local psk
