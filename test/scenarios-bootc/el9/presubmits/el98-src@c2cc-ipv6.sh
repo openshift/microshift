@@ -5,8 +5,6 @@
 # shellcheck source=test/bin/c2cc_common.sh
 source "${SCRIPTDIR}/c2cc_common.sh"
 
-export TEST_RANDOMIZATION=suites
-
 # Redefine network-related settings to use the dedicated IPv6 network bridge
 # shellcheck disable=SC2034  # used elsewhere
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"

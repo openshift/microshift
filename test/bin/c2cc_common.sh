@@ -2,6 +2,23 @@
 #
 # This script contains common functions used by C2CC scenarios.
 
+# Cluster A (host1): default MicroShift CIDRs
+CLUSTER_A_POD_CIDR="10.42.0.0/16"
+CLUSTER_A_SVC_CIDR="10.43.0.0/16"
+CLUSTER_A_DOMAIN="cluster-a.remote"
+
+# Cluster B (host2): non-overlapping CIDRs
+CLUSTER_B_POD_CIDR="10.45.0.0/16"
+CLUSTER_B_SVC_CIDR="10.46.0.0/16"
+CLUSTER_B_DOMAIN="cluster-b.remote"
+
+# Cluster C (host3): non-overlapping CIDRs
+CLUSTER_C_POD_CIDR="10.48.0.0/16"
+CLUSTER_C_SVC_CIDR="10.49.0.0/16"
+CLUSTER_C_DOMAIN="cluster-c.remote"
+
+export TEST_RANDOMIZATION=suites
+
 wait_for_greenboot_on_hosts() {
     local junit_label=$1
     local host
