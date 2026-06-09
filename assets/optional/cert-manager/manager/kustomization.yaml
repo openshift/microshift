@@ -58,6 +58,16 @@ replacements:
   - source:
       kind: ConfigMap
       name: cert-manager-images
+      fieldPath: data.cert-manager-trust-manager
+    targets:
+      - select:
+          kind: Deployment
+          name: controller-manager
+        fieldPaths:
+          - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_TRUST_MANAGER].value
+  - source:
+      kind: ConfigMap
+      name: cert-manager-images
       fieldPath: data.controller
     targets:
       - select:

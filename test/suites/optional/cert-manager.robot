@@ -23,36 +23,35 @@ Test Tags           cert-manager    certificates    tls
 
 
 *** Variables ***
-${CERT_NAME}                        test-certificate
-${SECRET_NAME}                      test-cert-secret
-${ISSUER_NAME}                      test-issuer
-${CERT_COMMON_NAME}                 example.com
-${CERT_DNS_NAME}                    example.com
-${ROUTE_NAME}                       hello-app
-${CERT_ISSUER_YAML}                 SEPARATOR=\n
-...                                 ---
-...                                 apiVersion: cert-manager.io/v1
-...                                 kind: ClusterIssuer
-...                                 metadata:
-...                                 \ \ name: ${ISSUER_NAME}
-...                                 spec:
-...                                 \ \ selfSigned: {}
+${CERT_NAME}                    test-certificate
+${SECRET_NAME}                  test-cert-secret
+${ISSUER_NAME}                  test-issuer
+${CERT_COMMON_NAME}             example.com
+${CERT_DNS_NAME}                example.com
+${ROUTE_NAME}                   hello-app
+${CERT_ISSUER_YAML}             SEPARATOR=\n
+...                             ---
+...                             apiVersion: cert-manager.io/v1
+...                             kind: ClusterIssuer
+...                             metadata:
+...                             \ \ name: ${ISSUER_NAME}
+...                             spec:
+...                             \ \ selfSigned: {}
 
-${HTTP01_ISSUER_NAME}               letsencrypt-http01
-${HTTP01_CERT_NAME}                 cert-from-${HTTP01_ISSUER_NAME}
-${HTTP01_SECRET_NAME}               ${HTTP01_CERT_NAME}
-${PEBBLE_DEPLOYMENT_FILE}           ./assets/cert-manager/pebble-server.yaml
-${HOSTSFILE_ENABLED}                SEPARATOR=\n
-...                                 ---
-...                                 dns:
-...                                 \ \ hosts:
-...                                 \ \ \ \ status: Enabled
+${HTTP01_ISSUER_NAME}           letsencrypt-http01
+${HTTP01_CERT_NAME}             cert-from-${HTTP01_ISSUER_NAME}
+${HTTP01_SECRET_NAME}           ${HTTP01_CERT_NAME}
+${PEBBLE_DEPLOYMENT_FILE}       ./assets/cert-manager/pebble-server.yaml
+${HOSTSFILE_ENABLED}            SEPARATOR=\n
+...                             ---
+...                             dns:
+...                             \ \ hosts:
+...                             \ \ \ \ status: Enabled
 
-${TRUST_MANAGER_BUNDLE_NAME}        test-trust-bundle
-${TRUST_MANAGER_OPERATOR_NS}        cert-manager-operator
-${TRUST_MANAGER_NS}                 cert-manager
-${TRUST_MANAGER_DEPLOYMENT}         cert-manager-operator-controller-manager
-${TRUST_MANAGER_MANIFESTS_DIR}      /etc/microshift/manifests.d/trust-manager
+${TRUST_MANAGER_BUNDLE_NAME}    test-trust-bundle
+${TRUST_MANAGER_OPERATOR_NS}    cert-manager-operator
+${TRUST_MANAGER_NS}             cert-manager
+${TRUST_MANAGER_DEPLOYMENT}     cert-manager-operator-controller-manager
 
 
 *** Test Cases ***
@@ -506,21 +505,25 @@ Cleanup DNS For Test
     Restart MicroShift
 
 Enable Trust Manager
-    [Documentation]    Deploy trust-manager by creating a TrustManager CR via manifests.d
-    ...    and restarting MicroShift. The UNSUPPORTED_ADDON_FEATURES=TrustManager=true
-    ...    feature gate is already set in the system cert-manager kustomization.
-    Create Trust Manager CR Manifests
-    Restart MicroShift
+    [Documentation]    Deploy trust-manager by applying the TrustManager CR directly.
+    ...    The UNSUPPORTED_ADDON_FEATURES=TrustManager=true feature gate is already
+    ...    set in the system cert-manager kustomization.
+    ${tm_cr}=    CATENATE    SEPARATOR=\n
+    ...    apiVersion: operator.openshift.io/v1alpha1
+    ...    kind: TrustManager
+    ...    metadata:
+    ...    \ \ name: cluster
+    ...    spec:
+    ...    \ \ trustManagerConfig: {}
+    Apply Trust Manager YAML    ${tm_cr}
     Wait Until Keyword Succeeds    30x    10s
     ...    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
 
 Disable Trust Manager
-    [Documentation]    Remove the TrustManager CR manifests.d and restart MicroShift.
+    [Documentation]    Remove the TrustManager CR and wait for cleanup.
     Run With Kubeconfig    oc delete trustmanager cluster --ignore-not-found
     Run With Kubeconfig    oc delete bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
     Run With Kubeconfig    oc delete deployment trust-manager -n ${TRUST_MANAGER_NS} --ignore-not-found
-    Remove Trust Manager CR Manifests
-    Restart MicroShift
     Wait Until Keyword Succeeds    12x    10s
     ...    Trust Manager Pod Should Not Exist
 
@@ -529,35 +532,7 @@ Trust Manager Pod Should Not Exist
     ${output}=    Run With Kubeconfig
     ...    oc get pods -n ${TRUST_MANAGER_NS} -l app.kubernetes.io/name\=cert-manager-trust-manager --no-headers
     ...    allow_fail=True
-    Should Be Empty    ${output}    msg=trust-manager pod still exists
-
-Create Trust Manager CR Manifests
-    [Documentation]    Create the manifests.d kustomization with the TrustManager CR
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    mkdir -p ${TRUST_MANAGER_MANIFESTS_DIR}
-    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
-    Should Be Equal As Integers    ${rc}    0
-    ${kustomization}=    CATENATE    SEPARATOR=\n
-    ...    apiVersion: kustomize.config.k8s.io/v1beta1
-    ...    kind: Kustomization
-    ...    resources:
-    ...    \ \ - trust-manager-cr.yaml
-    Upload String To File    ${kustomization}    ${TRUST_MANAGER_MANIFESTS_DIR}/kustomization.yaml
-    ${tm_cr}=    CATENATE    SEPARATOR=\n
-    ...    apiVersion: operator.openshift.io/v1alpha1
-    ...    kind: TrustManager
-    ...    metadata:
-    ...    \ \ name: cluster
-    ...    spec:
-    ...    \ \ trustManagerConfig: {}
-    Upload String To File    ${tm_cr}    ${TRUST_MANAGER_MANIFESTS_DIR}/trust-manager-cr.yaml
-
-Remove Trust Manager CR Manifests
-    [Documentation]    Remove the trust-manager manifests.d directory
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    rm -rf ${TRUST_MANAGER_MANIFESTS_DIR}
-    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
-    Should Be Equal As Integers    ${rc}    0
+    Should Not Contain    ${output}    trust-manager    msg=trust-manager pod still exists
 
 Create CA Secret For Trust Manager
     [Documentation]    Generate a self-signed CA cert locally and create a secret in the trust namespace
