@@ -139,8 +139,8 @@ Setup Pebble Server
     [Arguments]    ${namespace}
     ${result}=    Oc Apply    -f ${PEBBLE_DEPLOYMENT_FILE} -n ${namespace}
 
-    # Wait for Pebble deployment to be ready
-    Wait Until Keyword Succeeds    12x    10s    Check Pebble Deployment Ready    ${namespace}
+    # Wait for Pebble deployment to be ready (ARM64 needs longer startup)
+    Wait Until Keyword Succeeds    24x    10s    Check Pebble Deployment Ready    ${namespace}
 
     VAR    ${endpoint}=    https://pebble.${namespace}.svc.cluster.local:14000/dir
     Log    Pebble server setup successfully! (endpoint ${endpoint})

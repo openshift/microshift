@@ -2,6 +2,8 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+TEST_EXECUTION_TIMEOUT=60m
+
 # Redefine network-related settings to use the dedicated network bridge
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
