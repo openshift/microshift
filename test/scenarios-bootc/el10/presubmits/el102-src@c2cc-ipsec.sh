@@ -7,6 +7,9 @@
 # full mesh.  Tests validate ESP encapsulation, connectivity, policy
 # enforcement, plaintext rejection, and MTU behaviour.
 
+# shellcheck source=test/bin/c2cc_common.sh
+source "${SCRIPTDIR}/c2cc_common.sh"
+
 # IPsec tests have ordering dependencies (setup verification must pass before
 # enforcement tests), so disable randomization.
 export TEST_RANDOMIZATION=none
@@ -25,7 +28,6 @@ CLUSTER_B_DOMAIN="cluster-b.remote"
 CLUSTER_C_POD_CIDR="10.48.0.0/16"
 CLUSTER_C_SVC_CIDR="10.49.0.0/16"
 CLUSTER_C_DOMAIN="cluster-c.remote"
-
 
 # configure_ipsec_host writes the PSK and connection configs, initializes the
 # NSS database, and starts the ipsec service on a single host.
