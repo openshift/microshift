@@ -1,0 +1,12 @@
+- operator-framework-olm embedded-component ba51f79a26f4e32659da4627cb3c577d924ac8f4 to 49b453662f1eae64212bf12cc96ce7f327f342d1
+  - a92cf3d4 2026-05-20T00:11:26+05:30 OCPBUGS-82057: Drop github.com/distribution/distribution dep
+
+- route-controller-manager embedded-component 5da234dd58c092cba019807979f9c29664ddb860 to c1af9e08f34658e703dd0d1bce5f2df8207c7cfd
+  - bd1721c 2026-05-04T21:00:59+00:00 OCPBUGS-79934: Bump google.golang.org/grpc to v1.79.3
+
+- router image-amd64 7c4b47201b75421631739feb42e7ae86ae047739 to 737cf348c315da38a947dadc229d1144d00c2b27
+  - da2c909 2026-04-27T17:00:58+01:00 Adding escapeHAProxySingleQuotes for sanitize
+
+- router image-arm64 7c4b47201b75421631739feb42e7ae86ae047739 to 737cf348c315da38a947dadc229d1144d00c2b27
+  - da2c909 2026-04-27T17:00:58+01:00 Adding escapeHAProxySingleQuotes for sanitize
+
