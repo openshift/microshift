@@ -1,12 +1,3 @@
-- machine-config-operator embedded-component a250b82705e39c7920df66303c4fc66e1dccc9f6 to 78a9eabe11a818eec75f1c5355a08b5204ba5b7b
-  - 18a6a6f4 2026-06-04T11:12:14+05:30 Migrate mco_observability and mco_daemon tests from openshift-tests-private
-  - faeab0bf 2026-06-03T10:26:21-04:00 Fix e2e-ocl-2of2 timeout flake for TestStaleAnnotationClearedOnLayerOnlyChange
-  - cdc473d3 2026-06-03T10:26:21-04:00 Remove monolithic e2e-ocl test suite
-  - 039fd6b1 2026-06-03T10:26:21-04:00 Fix e2e-ocl-1of2 flake where MOSB is deleted by stale controller event
-  - 7df892b3 2026-05-25T04:58:36Z Fix test 88814: osImageStream is empty when pool is degraded
-  - bdcaed42 2026-05-25T04:58:36Z Fix test 88814: use IGNITION_VERSION for degradation instead of invalid osImageURL
-  - 42f32218 2026-05-25T04:58:36Z Fix test 88814: wait for degraded state to clear before waitForComplete
-  - ae61da12 2026-05-25T04:58:36Z Remove OTP label and MCO-2025 prefix from test titles
-  - 69871bb3 2026-05-25T04:58:36Z Split OCP-88366: separate degraded pool test into OCP-88814
-  - 0d6cf803 2026-05-25T04:58:36Z Migrate test OCP-88366: osImageStream should be empty when osImageURL is set
+- machine-config-operator embedded-component 78a9eabe11a818eec75f1c5355a08b5204ba5b7b to 1e10f967632964da25a5bfb17c9deeeb4cd22952
+  - ac523be1 2026-06-08T11:15:57+05:30 Merge pull request #6078 from ptalgulk01/fix-osimagestream-status-config-lag
 
