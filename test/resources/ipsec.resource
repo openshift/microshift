@@ -72,7 +72,7 @@ Start Tcpdump For ESP On Cluster
     Disruptive Command On Cluster    ${alias}    rm -f ${pcap_file}
     ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
     SSHLibrary.Switch Connection    ${conn_id}
-    SSHLibrary.Start Command    tcpdump -U -i ${iface} -w ${pcap_file} esp 2>/dev/null    sudo=True
+    SSHLibrary.Start Command    tcpdump -U -i ${iface} -w ${pcap_file} esp    sudo=True
     Sleep    2s    reason=Wait for tcpdump to initialize packet capture
     RETURN    ${pcap_file}
 
@@ -83,7 +83,9 @@ Wait For Tcpdump And Verify ESP
     Disruptive Command On Cluster    ${alias}    pkill -INT tcpdump
     ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
     SSHLibrary.Switch Connection    ${conn_id}
-    SSHLibrary.Read Command Output
+    ${stdout}    ${stderr}=    SSHLibrary.Read Command Output    return_stderr=True
+    Log    tcpdump stdout: ${stdout}    level=DEBUG
+    Log    tcpdump stderr: ${stderr}    level=DEBUG
     ${stdout}=    Command On Cluster    ${alias}
     ...    tcpdump -r ${pcap_file} 2>/dev/null | head -5
     Should Contain    ${stdout}    ESP
