@@ -159,8 +159,8 @@ c2cc_remove_vms() {
 
 c2cc_run_tests() {
     local -r suites_dir="${1}"
-    local -r foreign_cidr="${2}"
-    local -r ip_family="${3}"
+    local -r foreign_cidr="${2:-}"
+    local -r ip_family="${3:-}"
 
     local foreign_cidr_var=""
     if [ -n "${foreign_cidr}" ]; then
