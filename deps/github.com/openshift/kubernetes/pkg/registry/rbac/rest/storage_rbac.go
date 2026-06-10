@@ -363,8 +363,8 @@ func primeAggregatedClusterRoles(ctx context.Context, clusterRolesToAggregate ma
 		if err == nil {
 			continue
 		}
-		return err
 		if !apierrors.IsNotFound(err) {
+			return err
 		}
 
 		existingRole, err := clusterRoleClient.ClusterRoles().Get(ctx, oldName, metav1.GetOptions{})
