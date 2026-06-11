@@ -1,10 +1,15 @@
-- api embedded-component 50517c6f4bfdbf9fc2cb291fd97cce150a3237ca to 6755619009c291e10c1903d20c579eae4bac9854
-  - 30108b30 2026-06-02T20:40:18-04:00 OCPBUGS-85149: Backport GatewayAPIWithoutOLM feature gate as disabled
-  - 69ef4c57 2026-06-02T09:03:47Z Add labelSelector to MachineSet status for scale subresource
+- kubernetes embedded-component 2a0461f5d0e21c5b74371626fad32f9632920caa to 690775342de24ee56631e38e3f17592b14a6b202
+  - d9bed68bd 2026-06-04T18:11:31Z UPSTREAM: 133509: fix flake race in VAP e2e case
 
-- cluster-kube-apiserver-operator embedded-component 645cb9f8bb9171c390cad9eb3fdeb9a1be30ca8a to aa9bd6a74ac8b3c9918581b5e49f8e7cf0109862
-  - 264900e 2026-05-21T11:17:56-04:00 vendor: bump library-go for atomicdir fsync fix
+- ovn-kubernetes image-amd64 1dce328f5ea3cba8bbabfcaaabb38aa4208f90b3 to 24316b97b964e7de7aa2d7272aa8adc963ea9679
+  - d18e8e85 2026-06-04T17:37:52+02:00 remove forced V(5) logging during startup
 
-- machine-config-operator embedded-component a271df11d1323435cdf0f4aac925640c42fedccd to 1bee530c4d08401d07454a259a5ee430edb5216b
-  - 1aec4fb6 2026-06-03T14:08:26Z chore: update AMIs
+- kubernetes image-amd64 2a0461f5d0e21c5b74371626fad32f9632920caa to 690775342de24ee56631e38e3f17592b14a6b202
+  - d9bed68bd 2026-06-04T18:11:31Z UPSTREAM: 133509: fix flake race in VAP e2e case
+
+- ovn-kubernetes image-arm64 1dce328f5ea3cba8bbabfcaaabb38aa4208f90b3 to 24316b97b964e7de7aa2d7272aa8adc963ea9679
+  - d18e8e85 2026-06-04T17:37:52+02:00 remove forced V(5) logging during startup
+
+- kubernetes image-arm64 2a0461f5d0e21c5b74371626fad32f9632920caa to 690775342de24ee56631e38e3f17592b14a6b202
+  - d9bed68bd 2026-06-04T18:11:31Z UPSTREAM: 133509: fix flake race in VAP e2e case
 
