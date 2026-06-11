@@ -1,7 +1,0 @@
-- machine-config-operator embedded-component cfdb3056fd93f26cabd596ce66cfcd9519805684 to 33b3550f9b402d1716f1362149f4bee0ac01d245
-  - b43c0b11 2026-06-02T07:15:35+00:00 TestNoReboot should only consider password hash in /etc/shadow
-  - efe705fa 2026-06-02T07:15:35+00:00 OCPBUGS-83830: Apply password only if changes exist
-
-- operator-framework-olm embedded-component 4680ec1ee00e1af34e29ec598ac983bf74d2e523 to f3a32b076b409a9be12ca8082ef758f4ddffd41e
-  - 5cb586d6 2026-06-03T11:27:52+05:30 Fix CVE-2026-33186 with openshift-sustaining/grpc-go v1.71.3-sec.1 for Go 1.22
-
