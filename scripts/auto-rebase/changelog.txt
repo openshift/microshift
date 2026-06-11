@@ -1,39 +1,40 @@
-- cluster-kube-apiserver-operator embedded-component 24b60d04b3478e04a728fb0ae1385abc6a478d20 to a61282875d032c4b8cc7ea5567830942583ec378
-  - 75e998a 2026-06-08T13:41:30+02:00 NO-JIRA: Automatic agentic rebase: Update library-go to 0469313
-  - e126bb0 2026-06-01T12:29:56+02:00 Fix kube-apiserver-to-kubelet-signer refresh interval
+- api embedded-component 1194f4c62539275cd6dec231cc2bf7e0a010bd94 to 5d6833341521c0b9239e352153d4cab9baab3e25
+  - ee7dc415 2026-06-07T19:39:21Z Updating ose-cluster-config-api-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-cluster-config-api.yml
+  - 8ecf6a78 2026-05-14T11:13:38-04:00 Lower maximum allowed etcd quota from 32 to 16GiB
 
-- cluster-kube-controller-manager-operator embedded-component 9d636ab4992bd501006d2b0c1d3ac512666c6ca7 to c35307f04313369c9ba4dcab3308506a3987065e
-  - aa0c868 2026-06-03T17:05:46+05:30 fix lock failure cases
+- cluster-dns-operator embedded-component 65d60f9c12297a91ee89359e90f591fd44e661b0 to 4556c40798213ee824f76c26bef66865326fe08b
+  - d4284dc 2026-05-18T14:30:22-04:00 NE-2391: Add Force management state to docs
+  - 2fa1fac 2026-04-24T09:33:58-04:00 Address CodeRabbit review feedback
+  - 75d5e62 2026-04-23T17:50:34-04:00 NE-2391: Add progressive disclosure AI agent context
 
-- etcd embedded-component c543fe15324510d13e896c31232ecd5d100d9de5 to bf6c0094589afdf6c814a28c24f8f1bb5a577816
-  - d4656811 2026-06-06T16:04:21Z Updating ose-etcd-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-etcd.yml
+- cluster-ingress-operator embedded-component 140e0bf13b3d01c369672c766c44b4be0b4ec78c to 5f559aec7460ba47a04dbe6ce1a6dc7c842a6a5e
+  - 5fcf1a07 2026-06-09T14:58:48+01:00 Replace iptables with nftables in TestConnectTimeout e2e test
 
-- machine-config-operator embedded-component 62b06d28399b348cb7238d32ad74b9a978c4292f to 62dbab4477ce608b73bb8d4b190b0f522d2a5bb5
-  - cfb74c3e 2026-06-05T13:08:35-04:00 Fix error wrapping and error message casing
-  - a96a9248 2026-06-05T08:57:59Z MCO-2321: adapt osimagestream tests to clusters with rhel-10 default stream
-  - b547d0ae 2026-06-04T07:50:22-04:00 avoid running IRI deletion tests for standard e2e IRI tests
-  - 55be329d 2026-06-03T14:48:40+05:30 Reorder functions to match source file sequence
-  - 02d7d918 2026-06-02T20:20:43+05:30 Add bootstrap infrastructure and migrate test 53960
-  - 80b16676 2026-06-02T20:20:43+05:30 Migrate registry tests from openshift-tests-private
-  - dbea5e53 2026-05-28T15:23:08-04:00 bootimage: use version for vsphere hotloop check
-
-- operator-framework-olm embedded-component a1de734673fb56da500b6ea212a70d50bd5740ab to c0b1b223882bd7657853441ccf18099527a8841b
-  - 230f72bf 2026-06-05T10:25:33-04:00 [CARRY] fix unit test failure
-  - 2d13397d 2026-06-05T06:43:47-04:00 UPSTREAM: <carry>: Update to golang 1.26.3 and openshift-4.23 builders
-
-- oc image-amd64 d1f312bb855e741cadb8b3ac419d2cb3f3fd7ba5 to 4007283544cbc3609f90375b7a8efd395561612f
-  - c57c61a1 2026-06-08T04:25:30Z Updating openshift-enterprise-deployer-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/openshift-enterprise-deployer.yml
-
-- csi-external-snapshotter image-arm64 77d02e52a442c1a98457797bf8eb5777489aabae to 6411c3232ca015c2a02ece1d5a675045d17031cd
+- csi-external-snapshotter embedded-component 77d02e52a442c1a98457797bf8eb5777489aabae to 6411c3232ca015c2a02ece1d5a675045d17031cd
   - 872813a 2026-06-07T12:35:43Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
 
-- router image-arm64 a86164c8ebaed55a2a28451fa913a04f10cc9a72 to 808b0001233b4c084694244f25cd53c3808c4e81
+- kubernetes embedded-component 872bd3722d0954b31459f715fbd4fb7612aaf338 to d8d517e6bbe7cf7359026cac26bb96ea45e18806
+  - 59c831f7c 2026-06-06T16:54:59-04:00 UPSTREAM: <carry>: add kubernetes/conformance umbrella suite
+
+- machine-config-operator embedded-component 62dbab4477ce608b73bb8d4b190b0f522d2a5bb5 to ee994cd50b06fbe93bcf20e769c1fef405a10a90
+  - 8959e528 2026-06-08T20:02:57+02:00 MCO-2343: Temporary make MCO default to rhel-9
+  - ea093553 2026-06-08T09:21:56+02:00 OCPBUGS-87635: Fix MCP.status.osImageStream
+  - 4dc05f6f 2026-06-05T13:55:40+05:30 OCPBUGS-78524: Create mco_extensions.go suite with USBGuard, install all extensions, and invalid extensions tests
+  - 65934067 2026-06-05T12:58:31+05:30 OCP-88729: Only wait on last MachineConfig deletion to avoid double-waiting
+  - 2f91e47a 2026-06-05T12:58:31+05:30 OCP-88729: Use mc.DeleteWithWait() for cleanup instead of raw oc delete
+  - 7222f9d1 2026-06-05T12:58:31+05:30 OCP-88729: Optimize cleanup by deleting both MachineConfigs in one shot
+  - 0a2ade7a 2026-06-05T12:58:30+05:30 Move OCP-88729 USBGuard test to mco_kernel.go and add extension RPM verification
+
+- csi-external-snapshotter image-amd64 77d02e52a442c1a98457797bf8eb5777489aabae to 6411c3232ca015c2a02ece1d5a675045d17031cd
+  - 872813a 2026-06-07T12:35:43Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
+
+- router image-amd64 a86164c8ebaed55a2a28451fa913a04f10cc9a72 to 808b0001233b4c084694244f25cd53c3808c4e81
   - d180c82 2026-06-08T18:21:01-03:00 OCPBUGS-87205: fix comments on template
   - 861e7c2 2026-06-08T11:47:45-03:00 Update images/router/haproxy/conf/haproxy-config.template
   - fca5221 2026-06-08T11:47:45-03:00 Expand list of stripped X-SSL-Client-* headers
   - ef98dff 2026-06-08T11:47:45-03:00 Rename env var to ROUTER_MUTUAL_TLS_HEADER_FILTER
   - 2e0ec41 2026-06-08T11:47:45-03:00 OCPBUGS-86718: Strip X-SSL-Client-* headers for plain HTTP
 
-- kubernetes image-arm64 872bd3722d0954b31459f715fbd4fb7612aaf338 to d8d517e6bbe7cf7359026cac26bb96ea45e18806
+- kubernetes image-amd64 872bd3722d0954b31459f715fbd4fb7612aaf338 to d8d517e6bbe7cf7359026cac26bb96ea45e18806
   - 59c831f7c 2026-06-06T16:54:59-04:00 UPSTREAM: <carry>: add kubernetes/conformance umbrella suite
 
