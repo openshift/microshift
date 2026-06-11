@@ -1,3 +1,0 @@
-- machine-config-operator embedded-component 09ddec72f4ebeec4b2615da078c65e49b79bbe36 to 2a19fa0e641255ad70c96e5948f799fcc7b53a0c
-  - 261d2300 2026-06-03T14:07:38+00:00 chore: update AMIs
-
