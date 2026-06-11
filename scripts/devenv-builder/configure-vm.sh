@@ -193,9 +193,6 @@ function configure_rhel_subscription() {
 function configure_rhel_repositories() {
     sudo subscription-manager config --rhsm.manage_repos=1
 
-    # Extract major version from Makefile.version
-    local -r ocp_major="$(grep '^OCP_VERSION' "${MAKE_VERSION}" | cut -d'=' -f2 | tr -d ' ' | cut -d'.' -f1)"
-
     # Map of last minor version for each major (for cross-major transitions)
     local -A last_minor_for_major=([4]=22)
 
@@ -214,34 +211,35 @@ function configure_rhel_repositories() {
     }
 
     RHOCP=$("${RHOCP_REPO}")
-    if [[ "${RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
-        sudo subscription-manager repos --enable "rhocp-${ocp_major}.${RHOCP}-for-rhel-9-$(uname -m)-rpms"
+    if [[ "${RHOCP}" =~ ^[0-9]+\.[0-9]+$ ]]; then
+        sudo subscription-manager repos --enable "rhocp-${RHOCP}-for-rhel-9-$(uname -m)-rpms"
     elif [[ "${RHOCP}" =~ ^http ]]; then
         url=$(echo "${RHOCP}" | cut -d, -f1)
-        major=$(echo "${RHOCP}" | cut -d, -f2)
-        ver=$(echo "${RHOCP}" | cut -d, -f3)
-        OCP_REPO_NAME="rhocp-${major}.${ver}-for-rhel-9-mirrorbeta-$(uname -i)-rpms"
+        ver=$(echo "${RHOCP}" | cut -d, -f2)
+        OCP_REPO_NAME="rhocp-${ver}-for-rhel-9-mirrorbeta-$(uname -m)-rpms"
         sudo tee "/etc/yum.repos.d/${OCP_REPO_NAME}.repo" >/dev/null <<EOF
 [${OCP_REPO_NAME}]
-name=Beta rhocp-${major}.${ver} RPMs for RHEL 9
+name=Beta rhocp-${ver} RPMs for RHEL 9
 baseurl=${url}
 enabled=1
 gpgcheck=0
 skip_if_unavailable=0
 EOF
         # Calculate Y-1 version
-        get_prev_version "${major}" "${ver}"
+        local major=${ver%%.*}
+        local minor=${ver##*.}
+        get_prev_version "${major}" "${minor}"
         if [[ -n "${prev_minor}" ]]; then
             PREVIOUS_RHOCP=$("${RHOCP_REPO}" "${prev_minor}" "${prev_major}")
-            if [[ "${PREVIOUS_RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
-                sudo subscription-manager repos --enable "rhocp-${prev_major}.${PREVIOUS_RHOCP}-for-rhel-9-$(uname -m)-rpms"
+            if [[ "${PREVIOUS_RHOCP}" =~ ^[0-9]+\.[0-9]+$ ]]; then
+                sudo subscription-manager repos --enable "rhocp-${PREVIOUS_RHOCP}-for-rhel-9-$(uname -m)-rpms"
             else
                 # If RHOCP Y-1 is not available, try RHOCP Y-2.
                 get_prev_version "${prev_major}" "${prev_minor}"
                 if [[ -n "${prev_minor}" ]]; then
                     Y2_RHOCP=$("${RHOCP_REPO}" "${prev_minor}" "${prev_major}")
-                    if [[ "${Y2_RHOCP}" =~ ^[0-9]{1,2}$ ]]; then
-                        sudo subscription-manager repos --enable "rhocp-${prev_major}.${Y2_RHOCP}-for-rhel-9-$(uname -m)-rpms"
+                    if [[ "${Y2_RHOCP}" =~ ^[0-9]+\.[0-9]+$ ]]; then
+                        sudo subscription-manager repos --enable "rhocp-${Y2_RHOCP}-for-rhel-9-$(uname -m)-rpms"
                     fi
                 fi
             fi
