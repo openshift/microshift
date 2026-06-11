@@ -35,8 +35,9 @@ func BenchmarkEnsureRBACPolicy(b *testing.B) {
 			ClusterRoleBindingsToSplit: bootstrappolicy.ClusterRoleBindingsToSplit(),
 		}
 		coreClientSet := fake.NewSimpleClientset()
-		if _, err := ensureRBACPolicy(context.Background(), policy, coreClientSet); err != nil {
-			b.Fatalf("ensureRBACPolicy failed: %v", err)
+		done, err := ensureRBACPolicy(context.Background(), policy, coreClientSet)
+		if err != nil || !done {
+			b.Fatalf("ensureRBACPolicy failed or did not complete: done=%v err=%v", done, err)
 		}
 	}
 }
