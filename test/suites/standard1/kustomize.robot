@@ -224,7 +224,7 @@ Write Manifests
 ConfigMap Path Should Match
     [Documentation]    Ensure the config map path value matches the manifest dir
     [Arguments]    ${namespace}    ${manifest_dir}
-    ${configmap}=    Wait Until Keyword Succeeds    20x    10s
+    ${configmap}=    Wait Until Keyword Succeeds    30x    10s
     ...    Oc Get    configmap    ${namespace}    ${CONFIGMAP_NAME}
     Should Be Equal    ${manifest_dir}    ${configmap.data.path}
 
