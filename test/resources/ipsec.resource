@@ -66,19 +66,26 @@ Verify XFRM Counters Incremented
 
 Start Tcpdump For ESP On Cluster
     [Documentation]    Start tcpdump in the background capturing ESP packets.
-    ...    Returns the pcap file path. Uses timeout to auto-exit.
-    [Arguments]    ${alias}    ${iface}=enp1s0    ${timeout}=15
+    ...    Returns the pcap file path.
+    [Arguments]    ${alias}    ${iface}=enp1s0
     VAR    ${pcap_file}=    /tmp/esp-capture-${alias}.pcap
     Disruptive Command On Cluster    ${alias}    rm -f ${pcap_file}
-    Command On Cluster    ${alias}
-    ...    nohup timeout ${timeout} tcpdump -i ${iface} -w ${pcap_file} esp &>/dev/null &
+    ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
+    SSHLibrary.Switch Connection    ${conn_id}
+    SSHLibrary.Start Command    tcpdump -U -i ${iface} -w ${pcap_file} esp    sudo=True
     Sleep    2s    reason=Wait for tcpdump to initialize packet capture
     RETURN    ${pcap_file}
 
 Wait For Tcpdump And Verify ESP
-    [Documentation]    Wait briefly for traffic to be captured, then verify ESP packets in pcap.
+    [Documentation]    Stop tcpdump, then verify ESP packets in pcap.
     [Arguments]    ${alias}    ${pcap_file}
-    Sleep    5s    reason=Wait for ESP packets to be captured
+    Sleep    3s    reason=Wait for ESP packets to be captured
+    Disruptive Command On Cluster    ${alias}    pkill -INT -f "tcpdump.*${pcap_file}"
+    ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
+    SSHLibrary.Switch Connection    ${conn_id}
+    ${stdout}    ${stderr}=    SSHLibrary.Read Command Output    return_stderr=True
+    Log    tcpdump stdout: ${stdout}    level=DEBUG
+    Log    tcpdump stderr: ${stderr}    level=DEBUG
     ${stdout}=    Command On Cluster    ${alias}
     ...    tcpdump -r ${pcap_file} 2>/dev/null | head -5
     Should Contain    ${stdout}    ESP
