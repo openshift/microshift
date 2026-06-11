@@ -80,7 +80,7 @@ Wait For Tcpdump And Verify ESP
     [Documentation]    Stop tcpdump, then verify ESP packets in pcap.
     [Arguments]    ${alias}    ${pcap_file}
     Sleep    3s    reason=Wait for ESP packets to be captured
-    Disruptive Command On Cluster    ${alias}    pkill -INT tcpdump
+    Disruptive Command On Cluster    ${alias}    pkill -INT -f "tcpdump.*${pcap_file}"
     ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
     SSHLibrary.Switch Connection    ${conn_id}
     ${stdout}    ${stderr}=    SSHLibrary.Read Command Output    return_stderr=True
