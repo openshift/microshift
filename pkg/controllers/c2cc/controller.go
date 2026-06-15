@@ -83,13 +83,13 @@ func (c *C2CCRouteManager) Run(ctx context.Context, ready chan<- struct{}, stopp
 	c.ovn.subscribe(ctx, reconcileCh)
 
 	if routeDone, err := c.routes.subscribe(reconcileCh, "linux-route-change"); err != nil {
-		klog.Warningf("Could not subscribe to route events for table %d: %v", c2ccRouteTable, err)
+		klog.Warningf("Could not subscribe to route events for table %d: %v", c.routes.table, err)
 	} else {
 		defer close(routeDone)
 	}
 
 	if svcRouteDone, err := c.svcRoutes.subscribe(reconcileCh, "service-route-change"); err != nil {
-		klog.Warningf("Could not subscribe to route events for table %d: %v", c2ccSvcRouteTable, err)
+		klog.Warningf("Could not subscribe to route events for table %d: %v", c.svcRoutes.table, err)
 	} else {
 		defer close(svcRouteDone)
 	}
