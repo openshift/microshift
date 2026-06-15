@@ -66,6 +66,18 @@ clusterToCluster:
           nextHop: ""
           # Service CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
           serviceNetwork: []
+    # Linux policy routing table settings for C2CC routes.
+    routing:
+        # Linux policy routing table ID for direct routes to remote cluster CIDRs.
+        # The route protocol number is set to the same value.
+        # Must be between 1 and 252 (253-255 are reserved by the kernel).
+        # Must differ from serviceRouteTableID.
+        routeTableID: 200
+        # Linux policy routing table ID for service routes via the OVN management port.
+        # The route protocol number is set to the same value.
+        # Must be between 1 and 252 (253-255 are reserved by the kernel).
+        # Must differ from routeTableID.
+        serviceRouteTableID: 201
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll".
     # Defaults to "Normal".

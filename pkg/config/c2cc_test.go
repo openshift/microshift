@@ -69,6 +69,16 @@ func withDNSDefaults(c2cc C2CC) C2CC {
 	return c2cc
 }
 
+func withRoutingDefaults(c2cc C2CC) C2CC {
+	if c2cc.Routing.RouteTableID == nil {
+		c2cc.Routing.RouteTableID = ptr.To(200)
+	}
+	if c2cc.Routing.ServiceRouteTableID == nil {
+		c2cc.Routing.ServiceRouteTableID = ptr.To(201)
+	}
+	return c2cc
+}
+
 func mkC2CCConfig(c2cc C2CC) *Config {
 	if c2cc.ProbeInterval == "" {
 		c2cc.ProbeInterval = "10s"
@@ -82,7 +92,7 @@ func mkC2CCConfig(c2cc C2CC) *Config {
 		Node: Node{
 			NodeIP: "10.100.0.1",
 		},
-		C2CC: withDNSDefaults(c2cc),
+		C2CC: withRoutingDefaults(withDNSDefaults(c2cc)),
 	}
 }
 
@@ -100,7 +110,7 @@ func mkDualStackC2CCConfig(c2cc C2CC) *Config {
 			NodeIP:   "10.100.0.1",
 			NodeIPV6: "fd00::1",
 		},
-		C2CC: withDNSDefaults(c2cc),
+		C2CC: withRoutingDefaults(withDNSDefaults(c2cc)),
 	}
 }
 
@@ -117,7 +127,7 @@ func mkIPv6OnlyC2CCConfig(c2cc C2CC) *Config {
 		Node: Node{
 			NodeIP: "fd00::1",
 		},
-		C2CC: withDNSDefaults(c2cc),
+		C2CC: withRoutingDefaults(withDNSDefaults(c2cc)),
 	}
 }
 
@@ -859,6 +869,82 @@ func TestRenderC2CCDNSBlocks(t *testing.T) {
 	})
 }
 
+func TestC2CC_RoutingTableValidation(t *testing.T) {
+	stubHostIPs(t, nil)
+
+	validRemote := []RemoteCluster{{
+		NextHop:        "10.100.0.2",
+		ClusterNetwork: []string{"10.45.0.0/16"},
+		ServiceNetwork: []string{"10.46.0.0/16"},
+	}}
+
+	t.Run("valid custom routing table IDs", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			Routing:        C2CCRouting{RouteTableID: ptr.To(100), ServiceRouteTableID: ptr.To(101)},
+			RemoteClusters: validRemote,
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		assert.Equal(t, 100, cfg.C2CC.ResolvedRouteTableID)
+		assert.Equal(t, 101, cfg.C2CC.ResolvedServiceRouteTableID)
+	})
+
+	t.Run("boundary values 1 and 252", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			Routing:        C2CCRouting{RouteTableID: ptr.To(1), ServiceRouteTableID: ptr.To(252)},
+			RemoteClusters: validRemote,
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		assert.Equal(t, 1, cfg.C2CC.ResolvedRouteTableID)
+		assert.Equal(t, 252, cfg.C2CC.ResolvedServiceRouteTableID)
+	})
+
+	t.Run("routeTableID below range", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			Routing:        C2CCRouting{RouteTableID: ptr.To(0), ServiceRouteTableID: ptr.To(201)},
+			RemoteClusters: validRemote,
+		})
+		err := cfg.C2CC.validate(cfg)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "routing.routeTableID must be between 1 and 252")
+	})
+
+	t.Run("serviceRouteTableID above range", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			Routing:        C2CCRouting{RouteTableID: ptr.To(200), ServiceRouteTableID: ptr.To(253)},
+			RemoteClusters: validRemote,
+		})
+		err := cfg.C2CC.validate(cfg)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "routing.serviceRouteTableID must be between 1 and 252")
+	})
+
+	t.Run("duplicate table IDs", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			Routing:        C2CCRouting{RouteTableID: ptr.To(150), ServiceRouteTableID: ptr.To(150)},
+			RemoteClusters: validRemote,
+		})
+		err := cfg.C2CC.validate(cfg)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "must differ")
+	})
+
+	t.Run("defaults are used when nil", func(t *testing.T) {
+		c2cc := C2CC{RemoteClusters: validRemote, ProbeInterval: "10s"}
+		cfg := &Config{
+			Network: Network{
+				CNIPlugin:      CniPluginOVNK,
+				ClusterNetwork: []string{"10.42.0.0/16"},
+				ServiceNetwork: []string{"10.43.0.0/16"},
+			},
+			Node: Node{NodeIP: "10.100.0.1"},
+			C2CC: withDNSDefaults(c2cc),
+		}
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		assert.Equal(t, 200, cfg.C2CC.ResolvedRouteTableID)
+		assert.Equal(t, 201, cfg.C2CC.ResolvedServiceRouteTableID)
+	})
+}
+
 func TestC2CC_ProbeIntervalDefault(t *testing.T) {
 	cfg := &Config{}
 	require.NoError(t, cfg.fillDefaults())
@@ -877,6 +963,39 @@ func TestC2CC_IncorporateUserSettings(t *testing.T) {
 		}
 		cfg.incorporateUserSettings(user)
 		assert.Equal(t, "30s", cfg.C2CC.ProbeInterval)
+	})
+
+	t.Run("user overrides routing table IDs", func(t *testing.T) {
+		cfg := &Config{}
+		require.NoError(t, cfg.fillDefaults())
+
+		user := &Config{
+			C2CC: C2CC{
+				Routing: C2CCRouting{
+					RouteTableID:        ptr.To(100),
+					ServiceRouteTableID: ptr.To(101),
+				},
+			},
+		}
+		cfg.incorporateUserSettings(user)
+		assert.Equal(t, 100, *cfg.C2CC.Routing.RouteTableID)
+		assert.Equal(t, 101, *cfg.C2CC.Routing.ServiceRouteTableID)
+	})
+
+	t.Run("user overrides only one routing table ID preserves other default", func(t *testing.T) {
+		cfg := &Config{}
+		require.NoError(t, cfg.fillDefaults())
+
+		user := &Config{
+			C2CC: C2CC{
+				Routing: C2CCRouting{
+					RouteTableID: ptr.To(100),
+				},
+			},
+		}
+		cfg.incorporateUserSettings(user)
+		assert.Equal(t, 100, *cfg.C2CC.Routing.RouteTableID)
+		assert.Equal(t, 201, *cfg.C2CC.Routing.ServiceRouteTableID)
 	})
 
 	t.Run("user sets remoteClusters without probeInterval preserves default", func(t *testing.T) {

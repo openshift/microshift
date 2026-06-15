@@ -26,9 +26,30 @@ type C2CCDNS struct {
 	CacheNegativeTTL *int `json:"cacheNegativeTTL,omitempty"`
 }
 
+type C2CCRouting struct {
+	// Linux policy routing table ID for direct routes to remote cluster CIDRs.
+	// The route protocol number is set to the same value.
+	// Must be between 1 and 252 (253-255 are reserved by the kernel).
+	// Must differ from serviceRouteTableID.
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=252
+	// +kubebuilder:default=200
+	RouteTableID *int `json:"routeTableID,omitempty"`
+	// Linux policy routing table ID for service routes via the OVN management port.
+	// The route protocol number is set to the same value.
+	// Must be between 1 and 252 (253-255 are reserved by the kernel).
+	// Must differ from routeTableID.
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=252
+	// +kubebuilder:default=201
+	ServiceRouteTableID *int `json:"serviceRouteTableID,omitempty"`
+}
+
 type C2CC struct {
 	// DNS cache settings for CoreDNS server blocks generated for remote clusters.
 	DNS C2CCDNS `json:"dns"`
+	// Linux policy routing table settings for C2CC routes.
+	Routing C2CCRouting `json:"routing"`
 	// List of remote clusters to establish connectivity with.
 	// C2CC is disabled when this list is empty.
 	RemoteClusters []RemoteCluster `json:"remoteClusters,omitempty"`
@@ -39,9 +60,11 @@ type C2CC struct {
 	ProbeInterval string `json:"probeInterval,omitempty"`
 
 	// Populated during validation with parsed network objects.
-	Resolved              []ResolvedRemoteCluster `json:"-"`
-	ResolvedAllCIDRs      []*net.IPNet            `json:"-"`
-	ResolvedProbeInterval time.Duration           `json:"-"`
+	Resolved                    []ResolvedRemoteCluster `json:"-"`
+	ResolvedAllCIDRs            []*net.IPNet            `json:"-"`
+	ResolvedProbeInterval       time.Duration           `json:"-"`
+	ResolvedRouteTableID        int                     `json:"-"`
+	ResolvedServiceRouteTableID int                     `json:"-"`
 }
 
 type RemoteCluster struct {
@@ -193,16 +216,58 @@ func parseAndValidateCIDR(cidr, field string, errs *[]error) *net.IPNet {
 	return ipNet
 }
 
+func (c *C2CC) resolveRoutingDefaults() {
+	routeTable := 200
+	if c.Routing.RouteTableID != nil {
+		routeTable = *c.Routing.RouteTableID
+	}
+	svcRouteTable := 201
+	if c.Routing.ServiceRouteTableID != nil {
+		svcRouteTable = *c.Routing.ServiceRouteTableID
+	}
+	c.ResolvedRouteTableID = routeTable
+	c.ResolvedServiceRouteTableID = svcRouteTable
+}
+
+func (r *C2CCRouting) validate(c2cc *C2CC) error {
+	c2cc.resolveRoutingDefaults()
+
+	var errs []error
+	if c2cc.ResolvedRouteTableID < 1 || c2cc.ResolvedRouteTableID > 252 {
+		errs = append(errs, fmt.Errorf("routing.routeTableID must be between 1 and 252, got %d", c2cc.ResolvedRouteTableID))
+	}
+	if c2cc.ResolvedServiceRouteTableID < 1 || c2cc.ResolvedServiceRouteTableID > 252 {
+		errs = append(errs, fmt.Errorf("routing.serviceRouteTableID must be between 1 and 252, got %d", c2cc.ResolvedServiceRouteTableID))
+	}
+	if c2cc.ResolvedRouteTableID == c2cc.ResolvedServiceRouteTableID {
+		errs = append(errs, fmt.Errorf("routing.routeTableID (%d) and routing.serviceRouteTableID (%d) must differ",
+			c2cc.ResolvedRouteTableID, c2cc.ResolvedServiceRouteTableID))
+	}
+	return errors.Join(errs...)
+}
+
+func (d *C2CCDNS) validate() error {
+	var errs []error
+	if d.CacheTTL != nil && *d.CacheTTL < 0 {
+		errs = append(errs, fmt.Errorf("dns.cacheTTL must be >= 0, got %d", *d.CacheTTL))
+	}
+	if d.CacheNegativeTTL != nil && *d.CacheNegativeTTL < 0 {
+		errs = append(errs, fmt.Errorf("dns.cacheNegativeTTL must be >= 0, got %d", *d.CacheNegativeTTL))
+	}
+	return errors.Join(errs...)
+}
+
 func (c *C2CC) validate(cfg *Config) error {
 	if cfg.Network.CNIPlugin != CniPluginUnset && cfg.Network.CNIPlugin != CniPluginOVNK {
 		return fmt.Errorf("cluster to cluster requires OVN-Kubernetes CNI (network.cniPlugin must be \"\" or \"ovnk\", got %q)", cfg.Network.CNIPlugin)
 	}
 
-	if c.DNS.CacheTTL != nil && *c.DNS.CacheTTL < 0 {
-		return fmt.Errorf("dns.cacheTTL must be >= 0, got %d", *c.DNS.CacheTTL)
+	if err := c.DNS.validate(); err != nil {
+		return err
 	}
-	if c.DNS.CacheNegativeTTL != nil && *c.DNS.CacheNegativeTTL < 0 {
-		return fmt.Errorf("dns.cacheNegativeTTL must be >= 0, got %d", *c.DNS.CacheNegativeTTL)
+
+	if err := c.Routing.validate(c); err != nil {
+		return err
 	}
 
 	resolved, parseErrs := c.parseRemoteClusters()
