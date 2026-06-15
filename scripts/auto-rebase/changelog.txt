@@ -1,5 +1,3 @@
-- machine-config-operator embedded-component 67bc7c608b3454ded13055bc642a169aa1dcf207 to 507538ada4b9261a9260aef93be7518993dfdcf1
-  - 49e33c43 2026-06-03T14:32:37-04:00 Restore assertBuildJobIsAsExpected and fix test inconsistencies
-  - a5b20d95 2026-06-03T14:32:36-04:00 Fix e2e-ocl-1of2 flake where MOSB is deleted by stale controller event
-  - b716a5fa 2026-06-03T14:32:36-04:00 Replace monolithic e2e-ocl test suite with sharded suite
+- machine-config-operator embedded-component 507538ada4b9261a9260aef93be7518993dfdcf1 to 9df79499f49b33f03975fddbb9595ecf8004f605
+  - 84b57daf 2026-06-03T14:51:57Z OCPBUGS-63650: configure-ovs: copy lldp mode to br-ex port
 
