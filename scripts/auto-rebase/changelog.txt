@@ -1,3 +1,0 @@
-- operator-framework-olm embedded-component 7c68dcc506c099477f0fff65fd187d2c9c973429 to b3e9095f255735381fb4d9d8651077abcafc1a25
-  - 133f17fb 2026-06-05T01:24:15+05:30 Fix CVE-2026-33186 with openshift-sustaining/grpc-go v1.71.3-sec.1 for Go 1.22
-
