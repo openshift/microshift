@@ -292,7 +292,7 @@ EOF
         "${QUAY_IMAGE}" >/dev/null
 
     # Wait until the Quay instance is started
-    for i in $(seq 60) ; do
+    for i in $(seq 120) ; do
         sleep 1
         if curl -sI --connect-timeout 5 --max-time 5 "${quay_url}" 2>/dev/null | grep -Eq "HTTP.*200 OK" ; then
             i=0
@@ -301,6 +301,10 @@ EOF
     done
     if [ "${i}" -ne 0 ] ; then
         echo "ERROR: Timed out waiting for Quay to start"
+        echo "--- Quay container status ---"
+        sudo podman ps -a --filter "name=microshift-quay" --no-trunc
+        echo "--- Quay container logs (last 50 lines) ---"
+        sudo podman logs --tail 50 microshift-quay 2>&1
         exit 1
     fi
 
