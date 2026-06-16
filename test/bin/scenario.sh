@@ -307,6 +307,7 @@ sos_report_for_vm_offline() {
 
 get_lrel_release_image_url() {
     local -r brew_lrel_release_version="$1"
+    local -r rhel_version="${2:-9}"
     local image_url=""
 
     # Strip the rpm release suffix and convert tilde to dash.
@@ -327,7 +328,7 @@ get_lrel_release_image_url() {
 
     if [ -n "${mirror_path}" ]; then
         if ! image_url="$(curl -fsS --retry 3 \
-            "https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/${mirror_path}/${release_version}/el9/bootc-pullspec.txt")"; then
+            "https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/${mirror_path}/${release_version}/el${rhel_version}/bootc-pullspec.txt")"; then
             image_url=""
         fi
         echo "${image_url}"
@@ -343,7 +344,7 @@ get_lrel_release_image_url() {
     fi
 
     # Resolve the arch-specific digest from both registries
-    local -r image_path="openshift4/microshift-bootc-rhel9"
+    local -r image_path="openshift4/microshift-bootc-rhel${rhel_version}"
     local -r image_tag="v${release_version}"
     local -r prod_registry="registry.redhat.io"
     local -r stage_registry="registry.stage.redhat.io"
