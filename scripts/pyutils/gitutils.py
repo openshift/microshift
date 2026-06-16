@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+import base64
 import logging
 
-from git import PushInfo, Repo  # GitPython
+from git import Repo  # GitPython
+from github import GithubException, InputGitTreeElement
 
 BOT_REMOTE_NAME = "bot-creds"
 REMOTE_ORIGIN = "origin"
@@ -69,19 +71,62 @@ class GitUtils():
             return
         self.remote.remove(self.git_repo, BOT_REMOTE_NAME)
 
-    def push(self, branch_name):
+    def push(self, branch_name, base_branch, gh_repo):
+        """
+        Replays local commits onto GitHub via the API so they are marked Verified.
+        Commits created through the GitHub API are automatically signed by GitHub
+        when using a GitHub App token, unlike commits created with git push.
+        """
         if self.dry_run:
-            logging.info(f"[DRY RUN] git push --force {branch_name}")
+            logging.info(f"[DRY RUN] Creating verified commits via GitHub API for branch {branch_name}")
             return
 
-        push_result = self.remote.push(branch_name, force=True)
+        # Collect commits between base_branch and branch_name, oldest first
+        commits = list(reversed(list(
+            self.git_repo.iter_commits(f"{base_branch}..{branch_name}")
+        )))
 
-        if len(push_result) != 1:
-            raise Exception(f"Unexpected amount ({len(push_result)}) of items in push_result: {push_result}")
-        if push_result[0].flags & PushInfo.ERROR:
-            raise Exception(f"Pushing branch failed: {push_result[0].summary}")
-        if push_result[0].flags & PushInfo.FORCED_UPDATE:
-            logging.info(f"Branch '{branch_name}' existed and was updated (force push)")
+        if not commits:
+            logging.info(f"No commits to push for branch {branch_name}")
+            return
+
+        parent_sha = gh_repo.get_branch(base_branch).commit.sha
+
+        for local_commit in commits:
+            # diff from parent → this commit: a=parent state, b=commit state
+            diffs = (local_commit.parents[0].diff(local_commit)
+                     if local_commit.parents else local_commit.diff(None))
+
+            tree_elements = []
+            for diff in diffs:
+                if diff.deleted_file:
+                    # sha=None signals a deletion to the GitHub tree API
+                    tree_elements.append(InputGitTreeElement(
+                        path=diff.a_path, mode="100644", type="blob", sha=None))
+                else:
+                    content = diff.b_blob.data_stream.read()
+                    try:
+                        blob = gh_repo.create_git_blob(content.decode("utf-8"), "utf-8")
+                    except UnicodeDecodeError:
+                        blob = gh_repo.create_git_blob(
+                            base64.b64encode(content).decode("ascii"), "base64")
+                    mode = "100755" if diff.b_blob.mode == 0o100755 else "100644"
+                    tree_elements.append(InputGitTreeElement(
+                        path=diff.b_path, mode=mode, type="blob", sha=blob.sha))
+
+            parent_gh_commit = gh_repo.get_git_commit(parent_sha)
+            new_tree = gh_repo.create_git_tree(tree_elements, parent_gh_commit.tree)
+            new_commit = gh_repo.create_git_commit(local_commit.message, new_tree, [parent_gh_commit])
+            logging.info(f"Created verified commit {new_commit.sha[:8]}: {local_commit.summary}")
+            parent_sha = new_commit.sha
+
+        try:
+            ref = gh_repo.get_git_ref(f"heads/{branch_name}")
+            ref.edit(parent_sha, force=True)
+            logging.info(f"Updated branch '{branch_name}' to {parent_sha[:8]}")
+        except GithubException:
+            gh_repo.create_git_ref(f"refs/heads/{branch_name}", parent_sha)
+            logging.info(f"Created branch '{branch_name}' at {parent_sha[:8]}")
 
     def get_remote_branch(self, branch_name):
         """
