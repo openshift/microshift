@@ -9,11 +9,15 @@ install_and_configure_composer() {
     local -r version_id_major="$(awk -F. '{print $1}' <<< "${version_id}")"
 
     "${DNF_RETRY}" "install" "osbuild osbuild-composer"
-    "${DNF_RETRY}" "install" \
-        "git composer-cli ostree rpm-ostree \
-        cockpit-composer bash-completion podman runc genisoimage \
+
+    local packages="git composer-cli ostree rpm-ostree \
+        cockpit-composer bash-completion podman runc \
         createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
-        containernetworking-plugins expect httpd-tools vim-common"
+        python3-psutil expect httpd-tools vim-common"
+    if [[ "${version_id_major}" -lt 10 ]]; then
+        packages+=" genisoimage containernetworking-plugins"
+    fi
+    "${DNF_RETRY}" "install" "${packages}"
 
     # The mock utility comes from the EPEL repository
     "${DNF_RETRY}" "install" "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${version_id_major}.noarch.rpm"
