@@ -32,6 +32,8 @@ firewall_settings() {
 
     # Web server port to allow access from virtual machines
     sudo firewall-cmd --permanent --zone=public "--${action}-port"="${WEB_SERVER_PORT}/tcp"
+    # Mirror registry port for Quay container access
+    sudo firewall-cmd --permanent --zone=public "--${action}-port"="${MIRROR_REGISTRY_PORT}/tcp"
     # VNC ports for remote console connection to virtual machines
     sudo firewall-cmd --permanent --zone=public "--${action}-port=5900-5999/tcp"
     # Enable mDNS over libvirt network
