@@ -68,7 +68,7 @@ function get_base_isofile {
 }
 
 function action_config() {
-    local -r deps="libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass wget"
+    local -r deps="libvirt virt-install virt-viewer libvirt-client qemu-kvm qemu-img sshpass wget"
     
     "${SCRIPTDIR}/../dnf_retry.sh" "install" "${deps}"
 
