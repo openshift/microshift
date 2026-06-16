@@ -4,5 +4,6 @@ type = "yum-baseurl"
 url = "https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/fast-datapath/os"
 check_gpg = true
 check_ssl = true
+gpgkeys = ["file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release"]
 system = false
 rhsm = true
