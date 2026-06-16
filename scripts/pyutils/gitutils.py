@@ -3,7 +3,7 @@
 import base64
 import logging
 
-from git import Repo  # GitPython
+from git import NULL_TREE, Repo  # GitPython
 from github import GithubException, InputGitTreeElement
 
 BOT_REMOTE_NAME = "bot-creds"
@@ -95,7 +95,7 @@ class GitUtils():
         for local_commit in commits:
             # diff from parent → this commit: a=parent state, b=commit state
             diffs = (local_commit.parents[0].diff(local_commit)
-                     if local_commit.parents else local_commit.diff(None))
+                     if local_commit.parents else local_commit.diff(NULL_TREE))
 
             tree_elements = []
             for diff in diffs:
@@ -110,7 +110,12 @@ class GitUtils():
                     except UnicodeDecodeError:
                         blob = gh_repo.create_git_blob(
                             base64.b64encode(content).decode("ascii"), "base64")
-                    mode = "100755" if diff.b_blob.mode == 0o100755 else "100644"
+                    if diff.b_blob.mode == 0o120000:
+                        mode = "120000"
+                    elif diff.b_blob.mode == 0o100755:
+                        mode = "100755"
+                    else:
+                        mode = "100644"
                     tree_elements.append(InputGitTreeElement(
                         path=diff.b_path, mode=mode, type="blob", sha=blob.sha))
 
@@ -124,7 +129,9 @@ class GitUtils():
             ref = gh_repo.get_git_ref(f"heads/{branch_name}")
             ref.edit(parent_sha, force=True)
             logging.info(f"Updated branch '{branch_name}' to {parent_sha[:8]}")
-        except GithubException:
+        except GithubException as e:
+            if e.status != 404:
+                raise
             gh_repo.create_git_ref(f"refs/heads/{branch_name}", parent_sha)
             logging.info(f"Created branch '{branch_name}' at {parent_sha[:8]}")
 
