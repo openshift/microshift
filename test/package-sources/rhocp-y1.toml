@@ -5,6 +5,7 @@ type = "yum-baseurl"
 url = "https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/rhocp/{{ .Env.RHOCP_MAJOR_Y1 }}.{{ .Env.RHOCP_MINOR_Y1 }}/os"
 check_gpg = true
 check_ssl = true
+gpgkeys = ["file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release"]
 system = false
 rhsm = true
 {{- else if env.Getenv "RHOCP_MINOR_Y1_BETA" "" -}}
