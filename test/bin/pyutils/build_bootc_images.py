@@ -8,6 +8,7 @@ import multiprocessing
 import os
 import platform
 import re
+import subprocess
 import sys
 import time
 import traceback
@@ -219,7 +220,13 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
 
     # Construct and execute the dnf download command
     dnf_command = ["dnf", "download"] + dnf_options + [f"microshift-release-info-{version}"]
-    if common.run_command(dnf_command, dry_run) is not None:
+    try:
+        result = common.run_command(dnf_command, dry_run)
+    except subprocess.CalledProcessError:
+        common.print_msg(f"Warning: failed to download release-info for {version} from {repo_spec}, skipping")
+        common.popd()
+        return
+    if result is not None:
         images_output = get_container_images(str(image_path), version)
         with open(outfile, "a") as f:
             f.write(images_output.replace(',', '\n'))
