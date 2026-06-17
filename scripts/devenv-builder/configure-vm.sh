@@ -283,7 +283,7 @@ function install_build_deps() {
         echo "Installing go ${GO_VER}..."
         # This is installed into different location (/usr/local/bin/go) from dnf installed Go (/usr/bin/go) so it doesn't conflict
         # /usr/local/bin is before /usr/bin in $PATH so newer one is picked up
-        curl -L -o "go${GO_VER}.linux-${GO_ARCH}.tar.gz" "https://go.dev/dl/go${GO_VER}.linux-${GO_ARCH}.tar.gz"
+        curl --fail --retry 3 --retry-delay 5 -L -o "go${GO_VER}.linux-${GO_ARCH}.tar.gz" "https://go.dev/dl/go${GO_VER}.linux-${GO_ARCH}.tar.gz"
         sudo rm -rf "/usr/local/go${GO_VER}"
         sudo mkdir -p "/usr/local/go${GO_VER}"
         sudo tar -C "/usr/local/go${GO_VER}" -xzf "go${GO_VER}.linux-${GO_ARCH}.tar.gz" --strip-components 1
