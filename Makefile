@@ -48,7 +48,7 @@ GO_PACKAGES=$(go list ./cmd/... ./pkg/...)
 # Build to a place we can ignore
 GO_BUILD_BINDIR :=$(OUTPUT_DIR)/bin
 
-GO_CACHE :=$(shell go env GOCACHE)
+GOCACHE :=$(shell go env GOCACHE)
 
 ifeq ($(DEBUG),true)
 	# throw all the debug info in!
