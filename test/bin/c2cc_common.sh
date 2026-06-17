@@ -172,6 +172,16 @@ c2cc_run_tests() {
         ip_family_var="--variable IP_FAMILY:${ip_family}"
     fi
 
+    local target_ref_var=""
+    if [ -n "${C2CC_TARGET_REF:-}" ]; then
+        target_ref_var="--variable TARGET_REF:${C2CC_TARGET_REF}"
+    fi
+
+    local bootc_registry_var=""
+    if [ -n "${C2CC_BOOTC_REGISTRY:-}" ]; then
+        bootc_registry_var="--variable BOOTC_REGISTRY:${C2CC_BOOTC_REGISTRY}"
+    fi
+
     local host2_ip host3_ip
     host2_ip=$(get_host_ip host2) || return 1
     host3_ip=$(get_host_ip host3) || return 1
@@ -207,6 +217,8 @@ c2cc_run_tests() {
         --variable "KUBECONFIG_C:${kubeconfig_c}" \
         ${foreign_cidr_var} \
         ${ip_family_var} \
+        ${target_ref_var} \
+        ${bootc_registry_var} \
         "${suites_dir}"
 }
 

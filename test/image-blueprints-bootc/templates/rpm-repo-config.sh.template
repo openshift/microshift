@@ -12,6 +12,16 @@ function enable_eus_repositories() {
         "rhel-${vmajor}-for-$(uname -m)-appstream-eus-rpms"
 }
 
+function enable_ga_repositories() {
+    local -r vmajor="$(awk -F. '{print $1}' <<< "${VERSION_ID}")"
+
+    dnf config-manager --set-disabled '*'
+    dnf config-manager --set-enabled \
+        "rhel-${vmajor}-for-$(uname -m)-baseos-rpms" \
+        "rhel-${vmajor}-for-$(uname -m)-appstream-rpms"
+}
+
+
 # Lock the OS release version to prevent the installation of packages belonging
 # to a newer OS release
 source /etc/os-release
@@ -22,6 +32,10 @@ while [ $# -gt 0 ] ; do
     case "$1" in
     --enable-eus)
         enable_eus_repositories
+        shift
+        ;;
+    --enable-ga)
+        enable_ga_repositories
         shift
         ;;
     --disable-all)
