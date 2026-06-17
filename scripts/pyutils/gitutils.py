@@ -104,6 +104,9 @@ class GitUtils():
                     tree_elements.append(InputGitTreeElement(
                         path=diff.a_path, mode="100644", type="blob", sha=None))
                 else:
+                    if diff.renamed_file:
+                        tree_elements.append(InputGitTreeElement(
+                            path=diff.a_path, mode="100644", type="blob", sha=None))
                     content = diff.b_blob.data_stream.read()
                     try:
                         blob = gh_repo.create_git_blob(content.decode("utf-8"), "utf-8")
