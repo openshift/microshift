@@ -1,15 +1,25 @@
-- kubernetes embedded-component 2a0461f5d0e21c5b74371626fad32f9632920caa to 690775342de24ee56631e38e3f17592b14a6b202
-  - d9bed68bd 2026-06-04T18:11:31Z UPSTREAM: 133509: fix flake race in VAP e2e case
+- cluster-ingress-operator embedded-component d14c13be1685e74b898b93a3fa7e03e9b75aa174 to 006a3edb4eec250bc414da316d912fc5231d195b
+  - 6ee6072 2026-06-15T22:34:06+05:30 OCPBUGS-86717: Add configuration override for X-SSL strip
 
-- ovn-kubernetes image-amd64 1dce328f5ea3cba8bbabfcaaabb38aa4208f90b3 to 24316b97b964e7de7aa2d7272aa8adc963ea9679
-  - d18e8e85 2026-06-04T17:37:52+02:00 remove forced V(5) logging during startup
+- cluster-kube-apiserver-operator embedded-component aa9bd6a74ac8b3c9918581b5e49f8e7cf0109862 to 00259384502230d2c5b463dcda8a5c05caf2154e
+  - ed3a671 2025-10-24T21:09:18Z scc: Grant authenticated users use of restricted-v3
 
-- kubernetes image-amd64 2a0461f5d0e21c5b74371626fad32f9632920caa to 690775342de24ee56631e38e3f17592b14a6b202
-  - d9bed68bd 2026-06-04T18:11:31Z UPSTREAM: 133509: fix flake race in VAP e2e case
+- machine-config-operator embedded-component 1bee530c4d08401d07454a259a5ee430edb5216b to d0d6ce62b4b7ba63529b9e400cf8ec72fa4589a6
+  - d92db453 2026-06-02T13:54:54Z daemon: verify extension packages are staged pre-reboot and installed pst-reboot
 
-- ovn-kubernetes image-arm64 1dce328f5ea3cba8bbabfcaaabb38aa4208f90b3 to 24316b97b964e7de7aa2d7272aa8adc963ea9679
-  - d18e8e85 2026-06-04T17:37:52+02:00 remove forced V(5) logging during startup
+- router image-amd64 cdfa172b2373257fdca5b8e7546378a2e762411c to 40c34581a02ca043d454034e376771c12d2e995c
+  - 6eff131 2026-06-15T22:25:12+05:30 OCPBUGS-86717: Strip X-SSL-Client-* headers for plain HTTP
+  - a51423e 2026-06-05T17:45:32Z OCPBUGS-67161: Define admin socket URL in a single place
+  - 60a39ec 2026-06-05T17:45:32Z OCPBUGS-67161: Replace HTTP backend liveness check with admin socket check
 
-- kubernetes image-arm64 2a0461f5d0e21c5b74371626fad32f9632920caa to 690775342de24ee56631e38e3f17592b14a6b202
-  - d9bed68bd 2026-06-04T18:11:31Z UPSTREAM: 133509: fix flake race in VAP e2e case
+- ovn-kubernetes image-amd64 24316b97b964e7de7aa2d7272aa8adc963ea9679 to e02cc75645fbc8981239e4144da1cd4dd98b1b17
+  - cc7f427b 2026-05-11T09:41:17+02:00 ANP: Skip redundant status updates to reduce API server load
+
+- router image-arm64 cdfa172b2373257fdca5b8e7546378a2e762411c to 40c34581a02ca043d454034e376771c12d2e995c
+  - 6eff131 2026-06-15T22:25:12+05:30 OCPBUGS-86717: Strip X-SSL-Client-* headers for plain HTTP
+  - a51423e 2026-06-05T17:45:32Z OCPBUGS-67161: Define admin socket URL in a single place
+  - 60a39ec 2026-06-05T17:45:32Z OCPBUGS-67161: Replace HTTP backend liveness check with admin socket check
+
+- ovn-kubernetes image-arm64 24316b97b964e7de7aa2d7272aa8adc963ea9679 to e02cc75645fbc8981239e4144da1cd4dd98b1b17
+  - cc7f427b 2026-05-11T09:41:17+02:00 ANP: Skip redundant status updates to reduce API server load
 
