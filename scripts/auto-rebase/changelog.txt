@@ -1,3 +1,13 @@
-- machine-config-operator embedded-component 507538ada4b9261a9260aef93be7518993dfdcf1 to 9df79499f49b33f03975fddbb9595ecf8004f605
-  - 84b57daf 2026-06-03T14:51:57Z OCPBUGS-63650: configure-ovs: copy lldp mode to br-ex port
+- cluster-ingress-operator embedded-component f7a3395618f0925fbe626b18cc8173d19ab30dac to ffc48a136de559eb8aff1e9750b67db1a482c7fe
+  - a67c855 2026-06-11T19:00:36+05:30 OCPBUGS-86718: Add configuration override for X-SSL strip
+
+- machine-config-operator embedded-component 9df79499f49b33f03975fddbb9595ecf8004f605 to 59524130bbc7ffc63b1c2f7dbd1cd24882e447d3
+  - ac835913 2026-06-11T16:16:51Z OCPBUGS-84832: daemon: don't pull/extract extensions for all OS updates
+  - 3ed3f95c 2026-06-11T16:16:25Z OCPBUGS-84814: Skip chrony-wait on first node join
+
+- router image-amd64 f4c2ba80abb1fb3694a6b2ae0be2e5c898572632 to dc4c01d494f572773a05e82bffd19c2cdaf8dce9
+  - 0c478b8 2026-06-11T18:47:28+05:30 OCPBUGS-86718: Strip X-SSL-Client-* headers for plain HTTP
+
+- router image-arm64 f4c2ba80abb1fb3694a6b2ae0be2e5c898572632 to dc4c01d494f572773a05e82bffd19c2cdaf8dce9
+  - 0c478b8 2026-06-11T18:47:28+05:30 OCPBUGS-86718: Strip X-SSL-Client-* headers for plain HTTP
 
