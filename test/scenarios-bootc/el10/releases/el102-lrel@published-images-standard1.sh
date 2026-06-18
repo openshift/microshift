@@ -7,7 +7,7 @@
 # shellcheck disable=SC2034  # used elsewhere
 IMAGE_SIGSTORE_ENABLED=true
 
-LATEST_RELEASE_IMAGE_URL="$(get_lrel_release_image_url "${BREW_LREL_RELEASE_VERSION}")"
+LATEST_RELEASE_IMAGE_URL="$(get_lrel_release_image_url "${BREW_LREL_RELEASE_VERSION}" 10)"
 
 scenario_create_vms() {
     exit_if_image_not_set "${LATEST_RELEASE_IMAGE_URL}"
