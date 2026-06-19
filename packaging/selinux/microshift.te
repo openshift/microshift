@@ -4,8 +4,14 @@ type microshift_t;
 domain_type(microshift_t);
 
 gen_require(`
-	type kubelet_t, var_lib_t, container_var_lib_t;
+	type kubelet_t, var_lib_t, container_var_lib_t, kernel_t;
 ')
+
+# Workaround for kernel 7.x composefs/overlayfs SELinux regression (USHIFT-7215).
+# CRI-O runs as kernel_t instead of container_runtime_t on composefs, which denies
+# execmem needed for text relocations. Upstream fix: kernel v7.1-rc1 commits
+# 880bd496ec72, 6af36aeb147a, 82544d36b172. Remove when backported to RHEL 10.2 kernel.
+allow kernel_t self:process execmem;
 
 # When microshift creates backup folders in /var/lib/microshift-backups, the correct labels are applied
 # Note: filetrans_pattern rules states;
