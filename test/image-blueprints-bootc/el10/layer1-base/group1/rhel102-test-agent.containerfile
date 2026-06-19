@@ -5,9 +5,15 @@ ARG USHIFT_RPM_REPO_NAME=microshift-local
 ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 
 # Configure the RPM repositories
-# Enable GA baseos and appstream repositories
+# - No EUS repositories in staging environment
+# - Disable default repositories to avoid pre-release repo access errors
 COPY --chmod=755 ./bootc-images/rpm-repo-config.sh /tmp/rpm-repo-config.sh
-RUN /tmp/rpm-repo-config.sh --enable-ga && rm -f /tmp/rpm-repo-config.sh
+RUN /tmp/rpm-repo-config.sh --disable-all && rm -f /tmp/rpm-repo-config.sh
+
+# Configure the RHEL mirror RPM repositories (for use in the staging environment)
+ARG RHEL_MIRROR_REPO_NAME=rhel102-mirror.repo
+ARG RHEL_MIRROR_REPO_PATH=/etc/yum.repos.d/$RHEL_MIRROR_REPO_NAME
+COPY --chmod=644 ./bootc-images/$RHEL_MIRROR_REPO_NAME $RHEL_MIRROR_REPO_PATH
 
 # Copy the MicroShift repository contents
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
@@ -21,4 +27,3 @@ RUN dnf install -y microshift-test-agent pcp pcp-zeroconf && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
-
