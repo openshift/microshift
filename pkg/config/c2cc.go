@@ -229,19 +229,19 @@ func (c *C2CC) resolveRoutingDefaults() {
 	c.ResolvedServiceRouteTableID = svcRouteTable
 }
 
-func (r *C2CCRouting) validate(c2cc *C2CC) error {
-	c2cc.resolveRoutingDefaults()
+func (c *C2CC) validateRouting() error {
+	c.resolveRoutingDefaults()
 
 	var errs []error
-	if c2cc.ResolvedRouteTableID < 1 || c2cc.ResolvedRouteTableID > 252 {
-		errs = append(errs, fmt.Errorf("routing.routeTableID must be between 1 and 252, got %d", c2cc.ResolvedRouteTableID))
+	if c.ResolvedRouteTableID < 1 || c.ResolvedRouteTableID > 252 {
+		errs = append(errs, fmt.Errorf("routing.routeTableID must be between 1 and 252, got %d", c.ResolvedRouteTableID))
 	}
-	if c2cc.ResolvedServiceRouteTableID < 1 || c2cc.ResolvedServiceRouteTableID > 252 {
-		errs = append(errs, fmt.Errorf("routing.serviceRouteTableID must be between 1 and 252, got %d", c2cc.ResolvedServiceRouteTableID))
+	if c.ResolvedServiceRouteTableID < 1 || c.ResolvedServiceRouteTableID > 252 {
+		errs = append(errs, fmt.Errorf("routing.serviceRouteTableID must be between 1 and 252, got %d", c.ResolvedServiceRouteTableID))
 	}
-	if c2cc.ResolvedRouteTableID == c2cc.ResolvedServiceRouteTableID {
+	if c.ResolvedRouteTableID == c.ResolvedServiceRouteTableID {
 		errs = append(errs, fmt.Errorf("routing.routeTableID (%d) and routing.serviceRouteTableID (%d) must differ",
-			c2cc.ResolvedRouteTableID, c2cc.ResolvedServiceRouteTableID))
+			c.ResolvedRouteTableID, c.ResolvedServiceRouteTableID))
 	}
 	return errors.Join(errs...)
 }
@@ -266,7 +266,7 @@ func (c *C2CC) validate(cfg *Config) error {
 		return err
 	}
 
-	if err := c.Routing.validate(c); err != nil {
+	if err := c.validateRouting(); err != nil {
 		return err
 	}
 
