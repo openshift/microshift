@@ -139,6 +139,11 @@ Oc Apply On Cluster
     ${stdout}=    Oc On Cluster    ${alias}    oc apply ${ns_arg} -f ${file}
     RETURN    ${stdout}
 
+Verify Cluster Is Healthy
+    [Documentation]    Verify MicroShift and all core workloads are ready.
+    [Arguments]    ${alias}
+    Command On Cluster    ${alias}    microshift healthcheck --timeout=300s
+
 Verify Routes In Table 200
     [Documentation]    Check that routes for the given CIDRs exist in table 200.
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}

@@ -126,8 +126,3 @@ Enable C2CC On Cluster
     Command On Cluster    ${alias}    systemctl restart microshift
     Wait Until Keyword Succeeds    ${CLEANUP_TIMEOUT}    ${CLEANUP_RETRY}
     ...    Verify Cluster Is Healthy    ${alias}
-
-Verify Cluster Is Healthy
-    [Documentation]    Verify MicroShift and all core workloads (including OVN-K) are ready.
-    [Arguments]    ${alias}
-    Command On Cluster    ${alias}    microshift healthcheck --timeout=300s
