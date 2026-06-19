@@ -178,8 +178,8 @@ c2cc_run_tests() {
     fi
 
     local bootc_registry_var=""
-    if [ -n "${C2CC_BOOTC_REGISTRY:-}" ]; then
-        bootc_registry_var="--variable BOOTC_REGISTRY:${C2CC_BOOTC_REGISTRY}"
+    if [ -n "${MIRROR_REGISTRY_URL:-}" ]; then
+        bootc_registry_var="--variable BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}"
     fi
 
     local host2_ip host3_ip

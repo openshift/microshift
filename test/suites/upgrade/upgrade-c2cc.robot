@@ -37,6 +37,7 @@ Upgrade C2CC Clusters From RHEL9 To RHEL10
     ...    to RHEL 10.2 and verifies health and C2CC connectivity after each upgrade.
 
     Verify All Clusters Healthy
+    Verify All RemoteClusters Healthy
     Deploy Test Workloads
     Verify Full C2CC Connectivity
 
@@ -44,6 +45,7 @@ Upgrade C2CC Clusters From RHEL9 To RHEL10
         Log To Console    Upgrading ${alias} to ${TARGET_REF}
         Upgrade Cluster    ${alias}
         Verify All Clusters Healthy
+        Verify All RemoteClusters Healthy
         Wait For Test Pods
         Wait For Service Endpoints
         Verify Full C2CC Connectivity
@@ -60,8 +62,9 @@ Setup
     Should Not Be Empty    ${TARGET_REF}    TARGET_REF variable is required
     Login MicroShift Host
     Setup Kubeconfig
+    Logout MicroShift Host
 
-    Register Local Cluster    cluster-a
+    Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG}
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
     Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
 
@@ -69,7 +72,6 @@ Teardown
     [Documentation]    Close all connections and clean up.
     Teardown All Remote Clusters
     Remove Kubeconfig
-    Logout MicroShift Host
 
 Verify All Clusters Healthy
     [Documentation]    Verify all clusters are running and API server is reachable.
@@ -142,6 +144,7 @@ Cluster Rebooted And Healthy
     IF    ${status}    SSHLibrary.Close Connection
 
     ${host}    ${port}    ${kc}=    Get Cluster Connection Info    ${alias}
+    Remove Values From List    ${C2CC_REMOTE_ALIASES}    ${alias}
     Register Remote Cluster    ${alias}    ${host}    ${port}    ${kc}
 
     ${new_boot_id}=    Command On Cluster    ${alias}

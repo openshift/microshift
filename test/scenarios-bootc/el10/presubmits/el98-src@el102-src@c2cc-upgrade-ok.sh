@@ -9,7 +9,6 @@ export TEST_RANDOMIZATION=none
 export TEST_EXECUTION_TIMEOUT=60m
 
 C2CC_TARGET_REF=rhel102-bootc-source
-C2CC_BOOTC_REGISTRY="${MIRROR_REGISTRY_URL}"
 
 scenario_create_vms() {
     c2cc_create_vms rhel98-bootc-source rhel98-bootc
