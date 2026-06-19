@@ -1,39 +1,386 @@
-- cluster-kube-apiserver-operator embedded-component 24b60d04b3478e04a728fb0ae1385abc6a478d20 to a61282875d032c4b8cc7ea5567830942583ec378
-  - 75e998a 2026-06-08T13:41:30+02:00 NO-JIRA: Automatic agentic rebase: Update library-go to 0469313
-  - e126bb0 2026-06-01T12:29:56+02:00 Fix kube-apiserver-to-kubelet-signer refresh interval
+- api embedded-component 1194f4c62539275cd6dec231cc2bf7e0a010bd94 to 05673ba6e6503fa49f049fb7a85903cb1f7a34ed
+  - aa06d197 2026-06-16T09:06:46-03:00 NE-2278: Move ingresscontroller api file to proper name
+  - c204af10 2026-06-12T14:50:04+01:00 Add MachineAPIMigration platform-specific featuregates for Azure, BareMetal, GCP, and PowerVS
+  - 880765ae 2026-06-12T14:34:46+01:00 NO-JIRA: tools: fix verify-codegen in git worktrees
+  - 564b1995 2026-06-11T13:31:27-04:00 Promote AWS ClusterHostedDNS to Default
+  - 1bf28d79 2026-06-10T14:30:56-04:00 Revert "TRT-2701: Revert "SPLAT-2793: Promoted VSphereMultiVCenterDay2 feature gate to TP""
+  - 6889b9c1 2026-06-10T16:13:57+01:00 rewrite api review command to skill
+  - e8598fc2 2026-06-10T13:12:05Z Revert "SPLAT-2793: Promoted VSphereMultiVCenterDay2 feature gate to TP"
+  - 936a2b0a 2026-06-09T09:32:35-04:00 Promoted VSphereMultiVCenterDay2 feature gate to TP
+  - ee7dc415 2026-06-07T19:39:21Z Updating ose-cluster-config-api-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-cluster-config-api.yml
+  - b4b461bd 2026-06-04T19:21:24+02:00 Remove all KMS changes from retention PR vs rebase base
+  - 94f7c093 2026-06-04T18:44:42+02:00 Drop unrelated apiservers KMS test changes from retention PR
+  - d4cc57b4 2026-06-04T17:40:33+02:00 Revert unrelated KMS changes to match master
+  - c67898b0 2026-06-04T17:12:29+02:00 fix review comments
+  - a8a2c339 2026-06-04T17:12:29+02:00 Tombstone legacy retention fields and tighten duration/size validation
+  - f6e2e929 2026-06-04T17:12:28+02:00 Fix retention API schema compatibility and validation tests
+  - 68a8b0db 2026-06-04T17:12:28+02:00 Clarify retention duration semantics and fix tombstone comments
+  - 602d6f4e 2026-06-04T17:12:28+02:00 Use Prometheus Operator retention strings in ClusterMonitoring API
+  - db4e70fa 2026-06-04T17:11:47+02:00 Use durationInHours for Prometheus retention and tune limits
+  - b479107f 2026-06-04T10:27:34-04:00 promote OSStreams to GA in self-managed clusters
+  - a6130498 2026-05-18T13:43:30+01:00 Add eval suite for /api-review command
+  - 8ecf6a78 2026-05-14T11:13:38-04:00 Lower maximum allowed etcd quota from 32 to 16GiB
 
-- cluster-kube-controller-manager-operator embedded-component 9d636ab4992bd501006d2b0c1d3ac512666c6ca7 to c35307f04313369c9ba4dcab3308506a3987065e
-  - aa0c868 2026-06-03T17:05:46+05:30 fix lock failure cases
+- cluster-csi-snapshot-controller-operator embedded-component 108f37f0e378accc322cbeb68136ec500ec35b94 to d6dbe6dd6aaed30d36409d8e54adb0c5b60b6744
+  - b8f89e3 2026-06-12T17:16:27+02:00 STOR-3003: Update group snapshot CRDs to support both v1 and v1beta2 APIs
+  - 9915fa5 2026-06-09T12:19:21+02:00 Fix group snapshots on HyperShift
+  - a2cf0e8 2026-06-06T13:54:10Z Updating ose-cluster-csi-snapshot-controller-operator-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-cluster-csi-snapshot-controller-operator.yml
 
-- etcd embedded-component c543fe15324510d13e896c31232ecd5d100d9de5 to bf6c0094589afdf6c814a28c24f8f1bb5a577816
-  - d4656811 2026-06-06T16:04:21Z Updating ose-etcd-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-etcd.yml
+- cluster-dns-operator embedded-component 65d60f9c12297a91ee89359e90f591fd44e661b0 to 8395f9054f235aec2cd5185019d201146c9827ed
+  - dc48f78 2026-06-06T22:36:10Z Updating ose-cluster-dns-operator-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-cluster-dns-operator.yml
+  - d4284dc 2026-05-18T14:30:22-04:00 NE-2391: Add Force management state to docs
+  - 2fa1fac 2026-04-24T09:33:58-04:00 Address CodeRabbit review feedback
+  - 75d5e62 2026-04-23T17:50:34-04:00 NE-2391: Add progressive disclosure AI agent context
 
-- machine-config-operator embedded-component 62b06d28399b348cb7238d32ad74b9a978c4292f to 62dbab4477ce608b73bb8d4b190b0f522d2a5bb5
-  - cfb74c3e 2026-06-05T13:08:35-04:00 Fix error wrapping and error message casing
-  - a96a9248 2026-06-05T08:57:59Z MCO-2321: adapt osimagestream tests to clusters with rhel-10 default stream
-  - b547d0ae 2026-06-04T07:50:22-04:00 avoid running IRI deletion tests for standard e2e IRI tests
-  - 55be329d 2026-06-03T14:48:40+05:30 Reorder functions to match source file sequence
-  - 02d7d918 2026-06-02T20:20:43+05:30 Add bootstrap infrastructure and migrate test 53960
-  - 80b16676 2026-06-02T20:20:43+05:30 Migrate registry tests from openshift-tests-private
-  - dbea5e53 2026-05-28T15:23:08-04:00 bootimage: use version for vsphere hotloop check
+- cluster-ingress-operator embedded-component 140e0bf13b3d01c369672c766c44b4be0b4ec78c to 6c84b7c7250e7412502382dca7d1f065f94fed5b
+  - b2875a0b 2026-06-09T17:43:53-04:00 Add aswinsuryan (asuryana@redhat.com) to OWNERS
+  - 5fcf1a07 2026-06-09T14:58:48+01:00 Replace iptables with nftables in TestConnectTimeout e2e test
+  - 77b06b59 2026-06-08T18:06:45-03:00 OCPBUGS-87205: Add configuration override for X-SSL strip
+  - 02ace843 2026-06-07T07:43:53Z Updating ose-cluster-ingress-operator-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-cluster-ingress-operator.yml
 
-- operator-framework-olm embedded-component a1de734673fb56da500b6ea212a70d50bd5740ab to c0b1b223882bd7657853441ccf18099527a8841b
-  - 230f72bf 2026-06-05T10:25:33-04:00 [CARRY] fix unit test failure
-  - 2d13397d 2026-06-05T06:43:47-04:00 UPSTREAM: <carry>: Update to golang 1.26.3 and openshift-4.23 builders
+- cluster-kube-apiserver-operator embedded-component a61282875d032c4b8cc7ea5567830942583ec378 to 86563261c7e7e4bbbbbf10791fc5065514e4d4de
+  - 1a0b65a 2026-06-16T13:18:27+03:00 Register health monitoring as new command
+  - c7f72a7 2026-06-12T16:12:24-04:00 bump(openshift/library-go): to get KMS plugin security context
+  - 4a28fda 2026-06-12T10:54:29-04:00 bump(openshift/library-go): to get KMS plugin CA bundle wiring
+  - 3cda3c4 2026-06-11T10:11:56+02:00 NO-JIRA: Automatic agentic rebase: Update library-go to 7fd5f33
 
-- oc image-amd64 d1f312bb855e741cadb8b3ac419d2cb3f3fd7ba5 to 4007283544cbc3609f90375b7a8efd395561612f
-  - c57c61a1 2026-06-08T04:25:30Z Updating openshift-enterprise-deployer-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/openshift-enterprise-deployer.yml
+- cluster-network-operator embedded-component 6dc18040e7c214f6a1db25b6f5ef4642c6c6a186 to c376140ed1842c6a5f78cb74c55b4b49ba212041
+  - 1aac2a7 2026-06-09T14:07:27-07:00 Replace weak hash algorithms with SHA256
+  - 71543af 2026-06-09T14:07:27-07:00 Exclude vendor directory from Snyk security scans
 
-- csi-external-snapshotter image-arm64 77d02e52a442c1a98457797bf8eb5777489aabae to 6411c3232ca015c2a02ece1d5a675045d17031cd
+- csi-external-snapshotter embedded-component 77d02e52a442c1a98457797bf8eb5777489aabae to e695e2bd0b548afd0fce049d86d4af29dd34e574
+  - 56ba1dc 2026-06-11T13:36:34Z UPSTREAM: revert: <carry>: Rebase external-snapshotter to v8.6.0
+  - 151ed79 2026-06-10T12:38:21+02:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
+  - c611294 2026-06-09T14:07:00+02:00 UPSTREAM: <carry>: Add OpenShift files
   - 872813a 2026-06-07T12:35:43Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
+  - af6ba61 2026-06-05T21:55:26Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-csi-external-snapshotter.yml
+  - d920dc6 2026-05-27T22:18:07-04:00 Add changelog for v8.6.0
+  - 41cb4da 2026-05-27T05:36:33Z Bump the k8s-dependencies group across 1 directory with 2 updates
+  - e3d7c8b 2026-05-26T17:51:49Z Squashed 'release-tools/' changes from e019f2a72..31186bf0a
+  - c57619a 2026-05-25T17:14:54Z Bump the github-dependencies group across 1 directory with 34 updates
+  - fce55ed 2026-05-22T19:31:15Z Add timeouts to webhook server.
+  - ac46e7f 2026-05-20T10:01:48+02:00 Bump k8s dependencies to v1.36.1
+  - e38b2f6 2026-05-19T16:31:31+02:00 Squashed 'release-tools/' changes from 909252797..e019f2a72
+  - 4907b0a 2026-05-14T10:35:25+05:30 Add newClaimPendingRestoreFromVolumeSnapshot and a TestDeleteSync case that asserts syncSnapshot returns an error and emits SnapshotDeletePending while a Pending PVC's dataSource references the snapshot, matching the requeue behavior for issue #1366.
+  - 9c09524 2026-04-29T09:56:41+05:30 Address review: clarify snapshot-in-use errors and group snapshot requeue comment
+  - 21c0111 2026-04-29T09:34:52+05:30 Fix requeue on VolumeSnapshot deletion when used for PVC restore When a VolumeSnapshot is deleted while a PVC is still being created from it, the controller blocked deletion but returned nil, so the workqueue never retried. Return an error so the snapshot is requeued and deletion is retried once the PVC is no longer in use. Same fix applied for VolumeGroupSnapshot in the group snapshot helper.
+  - f3f8db4 2026-04-22T11:23:08Z Bump aquasecurity/trivy-action from 0.35.0 to 0.36.0
+  - e8f6849 2026-04-20T13:28:17+02:00 Fix VolumeSnapshotContent deletion
+  - 9773a35 2026-04-17T03:00:21Z Squashed 'release-tools/' changes from de06a09a7..909252797
+  - 1aececd 2026-04-16T12:44:28-04:00 Update unit tests
+  - f298d12 2026-04-16T11:26:01-04:00 Update go version to 1.25.8
+  - c28b251 2026-04-16T11:26:01-04:00 Set v1beta2 as stored version
+  - 027ff6f 2026-04-16T11:25:54-04:00 Update controllers to use v1 VolumeGroupSnapshot APIs
+  - 7810fa8 2026-04-16T11:23:47-04:00 Move VolumeGroupSnapshot API to V1
+  - 86c1a6c 2026-04-15T19:55:40-04:00 Add unit tests for group snapshots
+  - 13bf493 2026-04-15T18:26:54Z Run Trivy scan on schedule instead of pull requests
+  - fad717c 2026-04-15T12:32:14-04:00 Update go.opentelemetry.io/otel libs
+  - 72ee717 2026-04-15T10:57:54-04:00 Squashed 'release-tools/' changes from 119a53c3c..de06a09a7
+  - c34d0df 2026-04-08T14:17:37-04:00 Fix data race in metrics test
+  - 4a8f5b5 2026-03-31T13:27:30+02:00 fix: pin github action to exact SHA
+  - 93ef9f3 2026-03-23T11:35:40Z Bump the github-dependencies group across 1 directory with 39 updates
+  - c18f4ec 2026-03-22T19:22:58+01:00 security: Update trivy-action to v0.35.0
+  - 77c491f 2026-03-15T22:27:40-04:00 Squashed 'release-tools/' changes from 1e81e752e..119a53c3c
+  - 8c992f2 2026-03-03T13:37:39-05:00 Add more unit tests
+  - 97f3abc 2026-03-03T13:03:59+05:30 deploy: update sidecar image versions
+  - dec67ea 2026-02-27T12:54:09-05:00 Add unit tests for volume group snapshot controller in sidecar
+  - ee18dbc 2026-02-17T16:28:28-05:00 Add unit tests for group snapshots in snapshot-controller
+  - bb34c93 2026-02-16T12:29:17Z Bump the github-dependencies group with 11 updates
+  - 658c1ac 2025-10-19T14:06:14+03:00 [snapshot-controller] Do not modify error when retrying PVC finalizer removal
 
-- router image-arm64 a86164c8ebaed55a2a28451fa913a04f10cc9a72 to 808b0001233b4c084694244f25cd53c3808c4e81
+- kubernetes embedded-component 872bd3722d0954b31459f715fbd4fb7612aaf338 to d8d517e6bbe7cf7359026cac26bb96ea45e18806
+  - 59c831f7c 2026-06-06T16:54:59-04:00 UPSTREAM: <carry>: add kubernetes/conformance umbrella suite
+
+- machine-config-operator embedded-component 62dbab4477ce608b73bb8d4b190b0f522d2a5bb5 to 49eaf75d2e8cf026da563bd708f6f5512facf41a
+  - 4be5fa97 2026-06-12T12:40:02+02:00 MCO-2344: Revert MCO-2343
+  - b0d6754e 2026-06-11T14:19:57-04:00 tests: update custom containerfile OCB test to work in disconnected environments
+  - 2c81fec6 2026-06-11T18:42:55+05:30 Add fix for TC 59424
+  - f88d97c6 2026-06-11T08:10:11-04:00 controller & test: process rebuild annotation on machine-os-builder restart & increase test timeout
+  - 2f47b964 2026-06-10T02:54:33-04:00 move helpers in iri e2e main test
+  - 34a93a4e 2026-06-10T11:57:49+05:30 MCO-2209 MCO-2213 MCO-2233: Migrate security, daemon, and kernel TCs from otp3 mco.go
+  - 4016370d 2026-06-10T11:57:13+05:30 Update OWNERS: update current MCO team members
+  - 8959e528 2026-06-08T20:02:57+02:00 MCO-2343: Temporary make MCO default to rhel-9
+  - ea093553 2026-06-08T09:21:56+02:00 OCPBUGS-87635: Fix MCP.status.osImageStream
+  - 73caf416 2026-06-06T22:07:29Z Updating ose-machine-config-operator-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-machine-config-operator.yml
+  - 23696fbf 2026-06-05T14:44:41-04:00 Added check for missingAnnotation
+  - ce58f78d 2026-06-05T13:50:04-04:00 Added a if-statement to compare images
+  - 4dc05f6f 2026-06-05T13:55:40+05:30 OCPBUGS-78524: Create mco_extensions.go suite with USBGuard, install all extensions, and invalid extensions tests
+  - 65934067 2026-06-05T12:58:31+05:30 OCP-88729: Only wait on last MachineConfig deletion to avoid double-waiting
+  - 2f91e47a 2026-06-05T12:58:31+05:30 OCP-88729: Use mc.DeleteWithWait() for cleanup instead of raw oc delete
+  - 7222f9d1 2026-06-05T12:58:31+05:30 OCP-88729: Optimize cleanup by deleting both MachineConfigs in one shot
+  - 0a2ade7a 2026-06-05T12:58:30+05:30 Move OCP-88729 USBGuard test to mco_kernel.go and add extension RPM verification
+  - 78749cea 2026-06-04T15:56:52+05:30 Fix kubelet certificate wait loop in criometricsproxy.yaml and update init container's volumeMount to  /var/lib/kubelet
+  - 36c7cead 2026-06-02T12:13:48+05:30 OCPNODE-4487: replace --system-reserved flags with config drop-in Remove EnvironmentFile=/etc/node-sizing.env and the --system-reserved command-line flag from kubelet.service. The auto-sizing script now writes a KubeletConfiguration drop-in file to /etc/openshift/kubelet.conf.d/20-auto-sizing.conf, which kubelet reads via --config-dir. Add --config-dir to master and arbiter kubelet.service for consistency with workers.
+
+- operator-framework-olm embedded-component c0b1b223882bd7657853441ccf18099527a8841b to a78cfd39c259a22c104831c6ddf2572801b0f19d
+  - 0e8033fe 2026-06-10T08:01:50Z Updating operator-registry-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/da480a0c5a26a42e950fbcaf77b64918e1d76442/images/operator-registry.yml
+  - 8e42c8ea 2026-06-10T07:42:34Z Updating operator-lifecycle-manager-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/da480a0c5a26a42e950fbcaf77b64918e1d76442/images/operator-lifecycle-manager.yml
+  - b812d0c0 2026-06-10T07:26:00Z Updating ose-operator-framework-tools-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/da480a0c5a26a42e950fbcaf77b64918e1d76442/images/ose-operator-framework-tools.yml
+
+- route-controller-manager embedded-component 1916ceb059f500f06e8552f88bf38cd09f9522fd to e454c01fbe561cce9973f54b1ddbcdd35a9d18ff
+  - d4a98a4 2026-06-02T15:09:50-03:00 OCPBUGS-86886: (vendor) Use the copied ipallocator utils
+  - f51ec5e 2026-06-02T15:04:33-03:00 OCPBUGS-86886: Use the copied ipallocator utils
+  - b547252 2026-06-02T15:04:07-03:00 OCPBUGS-86886: Copy ipallocator code to route-controller-manager
+  - 31a2af8 2026-06-02T13:48:36-03:00 OCPBUGS-86886: (vendor) modernize dependency of k8s imports
+  - 5a43a7e 2026-06-02T13:48:36-03:00 OCPBUGS-86886: modernize dependency of k8s imports
+
+- service-ca-operator embedded-component e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b to 35cf51895f4dc77dca8a709e7635980753f87e17
+  - 97a337e 2026-06-10T16:02:10+02:00 Watch CA bundle files for changes and reload dynamically
+  - 792dd4a 2026-06-10T16:00:29+02:00 deps: Update library-go and add k8s.io/kubernetes
+
+- oc image-amd64 4007283544cbc3609f90375b7a8efd395561612f to c639a3143e8d86763c185a5afc6c9b38d24c00a7
+  - 6af74868 2026-06-12T11:00:03+02:00 fixup: Address test review feedback
+  - 4c50d0b4 2026-06-11T14:13:12-04:00 spec: Recommend bash-completion instead of requiring it
+  - 1477468e 2026-06-11T12:03:33+02:00 oc adm release new: Include base image's image-references in pruning
+
+- coredns image-amd64 3c21b066c9bd86caa06f790dcd1c046667875d46 to 97f7cc327ab5df7d6da38137b7be338efa9a3551
+  - fdb17cd 2026-06-09T17:34:52-04:00 Add aswinsuryan (asuryana@redhat.com) to OWNERS
+
+- csi-external-snapshotter image-amd64 77d02e52a442c1a98457797bf8eb5777489aabae to e695e2bd0b548afd0fce049d86d4af29dd34e574
+  - 56ba1dc 2026-06-11T13:36:34Z UPSTREAM: revert: <carry>: Rebase external-snapshotter to v8.6.0
+  - 151ed79 2026-06-10T12:38:21+02:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
+  - c611294 2026-06-09T14:07:00+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - 872813a 2026-06-07T12:35:43Z UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
+  - af6ba61 2026-06-05T21:55:26Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-csi-external-snapshotter.yml
+  - d920dc6 2026-05-27T22:18:07-04:00 Add changelog for v8.6.0
+  - 41cb4da 2026-05-27T05:36:33Z Bump the k8s-dependencies group across 1 directory with 2 updates
+  - e3d7c8b 2026-05-26T17:51:49Z Squashed 'release-tools/' changes from e019f2a72..31186bf0a
+  - c57619a 2026-05-25T17:14:54Z Bump the github-dependencies group across 1 directory with 34 updates
+  - fce55ed 2026-05-22T19:31:15Z Add timeouts to webhook server.
+  - ac46e7f 2026-05-20T10:01:48+02:00 Bump k8s dependencies to v1.36.1
+  - e38b2f6 2026-05-19T16:31:31+02:00 Squashed 'release-tools/' changes from 909252797..e019f2a72
+  - 4907b0a 2026-05-14T10:35:25+05:30 Add newClaimPendingRestoreFromVolumeSnapshot and a TestDeleteSync case that asserts syncSnapshot returns an error and emits SnapshotDeletePending while a Pending PVC's dataSource references the snapshot, matching the requeue behavior for issue #1366.
+  - 9c09524 2026-04-29T09:56:41+05:30 Address review: clarify snapshot-in-use errors and group snapshot requeue comment
+  - 21c0111 2026-04-29T09:34:52+05:30 Fix requeue on VolumeSnapshot deletion when used for PVC restore When a VolumeSnapshot is deleted while a PVC is still being created from it, the controller blocked deletion but returned nil, so the workqueue never retried. Return an error so the snapshot is requeued and deletion is retried once the PVC is no longer in use. Same fix applied for VolumeGroupSnapshot in the group snapshot helper.
+  - f3f8db4 2026-04-22T11:23:08Z Bump aquasecurity/trivy-action from 0.35.0 to 0.36.0
+  - e8f6849 2026-04-20T13:28:17+02:00 Fix VolumeSnapshotContent deletion
+  - 9773a35 2026-04-17T03:00:21Z Squashed 'release-tools/' changes from de06a09a7..909252797
+  - 1aececd 2026-04-16T12:44:28-04:00 Update unit tests
+  - f298d12 2026-04-16T11:26:01-04:00 Update go version to 1.25.8
+  - c28b251 2026-04-16T11:26:01-04:00 Set v1beta2 as stored version
+  - 027ff6f 2026-04-16T11:25:54-04:00 Update controllers to use v1 VolumeGroupSnapshot APIs
+  - 7810fa8 2026-04-16T11:23:47-04:00 Move VolumeGroupSnapshot API to V1
+  - 86c1a6c 2026-04-15T19:55:40-04:00 Add unit tests for group snapshots
+  - 13bf493 2026-04-15T18:26:54Z Run Trivy scan on schedule instead of pull requests
+  - fad717c 2026-04-15T12:32:14-04:00 Update go.opentelemetry.io/otel libs
+  - 72ee717 2026-04-15T10:57:54-04:00 Squashed 'release-tools/' changes from 119a53c3c..de06a09a7
+  - c34d0df 2026-04-08T14:17:37-04:00 Fix data race in metrics test
+  - 4a8f5b5 2026-03-31T13:27:30+02:00 fix: pin github action to exact SHA
+  - 93ef9f3 2026-03-23T11:35:40Z Bump the github-dependencies group across 1 directory with 39 updates
+  - c18f4ec 2026-03-22T19:22:58+01:00 security: Update trivy-action to v0.35.0
+  - 77c491f 2026-03-15T22:27:40-04:00 Squashed 'release-tools/' changes from 1e81e752e..119a53c3c
+  - 8c992f2 2026-03-03T13:37:39-05:00 Add more unit tests
+  - 97f3abc 2026-03-03T13:03:59+05:30 deploy: update sidecar image versions
+  - dec67ea 2026-02-27T12:54:09-05:00 Add unit tests for volume group snapshot controller in sidecar
+  - ee18dbc 2026-02-17T16:28:28-05:00 Add unit tests for group snapshots in snapshot-controller
+  - bb34c93 2026-02-16T12:29:17Z Bump the github-dependencies group with 11 updates
+  - 658c1ac 2025-10-19T14:06:14+03:00 [snapshot-controller] Do not modify error when retrying PVC finalizer removal
+
+- router image-amd64 a86164c8ebaed55a2a28451fa913a04f10cc9a72 to ce3479af6677053650d617a8165ce80c1178597c
   - d180c82 2026-06-08T18:21:01-03:00 OCPBUGS-87205: fix comments on template
   - 861e7c2 2026-06-08T11:47:45-03:00 Update images/router/haproxy/conf/haproxy-config.template
   - fca5221 2026-06-08T11:47:45-03:00 Expand list of stripped X-SSL-Client-* headers
   - ef98dff 2026-06-08T11:47:45-03:00 Rename env var to ROUTER_MUTUAL_TLS_HEADER_FILTER
   - 2e0ec41 2026-06-08T11:47:45-03:00 OCPBUGS-86718: Strip X-SSL-Client-* headers for plain HTTP
+  - befe5dd 2026-06-07T22:20:03Z Updating ose-haproxy-router-base-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-haproxy-router-base.yml
 
-- kubernetes image-arm64 872bd3722d0954b31459f715fbd4fb7612aaf338 to d8d517e6bbe7cf7359026cac26bb96ea45e18806
+- ovn-kubernetes image-amd64 e9295c0d0d7caa1eda7cc9f2f3900c64096c943c to 62baca4832f3aeb3fc7032d38619835c04208c95
+  - 4ed7d1ec 2026-06-11T15:36:43+05:30 sync test annotations with upstream changes
+  - b4194487 2026-06-11T15:35:36+05:30 e2e: fix UDN subnet overlap with downstream service CIDR
+  - 4439fbd8 2026-06-04T11:09:04-04:00 fix: fail license generation on module download errors
+  - 73c7c88d 2026-06-04T11:09:00-04:00 fix: Use default GOTOOLCHAIN=auto when generating license files
+  - 69abaab2 2026-06-03T12:48:16+02:00 Make BGP server host port configurable
+  - 5e373a9c 2026-06-03T12:48:16+02:00 e2e: split same-UDN NodePort backend paths
+  - 19e34082 2026-06-03T12:48:16+02:00 e2e: add NodePort-node backend for UDN service
+  - bef1aa03 2026-06-03T12:48:16+02:00 e2e: select CUDN pod IP by family
+  - b3475348 2026-06-03T12:48:16+02:00 e2e: expect ETP=Local NodePort tests to succeed
+  - ae449ce3 2026-06-03T12:48:16+02:00 iprulemanager: include address family in rule equality
+  - 5fb1ded4 2026-06-03T12:48:16+02:00 e2e: wait for VRF-lite node readiness
+  - 9b514ecb 2026-06-02T14:48:48+02:00 e2e: expect VRF egress interface IP for LGW no-overlay SNAT
+  - 3710b5ab 2026-06-02T14:48:11+02:00 e2e: unskip no-overlay cross-node NodePort cases
+  - b435536a 2026-06-02T14:48:11+02:00 Test cases for CUDN with transport NoOverlay routing unmanaged outboundSNAT enabled and disabled in SGW and LGW mode
+  - 21bce8d9 2026-06-02T14:48:11+02:00 LGW: set ct-commit-all on L2 UDN cluster routers
+  - e95849c9 2026-06-02T14:48:11+02:00 LGW: set ct-commit-all on UDN cluster router
+  - 0ddbc064 2026-06-02T14:48:07+02:00 LGW: route no-overlay UDN ingress via OVN
+  - 9f42f945 2026-06-02T14:36:34+02:00 UDN service OpenFlow: handle SNAT to masq ip
+  - 88c03903 2026-06-02T14:36:34+02:00 SGW: Add conntrack flows for no-overlay UDN cross-node traffic
+  - 122ab5c2 2026-06-02T14:36:34+02:00 SGW: use allowed_ext_ips for advertised UDN SNAT
+  - 1ba24787 2026-06-01T11:05:14+02:00 Implement OutboundSNAT for CUDN in shared gateway mode
+  - 50386fa3 2026-06-01T11:05:12+02:00 Add OutboundSNAT field to NetInfo interface
+  - 2fbcc1f8 2026-06-01T11:05:10+02:00 Implement OutboundSNAT for CUDN in local gateway mode
+  - 91683a3d 2026-06-01T11:05:08+02:00 Render OutboundSNAT config from CUDN CRD to NAD
+  - 497c201a 2026-05-27T18:02:30-04:00 unit test: fix EVPN UDN expected node IP address set
+  - ad54c5a5 2026-05-27T17:25:34+02:00 node: skip updateOVNEncapIPAndReconnect tests without root privileges
+  - e2e701ee 2026-05-27T15:36:52+02:00 util: assume pod network advertisement for certain transports
+  - d2d101d6 2026-05-27T09:52:45+02:00 Optimize addressManager sync and linkmanager syncLink
+  - a069246c 2026-05-27T08:48:19+02:00 Fix deadlock in webhook if Serve fails before cancellation
+  - b9ed3293 2026-05-27T08:48:19+02:00 Add comprehensive unit tests for ovnkube-identity webhook.Run()
+  - 9d4334cd 2026-05-27T08:48:19+02:00 Refactor ovnkubeidentity webhook server into separate package
+  - cbb5c4d0 2026-05-26T17:04:54-04:00 Ensure node IP address set for advertised SNAT
+  - 757f3099 2026-05-26T20:44:22+02:00 e2e: replace random allocations with ConfigMap-backed allocators
+  - 1ff56ce8 2026-05-25T09:45:12+02:00 Fix kubevirt live migration test flake by avoiding fake client race
+  - 5ec0be6b 2026-05-25T07:40:38+02:00 fix(evpn): re-program neighbors after kubevirt live migration
+  - 5aa65afe 2026-05-25T07:40:38+02:00 fix(evpn): use NeighSet instead of NeighAdd for PERMANENT neighbors
+  - 3fbc9381 2026-05-22T14:20:05-07:00 chore: skip cicd tests for doc changes
+  - 8bc78918 2026-05-22T08:36:40-07:00 Deprecate OVN_METRICS_MASTER_PORT in favor of OVN_METRICS_CONTROLLER_PORT
+  - 811879b7 2026-05-22T08:36:40-07:00 docs: drop obsolete central-mode SSL install guides
+  - f7ceb813 2026-05-22T08:36:40-07:00 ovn: drop --no-leader-only from OVN client invocations
+  - 3cf80961 2026-05-22T08:36:40-07:00 helm: fix Prometheus alert description template variable
+  - 8ef7ca88 2026-05-22T08:36:40-07:00 config: drop OvnAuthConfig central-mode fields, keep Egress IP healthcheck plumbing
+  - f4c700df 2026-05-22T08:36:40-07:00 helm: drop OVN_SSL_ENABLE and OVN_NORTH/OVN_SOUTH plumbing
+  - e2dddda6 2026-05-22T08:36:40-07:00 ovnkube.sh: drop network NB/SB containers and SSL plumbing
+  - 4dd7f126 2026-05-22T08:36:40-07:00 Remove central mode leftover code
+  - d4d225a8 2026-05-22T10:43:26-04:00 e2e: remove temporary multihoming NAD sync sleeps
+  - 33a96ff8 2026-05-21T20:31:59+02:00 e2e: always resolve agnhost image via DeploymentConfig
+  - 9eb9b572 2026-05-21T13:34:23-04:00 Create UDN VRFs in DPU mode
+  - 83507aff 2026-05-21T18:28:38+02:00 Adds ignore paths for performance tests
+  - 6bc965b5 2026-05-20T07:49:47+02:00 e2e(virt): Replace fake virt-launcher pod with proper VMI in UDPN test
+  - 84513297 2026-05-20T07:49:47+02:00 e2e(virt): Add test with three VMs same hostname
+  - 89a8c5a1 2026-05-20T07:49:47+02:00 kubevirt: Support handling vm hostname field
+  - afadc29a 2026-05-19T14:30:18-04:00 Configure advertised UDN nftables on node init
+  - ccdf1bcd 2026-05-19T13:28:43-04:00 Pass route advertisement flag to DPU nodes
+  - 513717d3 2026-05-19T08:58:46-04:00 Resolve simulated DPU representors by alias
+  - 8a4852e7 2026-05-18T10:24:51-07:00 e2e: extend primary L3 UDN test cases with multiple subnets
+  - 49cb7ca2 2026-05-18T10:24:51-07:00 egressip: reconcile routes when P-UDN subnets change
+  - adaece03 2026-05-18T10:24:51-07:00 UDN: reconcile BGP isolation on primary UDN subnet changes
+  - 14d98051 2026-05-18T10:24:51-07:00 BGP: cover primary UDN multi-subnet route filtering for route importing
+  - 18eb5671 2026-05-18T10:24:51-07:00 docs: clarify RouteAdvertisement handling for Layer3 multi-subnet UDN
+  - 0cf8456b 2026-05-18T10:24:51-07:00 egressfirewall: update ACL when P-UDN adds overlapping subnet
+  - 7d8e841b 2026-05-18T10:24:51-07:00 networkconnect: handle P-UDN multi-subnet CNC router policies
+  - 8308e803 2026-05-18T10:24:51-07:00 Add e2e test case for layer P-UDN multi-subnet support
+  - 3456af40 2026-05-18T10:24:51-07:00 P-UDN: Support multiple cluster-subnets per IP family in Layer3 topology
+  - 3a242db4 2026-05-18T10:18:24-07:00 Update CRD validation rules and add corresponding e2e test cases
+  - a689686a 2026-05-18T12:40:31-04:00 Fix performance report
+  - 26b5c617 2026-05-18T12:17:43+02:00 Remove dead raft variable definitions from ovnkube.sh
+
+- kubernetes image-amd64 872bd3722d0954b31459f715fbd4fb7612aaf338 to d8d517e6bbe7cf7359026cac26bb96ea45e18806
   - 59c831f7c 2026-06-06T16:54:59-04:00 UPSTREAM: <carry>: add kubernetes/conformance umbrella suite
+
+- service-ca-operator image-amd64 e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b to 35cf51895f4dc77dca8a709e7635980753f87e17
+  - 97a337e 2026-06-10T16:02:10+02:00 Watch CA bundle files for changes and reload dynamically
+  - 792dd4a 2026-06-10T16:00:29+02:00 deps: Update library-go and add k8s.io/kubernetes
+
+- oc image-arm64 4007283544cbc3609f90375b7a8efd395561612f to c639a3143e8d86763c185a5afc6c9b38d24c00a7
+  - 6af74868 2026-06-12T11:00:03+02:00 fixup: Address test review feedback
+  - 4c50d0b4 2026-06-11T14:13:12-04:00 spec: Recommend bash-completion instead of requiring it
+  - 1477468e 2026-06-11T12:03:33+02:00 oc adm release new: Include base image's image-references in pruning
+
+- coredns image-arm64 3c21b066c9bd86caa06f790dcd1c046667875d46 to 97f7cc327ab5df7d6da38137b7be338efa9a3551
+  - fdb17cd 2026-06-09T17:34:52-04:00 Add aswinsuryan (asuryana@redhat.com) to OWNERS
+
+- csi-external-snapshotter image-arm64 6411c3232ca015c2a02ece1d5a675045d17031cd to e695e2bd0b548afd0fce049d86d4af29dd34e574
+  - 56ba1dc 2026-06-11T13:36:34Z UPSTREAM: revert: <carry>: Rebase external-snapshotter to v8.6.0
+  - 151ed79 2026-06-10T12:38:21+02:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
+  - c611294 2026-06-09T14:07:00+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - af6ba61 2026-06-05T21:55:26Z UPSTREAM: <carry>: Updating ose-csi-external-snapshotter-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-csi-external-snapshotter.yml
+  - d920dc6 2026-05-27T22:18:07-04:00 Add changelog for v8.6.0
+  - 41cb4da 2026-05-27T05:36:33Z Bump the k8s-dependencies group across 1 directory with 2 updates
+  - e3d7c8b 2026-05-26T17:51:49Z Squashed 'release-tools/' changes from e019f2a72..31186bf0a
+  - c57619a 2026-05-25T17:14:54Z Bump the github-dependencies group across 1 directory with 34 updates
+  - fce55ed 2026-05-22T19:31:15Z Add timeouts to webhook server.
+  - ac46e7f 2026-05-20T10:01:48+02:00 Bump k8s dependencies to v1.36.1
+  - e38b2f6 2026-05-19T16:31:31+02:00 Squashed 'release-tools/' changes from 909252797..e019f2a72
+  - 4907b0a 2026-05-14T10:35:25+05:30 Add newClaimPendingRestoreFromVolumeSnapshot and a TestDeleteSync case that asserts syncSnapshot returns an error and emits SnapshotDeletePending while a Pending PVC's dataSource references the snapshot, matching the requeue behavior for issue #1366.
+  - 9c09524 2026-04-29T09:56:41+05:30 Address review: clarify snapshot-in-use errors and group snapshot requeue comment
+  - 21c0111 2026-04-29T09:34:52+05:30 Fix requeue on VolumeSnapshot deletion when used for PVC restore When a VolumeSnapshot is deleted while a PVC is still being created from it, the controller blocked deletion but returned nil, so the workqueue never retried. Return an error so the snapshot is requeued and deletion is retried once the PVC is no longer in use. Same fix applied for VolumeGroupSnapshot in the group snapshot helper.
+  - f3f8db4 2026-04-22T11:23:08Z Bump aquasecurity/trivy-action from 0.35.0 to 0.36.0
+  - e8f6849 2026-04-20T13:28:17+02:00 Fix VolumeSnapshotContent deletion
+  - 9773a35 2026-04-17T03:00:21Z Squashed 'release-tools/' changes from de06a09a7..909252797
+  - 1aececd 2026-04-16T12:44:28-04:00 Update unit tests
+  - f298d12 2026-04-16T11:26:01-04:00 Update go version to 1.25.8
+  - c28b251 2026-04-16T11:26:01-04:00 Set v1beta2 as stored version
+  - 027ff6f 2026-04-16T11:25:54-04:00 Update controllers to use v1 VolumeGroupSnapshot APIs
+  - 7810fa8 2026-04-16T11:23:47-04:00 Move VolumeGroupSnapshot API to V1
+  - 86c1a6c 2026-04-15T19:55:40-04:00 Add unit tests for group snapshots
+  - 13bf493 2026-04-15T18:26:54Z Run Trivy scan on schedule instead of pull requests
+  - fad717c 2026-04-15T12:32:14-04:00 Update go.opentelemetry.io/otel libs
+  - 72ee717 2026-04-15T10:57:54-04:00 Squashed 'release-tools/' changes from 119a53c3c..de06a09a7
+  - c34d0df 2026-04-08T14:17:37-04:00 Fix data race in metrics test
+  - 4a8f5b5 2026-03-31T13:27:30+02:00 fix: pin github action to exact SHA
+  - 93ef9f3 2026-03-23T11:35:40Z Bump the github-dependencies group across 1 directory with 39 updates
+  - c18f4ec 2026-03-22T19:22:58+01:00 security: Update trivy-action to v0.35.0
+  - 77c491f 2026-03-15T22:27:40-04:00 Squashed 'release-tools/' changes from 1e81e752e..119a53c3c
+  - 8c992f2 2026-03-03T13:37:39-05:00 Add more unit tests
+  - 97f3abc 2026-03-03T13:03:59+05:30 deploy: update sidecar image versions
+  - dec67ea 2026-02-27T12:54:09-05:00 Add unit tests for volume group snapshot controller in sidecar
+  - ee18dbc 2026-02-17T16:28:28-05:00 Add unit tests for group snapshots in snapshot-controller
+  - bb34c93 2026-02-16T12:29:17Z Bump the github-dependencies group with 11 updates
+  - 658c1ac 2025-10-19T14:06:14+03:00 [snapshot-controller] Do not modify error when retrying PVC finalizer removal
+
+- router image-arm64 808b0001233b4c084694244f25cd53c3808c4e81 to 3553702970b094986d91f218e3191487de46e476
+  - 7103676 2026-06-12T14:49:31-03:00 add option to separate router and haproxy containers
+  - befe5dd 2026-06-07T22:20:03Z Updating ose-haproxy-router-base-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-haproxy-router-base.yml
+
+- ovn-kubernetes image-arm64 e9295c0d0d7caa1eda7cc9f2f3900c64096c943c to 62baca4832f3aeb3fc7032d38619835c04208c95
+  - 4ed7d1ec 2026-06-11T15:36:43+05:30 sync test annotations with upstream changes
+  - b4194487 2026-06-11T15:35:36+05:30 e2e: fix UDN subnet overlap with downstream service CIDR
+  - 4439fbd8 2026-06-04T11:09:04-04:00 fix: fail license generation on module download errors
+  - 73c7c88d 2026-06-04T11:09:00-04:00 fix: Use default GOTOOLCHAIN=auto when generating license files
+  - 69abaab2 2026-06-03T12:48:16+02:00 Make BGP server host port configurable
+  - 5e373a9c 2026-06-03T12:48:16+02:00 e2e: split same-UDN NodePort backend paths
+  - 19e34082 2026-06-03T12:48:16+02:00 e2e: add NodePort-node backend for UDN service
+  - bef1aa03 2026-06-03T12:48:16+02:00 e2e: select CUDN pod IP by family
+  - b3475348 2026-06-03T12:48:16+02:00 e2e: expect ETP=Local NodePort tests to succeed
+  - ae449ce3 2026-06-03T12:48:16+02:00 iprulemanager: include address family in rule equality
+  - 5fb1ded4 2026-06-03T12:48:16+02:00 e2e: wait for VRF-lite node readiness
+  - 9b514ecb 2026-06-02T14:48:48+02:00 e2e: expect VRF egress interface IP for LGW no-overlay SNAT
+  - 3710b5ab 2026-06-02T14:48:11+02:00 e2e: unskip no-overlay cross-node NodePort cases
+  - b435536a 2026-06-02T14:48:11+02:00 Test cases for CUDN with transport NoOverlay routing unmanaged outboundSNAT enabled and disabled in SGW and LGW mode
+  - 21bce8d9 2026-06-02T14:48:11+02:00 LGW: set ct-commit-all on L2 UDN cluster routers
+  - e95849c9 2026-06-02T14:48:11+02:00 LGW: set ct-commit-all on UDN cluster router
+  - 0ddbc064 2026-06-02T14:48:07+02:00 LGW: route no-overlay UDN ingress via OVN
+  - 9f42f945 2026-06-02T14:36:34+02:00 UDN service OpenFlow: handle SNAT to masq ip
+  - 88c03903 2026-06-02T14:36:34+02:00 SGW: Add conntrack flows for no-overlay UDN cross-node traffic
+  - 122ab5c2 2026-06-02T14:36:34+02:00 SGW: use allowed_ext_ips for advertised UDN SNAT
+  - 1ba24787 2026-06-01T11:05:14+02:00 Implement OutboundSNAT for CUDN in shared gateway mode
+  - 50386fa3 2026-06-01T11:05:12+02:00 Add OutboundSNAT field to NetInfo interface
+  - 2fbcc1f8 2026-06-01T11:05:10+02:00 Implement OutboundSNAT for CUDN in local gateway mode
+  - 91683a3d 2026-06-01T11:05:08+02:00 Render OutboundSNAT config from CUDN CRD to NAD
+  - 497c201a 2026-05-27T18:02:30-04:00 unit test: fix EVPN UDN expected node IP address set
+  - ad54c5a5 2026-05-27T17:25:34+02:00 node: skip updateOVNEncapIPAndReconnect tests without root privileges
+  - e2e701ee 2026-05-27T15:36:52+02:00 util: assume pod network advertisement for certain transports
+  - d2d101d6 2026-05-27T09:52:45+02:00 Optimize addressManager sync and linkmanager syncLink
+  - a069246c 2026-05-27T08:48:19+02:00 Fix deadlock in webhook if Serve fails before cancellation
+  - b9ed3293 2026-05-27T08:48:19+02:00 Add comprehensive unit tests for ovnkube-identity webhook.Run()
+  - 9d4334cd 2026-05-27T08:48:19+02:00 Refactor ovnkubeidentity webhook server into separate package
+  - cbb5c4d0 2026-05-26T17:04:54-04:00 Ensure node IP address set for advertised SNAT
+  - 757f3099 2026-05-26T20:44:22+02:00 e2e: replace random allocations with ConfigMap-backed allocators
+  - 1ff56ce8 2026-05-25T09:45:12+02:00 Fix kubevirt live migration test flake by avoiding fake client race
+  - 5ec0be6b 2026-05-25T07:40:38+02:00 fix(evpn): re-program neighbors after kubevirt live migration
+  - 5aa65afe 2026-05-25T07:40:38+02:00 fix(evpn): use NeighSet instead of NeighAdd for PERMANENT neighbors
+  - 3fbc9381 2026-05-22T14:20:05-07:00 chore: skip cicd tests for doc changes
+  - 8bc78918 2026-05-22T08:36:40-07:00 Deprecate OVN_METRICS_MASTER_PORT in favor of OVN_METRICS_CONTROLLER_PORT
+  - 811879b7 2026-05-22T08:36:40-07:00 docs: drop obsolete central-mode SSL install guides
+  - f7ceb813 2026-05-22T08:36:40-07:00 ovn: drop --no-leader-only from OVN client invocations
+  - 3cf80961 2026-05-22T08:36:40-07:00 helm: fix Prometheus alert description template variable
+  - 8ef7ca88 2026-05-22T08:36:40-07:00 config: drop OvnAuthConfig central-mode fields, keep Egress IP healthcheck plumbing
+  - f4c700df 2026-05-22T08:36:40-07:00 helm: drop OVN_SSL_ENABLE and OVN_NORTH/OVN_SOUTH plumbing
+  - e2dddda6 2026-05-22T08:36:40-07:00 ovnkube.sh: drop network NB/SB containers and SSL plumbing
+  - 4dd7f126 2026-05-22T08:36:40-07:00 Remove central mode leftover code
+  - d4d225a8 2026-05-22T10:43:26-04:00 e2e: remove temporary multihoming NAD sync sleeps
+  - 33a96ff8 2026-05-21T20:31:59+02:00 e2e: always resolve agnhost image via DeploymentConfig
+  - 9eb9b572 2026-05-21T13:34:23-04:00 Create UDN VRFs in DPU mode
+  - 83507aff 2026-05-21T18:28:38+02:00 Adds ignore paths for performance tests
+  - 6bc965b5 2026-05-20T07:49:47+02:00 e2e(virt): Replace fake virt-launcher pod with proper VMI in UDPN test
+  - 84513297 2026-05-20T07:49:47+02:00 e2e(virt): Add test with three VMs same hostname
+  - 89a8c5a1 2026-05-20T07:49:47+02:00 kubevirt: Support handling vm hostname field
+  - afadc29a 2026-05-19T14:30:18-04:00 Configure advertised UDN nftables on node init
+  - ccdf1bcd 2026-05-19T13:28:43-04:00 Pass route advertisement flag to DPU nodes
+  - 513717d3 2026-05-19T08:58:46-04:00 Resolve simulated DPU representors by alias
+  - 8a4852e7 2026-05-18T10:24:51-07:00 e2e: extend primary L3 UDN test cases with multiple subnets
+  - 49cb7ca2 2026-05-18T10:24:51-07:00 egressip: reconcile routes when P-UDN subnets change
+  - adaece03 2026-05-18T10:24:51-07:00 UDN: reconcile BGP isolation on primary UDN subnet changes
+  - 14d98051 2026-05-18T10:24:51-07:00 BGP: cover primary UDN multi-subnet route filtering for route importing
+  - 18eb5671 2026-05-18T10:24:51-07:00 docs: clarify RouteAdvertisement handling for Layer3 multi-subnet UDN
+  - 0cf8456b 2026-05-18T10:24:51-07:00 egressfirewall: update ACL when P-UDN adds overlapping subnet
+  - 7d8e841b 2026-05-18T10:24:51-07:00 networkconnect: handle P-UDN multi-subnet CNC router policies
+  - 8308e803 2026-05-18T10:24:51-07:00 Add e2e test case for layer P-UDN multi-subnet support
+  - 3456af40 2026-05-18T10:24:51-07:00 P-UDN: Support multiple cluster-subnets per IP family in Layer3 topology
+  - 3a242db4 2026-05-18T10:18:24-07:00 Update CRD validation rules and add corresponding e2e test cases
+  - a689686a 2026-05-18T12:40:31-04:00 Fix performance report
+  - 26b5c617 2026-05-18T12:17:43+02:00 Remove dead raft variable definitions from ovnkube.sh
+
+- service-ca-operator image-arm64 e7ccfa308e69ce4ad1f2afcd1d7c8ff25144374b to 35cf51895f4dc77dca8a709e7635980753f87e17
+  - 97a337e 2026-06-10T16:02:10+02:00 Watch CA bundle files for changes and reload dynamically
+  - 792dd4a 2026-06-10T16:00:29+02:00 deps: Update library-go and add k8s.io/kubernetes
 
