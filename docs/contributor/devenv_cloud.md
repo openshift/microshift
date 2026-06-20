@@ -143,7 +143,7 @@ Run the following command to create a new virtual machine using **nested** virtu
 
 ```bash
 VMNAME=microshift-bench
-ISO="/var/lib/libvirt/images/rhel-9.2-$(uname -m)-dvd.iso"
+ISO="/var/lib/libvirt/images/rhel-9.8-$(uname -m)-dvd.iso"
 
 export NCPUS=2
 export RAMSIZE=2

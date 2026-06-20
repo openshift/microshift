@@ -178,7 +178,7 @@ Arguments:
                             the latest build will be selected.
 
     [--os <os>]:            (create/ami only) specific version of RHEL, 
-                            e.g. 'rhel-9.3'. Defaults to rhel-9.4.
+                            e.g. 'rhel-9.3'. Defaults to rhel-9.8.
 
     [--arch <arch>]:        (ami only) Filter AMIs based on arch. Must be 
                             one of: x86_64, arm64. Lists all when not set.
@@ -199,7 +199,7 @@ inst_type=""
 region=""
 pub_key="${HOME}/.ssh/id_rsa.pub"
 ami=""
-os="rhel-9.4"
+os="rhel-9.8"
 arch=""
 
 while [ $# -gt 0 ]; do
