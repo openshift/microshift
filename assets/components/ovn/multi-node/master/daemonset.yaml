@@ -414,7 +414,7 @@ spec:
 
           sysctl net.ipv4.ip_forward=1
 
-          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE}"
+          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-ovnkube-controller ${K8S_NODE}"
           exec /usr/bin/ovnkube \
             --init-ovnkube-controller "${K8S_NODE}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
