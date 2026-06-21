@@ -141,8 +141,6 @@ spec:
           echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-node - start ovnkube --init-node ${K8S_NODE}"
           exec /usr/bin/ovnkube \
             --init-node "${K8S_NODE}" \
-            --nb-address "{{.OVN_NB_DB_LIST}}" \
-            --sb-address "{{.OVN_SB_DB_LIST}}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
             --allow-no-uplink \
