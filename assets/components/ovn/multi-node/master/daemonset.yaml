@@ -378,8 +378,6 @@ spec:
           exec /usr/bin/ovnkube \
             --init-cluster-manager "${K8S_NODE}" \
             --init-ovnkube-controller "${K8S_NODE}" \
-            --nb-address "{{.OVN_NB_DB_LIST}}" \
-            --sb-address "{{.OVN_SB_DB_LIST}}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
             ${gateway_mode_flags} \
