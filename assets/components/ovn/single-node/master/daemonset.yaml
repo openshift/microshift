@@ -345,8 +345,6 @@ spec:
             ${gateway_mode_flags} \
             ${gw_interface_flag} \
             --inactivity-probe="180000" \
-            --nb-address "" \
-            --sb-address "" \
             --enable-multicast \
             --disable-snat-multiple-gws \
             --single-node \
