@@ -369,7 +369,7 @@ def main():
         g.is_local_branch_based_on_newer_base_branch_commit(base_branch, remote_branch.name, rebase_branch_name)
     )
     if rbranch_does_not_exists or rbranch_exists_and_needs_update:
-        g.push(rebase_branch_name)
+        g.push(rebase_branch_name, base_branch, gh.gh_repo)
 
     prow_job_url = try_create_prow_job_url()
     pr_title = create_pr_title(rebase_branch_name, rebase_result.success)

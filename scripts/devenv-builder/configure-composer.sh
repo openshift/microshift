@@ -4,11 +4,22 @@ set -euxo pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DNF_RETRY="${SCRIPTDIR}/../dnf_retry.sh"
 
+enable_copr_repositories() {
+    local -r version_id=$1
+    local -r version_id_major="$(awk -F. '{print $1}' <<< "${version_id}")"
+
+    sudo dnf copr enable -y @osbuild/osbuild-composer "rhel-${version_id_major}-$(uname -m)"
+    sudo dnf copr enable -y @osbuild/osbuild          "epel-${version_id_major}-$(uname -m)"
+}
+
 install_and_configure_composer() {
     local -r version_id=$1
     local -r version_id_major="$(awk -F. '{print $1}' <<< "${version_id}")"
 
-    "${DNF_RETRY}" "install" "osbuild osbuild-composer"
+    # The osbuild packages may come from 'copr' repositories.
+    # They are installed separately to resolve potential RPM package dependency
+    # conflicts with the system packages.
+    "${DNF_RETRY}" "install" "--nobest osbuild osbuild-composer"
     "${DNF_RETRY}" "install" \
         "git composer-cli ostree rpm-ostree \
         cockpit-composer bash-completion podman runc genisoimage \
@@ -141,6 +152,7 @@ EOF
 source /etc/os-release
 
 # shellcheck disable=SC2153
+enable_copr_repositories       "${VERSION_ID}"
 install_and_configure_composer "${VERSION_ID}"
 check_umask_and_permissions
 

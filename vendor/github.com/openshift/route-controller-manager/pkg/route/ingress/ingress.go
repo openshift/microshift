@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	coreinformers "k8s.io/client-go/informers/core/v1"
 	networkingv1informers "k8s.io/client-go/informers/networking/v1"
+	"k8s.io/client-go/kubernetes/scheme"
 	kv1core "k8s.io/client-go/kubernetes/typed/core/v1"
 	kv1networking "k8s.io/client-go/kubernetes/typed/networking/v1"
 	corelisters "k8s.io/client-go/listers/core/v1"
@@ -35,7 +36,6 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/component-base/metrics/legacyregistry"
-	"k8s.io/kubernetes/pkg/api/legacyscheme"
 
 	routev1 "github.com/openshift/api/route/v1"
 	routeclient "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
@@ -177,7 +177,7 @@ func NewController(eventsClient kv1core.EventsGetter, routeClient routeclient.Ro
 	broadcaster.StartLogging(klog.Infof)
 	// TODO: remove the wrapper when every clients have moved to use the clientset.
 	broadcaster.StartRecordingToSink(&kv1core.EventSinkImpl{Interface: eventsClient.Events("")})
-	recorder := broadcaster.NewRecorder(legacyscheme.Scheme, corev1.EventSource{Component: "ingress-to-route-controller"})
+	recorder := broadcaster.NewRecorder(scheme.Scheme, corev1.EventSource{Component: "ingress-to-route-controller"})
 
 	c := &Controller{
 		eventRecorder: recorder,

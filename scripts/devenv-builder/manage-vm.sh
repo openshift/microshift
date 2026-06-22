@@ -56,7 +56,7 @@ function get_base_isofile {
             echo "rhel-${rhel_version}-$(uname -m)-dvd.iso"
             ;;
         9)
-            echo "rhel-9.4-$(uname -m)-dvd.iso"
+            echo "rhel-9.8-$(uname -m)-dvd.iso"
             ;;
         9.*)
             echo "rhel-${rhel_version}-$(uname -m)-dvd.iso"

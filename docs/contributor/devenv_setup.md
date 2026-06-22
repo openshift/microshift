@@ -4,7 +4,7 @@ in a virtual machine.
 
 ## Create Development Virtual Machine
 Start by downloading one of the DVD ISO images for the `x86_64` or `aarch64` architecture:
-* RHEL 9.4 from https://developers.redhat.com/products/rhel/download
+* RHEL 9.8 from https://developers.redhat.com/products/rhel/download
 * CentOS 9 Stream from https://www.centos.org/download
 
 ### Creating VM

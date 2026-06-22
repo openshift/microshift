@@ -157,7 +157,7 @@ Most of the following variables are defined in `vars/all.yml`. `rhel_target_vers
 | `enable_gpu` | Install NVIDIA GPU drivers and container toolkit for GPU workloads | `false` |
 | `deploy_gpu_test` | Deploy a test GPU workload to validate GPU functionality | `true` |
 | `run_workloads` | Run kube-burner performance workloads | `false` |
-| `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.6") | `undefined` |
+| `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.8") | `undefined` |
 
 ### Inventory Configuration
 
