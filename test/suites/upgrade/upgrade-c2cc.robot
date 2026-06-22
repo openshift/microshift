@@ -82,7 +82,7 @@ Verify All Clusters Healthy
 
 Verify Full C2CC Connectivity
     [Documentation]    Verify pod-to-pod and pod-to-service connectivity between all cluster pairs.
-    VAR    @{clusters}    cluster-a    cluster-b    cluster-c
+    VAR    @{clusters}=    cluster-a    cluster-b    cluster-c
     FOR    ${src}    IN    @{clusters}
         FOR    ${dst}    IN    @{clusters}
             IF    '${src}' != '${dst}'
