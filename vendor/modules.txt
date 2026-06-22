@@ -798,13 +798,14 @@ github.com/openshift/library-go/pkg/route/validation
 github.com/openshift/library-go/pkg/security/ldaputil
 github.com/openshift/library-go/pkg/security/uid
 github.com/openshift/library-go/pkg/serviceability
-# github.com/openshift/route-controller-manager v0.0.0-20260526224403-1916ceb059f5
+# github.com/openshift/route-controller-manager v0.0.0-20260611182032-e454c01fbe56
 ## explicit; go 1.25.0
 github.com/openshift/route-controller-manager/pkg/cmd/controller
 github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager
 github.com/openshift/route-controller-manager/pkg/route/ingress
 github.com/openshift/route-controller-manager/pkg/route/ingressip
 github.com/openshift/route-controller-manager/pkg/routecontroller
+github.com/openshift/route-controller-manager/pkg/utils/ipallocator
 github.com/openshift/route-controller-manager/pkg/version
 # github.com/ovn-kubernetes/libovsdb v0.8.2-0.20260302130604-c07ce22366ac
 ## explicit; go 1.24.0
