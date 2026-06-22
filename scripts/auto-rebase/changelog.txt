@@ -1,13 +1,22 @@
-- cluster-ingress-operator embedded-component f7a3395618f0925fbe626b18cc8173d19ab30dac to ffc48a136de559eb8aff1e9750b67db1a482c7fe
-  - a67c855 2026-06-11T19:00:36+05:30 OCPBUGS-86718: Add configuration override for X-SSL strip
+- api embedded-component 1d79f30d4668393dc34e9b423ec6904645503c58 to 253fff21f708fa7efd5ee65a4c30d6bde1e61cc8
+  - 84e0ae99 2026-06-03T17:21:35-04:00 [release-4.21] NE-2480: Promote GatewayAPIWithoutOLM feature gate to TechPreview
 
-- machine-config-operator embedded-component 9df79499f49b33f03975fddbb9595ecf8004f605 to 59524130bbc7ffc63b1c2f7dbd1cd24882e447d3
-  - ac835913 2026-06-11T16:16:51Z OCPBUGS-84832: daemon: don't pull/extract extensions for all OS updates
-  - 3ed3f95c 2026-06-11T16:16:25Z OCPBUGS-84814: Skip chrony-wait on first node join
+- cluster-ingress-operator embedded-component ffc48a136de559eb8aff1e9750b67db1a482c7fe to 356e3777400d549d9b3194c74c716eb2290baefc
+  - 12879f2 2026-06-03T17:09:21-04:00 Remove SetImageDefaults that overrode CSV image SHAs
+  - 6794e77 2026-06-03T17:09:18-04:00 NE-2519: Move Sail Library to official release branch
+  - b87969f 2026-06-03T16:59:28-04:00 OCPBUGS-79467: Change default log level from DEBUG to INFO
+  - dae6fef 2026-06-03T16:55:52-04:00 NE-2471: Add downstream image defaults for main OSSM branch
+  - 326aff6 2026-06-03T16:55:52-04:00 NE-2471: E2E Tests for Gateway API with Sail Library
+  - 4b7fd54 2026-06-03T16:55:52-04:00 NE-2471: Separate Sail Library RBAC permissions into dedicated ClusterRole
+  - 2cb10d5 2026-06-03T16:55:48-04:00 NE-2471: Clean up and improve Sail Library integration
+  - c74f9ef 2026-06-02T21:29:49-04:00 NE-2471: Improve Sail Library integration with notification channel
+  - 21a1ee1 2026-06-02T21:29:49-04:00 NE-2471: Add migration from OLM to Sail Library
+  - 92f273b 2026-06-02T21:29:49-04:00 NE-2471: Add Istio Install via Sail Library
+  - d2928d3 2026-06-02T21:29:48-04:00 NE-2471: Vendor openshift/api with GatewayAPIWithoutOLM feature gate
 
-- router image-amd64 f4c2ba80abb1fb3694a6b2ae0be2e5c898572632 to dc4c01d494f572773a05e82bffd19c2cdaf8dce9
-  - 0c478b8 2026-06-11T18:47:28+05:30 OCPBUGS-86718: Strip X-SSL-Client-* headers for plain HTTP
-
-- router image-arm64 f4c2ba80abb1fb3694a6b2ae0be2e5c898572632 to dc4c01d494f572773a05e82bffd19c2cdaf8dce9
-  - 0c478b8 2026-06-11T18:47:28+05:30 OCPBUGS-86718: Strip X-SSL-Client-* headers for plain HTTP
+- machine-config-operator embedded-component 59524130bbc7ffc63b1c2f7dbd1cd24882e447d3 to 45a196b7ba10a6175895db65a81d08e88fdfd5f2
+  - fff4768e 2026-06-17T15:20:26Z Remove skopeo-install script
+  - 5c1c2a66 2026-06-16T21:00:38Z controller & test: process rebuild annotation on machine-os-builder restart & increase test timeout
+  - c62e5620 2026-06-15T17:04:58-04:00 tests: update custom containerfile OCB test to work in disconnected environments
+  - b509b1d4 2026-06-11T13:00:23-04:00 bootimage: use version for vsphere hotloop check
 
