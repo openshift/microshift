@@ -1,7 +1,7 @@
-https://github.com/openshift/api embedded-component 1d79f30d4668393dc34e9b423ec6904645503c58
+https://github.com/openshift/api embedded-component 253fff21f708fa7efd5ee65a4c30d6bde1e61cc8
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component 8c1ebc60a2014ab925cbad6ef255e06ea0bd72b4
 https://github.com/openshift/cluster-dns-operator embedded-component 41a53fed36e6e99c7c9ceb3a699c3547ee5d9bb9
-https://github.com/openshift/cluster-ingress-operator embedded-component ffc48a136de559eb8aff1e9750b67db1a482c7fe
+https://github.com/openshift/cluster-ingress-operator embedded-component 356e3777400d549d9b3194c74c716eb2290baefc
 https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 424f27c9c415373b7f60756b5a1c24f48f248512
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 395de96705749de9c6a5f25747b9d5c3d5f65a8f
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 5ef1df3be41d38ddae9b3d22ce51ba486939e9f1
@@ -12,7 +12,7 @@ https://github.com/openshift/csi-external-snapshotter embedded-component 7503ea3
 https://github.com/openshift/etcd embedded-component 806f690e1f140e0aea2eb05ef5f288b756b62895
 https://github.com/openshift/kubernetes embedded-component a8c502a90d898d46e989ddeb5f00b0f1a4f02298
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component ce5ff17e9a81ce754567e6dd5053d13409c251e9
-https://github.com/openshift/machine-config-operator embedded-component 59524130bbc7ffc63b1c2f7dbd1cd24882e447d3
+https://github.com/openshift/machine-config-operator embedded-component 45a196b7ba10a6175895db65a81d08e88fdfd5f2
 https://github.com/openshift/openshift-controller-manager embedded-component 438d52e79d691e016d66eabfe9a53c84229db40c
 https://github.com/openshift/operator-framework-olm embedded-component 149d553b2057320d761c4d1913098a66787dd09a
 https://github.com/openshift/route-controller-manager embedded-component 166a3e96f8151d9e789b3951ae75b03cdede5081
