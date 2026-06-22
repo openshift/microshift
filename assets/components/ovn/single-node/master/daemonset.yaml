@@ -295,6 +295,46 @@ spec:
             memory: 10Mi
         terminationMessagePolicy: FallbackToLogsOnError
 
+      # ovnkube cluster-manager: allocates subnets to nodes, handles cluster-wide IPAM
+      - name: ovnkube-cluster-manager
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -xe
+          if [[ -f "/env/_master" ]]; then
+            set -o allexport
+            source "/env/_master"
+            set +o allexport
+          fi
+
+          echo "$(date -Iseconds) - starting ovnkube-cluster-manager, Node: ${K8S_NODE}"
+          exec /usr/bin/ovnkube \
+            --init-cluster-manager "${K8S_NODE}" \
+            --config-file=/run/ovnkube-config/ovnkube.conf \
+            --loglevel "${OVN_KUBE_LOG_LEVEL}" \
+            --enable-multicast
+        env:
+        - name: OVN_KUBE_LOG_LEVEL
+          value: "4"
+        - name: K8S_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - mountPath: /run/ovnkube-config/
+          name: ovnkube-config
+        - mountPath: {{.KubeconfigDir}}
+          name: kubeconfig
+        - mountPath: /env
+          name: env-overrides
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+
       # ovnkube master: convert kubernetes objects in to nbdb logical network components
       - name: ovnkube-master
         image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
@@ -335,9 +375,8 @@ spec:
             # the functionality depends on ip_forwarding being enabled
           fi
 
-          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE} --init-node ${K8S_NODE}"
+          echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-node ${K8S_NODE}"
           exec /usr/bin/ovnkube \
-            --init-cluster-manager "${K8S_NODE}" \
             --init-ovnkube-controller "${K8S_NODE}" \
             --init-node "${K8S_NODE}" \
             --allow-no-uplink \
@@ -346,8 +385,6 @@ spec:
             ${gateway_mode_flags} \
             ${gw_interface_flag} \
             --inactivity-probe="180000" \
-            --nb-address "" \
-            --sb-address "" \
             --enable-multicast \
             --disable-snat-multiple-gws \
             --single-node \

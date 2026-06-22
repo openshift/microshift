@@ -353,6 +353,46 @@ spec:
           containerPort: {{.OVN_SB_PORT}}
         terminationMessagePolicy: FallbackToLogsOnError
 
+      # ovnkube cluster-manager: allocates subnets to nodes, handles cluster-wide IPAM
+      - name: ovnkube-cluster-manager
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -xe
+          if [[ -f "/env/_master" ]]; then
+            set -o allexport
+            source "/env/_master"
+            set +o allexport
+          fi
+
+          echo "$(date -Iseconds) - starting ovnkube-cluster-manager, Node: ${K8S_NODE}"
+          exec /usr/bin/ovnkube \
+            --init-cluster-manager "${K8S_NODE}" \
+            --config-file=/run/ovnkube-config/ovnkube.conf \
+            --loglevel "${OVN_KUBE_LOG_LEVEL}" \
+            --enable-multicast
+        env:
+        - name: OVN_KUBE_LOG_LEVEL
+          value: "4"
+        - name: K8S_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - mountPath: /run/ovnkube-config/
+          name: ovnkube-config
+        - mountPath: {{.KubeconfigDir}}
+          name: kubeconfig
+        - mountPath: /env
+          name: env-overrides
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+
       # ovnkube master: convert kubernetes objects in to nbdb logical network components
       - name: ovnkube-master
         image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
@@ -376,10 +416,7 @@ spec:
 
           echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE}"
           exec /usr/bin/ovnkube \
-            --init-cluster-manager "${K8S_NODE}" \
             --init-ovnkube-controller "${K8S_NODE}" \
-            --nb-address "{{.OVN_NB_DB_LIST}}" \
-            --sb-address "{{.OVN_SB_DB_LIST}}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
             ${gateway_mode_flags} \
