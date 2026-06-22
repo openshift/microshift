@@ -67,6 +67,9 @@ Old Default Tables Are Not Cleaned Up
     Should Contain    ${routes}    ${CLUSTER_B_POD_CIDR}
     ${rules}=    Command On Cluster    cluster-a    ${IP_CMD} rule show
     Should Contain    ${rules}    lookup 200
+    ${svc_routes}=    Command On Cluster    cluster-a    ${IP_CMD} route show table 201
+    Should Contain    ${svc_routes}    ${CLUSTER_A_SVC_CIDR}
+    Should Contain    ${rules}    lookup 201
 
 
 *** Keywords ***
@@ -83,8 +86,8 @@ Setup
 Teardown
     [Documentation]    Remove custom routing drop-in, flush custom tables, restore defaults.
     Remove Custom Routing Config
-    Flush Custom Tables
     Restart And Wait For Healthy
+    Flush Custom Tables
     Teardown All Remote Clusters
     Remove Kubeconfig
     Logout MicroShift Host
@@ -113,7 +116,7 @@ Flush Custom Tables
     ...    ${IP_CMD} route flush table ${CUSTOM_ROUTE_TABLE}
     Disruptive Command On Cluster    cluster-a
     ...    ${IP_CMD} route flush table ${CUSTOM_SVC_ROUTE_TABLE}
-    ${rules}=    Disruptive Command On Cluster    cluster-a    ${IP_CMD} rule show
+    ${rules}=    Command On Cluster    cluster-a    ${IP_CMD} rule show
     ${lines}=    Split To Lines    ${rules}
     FOR    ${line}    IN    @{lines}
         IF    'lookup ${CUSTOM_ROUTE_TABLE}' in $line or 'lookup ${CUSTOM_SVC_ROUTE_TABLE}' in $line
