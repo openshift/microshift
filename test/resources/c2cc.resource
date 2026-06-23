@@ -68,16 +68,20 @@ Register Remote Cluster
     Append To List    ${C2CC_REMOTE_ALIASES}    ${alias}
 
 Teardown All Remote Clusters
-    [Documentation]    Close SSH connections for all registered remote clusters
-    ...    and switch back to the local cluster connection so that
-    ...    Logout MicroShift Host can close it.
+    [Documentation]    Close SSH connections for all registered remote clusters.
+    ...    If cluster-a was registered as a local cluster, switch back to it
+    ...    so that Logout MicroShift Host can close it. If all clusters were
+    ...    registered as remote (e.g. upgrade tests), skip the switch-back.
+    ${has_local}=    Evaluate    'cluster-a' not in ${C2CC_REMOTE_ALIASES}
     FOR    ${alias}    IN    @{C2CC_REMOTE_ALIASES}
         SSHLibrary.Switch Connection    ${alias}
         SSHLibrary.Close Connection
     END
     VAR    @{C2CC_REMOTE_ALIASES}=    @{EMPTY}    scope=SUITE
-    ${local_conn}=    Get From Dictionary    ${C2CC_SSH_IDS}    cluster-a
-    SSHLibrary.Switch Connection    ${local_conn}
+    IF    ${has_local}
+        ${local_conn}=    Get From Dictionary    ${C2CC_SSH_IDS}    cluster-a
+        SSHLibrary.Switch Connection    ${local_conn}
+    END
 
 Command On Cluster
     [Documentation]    Run a shell command on the specified cluster via SSH.
@@ -383,6 +387,26 @@ DNS Lookup Should Succeed
     ${stdout}=    Oc On Cluster    ${alias}
     ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- getent hosts ${fqdn}
     Should Not Be Empty    ${stdout}
+
+Verify RemoteCluster State
+    [Documentation]    Check that all RemoteCluster CRs on this cluster have the expected state.
+    [Arguments]    ${alias}    ${expected_state}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.state}'
+    Should Not Be Empty    ${stdout}
+    @{states}=    Split String    ${stdout}
+    ${count}=    Get Length    ${states}
+    Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster states, got ${count}
+    FOR    ${state}    IN    @{states}
+        Should Be Equal As Strings    ${state}    ${expected_state}
+    END
+
+Verify All RemoteClusters Healthy
+    [Documentation]    Wait for all RemoteCluster CRs on all clusters to report Healthy.
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
+        Wait Until Keyword Succeeds    3m    10s
+        ...    Verify RemoteCluster State    ${alias}    Healthy
+    END
 
 Curl DNS From Cluster
     [Documentation]    Curl a service by DNS name from curl-pod on the given cluster.

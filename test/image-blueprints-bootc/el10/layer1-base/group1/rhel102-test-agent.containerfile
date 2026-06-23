@@ -27,4 +27,3 @@ RUN dnf install -y microshift-test-agent pcp pcp-zeroconf && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
     dnf clean all
-

@@ -103,7 +103,7 @@ Probe Deployment Self-Heals After Scale Down
 RemoteCluster Status Becomes Unhealthy When Probe Fails
     [Documentation]    Block probe traffic on cluster-b and verify cluster-a
     ...    reports Unhealthy for the corresponding RemoteCluster CR.
-    [Setup]    Ensure All Clusters Healthy
+    [Setup]    Verify All RemoteClusters Healthy
     ${cr_name}=    RemoteCluster CR Name From IP    ${HOST2_IP}
     # Apply a NetworkPolicy on cluster-b that denies all ingress to the probe pod,
     # causing cluster-a's probes to cluster-b to time out.
@@ -151,19 +151,6 @@ Verify Probe Service ClusterIP
     ...    oc get service ${PROBE_DEPLOYMENT} -n ${C2CC_NAMESPACE} -o jsonpath='{.spec.clusterIP}'
     Should Be Equal As Strings    ${actual_ip}    ${expected_ip}    strip_spaces=True
 
-Verify RemoteCluster State
-    [Documentation]    Check that all RemoteCluster CRs on this cluster have the expected state.
-    [Arguments]    ${alias}    ${expected_state}
-    ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.state}'
-    Should Not Be Empty    ${stdout}
-    @{states}=    Split String    ${stdout}
-    ${count}=    Get Length    ${states}
-    Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster states, got ${count}
-    FOR    ${state}    IN    @{states}
-        Should Be Equal As Strings    ${state}    ${expected_state}
-    END
-
 Verify RemoteCluster State By Name
     [Documentation]    Check that a specific RemoteCluster CR has the expected state.
     [Arguments]    ${alias}    ${cr_name}    ${expected_state}
@@ -186,13 +173,6 @@ RemoteCluster CR Name From IP
     ${dashed}=    Replace String    ${ip}    .    -
     ${dashed}=    Replace String    ${dashed}    :    -
     RETURN    c2cc-${dashed}
-
-Ensure All Clusters Healthy
-    [Documentation]    Pre-condition: all clusters must be Healthy before fault injection.
-    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
-        Wait Until Keyword Succeeds    3m    10s
-        ...    Verify RemoteCluster State    ${alias}    Healthy
-    END
 
 Apply Probe Deny Policy
     [Documentation]    Apply a NetworkPolicy that denies all ingress to the probe pod.
