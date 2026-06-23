@@ -177,11 +177,6 @@ c2cc_run_tests() {
         target_ref_var="--variable TARGET_REF:${C2CC_TARGET_REF}"
     fi
 
-    local bootc_registry_var=""
-    if [ -n "${MIRROR_REGISTRY_URL:-}" ]; then
-        bootc_registry_var="--variable BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}"
-    fi
-
     local host2_ip host3_ip
     host2_ip=$(get_host_ip host2) || return 1
     host3_ip=$(get_host_ip host3) || return 1
@@ -218,7 +213,7 @@ c2cc_run_tests() {
         ${foreign_cidr_var} \
         ${ip_family_var} \
         ${target_ref_var} \
-        ${bootc_registry_var} \
+        --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         "${suites_dir}"
 }
 

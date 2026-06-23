@@ -60,6 +60,7 @@ Setup
     ...    and store connection details for reconnection after reboots.
     Check Required Env Variables
     Should Not Be Empty    ${TARGET_REF}    TARGET_REF variable is required
+    Should Not Be Empty    ${BOOTC_REGISTRY}    BOOTC_REGISTRY variable is required
     Login MicroShift Host
     Setup Kubeconfig
     Logout MicroShift Host

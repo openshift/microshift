@@ -1,1 +1,0 @@
-../../c2cc/el98-src@el102-src@c2cc-upgrade-ok.sh

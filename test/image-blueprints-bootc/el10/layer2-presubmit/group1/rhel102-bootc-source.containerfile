@@ -43,10 +43,3 @@ RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
 # when upgrading from older ostree commits to bootc container layers
 RUN mkdir -p /usr/lib/systemd/system/ovsdb-server.service.d
 COPY --chmod=644 ./bootc-images/microshift-ovsdb-ownership.conf /usr/lib/systemd/system/ovsdb-server.service.d/microshift-ovsdb-ownership.conf
-
-# Fix SSH host key permissions for cross-version upgrades (RHEL 9 uses 0640
-# with ssh_keys group, RHEL 10 sshd requires 0600)
-# Similar workaround is used in microshift-test-agent.sh
-RUN mkdir -p /usr/lib/systemd/system/sshd.service.d && \
-    printf '[Service]\nExecStartPre=/bin/bash -c "chmod 600 /etc/ssh/ssh_host_*_key 2>/dev/null || true"\n' \
-    > /usr/lib/systemd/system/sshd.service.d/fix-hostkey-perms.conf

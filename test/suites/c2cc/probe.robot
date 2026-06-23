@@ -103,7 +103,7 @@ Probe Deployment Self-Heals After Scale Down
 RemoteCluster Status Becomes Unhealthy When Probe Fails
     [Documentation]    Block probe traffic on cluster-b and verify cluster-a
     ...    reports Unhealthy for the corresponding RemoteCluster CR.
-    [Setup]    Ensure All Clusters Healthy
+    [Setup]    Verify All RemoteClusters Healthy
     ${cr_name}=    RemoteCluster CR Name From IP    ${HOST2_IP}
     # Apply a NetworkPolicy on cluster-b that denies all ingress to the probe pod,
     # causing cluster-a's probes to cluster-b to time out.
@@ -174,9 +174,6 @@ RemoteCluster CR Name From IP
     ${dashed}=    Replace String    ${dashed}    :    -
     RETURN    c2cc-${dashed}
 
-Ensure All Clusters Healthy
-    [Documentation]    Pre-condition: all clusters must be Healthy before fault injection.
-    Verify All RemoteClusters Healthy
 
 Apply Probe Deny Policy
     [Documentation]    Apply a NetworkPolicy that denies all ingress to the probe pod.

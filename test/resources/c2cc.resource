@@ -68,16 +68,20 @@ Register Remote Cluster
     Append To List    ${C2CC_REMOTE_ALIASES}    ${alias}
 
 Teardown All Remote Clusters
-    [Documentation]    Close SSH connections for all registered remote clusters
-    ...    and switch back to the local cluster connection so that
-    ...    Logout MicroShift Host can close it.
+    [Documentation]    Close SSH connections for all registered remote clusters.
+    ...    If cluster-a was registered as a local cluster, switch back to it
+    ...    so that Logout MicroShift Host can close it. If all clusters were
+    ...    registered as remote (e.g. upgrade tests), skip the switch-back.
+    ${has_local}=    Evaluate    'cluster-a' not in ${C2CC_REMOTE_ALIASES}
     FOR    ${alias}    IN    @{C2CC_REMOTE_ALIASES}
         SSHLibrary.Switch Connection    ${alias}
         SSHLibrary.Close Connection
     END
     VAR    @{C2CC_REMOTE_ALIASES}=    @{EMPTY}    scope=SUITE
-    ${local_conn}=    Get From Dictionary    ${C2CC_SSH_IDS}    cluster-a
-    ${status}=    Run Keyword And Return Status    SSHLibrary.Switch Connection    ${local_conn}
+    IF    ${has_local}
+        ${local_conn}=    Get From Dictionary    ${C2CC_SSH_IDS}    cluster-a
+        SSHLibrary.Switch Connection    ${local_conn}
+    END
 
 Command On Cluster
     [Documentation]    Run a shell command on the specified cluster via SSH.
