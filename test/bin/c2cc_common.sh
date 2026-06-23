@@ -111,7 +111,7 @@ c2cc_create_vms() {
     local -r boot_commit_ref="${1}"
     local -r boot_blueprint="${2}"
     local -r network="${3:-default}"
-    local -r ip_family="${4:-ipv4}" 
+    local -r ip_family="${4:-ipv4}"
 
     # Prepare kickstart for all hosts
     local ipv6_args=""
@@ -161,7 +161,6 @@ c2cc_run_tests() {
     local -r suites_dir="${1}"
     local -r foreign_cidr="${2:-}"
     local -r ip_family="${3:-}"
-
     local foreign_cidr_var=""
     if [ -n "${foreign_cidr}" ]; then
         foreign_cidr_var="--variable FOREIGN_CIDR:${foreign_cidr}"
@@ -177,15 +176,16 @@ c2cc_run_tests() {
         target_ref_var="--variable TARGET_REF:${C2CC_TARGET_REF}"
     fi
 
+    local host2_vm host3_vm
+    host2_vm=$(full_vm_name host2)
+    host3_vm=$(full_vm_name host3)
+
     local host2_ip host3_ip
     host2_ip=$(get_host_ip host2) || return 1
     host3_ip=$(get_host_ip host3) || return 1
     readonly host2_ip host3_ip
 
-    # Retrieve host2's kubeconfig
     local -r kubeconfig_b="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-b"
-    
-    # Retrieve host3's kubeconfig
     local -r kubeconfig_c="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-c"
 
     # Wait for host2 and host3 to be fully ready (run_tests only waits for host1)
@@ -210,6 +210,8 @@ c2cc_run_tests() {
         --variable "CLUSTER_C_SVC_CIDR:${CLUSTER_C_SVC_CIDR}" \
         --variable "CLUSTER_C_DOMAIN:${CLUSTER_C_DOMAIN}" \
         --variable "KUBECONFIG_C:${kubeconfig_c}" \
+        --variable "HOST2_VM_NAME:${host2_vm}" \
+        --variable "HOST3_VM_NAME:${host3_vm}" \
         ${foreign_cidr_var} \
         ${ip_family_var} \
         ${target_ref_var} \

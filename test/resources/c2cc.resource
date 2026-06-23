@@ -8,6 +8,7 @@ Library             Process
 Library             String
 Library             SSHLibrary
 Resource            common.resource
+Resource            libvirt.resource
 Resource            microshift-host.resource
 
 
@@ -39,6 +40,15 @@ ${IP_CMD}                   ${{'ip -6' if '${IP_FAMILY}' == 'ipv6' else 'ip -4'}
 ...                         cluster-a=${CLUSTER_A_DOMAIN}
 ...                         cluster-b=${CLUSTER_B_DOMAIN}
 ...                         cluster-c=${CLUSTER_C_DOMAIN}
+&{POD_CIDR_MAP}
+...                         cluster-a=${CLUSTER_A_POD_CIDR}
+...                         cluster-b=${CLUSTER_B_POD_CIDR}
+...                         cluster-c=${CLUSTER_C_POD_CIDR}
+&{SVC_CIDR_MAP}
+...                         cluster-a=${CLUSTER_A_SVC_CIDR}
+...                         cluster-b=${CLUSTER_B_SVC_CIDR}
+...                         cluster-c=${CLUSTER_C_SVC_CIDR}
+@{ALL_CLUSTERS}             cluster-a    cluster-b    cluster-c
 
 
 *** Keywords ***
@@ -162,18 +172,27 @@ Verify IP Rules For Table 200
     Should Contain    ${stdout}    to ${remote_pod_cidr} lookup 200
     Should Contain    ${stdout}    to ${remote_svc_cidr} lookup 200
 
-Verify Routes In Table 201
-    [Documentation]    Check that service routes exist in table 201 for the local service CIDR.
-    [Arguments]    ${alias}    ${local_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ${IP_CMD} route show table 201
-    Should Contain    ${stdout}    ${local_svc_cidr}
-
 Verify Service IP Rules
     [Documentation]    Check that IP rules at priority 99 exist for cross-cluster service routing.
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
     ${stdout}=    Command On Cluster    ${alias}    ${IP_CMD} rule show
     Should Contain    ${stdout}    from ${remote_pod_cidr} to ${local_svc_cidr} lookup 201
     Should Contain    ${stdout}    from ${remote_svc_cidr} to ${local_svc_cidr} lookup 201
+
+Verify All IP Rules
+    [Documentation]    Check all IP rules (table 200 and 201) in a single SSH call.
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
+    ${stdout}=    Command On Cluster    ${alias}    ${IP_CMD} rule show
+    Should Contain    ${stdout}    to ${remote_pod_cidr} lookup 200
+    Should Contain    ${stdout}    to ${remote_svc_cidr} lookup 200
+    Should Contain    ${stdout}    from ${remote_pod_cidr} to ${local_svc_cidr} lookup 201
+    Should Contain    ${stdout}    from ${remote_svc_cidr} to ${local_svc_cidr} lookup 201
+
+Verify Routes In Table 201
+    [Documentation]    Check that service routes exist in table 201 for the local service CIDR.
+    [Arguments]    ${alias}    ${local_svc_cidr}
+    ${stdout}=    Command On Cluster    ${alias}    ${IP_CMD} route show table 201
+    Should Contain    ${stdout}    ${local_svc_cidr}
 
 Verify NFTables Bypass Rules
     [Documentation]    Check that nftables masquerade bypass rules exist for remote CIDRs.
@@ -393,19 +412,6 @@ DNS Lookup Should Succeed
     ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- getent hosts ${fqdn}
     Should Not Be Empty    ${stdout}
 
-Verify RemoteCluster State
-    [Documentation]    Check that all RemoteCluster CRs on this cluster have the expected state.
-    [Arguments]    ${alias}    ${expected_state}
-    ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.state}'
-    Should Not Be Empty    ${stdout}
-    @{states}=    Split String    ${stdout}
-    ${count}=    Get Length    ${states}
-    Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster states, got ${count}
-    FOR    ${state}    IN    @{states}
-        Should Be Equal As Strings    ${state}    ${expected_state}
-    END
-
 Verify All RemoteClusters Healthy
     [Documentation]    Wait for all RemoteCluster CRs on all clusters to report Healthy.
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
@@ -434,3 +440,135 @@ Curl Remote Service Via DNS
     ${stdout}=    Curl DNS From Cluster    ${source}
     ...    hello-microshift.${NAMESPACES}[${destination}].svc.${DOMAIN_MAP}[${destination}]    8080
     Should Contain    ${stdout}    Hello from
+
+Verify RemoteCluster State
+    [Documentation]    Check that all RemoteCluster CRs on this cluster have the expected state.
+    [Arguments]    ${alias}    ${expected_state}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.state}'
+    Should Not Be Empty    ${stdout}
+    @{states}=    Split String    ${stdout}
+    ${count}=    Get Length    ${states}
+    ${expected_count}=    Evaluate    len($ALL_CLUSTERS) - 1
+    Should Be Equal As Integers    ${count}    ${expected_count}
+    ...    Expected ${expected_count} RemoteCluster states, got ${count}
+    FOR    ${state}    IN    @{states}
+        Should Be Equal As Strings    ${state}    ${expected_state}
+    END
+
+Verify RemoteCluster State By Name
+    [Documentation]    Check that a specific RemoteCluster CR has the expected state.
+    [Arguments]    ${alias}    ${cr_name}    ${expected_state}
+    ${stdout}=    Oc On Cluster
+    ...    ${alias}
+    ...    oc get remoteclusters.microshift.io ${cr_name} -o jsonpath='{.status.state}'
+    Should Be Equal As Strings    ${stdout}    ${expected_state}
+
+RemoteCluster CR Name From IP
+    [Documentation]    Compute the RemoteCluster CR name from a host IP (e.g. 192.168.1.2 -> c2cc-192-168-1-2).
+    [Arguments]    ${ip}
+    ${dashed}=    Replace String    ${ip}    .    -
+    ${dashed}=    Replace String    ${dashed}    :    -
+    RETURN    c2cc-${dashed}
+
+Verify RemoteCluster Unhealthy On Observers
+    [Documentation]    Wait for observer clusters to report a disrupted cluster's CR as Unhealthy.
+    [Arguments]    ${disrupted_ip}    @{observers}
+    ${cr_name}=    RemoteCluster CR Name From IP    ${disrupted_ip}
+    FOR    ${observer}    IN    @{observers}
+        Wait Until Keyword Succeeds    3m    10s
+        ...    Verify RemoteCluster State By Name    ${observer}    ${cr_name}    Unhealthy
+    END
+
+Ensure All Clusters Healthy
+    [Documentation]    Pre-condition: all clusters must be Healthy before fault injection.
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
+        Wait Until Keyword Succeeds    3m    10s
+        ...    Verify RemoteCluster State    ${alias}    Healthy
+    END
+
+Verify C2CC Infrastructure For Remote
+    [Documentation]    Verify C2CC infrastructure for one remote cluster's CIDRs.
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
+    Verify Routes In Table 200    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    Verify All IP Rules    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
+    Verify NFTables Bypass Rules    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    Verify OVN Static Routes    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    Verify Node SNAT Annotation    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+
+Verify C2CC Infrastructure On Cluster
+    [Documentation]    Run all C2CC infrastructure checks for all remote CIDRs on the given cluster.
+    [Arguments]    ${alias}
+    ${local_svc_cidr}=    Get From Dictionary    ${SVC_CIDR_MAP}    ${alias}
+    FOR    ${remote}    IN    @{ALL_CLUSTERS}
+        IF    '${remote}' != '${alias}'
+            ${remote_pod_cidr}=    Get From Dictionary    ${POD_CIDR_MAP}    ${remote}
+            ${remote_svc_cidr}=    Get From Dictionary    ${SVC_CIDR_MAP}    ${remote}
+            Verify C2CC Infrastructure For Remote
+            ...    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
+        END
+    END
+    Verify Routes In Table 201    ${alias}    ${local_svc_cidr}
+
+Verify Cross Cluster Connectivity
+    [Documentation]    Verify a representative subset of cross-cluster connectivity.
+    ...    Tests one direction per cluster pair, alternating pod/service.
+    Test Connectivity Between Clusters    cluster-a    cluster-b    pod
+    Test Connectivity Between Clusters    cluster-a    cluster-c    service
+    Test Connectivity Between Clusters    cluster-b    cluster-a    service
+    Test Connectivity Between Clusters    cluster-b    cluster-c    pod
+    Test Connectivity Between Clusters    cluster-c    cluster-a    pod
+    Test Connectivity Between Clusters    cluster-c    cluster-b    service
+
+Verify Cross Cluster DNS
+    [Documentation]    Verify a representative subset of cross-cluster DNS resolution.
+    Curl Remote Service Via DNS    cluster-a    cluster-b
+    Curl Remote Service Via DNS    cluster-b    cluster-c
+    Curl Remote Service Via DNS    cluster-c    cluster-a
+
+Wait For OVN-K Pods Ready On Cluster
+    [Documentation]    Wait for all OVN-K pods to be Running and Ready on the given cluster.
+    [Arguments]    ${alias}    ${timeout}=5m    ${retry}=15s
+    Wait Until Keyword Succeeds    ${timeout}    ${retry}
+    ...    OVN-K Pods Should Be Ready    ${alias}
+
+OVN-K Pods Should Be Ready
+    [Documentation]    Assert all pods in openshift-ovn-kubernetes are Ready.
+    [Arguments]    ${alias}
+    Oc On Cluster    ${alias}
+    ...    oc wait pods -n openshift-ovn-kubernetes --all --for=condition=Ready --timeout=30s
+
+Disable All NICs For VM
+    [Documentation]    Disable all vnet interfaces for the given VM via virsh.
+    ...    Returns the list of disabled interfaces for later re-enabling.
+    [Arguments]    ${vm_name}
+    ${vnet_ifaces}=    Get Vnet Devices For MicroShift Host    ${vm_name}
+    FOR    ${iface}    IN    @{vnet_ifaces}
+        Disable NIC For MicroShift Host    ${vm_name}    ${iface}
+    END
+    RETURN    ${vnet_ifaces}
+
+Enable All NICs For VM
+    [Documentation]    Re-enable all specified vnet interfaces for the given VM via virsh.
+    [Arguments]    ${vm_name}    ${vnet_ifaces}
+    FOR    ${iface}    IN    @{vnet_ifaces}
+        Enable NIC For MicroShift Host    ${vm_name}    ${iface}
+    END
+
+Deregister Remote Cluster
+    [Documentation]    Close SSH connection and remove a remote cluster from all tracking structures.
+    [Arguments]    ${alias}
+    Run Keyword And Ignore Error    SSHLibrary.Switch Connection    ${alias}
+    Run Keyword And Ignore Error    SSHLibrary.Close Connection
+    ${idx}=    Evaluate    $C2CC_REMOTE_ALIASES.index('${alias}')
+    Remove From List    ${C2CC_REMOTE_ALIASES}    ${idx}
+    Remove From Dictionary    ${C2CC_SSH_IDS}    ${alias}
+    Remove From Dictionary    ${C2CC_KUBECONFIGS}    ${alias}
+
+Reconnect To Cluster
+    [Documentation]    Re-establish SSH connection to a remote cluster after network disruption.
+    ...    Deregisters the stale connection and waits for SSH to come back.
+    [Arguments]    ${alias}    ${host}    ${ssh_port}    ${kubeconfig}    ${timeout}=5m
+    Deregister Remote Cluster    ${alias}
+    Wait Until Keyword Succeeds    ${timeout}    15s
+    ...    Register Remote Cluster    ${alias}    ${host}    ${ssh_port}    ${kubeconfig}
