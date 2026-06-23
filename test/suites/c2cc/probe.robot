@@ -174,7 +174,6 @@ RemoteCluster CR Name From IP
     ${dashed}=    Replace String    ${dashed}    :    -
     RETURN    c2cc-${dashed}
 
-
 Apply Probe Deny Policy
     [Documentation]    Apply a NetworkPolicy that denies all ingress to the probe pod.
     [Arguments]    ${alias}
