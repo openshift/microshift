@@ -36,15 +36,68 @@ assets:
       - file: release-metrics-server-aarch64.json
         ignore: "gets generated during image rebase"
   - dir: optional/kube-state-metrics/
-      no_clean: True
-      src: cluster-monitoring-operator/assets/kube-state-metrics/
-        - file: 01-service-account.yaml
-          src: service-account.yaml
-        - file: 02-custom-resource-state-configmap.yaml
-          src: custom-resource-state-configmap.yaml
-        - file: 02-kube-rbac-proxy-secret.yaml
-          src: kube-rbac-proxy-secret.yaml
-        - file: release-kube-state-metrics-x86_64.json
-          ignore: "gets generated during image rebase"
-        - file: release-kube-state-metrics-aarch64.json
-          ignore: "gets generated during image rebase"
+    no_clean: True
+    src: cluster-monitoring-operator/assets/kube-state-metrics/
+    files:
+      - file: 00-namespace.yaml
+        ignore: "MicroShift-specific, no upstream equivalent"
+        git_restore: True
+      - file: 01-cluster-role.yaml
+        src: cluster-role.yaml
+      - file: 01-cluster-role-binding.yaml
+        src: cluster-role-binding.yaml
+      - file: 01-service-account.yaml
+        src: service-account.yaml
+      - file: 02-custom-resource-state-configmap.yaml
+        src: custom-resource-state-configmap.yaml
+      - file: 02-kube-rbac-proxy-secret.yaml
+        src: kube-rbac-proxy-secret.yaml
+      - file: 03-deployment.yaml
+        src: deployment.yaml
+      - file: 04-service.yaml
+        src: service.yaml
+      - file: kustomization.yaml
+        ignore: "MicroShift-specific kustomization"
+        git_restore: True
+      - file: kustomization.x86_64.yaml
+        ignore: "gets generated during image rebase"
+      - file: kustomization.aarch64.yaml
+        ignore: "gets generated during image rebase"
+      - file: release-kube-state-metrics-x86_64.json
+        ignore: "gets generated during image rebase"
+      - file: release-kube-state-metrics-aarch64.json
+        ignore: "gets generated during image rebase"
+  - dir: optional/node-exporter/
+    no_clean: True
+    src: cluster-monitoring-operator/assets/node-exporter/
+    files:
+      - file: 00-namespace.yaml
+        ignore: "MicroShift-specific, no upstream equivalent"
+        git_restore: True
+      - file: 01-cluster-role.yaml
+        src: cluster-role.yaml
+      - file: 01-cluster-role-binding.yaml
+        src: cluster-role-binding.yaml
+      - file: 01-service-account.yaml
+        src: service-account.yaml
+      - file: 01-security-context-constraints.yaml
+        src: security-context-constraints.yaml
+      - file: 02-accelerators-collector-configmap.yaml
+        src: accelerators-collector-configmap.yaml
+      - file: 02-kube-rbac-proxy-secret.yaml
+        src: kube-rbac-proxy-secret.yaml
+      - file: 03-daemonset.yaml
+        src: daemonset.yaml
+      - file: 04-service.yaml
+        src: service.yaml
+      - file: kustomization.yaml
+        ignore: "MicroShift-specific kustomization"
+        git_restore: True
+      - file: kustomization.x86_64.yaml
+        ignore: "gets generated during image rebase"
+      - file: kustomization.aarch64.yaml
+        ignore: "gets generated during image rebase"
+      - file: release-node-exporter-x86_64.json
+        ignore: "gets generated during image rebase"
+      - file: release-node-exporter-aarch64.json
+        ignore: "gets generated during image rebase"

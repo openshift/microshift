@@ -1,0 +1,199 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/managed-by: cluster-monitoring-operator
+    app.kubernetes.io/name: node-exporter
+    app.kubernetes.io/part-of: openshift-monitoring
+    app.kubernetes.io/version: 1.11.1
+  name: node-exporter
+  namespace: openshift-monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: node-exporter
+      app.kubernetes.io/part-of: openshift-monitoring
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/enable-ds-eviction: "false"
+        kubectl.kubernetes.io/default-container: node-exporter
+        openshift.io/required-scc: node-exporter
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app.kubernetes.io/component: exporter
+        app.kubernetes.io/managed-by: cluster-monitoring-operator
+        app.kubernetes.io/name: node-exporter
+        app.kubernetes.io/part-of: openshift-monitoring
+        app.kubernetes.io/version: 1.11.1
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - args:
+            - --web.listen-address=127.0.0.1:9101
+            - --path.sysfs=/host/sys
+            - --path.rootfs=/host/root
+            - --path.procfs=/host/root/proc
+            - --path.udev.data=/host/root/run/udev/data
+            - --no-collector.wifi
+            - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/k3s/containerd/.+|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
+            - --collector.netclass.ignored-devices=^.*$
+            - --collector.netdev.device-exclude=^.*$
+            - --collector.cpu.info
+            - --collector.textfile.directory=/var/node_exporter/textfile
+            - --no-collector.btrfs
+          command:
+            - /bin/sh
+            - -c
+            - |
+              export GOMAXPROCS=4
+              # We don't take CPU affinity into account as the container doesn't have integer CPU requests.
+              # In case of error, fallback to the default value.
+              NUM_CPUS=$(grep -c '^processor' "/proc/cpuinfo" 2>/dev/null || echo "0")
+              if [ "$NUM_CPUS" -lt "$GOMAXPROCS" ]; then
+                export GOMAXPROCS="$NUM_CPUS"
+              fi
+              echo "ts=$(date --iso-8601=seconds) num_cpus=$NUM_CPUS gomaxprocs=$GOMAXPROCS"
+              exec /bin/node_exporter "$0" "$@"
+          env:
+            - name: DBUS_SYSTEM_BUS_ADDRESS
+              value: unix:path=/host/root/var/run/dbus/system_bus_socket
+          image: "quay.io/openshift/node-exporter"
+          name: node-exporter
+          resources:
+            requests:
+              cpu: 8m
+              memory: 32Mi
+          securityContext: {}
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /host/sys
+              mountPropagation: HostToContainer
+              name: sys
+              readOnly: true
+            - mountPath: /host/root
+              mountPropagation: HostToContainer
+              name: root
+              readOnly: true
+            - mountPath: /var/node_exporter/textfile
+              name: node-exporter-textfile
+              readOnly: true
+            - mountPath: /var/node_exporter/accelerators_collector_config
+              name: node-exporter-accelerators-collector-config
+              readOnly: true
+          workingDir: /var/node_exporter/textfile
+        - args:
+            - --secure-listen-address=0.0.0.0:9100
+            - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+            - --upstream=http://127.0.0.1:9101/
+            - --tls-cert-file=/etc/tls/private/tls.crt
+            - --tls-private-key-file=/etc/tls/private/tls.key
+            - --client-ca-file=/etc/tls/client-ca/ca.crt
+            - --config-file=/etc/kube-rbac-policy/config.yaml
+          env:
+            - name: IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          image: "quay.io/openshift/kube-rbac-proxy"
+          name: kube-rbac-proxy
+          ports:
+            - containerPort: 9100
+              hostPort: 9100
+              name: https
+          resources:
+            requests:
+              cpu: 1m
+              memory: 15Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 65532
+            runAsNonRoot: true
+            runAsUser: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /etc/tls/private
+              name: node-exporter-tls
+              readOnly: true
+            - mountPath: /etc/kube-rbac-policy
+              name: node-exporter-kube-rbac-proxy-config
+              readOnly: true
+            - mountPath: /etc/tls/client-ca/ca.crt
+              name: admin-kubeconfig-signer-ca
+              readOnly: true
+      hostNetwork: true
+      hostPID: true
+      initContainers:
+        - command:
+            - /bin/sh
+            - -c
+            - '[[ ! -d /node_exporter/collectors/init ]] || find /node_exporter/collectors/init -perm /111 -type f -exec {} \;'
+          env:
+            - name: TMPDIR
+              value: /tmp
+          image: "quay.io/openshift/node-exporter"
+          name: init-textfile
+          resources:
+            requests:
+              cpu: 1m
+              memory: 1Mi
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /var/node_exporter/textfile
+              name: node-exporter-textfile
+              readOnly: false
+            - mountPath: /var/log/wtmp
+              name: node-exporter-wtmp
+              readOnly: true
+          workingDir: /var/node_exporter/textfile
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: system-cluster-critical
+      securityContext: {}
+      serviceAccountName: node-exporter
+      tolerations:
+        - operator: Exists
+      volumes:
+        - hostPath:
+            path: /sys
+          name: sys
+        - hostPath:
+            path: /
+          name: root
+        - emptyDir: {}
+          name: node-exporter-textfile
+        - name: node-exporter-tls
+          secret:
+            secretName: node-exporter-tls
+        - hostPath:
+            path: /var/log/wtmp
+            type: File
+          name: node-exporter-wtmp
+        - name: node-exporter-kube-rbac-proxy-config
+          secret:
+            secretName: node-exporter-kube-rbac-proxy-config
+        - configMap:
+            items:
+              - key: config.yaml
+                path: config.yaml
+            name: node-exporter-accelerators-collector-config
+          name: node-exporter-accelerators-collector-config
+        - hostPath:
+            path: /var/lib/microshift/certs/admin-kubeconfig-signer/ca.crt
+            type: File
+          name: admin-kubeconfig-signer-ca
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 10%
+    type: RollingUpdate
