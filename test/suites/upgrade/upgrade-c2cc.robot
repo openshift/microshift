@@ -32,9 +32,9 @@ ${KUBECONFIG_C}             ${EMPTY}
 
 
 *** Test Cases ***
-Upgrade C2CC Clusters From RHEL9 To RHEL10
-    [Documentation]    Upgrades 3 C2CC-connected clusters one by one from RHEL 9.8
-    ...    to RHEL 10.2 and verifies health and C2CC connectivity after each upgrade.
+Upgrade C2CC Clusters And Verify
+    [Documentation]    Upgrades 3 C2CC-connected clusters one by one
+    ...    and verifies health and C2CC connectivity after each upgrade.
 
     Verify All Clusters Healthy
     Verify All RemoteClusters Healthy
