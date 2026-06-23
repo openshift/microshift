@@ -13,6 +13,9 @@ export SKIP_GREENBOOT=true
 # did not want to spend the resources on a new VM.
 export TEST_RANDOMIZATION=none
 
+# Add extra timeout because it run both standard1 and standard2 suites.
+export TEST_EXECUTION_TIMEOUT=60m
+
 # On RHEL 10, rhocp and fast-datapath repos are not available via
 # subscription-manager. Create repo files pointing to the RHEL 9 CDN
 # using entitlement certificates as a workaround.
@@ -127,5 +130,6 @@ scenario_run_tests() {
         --variable "EXPECTED_OS_VERSION:10.2" \
         suites/rpm/install.robot \
         suites/standard1/ \
+        suites/standard2/ \
         suites/rpm/remove.robot
 }
