@@ -18,7 +18,6 @@ Test Tags           c2cc    chaos
 *** Variables ***
 ${RECOVERY_TIMEOUT}         5m
 ${RECOVERY_RETRY}           15s
-${NIC_OUTAGE_DURATION}      30s
 ${INFRA_VERIFY_TIMEOUT}     3m
 ${INFRA_VERIFY_RETRY}       10s
 ${HOST2_VM_NAME}            ${EMPTY}
@@ -65,7 +64,7 @@ Recovery After NIC Outage On Cluster B
     ${vnet_ifaces}    Disable All NICs For VM    ${HOST2_VM_NAME}
     VAR    ${DISABLED_VM}    ${HOST2_VM_NAME}    scope=TEST
     VAR    @{DISABLED_IFACES}    @{vnet_ifaces}    scope=TEST
-    Sleep    ${NIC_OUTAGE_DURATION}    Simulating network outage
+    Verify RemoteCluster Unhealthy On Observers    ${HOST2_IP}    cluster-a    cluster-c
     Enable All NICs For VM    ${HOST2_VM_NAME}    ${vnet_ifaces}
     Reconnect To Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
     ...    timeout=${RECOVERY_TIMEOUT}
@@ -98,7 +97,7 @@ Recovery After OVN-K Restart On B And NIC Outage On C
     ${vnet_ifaces}    Disable All NICs For VM    ${HOST3_VM_NAME}
     VAR    ${DISABLED_VM}    ${HOST3_VM_NAME}    scope=TEST
     VAR    @{DISABLED_IFACES}    @{vnet_ifaces}    scope=TEST
-    Sleep    ${NIC_OUTAGE_DURATION}    Simulating network outage on cluster-c
+    Verify RemoteCluster Unhealthy On Observers    ${HOST3_IP}    cluster-a
     Enable All NICs For VM    ${HOST3_VM_NAME}    ${vnet_ifaces}
     Wait For OVN-K Pods Ready On Cluster    cluster-b
     Reconnect To Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
