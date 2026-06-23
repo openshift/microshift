@@ -51,7 +51,7 @@ ${HOSTSFILE_ENABLED}            SEPARATOR=\n
 ${TRUST_MANAGER_BUNDLE_NAME}    test-trust-bundle
 ${TRUST_MANAGER_OPERATOR_NS}    cert-manager-operator
 ${TRUST_MANAGER_NS}             cert-manager
-${TRUST_MANAGER_DEPLOYMENT}     cert-manager-operator-controller-manager
+${TRUST_MANAGER_CR_FILE}        ./assets/cert-manager/trust-manager-cr.yaml
 
 
 *** Test Cases ***
@@ -119,7 +119,7 @@ Trust Manager Bundle Creates ConfigMap
     ${bundle_yaml}=    Create Trust Bundle From Source Secret YAML
     Apply Trust Manager YAML    ${bundle_yaml}
     Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
-    ...    --for=jsonpath='{.status.conditions[0].reason}'=Synced --timeout=${DEFAULT_WAIT_TIMEOUT}
+    ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
 
     ${cm_data}=    Oc Get JsonPath
     ...    configmap
@@ -130,7 +130,7 @@ Trust Manager Bundle Creates ConfigMap
 
     [Teardown]    Run Keywords
     ...    Cleanup Trust Bundle
-    ...    AND    Run With Kubeconfig    oc delete secret ca-source-secret -n ${TRUST_MANAGER_NS} --ignore-not-found
+    ...    AND    Oc Delete    secret ca-source-secret -n ${TRUST_MANAGER_NS} --ignore-not-found
     ...    AND    Disable Trust Manager
 
 Trust Manager Bundle With Cert Manager CA
@@ -151,7 +151,7 @@ Trust Manager Bundle With Cert Manager CA
     ${bundle_yaml}=    Create Trust Bundle From Secret YAML
     Apply Trust Manager YAML    ${bundle_yaml}
     Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
-    ...    --for=jsonpath='{.status.conditions[0].reason}'=Synced --timeout=${DEFAULT_WAIT_TIMEOUT}
+    ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
 
     ${cm_data}=    Oc Get JsonPath
     ...    configmap
@@ -508,22 +508,15 @@ Enable Trust Manager
     [Documentation]    Deploy trust-manager by applying the TrustManager CR directly.
     ...    The UNSUPPORTED_ADDON_FEATURES=TrustManager=true feature gate is already
     ...    set in the system cert-manager kustomization.
-    ${tm_cr}=    CATENATE    SEPARATOR=\n
-    ...    apiVersion: operator.openshift.io/v1alpha1
-    ...    kind: TrustManager
-    ...    metadata:
-    ...    \ \ name: cluster
-    ...    spec:
-    ...    \ \ trustManagerConfig: {}
-    Apply Trust Manager YAML    ${tm_cr}
+    Oc Apply    -f ${TRUST_MANAGER_CR_FILE}
     Wait Until Keyword Succeeds    30x    10s
     ...    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
 
 Disable Trust Manager
     [Documentation]    Remove the TrustManager CR and wait for cleanup.
-    Run With Kubeconfig    oc delete trustmanager cluster --ignore-not-found
-    Run With Kubeconfig    oc delete bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
-    Run With Kubeconfig    oc delete deployment trust-manager -n ${TRUST_MANAGER_NS} --ignore-not-found
+    Oc Delete    trustmanager cluster --ignore-not-found
+    Oc Delete    bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
+    Oc Delete    deployment trust-manager -n ${TRUST_MANAGER_NS} --ignore-not-found
     Wait Until Keyword Succeeds    12x    10s
     ...    Trust Manager Pod Should Not Exist
 
@@ -531,8 +524,7 @@ Trust Manager Pod Should Not Exist
     [Documentation]    Verify trust-manager pod no longer exists in cert-manager namespace
     ${output}=    Run With Kubeconfig
     ...    oc get pods -n ${TRUST_MANAGER_NS} -l app.kubernetes.io/name\=cert-manager-trust-manager --no-headers
-    ...    allow_fail=True
-    Should Not Contain    ${output}    trust-manager    msg=trust-manager pod still exists
+    Should Be Empty    ${output}    msg=trust-manager pod still exists
 
 Create CA Secret For Trust Manager
     [Documentation]    Generate a self-signed CA cert locally and create a secret in the trust namespace
@@ -611,11 +603,14 @@ Apply Trust Manager YAML
     [Documentation]    Apply YAML manifest, allowing both created and configured/unchanged results
     [Arguments]    ${yaml_content}
     ${temp_file}=    Create Random Temp File    ${yaml_content}
-    ${result}=    Oc Apply    -f ${temp_file}
-    Remove File    ${temp_file}
-    Log    Applied manifest: ${result}
+    TRY
+        ${result}=    Oc Apply    -f ${temp_file}
+        Log    Applied manifest: ${result}
+    FINALLY
+        Remove File    ${temp_file}
+    END
 
 Cleanup Trust Bundle
     [Documentation]    Remove the test trust-manager Bundle CR and its target ConfigMap
-    Run With Kubeconfig    oc delete bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
-    Run With Kubeconfig    oc delete configmap ${TRUST_MANAGER_BUNDLE_NAME} -n ${NAMESPACE} --ignore-not-found
+    Oc Delete    bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
+    Oc Delete    configmap ${TRUST_MANAGER_BUNDLE_NAME} -n ${NAMESPACE} --ignore-not-found
