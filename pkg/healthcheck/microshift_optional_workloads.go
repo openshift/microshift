@@ -1,6 +1,8 @@
 package healthcheck
 
 import (
+	"slices"
+
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util"
 	"k8s.io/klog/v2"
@@ -38,6 +40,20 @@ var optionalWorkloadPaths = map[string]optionalWorkloads{
 		Namespace: "sriov-network-operator",
 		Workloads: NamespaceWorkloads{Deployments: []string{"sriov-network-operator"}},
 	},
+
+	"/usr/lib/microshift/manifests.d/082-microshift-node-exporter": {
+		Namespace: "openshift-monitoring",
+		Workloads: NamespaceWorkloads{DaemonSets: []string{"node-exporter"}},
+	},
+}
+
+// mergeWorkloads combines two NamespaceWorkloads into one.
+func mergeWorkloads(existing, incoming NamespaceWorkloads) NamespaceWorkloads {
+	return NamespaceWorkloads{
+		Deployments:  slices.Concat(existing.Deployments, incoming.Deployments),
+		DaemonSets:   slices.Concat(existing.DaemonSets, incoming.DaemonSets),
+		StatefulSets: slices.Concat(existing.StatefulSets, incoming.StatefulSets),
+	}
 }
 
 // fillOptionalMicroShiftWorkloads assembles list of optional MicroShift workloads
@@ -73,7 +89,7 @@ func fillOptionalMicroShiftWorkloads(workloadsToCheck map[string]NamespaceWorklo
 		}
 
 		klog.Infof("Optional component path exists and is configured: %s - expecting %v in namespace %q", path, ow.Workloads.String(), ow.Namespace)
-		workloadsToCheck[ow.Namespace] = ow.Workloads
+		workloadsToCheck[ow.Namespace] = mergeWorkloads(workloadsToCheck[ow.Namespace], ow.Workloads)
 	}
 	return nil
 }
