@@ -261,6 +261,25 @@ The microshift-cert-manager-release-info package provides release information fi
 release. These files contain the list of container image references used by Cert Manager
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
+%package metrics-node-exporter
+Summary: Prometheus node-exporter for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description metrics-node-exporter
+The microshift-metrics-node-exporter package provides the Prometheus node-exporter for MicroShift.
+Install this package to expose host-level hardware and OS metrics.
+
+%package metrics-node-exporter-release-info
+Summary: Release information for node-exporter for MicroShift
+BuildArch: noarch
+Requires: microshift-release-info = %{version}
+
+%description metrics-node-exporter-release-info
+The microshift-metrics-node-exporter-release-info package provides release information files for this
+release. These files contain the list of container image references used by node-exporter
+and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+
 %package sriov
 Summary: SR-IOV Network Operator for MicroShift
 ExclusiveArch: x86_64 aarch64
@@ -599,6 +618,30 @@ cat assets/optional/cert-manager/manager/images-x86_64.yaml >> %{buildroot}/%{_p
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/cert-manager/release-cert-manager-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+# node-exporter
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-security-context-constraints.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/02-kube-rbac-proxy-secret.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/02-accelerators-collector-configmap.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/03-daemonset.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/04-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+
+%ifarch %{arm} aarch64
+cat assets/optional/node-exporter/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/node-exporter/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/kustomization.yaml
+%endif
+
+# node-exporter-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/node-exporter/release-node-exporter-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
 # sriov
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd
@@ -801,6 +844,13 @@ fi
 
 %files cert-manager-release-info
 %{_datadir}/microshift/release/release-cert-manager-{x86_64,aarch64}.json
+
+%files metrics-node-exporter
+%dir %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/*
+
+%files metrics-node-exporter-release-info
+%{_datadir}/microshift/release/release-node-exporter-{x86_64,aarch64}.json
 
 %files sriov
 %dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
