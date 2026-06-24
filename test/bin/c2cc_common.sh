@@ -161,6 +161,13 @@ c2cc_run_tests() {
     local -r suites_dir="${1}"
     local -r foreign_cidr="${2:-}"
     local -r ip_family="${3:-}"
+    local -r include_tags="${4:-c2cc}"
+
+    local include_args=""
+    for tag in ${include_tags}; do
+        include_args+="--include ${tag} "
+    done
+
     local foreign_cidr_var=""
     if [ -n "${foreign_cidr}" ]; then
         foreign_cidr_var="--variable FOREIGN_CIDR:${foreign_cidr}"
@@ -216,6 +223,7 @@ c2cc_run_tests() {
         ${ip_family_var} \
         ${target_ref_var} \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
+        ${include_args} \
         "${suites_dir}"
 }
 
