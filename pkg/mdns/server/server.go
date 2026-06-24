@@ -31,10 +31,10 @@ const (
 )
 
 type Server struct {
-	iface     *net.Interface
 	responder Responder
-	listeners []*net.UDPConn
+	iface     *net.Interface
 	stopCh    chan struct{}
+	listeners []*net.UDPConn
 }
 
 type Responder interface {

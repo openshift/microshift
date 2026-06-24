@@ -31,10 +31,9 @@ import (
 )
 
 type ClusterPolicyController struct {
+	configErr  error
 	run        func(context.Context) error
 	kubeconfig string
-
-	configErr error
 }
 
 func NewClusterPolicyController(cfg *config.Config) *ClusterPolicyController {

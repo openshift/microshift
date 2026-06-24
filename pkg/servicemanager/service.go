@@ -8,10 +8,9 @@ import (
 type RunFunc func(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error
 
 type GenericService struct {
+	run  RunFunc
 	name string
 	deps []string
-
-	run RunFunc
 }
 
 func NewGenericService(name string, dependencies []string, run RunFunc) *GenericService {

@@ -13,14 +13,12 @@ import (
 )
 
 type ServiceManager struct {
-	name string
-	deps []string
-
-	services   []Service
 	serviceMap map[string]Service
 	startRec   *startuprecorder.StartupRecorder
-
-	errChan chan error
+	errChan    chan error
+	name       string
+	deps       []string
+	services   []Service
 }
 
 func NewServiceManager(startRec *startuprecorder.StartupRecorder) *ServiceManager {

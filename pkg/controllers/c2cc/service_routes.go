@@ -17,6 +17,7 @@ const (
 	mgmtPortInterface   = "ovn-k8s-mp0"
 )
 
+//nolint:govet // fieldalignment: keep the embedded route-table fields first.
 type serviceRouteManager struct {
 	policyRouteTable
 

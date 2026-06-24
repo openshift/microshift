@@ -9,6 +9,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
+//nolint:govet // fieldalignment: preserve startup service JSON field order.
 type ServiceData struct {
 	Name         string        `json:"name"`
 	Dependencies []string      `json:"dependencies"`
@@ -24,16 +25,17 @@ type MicroshiftData struct {
 	TimeToReady   time.Duration `json:"timeToReady"`
 }
 
+//nolint:govet // fieldalignment: preserve startup JSON top-level field order.
 type StartupData struct {
 	Services   []ServiceData  `json:"services"`
 	Microshift MicroshiftData `json:"microshift"`
 }
 
 type StartupRecorder struct {
-	Data StartupData
+	allLogged chan struct{}
+	Data      StartupData
 
 	ServiceCount int
-	allLogged    chan struct{}
 	m            sync.Mutex
 }
 

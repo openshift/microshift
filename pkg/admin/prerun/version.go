@@ -22,6 +22,7 @@ var (
 	errDataVersionDoesNotExist = errors.New("version file for MicroShift data does not exist")
 )
 
+//nolint:govet // fieldalignment: preserve persisted version metadata JSON field order.
 type versionFile struct {
 	Version      versionMetadata `json:"version"`
 	DeploymentID string          `json:"deployment_id,omitempty"`
@@ -117,8 +118,8 @@ func WriteVersionMetadata() error {
 }
 
 type versions struct {
-	exec versionMetadata
 	data *versionMetadata
+	exec versionMetadata
 }
 
 // getVersions obtains and returns versions of executable and data dir.

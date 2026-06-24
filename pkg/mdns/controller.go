@@ -14,6 +14,7 @@ import (
 	"k8s.io/klog/v2"
 )
 
+//nolint:govet // fieldalignment: keep the embedded mutex first.
 type MicroShiftmDNSController struct {
 	sync.Mutex
 

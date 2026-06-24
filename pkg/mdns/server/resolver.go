@@ -24,6 +24,7 @@ import (
 
 const defaultTTL = 120
 
+//nolint:govet // fieldalignment: keep the embedded mutex first.
 type Resolver struct {
 	sync.Mutex
 

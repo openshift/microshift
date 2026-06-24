@@ -73,6 +73,27 @@ linters:
           - errcheck
           - goconst
           - gosec
+      # fieldalignment is useful for runtime structs, but test fixtures are
+      # usually clearer in table-driven test order.
+      - path: '_test\.go'
+        text: 'fieldalignment:'
+        linters:
+          - govet
+      # Preserve Kubernetes API type conventions.
+      - path: 'pkg/apis/microshift/v1alpha1/types\.go'
+        text: 'fieldalignment:'
+        linters:
+          - govet
+      # Preserve user-facing configuration field order.
+      - path: 'pkg/config/.*\.go'
+        text: 'fieldalignment:'
+        linters:
+          - govet
+      # Preserve OVSDB model field order.
+      - path: 'pkg/controllers/c2cc/nbdb\.go'
+        text: 'fieldalignment:'
+        linters:
+          - govet
       - path: 'pkg/cmd/init\.go'
         text: 'calculated cyclomatic complexity for function initKubeconfigs is'
       - path: 'pkg/config/config\.go'
@@ -120,6 +141,9 @@ linters:
   settings:
     cyclop:
       max-complexity: 20
+    govet:
+      enable:
+        - fieldalignment
     funcorder:
       struct-method: false
     inamedparam:

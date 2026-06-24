@@ -18,17 +18,17 @@ import (
 )
 
 type fileWatcherConfig struct {
-	serviceName        string
-	dependencies       []string
-	file               string
+	labels             map[string]string
+	annotations        map[string]string
 	kubeconfig         string
-	enabled            bool
+	serviceName        string
 	configMapNamespace string
 	configMapName      string
 	configMapDataKey   string
-	labels             map[string]string
-	annotations        map[string]string
+	file               string
+	dependencies       []string
 	eventMask          fsnotify.Op
+	enabled            bool
 	reAddOnCreate      bool
 	mergeAnnotations   bool
 	deleteOnDisable    bool

@@ -16,6 +16,7 @@ const (
 	c2ccRulePriority = 100
 )
 
+//nolint:govet // fieldalignment: keep the embedded route-table fields first.
 type linuxRouteManager struct {
 	policyRouteTable
 

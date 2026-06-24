@@ -44,11 +44,10 @@ const (
 )
 
 type KubeControllerManager struct {
-	args    []string
-	applyFn func() error
-
 	// TODO: report configuration errors immediately
 	configureErr error
+	applyFn      func() error
+	args         []string
 }
 
 func NewKubeControllerManager(ctx context.Context, cfg *config.Config) *KubeControllerManager {
