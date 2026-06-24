@@ -1,4 +1,2 @@
 
-# TODO: Replace this by a RHEL 10.2 image when its RPM repositories are released.
-# rhel-10.2
-rhel-10.1
+rhel-10.2
