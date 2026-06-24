@@ -347,6 +347,10 @@ function build_and_install_microshift_rpms() {
 function configure_firewall() {
     "${DNF_RETRY}" "install" "firewalld"
     sudo systemctl enable firewalld --now
+    for _ in $(seq 30) ; do
+        sudo firewall-cmd --state &>/dev/null && break
+        sleep 1
+    done
     sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
     sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
     sudo firewall-cmd --permanent --zone=trusted --add-source=fd01::/48
