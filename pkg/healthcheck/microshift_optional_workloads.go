@@ -45,6 +45,10 @@ var optionalWorkloadPaths = map[string]optionalWorkloads{
 		Namespace: "openshift-monitoring",
 		Workloads: NamespaceWorkloads{Deployments: []string{"metrics-server"}},
 	},
+	"/usr/lib/microshift/manifests.d/081-microshift-kube-state-metrics": {
+		Namespace: "openshift-monitoring",
+		Workloads: NamespaceWorkloads{Deployments: []string{"kube-state-metrics"}},
+	},
 }
 
 // mergeWorkloads combines two NamespaceWorkloads into one.
