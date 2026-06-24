@@ -557,13 +557,17 @@ Enable All NICs For VM
 
 Deregister Remote Cluster
     [Documentation]    Close SSH connection and remove a remote cluster from all tracking structures.
+    ...    Safe to call even if the alias was already deregistered.
     [Arguments]    ${alias}
     Run Keyword And Ignore Error    SSHLibrary.Switch Connection    ${alias}
     Run Keyword And Ignore Error    SSHLibrary.Close Connection
-    ${idx}=    Evaluate    $C2CC_REMOTE_ALIASES.index('${alias}')
-    Remove From List    ${C2CC_REMOTE_ALIASES}    ${idx}
-    Remove From Dictionary    ${C2CC_SSH_IDS}    ${alias}
-    Remove From Dictionary    ${C2CC_KUBECONFIGS}    ${alias}
+    ${present}=    Evaluate    '${alias}' in $C2CC_REMOTE_ALIASES
+    IF    ${present}
+        ${idx}=    Evaluate    $C2CC_REMOTE_ALIASES.index('${alias}')
+        Remove From List    ${C2CC_REMOTE_ALIASES}    ${idx}
+    END
+    Run Keyword And Ignore Error    Remove From Dictionary    ${C2CC_SSH_IDS}    ${alias}
+    Run Keyword And Ignore Error    Remove From Dictionary    ${C2CC_KUBECONFIGS}    ${alias}
 
 Reconnect To Cluster
     [Documentation]    Re-establish SSH connection to a remote cluster after network disruption.
