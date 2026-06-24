@@ -35,3 +35,16 @@ assets:
         ignore: "gets generated during image rebase"
       - file: release-metrics-server-aarch64.json
         ignore: "gets generated during image rebase"
+  - dir: optional/kube-state-metrics/
+      no_clean: True
+      src: cluster-monitoring-operator/assets/kube-state-metrics/
+        - file: 01-service-account.yaml
+          src: service-account.yaml
+        - file: 02-custom-resource-state-configmap.yaml
+          src: custom-resource-state-configmap.yaml
+        - file: 02-kube-rbac-proxy-secret.yaml
+          src: kube-rbac-proxy-secret.yaml
+        - file: release-kube-state-metrics-x86_64.json
+          ignore: "gets generated during image rebase"
+        - file: release-kube-state-metrics-aarch64.json
+          ignore: "gets generated during image rebase"
