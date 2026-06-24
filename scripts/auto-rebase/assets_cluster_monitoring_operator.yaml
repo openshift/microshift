@@ -1,0 +1,37 @@
+assets:
+  - dir: optional/metrics-server/
+    no_clean: True
+    src: cluster-monitoring-operator/assets/metrics-server/
+    files:
+      - file: 00-namespace.yaml
+        ignore: "MicroShift-specific, no upstream equivalent"
+        git_restore: True
+      - file: 01-service-account.yaml
+        src: service-account.yaml
+      - file: 01-cluster-role.yaml
+        src: cluster-role.yaml
+      - file: 01-cluster-role-binding.yaml
+        src: cluster-role-binding.yaml
+      - file: 01-cluster-role-binding-auth-delegator.yaml
+        src: cluster-role-binding-auth-delegator.yaml
+      - file: 01-role-binding-auth-reader.yaml
+        src: role-binding-auth-reader.yaml
+      - file: 02-configmap-audit-profiles.yaml
+        src: configmap-audit-profiles.yaml
+      - file: 03-deployment.yaml
+        src: deployment.yaml
+      - file: 04-service.yaml
+        src: service.yaml
+      - file: 04-api-service.yaml
+        src: api-service.yaml
+      - file: kustomization.yaml
+        ignore: "MicroShift-specific kustomization"
+        git_restore: True
+      - file: kustomization.x86_64.yaml
+        ignore: "gets generated during image rebase"
+      - file: kustomization.aarch64.yaml
+        ignore: "gets generated during image rebase"
+      - file: release-metrics-server-x86_64.json
+        ignore: "gets generated during image rebase"
+      - file: release-metrics-server-aarch64.json
+        ignore: "gets generated during image rebase"
