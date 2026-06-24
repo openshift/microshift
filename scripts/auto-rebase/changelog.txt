@@ -1,0 +1,4 @@
+- cluster-network-operator embedded-component 0f1151ea0db94220ae0615162bcad1e2e8f838c2 to 899d3bc685dc825fde83daaab648275d6b5dc71c
+  - 5fb4cb9 2026-06-16T18:50:08-04:00 NVIDIA-616: Bump Multus CNI API version to 1.1.0
+  - 761ab63 2026-06-16T18:50:08-04:00 NVIDIA-596: Enable DPU healthcheck
+
