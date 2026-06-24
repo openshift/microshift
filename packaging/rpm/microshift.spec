@@ -276,6 +276,23 @@ Requires: microshift-release-info = %{version}
 %description metrics-server-release-info
 The microshift-metrics-server-release-info package provides release information files for this
 release. These files contain the list of container image references used by the metrics-server
+%package metrics-kube-state
+Summary: Kubernetes kube-state-metrics for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description metrics-kube-state
+The microshift-metrics-kube-state package provides kube-state-metrics for MicroShift.
+Install this package to expose Kubernetes object state metrics via a secure endpoint.
+
+%package metrics-kube-state-release-info
+Summary: Release information for kube-state-metrics for MicroShift
+BuildArch: noarch
+Requires: microshift-release-info = %{version}
+
+%description metrics-kube-state-release-info
+The microshift-metrics-kube-state-release-info package provides release information files for this
+release. These files contain the list of container image references used by kube-state-metrics
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
 %package sriov
@@ -640,6 +657,28 @@ cat assets/optional/metrics-server/kustomization.x86_64.yaml >> %{buildroot}/%{_
 # metrics-server-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/metrics-server/release-metrics-server-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+# kube-state-metrics
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/01-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/01-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/02-kube-rbac-proxy-secret.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/02-custom-resource-state-configmap.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/03-deployment.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/04-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+
+%ifarch %{arm} aarch64
+cat assets/optional/kube-state-metrics/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/kube-state-metrics/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/kustomization.yaml
+%endif
+
+# kube-state-metrics-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/kube-state-metrics/release-kube-state-metrics-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
 # sriov
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
@@ -850,6 +889,12 @@ fi
 
 %files metrics-server-release-info
 %{_datadir}/microshift/release/release-metrics-server-{x86_64,aarch64}.json
+%files metrics-kube-state
+%dir %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/*
+
+%files metrics-kube-state-release-info
+%{_datadir}/microshift/release/release-kube-state-metrics-{x86_64,aarch64}.json
 
 %files sriov
 %dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
@@ -868,6 +913,9 @@ fi
 %changelog
 * Mon Jun 22 2026 Jonathan H. Cope <jcope@redhat.com> 5.0
 - Add metrics-server as optional rpm package
+
+* Mon Jun 22 2026 Jonathan H. Cope <jcope@redhat.com> 5.0
+- add kube-state-metrics as optional rpm package
 
 * Tue Jan 20 2026 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.21.0
 - Add multus as dependency for sriov
