@@ -271,7 +271,7 @@ function install_build_deps() {
     if ${DNF_UPDATE}; then
         "${DNF_RETRY}" "update" "--nobest"
     fi
-    "${DNF_RETRY}" "install" "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools createrepo"
+    "${DNF_RETRY}" "install" "gcc git golang cockpit make jq selinux-policy-devel rpm-build jq bash-completion avahi-tools createrepo gettext"
 
     # run only if booted with systemd
     [[ -d /run/systemd/system ]] &&  sudo systemctl enable --now cockpit.socket
