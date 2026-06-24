@@ -26,6 +26,11 @@ const (
 
 var metricsEventRecorder events.Recorder = events.NewLoggingEventRecorder("microshift-metrics-server", clock.RealClock{})
 
+// ProvisionMetricsServerCerts provisions the TLS client certificate and kubelet
+// serving CA that metrics-server needs to authenticate to kubelet and verify its
+// serving certificate when scraping /metrics/resource. These are provisioned at
+// runtime rather than baked into manifests because the certificates are generated
+// by MicroShift's certificate lifecycle and must be refreshed from the live PKI.
 func ProvisionMetricsServerCerts(ctx context.Context, cfg *config.Config) error {
 	exists, err := util.PathExists(metricsServerManifestPath)
 	if err != nil {
@@ -119,7 +124,8 @@ func ProvisionMetricsServerCerts(ctx context.Context, cfg *config.Config) error 
 	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, 1*time.Minute, true, func(ctx context.Context) (bool, error) {
 		_, _, err := resourceapply.ApplyConfigMap(ctx, clientset.CoreV1(), metricsEventRecorder, cm)
 		if err != nil {
-			return false, fmt.Errorf("applying kubelet serving CA configmap: %w", err)
+			klog.Errorf("applying kubelet serving CA configmap: %v", err)
+			return false, nil
 		}
 		return true, nil
 	})
