@@ -543,6 +543,7 @@ Disable All NICs For VM
     ...    Returns the list of disabled interfaces for later re-enabling.
     [Arguments]    ${vm_name}
     ${vnet_ifaces}=    Get Vnet Devices For MicroShift Host    ${vm_name}
+    Should Not Be Empty    ${vnet_ifaces}    No vnet interfaces found for VM ${vm_name}
     FOR    ${iface}    IN    @{vnet_ifaces}
         Disable NIC For MicroShift Host    ${vm_name}    ${iface}
     END
@@ -559,8 +560,10 @@ Deregister Remote Cluster
     [Documentation]    Close SSH connection and remove a remote cluster from all tracking structures.
     ...    Safe to call even if the alias was already deregistered.
     [Arguments]    ${alias}
-    Run Keyword And Ignore Error    SSHLibrary.Switch Connection    ${alias}
-    Run Keyword And Ignore Error    SSHLibrary.Close Connection
+    ${switch_status}    ${_}=    Run Keyword And Ignore Error    SSHLibrary.Switch Connection    ${alias}
+    IF    '${switch_status}' == 'PASS'
+        Run Keyword And Ignore Error    SSHLibrary.Close Connection
+    END
     ${present}=    Evaluate    '${alias}' in $C2CC_REMOTE_ALIASES
     IF    ${present}
         ${idx}=    Evaluate    $C2CC_REMOTE_ALIASES.index('${alias}')

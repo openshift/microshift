@@ -184,8 +184,8 @@ c2cc_run_tests() {
     fi
 
     local host2_vm host3_vm
-    host2_vm=$(full_vm_name host2)
-    host3_vm=$(full_vm_name host3)
+    host2_vm=$(full_vm_name host2) || return 1
+    host3_vm=$(full_vm_name host3) || return 1
 
     local host2_ip host3_ip
     host2_ip=$(get_host_ip host2) || return 1
