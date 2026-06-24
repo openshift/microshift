@@ -155,6 +155,13 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				UserInfo: &user.DefaultInfo{Name: "system:kube-apiserver", Groups: []string{"kube-master"}},
+			}).WithClientCertificates(
+			&certchains.ClientCertificateSigningRequestInfo{
+				CSRMeta: certchains.CSRMeta{
+					Name:     "metrics-server-kubelet-client",
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+				},
+				UserInfo: &user.DefaultInfo{Name: "system:metrics-server"},
 			}),
 
 		// admin-kubeconfig-signer
@@ -175,7 +182,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					Name:     "openshift-observability-client",
 					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
-				UserInfo: &user.DefaultInfo{Name: "openshift-observability-client", Groups: []string{""}},
+				UserInfo: &user.DefaultInfo{Name: "openshift-observability-client"},
 			},
 		),
 
@@ -362,6 +369,10 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 		[]string{"kube-control-plane-signer"},
 		[]string{"kube-apiserver-to-kubelet-signer"},
 		[]string{"admin-kubeconfig-signer"},
+		[]string{"kubelet-signer"},
+		[]string{"kubelet-signer", "kube-csr-signer"},
+	).WithCABundle(
+		cryptomaterial.KubeletServingCAPath(certsDir),
 		[]string{"kubelet-signer"},
 		[]string{"kubelet-signer", "kube-csr-signer"},
 	).WithCABundle(
