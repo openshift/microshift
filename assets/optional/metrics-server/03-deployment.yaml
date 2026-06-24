@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: metrics-server
+    app.kubernetes.io/managed-by: cluster-monitoring-operator
+    app.kubernetes.io/name: metrics-server
+    app.kubernetes.io/part-of: openshift-monitoring
+  name: metrics-server
+  namespace: openshift-monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: metrics-server
+      app.kubernetes.io/name: metrics-server
+      app.kubernetes.io/part-of: openshift-monitoring
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        openshift.io/required-scc: restricted-v2
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+      labels:
+        app.kubernetes.io/component: metrics-server
+        app.kubernetes.io/name: metrics-server
+        app.kubernetes.io/part-of: openshift-monitoring
+    spec:
+      containers:
+        - args:
+            - --secure-port=10250
+            - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+            - --kubelet-use-node-status-port
+            - --metric-resolution=15s
+            - --kubelet-certificate-authority=/etc/tls/kubelet-serving-ca-bundle/ca-bundle.crt
+            - --kubelet-client-certificate=/etc/tls/metrics-server-client-certs/tls.crt
+            - --kubelet-client-key=/etc/tls/metrics-server-client-certs/tls.key
+            - --tls-cert-file=/etc/tls/private/tls.crt
+            - --tls-private-key-file=/etc/tls/private/tls.key
+            - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+            - --shutdown-send-retry-after=true
+            - --shutdown-delay-duration=150s
+            - --disable-http2-serving=true
+          image: "quay.io/openshift/kube-metrics-server"
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /livez
+              port: https
+              scheme: HTTPS
+            periodSeconds: 10
+          name: metrics-server
+          ports:
+            - containerPort: 10250
+              name: https
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /readyz
+              port: https
+              scheme: HTTPS
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 1m
+              memory: 40Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /etc/tls/private
+              name: secret-metrics-server-tls
+            - mountPath: /etc/tls/metrics-server-client-certs
+              name: secret-metrics-server-client-certs
+            - mountPath: /etc/tls/kubelet-serving-ca-bundle
+              name: configmap-kubelet-serving-ca-bundle
+            - mountPath: /etc/audit
+              name: metrics-server-audit-profiles
+              readOnly: true
+            - mountPath: /var/log/metrics-server
+              name: audit-log
+              readOnly: false
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: system-cluster-critical
+      serviceAccountName: metrics-server
+      terminationGracePeriodSeconds: 170
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+      volumes:
+        - name: secret-metrics-server-client-certs
+          secret:
+            secretName: metrics-server-client-certs
+        - name: secret-metrics-server-tls
+          secret:
+            secretName: metrics-server-tls
+        - configMap:
+            name: kubelet-serving-ca-bundle
+          name: configmap-kubelet-serving-ca-bundle
+        - emptyDir: {}
+          name: audit-log
+        - configMap:
+            name: metrics-server-audit-profiles
+          name: metrics-server-audit-profiles
