@@ -1,0 +1,544 @@
+apiVersion: v1
+data:
+  custom-resource-state-configmap.yaml: |-
+    "kind": "CustomResourceStateMetrics"
+    "spec":
+      "resources":
+      - "groupVersionKind":
+          "group": "autoscaling.k8s.io"
+          "kind": "VerticalPodAutoscaler"
+          "version": "v1"
+        "metrics":
+        - "commonLabels": null
+          "each":
+            "stateSet":
+              "labelName": "updatemode"
+              "list":
+              - "Off"
+              - "Initial"
+              - "Recreate"
+              - "Auto"
+              "path":
+              - "spec"
+              - "updatePolicy"
+              - "updateMode"
+            "type": "StateSet"
+          "help": "Update mode of the VerticalPodAutoscaler."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_spec_updatepolicy_updatemode"
+        - "commonLabels":
+            "resource": "cpu"
+            "unit": "cores"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "status"
+              - "recommendation"
+              - "containerRecommendations"
+              "valueFrom":
+              - "lowerBound"
+              - "cpu"
+            "type": "Gauge"
+          "help": "Minimum cpu resources the container can use before the VerticalPodAutoscaler updater evicts it."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_status_recommendation_containerrecommendations_lowerbound_cpu"
+        - "commonLabels":
+            "resource": "memory"
+            "unit": "bytes"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "status"
+              - "recommendation"
+              - "containerRecommendations"
+              "valueFrom":
+              - "lowerBound"
+              - "memory"
+            "type": "Gauge"
+          "help": "Minimum memory resources the container can use before the VerticalPodAutoscaler updater evicts it."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_status_recommendation_containerrecommendations_lowerbound_memory"
+        - "commonLabels":
+            "resource": "cpu"
+            "unit": "cores"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "status"
+              - "recommendation"
+              - "containerRecommendations"
+              "valueFrom":
+              - "upperBound"
+              - "cpu"
+            "type": "Gauge"
+          "help": "Maximum cpu resources the container can use before the VerticalPodAutoscaler updater evicts it."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_status_recommendation_containerrecommendations_upperbound_cpu"
+        - "commonLabels":
+            "resource": "memory"
+            "unit": "bytes"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "status"
+              - "recommendation"
+              - "containerRecommendations"
+              "valueFrom":
+              - "upperBound"
+              - "memory"
+            "type": "Gauge"
+          "help": "Maximum memory resources the container can use before the VerticalPodAutoscaler updater evicts it."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_status_recommendation_containerrecommendations_upperbound_memory"
+        - "commonLabels":
+            "resource": "cpu"
+            "unit": "cores"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "status"
+              - "recommendation"
+              - "containerRecommendations"
+              "valueFrom":
+              - "target"
+              - "cpu"
+            "type": "Gauge"
+          "help": "Target cpu resources the VerticalPodAutoscaler recommends for the container."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_status_recommendation_containerrecommendations_target_cpu"
+        - "commonLabels":
+            "resource": "memory"
+            "unit": "bytes"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "status"
+              - "recommendation"
+              - "containerRecommendations"
+              "valueFrom":
+              - "target"
+              - "memory"
+            "type": "Gauge"
+          "help": "Target memory resources the VerticalPodAutoscaler recommends for the container."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_status_recommendation_containerrecommendations_target_memory"
+        - "commonLabels":
+            "resource": "cpu"
+            "unit": "cores"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "status"
+              - "recommendation"
+              - "containerRecommendations"
+              "valueFrom":
+              - "uncappedTarget"
+              - "cpu"
+            "type": "Gauge"
+          "help": "Target cpu resources the VerticalPodAutoscaler recommends for the container ignoring bounds."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_status_recommendation_containerrecommendations_uncappedtarget_cpu"
+        - "commonLabels":
+            "resource": "memory"
+            "unit": "bytes"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "status"
+              - "recommendation"
+              - "containerRecommendations"
+              "valueFrom":
+              - "uncappedTarget"
+              - "memory"
+            "type": "Gauge"
+          "help": "Target memory resources the VerticalPodAutoscaler recommends for the container ignoring bounds."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_status_recommendation_containerrecommendations_uncappedtarget_memory"
+        - "commonLabels":
+            "resource": "cpu"
+            "unit": "cores"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "spec"
+              - "resourcePolicy"
+              - "containerPolicies"
+              "valueFrom":
+              - "minAllowed"
+              - "cpu"
+            "type": "Gauge"
+          "help": "Minimum cpu resources the VerticalPodAutoscaler can set for containers matching the name."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_spec_resourcepolicy_container_policies_minallowed_cpu"
+        - "commonLabels":
+            "resource": "memory"
+            "unit": "bytes"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "spec"
+              - "resourcePolicy"
+              - "containerPolicies"
+              "valueFrom":
+              - "minAllowed"
+              - "memory"
+            "type": "Gauge"
+          "help": "Minimum memory resources the VerticalPodAutoscaler can set for containers matching the name."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_spec_resourcepolicy_container_policies_minallowed_memory"
+        - "commonLabels":
+            "resource": "cpu"
+            "unit": "cores"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "spec"
+              - "resourcePolicy"
+              - "containerPolicies"
+              "valueFrom":
+              - "maxAllowed"
+              - "cpu"
+            "type": "Gauge"
+          "help": "Minimum cpu resources the VerticalPodAutoscaler can set for containers matching the name."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_spec_resourcepolicy_container_policies_maxallowed_cpu"
+        - "commonLabels":
+            "resource": "memory"
+            "unit": "bytes"
+          "each":
+            "gauge":
+              "labelsFromPath":
+                "container":
+                - "containerName"
+              "path":
+              - "spec"
+              - "resourcePolicy"
+              - "containerPolicies"
+              "valueFrom":
+              - "maxAllowed"
+              - "memory"
+            "type": "Gauge"
+          "help": "Minimum memory resources the VerticalPodAutoscaler can set for containers matching the name."
+          "labelsFromPath":
+            "namespace":
+            - "metadata"
+            - "namespace"
+            "target_api_version":
+            - "spec"
+            - "targetRef"
+            - "apiVersion"
+            "target_kind":
+            - "spec"
+            - "targetRef"
+            - "kind"
+            "target_name":
+            - "spec"
+            - "targetRef"
+            - "name"
+            "verticalpodautoscaler":
+            - "metadata"
+            - "name"
+          "name": "verticalpodautoscaler_spec_resourcepolicy_container_policies_maxallowed_memory"
+      - "groupVersionKind":
+          "group": "gateway.networking.k8s.io"
+          "kind": "GatewayClass"
+          "version": "v1"
+        "metrics":
+        - "each":
+            "info":
+              "labelsFromPath":
+                "accepted":
+                - "status"
+                - "conditions"
+                - "[type=Accepted]"
+                - "status"
+                "controller":
+                - "spec"
+                - "controllerName"
+                "gateway_class":
+                - "metadata"
+                - "name"
+            "type": "Info"
+          "help": "Information about GatewayClasses"
+          "name": "gateway_class_info"
+      - "groupVersionKind":
+          "group": "gateway.networking.k8s.io"
+          "kind": "Gateway"
+          "version": "v1"
+        "metrics":
+        - "each":
+            "info":
+              "labelsFromPath":
+                "gateway":
+                - "metadata"
+                - "name"
+                "gateway_class":
+                - "spec"
+                - "gatewayClassName"
+                "namespace":
+                - "metadata"
+                - "namespace"
+                "programmed":
+                - "status"
+                - "conditions"
+                - "[type=Programmed]"
+                - "status"
+            "type": "Info"
+          "help": "Information about Gateways"
+          "name": "gateway_info"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: cluster-monitoring-operator
+    app.kubernetes.io/part-of: openshift-monitoring
+  name: kube-state-metrics-custom-resource-state-configmap
+  namespace: openshift-monitoring
