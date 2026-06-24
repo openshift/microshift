@@ -2,6 +2,10 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+# NOTE: prerun-data-management.robot is destructive (deletes MicroShift
+# data, triggers greenboot rollback loops) and must run last.
+export TEST_RANDOMIZATION=none
+
 start_image="rhel98-brew-lrel-optional"
 
 scenario_create_vms() {
@@ -20,5 +24,7 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_commit_not_found "${start_image}"
 
-    run_tests host1 suites/backup/backups.robot
+    run_tests host1 \
+        suites/backup/backups.robot \
+        suites/backup/prerun-data-management.robot
 }
