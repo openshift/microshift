@@ -182,7 +182,8 @@
     "clusterToCluster": {
       "type": "object",
       "required": [
-        "dns"
+        "dns",
+        "routing"
       ],
       "properties": {
         "dns": {
@@ -241,6 +242,26 @@
                   "type": "string"
                 }
               }
+            }
+          }
+        },
+        "routing": {
+          "description": "Linux policy routing table settings for C2CC routes.",
+          "type": "object",
+          "properties": {
+            "routeTableID": {
+              "description": "Linux policy routing table ID for direct routes to remote cluster CIDRs.\nThe route protocol number is set to the same value.\nMust be between 1 and 252 (253-255 are reserved by the kernel).\nMust differ from serviceRouteTableID.",
+              "type": "integer",
+              "default": 200,
+              "maximum": 252,
+              "minimum": 1
+            },
+            "serviceRouteTableID": {
+              "description": "Linux policy routing table ID for service routes via the OVN management port.\nThe route protocol number is set to the same value.\nMust be between 1 and 252 (253-255 are reserved by the kernel).\nMust differ from routeTableID.",
+              "type": "integer",
+              "default": 201,
+              "maximum": 252,
+              "minimum": 1
             }
           }
         }

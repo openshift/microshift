@@ -13,8 +13,6 @@ import (
 )
 
 const (
-	c2ccSvcRouteTable   = 201
-	c2ccSvcRouteProto   = 201
 	c2ccSvcRulePriority = 99
 	mgmtPortInterface   = "ovn-k8s-mp0"
 )
@@ -41,8 +39,8 @@ func newServiceRouteManager(cfg *config.Config) *serviceRouteManager {
 
 	return &serviceRouteManager{
 		policyRouteTable: policyRouteTable{
-			table:    c2ccSvcRouteTable,
-			proto:    c2ccSvcRouteProto,
+			table:    cfg.C2CC.ResolvedServiceRouteTableID,
+			proto:    cfg.C2CC.ResolvedServiceRouteTableID,
 			priority: c2ccSvcRulePriority,
 		},
 		remoteCIDRs:   remoteCIDRs,

@@ -40,6 +40,9 @@ clusterToCluster:
           domain: ""
           nextHop: ""
           serviceNetwork: []
+    routing:
+        routeTableID: 0
+        serviceRouteTableID: 0
 debugging:
     logLevel: ""
 dns:
@@ -206,6 +209,9 @@ clusterToCluster:
           domain: ""
           nextHop: ""
           serviceNetwork: []
+    routing:
+        routeTableID: 200
+        serviceRouteTableID: 201
 debugging:
     logLevel: Normal
 dns:

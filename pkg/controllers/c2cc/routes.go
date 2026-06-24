@@ -13,8 +13,6 @@ import (
 )
 
 const (
-	c2ccRouteTable   = 200
-	c2ccRouteProto   = 200
 	c2ccRulePriority = 100
 )
 
@@ -28,8 +26,8 @@ type linuxRouteManager struct {
 func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 	m := &linuxRouteManager{
 		policyRouteTable: policyRouteTable{
-			table:    c2ccRouteTable,
-			proto:    c2ccRouteProto,
+			table:    cfg.C2CC.ResolvedRouteTableID,
+			proto:    cfg.C2CC.ResolvedRouteTableID,
 			priority: c2ccRulePriority,
 		},
 		desiredGWs: make(map[string]net.IP),

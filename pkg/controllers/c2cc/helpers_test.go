@@ -60,5 +60,8 @@ func testConfigWithRemotes(t *testing.T, remotes ...testRemoteConfig) *config.Co
 		cfg.C2CC.ResolvedAllCIDRs = append(cfg.C2CC.ResolvedAllCIDRs, resolved.AllCIDRs()...)
 	}
 
+	cfg.C2CC.ResolvedRouteTableID = 200
+	cfg.C2CC.ResolvedServiceRouteTableID = 201
+
 	return cfg
 }
