@@ -305,9 +305,12 @@ func RunMicroshift(cfg *config.Config) error {
 		kustomize.NewKustomizer(cfg).RunStandalone(runCtx)
 
 		// Provision certs for optional components after kustomize creates their namespaces.
-		if err := components.ProvisionMetricsServerCerts(runCtx, cfg); err != nil {
-			return fmt.Errorf("failed to provision metrics-server certs: %w", err)
-		}
+		// Runs concurrently because it polls for the namespace created by kustomize.
+		go func() {
+			if err := components.ProvisionMetricsServerCerts(runCtx, cfg); err != nil {
+				klog.Errorf("Failed to provision metrics-server certs: %v", err)
+			}
+		}()
 
 		// Watch for SIGTERM or service error to exit, now that we are ready.
 		select {
