@@ -32,7 +32,7 @@ Recovery After MicroShift Restart On One Cluster
     ...    Verify infrastructure and connectivity recover.
     [Setup]    Verify All RemoteClusters Healthy
     Command On Cluster    cluster-b    systemctl restart microshift
-    Verify Clusters Are Healthy    cluster-b
+    Verify All Clusters Are Healthy
 
 Recovery After OVN-K Pod Restart On Cluster A
     [Documentation]    Force-delete all OVN-K pods on cluster-a.
@@ -42,14 +42,14 @@ Recovery After OVN-K Pod Restart On Cluster A
     ...    oc delete pods -n openshift-ovn-kubernetes --all --force --grace-period=0
     ...    allow_fail=${TRUE}
     Wait For OVN-K Pods Ready On Cluster    cluster-a
-    Verify Clusters Are Healthy    cluster-a
+    Verify All Clusters Are Healthy
 
 Recovery After NetworkManager Restart On Cluster C
     [Documentation]    Restart NetworkManager on cluster-c.
     ...    Verify kernel routes/rules are restored and connectivity recovers.
     [Setup]    Verify All RemoteClusters Healthy
     Command On Cluster    cluster-c    systemctl restart NetworkManager
-    Verify Clusters Are Healthy    cluster-c
+    Verify All Clusters Are Healthy
 
 Recovery After NIC Outage On Cluster B
     [Documentation]    Disable then re-enable NICs on cluster-b via virsh.
@@ -63,7 +63,7 @@ Recovery After NIC Outage On Cluster B
     Reconnect To Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
     ...    timeout=${RECOVERY_TIMEOUT}
     VAR    ${DISABLED_VM}    ${EMPTY}    scope=TEST
-    Verify Clusters Are Healthy    cluster-b
+    Verify All Clusters Are Healthy
     [Teardown]    Restore NICs And Reconnect
     ...    ${HOST2_VM_NAME}    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
 
@@ -74,7 +74,7 @@ Recovery After MicroShift Restart On Clusters A And C
     Disruptive Command On Cluster    cluster-a    nohup systemctl restart microshift &>/dev/null &
     Disruptive Command On Cluster    cluster-c    nohup systemctl restart microshift &>/dev/null &
     Sleep    10s
-    Verify Clusters Are Healthy    cluster-a    cluster-c
+    Verify All Clusters Are Healthy
 
 Recovery After MicroShift Restart On All Clusters
     [Documentation]    Restart microshift.service on all three clusters simultaneously.
@@ -84,7 +84,7 @@ Recovery After MicroShift Restart On All Clusters
     Disruptive Command On Cluster    cluster-b    nohup systemctl restart microshift &>/dev/null &
     Disruptive Command On Cluster    cluster-c    nohup systemctl restart microshift &>/dev/null &
     Sleep    10s
-    Verify Clusters Are Healthy    cluster-a    cluster-b    cluster-c
+    Verify All Clusters Are Healthy
 
 Recovery After OVN-K Restart On B And NIC Outage On C
     [Documentation]    Delete OVN-K pods on cluster-b and disable NICs on cluster-c.
@@ -102,7 +102,7 @@ Recovery After OVN-K Restart On B And NIC Outage On C
     Reconnect To Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
     ...    timeout=${RECOVERY_TIMEOUT}
     VAR    ${DISABLED_VM}    ${EMPTY}    scope=TEST
-    Verify Clusters Are Healthy    cluster-b    cluster-c
+    Verify All Clusters Are Healthy
     [Teardown]    Restore NICs And Reconnect
     ...    ${HOST3_VM_NAME}    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
 
@@ -113,25 +113,23 @@ Recovery After NM Restart On A And MicroShift Restart On B
     Disruptive Command On Cluster    cluster-a    nohup systemctl restart NetworkManager &>/dev/null &
     Disruptive Command On Cluster    cluster-b    nohup systemctl restart microshift &>/dev/null &
     Sleep    10s
-    Verify Clusters Are Healthy    cluster-a    cluster-b
+    Verify All Clusters Are Healthy
 
 
 *** Keywords ***
-Verify Clusters Are Healthy
+Verify All Clusters Are Healthy
     [Documentation]    Wait for each cluster's healthcheck, then verify full C2CC recovery.
-    [Arguments]    @{clusters}
-    FOR    ${cluster}    IN    @{clusters}
+    FOR    ${cluster}    IN    @{ALL_CLUSTERS}
         Wait Until Keyword Succeeds    ${RECOVERY_TIMEOUT}    ${RECOVERY_RETRY}
         ...    Verify Cluster Is Healthy    ${cluster}
     END
-    Verify Full Recovery On Clusters    @{clusters}
+    Verify Full Recovery On All Clusters
 
-Verify Full Recovery On Clusters
+Verify Full Recovery On All Clusters
     [Documentation]    Wait for RemoteCluster CRs to converge, verify C2CC infrastructure
-    ...    on each specified cluster, then verify cross-cluster connectivity and DNS.
-    [Arguments]    @{clusters}
+    ...    on all clusters, then verify cross-cluster connectivity and DNS.
     Verify All RemoteClusters Healthy
-    FOR    ${cluster}    IN    @{clusters}
+    FOR    ${cluster}    IN    @{ALL_CLUSTERS}
         Wait Until Keyword Succeeds    ${INFRA_VERIFY_TIMEOUT}    ${INFRA_VERIFY_RETRY}
         ...    Verify C2CC Infrastructure On Cluster    ${cluster}
     END
