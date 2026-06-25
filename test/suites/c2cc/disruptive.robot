@@ -34,7 +34,7 @@ Recovery After MicroShift Restart On One Cluster
     Command On Cluster    cluster-b    systemctl restart microshift
     Verify All Clusters Are Healthy
 
-Recovery After OVN-K Pod Restart On Cluster A
+Recovery After OVN-K Pod Restart On One Cluster
     [Documentation]    Force-delete all OVN-K pods on cluster-a.
     ...    Verify OVN-K pods recover and C2CC state is restored.
     [Setup]    Verify All RemoteClusters Healthy
@@ -44,14 +44,14 @@ Recovery After OVN-K Pod Restart On Cluster A
     Wait For OVN-K Pods Ready On Cluster    cluster-a
     Verify All Clusters Are Healthy
 
-Recovery After NetworkManager Restart On Cluster C
+Recovery After NetworkManager Restart On One Cluster
     [Documentation]    Restart NetworkManager on cluster-c.
     ...    Verify kernel routes/rules are restored and connectivity recovers.
     [Setup]    Verify All RemoteClusters Healthy
     Command On Cluster    cluster-c    systemctl restart NetworkManager
     Verify All Clusters Are Healthy
 
-Recovery After NIC Outage On Cluster B
+Recovery After NIC Outage On One Cluster
     [Documentation]    Disable then re-enable NICs on cluster-b via virsh.
     ...    Verify SSH reconnection, infrastructure, and connectivity.
     [Setup]    Verify All RemoteClusters Healthy
@@ -67,7 +67,7 @@ Recovery After NIC Outage On Cluster B
     [Teardown]    Restore NICs And Reconnect
     ...    ${HOST2_VM_NAME}    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
 
-Recovery After MicroShift Restart On Clusters A And C
+Recovery After MicroShift Restart On Two Clusters
     [Documentation]    Restart microshift.service on cluster-a and cluster-c simultaneously.
     ...    Verify both clusters recover independently.
     [Setup]    Verify All RemoteClusters Healthy
@@ -86,7 +86,7 @@ Recovery After MicroShift Restart On All Clusters
     Sleep    10s
     Verify All Clusters Are Healthy
 
-Recovery After OVN-K Restart On B And NIC Outage On C
+Recovery After OVN-K Restart On One Cluster And NIC Outage On Another Cluster
     [Documentation]    Delete OVN-K pods on cluster-b and disable NICs on cluster-c.
     ...    Verify both clusters recover from different failure modes.
     [Setup]    Verify All RemoteClusters Healthy
@@ -106,7 +106,7 @@ Recovery After OVN-K Restart On B And NIC Outage On C
     [Teardown]    Restore NICs And Reconnect
     ...    ${HOST3_VM_NAME}    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
 
-Recovery After NM Restart On A And MicroShift Restart On B
+Recovery After NM Restart On One Cluster And MicroShift Restart On Another Cluster
     [Documentation]    Restart NetworkManager on cluster-a and microshift on cluster-b.
     ...    Verify both clusters recover from different service disruptions.
     [Setup]    Verify All RemoteClusters Healthy
