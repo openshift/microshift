@@ -27,30 +27,11 @@ ${VERSION_BACKUP}       /var/tmp/microshift-version.backup
 
 
 *** Test Cases ***
-Prerun Failure Is Logged When Version Is Too Old
-    [Documentation]    Verify that when the version file indicates a version
-    ...    3 minor versions behind the executable, MicroShift fails to start
-    ...    after reboot and the failure reason is logged to prerun_failed.log
-    ...    and reported by greenboot healthcheck.
-    ...    OCP-66820
-
-    Wait For MicroShift Service
-    Stop MicroShift
-
-    Save Version File
-    Set Version N Minors Back    3
-
-    Reboot MicroShift Host And Wait For Greenboot
-
-    Greenboot Journal Should Report Prerun Failure
-    Prerun Failed Log Should Contain Version Mismatch
-
-    [Teardown]    Run Keywords
-    ...    Run Keyword And Ignore Error    Restore Version File
-    ...    AND
-    ...    Run Keyword And Ignore Error    Remove Prerun Failed Log
-    ...    AND
-    ...    Start MicroShift
+# NOTE: Test order matters — randomization is disabled in the scenario.
+# "Data Missing" must run before "Version Too Old" because the latter
+# triggers greenboot rollback loops that degrade ARM system performance
+# (EBS burst credit exhaustion), causing subsequent healthy reboots to
+# exceed the 5-minute timeout.
 
 Data Missing With Healthy Status Starts Fresh
     [Documentation]    Verify that when MicroShift data directory is removed
@@ -75,6 +56,31 @@ Data Missing With Healthy Status Starts Fresh
     Current Boot Journal Should Show Fresh Start
 
     [Teardown]    Ensure MicroShift Is Running
+
+Prerun Failure Is Logged When Version Is Too Old
+    [Documentation]    Verify that when the version file indicates a version
+    ...    3 minor versions behind the executable, MicroShift fails to start
+    ...    after reboot and the failure reason is logged to prerun_failed.log
+    ...    and reported by greenboot healthcheck.
+    ...    OCP-66820
+
+    Wait For MicroShift Service
+    Stop MicroShift
+
+    Save Version File
+    Set Version N Minors Back    3
+
+    Reboot MicroShift Host And Wait For Greenboot
+
+    Greenboot Journal Should Report Prerun Failure
+    Prerun Failed Log Should Contain Version Mismatch
+
+    [Teardown]    Run Keywords
+    ...    Run Keyword And Ignore Error    Restore Version File
+    ...    AND
+    ...    Run Keyword And Ignore Error    Remove Prerun Failed Log
+    ...    AND
+    ...    Start MicroShift
 
 
 *** Keywords ***
