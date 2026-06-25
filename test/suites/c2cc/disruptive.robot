@@ -59,6 +59,7 @@ Recovery After NIC Outage On One Cluster
     VAR    ${DISABLED_VM}    ${HOST2_VM_NAME}    scope=TEST
     VAR    @{DISABLED_IFACES}    @{vnet_ifaces}    scope=TEST
     Verify RemoteCluster Unhealthy On Observers    ${HOST2_IP}    cluster-a    cluster-c
+    ...    disrupted_ipv6=${HOST2_IPV6}
     Enable All NICs For VM    ${HOST2_VM_NAME}    ${vnet_ifaces}
     Reconnect To Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
     ...    timeout=${RECOVERY_TIMEOUT}
@@ -97,6 +98,7 @@ Recovery After OVN-K Restart On One Cluster And NIC Outage On Another Cluster
     VAR    ${DISABLED_VM}    ${HOST3_VM_NAME}    scope=TEST
     VAR    @{DISABLED_IFACES}    @{vnet_ifaces}    scope=TEST
     Verify RemoteCluster Unhealthy On Observers    ${HOST3_IP}    cluster-a
+    ...    disrupted_ipv6=${HOST3_IPV6}
     Enable All NICs For VM    ${HOST3_VM_NAME}    ${vnet_ifaces}
     Wait For OVN-K Pods Ready On Cluster    cluster-b
     Reconnect To Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
