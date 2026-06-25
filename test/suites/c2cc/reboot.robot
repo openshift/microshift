@@ -158,22 +158,6 @@ Verify C2CC DNS
     Curl Remote Service Via DNS    cluster-c    cluster-a
     Curl Remote Service Via DNS    cluster-c    cluster-b
 
-Verify RemoteCluster State
-    [Documentation]    Check that all RemoteCluster CRs on this cluster have the expected state.
-    [Arguments]    ${alias}    ${expected_state}
-    ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.state}'
-    Should Not Be Empty    ${stdout}
-    @{states}=    Split String    ${stdout}
-    ${count}=    Get Length    ${states}
-    Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster states, got ${count}
-    FOR    ${state}    IN    @{states}
-        Should Be Equal As Strings    ${state}    ${expected_state}
-    END
-
 Ensure All Clusters Healthy
     [Documentation]    Pre-condition: all clusters must have Healthy RemoteCluster CRs.
-    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
-        Wait Until Keyword Succeeds    3m    10s
-        ...    Verify RemoteCluster State    ${alias}    Healthy
-    END
+    Verify All RemoteClusters Healthy
