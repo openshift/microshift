@@ -20,6 +20,59 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
+# resolve_latest_z_tag IMAGE_URL XY_VERSION
+# Queries a container image registry for tags and returns the latest
+# version tag matching the given X.Y stream.
+# Tries clean semver tags (vX.Y.Z) first, then pre-release (vX.Y.Z-N).
+resolve_latest_z_tag() {
+    local image_url="$1"
+    local xy_version="$2"
+    local auth_args=""
+
+    if [[ -f "${PULL_SECRET_FILE}" ]]; then
+        auth_args="--authfile ${PULL_SECRET_FILE}"
+    fi
+
+    local tags
+    # shellcheck disable=SC2086
+    tags=$(skopeo list-tags ${auth_args} "docker://${image_url}") || return 1
+
+    local xy_escaped="${xy_version//./\\.}"
+
+    # Try clean semver first (vX.Y.Z where Z is purely numeric)
+    local latest
+    latest=$(echo "${tags}" | jq -r '.Tags[]' | grep -E "^v${xy_escaped}\.[0-9]+$" | sort -V | tail -1)
+    if [[ -n "${latest}" ]]; then
+        echo "${latest}"
+        return 0
+    fi
+
+    # Try pre-release tags (vX.Y.Z-N with short numeric suffix)
+    latest=$(echo "${tags}" | jq -r '.Tags[]' | grep -E "^v${xy_escaped}\.[0-9]+-[0-9]{1,3}$" | sort -V | tail -1)
+    if [[ -n "${latest}" ]]; then
+        echo "${latest}"
+        return 0
+    fi
+
+    return 1
+}
+
+# Resolves the latest z-stream for the given X.Y version and rebases to it.
+rebase_lvms_latest() {
+    local registry="$1"
+    local xy_version="$2"
+
+    title "# Resolving latest LVMS tag for stream ${xy_version}"
+    local tag
+    tag=$(resolve_latest_z_tag "${registry}" "${xy_version}") || true
+    if [[ -z "${tag}" ]]; then
+        echo "ERROR: Could not find any LVMS tag for stream ${xy_version} in ${registry}"
+        exit 1
+    fi
+    title "# Resolved LVMS version ${tag}"
+    rebase_lvms_to "${registry}:${tag}"
+}
+
 check_preconditions() {
     if ! hash yq; then
         title "Installing yq"
@@ -51,7 +104,6 @@ rebase_lvms_to() {
     git checkout -b "${rebase_branch}"
 
     update_last_lvms_rebase "${lvms_operator_bundle_manifest}"
-    update_rebase_job_entrypoint "${lvms_operator_bundle_manifest}"
 
     update_lvms_images
     if [[ -n "$(git status -s pkg/release)" ]]; then
@@ -252,25 +304,6 @@ EOF
              title "## Committing changes to last_lvms_rebase.sh" && \
              git add scripts/auto-rebase/last_lvms_rebase.sh && \
              git commit -m "update last_lvms_rebase.sh"; \
-         fi)
-}
-
-update_rebase_job_entrypoint() {
-    local lvms_operator_bundle_manifest="$1"
-    version=$(echo "${lvms_operator_bundle_manifest}" | awk -F':' '{print $2}')
-
-    title "## Updating rebase_job_entrypoint.sh with new lvms version ${version}"
-
-    local rebase_job_entrypoint="${REPOROOT}/scripts/auto-rebase/rebase_job_entrypoint.sh"
-
-    # Replace the line that sets the LVMS release version
-    sed -i "s/^release_lvms=.*$/release_lvms=\"${version}\"/" "${rebase_job_entrypoint}"
-
-    (cd "${REPOROOT}" && \
-         if test -n "$(git status -s scripts/auto-rebase/rebase_job_entrypoint.sh)"; then \
-             title "## Committing changes to rebase_job_entrypoint.sh" && \
-             git add scripts/auto-rebase/rebase_job_entrypoint.sh && \
-             git commit -m "update rebase_job_entrypoint.sh"; \
          fi)
 }
 
@@ -505,10 +538,11 @@ parse_images() {
 
 usage() {
     echo "Usage:"
-    echo "$(basename "$0") to LVMS_RELEASE_IMAGE         Performs all the steps to rebase LVMS"
-    echo "$(basename "$0") download LVMS_RELEASE_IMAGE   Downloads the content of a LVMS release image to disk in preparation for rebasing"
-    echo "$(basename "$0") images                        Updates LVMS images"
-    echo "$(basename "$0") manifests                     Updates LVMS manifests"
+    echo "$(basename "$0") to LVMS_RELEASE_IMAGE              Performs all the steps to rebase LVMS"
+    echo "$(basename "$0") latest REGISTRY XY_VERSION          Resolves latest z-stream and rebases"
+    echo "$(basename "$0") download LVMS_RELEASE_IMAGE         Downloads the content of a LVMS release image to disk in preparation for rebasing"
+    echo "$(basename "$0") images                              Updates LVMS images"
+    echo "$(basename "$0") manifests                           Updates LVMS manifests"
     exit 1
 }
 
@@ -518,6 +552,9 @@ command=${1:-help}
 case "${command}" in
     to)
         rebase_lvms_to "$2"
+        ;;
+    latest)
+        rebase_lvms_latest "$2" "$3"
         ;;
     download)
         download_lvms_operator_bundle_manifest "$2"
