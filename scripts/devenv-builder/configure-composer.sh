@@ -4,6 +4,7 @@ set -euxo pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DNF_RETRY="${SCRIPTDIR}/../dnf_retry.sh"
 
+# TEST only for cache rebuild
 enable_copr_repositories() {
     local -r version_id=$1
     local -r version_id_major="$(awk -F. '{print $1}' <<< "${version_id}")"
