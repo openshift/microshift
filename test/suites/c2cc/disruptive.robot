@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation       Chaos/resilience tests for C2CC.
+Documentation       Disruptive/resilience tests for C2CC.
 ...                 Each test injects a disruption (service restart, pod deletion,
 ...                 NIC outage), waits for recovery, and verifies that C2CC
 ...                 infrastructure and cross-cluster connectivity are restored.
@@ -12,7 +12,7 @@ Resource            ../../resources/c2cc.resource
 Suite Setup         Setup
 Suite Teardown      Teardown
 
-Test Tags           chaos
+Test Tags           disruptive
 
 
 *** Variables ***
