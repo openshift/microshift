@@ -86,6 +86,52 @@ No C2CC Tracking Annotation After Disable
     ...    oc get node -o jsonpath='{.items[0].metadata.annotations.microshift\\.io/c2cc-snat-subnets}'
     Should Be Empty    ${stdout}
 
+No Dual Stack Linux Routes In Table 200 After Disable
+    [Documentation]    Dual-stack routes to remote CIDRs in table 200 should be gone.
+    Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    ${ip_cmd}=    IP Command For CIDR    ${CLUSTER_B_POD_CIDR_DUAL}
+    ${stdout}=    Command On Cluster    cluster-a    ${ip_cmd} route show table 200
+    FOR    ${cidr}    IN
+    ...    ${CLUSTER_B_POD_CIDR_DUAL}
+    ...    ${CLUSTER_B_SVC_CIDR_DUAL}
+    ...    ${CLUSTER_C_POD_CIDR_DUAL}
+    ...    ${CLUSTER_C_SVC_CIDR_DUAL}
+        Should Not Contain    ${stdout}    ${cidr}
+    END
+
+No Dual Stack IP Rules For Table 200 After Disable
+    [Documentation]    Dual-stack IP rules directing to table 200 should be gone.
+    Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    ${ip_cmd}=    IP Command For CIDR    ${CLUSTER_B_POD_CIDR_DUAL}
+    ${stdout}=    Command On Cluster    cluster-a    ${ip_cmd} rule show
+    FOR    ${cidr}    IN
+    ...    ${CLUSTER_B_POD_CIDR_DUAL}
+    ...    ${CLUSTER_B_SVC_CIDR_DUAL}
+    ...    ${CLUSTER_C_POD_CIDR_DUAL}
+    ...    ${CLUSTER_C_SVC_CIDR_DUAL}
+        Should Not Contain    ${stdout}    to ${cidr} lookup 200
+    END
+
+No Dual Stack Service Routes In Table 201 After Disable
+    [Documentation]    Dual-stack service routes in table 201 should be gone.
+    Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    ${ip_cmd}=    IP Command For CIDR    ${CLUSTER_A_SVC_CIDR_DUAL}
+    ${stdout}=    Command On Cluster    cluster-a    ${ip_cmd} route show table 201
+    Should Not Contain    ${stdout}    ${CLUSTER_A_SVC_CIDR_DUAL}
+
+No Dual Stack Service IP Rules After Disable
+    [Documentation]    Dual-stack service IP rules for table 201 should be gone.
+    Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    ${ip_cmd}=    IP Command For CIDR    ${CLUSTER_B_POD_CIDR_DUAL}
+    ${stdout}=    Command On Cluster    cluster-a    ${ip_cmd} rule show
+    FOR    ${cidr}    IN
+    ...    ${CLUSTER_B_POD_CIDR_DUAL}
+    ...    ${CLUSTER_B_SVC_CIDR_DUAL}
+    ...    ${CLUSTER_C_POD_CIDR_DUAL}
+    ...    ${CLUSTER_C_SVC_CIDR_DUAL}
+        Should Not Contain    ${stdout}    from ${cidr} to ${CLUSTER_A_SVC_CIDR_DUAL} lookup 201
+    END
+
 C2CC Controller Logged Cleanup
     [Documentation]    The controller should have logged that it is disabled and cleaning up.
     ${stdout}=    Command On Cluster    cluster-a
