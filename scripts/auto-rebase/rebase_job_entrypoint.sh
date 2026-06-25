@@ -91,7 +91,7 @@ OPM_RELEASE=${opm_release} \
 # LVMS is not tracked in the OCP release image. Instead, rely on the
 # latest z-stream for a given X.Y version. Only the X.Y needs manual
 # updating between releases.
-./scripts/auto-rebase/rebase-lvms.sh latest "registry.redhat.io/lvms4/lvms-operator-bundle" "4.22"
+./scripts/auto-rebase/rebase_lvms.sh latest "registry.redhat.io/lvms4/lvms-operator-bundle" "4.22"
 
 if [[ "${JOB_TYPE}" == "presubmit" ]]; then
     # Verify the assets after the rebase to make sure

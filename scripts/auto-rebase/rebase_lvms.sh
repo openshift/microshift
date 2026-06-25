@@ -103,7 +103,7 @@ rebase_lvms_to() {
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
-    update_last_lvms_rebase "${lvms_operator_bundle_manifest}"
+    update_last_rebase_lvms "${lvms_operator_bundle_manifest}"
 
     update_lvms_images
     if [[ -n "$(git status -s pkg/release)" ]]; then
@@ -285,25 +285,25 @@ update_lvms_manifests() {
     yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.lvms_operator }}"' "${REPOROOT}/assets/components/lvms/lvms-operator_apps_v1_deployment.yaml"
 }
 
-update_last_lvms_rebase() {
+update_last_rebase_lvms() {
     local lvms_operator_bundle_manifest="$1"
 
-    title "## Updating last_lvms_rebase.sh"
+    title "## Updating last_rebase_lvms.sh"
 
-    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_lvms_rebase.sh"
+    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase_lvms.sh"
 
     rm -f "${last_rebase_script}"
     cat - >"${last_rebase_script}" <<EOF
 #!/bin/bash -x
-./scripts/auto-rebase/rebase-lvms.sh to "${lvms_operator_bundle_manifest}"
+./scripts/auto-rebase/rebase_lvms.sh to "${lvms_operator_bundle_manifest}"
 EOF
     chmod +x "${last_rebase_script}"
 
     (cd "${REPOROOT}" && \
-         if test -n "$(git status -s scripts/auto-rebase/last_lvms_rebase.sh)"; then \
-             title "## Committing changes to last_lvms_rebase.sh" && \
-             git add scripts/auto-rebase/last_lvms_rebase.sh && \
-             git commit -m "update last_lvms_rebase.sh"; \
+         if test -n "$(git status -s scripts/auto-rebase/last_rebase_lvms.sh)"; then \
+             title "## Committing changes to last_rebase_lvms.sh" && \
+             git add scripts/auto-rebase/last_rebase_lvms.sh && \
+             git commit -m "update last_rebase_lvms.sh"; \
          fi)
 }
 

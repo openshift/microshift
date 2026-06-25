@@ -169,7 +169,7 @@ git commit -m "update buildfiles"
 
 Since LVMS is part of the delivery of MicroShift default functionality, we cannot rely on OLM to use a ClusterServiceVersion to install LVMS as we would in a normal OpenShift cluster. 
 
-To workaround this issue, there is a dedicated script in `scripts/auto-rebase/rebase-lvms.sh` to update the LVMS component images and manifests based on (naive but straight-forward) reverse-engineering the Operator Bundle image of LVMS.
+To workaround this issue, there is a dedicated script in `scripts/auto-rebase/rebase_lvms.sh` to update the LVMS component images and manifests based on (naive but straight-forward) reverse-engineering the Operator Bundle image of LVMS.
 
 The script employs `yq` extensively for manipulating YAML files coming from the bundle, 
 such as extracting and updating image references in the LVMS operator bundle manifest. 
@@ -193,13 +193,13 @@ The following command attempts a fully automatic rebase to a given target LVMS r
 for a release candidate in CPaaS (Red Hat Internal Build System):
 
 ```shell
-./scripts/auto-rebase/rebase-lvms.sh to "quay.io/lvms_dev/lvms4-lvms-operator-bundle:[TAG || DIGEST]"
+./scripts/auto-rebase/rebase_lvms.sh to "quay.io/lvms_dev/lvms4-lvms-operator-bundle:[TAG || DIGEST]"
 ```
 
 for a public release:
 
 ```shell
-./scripts/auto-rebase/rebase-lvms.sh to "registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]"
+./scripts/auto-rebase/rebase_lvms.sh to "registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]"
 ```
 
 #### Manual Update of LVMS
@@ -209,7 +209,7 @@ for a public release:
 Run the following to download the LVMS release to update to, specifying the multi-arch target release image, e.g.:
 
 ```shell
-./scripts/auto-rebase/rebase-lvms.sh download "registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]"
+./scripts/auto-rebase/rebase_lvms.sh download "registry.redhat.io/lvms4/lvms-operator-bundle:[TAG || DIGEST]"
 ```
 
 This will create a directory `_output/staging`, download the operator bundle for the specified LVMS release.
@@ -219,7 +219,7 @@ This will create a directory `_output/staging`, download the operator bundle for
 To update the image references for LVMS, run:
 
 ```shell
-./scripts/auto-rebase/rebase-lvms.sh images
+./scripts/auto-rebase/rebase_lvms.sh images
 git add pkg/release
 git commit -m "update LVMS images"
 ```
@@ -229,7 +229,7 @@ git commit -m "update LVMS images"
 To update the manifests for LVMS, run:
 
 ```shell
-./scripts/auto-rebase/rebase-lvms.sh manifests
+./scripts/auto-rebase/rebase_lvms.sh manifests
 git add assets
 git commit -m "update LVMS manifests"
 ```
