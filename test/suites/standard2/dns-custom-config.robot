@@ -68,6 +68,24 @@ Cluster Local Resolution With Custom Corefile
     Resolve Host From Pod    kubernetes.default.svc.cluster.local
     [Teardown]    Teardown Custom Corefile
 
+Atomic File Replacement Via Mv Updates ConfigMap
+    [Documentation]    Replace the custom Corefile atomically using mv
+    ...    (write temp file, then rename) and verify the ConfigMap is updated
+    ...    without restarting MicroShift. Also verifies show-config --mode
+    ...    effective reports the configured dns.configFile path.
+    [Setup]    Setup Custom Corefile With Hosts Entry
+    Resolve Host From Pod    ${HOSTNAME}
+    ${new_hostname}=    Generate Random HostName
+    ${corefile}=    Build Custom Corefile    ${new_hostname}    ${FAKE_LISTEN_IP}
+    Upload String To File    ${corefile}    ${CUSTOM_COREFILE_PATH}.tmp
+    Command Should Work    mv ${CUSTOM_COREFILE_PATH}.tmp ${CUSTOM_COREFILE_PATH}
+    Wait Until Keyword Succeeds    20x    5s
+    ...    ConfigMap Should Contain Hostname    ${new_hostname}
+    Resolve Host From Pod    ${new_hostname}
+    ${config}=    Show Config    effective
+    Should Be Equal As Strings    ${config.dns.configFile}    ${CUSTOM_COREFILE_PATH}
+    [Teardown]    Teardown Custom Corefile
+
 
 *** Keywords ***
 Build Custom Corefile
@@ -124,6 +142,6 @@ Teardown Custom Corefile
 Remove Custom Corefile
     [Documentation]    Remove the custom Corefile from the host
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    rm -f ${CUSTOM_COREFILE_PATH}
+    ...    rm -f ${CUSTOM_COREFILE_PATH} ${CUSTOM_COREFILE_PATH}.tmp
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}
