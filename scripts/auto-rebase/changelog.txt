@@ -1,3 +1,5 @@
-- machine-config-operator embedded-component d0d6ce62b4b7ba63529b9e400cf8ec72fa4589a6 to 109d1ad8bdd34d81b1adc7b60d3748cd979f43c6
-  - 8927849b 2026-06-11T21:23:45Z OCPBUGS-63650: configure-ovs: copy lldp mode to br-ex port
+- machine-config-operator embedded-component 109d1ad8bdd34d81b1adc7b60d3748cd979f43c6 to 51f9b31f3f6981021f0da3ad32030ed1028bce0b
+  - 9b43a888 2026-06-22T14:39:16-04:00 OCPBUGS-84832: daemon: don't pull/extract extensions for all OS updates
+  - 04d55a25 2026-06-18T13:53:14Z bootimage: use version for vsphere hotloop check
+  - fda7032c 2026-06-15T18:48:04Z OCPBUGS-84814: Skip chrony-wait on first node join
 
