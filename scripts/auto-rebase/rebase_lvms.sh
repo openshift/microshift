@@ -20,6 +20,63 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
+# catalog_list_tags REPOSITORY
+# Lists all tags for a container image using the Red Hat container catalog API.
+# No authentication required. The repository should be the path portion
+# (e.g. "lvms4/lvms-operator-bundle").
+catalog_list_tags() {
+    local repo="$1"
+    local api_url="https://catalog.redhat.com/api/containers/v1/repositories/registry/registry.access.redhat.com/repository"
+    local encoded_repo="${repo/\//%2F}"
+
+    curl -s --fail --max-time 60 --retry 3 --retry-delay 5 \
+        "${api_url}/${encoded_repo}/images?page_size=500" \
+        | jq -r '[.data[].repositories[].tags[].name] | unique[]'
+}
+
+# resolve_latest_z_tag IMAGE_URL XY_VERSION
+# Queries the Red Hat container catalog for tags and returns the latest
+# clean semver tag (vX.Y.Z) matching the given X.Y stream.
+# Returns 1 if no matching tag is found.
+resolve_latest_z_tag() {
+    local image_url="$1"
+    local xy_version="$2"
+
+    # Extract repository path from full image URL
+    # e.g. "registry.redhat.io/lvms4/lvms-operator-bundle" -> "lvms4/lvms-operator-bundle"
+    local repo="${image_url#*/}"
+
+    local tags
+    tags=$(catalog_list_tags "${repo}") || return 1
+
+    local xy_escaped="${xy_version//./\\.}"
+
+    local latest
+    latest=$(echo "${tags}" | grep -E "^v${xy_escaped}\.[0-9]+$" | sort -V | tail -1)
+    if [[ -n "${latest}" ]]; then
+        echo "${latest}"
+        return 0
+    fi
+
+    return 1
+}
+
+# Resolves the latest z-stream for the given X.Y version and rebases to it.
+rebase_lvms_latest() {
+    local registry="$1"
+    local xy_version="$2"
+
+    title "# Resolving latest LVMS tag for stream ${xy_version}"
+    local tag
+    tag=$(resolve_latest_z_tag "${registry}" "${xy_version}") || true
+    if [[ -z "${tag}" ]]; then
+        echo "ERROR: Could not find any LVMS tag for stream ${xy_version} in ${registry}"
+        exit 1
+    fi
+    title "# Resolved LVMS version ${tag}"
+    rebase_lvms_to "${registry}:${tag}"
+}
+
 check_preconditions() {
     if ! hash yq; then
         title "Installing yq"
@@ -70,8 +127,7 @@ rebase_lvms_to() {
     git branch -D "${rebase_branch}" || true
     git checkout -b "${rebase_branch}"
 
-    update_last_lvms_rebase "${lvms_operator_bundle_manifest}"
-    update_rebase_job_entrypoint "${lvms_operator_bundle_manifest}"
+    update_last_rebase_lvms "${lvms_operator_bundle_manifest}"
 
     update_lvms_images
     if [[ -n "$(git status -s pkg/release)" ]]; then
@@ -246,47 +302,30 @@ update_lvms_manifests() {
         >&2 echo 'lvms staging dir not found, aborting asset update'
         return 1
     }
-    "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/lvms_assets.yaml
+
+    "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/assets_lvms.yaml
+    yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.lvms_operator }}"' "${REPOROOT}/assets/components/lvms/lvms-operator_apps_v1_deployment.yaml"
 }
 
-update_last_lvms_rebase() {
+update_last_rebase_lvms() {
     local lvms_operator_bundle_manifest="$1"
 
-    title "## Updating last_lvms_rebase.sh"
+    title "## Updating last_rebase_lvms.sh"
 
-    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_lvms_rebase.sh"
+    local last_rebase_script="${REPOROOT}/scripts/auto-rebase/last_rebase_lvms.sh"
 
     rm -f "${last_rebase_script}"
     cat - >"${last_rebase_script}" <<EOF
 #!/bin/bash -x
-./scripts/auto-rebase/rebase-lvms.sh to "${lvms_operator_bundle_manifest}"
+./scripts/auto-rebase/rebase_lvms.sh to "${lvms_operator_bundle_manifest}"
 EOF
     chmod +x "${last_rebase_script}"
 
     (cd "${REPOROOT}" && \
-         if test -n "$(git status -s scripts/auto-rebase/last_lvms_rebase.sh)"; then \
-             title "## Committing changes to last_lvms_rebase.sh" && \
-             git add scripts/auto-rebase/last_lvms_rebase.sh && \
-             git commit -m "update last_lvms_rebase.sh"; \
-         fi)
-}
-
-update_rebase_job_entrypoint() {
-    local lvms_operator_bundle_manifest="$1"
-    version=$(echo "${lvms_operator_bundle_manifest}" | awk -F':' '{print $2}')
-
-    title "## Updating rebase_job_entrypoint.sh with new lvms version ${version}"
-
-    local rebase_job_entrypoint="${REPOROOT}/scripts/auto-rebase/rebase_job_entrypoint.sh"
-
-    # Replace the line that sets the LVMS release version
-    sed -i "s/^release_lvms=.*$/release_lvms=\"${version}\"/" "${rebase_job_entrypoint}"
-
-    (cd "${REPOROOT}" && \
-         if test -n "$(git status -s scripts/auto-rebase/rebase_job_entrypoint.sh)"; then \
-             title "## Committing changes to rebase_job_entrypoint.sh" && \
-             git add scripts/auto-rebase/rebase_job_entrypoint.sh && \
-             git commit -m "update rebase_job_entrypoint.sh"; \
+         if test -n "$(git status -s scripts/auto-rebase/last_rebase_lvms.sh)"; then \
+             title "## Committing changes to last_rebase_lvms.sh" && \
+             git add scripts/auto-rebase/last_rebase_lvms.sh && \
+             git commit -m "update last_rebase_lvms.sh"; \
          fi)
 }
 
@@ -521,10 +560,11 @@ parse_images() {
 
 usage() {
     echo "Usage:"
-    echo "$(basename "$0") to LVMS_RELEASE_IMAGE         Performs all the steps to rebase LVMS"
-    echo "$(basename "$0") download LVMS_RELEASE_IMAGE   Downloads the content of a LVMS release image to disk in preparation for rebasing"
-    echo "$(basename "$0") images                        Updates LVMS images"
-    echo "$(basename "$0") manifests                     Updates LVMS manifests"
+    echo "$(basename "$0") to LVMS_RELEASE_IMAGE              Performs all the steps to rebase LVMS"
+    echo "$(basename "$0") latest REGISTRY XY_VERSION          Resolves latest z-stream and rebases"
+    echo "$(basename "$0") download LVMS_RELEASE_IMAGE         Downloads the content of a LVMS release image to disk in preparation for rebasing"
+    echo "$(basename "$0") images                              Updates LVMS images"
+    echo "$(basename "$0") manifests                           Updates LVMS manifests"
     exit 1
 }
 
@@ -534,6 +574,10 @@ command=${1:-help}
 case "${command}" in
     to)
         rebase_lvms_to "$2"
+        ;;
+    latest)
+        [[ $# -ge 3 ]] || usage
+        rebase_lvms_latest "$2" "$3"
         ;;
     download)
         download_lvms_operator_bundle_manifest "$2"
