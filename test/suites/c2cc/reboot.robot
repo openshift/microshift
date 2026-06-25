@@ -5,11 +5,7 @@ Documentation       Verify C2CC survives VM reboots in escalating scenarios.
 ...                 verification confirms connectivity, infrastructure, health probes,
 ...                 and DNS all recover.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
 Resource            ../../resources/c2cc.resource
-Resource            ../../resources/ostree-health.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -24,7 +20,7 @@ Reboot Single Cluster
     ...    with both peers.
     [Setup]    Ensure All Clusters Healthy
     Reboot Clusters Simultaneously    cluster-a
-    Wait For Clusters Ready    cluster-a
+    Wait For Clusters Ready
     Verify Full C2CC Stack
 
 Reboot Two Clusters Simultaneously
@@ -33,7 +29,7 @@ Reboot Two Clusters Simultaneously
     ...    The two rebooted clusters must also reconnect with each other.
     [Setup]    Ensure All Clusters Healthy
     Reboot Clusters Simultaneously    cluster-b    cluster-c
-    Wait For Clusters Ready    cluster-b    cluster-c
+    Wait For Clusters Ready
     Verify Full C2CC Stack
 
 Reboot All Three Clusters Simultaneously
@@ -42,7 +38,7 @@ Reboot All Three Clusters Simultaneously
     ...    to reference. All must independently reconstruct C2CC state.
     [Setup]    Ensure All Clusters Healthy
     Reboot Clusters Simultaneously    cluster-a    cluster-b    cluster-c
-    Wait For Clusters Ready    cluster-a    cluster-b    cluster-c
+    Wait For Clusters Ready
     Verify Full C2CC Stack
 
 
@@ -52,7 +48,9 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig
-    Register Local Cluster    cluster-a
+    Logout MicroShift Host
+
+    Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG}
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
     Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
     Deploy Test Workloads
@@ -63,27 +61,12 @@ Teardown
     Cleanup Test Workloads
     Teardown All Remote Clusters
     Remove Kubeconfig
-    Logout MicroShift Host
 
 Wait For Clusters Ready
-    [Documentation]    Wait for rebooted clusters to finish greenboot and for test pods
-    ...    and service endpoints to become ready.
-    [Arguments]    @{cluster_aliases}
-    Wait Until Keyword Succeeds    10m    15s
-    ...    All Clusters Greenboot Exited    @{cluster_aliases}
+    [Documentation]    Wait for test pods and service endpoints to become ready
+    ...    after a reboot cycle.
     Wait For Test Pods
     Wait For Service Endpoints
-
-All Clusters Greenboot Exited
-    [Documentation]    Check that greenboot has exited on all given clusters.
-    ...    Fails if any cluster has not finished yet, causing the caller's
-    ...    Wait Until Keyword Succeeds to retry.
-    [Arguments]    @{cluster_aliases}
-    FOR    ${alias}    IN    @{cluster_aliases}
-        ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
-        SSHLibrary.Switch Connection    ${conn_id}
-        Greenboot Health Check Exited
-    END
 
 Verify Full C2CC Stack
     [Documentation]    Comprehensive verification of all C2CC components across all clusters.

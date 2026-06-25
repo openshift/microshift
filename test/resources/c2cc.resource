@@ -588,6 +588,7 @@ Verify All RemoteClusters Healthy
 Reboot Clusters Simultaneously
     [Documentation]    Reboot one or more clusters and wait for all to come back
     ...    with a new boot ID and greenboot health check passed.
+    ...    Issues reboot on all targets before waiting, so reboots overlap.
     [Arguments]    @{cluster_aliases}
     &{boot_ids}=    Create Dictionary
     FOR    ${alias}    IN    @{cluster_aliases}
