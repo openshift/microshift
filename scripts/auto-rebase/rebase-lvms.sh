@@ -554,6 +554,7 @@ case "${command}" in
         rebase_lvms_to "$2"
         ;;
     latest)
+        [[ $# -ge 3 ]] || usage
         rebase_lvms_latest "$2" "$3"
         ;;
     download)
