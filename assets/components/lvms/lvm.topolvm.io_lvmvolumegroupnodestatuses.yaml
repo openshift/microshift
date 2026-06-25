@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.3
+    controller-gen.kubebuilder.io/version: v0.20.1
   creationTimestamp: null
   name: lvmvolumegroupnodestatuses.lvm.topolvm.io
 spec:
@@ -46,16 +46,16 @@ spec:
                 items:
                   properties:
                     deviceDiscoveryPolicy:
-                      default: RuntimeDynamic
+                      default: RuntimeStatic
                       description: |-
-                        DeviceDiscoveryPolicy is a field to indicate whether the devices are discovered
-                        at runtime or preconfigured through a DeviceSelector
-                        Setting this to DeviceDiscoveryPolicyPreconfigured indicates the devices are preconfigured through a DeviceSelector.
-                        Setting this to DeviceDiscoveryPolicyRuntimeDynamic indicates the devices are added to the VG dynamically if they are present at runtime.
-                        By default, the value is set to RuntimeDynamic.
+                        DeviceDiscoveryPolicy is a field to indicate the effective device discovery policy for this volume group.
+                        Preconfigured indicates explicit DeviceSelector paths are configured and the discovery policy is not applicable.
+                        RuntimeDynamic indicates devices are discovered and added dynamically at runtime (no explicit paths, Dynamic policy).
+                        RuntimeStatic indicates devices were discovered at install time and new devices are ignored (no explicit paths, Static policy).
                       enum:
                       - Preconfigured
                       - RuntimeDynamic
+                      - RuntimeStatic
                       type: string
                     devices:
                       description: Devices is the list of devices used by the volume

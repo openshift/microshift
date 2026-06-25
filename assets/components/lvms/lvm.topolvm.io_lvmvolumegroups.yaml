@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.3
+    controller-gen.kubebuilder.io/version: v0.20.1
   creationTimestamp: null
   name: lvmvolumegroups.lvm.topolvm.io
 spec:
@@ -43,6 +43,16 @@ spec:
                 description: Default is a flag to indicate whether the device-class
                   is the default
                 type: boolean
+              deviceDiscoveryPolicy:
+                description: |-
+                  DeviceDiscoveryPolicy specifies the policy for discovering devices for this volume group.
+                  Static means the volume group is created with devices found at install time; new devices are ignored.
+                  Dynamic means devices are continuously discovered and added to the volume group.
+                  When not set, new volume groups default to Static and existing volume groups default to Dynamic for backward compatibility.
+                enum:
+                - Static
+                - Dynamic
+                type: string
               deviceSelector:
                 description: DeviceSelector is a set of rules that should match for
                   a device to be included in this TopoLVMCluster
@@ -54,12 +64,19 @@ spec:
                       Force wipe the devices only when you know that they do not contain any important data.
                     type: boolean
                   optionalPaths:
-                    description: OptionalPaths specify the optional device paths.
+                    description: |-
+                      OptionalPaths is a list of device paths. At least one path must resolve on each node.
+                      Prefer stable, consistent paths such as /dev/disk/by-id/… instead of
+                      /dev/sda, which may be renamed or reordered by the kernel on reboot.
+                      This can be used to provide a single list of disk IDs across multiple nodes.
                     items:
                       type: string
                     type: array
                   paths:
-                    description: Paths specify the device paths.
+                    description: |-
+                      Paths is a list of device paths. All paths must resolve on each node.
+                      Prefer stable, consistent paths such as /dev/disk/by-id/… instead of
+                      /dev/sda, which may be renamed or reordered by the kernel on reboot.
                     items:
                       type: string
                     type: array

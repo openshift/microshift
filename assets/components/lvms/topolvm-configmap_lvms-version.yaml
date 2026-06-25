@@ -4,4 +4,4 @@ metadata:
   name: lvms-version
   namespace: kube-public
 data:
-  version: v4.21.0
+  version: v4.22.0
