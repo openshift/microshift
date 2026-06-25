@@ -201,6 +201,7 @@ func (c *Config) fillDefaults() error {
 	c.DNS = dnsDefaults()
 	c.C2CC = C2CC{
 		DNS:           C2CCDNS{CacheTTL: ptr.To(10), CacheNegativeTTL: ptr.To(10)},
+		Routing:       C2CCRouting{RouteTableID: ptr.To(200), ServiceRouteTableID: ptr.To(201)},
 		ProbeInterval: "10s",
 	}
 	return nil
@@ -491,6 +492,12 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	if u.C2CC.ProbeInterval != "" {
 		c.C2CC.ProbeInterval = u.C2CC.ProbeInterval
 	}
+	if u.C2CC.Routing.RouteTableID != nil {
+		c.C2CC.Routing.RouteTableID = u.C2CC.Routing.RouteTableID
+	}
+	if u.C2CC.Routing.ServiceRouteTableID != nil {
+		c.C2CC.Routing.ServiceRouteTableID = u.C2CC.Routing.ServiceRouteTableID
+	}
 }
 
 // updateComputedValues examins the existing settings and converts any
@@ -578,6 +585,7 @@ func (c *Config) updateComputedValues() error {
 	}
 
 	c.C2CC.stripEmptyRemoteClusters()
+	c.C2CC.resolveRoutingDefaults()
 
 	return nil
 }
