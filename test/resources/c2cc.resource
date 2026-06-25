@@ -572,3 +572,66 @@ Reconnect To Cluster
     Deregister Remote Cluster    ${alias}
     Wait Until Keyword Succeeds    ${timeout}    15s
     ...    Register Remote Cluster    ${alias}    ${host}    ${ssh_port}    ${kubeconfig}
+
+Verify Cluster Is Healthy
+    [Documentation]    Verify MicroShift and all core workloads are ready.
+    [Arguments]    ${alias}
+    Command On Cluster    ${alias}    microshift healthcheck --timeout=300s
+
+Verify All RemoteClusters Healthy
+    [Documentation]    Wait for all RemoteCluster CRs on all clusters to report Healthy.
+    FOR    ${alias}    IN    @{ALL_CLUSTERS}
+        Wait Until Keyword Succeeds    3m    10s
+        ...    Verify RemoteCluster State    ${alias}    Healthy
+    END
+
+Reboot Clusters Simultaneously
+    [Documentation]    Reboot one or more clusters and wait for all to come back
+    ...    with a new boot ID and greenboot health check passed.
+    [Arguments]    @{cluster_aliases}
+    &{boot_ids}=    Create Dictionary
+    FOR    ${alias}    IN    @{cluster_aliases}
+        ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
+        SSHLibrary.Switch Connection    ${conn_id}
+        ${bootid}=    Get Current Boot Id
+        Set To Dictionary    ${boot_ids}    ${alias}    ${bootid}
+    END
+    FOR    ${alias}    IN    @{cluster_aliases}
+        ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
+        SSHLibrary.Switch Connection    ${conn_id}
+        SSHLibrary.Start Command    reboot    sudo=True
+    END
+    FOR    ${alias}    IN    @{cluster_aliases}
+        ${old_bootid}=    Get From Dictionary    ${boot_ids}    ${alias}
+        Wait Until Keyword Succeeds    10m    15s
+        ...    Cluster Should Be Rebooted    ${alias}    ${old_bootid}
+    END
+
+Cluster Should Be Rebooted
+    [Documentation]    Assert that a cluster has rebooted and greenboot health check has passed.
+    [Arguments]    ${alias}    ${old_bootid}
+    Reconnect Cluster    ${alias}
+    ${new_bootid}=    Get Current Boot Id
+    Should Not Be Equal    ${new_bootid}    ${old_bootid}
+    ${stdout}=    Command On Cluster    ${alias}
+    ...    systemctl show -p SubState greenboot-healthcheck.service --value
+    Should Be Equal As Strings    ${stdout}    exited    strip_spaces=True
+
+Reconnect Cluster
+    [Documentation]    Re-establish SSH connection to a cluster after reboot.
+    ...    Resolves host/port from the alias and delegates to Reconnect To Cluster.
+    [Arguments]    ${alias}
+    IF    '${alias}' == 'cluster-a'
+        VAR    ${host}    ${USHIFT_HOST}
+        VAR    ${port}    ${SSH_PORT}
+    ELSE IF    '${alias}' == 'cluster-b'
+        VAR    ${host}    ${HOST2_IP}
+        VAR    ${port}    ${HOST2_SSH_PORT}
+    ELSE IF    '${alias}' == 'cluster-c'
+        VAR    ${host}    ${HOST3_IP}
+        VAR    ${port}    ${HOST3_SSH_PORT}
+    ELSE
+        Fail    Unknown cluster alias: ${alias}
+    END
+    ${kubeconfig}=    Get From Dictionary    ${C2CC_KUBECONFIGS}    ${alias}
+    Reconnect To Cluster    ${alias}    ${host}    ${port}    ${kubeconfig}    timeout=10m
