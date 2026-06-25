@@ -480,13 +480,6 @@ Verify RemoteCluster Unhealthy On Observers
         ...    Verify RemoteCluster State By Name    ${observer}    ${cr_name}    Unhealthy
     END
 
-Ensure All Clusters Healthy
-    [Documentation]    Pre-condition: all clusters must be Healthy before fault injection.
-    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
-        Wait Until Keyword Succeeds    3m    10s
-        ...    Verify RemoteCluster State    ${alias}    Healthy
-    END
-
 Verify C2CC Infrastructure For Remote
     [Documentation]    Verify C2CC infrastructure for one remote cluster's CIDRs.
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
