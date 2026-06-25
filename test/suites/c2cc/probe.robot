@@ -151,14 +151,6 @@ Verify Probe Service ClusterIP
     ...    oc get service ${PROBE_DEPLOYMENT} -n ${C2CC_NAMESPACE} -o jsonpath='{.spec.clusterIP}'
     Should Be Equal As Strings    ${actual_ip}    ${expected_ip}    strip_spaces=True
 
-Verify RemoteCluster State By Name
-    [Documentation]    Check that a specific RemoteCluster CR has the expected state.
-    [Arguments]    ${alias}    ${cr_name}    ${expected_state}
-    ${stdout}=    Oc On Cluster
-    ...    ${alias}
-    ...    oc get remoteclusters.microshift.io ${cr_name} -o jsonpath='{.status.state}'
-    Should Be Equal As Strings    ${stdout}    ${expected_state}
-
 Get RemoteCluster Errors By Name
     [Documentation]    Return the errors field from a specific RemoteCluster CR.
     [Arguments]    ${alias}    ${cr_name}
@@ -166,13 +158,6 @@ Get RemoteCluster Errors By Name
     ...    ${alias}
     ...    oc get remoteclusters.microshift.io ${cr_name} -o jsonpath='{.status.errors}'
     RETURN    ${stdout}
-
-RemoteCluster CR Name From IP
-    [Documentation]    Compute the RemoteCluster CR name from a host IP (e.g. 192.168.1.2 -> c2cc-192-168-1-2).
-    [Arguments]    ${ip}
-    ${dashed}=    Replace String    ${ip}    .    -
-    ${dashed}=    Replace String    ${dashed}    :    -
-    RETURN    c2cc-${dashed}
 
 Apply Probe Deny Policy
     [Documentation]    Apply a NetworkPolicy that denies all ingress to the probe pod.
