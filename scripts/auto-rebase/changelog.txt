@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component 2a19fa0e641255ad70c96e5948f799fcc7b53a0c to db6eb19fbdb721937f9fdc72d0ff55344c08508f
+  - 35d605e7 2026-06-11T22:57:15-04:00 daemon: verify extension packages are staged pre-reboot and installed pst-reboot
+
