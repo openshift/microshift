@@ -90,7 +90,7 @@ spec:
             - --upstream=http://127.0.0.1:9101/
             - --tls-cert-file=/etc/tls/private/tls.crt
             - --tls-private-key-file=/etc/tls/private/tls.key
-            - --client-ca-file=/etc/tls/client-ca/ca.crt
+            - --client-ca-file=/etc/tls/client/client-ca.crt
             - --config-file=/etc/kube-rbac-policy/config.yaml
           env:
             - name: IP
@@ -126,8 +126,8 @@ spec:
             - mountPath: /etc/kube-rbac-policy
               name: node-exporter-kube-rbac-proxy-config
               readOnly: true
-            - mountPath: /etc/tls/client-ca/ca.crt
-              name: admin-kubeconfig-signer-ca
+            - mountPath: /etc/tls/client
+              name: metrics-client-ca
               readOnly: true
       hostNetwork: true
       hostPID: true
@@ -189,10 +189,9 @@ spec:
                 path: config.yaml
             name: node-exporter-accelerators-collector-config
           name: node-exporter-accelerators-collector-config
-        - hostPath:
-            path: /var/lib/microshift/certs/admin-kubeconfig-signer/ca.crt
-            type: File
-          name: admin-kubeconfig-signer-ca
+        - configMap:
+            name: metrics-client-ca
+          name: metrics-client-ca
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 10%
