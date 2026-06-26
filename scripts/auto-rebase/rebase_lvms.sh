@@ -20,17 +20,21 @@ title() {
     echo -e "\E[34m$1\E[00m";
 }
 
-# catalog_list_tags REPOSITORY
-# Lists all tags for a container image using the Red Hat container catalog API.
+# catalog_list_tags REPOSITORY XY_VERSION
+# Lists tags for a container image using the Red Hat container catalog API,
+# filtered server-side to only return images with tags matching vX.Y.
 # No authentication required. The repository should be the path portion
 # (e.g. "lvms4/lvms-operator-bundle").
 catalog_list_tags() {
     local repo="$1"
+    local xy_version="$2"
     local api_url="https://catalog.redhat.com/api/containers/v1/repositories/registry/registry.access.redhat.com/repository"
     local encoded_repo="${repo/\//%2F}"
+    local filter="repositories.tags.name~=v${xy_version}"
 
+    # 500 is the API max page_size; server-side filter keeps results well under this limit.
     curl -s --fail --max-time 60 --retry 3 --retry-delay 5 \
-        "${api_url}/${encoded_repo}/images?page_size=500" \
+        "${api_url}/${encoded_repo}/images?page_size=500&filter=${filter}&include=data.repositories.tags.name" \
         | jq -r '[.data[].repositories[].tags[].name] | unique[]'
 }
 
@@ -47,7 +51,7 @@ resolve_latest_z_tag() {
     local repo="${image_url#*/}"
 
     local tags
-    tags=$(catalog_list_tags "${repo}") || return 1
+    tags=$(catalog_list_tags "${repo}" "${xy_version}") || return 1
 
     local xy_escaped="${xy_version//./\\.}"
 
