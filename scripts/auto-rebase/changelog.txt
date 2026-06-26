@@ -1,0 +1,11 @@
+- cluster-csi-snapshot-controller-operator embedded-component 108f37f0e378accc322cbeb68136ec500ec35b94 to 4847d2e09adb887610a0e18061bbf508e17f6ee3
+  - a3d9bd8 2026-06-12T11:07:02Z Fix group snapshots on HyperShift
+
+- machine-config-operator embedded-component e4e21767621b3047660d7042bb30dfffbe57fa01 to bc792586e0100981616e406f505fdf22280f7ed7
+  - e146dad4 2026-06-23T19:58:36Z bootimage: add reset cluster bootimage capability
+  - 7f7766af 2026-06-23T19:58:36Z bootimage: remove configmap version checks
+  - fd8ff337 2026-06-23T19:58:36Z bootimage: rename patchSkipped to reconcileSkipped
+  - 344f2b1b 2026-06-23T18:42:11Z bootimage: make vsphere updates atomic
+  - 90a50502 2026-06-22T19:23:20Z Migrate OS layering tests from openshift-tests-private
+  - 67b9a2b5 2026-06-18T11:42:42+05:30 MCO-2209 MCO-2213 MCO-2207: Migrate security, daemon, and kernel TCs from mco.go
+
