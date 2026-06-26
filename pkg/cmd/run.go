@@ -14,6 +14,7 @@ import (
 	"github.com/coreos/go-systemd/daemon"
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/admin/prerun"
+	"github.com/openshift/microshift/pkg/components"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
 	"github.com/openshift/microshift/pkg/controllers/c2cc"
@@ -302,6 +303,14 @@ func RunMicroshift(cfg *config.Config) error {
 
 		// After MicroShift's core becomes ready, run the kustomizer (delete and/or apply manifests).
 		kustomize.NewKustomizer(cfg).RunStandalone(runCtx)
+
+		// Provision certs for optional components after kustomize creates their namespaces.
+		// Runs concurrently because it polls for the namespace created by kustomize.
+		go func() {
+			if err := components.ProvisionMetricsServerCerts(runCtx, cfg); err != nil {
+				klog.Errorf("Failed to provision metrics-server certs: %v", err)
+			}
+		}()
 
 		// Watch for SIGTERM or service error to exit, now that we are ready.
 		select {

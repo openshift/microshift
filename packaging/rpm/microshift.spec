@@ -261,6 +261,25 @@ The microshift-cert-manager-release-info package provides release information fi
 release. These files contain the list of container image references used by Cert Manager
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
+%package metrics-server
+Summary: Kubernetes metrics-server for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description metrics-server
+The microshift-metrics-server package provides the metrics-server for MicroShift.
+Install this package to enable kubectl top and resource metrics via the Metrics API.
+
+%package metrics-server-release-info
+Summary: Release information for metrics-server for MicroShift
+BuildArch: noarch
+Requires: microshift-release-info = %{version}
+
+%description metrics-server-release-info
+The microshift-metrics-server-release-info package provides release information files for this
+release. These files contain the list of container image references used by the metrics-server
+and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+
 %package sriov
 Summary: SR-IOV Network Operator for MicroShift
 ExclusiveArch: x86_64 aarch64
@@ -599,6 +618,31 @@ cat assets/optional/cert-manager/manager/images-x86_64.yaml >> %{buildroot}/%{_p
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/cert-manager/release-cert-manager-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+# metrics-server
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-cluster-role-binding-auth-delegator.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/01-role-binding-auth-reader.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/02-configmap-audit-profiles.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/03-deployment.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/04-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/04-api-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+install -p -m644 assets/optional/metrics-server/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+
+%ifarch %{arm} aarch64
+cat assets/optional/metrics-server/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/metrics-server/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/kustomization.yaml
+%endif
+
+# metrics-server-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/metrics-server/release-metrics-server-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
 # sriov
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd
@@ -802,6 +846,13 @@ fi
 %files cert-manager-release-info
 %{_datadir}/microshift/release/release-cert-manager-{x86_64,aarch64}.json
 
+%files metrics-server
+%dir %{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
+%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/*
+
+%files metrics-server-release-info
+%{_datadir}/microshift/release/release-metrics-server-{x86_64,aarch64}.json
+
 %files sriov
 %dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
 %dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd
@@ -817,6 +868,9 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Mon Jun 22 2026 Jonathan H. Cope <jcope@redhat.com> 5.0
+- Add metrics-server as optional rpm package
+
 * Tue Jan 20 2026 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.21.0
 - Add multus as dependency for sriov
 

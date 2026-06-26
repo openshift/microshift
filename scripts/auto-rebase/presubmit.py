@@ -29,6 +29,7 @@ RECIPE_FILEPATHS = [
     "./scripts/auto-rebase/assets_ai_model_serving.yaml",
     "./scripts/auto-rebase/assets_cert_manager.yaml",
     "./scripts/auto-rebase/assets_sriov.yaml",
+    "./scripts/auto-rebase/assets_cluster_monitoring_operator.yaml",
 ]
 
 

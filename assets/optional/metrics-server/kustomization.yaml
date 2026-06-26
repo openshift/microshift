@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 00-namespace.yaml
+  - 01-service-account.yaml
+  - 01-cluster-role.yaml
+  - 01-cluster-role-binding.yaml
+  - 01-cluster-role-binding-auth-delegator.yaml
+  - 01-role-binding-auth-reader.yaml
+  - 02-configmap-audit-profiles.yaml
+  - 03-deployment.yaml
+  - 04-service.yaml
+  - 04-api-service.yaml
