@@ -12,7 +12,7 @@ import (
 func TestNewOVNRouteManager_DesiredRoutes(t *testing.T) {
 	resolved := []config.ResolvedRemoteCluster{
 		{
-			NextHop:        net.ParseIP("192.168.1.10"),
+			NextHops:       map[int]net.IP{2: net.ParseIP("192.168.1.10")},
 			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
 			ServiceNetwork: []*net.IPNet{parseCIDR(t, "10.46.0.0/16")},
 		},
@@ -34,12 +34,12 @@ func TestNewOVNRouteManager_DesiredRoutes(t *testing.T) {
 func TestNewOVNRouteManager_MultipleRemotes(t *testing.T) {
 	resolved := []config.ResolvedRemoteCluster{
 		{
-			NextHop:        net.ParseIP("192.168.1.10"),
+			NextHops:       map[int]net.IP{2: net.ParseIP("192.168.1.10")},
 			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
 			ServiceNetwork: []*net.IPNet{parseCIDR(t, "10.46.0.0/16")},
 		},
 		{
-			NextHop:        net.ParseIP("192.168.1.20"),
+			NextHops:       map[int]net.IP{2: net.ParseIP("192.168.1.20")},
 			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.55.0.0/16")},
 			ServiceNetwork: []*net.IPNet{parseCIDR(t, "10.56.0.0/16")},
 		},
@@ -69,7 +69,7 @@ func TestNewOVNRouteManager_EmptyResolved(t *testing.T) {
 func TestOVNRouteManager_OwnerTag(t *testing.T) {
 	resolved := []config.ResolvedRemoteCluster{
 		{
-			NextHop:        net.ParseIP("192.168.1.10"),
+			NextHops:       map[int]net.IP{2: net.ParseIP("192.168.1.10")},
 			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
 		},
 	}

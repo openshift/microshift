@@ -41,12 +41,14 @@ func TestBuildDesiredCRs(t *testing.T) {
 			ResolvedProbeInterval: 15 * time.Second,
 			Resolved: []config.ResolvedRemoteCluster{
 				{
-					NextHop: net.ParseIP("10.100.0.2"),
-					ProbeIP: "10.46.0.11",
+					NextHops:       map[int]net.IP{2: net.ParseIP("10.100.0.2")},
+					ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
+					ProbeIP:        "10.46.0.11",
 				},
 				{
-					NextHop: net.ParseIP("10.100.0.3"),
-					ProbeIP: "10.47.0.11",
+					NextHops:       map[int]net.IP{2: net.ParseIP("10.100.0.3")},
+					ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.55.0.0/16")},
+					ProbeIP:        "10.47.0.11",
 				},
 			},
 		},
@@ -80,8 +82,9 @@ func TestReconcileCreatesNewCRs(t *testing.T) {
 			ResolvedProbeInterval: 10 * time.Second,
 			Resolved: []config.ResolvedRemoteCluster{
 				{
-					NextHop: net.ParseIP("10.100.0.2"),
-					ProbeIP: "10.46.0.11",
+					NextHops:       map[int]net.IP{2: net.ParseIP("10.100.0.2")},
+					ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
+					ProbeIP:        "10.46.0.11",
 				},
 			},
 		},
@@ -154,8 +157,9 @@ func TestReconcileUpdatesCR(t *testing.T) {
 			ResolvedProbeInterval: 15 * time.Second,
 			Resolved: []config.ResolvedRemoteCluster{
 				{
-					NextHop: net.ParseIP("10.100.0.2"),
-					ProbeIP: "10.46.0.11",
+					NextHops:       map[int]net.IP{2: net.ParseIP("10.100.0.2")},
+					ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
+					ProbeIP:        "10.46.0.11",
 				},
 			},
 		},
