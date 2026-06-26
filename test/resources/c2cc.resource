@@ -414,7 +414,7 @@ DNS Lookup Should Succeed
 
 Verify All RemoteClusters Healthy
     [Documentation]    Wait for all RemoteCluster CRs on all clusters to report Healthy.
-    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
+    FOR    ${alias}    IN    @{ALL_CLUSTERS}
         Wait Until Keyword Succeeds    3m    10s
         ...    Verify RemoteCluster State    ${alias}    Healthy
     END
@@ -572,18 +572,6 @@ Reconnect To Cluster
     Deregister Remote Cluster    ${alias}
     Wait Until Keyword Succeeds    ${timeout}    15s
     ...    Register Remote Cluster    ${alias}    ${host}    ${ssh_port}    ${kubeconfig}
-
-Verify Cluster Is Healthy
-    [Documentation]    Verify MicroShift and all core workloads are ready.
-    [Arguments]    ${alias}
-    Command On Cluster    ${alias}    microshift healthcheck --timeout=300s
-
-Verify All RemoteClusters Healthy
-    [Documentation]    Wait for all RemoteCluster CRs on all clusters to report Healthy.
-    FOR    ${alias}    IN    @{ALL_CLUSTERS}
-        Wait Until Keyword Succeeds    3m    10s
-        ...    Verify RemoteCluster State    ${alias}    Healthy
-    END
 
 Reboot Clusters Simultaneously
     [Documentation]    Reboot one or more clusters and wait for all to come back
