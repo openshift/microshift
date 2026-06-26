@@ -38,7 +38,7 @@ clusterToCluster:
     remoteClusters:
         - clusterNetwork: []
           domain: ""
-          nextHop: ""
+          nextHop: []
           serviceNetwork: []
     routing:
         routeTableID: 0
@@ -207,7 +207,7 @@ clusterToCluster:
     remoteClusters:
         - clusterNetwork: []
           domain: ""
-          nextHop: ""
+          nextHop: []
           serviceNetwork: []
     routing:
         routeTableID: 200
