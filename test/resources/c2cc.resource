@@ -578,7 +578,7 @@ Reboot Clusters Simultaneously
     ...    with a new boot ID and greenboot health check passed.
     ...    Issues reboot on all targets before waiting, so reboots overlap.
     [Arguments]    @{cluster_aliases}
-    VAR    &{boot_ids}=
+    VAR    &{boot_ids}=    &{EMPTY}
     FOR    ${alias}    IN    @{cluster_aliases}
         ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
         SSHLibrary.Switch Connection    ${conn_id}
