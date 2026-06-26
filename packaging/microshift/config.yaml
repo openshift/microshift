@@ -62,8 +62,9 @@ clusterToCluster:
           # Services are reachable as <svc>.<ns>.svc.<domain>.
           # Optional — if empty, no DNS forwarding is configured for this remote.
           domain: ""
-          # IP address of the remote cluster's node, used as next-hop for routing.
-          nextHop: ""
+          # IP addresses of the remote cluster's node, used as next-hop for routing.
+          # At most one IPv4 and one IPv6 address. Dual-stack clusters need both.
+          nextHop: []
           # Service CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
           serviceNetwork: []
     # Linux policy routing table settings for C2CC routes.
