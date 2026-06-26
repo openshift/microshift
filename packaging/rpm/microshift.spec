@@ -701,6 +701,7 @@ cat assets/optional/node-exporter/kustomization.x86_64.yaml >> %{buildroot}/%{_p
 # node-exporter-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/node-exporter/release-node-exporter-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
 # kube-state-metrics
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
 install -p -m644 assets/optional/kube-state-metrics/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
