@@ -18,7 +18,7 @@ Reboot Single Cluster
     [Documentation]    Reboot cluster-a while cluster-b and cluster-c remain up.
     ...    Verifies that the rebooted cluster re-establishes C2CC connectivity
     ...    with both peers.
-    [Setup]    Ensure All Clusters Healthy
+    [Setup]    Verify All RemoteClusters Healthy
     Reboot Clusters Simultaneously    cluster-a
     Wait For Clusters Ready
     Verify Full C2CC Stack
@@ -27,7 +27,7 @@ Reboot Two Clusters Simultaneously
     [Documentation]    Reboot cluster-b and cluster-c at the same time.
     ...    The surviving cluster-a must wait for both peers to recover.
     ...    The two rebooted clusters must also reconnect with each other.
-    [Setup]    Ensure All Clusters Healthy
+    [Setup]    Verify All RemoteClusters Healthy
     Reboot Clusters Simultaneously    cluster-b    cluster-c
     Wait For Clusters Ready
     Verify Full C2CC Stack
@@ -36,7 +36,7 @@ Reboot All Three Clusters Simultaneously
     [Documentation]    Reboot all three clusters at once.
     ...    Every cluster starts from scratch simultaneously — no running peer
     ...    to reference. All must independently reconstruct C2CC state.
-    [Setup]    Ensure All Clusters Healthy
+    [Setup]    Verify All RemoteClusters Healthy
     Reboot Clusters Simultaneously    cluster-a    cluster-b    cluster-c
     Wait For Clusters Ready
     Verify Full C2CC Stack
@@ -94,12 +94,36 @@ Verify C2CC Connectivity
 Verify C2CC Infrastructure
     [Documentation]    Verify routes, IP rules, nftables, OVN static routes,
     ...    and node annotations for all cluster-peer combinations.
-    Verify Infra For Remote Peer    cluster-a    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}    ${CLUSTER_A_SVC_CIDR}
-    Verify Infra For Remote Peer    cluster-a    ${CLUSTER_C_POD_CIDR}    ${CLUSTER_C_SVC_CIDR}    ${CLUSTER_A_SVC_CIDR}
-    Verify Infra For Remote Peer    cluster-b    ${CLUSTER_A_POD_CIDR}    ${CLUSTER_A_SVC_CIDR}    ${CLUSTER_B_SVC_CIDR}
-    Verify Infra For Remote Peer    cluster-b    ${CLUSTER_C_POD_CIDR}    ${CLUSTER_C_SVC_CIDR}    ${CLUSTER_B_SVC_CIDR}
-    Verify Infra For Remote Peer    cluster-c    ${CLUSTER_A_POD_CIDR}    ${CLUSTER_A_SVC_CIDR}    ${CLUSTER_C_SVC_CIDR}
-    Verify Infra For Remote Peer    cluster-c    ${CLUSTER_B_POD_CIDR}    ${CLUSTER_B_SVC_CIDR}    ${CLUSTER_C_SVC_CIDR}
+    Verify Infra For Remote Peer
+    ...    cluster-a
+    ...    ${CLUSTER_B_POD_CIDR}
+    ...    ${CLUSTER_B_SVC_CIDR}
+    ...    ${CLUSTER_A_SVC_CIDR}
+    Verify Infra For Remote Peer
+    ...    cluster-a
+    ...    ${CLUSTER_C_POD_CIDR}
+    ...    ${CLUSTER_C_SVC_CIDR}
+    ...    ${CLUSTER_A_SVC_CIDR}
+    Verify Infra For Remote Peer
+    ...    cluster-b
+    ...    ${CLUSTER_A_POD_CIDR}
+    ...    ${CLUSTER_A_SVC_CIDR}
+    ...    ${CLUSTER_B_SVC_CIDR}
+    Verify Infra For Remote Peer
+    ...    cluster-b
+    ...    ${CLUSTER_C_POD_CIDR}
+    ...    ${CLUSTER_C_SVC_CIDR}
+    ...    ${CLUSTER_B_SVC_CIDR}
+    Verify Infra For Remote Peer
+    ...    cluster-c
+    ...    ${CLUSTER_A_POD_CIDR}
+    ...    ${CLUSTER_A_SVC_CIDR}
+    ...    ${CLUSTER_C_SVC_CIDR}
+    Verify Infra For Remote Peer
+    ...    cluster-c
+    ...    ${CLUSTER_B_POD_CIDR}
+    ...    ${CLUSTER_B_SVC_CIDR}
+    ...    ${CLUSTER_C_SVC_CIDR}
 
 Verify Infra For Remote Peer
     [Documentation]    Verify all infrastructure components on a cluster for one remote peer.
@@ -134,13 +158,16 @@ Verify C2CC DNS
     Verify Corefile Contains C2CC Server Block    cluster-b    ${CLUSTER_C_DOMAIN}
     Verify Corefile Contains C2CC Server Block    cluster-c    ${CLUSTER_A_DOMAIN}
     Verify Corefile Contains C2CC Server Block    cluster-c    ${CLUSTER_B_DOMAIN}
-    Curl Remote Service Via DNS    cluster-a    cluster-b
-    Curl Remote Service Via DNS    cluster-a    cluster-c
-    Curl Remote Service Via DNS    cluster-b    cluster-a
-    Curl Remote Service Via DNS    cluster-b    cluster-c
-    Curl Remote Service Via DNS    cluster-c    cluster-a
-    Curl Remote Service Via DNS    cluster-c    cluster-b
+    Verify DNS Connectivity All Pairs
 
-Ensure All Clusters Healthy
-    [Documentation]    Pre-condition: all clusters must have Healthy RemoteCluster CRs.
-    Verify All RemoteClusters Healthy
+Verify DNS Connectivity All Pairs
+    [Documentation]    Verify cross-cluster DNS-based service access for all cluster pairs.
+    FOR    ${src}    ${dst}    IN
+    ...    cluster-a    cluster-b
+    ...    cluster-a    cluster-c
+    ...    cluster-b    cluster-a
+    ...    cluster-b    cluster-c
+    ...    cluster-c    cluster-a
+    ...    cluster-c    cluster-b
+        Curl Remote Service Via DNS    ${src}    ${dst}
+    END

@@ -578,7 +578,7 @@ Reboot Clusters Simultaneously
     ...    with a new boot ID and greenboot health check passed.
     ...    Issues reboot on all targets before waiting, so reboots overlap.
     [Arguments]    @{cluster_aliases}
-    &{boot_ids}=    Create Dictionary
+    VAR    &{boot_ids}=
     FOR    ${alias}    IN    @{cluster_aliases}
         ${conn_id}=    Get From Dictionary    ${C2CC_SSH_IDS}    ${alias}
         SSHLibrary.Switch Connection    ${conn_id}
@@ -604,6 +604,8 @@ Cluster Should Be Rebooted
     Should Not Be Equal    ${new_bootid}    ${old_bootid}
     ${stdout}=    Command On Cluster    ${alias}
     ...    systemctl show -p SubState greenboot-healthcheck.service --value
+    Should Not Be Equal As Strings    ${stdout}    failed    strip_spaces=True
+    ...    msg=Greenboot healthcheck FAILED on ${alias}. Check greenboot logs.
     Should Be Equal As Strings    ${stdout}    exited    strip_spaces=True
 
 Reconnect Cluster
@@ -611,14 +613,14 @@ Reconnect Cluster
     ...    Resolves host/port from the alias and delegates to Reconnect To Cluster.
     [Arguments]    ${alias}
     IF    '${alias}' == 'cluster-a'
-        VAR    ${host}    ${USHIFT_HOST}
-        VAR    ${port}    ${SSH_PORT}
+        VAR    ${host}=    ${USHIFT_HOST}
+        VAR    ${port}=    ${SSH_PORT}
     ELSE IF    '${alias}' == 'cluster-b'
-        VAR    ${host}    ${HOST2_IP}
-        VAR    ${port}    ${HOST2_SSH_PORT}
+        VAR    ${host}=    ${HOST2_IP}
+        VAR    ${port}=    ${HOST2_SSH_PORT}
     ELSE IF    '${alias}' == 'cluster-c'
-        VAR    ${host}    ${HOST3_IP}
-        VAR    ${port}    ${HOST3_SSH_PORT}
+        VAR    ${host}=    ${HOST3_IP}
+        VAR    ${port}=    ${HOST3_SSH_PORT}
     ELSE
         Fail    Unknown cluster alias: ${alias}
     END
