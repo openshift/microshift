@@ -254,8 +254,6 @@ spec:
                               minimum: 10
                               type: integer
                           required:
-                          - chunkSizeCalculationPolicy
-                          - metadataSizeCalculationPolicy
                           - name
                           - overprovisionRatio
                           type: object
