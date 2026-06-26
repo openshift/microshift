@@ -221,7 +221,7 @@ update_ossm_manifests() {
         >&2 echo 'ossm staging dir not found, aborting asset update'
         return 1
     }
-    "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/ossm_assets.yaml
+    "${REPOROOT}/scripts/auto-rebase/handle_assets.py" ./scripts/auto-rebase/assets_ossm.yaml
 }
 
 update_last_ossm_rebase() {
