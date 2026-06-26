@@ -1,6 +1,3 @@
-- machine-config-operator embedded-component ae127c3c06eddd12a7f801a34f84109317ab0cbc to fb5bfe252ba774a014af1059223cea3d07ef14dd
-  - b3502b05 2026-06-18T10:38:29-04:00 make MCO E2E tests work on RHEL9 and RHEL10
-
-- kubernetes image-arm64 d8d517e6bbe7cf7359026cac26bb96ea45e18806 to cb701a76af41b535bbbc3db709ac5b0da52fb632
-  - 410f58272 2026-06-16T23:18:18-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for standalone clusters
+- kubernetes image-arm64 cb701a76af41b535bbbc3db709ac5b0da52fb632 to a466682e3867da746be24d7d56c6641612721d6c
+  - 7ffb8b2ae 2026-06-15T13:17:06-04:00 UPSTREAM: <carry>: fix kubernetes/conformance to filter on [Conformance] label
 
