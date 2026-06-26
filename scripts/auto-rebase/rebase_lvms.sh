@@ -36,7 +36,7 @@ catalog_list_tags() {
 
 # resolve_latest_z_tag IMAGE_URL XY_VERSION
 # Queries the Red Hat container catalog for tags and returns the latest
-# clean semver tag (vX.Y.Z) matching the given X.Y stream.
+# semver tag (vX.Y.Z or vX.Y.Z-NNN) matching the given X.Y stream.
 # Returns 1 if no matching tag is found.
 resolve_latest_z_tag() {
     local image_url="$1"
@@ -52,7 +52,7 @@ resolve_latest_z_tag() {
     local xy_escaped="${xy_version//./\\.}"
 
     local latest
-    latest=$(echo "${tags}" | grep -E "^v${xy_escaped}\.[0-9]+$" | sort -V | tail -1)
+    latest=$(echo "${tags}" | grep -E "^v${xy_escaped}\.[0-9]+(-[0-9]{1,3})?$" | sort -V | tail -1)
     if [[ -n "${latest}" ]]; then
         echo "${latest}"
         return 0
