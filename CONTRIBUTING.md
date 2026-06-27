@@ -1,0 +1,152 @@
+# Contributing to MicroShift
+
+## Contribution Flow
+
+1. Fork the `openshift/microshift` repository on GitHub.
+2. Create a branch from `main`, or from a `release-X.Y` branch if proposing a backport.
+3. Make changes.
+4. Push to your fork and open a pull request against `openshift/microshift`.
+5. Address review feedback (repeating steps 3-5 as needed).
+
+Reviews are managed through the [OWNERS](./OWNERS) file. All PRs require approval from a listed approver.
+
+**Branches**: `main` tracks the next minor version. `release-X.Y` branches receive z-stream (patch) updates. Backports should target the appropriate release branch.
+
+## Development Environment
+
+MicroShift requires a RHEL development environment. Two setup guides are available:
+
+- [VM-based development environment](./docs/contributor/devenv_setup.md)
+- [Cloud development environment](./docs/contributor/devenv_cloud.md)
+
+Key prerequisites:
+
+- Go (see `go.mod` for the required version)
+- Red Hat Enterprise Linux
+- `oc` CLI (latest)
+
+## Building
+
+| Command | Purpose |
+|---------|---------|
+| `make all` | Build microshift, etcd, and generate-config binaries |
+| `make verify` | Run standard verification checks (see [Testing](#verification-scripts)) |
+| `make cross-build-linux-amd64` | Cross-compile for x86_64 |
+| `make cross-build-linux-arm64` | Cross-compile for aarch64 |
+| `make rpm` | Build RPM packages |
+| `make rpm-podman` | Build RPMs in a container |
+| `make e2e` | Run end-to-end tests |
+
+For RPM packaging details, see [RPM Packages](./docs/contributor/rpm_packages.md). For build system internals (variants, version tracking), see [architecture](./docs/contributor/architecture.md#build-system).
+
+## Testing
+
+### Verification Scripts
+
+Pre-merge checks run via `scripts/verify/`:
+
+| Script / Target | What it checks |
+|--------|---------------|
+| `make verify-go` | golangci-lint, gofmt (Makefile target, not a script) |
+| `verify-shell.sh` | shellcheck for all bash scripts |
+| `verify-rf.sh` | Robot Framework syntax (robocop) |
+| `verify-py.sh` | Python linting (flake8) |
+| `verify-containers.sh` | Containerfile linting (hadolint) |
+| `verify-assets.sh` | Asset integrity |
+| `verify-images.sh` | Image blueprint validation |
+| `verify-licenses.sh` | License compliance |
+| `verify-vendor-etcd.sh` | Etcd vendor integrity |
+| `verify-crds.sh` | CRD schema validation |
+| `verify-config.sh` | Configuration file validation |
+
+Run the standard set with `make verify` (runs `verify-fast` + `verify-vendor-etcd`). CI runs additional checks via `make verify-ci` which adds `verify-images` and `verify-licenses`.
+
+### End-to-End Tests
+
+MicroShift uses Robot Framework for E2E testing. Tests live in `test/suites/`, organized by feature area (standard, backup, greenboot, upgrade, network, storage, etc.).
+
+Tests run against a remote MicroShift host via SSH. Copy the example variables file and configure it with your target host:
+
+```bash
+cp test/variables.yaml.example test/variables.yaml
+# Edit test/variables.yaml with your host, SSH user, and key
+```
+
+Then run:
+
+```bash
+test/run.sh [suite paths...]
+```
+
+Without suite arguments, it runs a default set (standard1, standard2, and selected osconfig/storage tests). The script automatically sets up a Python virtual environment with Robot Framework.
+
+### Test Harness
+
+The CI test harness provisions VMs, installs MicroShift, and runs Robot Framework tests. It supports two deployment modes (ostree and bootc), each with its own scenarios and image blueprints.
+
+For the full test harness documentation — scenarios, naming conventions, image blueprint layers, VM lifecycle, and kickstart templates — see [Test Harness](./docs/contributor/test_harness.md).
+
+For CI job configuration and Prow details, see [OpenShift CI for MicroShift](./docs/contributor/openshift_ci.md).
+
+## Rebase
+
+MicroShift's dependencies are kept in sync with OpenShift via automated nightly rebases. For full details:
+
+- [Rebase overview](./docs/contributor/rebase/rebase.md)
+- [Rebase procedure](./docs/contributor/rebase/procedure.md)
+- [Rebase guidelines](./docs/contributor/rebase/guidelines.md)
+
+## Code Standards
+
+### Go
+
+- Must pass golangci-lint and gofmt
+- Enforced by `make verify-go`
+
+### Shell
+
+- Shebang: `#!/usr/bin/bash`
+- `set -euo pipefail`
+- Quote all variables
+- Must pass shellcheck
+
+### Python
+
+- PEP 8
+- Must pass flake8
+
+### Robot Framework
+
+- Must pass robocop (`scripts/verify/verify-rf.sh`)
+
+### General
+
+- No hardcoded credentials — use environment variables or files
+- Self-documenting code over comments
+
+## Commit Conventions
+
+Prefix commits with the Jira ticket when applicable:
+
+```text
+USHIFT-1234: add gateway API configuration options
+OCPBUGS-5678: fix etcd startup timeout handling
+NO-ISSUE: update contributor documentation
+```
+
+Use `NO-ISSUE:` for changes without a Jira ticket. Rebase commits follow a fixed pattern (`update buildfiles`, `update manifests`, etc.) generated by the automation.
+
+## CI
+
+MicroShift uses OpenShift CI with Prow for continuous integration. PR test runs take approximately 45 minutes. Scenarios run in parallel on a hypervisor, each provisioning an independent VM.
+
+CI configuration is managed in the [openshift/release](https://github.com/openshift/release) repository. For details on CI setup, job types, and manual testing, see [OpenShift CI for MicroShift](./docs/contributor/openshift_ci.md).
+
+## Review Process
+
+All PRs require review from an approver listed in the [OWNERS](./OWNERS) file. Reviewers check:
+
+- Code quality and correctness
+- Test coverage (Go unit tests and/or Robot Framework E2E tests)
+- Documentation updates where applicable
+- Adherence to code standards
