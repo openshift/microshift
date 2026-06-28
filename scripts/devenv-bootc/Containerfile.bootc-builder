@@ -1,0 +1,23 @@
+ARG RHEL_VERSION=9.8
+FROM registry.redhat.io/rhel9-eus/rhel-${RHEL_VERSION}-bootc:${RHEL_VERSION}
+
+# Register subscription for build-time package installation
+# Credentials are passed via --secret mount to avoid leaking into image layers
+RUN --mount=type=secret,id=rhsm_org --mount=type=secret,id=rhsm_key \
+    if [ -f /run/secrets/rhsm_org ] && [ -f /run/secrets/rhsm_key ]; then \
+        subscription-manager register \
+            --org="$(cat /run/secrets/rhsm_org)" \
+            --activationkey="$(cat /run/secrets/rhsm_key)"; \
+    fi
+
+# Install only the minimal packages needed to bootstrap
+RUN dnf install -y podman git sudo firewalld && dnf clean all
+RUN systemctl enable firewalld
+
+# Unregister so the subscription is not baked into the image
+RUN subscription-manager unregister || true
+
+# Builder user with passwordless sudo (UID/GID adjusted at runtime to match host user)
+RUN useradd -m -G wheel builder && \
+    echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+ENV USER=builder
