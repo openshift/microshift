@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eo pipefail
+set -eou pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOTDIR="$( cd "${SCRIPTDIR}/../../" && pwd )"
@@ -171,9 +171,6 @@ function cmd_start() {
     echo "Waiting for systemd to boot..."
     sudo podman exec "${CONTAINER_NAME}" systemctl is-system-running --wait &>/dev/null || true
 
-    # Remove host entitlement symlink so subscription-manager registers a fresh subscription
-    sudo podman exec "${CONTAINER_NAME}" rm -f /etc/pki/entitlement-host
-
     # Register subscription
     echo "Registering subscription..."
     "${CONTAINER_EXEC[@]}" "${CONTAINER_NAME}" \
@@ -187,10 +184,10 @@ function cmd_start() {
         bash -x /opt/microshift/scripts/devenv-builder/configure-vm.sh \
             --no-build --skip-dnf-update /etc/crio/openshift-pull-secret
 
-    # Run configure-composer.sh for osbuild-composer setup
-    echo "Running configure-composer.sh..."
+    # Configure composer
+    echo "Running manage_composer_config.sh..."
     "${CONTAINER_EXEC[@]}" "${CONTAINER_NAME}" \
-        bash -x /opt/microshift/scripts/devenv-builder/configure-composer.sh
+        bash -x /opt/microshift/test/bin/manage_composer_config.sh create
 
     echo "Container '${CONTAINER_NAME}' started"
     echo "Use '$(basename "$0") shell' to open a shell"
