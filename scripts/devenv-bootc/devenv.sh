@@ -13,8 +13,13 @@ PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 function resolve_names() {
     CURRENT_BRANCH=$(git -C "${ROOTDIR}" rev-parse --abbrev-ref HEAD)
     DEVENV_BRANCH="${DEVENV_BRANCH:-${CURRENT_BRANCH}}"
-    BRANCH_TAG="${DEVENV_BRANCH//\//-}"
 
+    # Fall back to main if branch is not in rhel-versions.json
+    if ! jq -e --arg b "${DEVENV_BRANCH}" 'has($b)' "${SCRIPTDIR}/rhel-versions.json" &>/dev/null; then
+        DEVENV_BRANCH="main"
+    fi
+
+    BRANCH_TAG="${DEVENV_BRANCH//\//-}"
     CONTAINER_NAME="microshift-builder-${BRANCH_TAG}"
     IMAGE_NAME="microshift-builder:${BRANCH_TAG}"
 }
@@ -24,8 +29,7 @@ function resolve_source() {
 
     RHEL_VERSION=$(jq -r --arg b "${DEVENV_BRANCH}" '.[$b] // empty' "${SCRIPTDIR}/rhel-versions.json")
     if [ -z "${RHEL_VERSION}" ]; then
-        echo "ERROR: Branch '${DEVENV_BRANCH}' not found in rhel-versions.json"
-        echo "Add it to: ${SCRIPTDIR}/rhel-versions.json"
+        echo "ERROR: No RHEL version for branch '${DEVENV_BRANCH}' in rhel-versions.json"
         exit 1
     fi
 
