@@ -1,6 +1,9 @@
 ARG RHEL_VERSION=9.8
 FROM registry.redhat.io/rhel9-eus/rhel-${RHEL_VERSION}-bootc:${RHEL_VERSION}
 
+# Remove host entitlement symlink so subscription-manager registers a fresh subscription
+RUN rm -f /etc/pki/entitlement-host
+
 # Register subscription for build-time package installation
 # Credentials are passed via --secret mount to avoid leaking into image layers
 RUN --mount=type=secret,id=rhsm_org --mount=type=secret,id=rhsm_key \

@@ -168,6 +168,9 @@ function cmd_start() {
     echo "Waiting for systemd to boot..."
     sudo podman exec "${CONTAINER_NAME}" systemctl is-system-running --wait &>/dev/null || true
 
+    # Remove host entitlement symlink so subscription-manager registers a fresh subscription
+    sudo podman exec "${CONTAINER_NAME}" rm -f /etc/pki/entitlement-host
+
     # Register subscription
     echo "Registering subscription..."
     sudo podman exec --user builder "${CONTAINER_NAME}" \
