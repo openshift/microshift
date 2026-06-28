@@ -10,6 +10,9 @@ CONTAINERFILE="${SCRIPTDIR}/Containerfile.bootc-builder"
 # Default pull secret location
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
 
+# Common exec flags for builder user commands
+CONTAINER_EXEC=(sudo podman exec --user builder --workdir /opt/microshift)
+
 function resolve_names() {
     CURRENT_BRANCH=$(git -C "${ROOTDIR}" rev-parse --abbrev-ref HEAD)
     DEVENV_BRANCH="${DEVENV_BRANCH:-${CURRENT_BRANCH}}"
@@ -173,21 +176,21 @@ function cmd_start() {
 
     # Register subscription
     echo "Registering subscription..."
-    sudo podman exec --user builder "${CONTAINER_NAME}" \
+    "${CONTAINER_EXEC[@]}" "${CONTAINER_NAME}" \
         sudo subscription-manager register \
             --org="${RHSM_ORG}" \
             --activationkey="${RHSM_ACTIVATION_KEY}"
 
     # Run the release branch's configure-vm.sh
     echo "Running configure-vm.sh..."
-    sudo podman exec --user builder "${CONTAINER_NAME}" \
-        /opt/microshift/scripts/devenv-builder/configure-vm.sh \
+    "${CONTAINER_EXEC[@]}" "${CONTAINER_NAME}" \
+        bash -x /opt/microshift/scripts/devenv-builder/configure-vm.sh \
             --no-build --skip-dnf-update /etc/crio/openshift-pull-secret
 
     # Run configure-composer.sh for osbuild-composer setup
     echo "Running configure-composer.sh..."
-    sudo podman exec --user builder "${CONTAINER_NAME}" \
-        /opt/microshift/scripts/devenv-builder/configure-composer.sh
+    "${CONTAINER_EXEC[@]}" "${CONTAINER_NAME}" \
+        bash -x /opt/microshift/scripts/devenv-builder/configure-composer.sh
 
     echo "Container '${CONTAINER_NAME}' started"
     echo "Use '$(basename "$0") shell' to open a shell"
@@ -220,7 +223,7 @@ function cmd_shell() {
         echo "ERROR: Container '${CONTAINER_NAME}' is not running. Run '$(basename "$0") start' first."
         exit 1
     fi
-    sudo podman exec -it --user builder --workdir /opt/microshift "${CONTAINER_NAME}" bash
+    "${CONTAINER_EXEC[@]}" -it "${CONTAINER_NAME}" bash
 }
 
 function cmd_exec() {
@@ -231,7 +234,7 @@ function cmd_exec() {
         echo "ERROR: Container '${CONTAINER_NAME}' is not running. Run '$(basename "$0") start' first."
         exit 1
     fi
-    sudo podman exec -it --user builder --workdir /opt/microshift "${CONTAINER_NAME}" "$@"
+    "${CONTAINER_EXEC[@]}" -it "${CONTAINER_NAME}" "$@"
 }
 
 function cmd_status() {
