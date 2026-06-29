@@ -48,6 +48,11 @@ ${HOSTSFILE_ENABLED}            SEPARATOR=\n
 ...                             \ \ hosts:
 ...                             \ \ \ \ status: Enabled
 
+${TRUST_MANAGER_BUNDLE_NAME}    test-trust-bundle
+${TRUST_MANAGER_OPERATOR_NS}    cert-manager-operator
+${TRUST_MANAGER_NS}             cert-manager
+${TRUST_MANAGER_CR_FILE}        ./assets/cert-manager/trust-manager-cr.yaml
+
 
 *** Test Cases ***
 Create Ingress route with Custom certificate
@@ -94,6 +99,72 @@ Test Cert manager with local acme server
     [Teardown]    Run Keywords
     ...    Cleanup HTTP01 Resources
     ...    AND    Cleanup DNS For Test    ${dns_name}
+
+Trust Manager Deployment
+    [Documentation]    Verify trust-manager can be enabled and deploys successfully
+    [Tags]    trust-manager
+    [Setup]    Enable Trust Manager
+    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
+    ${status}=    Oc Get JsonPath    trustmanager    ${EMPTY}    cluster
+    ...    .status.conditions[?(@.type=="Ready")].status
+    Should Be Equal    ${status}    True    msg=TrustManager CR is not ready
+    [Teardown]    Disable Trust Manager
+
+Trust Manager Bundle Creates ConfigMap
+    [Documentation]    Verify trust-manager Bundle CR syncs a CA cert into a ConfigMap
+    [Tags]    trust-manager
+    [Setup]    Enable Trust Manager
+
+    Create CA Secret For Trust Manager
+    ${bundle_yaml}=    Create Trust Bundle From Source Secret YAML
+    Apply Trust Manager YAML    ${bundle_yaml}
+    Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${cm_data}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${NAMESPACE}
+    ...    ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    .data.ca-bundle\\.crt
+    Should Contain    ${cm_data}    BEGIN CERTIFICATE    msg=ConfigMap does not contain CA certificate data
+
+    [Teardown]    Run Keywords
+    ...    Cleanup Trust Bundle
+    ...    AND    Oc Delete    secret ca-source-secret -n ${TRUST_MANAGER_NS} --ignore-not-found
+    ...    AND    Disable Trust Manager
+
+Trust Manager Bundle With Cert Manager CA
+    [Documentation]    Verify trust-manager Bundle can use a cert-manager CA secret as a source
+    [Tags]    trust-manager
+    [Setup]    Enable Trust Manager
+
+    ${issuer_yaml}=    Create Cert Issuer YAML
+    Apply Trust Manager YAML    ${issuer_yaml}
+    Oc Wait    -n ${NAMESPACE} clusterissuer ${ISSUER_NAME}
+    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${ca_cert_yaml}=    Create CA Certificate YAML
+    Apply Trust Manager YAML    ${ca_cert_yaml}
+    Oc Wait    -n ${TRUST_MANAGER_NS} certificate ca-certificate
+    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${bundle_yaml}=    Create Trust Bundle From Secret YAML
+    Apply Trust Manager YAML    ${bundle_yaml}
+    Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${cm_data}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${NAMESPACE}
+    ...    ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    .data.ca-bundle\\.crt
+    Should Contain    ${cm_data}    BEGIN CERTIFICATE    msg=ConfigMap does not contain CA certificate data
+
+    [Teardown]    Run Keywords
+    ...    Cleanup Trust Bundle
+    ...    AND    Oc Delete    certificate/ca-certificate -n ${TRUST_MANAGER_NS}
+    ...    AND    Remove ClusterIssuer
+    ...    AND    Disable Trust Manager
 
 
 *** Keywords ***
@@ -432,3 +503,114 @@ Cleanup DNS For Test
     Remove Entry From Hosts    ${dns_name}
     Remove Drop In MicroShift Config    20-dns
     Restart MicroShift
+
+Enable Trust Manager
+    [Documentation]    Deploy trust-manager by applying the TrustManager CR directly.
+    ...    The UNSUPPORTED_ADDON_FEATURES=TrustManager=true feature gate is already
+    ...    set in the system cert-manager kustomization.
+    Oc Apply    -f ${TRUST_MANAGER_CR_FILE}
+    Wait Until Keyword Succeeds    30x    10s
+    ...    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
+
+Disable Trust Manager
+    [Documentation]    Remove the TrustManager CR and wait for cleanup.
+    Oc Delete    trustmanager cluster --ignore-not-found
+    Oc Delete    bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
+    Oc Delete    deployment trust-manager -n ${TRUST_MANAGER_NS} --ignore-not-found
+    Wait Until Keyword Succeeds    12x    10s
+    ...    Trust Manager Pod Should Not Exist
+
+Trust Manager Pod Should Not Exist
+    [Documentation]    Verify trust-manager pod no longer exists in cert-manager namespace
+    ${output}=    Run With Kubeconfig
+    ...    oc get pods -n ${TRUST_MANAGER_NS} -l app.kubernetes.io/name\=cert-manager-trust-manager --no-headers
+    Should Be Empty    ${output}    msg=trust-manager pod still exists
+
+Create CA Secret For Trust Manager
+    [Documentation]    Generate a self-signed CA cert locally and create a secret in the trust namespace
+    ${cert_file}=    Create Random Temp File
+    ${result}=    Process.Run Process
+    ...    openssl    req    -x509    -newkey    ec    -pkeyopt    ec_paramgen_curve:prime256v1
+    ...    -nodes    -keyout    /dev/null    -out    ${cert_file}    -days    365
+    ...    -subj    /CN\=test-ca.example.com
+    ...    stderr=STDOUT
+    Should Be Equal As Integers    ${result.rc}    0
+    Run With Kubeconfig
+    ...    oc create secret generic ca-source-secret -n ${TRUST_MANAGER_NS} --from-file=tls.crt=${cert_file}
+    Remove File    ${cert_file}
+
+Create Trust Bundle From Source Secret YAML
+    [Documentation]    Creates a Bundle CR YAML sourced from a manually created secret in the trust namespace
+    ${yaml}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiVersion: trust.cert-manager.io/v1alpha1
+    ...    kind: Bundle
+    ...    metadata:
+    ...    \ \ name: ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    spec:
+    ...    \ \ sources:
+    ...    \ \ \ \ - secret:
+    ...    \ \ \ \ \ \ \ \ name: ca-source-secret
+    ...    \ \ \ \ \ \ \ \ key: tls.crt
+    ...    \ \ target:
+    ...    \ \ \ \ configMap:
+    ...    \ \ \ \ \ \ key: ca-bundle.crt
+    ...    \ \ \ \ namespaceSelector:
+    ...    \ \ \ \ \ \ matchLabels:
+    ...    \ \ \ \ \ \ \ \ kubernetes.io/metadata.name: ${NAMESPACE}
+    RETURN    ${yaml}
+
+Create CA Certificate YAML
+    [Documentation]    Creates a cert-manager CA Certificate in the trust namespace
+    ${yaml}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiVersion: cert-manager.io/v1
+    ...    kind: Certificate
+    ...    metadata:
+    ...    \ \ name: ca-certificate
+    ...    \ \ namespace: ${TRUST_MANAGER_NS}
+    ...    spec:
+    ...    \ \ isCA: true
+    ...    \ \ commonName: test-ca.example.com
+    ...    \ \ secretName: ca-certificate-secret
+    ...    \ \ issuerRef:
+    ...    \ \ \ \ name: ${ISSUER_NAME}
+    ...    \ \ \ \ kind: ClusterIssuer
+    RETURN    ${yaml}
+
+Create Trust Bundle From Secret YAML
+    [Documentation]    Creates a Bundle CR YAML sourced from a cert-manager CA secret in the trust namespace
+    ${yaml}=    CATENATE    SEPARATOR=\n
+    ...    ---
+    ...    apiVersion: trust.cert-manager.io/v1alpha1
+    ...    kind: Bundle
+    ...    metadata:
+    ...    \ \ name: ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    spec:
+    ...    \ \ sources:
+    ...    \ \ \ \ - secret:
+    ...    \ \ \ \ \ \ \ \ name: ca-certificate-secret
+    ...    \ \ \ \ \ \ \ \ key: tls.crt
+    ...    \ \ target:
+    ...    \ \ \ \ configMap:
+    ...    \ \ \ \ \ \ key: ca-bundle.crt
+    ...    \ \ \ \ namespaceSelector:
+    ...    \ \ \ \ \ \ matchLabels:
+    ...    \ \ \ \ \ \ \ \ kubernetes.io/metadata.name: ${NAMESPACE}
+    RETURN    ${yaml}
+
+Apply Trust Manager YAML
+    [Documentation]    Apply YAML manifest, allowing both created and configured/unchanged results
+    [Arguments]    ${yaml_content}
+    ${temp_file}=    Create Random Temp File    ${yaml_content}
+    TRY
+        ${result}=    Oc Apply    -f ${temp_file}
+        Log    Applied manifest: ${result}
+    FINALLY
+        Remove File    ${temp_file}
+    END
+
+Cleanup Trust Bundle
+    [Documentation]    Remove the test trust-manager Bundle CR and its target ConfigMap
+    Oc Delete    bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
+    Oc Delete    configmap ${TRUST_MANAGER_BUNDLE_NAME} -n ${NAMESPACE} --ignore-not-found
