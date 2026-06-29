@@ -390,6 +390,10 @@ MICROSHIFT_Y2_OPTIONAL_RPMS_LIST=(
     microshift-sriov-release-info
     microshift-metrics-server
     microshift-metrics-server-release-info
+    microshift-metrics-kube-state
+    microshift-metrics-kube-state-release-info
+    microshift-metrics-node-exporter
+    microshift-metrics-node-exporter-release-info
 )
 MICROSHIFT_Y1_OPTIONAL_RPMS_LIST=(
     "${MICROSHIFT_Y2_OPTIONAL_RPMS_LIST[@]}"
