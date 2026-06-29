@@ -20,7 +20,9 @@ Test Tags           slow
 ${FAKE_LISTEN_IP}           99.99.99.98
 ${CUSTOM_COREFILE_PATH}     /etc/microshift/dns/Corefile
 ${COREFILE_TEMPLATE}        ./assets/dns/Corefile.template
+${MULTIZONE_TEMPLATE}       ./assets/dns/Corefile-multizone.template
 ${HOSTNAME}                 ${EMPTY}
+${EDGE_ZONE}                edge.local
 
 ${CUSTOM_DNS_CONFIG}        SEPARATOR=\n
 ...                         ---
@@ -66,6 +68,34 @@ Cluster Local Resolution With Custom Corefile
     ...    still resolves cluster-local services correctly.
     [Setup]    Setup Custom Corefile With Hosts Entry
     Resolve Host From Pod    kubernetes.default.svc.cluster.local
+    [Teardown]    Teardown Custom Corefile
+
+Atomic File Replacement Via Mv Updates ConfigMap
+    [Documentation]    Replace the custom Corefile atomically using mv
+    ...    (write temp file, then rename) and verify the ConfigMap is updated
+    ...    without restarting MicroShift.
+    [Setup]    Setup Custom Corefile With Hosts Entry
+    Resolve Host From Pod    ${HOSTNAME}
+    ${new_hostname}=    Generate Random HostName
+    ${corefile}=    Build Custom Corefile    ${new_hostname}    ${FAKE_LISTEN_IP}
+    Upload String To File    ${corefile}    ${CUSTOM_COREFILE_PATH}.tmp
+    Command Should Work    mv ${CUSTOM_COREFILE_PATH}.tmp ${CUSTOM_COREFILE_PATH}
+    Wait Until Keyword Succeeds    20x    5s
+    ...    ConfigMap Should Contain Hostname    ${new_hostname}
+    Resolve Host From Pod    ${new_hostname}
+    [Teardown]    Teardown Custom Corefile
+
+Multi Zone Custom Corefile Resolves Both Zones
+    [Documentation]    Configure a Corefile with two server blocks — a private
+    ...    zone using the hosts plugin and the default zone with the kubernetes
+    ...    plugin — and verify pods can resolve both custom hostnames and
+    ...    cluster services. Also verifies show-config --mode effective reports
+    ...    the configured dns.configFile path.
+    [Setup]    Setup Multi Zone Corefile
+    Resolve Host From Pod    ${HOSTNAME}
+    Resolve Host From Pod    kubernetes.default.svc.cluster.local
+    ${config}=    Show Config    effective
+    Should Be Equal As Strings    ${config}[dns][configFile]    ${CUSTOM_COREFILE_PATH}
     [Teardown]    Teardown Custom Corefile
 
 
@@ -124,6 +154,27 @@ Teardown Custom Corefile
 Remove Custom Corefile
     [Documentation]    Remove the custom Corefile from the host
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    rm -f ${CUSTOM_COREFILE_PATH}
+    ...    rm -f ${CUSTOM_COREFILE_PATH} ${CUSTOM_COREFILE_PATH}.tmp
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}
+
+Build Multi Zone Corefile
+    [Documentation]    Build a multi-zone Corefile from the template file.
+    [Arguments]    ${hostname}    ${ip}    ${zone}
+    ${template}=    OperatingSystem.Get File    ${MULTIZONE_TEMPLATE}
+    VAR    ${COREFILE_HOSTNAME}=    ${hostname}
+    VAR    ${COREFILE_HOST_IP}=    ${ip}
+    VAR    ${COREFILE_ZONE}=    ${zone}
+    ${corefile}=    Replace Variables    ${template}
+    RETURN    ${corefile}
+
+Setup Multi Zone Corefile
+    [Documentation]    Create a multi-zone Corefile with a private zone and
+    ...    the default zone with kubernetes plugin, then restart.
+    VAR    ${HOSTNAME}=    gateway.${EDGE_ZONE}    scope=SUITE
+    Add Fake IP To NIC    ${FAKE_LISTEN_IP}
+    ${corefile}=    Build Multi Zone Corefile    ${HOSTNAME}    ${FAKE_LISTEN_IP}    ${EDGE_ZONE}
+    Create Remote Dir For Path    ${CUSTOM_COREFILE_PATH}
+    Upload String To File    ${corefile}    ${CUSTOM_COREFILE_PATH}
+    Drop In MicroShift Config    ${CUSTOM_DNS_CONFIG}    20-dns-custom
+    Restart MicroShift
