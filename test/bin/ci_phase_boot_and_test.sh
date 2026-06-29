@@ -54,7 +54,7 @@ bash -x ./bin/manage_hypervisor_config.sh create
 # Setup a container registry and mirror images.
 # Release jobs need to also mirror the images from the brew RPMs.
 # RPM-only presubmits skip the mirror registry — scenarios pull images directly.
-if [[ "${SCENARIO_TYPE:-}" =~ ^rpm-presubmits-.*$ ]]; then
+if [[ "${SCENARIO_SOURCES:-}" =~ .*scenarios-rpm.* ]]; then
     export SKIP_MIRROR_REGISTRY=true
 elif [[ "${SCENARIO_SOURCES:-}" =~ .*releases.* ]]; then
     bash -x ./bin/mirror_registry.sh -ri "${BREW_RPM_SOURCE}"
