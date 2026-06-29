@@ -219,6 +219,9 @@ if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
         exit 1
     fi
 elif [ $# -gt 0 ] && [ "$1" = "-rpm_only" ] ; then
+    # build_images.sh normally creates this; without it, virsh pool-build
+    # creates it as root and scenario.sh can't mkdir inside it
+    mkdir -p "${VM_DISK_BASEDIR}"
     $(dry_run) bash -x ./bin/build_rpms.sh
 else
     GOT_CACHED_DATA=false
