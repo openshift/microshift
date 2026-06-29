@@ -47,7 +47,7 @@ build_rpms() {
     fi
 
     # Disable the GNU Parallel citation
-    echo will cite | parallel --citation &>/dev/null
+    mkdir -p ~/.parallel && touch ~/.parallel/will-cite
     # Run the commands in parallel
     echo "Starting parallel builds:"
     printf -- "  - %s\n" "${build_cmds[@]}"
