@@ -1,6 +1,12 @@
-- api embedded-component 253fff21f708fa7efd5ee65a4c30d6bde1e61cc8 to 876752f4da3e5d7849dfec0da72095a28be42400
-  - f6cb1187 2026-06-17T10:48:59-04:00 NE-2480: Promote GatewayAPIWithoutOLM feature gate to Default
+- csi-external-snapshotter embedded-component 7503ea30886b6e5565ffa02935cf8d2ca299f281 to 2c14afc50a30de62cb00cc8263b061383cfbd3b5
+  - 822424a 2026-06-17T13:30:16Z UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
 
-- cluster-ingress-operator embedded-component 356e3777400d549d9b3194c74c716eb2290baefc to cadbee7826ca38851b6aee0a3bd92445f9a6ab62
-  - f40fbdd 2026-06-22T14:12:29-04:00 Remove feature-set annotation from Sail Library RBAC manifests
+- machine-config-operator embedded-component 45a196b7ba10a6175895db65a81d08e88fdfd5f2 to 52ada8cd24588ffe90276d909a7dc376f9e845b7
+  - 8af9ca14 2026-06-18T14:23:38-04:00 mcc: replace wildcard permissions with explicit verbs and resources in MCC ClusterRole & scope configmap access to target namespace via Role instead of ClusterRole
+
+- csi-external-snapshotter image-amd64 7503ea30886b6e5565ffa02935cf8d2ca299f281 to 2c14afc50a30de62cb00cc8263b061383cfbd3b5
+  - 822424a 2026-06-17T13:30:16Z UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
+
+- csi-external-snapshotter image-arm64 7503ea30886b6e5565ffa02935cf8d2ca299f281 to 2c14afc50a30de62cb00cc8263b061383cfbd3b5
+  - 822424a 2026-06-17T13:30:16Z UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
 
