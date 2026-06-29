@@ -180,7 +180,9 @@ cd "${ROOTDIR}"
 # Get firewalld and repos in place. Use scripts to get the right repos
 # for each branch.
 $(dry_run) bash -x ./scripts/devenv-builder/configure-vm.sh --skip-dnf-update --no-build --force-firewall "${PULL_SECRET}"
-$(dry_run) bash -x ./test/bin/manage_composer_config.sh create
+if [ $# -eq 0 ] || [ "$1" != "-rpm_only" ]; then
+    $(dry_run) bash -x ./test/bin/manage_composer_config.sh create
+fi
 
 cd "${ROOTDIR}/test/"
 
@@ -215,6 +217,8 @@ if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
         echo "ERROR: Access to the build cache is not available"
         exit 1
     fi
+elif [ $# -gt 0 ] && [ "$1" = "-rpm_only" ] ; then
+    $(dry_run) bash -x ./bin/build_rpms.sh
 else
     GOT_CACHED_DATA=false
     if ${HAS_CACHE_ACCESS} ; then
