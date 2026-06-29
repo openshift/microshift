@@ -189,6 +189,11 @@ function cmd_start() {
     "${CONTAINER_EXEC[@]}" "${CONTAINER_NAME}" \
         bash -x /opt/microshift/test/bin/manage_composer_config.sh create
 
+    # Configure hypervisor for VM management
+    echo "Running manage-vm.sh config and manage_hypervisor_config.sh create..."
+    "${CONTAINER_EXEC[@]}" "${CONTAINER_NAME}" \
+        bash -x -c '/opt/microshift/scripts/devenv-builder/manage-vm.sh config && /opt/microshift/test/bin/manage_hypervisor_config.sh create'
+
     echo "Container '${CONTAINER_NAME}' started"
     echo "Use '$(basename "$0") shell' to open a shell"
 }
