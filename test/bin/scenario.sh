@@ -1602,8 +1602,10 @@ check_dependencies() {
         "${TESTDIR}/bin/manage_webserver.sh" "start"
     fi
 
-    if ! sudo podman ps --format '{{.Names}}' | grep -q ^microshift-quay  ; then
-        "${TESTDIR}/bin/mirror_registry.sh"
+    if [ "${SKIP_MIRROR_REGISTRY:-false}" != "true" ] ; then
+        if ! sudo podman ps --format '{{.Names}}' | grep -q ^microshift-quay  ; then
+            "${TESTDIR}/bin/mirror_registry.sh"
+        fi
     fi
 }
 
