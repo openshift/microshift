@@ -1,5 +1,3 @@
-- machine-config-operator embedded-component 109d1ad8bdd34d81b1adc7b60d3748cd979f43c6 to 51f9b31f3f6981021f0da3ad32030ed1028bce0b
-  - 9b43a888 2026-06-22T14:39:16-04:00 OCPBUGS-84832: daemon: don't pull/extract extensions for all OS updates
-  - 04d55a25 2026-06-18T13:53:14Z bootimage: use version for vsphere hotloop check
-  - fda7032c 2026-06-15T18:48:04Z OCPBUGS-84814: Skip chrony-wait on first node join
+- machine-config-operator embedded-component 51f9b31f3f6981021f0da3ad32030ed1028bce0b to 9bcea08436e8ed3d8d0a60667a64cbe58a9a1028
+  - 94cf308a 2026-06-23T07:42:39-04:00 controller & test: process rebuild annotation on machine-os-builder restart & increase test timeout
 
