@@ -274,6 +274,9 @@ get_scenario_type_from_path() {
     */scenarios-bootc-containers/*)
         type="bootc-containers"
         ;;
+    */scenarios-rpm/*)
+        type="rpm"
+        ;;
     *)
         type="unknown"
         ;;
