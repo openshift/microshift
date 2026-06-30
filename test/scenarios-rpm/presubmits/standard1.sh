@@ -20,5 +20,5 @@ scenario_run_tests() {
 
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:${RPM_RHEL_VERSION}" \
-        suites/standard1/version.robot
+        suites/standard1/
 }

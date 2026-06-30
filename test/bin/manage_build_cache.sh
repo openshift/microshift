@@ -170,8 +170,7 @@ action_download_isos() {
     local -r iso_src="${src_base}/${VM_POOL_BASENAME}"
 
     echo "Downloading installer ISOs from '${iso_src}'"
-    run_aws_cli s3 sync --quiet --exclude '*' --include '*-installer.iso' "${iso_src}" "${iso_dest}" \
-        || echo "WARNING: Installer ISO download failed"
+    run_aws_cli s3 sync --quiet --exclude '*' --include '*-installer.iso' "${iso_src}" "${iso_dest}"
 
     local -r iso_size="$(du -csh "${iso_dest}" | awk 'END{print $1}')"
     echo "Downloaded ${iso_size} of installer ISOs"

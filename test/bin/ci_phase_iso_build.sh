@@ -45,6 +45,10 @@ download_build_cache_isos() {
             -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" | \
             awk '/LAST:/ {print $NF}' \
         )"
+    if [[ -z "${cache_last}" ]]; then
+        echo "ERROR: Could not determine the 'last' build cache tag for branch '${SCENARIO_BUILD_BRANCH}'"
+        return 1
+    fi
     ./bin/manage_build_cache.sh download_isos -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}"
 }
 
@@ -231,6 +235,9 @@ elif [ $# -gt 0 ] && [ "$1" = "-rpm_only" ] ; then
     mkdir -p "${VM_DISK_BASEDIR}"
     if ${HAS_CACHE_ACCESS} ; then
         download_build_cache_isos
+    else
+        echo "ERROR: RPM-only mode requires installer ISOs from the build cache, but cache access is not available"
+        exit 1
     fi
     $(dry_run) bash -x ./bin/build_rpms.sh
 else

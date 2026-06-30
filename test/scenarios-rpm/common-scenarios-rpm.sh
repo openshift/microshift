@@ -16,12 +16,17 @@ if [[ -z "${RPM_RHEL_VERSION:-}" ]]; then
     SCENARIO_TYPE="${SCENARIO_TYPE:-$(cat "${OUTPUTDIR}/scenario_type" 2>/dev/null || echo "")}"
     case "${SCENARIO_TYPE}" in
         *el10*) RPM_RHEL_VERSION="10.2" ;;
-        *)      RPM_RHEL_VERSION="9.8" ;;
+        *el9*)  RPM_RHEL_VERSION="9.8" ;;
+        *)
+            RPM_RHEL_VERSION="9.8"
+            echo "WARNING: Could not determine RHEL version from SCENARIO_TYPE='${SCENARIO_TYPE}', defaulting to ${RPM_RHEL_VERSION}"
+            ;;
     esac
 fi
 
 RPM_RHEL_MAJOR="${RPM_RHEL_VERSION%%.*}"
 RPM_INSTALLER_IMAGE="rhel${RPM_RHEL_VERSION//./}-installer"
+echo "RPM scenario targeting RHEL ${RPM_RHEL_VERSION} (installer: ${RPM_INSTALLER_IMAGE})"
 
 configure_microshift_mirror() {
     local -r repo=$1
@@ -162,9 +167,14 @@ EOF
     rm -f "${tmp_file}"
 
     run_command_on_vm host1 "sudo dnf install -q -R 2 -y --allowerasing 'microshift-${target_version}'"
-    # Keep the local repo for scenarios that install additional RPMs (e.g. microshift-low-latency)
-    # Wait for NetworkManager to reconnect after the RPM %post scriptlet restarts it
-    run_command_on_vm host1 "sudo nmcli -w 30 networking connectivity check || true"
+    # Wait for NetworkManager to reconnect after the RPM %post scriptlet restarts it.
+    # The install keeps the local repo for scenarios that install additional RPMs.
+    local nm_status
+    nm_status=$(run_command_on_vm host1 "sudo nmcli -w 30 networking connectivity check" 2>&1) || true
+    echo "Post-install connectivity: ${nm_status}"
+    if [[ "${nm_status}" != *"full"* ]]; then
+        echo "WARNING: Network connectivity is '${nm_status}' after RPM install (expected 'full')"
+    fi
     run_command_on_vm host1 "sudo systemctl start microshift.service"
 
     wait_for_microshift_endpoint /readyz
