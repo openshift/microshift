@@ -17,11 +17,29 @@ CLUSTER_C_POD_CIDR="10.48.0.0/16"
 CLUSTER_C_SVC_CIDR="10.49.0.0/16"
 CLUSTER_C_DOMAIN="cluster-c.remote"
 
+# Dual-stack secondary CIDRs (empty unless overridden by scenario)
+CLUSTER_A_POD_CIDR_DUAL=""
+CLUSTER_A_SVC_CIDR_DUAL=""
+CLUSTER_B_POD_CIDR_DUAL=""
+CLUSTER_B_SVC_CIDR_DUAL=""
+CLUSTER_C_POD_CIDR_DUAL=""
+CLUSTER_C_SVC_CIDR_DUAL=""
+
 export TEST_RANDOMIZATION=suites
 
 get_host_ip() {
     local host=$1
     get_vm_property "${host}" ip || { echo "failed to get ${host} ip" >&2; return 1; }
+}
+
+get_host_ipv6() {
+    local host=$1
+    local host_ip
+    host_ip=$(get_host_ip "${host}") || return 1
+    # Get the global-scope IPv6 address from the VM (excluding link-local fe80::)
+    run_command_on_vm "${host}" \
+        "ip -6 addr show scope global | grep -oP '(?<=inet6 )([0-9a-f:]+)' | head -1" \
+        | tail -1 | tr -d '\r'
 }
 
 wait_for_greenboot_on_hosts() {
@@ -42,7 +60,9 @@ wait_for_greenboot_on_hosts() {
 configure_c2cc_host() {
     local host=$1
     shift
-    # Remaining args are sets of 4: remote_ip remote_pod_cidr remote_svc_cidr remote_domain (repeat)
+    # Remaining args are sets of 7:
+    #   remote_ip remote_ipv6 remote_pod_cidr remote_svc_cidr remote_domain remote_pod_cidr_dual remote_svc_cidr_dual
+    # remote_ipv6 and the last two may be empty for single-stack scenarios.
 
     run_command_on_vm "${host}" "sudo mkdir -p /etc/microshift/config.d"
 
@@ -53,19 +73,38 @@ configure_c2cc_host() {
 
     while [ $# -gt 0 ]; do
         local remote_ip=$1
-        local remote_pod_cidr=$2
-        local remote_svc_cidr=$3
-        local remote_domain=$4
-        shift 4
+        local remote_ipv6=${2:-}
+        local remote_pod_cidr=$3
+        local remote_svc_cidr=$4
+        local remote_domain=$5
+        local remote_pod_cidr_dual=${6:-}
+        local remote_svc_cidr_dual=${7:-}
+        shift 7
 
-        yaml_content+=$'\n'"  - nextHop: ${remote_ip}"
+        yaml_content+=$'\n'"  - nextHop:"
+        yaml_content+=$'\n'"    - ${remote_ip}"
+        if [ -n "${remote_ipv6}" ]; then
+            yaml_content+=$'\n'"    - ${remote_ipv6}"
+        fi
         yaml_content+=$'\n'"    clusterNetwork:"
         yaml_content+=$'\n'"    - ${remote_pod_cidr}"
+        if [ -n "${remote_pod_cidr_dual}" ]; then
+            yaml_content+=$'\n'"    - ${remote_pod_cidr_dual}"
+        fi
         yaml_content+=$'\n'"    serviceNetwork:"
         yaml_content+=$'\n'"    - ${remote_svc_cidr}"
+        if [ -n "${remote_svc_cidr_dual}" ]; then
+            yaml_content+=$'\n'"    - ${remote_svc_cidr_dual}"
+        fi
         yaml_content+=$'\n'"    domain: ${remote_domain}"
 
         firewall_cidrs+=("${remote_pod_cidr}" "${remote_svc_cidr}")
+        if [ -n "${remote_pod_cidr_dual}" ]; then
+            firewall_cidrs+=("${remote_pod_cidr_dual}")
+        fi
+        if [ -n "${remote_svc_cidr_dual}" ]; then
+            firewall_cidrs+=("${remote_svc_cidr_dual}")
+        fi
     done
 
     run_command_on_vm "${host}" "sudo tee /etc/microshift/config.d/50-c2cc.yaml > /dev/null <<EOF
@@ -90,21 +129,59 @@ configure_c2cc_hosts() {
     host3_ip=$(get_host_ip host3) || return 1
     readonly host1_ip host2_ip host3_ip
 
+    local host1_ipv6="" host2_ipv6="" host3_ipv6=""
+    if [ -n "${CLUSTER_A_POD_CIDR_DUAL}" ]; then
+        host1_ipv6=$(get_host_ipv6 host1) || return 1
+        host2_ipv6=$(get_host_ipv6 host2) || return 1
+        host3_ipv6=$(get_host_ipv6 host3) || return 1
+    fi
+    readonly host1_ipv6 host2_ipv6 host3_ipv6
+
     wait_for_greenboot_on_hosts "${pre_junit_label}"
 
     configure_c2cc_host host1 \
-        "${host2_ip}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}" \
-        "${host3_ip}" "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" "${CLUSTER_C_DOMAIN}"
+        "${host2_ip}" "${host2_ipv6}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}" "${CLUSTER_B_POD_CIDR_DUAL}" "${CLUSTER_B_SVC_CIDR_DUAL}" \
+        "${host3_ip}" "${host3_ipv6}" "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" "${CLUSTER_C_DOMAIN}" "${CLUSTER_C_POD_CIDR_DUAL}" "${CLUSTER_C_SVC_CIDR_DUAL}"
 
     configure_c2cc_host host2 \
-        "${host1_ip}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}" \
-        "${host3_ip}" "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" "${CLUSTER_C_DOMAIN}"
+        "${host1_ip}" "${host1_ipv6}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}" "${CLUSTER_A_POD_CIDR_DUAL}" "${CLUSTER_A_SVC_CIDR_DUAL}" \
+        "${host3_ip}" "${host3_ipv6}" "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" "${CLUSTER_C_DOMAIN}" "${CLUSTER_C_POD_CIDR_DUAL}" "${CLUSTER_C_SVC_CIDR_DUAL}"
 
     configure_c2cc_host host3 \
-        "${host1_ip}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}" \
-        "${host2_ip}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}"
+        "${host1_ip}" "${host1_ipv6}" "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" "${CLUSTER_A_DOMAIN}" "${CLUSTER_A_POD_CIDR_DUAL}" "${CLUSTER_A_SVC_CIDR_DUAL}" \
+        "${host2_ip}" "${host2_ipv6}" "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" "${CLUSTER_B_DOMAIN}" "${CLUSTER_B_POD_CIDR_DUAL}" "${CLUSTER_B_SVC_CIDR_DUAL}"
 
     wait_for_greenboot_on_hosts "${post_junit_label}"
+}
+
+# inject_kickstart_network writes a network config block into a host's
+# kickstart post-microshift.cfg.
+# Args: host pod_cidr svc_cidr [pod_cidr_dual] [svc_cidr_dual]
+inject_kickstart_network() {
+    local -r host=$1
+    local -r pod_cidr=$2
+    local -r svc_cidr=$3
+    local -r pod_cidr_dual=${4:-}
+    local -r svc_cidr_dual=${5:-}
+
+    local -r ks_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${host}"
+    local network_yaml=""
+    network_yaml+="  clusterNetwork:"$'\n'
+    network_yaml+="  - ${pod_cidr}"$'\n'
+    if [ -n "${pod_cidr_dual}" ]; then
+        network_yaml+="  - ${pod_cidr_dual}"$'\n'
+    fi
+    network_yaml+="  serviceNetwork:"$'\n'
+    network_yaml+="  - ${svc_cidr}"$'\n'
+    if [ -n "${svc_cidr_dual}" ]; then
+        network_yaml+="  - ${svc_cidr_dual}"$'\n'
+    fi
+
+    cat >> "${ks_dir}/post-microshift.cfg" <<EOF
+cat - >>/etc/microshift/config.yaml <<IEOF
+network:
+${network_yaml}IEOF
+EOF
 }
 
 c2cc_create_vms() {
@@ -114,6 +191,7 @@ c2cc_create_vms() {
     local -r ip_family="${4:-ipv4}"
 
     # Prepare kickstart for all hosts
+    # prepare_kickstart args: vmname template commit_ref fips_enabled ipv6_only
     local ipv6_args=""
     [ "${ip_family}" = "ipv6" ] && ipv6_args="false true"
 
@@ -123,28 +201,23 @@ c2cc_create_vms() {
         prepare_kickstart "${host}" kickstart-bootc.ks.template "${boot_commit_ref}" ${ipv6_args}
     done
 
-    # Inject host2's and host3's non-default CIDRs into its kickstart config so MicroShift
-    # boots with the correct network from the start (no cleanup-data needed).
-    local -r host2_ks_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host2"
-    cat >> "${host2_ks_dir}/post-microshift.cfg" <<EOF
-cat - >>/etc/microshift/config.yaml <<IEOF
-network:
-  clusterNetwork:
-  - ${CLUSTER_B_POD_CIDR}
-  serviceNetwork:
-  - ${CLUSTER_B_SVC_CIDR}
-IEOF
-EOF
-    local -r host3_ks_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/host3"
-    cat >> "${host3_ks_dir}/post-microshift.cfg" <<EOF
-cat - >>/etc/microshift/config.yaml <<IEOF
-network:
-  clusterNetwork:
-  - ${CLUSTER_C_POD_CIDR}
-  serviceNetwork:
-  - ${CLUSTER_C_SVC_CIDR}
-IEOF
-EOF
+    # Inject CIDRs into kickstart config so MicroShift boots with the correct
+    # network from the start (no cleanup-data needed).
+
+    # For dual-stack, host1 needs explicit CIDRs too (MicroShift defaults are IPv4-only).
+    if [ -n "${CLUSTER_A_POD_CIDR_DUAL}" ]; then
+        inject_kickstart_network host1 \
+            "${CLUSTER_A_POD_CIDR}" "${CLUSTER_A_SVC_CIDR}" \
+            "${CLUSTER_A_POD_CIDR_DUAL}" "${CLUSTER_A_SVC_CIDR_DUAL}"
+    fi
+
+    inject_kickstart_network host2 \
+        "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}" \
+        "${CLUSTER_B_POD_CIDR_DUAL}" "${CLUSTER_B_SVC_CIDR_DUAL}"
+
+    inject_kickstart_network host3 \
+        "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" \
+        "${CLUSTER_C_POD_CIDR_DUAL}" "${CLUSTER_C_SVC_CIDR_DUAL}"
 
     launch_vm "${boot_blueprint}" --vmname host1 --network "${network}"
     launch_vm "${boot_blueprint}" --vmname host2 --network "${network}"
@@ -204,6 +277,21 @@ c2cc_run_tests() {
     copy_file_from_vm host2 "/tmp/kubeconfig-b" "${kubeconfig_b}"
     copy_file_from_vm host3 "/tmp/kubeconfig-c" "${kubeconfig_c}"
 
+    local dual_cidr_vars=""
+    if [ -n "${CLUSTER_A_POD_CIDR_DUAL}" ]; then
+        local host2_ipv6 host3_ipv6
+        host2_ipv6=$(get_host_ipv6 host2) || return 1
+        host3_ipv6=$(get_host_ipv6 host3) || return 1
+        dual_cidr_vars+=" --variable CLUSTER_A_POD_CIDR_DUAL:${CLUSTER_A_POD_CIDR_DUAL}"
+        dual_cidr_vars+=" --variable CLUSTER_A_SVC_CIDR_DUAL:${CLUSTER_A_SVC_CIDR_DUAL}"
+        dual_cidr_vars+=" --variable CLUSTER_B_POD_CIDR_DUAL:${CLUSTER_B_POD_CIDR_DUAL}"
+        dual_cidr_vars+=" --variable CLUSTER_B_SVC_CIDR_DUAL:${CLUSTER_B_SVC_CIDR_DUAL}"
+        dual_cidr_vars+=" --variable CLUSTER_C_POD_CIDR_DUAL:${CLUSTER_C_POD_CIDR_DUAL}"
+        dual_cidr_vars+=" --variable CLUSTER_C_SVC_CIDR_DUAL:${CLUSTER_C_SVC_CIDR_DUAL}"
+        dual_cidr_vars+=" --variable HOST2_IPV6:${host2_ipv6}"
+        dual_cidr_vars+=" --variable HOST3_IPV6:${host3_ipv6}"
+    fi
+
     # shellcheck disable=SC2086
     run_tests host1 \
         --variable "CLUSTER_A_POD_CIDR:${CLUSTER_A_POD_CIDR}" \
@@ -222,6 +310,7 @@ c2cc_run_tests() {
         ${foreign_cidr_var} \
         ${ip_family_var} \
         ${target_ref_var} \
+        ${dual_cidr_vars} \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         ${include_args} \
         "${suites_dir}"

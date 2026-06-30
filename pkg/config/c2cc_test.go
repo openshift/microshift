@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vishvananda/netlink"
 	"k8s.io/utils/ptr"
 )
 
@@ -20,7 +21,7 @@ func TestC2CC_IsEnabled(t *testing.T) {
 	t.Run("with remote clusters", func(t *testing.T) {
 		c := C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 			}},
@@ -43,13 +44,13 @@ func TestC2CC_StripEmptyRemoteClusters(t *testing.T) {
 		c := C2CC{
 			RemoteClusters: []RemoteCluster{
 				{},
-				{NextHop: "10.0.0.1", ClusterNetwork: []string{"10.45.0.0/16"}, ServiceNetwork: []string{"10.46.0.0/16"}},
+				{NextHop: []string{"10.0.0.1"}, ClusterNetwork: []string{"10.45.0.0/16"}, ServiceNetwork: []string{"10.46.0.0/16"}},
 				{},
 			},
 		}
 		c.stripEmptyRemoteClusters()
 		assert.Len(t, c.RemoteClusters, 1)
-		assert.Equal(t, "10.0.0.1", c.RemoteClusters[0].NextHop)
+		assert.Equal(t, []string{"10.0.0.1"}, c.RemoteClusters[0].NextHop)
 	})
 
 	t.Run("no-op on empty list", func(t *testing.T) {
@@ -149,7 +150,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "valid single remote IPv4",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -160,12 +161,12 @@ func TestC2CC_Validate(t *testing.T) {
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{
 					{
-						NextHop:        "10.100.0.2",
+						NextHop:        []string{"10.100.0.2"},
 						ClusterNetwork: []string{"10.45.0.0/16"},
 						ServiceNetwork: []string{"10.46.0.0/16"},
 					},
 					{
-						NextHop:        "10.100.0.3",
+						NextHop:        []string{"10.100.0.3"},
 						ClusterNetwork: []string{"10.55.0.0/16"},
 						ServiceNetwork: []string{"10.56.0.0/16"},
 					},
@@ -176,17 +177,29 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "valid dual-stack remote with dual-stack local",
 			cfg: mkDualStackC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2", "fd00::2"},
 					ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
 					ServiceNetwork: []string{"10.46.0.0/16", "fd04::/112"},
 				}},
 			}),
 		},
 		{
+			name: "dual-stack CIDRs with only IPv4 nextHop",
+			cfg: mkDualStackC2CCConfig(C2CC{
+				RemoteClusters: []RemoteCluster{{
+					NextHop:        []string{"10.100.0.2"},
+					ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
+					ServiceNetwork: []string{"10.46.0.0/16", "fd04::/112"},
+				}},
+			}),
+			expectErr: true,
+			errMsg:    "has IPv6 CIDRs but no IPv6 nextHop",
+		},
+		{
 			name: "invalid NextHop",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "not-an-ip",
+					NextHop:        []string{"not-an-ip"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -198,7 +211,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "invalid CIDR format",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"not-a-cidr"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -210,7 +223,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "local cluster network overlap",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.42.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -222,7 +235,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "local service network overlap",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.43.0.0/16"},
 				}},
@@ -234,7 +247,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "same remote clusterNetwork overlaps own serviceNetwork",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.45.0.0/16"},
 				}},
@@ -247,12 +260,12 @@ func TestC2CC_Validate(t *testing.T) {
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{
 					{
-						NextHop:        "10.100.0.2",
+						NextHop:        []string{"10.100.0.2"},
 						ClusterNetwork: []string{"10.45.0.0/16"},
 						ServiceNetwork: []string{"10.46.0.0/16"},
 					},
 					{
-						NextHop:        "10.100.0.3",
+						NextHop:        []string{"10.100.0.3"},
 						ClusterNetwork: []string{"10.55.0.0/16"},
 						ServiceNetwork: []string{"10.45.0.0/16"},
 					},
@@ -266,12 +279,12 @@ func TestC2CC_Validate(t *testing.T) {
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{
 					{
-						NextHop:        "10.100.0.2",
+						NextHop:        []string{"10.100.0.2"},
 						ClusterNetwork: []string{"10.45.0.0/16"},
 						ServiceNetwork: []string{"10.46.0.0/16"},
 					},
 					{
-						NextHop:        "10.100.0.2",
+						NextHop:        []string{"10.100.0.2"},
 						ClusterNetwork: []string{"10.55.0.0/16"},
 						ServiceNetwork: []string{"10.56.0.0/16"},
 					},
@@ -284,7 +297,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "NextHop equals local node IP",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.1",
+					NextHop:        []string{"10.100.0.1"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -296,7 +309,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "CIDR mask too short IPv4",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.0.0.0/4"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -308,7 +321,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "CIDR mask too short IPv6",
 			cfg: mkDualStackC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2", "fd00::2"},
 					ClusterNetwork: []string{"10.45.0.0/16", "fd00::/16"},
 					ServiceNetwork: []string{"10.46.0.0/16", "fd04::/112"},
 				}},
@@ -321,7 +334,7 @@ func TestC2CC_Validate(t *testing.T) {
 			cfg: func() *Config {
 				cfg := mkC2CCConfig(C2CC{
 					RemoteClusters: []RemoteCluster{{
-						NextHop:        "10.100.0.2",
+						NextHop:        []string{"10.100.0.2"},
 						ClusterNetwork: []string{"10.45.0.0/16"},
 						ServiceNetwork: []string{"10.46.0.0/16"},
 					}},
@@ -336,7 +349,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "remote CIDR contains host interface IP",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.100.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -348,7 +361,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "multiple IPv4 entries in clusterNetwork",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16", "10.47.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -360,7 +373,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "multiple IPv6 entries in clusterNetwork",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"fd03::/48", "fd05::/48"},
 					ServiceNetwork: []string{"fd04::/112"},
 				}},
@@ -372,7 +385,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "IPv6 remote with IPv4-only local",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "fd00::2",
+					NextHop:        []string{"fd00::2"},
 					ClusterNetwork: []string{"fd03::/48"},
 					ServiceNetwork: []string{"fd04::/112"},
 				}},
@@ -384,7 +397,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "IPv4 remote with IPv6-only local",
 			cfg: mkIPv6OnlyC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -396,7 +409,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "NextHop equals local node IP non-canonical form",
 			cfg: mkIPv6OnlyC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "fd00:0:0:0:0:0:0:1",
+					NextHop:        []string{"fd00:0:0:0:0:0:0:1"},
 					ClusterNetwork: []string{"fd03::/48"},
 					ServiceNetwork: []string{"fd04::/112"},
 				}},
@@ -408,7 +421,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "empty clusterNetwork",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -420,7 +433,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "empty serviceNetwork",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{},
 				}},
@@ -432,7 +445,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "invalid domain",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 					Domain:         "not a valid domain!",
@@ -445,7 +458,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "valid domain",
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 					Domain:         "cluster-b.remote",
@@ -457,13 +470,13 @@ func TestC2CC_Validate(t *testing.T) {
 			cfg: mkC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{
 					{
-						NextHop:        "10.100.0.2",
+						NextHop:        []string{"10.100.0.2"},
 						ClusterNetwork: []string{"10.45.0.0/16"},
 						ServiceNetwork: []string{"10.46.0.0/16"},
 						Domain:         "cluster-b.remote",
 					},
 					{
-						NextHop:        "10.100.0.3",
+						NextHop:        []string{"10.100.0.3"},
 						ClusterNetwork: []string{"10.55.0.0/16"},
 						ServiceNetwork: []string{"10.56.0.0/16"},
 						Domain:         "cluster-b.remote",
@@ -477,7 +490,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "NextHop equals local NodeIPV6 in dual-stack",
 			cfg: mkDualStackC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "fd00::1",
+					NextHop:        []string{"fd00::1"},
 					ClusterNetwork: []string{"fd03::/48"},
 					ServiceNetwork: []string{"fd04::/112"},
 				}},
@@ -489,7 +502,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "single-stack IPv4 remote with dual-stack local",
 			cfg: mkDualStackC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -499,7 +512,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "clusterNetwork and serviceNetwork cardinality mismatch",
 			cfg: mkDualStackC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2", "fd00::2"},
 					ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -511,7 +524,7 @@ func TestC2CC_Validate(t *testing.T) {
 			name: "clusterNetwork and serviceNetwork IP family mismatch at same index",
 			cfg: mkDualStackC2CCConfig(C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2", "fd00::2"},
 					ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
 					ServiceNetwork: []string{"fd04::/112", "10.46.0.0/16"},
 				}},
@@ -524,7 +537,7 @@ func TestC2CC_Validate(t *testing.T) {
 			cfg: mkC2CCConfig(C2CC{
 				DNS: C2CCDNS{CacheTTL: ptr.To(-1), CacheNegativeTTL: ptr.To(10)},
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -537,7 +550,7 @@ func TestC2CC_Validate(t *testing.T) {
 			cfg: mkC2CCConfig(C2CC{
 				DNS: C2CCDNS{CacheTTL: ptr.To(10), CacheNegativeTTL: ptr.To(-5)},
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -550,7 +563,7 @@ func TestC2CC_Validate(t *testing.T) {
 			cfg: mkC2CCConfig(C2CC{
 				DNS: C2CCDNS{CacheTTL: ptr.To(0), CacheNegativeTTL: ptr.To(0)},
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},
@@ -581,7 +594,7 @@ func TestC2CC_ValidateDualStack(t *testing.T) {
 	t.Run("valid IPv6-only remote with IPv6-only local", func(t *testing.T) {
 		cfg := mkIPv6OnlyC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "fd00::2",
+				NextHop:        []string{"fd00::2"},
 				ClusterNetwork: []string{"fd03::/48"},
 				ServiceNetwork: []string{"fd04::/112"},
 			}},
@@ -592,7 +605,7 @@ func TestC2CC_ValidateDualStack(t *testing.T) {
 	t.Run("dual-stack remote with dual-stack local", func(t *testing.T) {
 		cfg := mkDualStackC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2", "fd00::2"},
 				ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
 				ServiceNetwork: []string{"10.46.0.0/16", "fd04::/112"},
 			}},
@@ -603,7 +616,7 @@ func TestC2CC_ValidateDualStack(t *testing.T) {
 	t.Run("single-stack IPv6 remote with dual-stack local", func(t *testing.T) {
 		cfg := mkDualStackC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "fd00::2",
+				NextHop:        []string{"fd00::2"},
 				ClusterNetwork: []string{"fd03::/48"},
 				ServiceNetwork: []string{"fd04::/112"},
 			}},
@@ -619,7 +632,7 @@ func TestC2CC_ProbeIntervalValidation(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			ProbeInterval: "500ms",
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 			}},
@@ -633,7 +646,7 @@ func TestC2CC_ProbeIntervalValidation(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			ProbeInterval: "6m",
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 			}},
@@ -647,7 +660,7 @@ func TestC2CC_ProbeIntervalValidation(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			ProbeInterval: "not-a-duration",
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 			}},
@@ -661,7 +674,7 @@ func TestC2CC_ProbeIntervalValidation(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			ProbeInterval: "1s",
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 			}},
@@ -673,7 +686,7 @@ func TestC2CC_ProbeIntervalValidation(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			ProbeInterval: "5m",
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 			}},
@@ -685,7 +698,7 @@ func TestC2CC_ProbeIntervalValidation(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			ProbeInterval: "30s",
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 			}},
@@ -701,7 +714,7 @@ func TestC2CC_ProbeIP(t *testing.T) {
 	t.Run("IPv4 service network", func(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 			}},
@@ -714,7 +727,7 @@ func TestC2CC_ProbeIP(t *testing.T) {
 	t.Run("IPv6 service network", func(t *testing.T) {
 		cfg := mkIPv6OnlyC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "fd00::2",
+				NextHop:        []string{"fd00::2"},
 				ClusterNetwork: []string{"fd03::/48"},
 				ServiceNetwork: []string{"fd04::/112"},
 			}},
@@ -727,7 +740,7 @@ func TestC2CC_ProbeIP(t *testing.T) {
 	t.Run("dual-stack uses first service network", func(t *testing.T) {
 		cfg := mkDualStackC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2", "fd00::2"},
 				ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
 				ServiceNetwork: []string{"10.46.0.0/16", "fd04::/112"},
 			}},
@@ -744,7 +757,7 @@ func TestC2CC_DNSIP(t *testing.T) {
 	t.Run("DNSIP populated when domain is set", func(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 				Domain:         "cluster-b.remote",
@@ -757,7 +770,7 @@ func TestC2CC_DNSIP(t *testing.T) {
 	t.Run("DNSIP empty when domain is not set", func(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "10.100.0.2",
+				NextHop:        []string{"10.100.0.2"},
 				ClusterNetwork: []string{"10.45.0.0/16"},
 				ServiceNetwork: []string{"10.46.0.0/16"},
 			}},
@@ -769,7 +782,7 @@ func TestC2CC_DNSIP(t *testing.T) {
 	t.Run("DNSIP for IPv6 service network", func(t *testing.T) {
 		cfg := mkIPv6OnlyC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
-				NextHop:        "fd00::2",
+				NextHop:        []string{"fd00::2"},
 				ClusterNetwork: []string{"fd03::/48"},
 				ServiceNetwork: []string{"fd04::/112"},
 				Domain:         "cluster-b.remote",
@@ -790,7 +803,7 @@ func parseCIDR(t *testing.T, s string) *net.IPNet {
 func TestRenderC2CCDNSBlocks(t *testing.T) {
 	t.Run("no domains configured", func(t *testing.T) {
 		resolved := []ResolvedRemoteCluster{{
-			NextHop:        net.ParseIP("10.100.0.2"),
+			NextHops:       map[int]net.IP{netlink.FAMILY_V4: net.ParseIP("10.100.0.2")},
 			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
 			ServiceNetwork: []*net.IPNet{parseCIDR(t, "10.46.0.0/16")},
 		}}
@@ -800,7 +813,7 @@ func TestRenderC2CCDNSBlocks(t *testing.T) {
 
 	t.Run("single domain with default TTLs", func(t *testing.T) {
 		resolved := []ResolvedRemoteCluster{{
-			NextHop:        net.ParseIP("10.100.0.2"),
+			NextHops:       map[int]net.IP{netlink.FAMILY_V4: net.ParseIP("10.100.0.2")},
 			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
 			ServiceNetwork: []*net.IPNet{parseCIDR(t, "10.46.0.0/16")},
 			Domain:         "cluster-b.remote",
@@ -873,7 +886,7 @@ func TestC2CC_RoutingTableValidation(t *testing.T) {
 	stubHostIPs(t, nil)
 
 	validRemote := []RemoteCluster{{
-		NextHop:        "10.100.0.2",
+		NextHop:        []string{"10.100.0.2"},
 		ClusterNetwork: []string{"10.45.0.0/16"},
 		ServiceNetwork: []string{"10.46.0.0/16"},
 	}}
@@ -1005,7 +1018,7 @@ func TestC2CC_IncorporateUserSettings(t *testing.T) {
 		user := &Config{
 			C2CC: C2CC{
 				RemoteClusters: []RemoteCluster{{
-					NextHop:        "10.100.0.2",
+					NextHop:        []string{"10.100.0.2"},
 					ClusterNetwork: []string{"10.45.0.0/16"},
 					ServiceNetwork: []string{"10.46.0.0/16"},
 				}},

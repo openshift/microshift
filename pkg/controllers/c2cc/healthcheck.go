@@ -88,7 +88,7 @@ func (h *healthcheckCRManager) reconcile(ctx context.Context) error {
 func (h *healthcheckCRManager) buildDesiredCRs() map[string]*microshiftv1alpha1.RemoteCluster {
 	desired := make(map[string]*microshiftv1alpha1.RemoteCluster, len(h.cfg.C2CC.Resolved))
 	for _, rc := range h.cfg.C2CC.Resolved {
-		name := crNameForRemote(rc.NextHop)
+		name := crNameForRemote(rc.PrimaryNextHop())
 		desired[name] = &microshiftv1alpha1.RemoteCluster{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: name,

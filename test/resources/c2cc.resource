@@ -13,42 +13,58 @@ Resource            microshift-host.resource
 
 
 *** Variables ***
-${CLUSTER_A_POD_CIDR}       ${EMPTY}
-${CLUSTER_A_SVC_CIDR}       ${EMPTY}
-${CLUSTER_A_DOMAIN}         ${EMPTY}
-${CLUSTER_B_POD_CIDR}       ${EMPTY}
-${CLUSTER_B_SVC_CIDR}       ${EMPTY}
-${CLUSTER_B_DOMAIN}         ${EMPTY}
-${HOST2_IP}                 ${EMPTY}
-${HOST2_SSH_PORT}           ${EMPTY}
-${HOST2_API_PORT}           ${EMPTY}
-${KUBECONFIG_B}             ${EMPTY}
-${CLUSTER_C_POD_CIDR}       ${EMPTY}
-${CLUSTER_C_SVC_CIDR}       ${EMPTY}
-${CLUSTER_C_DOMAIN}         ${EMPTY}
-${HOST3_IP}                 ${EMPTY}
-${HOST3_SSH_PORT}           ${EMPTY}
-${HOST3_API_PORT}           ${EMPTY}
-${KUBECONFIG_C}             ${EMPTY}
-&{C2CC_KUBECONFIGS}         &{EMPTY}
-&{C2CC_SSH_IDS}             &{EMPTY}
-@{C2CC_REMOTE_ALIASES}      @{EMPTY}
-${IP_FAMILY}                ${EMPTY}
-${IP_CMD}                   ${{'ip -6' if '${IP_FAMILY}' == 'ipv6' else 'ip -4'}}
-&{NAMESPACES}               cluster-a=${EMPTY}    cluster-b=${EMPTY}    cluster-c=${EMPTY}
+${CLUSTER_A_POD_CIDR}           ${EMPTY}
+${CLUSTER_A_SVC_CIDR}           ${EMPTY}
+${CLUSTER_A_DOMAIN}             ${EMPTY}
+${CLUSTER_B_POD_CIDR}           ${EMPTY}
+${CLUSTER_B_SVC_CIDR}           ${EMPTY}
+${CLUSTER_B_DOMAIN}             ${EMPTY}
+${HOST2_IP}                     ${EMPTY}
+${HOST2_IPV6}                   ${EMPTY}
+${HOST2_SSH_PORT}               ${EMPTY}
+${HOST2_API_PORT}               ${EMPTY}
+${KUBECONFIG_B}                 ${EMPTY}
+${CLUSTER_C_POD_CIDR}           ${EMPTY}
+${CLUSTER_C_SVC_CIDR}           ${EMPTY}
+${CLUSTER_C_DOMAIN}             ${EMPTY}
+${HOST3_IP}                     ${EMPTY}
+${HOST3_IPV6}                   ${EMPTY}
+${HOST3_SSH_PORT}               ${EMPTY}
+${HOST3_API_PORT}               ${EMPTY}
+${KUBECONFIG_C}                 ${EMPTY}
+&{C2CC_KUBECONFIGS}             &{EMPTY}
+&{C2CC_SSH_IDS}                 &{EMPTY}
+@{C2CC_REMOTE_ALIASES}          @{EMPTY}
+${CLUSTER_A_POD_CIDR_DUAL}      ${EMPTY}
+${CLUSTER_A_SVC_CIDR_DUAL}      ${EMPTY}
+${CLUSTER_B_POD_CIDR_DUAL}      ${EMPTY}
+${CLUSTER_B_SVC_CIDR_DUAL}      ${EMPTY}
+${CLUSTER_C_POD_CIDR_DUAL}      ${EMPTY}
+${CLUSTER_C_SVC_CIDR_DUAL}      ${EMPTY}
+${IP_FAMILY}                    ${EMPTY}
+${IP_CMD}                       ${{'ip -6' if '${IP_FAMILY}' == 'ipv6' else 'ip -4'}}
+&{NAMESPACES}                   cluster-a=${EMPTY}    cluster-b=${EMPTY}    cluster-c=${EMPTY}
 &{DOMAIN_MAP}
-...                         cluster-a=${CLUSTER_A_DOMAIN}
-...                         cluster-b=${CLUSTER_B_DOMAIN}
-...                         cluster-c=${CLUSTER_C_DOMAIN}
+...                             cluster-a=${CLUSTER_A_DOMAIN}
+...                             cluster-b=${CLUSTER_B_DOMAIN}
+...                             cluster-c=${CLUSTER_C_DOMAIN}
 &{POD_CIDR_MAP}
-...                         cluster-a=${CLUSTER_A_POD_CIDR}
-...                         cluster-b=${CLUSTER_B_POD_CIDR}
-...                         cluster-c=${CLUSTER_C_POD_CIDR}
+...                             cluster-a=${CLUSTER_A_POD_CIDR}
+...                             cluster-b=${CLUSTER_B_POD_CIDR}
+...                             cluster-c=${CLUSTER_C_POD_CIDR}
 &{SVC_CIDR_MAP}
-...                         cluster-a=${CLUSTER_A_SVC_CIDR}
-...                         cluster-b=${CLUSTER_B_SVC_CIDR}
-...                         cluster-c=${CLUSTER_C_SVC_CIDR}
-@{ALL_CLUSTERS}             cluster-a    cluster-b    cluster-c
+...                             cluster-a=${CLUSTER_A_SVC_CIDR}
+...                             cluster-b=${CLUSTER_B_SVC_CIDR}
+...                             cluster-c=${CLUSTER_C_SVC_CIDR}
+&{POD_CIDR_MAP_DUAL}
+...                             cluster-a=${CLUSTER_A_POD_CIDR_DUAL}
+...                             cluster-b=${CLUSTER_B_POD_CIDR_DUAL}
+...                             cluster-c=${CLUSTER_C_POD_CIDR_DUAL}
+&{SVC_CIDR_MAP_DUAL}
+...                             cluster-a=${CLUSTER_A_SVC_CIDR_DUAL}
+...                             cluster-b=${CLUSTER_B_SVC_CIDR_DUAL}
+...                             cluster-c=${CLUSTER_C_SVC_CIDR_DUAL}
+@{ALL_CLUSTERS}                 cluster-a    cluster-b    cluster-c
 
 
 *** Keywords ***
@@ -160,29 +176,29 @@ Verify Cluster Is Healthy
 
 Verify Routes In Table 200
     [Documentation]    Check that routes for the given CIDRs exist in table 200.
-    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ${IP_CMD} route show table 200
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${ip_cmd}=${IP_CMD}
+    ${stdout}=    Command On Cluster    ${alias}    ${ip_cmd} route show table 200
     Should Contain    ${stdout}    ${remote_pod_cidr}
     Should Contain    ${stdout}    ${remote_svc_cidr}
 
 Verify IP Rules For Table 200
     [Documentation]    Check that IP rules at priority 100 exist for the given CIDRs.
-    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ${IP_CMD} rule show
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${ip_cmd}=${IP_CMD}
+    ${stdout}=    Command On Cluster    ${alias}    ${ip_cmd} rule show
     Should Contain    ${stdout}    to ${remote_pod_cidr} lookup 200
     Should Contain    ${stdout}    to ${remote_svc_cidr} lookup 200
 
 Verify Service IP Rules
     [Documentation]    Check that IP rules at priority 99 exist for cross-cluster service routing.
-    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ${IP_CMD} rule show
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}    ${ip_cmd}=${IP_CMD}
+    ${stdout}=    Command On Cluster    ${alias}    ${ip_cmd} rule show
     Should Contain    ${stdout}    from ${remote_pod_cidr} to ${local_svc_cidr} lookup 201
     Should Contain    ${stdout}    from ${remote_svc_cidr} to ${local_svc_cidr} lookup 201
 
 Verify All IP Rules
     [Documentation]    Check all IP rules (table 200 and 201) in a single SSH call.
-    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ${IP_CMD} rule show
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}    ${ip_cmd}=${IP_CMD}
+    ${stdout}=    Command On Cluster    ${alias}    ${ip_cmd} rule show
     Should Contain    ${stdout}    to ${remote_pod_cidr} lookup 200
     Should Contain    ${stdout}    to ${remote_svc_cidr} lookup 200
     Should Contain    ${stdout}    from ${remote_pod_cidr} to ${local_svc_cidr} lookup 201
@@ -190,8 +206,8 @@ Verify All IP Rules
 
 Verify Routes In Table 201
     [Documentation]    Check that service routes exist in table 201 for the local service CIDR.
-    [Arguments]    ${alias}    ${local_svc_cidr}
-    ${stdout}=    Command On Cluster    ${alias}    ${IP_CMD} route show table 201
+    [Arguments]    ${alias}    ${local_svc_cidr}    ${ip_cmd}=${IP_CMD}
+    ${stdout}=    Command On Cluster    ${alias}    ${ip_cmd} route show table 201
     Should Contain    ${stdout}    ${local_svc_cidr}
 
 Verify NFTables Bypass Rules
@@ -361,11 +377,49 @@ Get Curl Pod IP
     ...    oc get pod curl-pod -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIP}'
     RETURN    ${ip}
 
+Get Hello Pod Dual IP
+    [Documentation]    Get the secondary (dual-stack) pod IP of hello-microshift.
+    [Arguments]    ${alias}
+    ${ip}=    Oc On Cluster    ${alias}
+    ...    oc get pod hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIPs[1].ip}'
+    RETURN    ${ip}
+
+Get Hello Service Dual IP
+    [Documentation]    Get the secondary (dual-stack) ClusterIP of the hello-microshift service.
+    [Arguments]    ${alias}
+    ${ip}=    Oc On Cluster    ${alias}
+    ...    oc get svc hello-microshift -n ${NAMESPACES}[${alias}] -o jsonpath='{.spec.clusterIPs[1]}'
+    RETURN    ${ip}
+
+Get Curl Pod Dual IP
+    [Documentation]    Get the secondary (dual-stack) pod IP of curl-pod.
+    [Arguments]    ${alias}
+    ${ip}=    Oc On Cluster    ${alias}
+    ...    oc get pod curl-pod -n ${NAMESPACES}[${alias}] -o jsonpath='{.status.podIPs[1].ip}'
+    RETURN    ${ip}
+
+Get Curl Pod IP Matching Family
+    [Documentation]    Get the curl-pod IP that matches the address family of the given destination IP.
+    ...    In dual-stack, OVN-K always assigns IPv4 first in podIPs regardless of clusterNetwork
+    ...    order, so status.podIP is always IPv4 and podIPs[1] is IPv6. Services, however,
+    ...    follow the config order — spec.clusterIP is IPv6 in IPv6-primary clusters.
+    ...    In single-stack (IPv4-only or IPv6-only), podIPs has length 1 and podIPs[1] does
+    ...    not exist, so we must check whether the primary IP already matches before reaching
+    ...    for the secondary.
+    [Arguments]    ${alias}    ${dest_ip}
+    ${primary}=    Get Curl Pod IP    ${alias}
+    ${dest_is_ipv6}=    Evaluate    ':' in '''${dest_ip}'''
+    ${primary_is_ipv6}=    Evaluate    ':' in '''${primary}'''
+    IF    ${dest_is_ipv6} == ${primary_is_ipv6}    RETURN    ${primary}
+    ${ip}=    Get Curl Pod Dual IP    ${alias}
+    RETURN    ${ip}
+
 Curl From Cluster
     [Documentation]    Exec curl from curl-pod on the given cluster to the target IP and port.
     [Arguments]    ${alias}    ${ip}    ${port}
+    ${is_ipv6}=    Evaluate    ':' in '''${ip}'''
     ${url}=    Set Variable If
-    ...    '${IP_FAMILY}' == 'ipv6'
+    ...    ${is_ipv6}
     ...    http://[${ip}]:${port}/cgi-bin/hello
     ...    http://${ip}:${port}/cgi-bin/hello
     ${stdout}=    Oc On Cluster    ${alias}
@@ -388,7 +442,6 @@ Test Connectivity Between Clusters
 Test Source IP Preserved Between Clusters
     [Documentation]    Verify ${source} to ${destination} pod-to-${endpoint_type} traffic preserves the source pod IP (no SNAT).
     [Arguments]    ${source}    ${destination}    ${endpoint_type}
-    ${curl_pod_ip}=    Get Curl Pod IP    ${source}
     IF    '${endpoint_type}' == 'pod'
         ${ip_dest}=    Get Hello Pod IP    ${destination}
     ELSE IF    '${endpoint_type}' == 'service'
@@ -396,6 +449,34 @@ Test Source IP Preserved Between Clusters
     ELSE
         Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
     END
+    ${curl_pod_ip}=    Get Curl Pod IP Matching Family    ${source}    ${ip_dest}
+    ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
+    Should Contain    ${stdout}    source: ${curl_pod_ip}
+
+Test Dual Stack Connectivity Between Clusters
+    [Documentation]    Verify pod on ${source} can reach ${endpoint_type} dual-stack IP on ${destination}.
+    [Arguments]    ${source}    ${destination}    ${endpoint_type}
+    IF    '${endpoint_type}' == 'pod'
+        ${ip_dest}=    Get Hello Pod Dual IP    ${destination}
+    ELSE IF    '${endpoint_type}' == 'service'
+        ${ip_dest}=    Get Hello Service Dual IP    ${destination}
+    ELSE
+        Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
+    END
+    ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
+    Should Contain    ${stdout}    Hello from
+
+Test Dual Stack Source IP Preserved Between Clusters
+    [Documentation]    Verify dual-stack traffic preserves the source pod IP (no SNAT).
+    [Arguments]    ${source}    ${destination}    ${endpoint_type}
+    IF    '${endpoint_type}' == 'pod'
+        ${ip_dest}=    Get Hello Pod Dual IP    ${destination}
+    ELSE IF    '${endpoint_type}' == 'service'
+        ${ip_dest}=    Get Hello Service Dual IP    ${destination}
+    ELSE
+        Fail    Invalid endpoint_type: ${endpoint_type}. Must be 'pod' or 'service'.
+    END
+    ${curl_pod_ip}=    Get Curl Pod IP Matching Family    ${source}    ${ip_dest}
     ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
     Should Contain    ${stdout}    source: ${curl_pod_ip}
 
@@ -471,20 +552,43 @@ RemoteCluster CR Name From IP
     ${dashed}=    Replace String    ${dashed}    :    -
     RETURN    c2cc-${dashed}
 
+Primary NextHop IP For Host
+    [Documentation]    Return the IP used as primary next-hop for a host. In IPv6-primary
+    ...    scenarios (IP_FAMILY=ipv6), the IPv6 address is primary; otherwise IPv4.
+    [Arguments]    ${ipv4}    ${ipv6}=${EMPTY}
+    ${is_ipv6_primary}=    Evaluate    '${IP_FAMILY}' == 'ipv6' and '${ipv6}' != ''
+    ${result}=    Set Variable If    ${is_ipv6_primary}    ${ipv6}    ${ipv4}
+    RETURN    ${result}
+
 Verify RemoteCluster Unhealthy On Observers
     [Documentation]    Wait for observer clusters to report a disrupted cluster's CR as Unhealthy.
-    [Arguments]    ${disrupted_ip}    @{observers}
-    ${cr_name}=    RemoteCluster CR Name From IP    ${disrupted_ip}
+    [Arguments]    ${disrupted_ip}    @{observers}    ${disrupted_ipv6}=${EMPTY}
+    ${primary}=    Primary NextHop IP For Host    ${disrupted_ip}    ${disrupted_ipv6}
+    ${cr_name}=    RemoteCluster CR Name From IP    ${primary}
     FOR    ${observer}    IN    @{observers}
         Wait Until Keyword Succeeds    3m    10s
         ...    Verify RemoteCluster State By Name    ${observer}    ${cr_name}    Unhealthy
     END
 
+Ensure All Clusters Healthy
+    [Documentation]    Pre-condition: all clusters must be Healthy before fault injection.
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
+        Wait Until Keyword Succeeds    3m    10s
+        ...    Verify RemoteCluster State    ${alias}    Healthy
+    END
+
+IP Command For CIDR
+    [Documentation]    Return 'ip -6' if the given CIDR is IPv6, otherwise 'ip -4'.
+    [Arguments]    ${cidr}
+    ${is_ipv6}=    Evaluate    ':' in '''${cidr}'''
+    ${cmd}=    Set Variable If    ${is_ipv6}    ip -6    ip -4
+    RETURN    ${cmd}
+
 Verify C2CC Infrastructure For Remote
     [Documentation]    Verify C2CC infrastructure for one remote cluster's CIDRs.
-    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
-    Verify Routes In Table 200    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
-    Verify All IP Rules    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
+    [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}    ${ip_cmd}=${IP_CMD}
+    Verify Routes In Table 200    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${ip_cmd}
+    Verify All IP Rules    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}    ${ip_cmd}
     Verify NFTables Bypass Rules    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
     Verify OVN Static Routes    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
     Verify Node SNAT Annotation    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
@@ -492,16 +596,26 @@ Verify C2CC Infrastructure For Remote
 Verify C2CC Infrastructure On Cluster
     [Documentation]    Run all C2CC infrastructure checks for all remote CIDRs on the given cluster.
     [Arguments]    ${alias}
-    ${local_svc_cidr}=    Get From Dictionary    ${SVC_CIDR_MAP}    ${alias}
+    Verify C2CC Infrastructure For CIDR Family    ${alias}    ${POD_CIDR_MAP}    ${SVC_CIDR_MAP}
+    ${local_svc_cidr_dual}=    Get From Dictionary    ${SVC_CIDR_MAP_DUAL}    ${alias}
+    IF    '${local_svc_cidr_dual}' != ''
+        Verify C2CC Infrastructure For CIDR Family    ${alias}    ${POD_CIDR_MAP_DUAL}    ${SVC_CIDR_MAP_DUAL}
+    END
+
+Verify C2CC Infrastructure For CIDR Family
+    [Documentation]    Verify C2CC infrastructure for one CIDR family (primary or dual) on a cluster.
+    [Arguments]    ${alias}    ${pod_map}    ${svc_map}
+    ${local_svc_cidr}=    Get From Dictionary    ${svc_map}    ${alias}
+    ${ip_cmd}=    IP Command For CIDR    ${local_svc_cidr}
     FOR    ${remote}    IN    @{ALL_CLUSTERS}
         IF    '${remote}' != '${alias}'
-            ${remote_pod_cidr}=    Get From Dictionary    ${POD_CIDR_MAP}    ${remote}
-            ${remote_svc_cidr}=    Get From Dictionary    ${SVC_CIDR_MAP}    ${remote}
+            ${remote_pod_cidr}=    Get From Dictionary    ${pod_map}    ${remote}
+            ${remote_svc_cidr}=    Get From Dictionary    ${svc_map}    ${remote}
             Verify C2CC Infrastructure For Remote
-            ...    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}
+            ...    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}    ${ip_cmd}
         END
     END
-    Verify Routes In Table 201    ${alias}    ${local_svc_cidr}
+    Verify Routes In Table 201    ${alias}    ${local_svc_cidr}    ${ip_cmd}
 
 Verify Cross Cluster Connectivity
     [Documentation]    Verify a representative subset of cross-cluster connectivity.

@@ -19,8 +19,9 @@ const (
 type linuxRouteManager struct {
 	policyRouteTable
 
-	desiredDsts []*net.IPNet
-	desiredGWs  map[string]net.IP
+	desiredDsts    []*net.IPNet
+	desiredDstKeys []string
+	desiredGWs     map[string]net.IP
 }
 
 func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
@@ -34,9 +35,16 @@ func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 	}
 
 	for i := range cfg.C2CC.Resolved {
-		for _, cidr := range cfg.C2CC.Resolved[i].AllCIDRs() {
+		rc := &cfg.C2CC.Resolved[i]
+		for _, cidr := range rc.AllCIDRs() {
+			gw, ok := rc.NextHopForFamily(ipFamilyOf(cidr))
+			if !ok {
+				continue
+			}
+			key := cidr.String()
 			m.desiredDsts = append(m.desiredDsts, cidr)
-			m.desiredGWs[cidr.String()] = cfg.C2CC.Resolved[i].NextHop
+			m.desiredDstKeys = append(m.desiredDstKeys, key)
+			m.desiredGWs[key] = gw
 		}
 	}
 
@@ -45,10 +53,10 @@ func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 
 func (m *linuxRouteManager) reconcile(ctx context.Context) error {
 	desired := make([]netlink.Route, 0, len(m.desiredDsts))
-	for _, cidr := range m.desiredDsts {
+	for i, cidr := range m.desiredDsts {
 		desired = append(desired, netlink.Route{
 			Dst:      cidr,
-			Gw:       m.desiredGWs[cidr.String()],
+			Gw:       m.desiredGWs[m.desiredDstKeys[i]],
 			Table:    m.table,
 			Protocol: netlink.RouteProtocol(m.proto),
 		})
@@ -77,8 +85,8 @@ func (m *linuxRouteManager) reconcileRules() error {
 	}
 
 	var errs []error
-	for _, cidr := range m.desiredDsts {
-		dst := cidr.String()
+	for i, cidr := range m.desiredDsts {
+		dst := m.desiredDstKeys[i]
 		if _, exists := actualByDst[dst]; exists {
 			delete(actualByDst, dst)
 			continue

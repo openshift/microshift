@@ -104,7 +104,8 @@ RemoteCluster Status Becomes Unhealthy When Probe Fails
     [Documentation]    Block probe traffic on cluster-b and verify cluster-a
     ...    reports Unhealthy for the corresponding RemoteCluster CR.
     [Setup]    Verify All RemoteClusters Healthy
-    ${cr_name}=    RemoteCluster CR Name From IP    ${HOST2_IP}
+    ${primary_ip}=    Primary NextHop IP For Host    ${HOST2_IP}    ${HOST2_IPV6}
+    ${cr_name}=    RemoteCluster CR Name From IP    ${primary_ip}
     # Apply a NetworkPolicy on cluster-b that denies all ingress to the probe pod,
     # causing cluster-a's probes to cluster-b to time out.
     Apply Probe Deny Policy    cluster-b
