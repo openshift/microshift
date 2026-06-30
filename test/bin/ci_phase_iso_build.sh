@@ -39,6 +39,15 @@ dry_run() {
 
 # Try downloading the 'last' build cache.
 # Return 0 on success or 1 otherwise.
+download_build_cache_isos() {
+    local -r cache_last="$(\
+        ./bin/manage_build_cache.sh getlast \
+            -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" | \
+            awk '/LAST:/ {print $NF}' \
+        )"
+    ./bin/manage_build_cache.sh download_isos -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}"
+}
+
 download_build_cache() {
     local -r cache_last="$(\
         ./bin/manage_build_cache.sh getlast \
@@ -219,20 +228,9 @@ if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
         exit 1
     fi
 elif [ $# -gt 0 ] && [ "$1" = "-rpm_only" ] ; then
-    # build_images.sh normally creates VM_DISK_BASEDIR and populates it
-    # with installer ISOs. In rpm_only mode, create the dir and download
-    # only the cached installer ISOs needed for VM kickstart.
     mkdir -p "${VM_DISK_BASEDIR}"
     if ${HAS_CACHE_ACCESS} ; then
-        cache_tag="$(\
-            ./bin/manage_build_cache.sh getlast \
-                -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" | \
-                awk '/LAST:/ {print $NF}' \
-            )"
-        iso_src="s3://${AWS_BUCKET_NAME:-microshift-build-cache}/${SCENARIO_BUILD_BRANCH}/${UNAME_M}/${cache_tag}/${VM_POOL_BASENAME}"
-        echo "Downloading installer ISOs from '${iso_src}'"
-        "${AWSCLI}" s3 sync --quiet --exclude '*' --include '*-installer.iso' "${iso_src}" "${VM_DISK_BASEDIR}" \
-            || echo "WARNING: Installer ISO download failed"
+        download_build_cache_isos
     fi
     $(dry_run) bash -x ./bin/build_rpms.sh
 else
