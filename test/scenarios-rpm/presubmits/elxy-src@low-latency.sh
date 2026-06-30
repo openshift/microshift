@@ -12,7 +12,8 @@ scenario_remove_vms() {
 }
 
 scenario_setup_vms() {
-    rpm_setup_and_install_microshift
+    rpm_configure_vm
+    rpm_install_microshift
 
     # Install low-latency RPM and wait for tuned reboot
     run_command_on_vm host1 "sudo dnf install -y microshift-low-latency"

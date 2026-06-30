@@ -12,7 +12,8 @@ scenario_remove_vms() {
 }
 
 scenario_setup_vms() {
-    rpm_setup_and_install_microshift
+    rpm_configure_vm
+    rpm_install_microshift
 
     # Wait for LVMS pods — greenboot normally handles this, but SKIP_GREENBOOT=true in RPM mode
     run_command_on_vm host1 "sudo /usr/bin/oc --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig wait --for=condition=Available deployment/lvms-operator -n openshift-storage --timeout=300s"

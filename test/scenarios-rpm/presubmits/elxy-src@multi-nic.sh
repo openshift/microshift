@@ -12,7 +12,8 @@ scenario_remove_vms() {
 }
 
 scenario_setup_vms() {
-    rpm_setup_and_install_microshift
+    rpm_configure_vm
+    rpm_install_microshift
 
     # greenboot-healthcheck is installed as a dependency but never ran (boot-time oneshot).
     # The RF test's Setup waits for it to be in "exited" state, so start it explicitly.

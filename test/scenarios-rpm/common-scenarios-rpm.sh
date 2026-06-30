@@ -35,10 +35,8 @@ rpm_configure_vm() {
     configure_rpm_repos
 }
 
-# Configure VM and install MicroShift from the local RPM repo.
-rpm_setup_and_install_microshift() {
-    rpm_configure_vm
-
+# Install MicroShift from the local RPM repo.
+rpm_install_microshift() {
     local -r reponame=$(basename "${LOCAL_REPO}")
     install_microshift "${WEB_SERVER_URL}/rpm-repos/${reponame}" "$(local_rpm_version)"
 }

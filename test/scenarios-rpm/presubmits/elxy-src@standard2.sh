@@ -9,7 +9,8 @@ scenario_create_vms() {
 
 
 scenario_setup_vms() {
-    rpm_setup_and_install_microshift
+    rpm_configure_vm
+    rpm_install_microshift
 }
 
 scenario_remove_vms() {
