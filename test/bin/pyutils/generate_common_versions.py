@@ -431,6 +431,10 @@ def main():
             logging.info("No changes to test/bin/common_versions.sh")
             exit(0)
 
+        if not args.dry_run and not os.getenv("GH_TOKEN") and not (os.getenv("APP_ID") and os.getenv("KEY")):
+            logging.error("--create-pr requires GitHub credentials: set GH_TOKEN or both APP_ID and KEY env vars")
+            sys.exit(1)
+
         base_branch = g.git_repo.active_branch.name
         if not base_branch.startswith(f"release-{args.version}"):
             logging.error(f"Script is expected to be executed on branch starting with 'release-{args.version}', but it's {base_branch}")
