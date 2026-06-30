@@ -231,7 +231,7 @@ elif [ $# -gt 0 ] && [ "$1" = "-rpm_only" ] ; then
             )"
         iso_src="s3://${AWS_BUCKET_NAME:-microshift-build-cache}/${SCENARIO_BUILD_BRANCH}/${UNAME_M}/${cache_tag}/${VM_POOL_BASENAME}"
         echo "Downloading installer ISOs from '${iso_src}'"
-        "${AWSCLI}" s3 sync --exclude '*' --include '*-installer.iso' "${iso_src}" "${VM_DISK_BASEDIR}" \
+        "${AWSCLI}" s3 sync --quiet --exclude '*' --include '*-installer.iso' "${iso_src}" "${VM_DISK_BASEDIR}" \
             || echo "WARNING: Installer ISO download failed"
     fi
     $(dry_run) bash -x ./bin/build_rpms.sh
