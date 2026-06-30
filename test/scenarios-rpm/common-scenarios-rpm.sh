@@ -158,9 +158,13 @@ EOF
 
 # Configure all RPM repos needed for MicroShift dependencies.
 # Branches on RPM_RHEL_MAJOR for el9 (subscription-manager) vs el10 (CDN certs).
+# Configures both current (Y) and previous (Y-1) version repos as fallback
+# for early development cycles when current repos may not be published yet.
 configure_rpm_repos() {
     configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
     configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1}"      "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}"
     run_command_on_vm host1 "sudo subscription-manager release --set ${RPM_RHEL_VERSION}"
 
     local -r arch=$(uname -m)
@@ -174,6 +178,27 @@ configure_rpm_repos() {
     fi
 
     run_command_on_vm host1 "sudo dnf install -y NetworkManager-ovs containers-common"
+}
+
+# Reboot the VM and wait for MicroShift to be ready.
+# Ensures clean network state (NM fully configured) and boot-time services
+# (greenboot-healthcheck) run properly — matches the bootc flow.
+rpm_reboot_and_wait() {
+    run_command_on_vm host1 "sudo systemctl enable microshift.service"
+    run_command_on_vm host1 "sudo reboot" || true
+    # Wait for VM to go down and come back
+    sleep 10
+    local attempt
+    for attempt in $(seq 30); do
+        if run_command_on_vm host1 "true" 2>/dev/null; then
+            break
+        fi
+        echo "Waiting for VM to come back (attempt ${attempt}/30)"
+        sleep 10
+    done
+    wait_for_microshift_endpoint /readyz
+    wait_for_microshift_endpoint /livez
+    echo "MicroShift is ready after reboot"
 }
 
 wait_for_microshift_endpoint() {

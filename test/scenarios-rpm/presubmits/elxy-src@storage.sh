@@ -16,7 +16,11 @@ scenario_setup_vms() {
     rpm_install_microshift
 
     # Wait for LVMS pods — greenboot normally handles this, but SKIP_GREENBOOT=true in RPM mode
-    run_command_on_vm host1 "sudo /usr/bin/oc --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig wait --for=condition=Available deployment/lvms-operator -n openshift-storage --timeout=300s"
+    local -r kc="/var/lib/microshift/resources/kubeadmin/kubeconfig"
+    run_command_on_vm host1 "sudo /usr/bin/oc --kubeconfig ${kc} wait --for=condition=Available deployment/lvms-operator -n openshift-storage --timeout=300s"
+    run_command_on_vm host1 "sudo /usr/bin/oc --kubeconfig ${kc} wait --for=jsonpath='{.status.numberReady}'=1 daemonset/vg-manager -n openshift-storage --timeout=300s"
+    # Wait for CSI driver to register
+    run_command_on_vm host1 "sudo /usr/bin/oc --kubeconfig ${kc} wait --for=jsonpath='{.status.numberReady}'=1 daemonset/topolvm-node -n openshift-storage --timeout=300s"
 }
 
 scenario_run_tests() {

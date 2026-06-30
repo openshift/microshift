@@ -9,6 +9,8 @@ scenario_create_vms() {
 scenario_setup_vms() {
     rpm_configure_vm
     rpm_install_microshift
+    # Reboot to ensure clean IPv6/dual-stack network state after NM restart
+    rpm_reboot_and_wait
 }
 
 scenario_remove_vms() {

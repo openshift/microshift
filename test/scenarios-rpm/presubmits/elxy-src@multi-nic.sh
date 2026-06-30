@@ -6,18 +6,16 @@ scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
     launch_vm "${RPM_INSTALLER_IMAGE}" --network default,"${VM_MULTUS_NETWORK}"
 }
-
-scenario_remove_vms() {
-    remove_vm host1
-}
-
 scenario_setup_vms() {
     rpm_configure_vm
     rpm_install_microshift
+    # Reboot so greenboot-healthcheck runs at boot (it refuses manual start)
+    # and NM fully configures all NICs
+    rpm_reboot_and_wait
+}
 
-    # greenboot-healthcheck is installed as a dependency but never ran (boot-time oneshot).
-    # The RF test's Setup waits for it to be in "exited" state, so start it explicitly.
-    run_command_on_vm host1 "sudo systemctl start greenboot-healthcheck.service"
+scenario_remove_vms() {
+    remove_vm host1
 }
 
 scenario_run_tests() {
