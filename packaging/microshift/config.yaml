@@ -475,8 +475,11 @@ ingress:
     # controller, resulting in a rollout.
     tlsSecurityProfile:
         # custom is a user-defined TLS security profile. Be extremely careful using a custom
-        # profile as invalid configurations can be catastrophic. An example custom profile
-        # looks like this:
+        # profile as invalid configurations can be catastrophic.
+
+        # The supported groups list for this profile is empty by default.
+
+        # An example custom profile looks like this:
 
         #   minTLSVersion: VersionTLS11
         #   ciphers:
@@ -495,6 +498,24 @@ ingress:
             # TLS 1.3 cipher suites (e.g. TLS_AES_128_GCM_SHA256) are not configurable
             # and are always enabled when TLS 1.3 is negotiated.
             ciphers: []
+            # groups is an optional, ordered field used to specify the supported groups (formerly known as
+            # elliptic curves) that are used during the TLS handshake.  The order of the groups represents
+            # a suggested preference, with the most preferred group first. Note that not all platform
+            # components honor the ordering: Go-based components use Go's internal preference order and
+            # treat this list as a filter of allowed groups rather than an ordered preference.
+            # Operators may remove entries their operands do not support.
+
+            # When omitted, this means no opinion and the platform is left to choose reasonable defaults which are
+            # subject to change over time and may be different per platform component depending on the underlying TLS
+            # libraries they use. If specified, the list must contain at least one and at most 7 groups,
+            # and each group must be unique.
+
+            # For example, to use X25519 and secp256r1 (yaml):
+
+            #   groups:
+            #     - X25519
+            #     - secp256r1
+            groups: []
             # minTLSVersion is used to specify the minimal version of the TLS protocol
             # that is negotiated during the TLS handshake. For example, to use TLS
             # versions 1.1, 1.2 and 1.3 (yaml):
@@ -504,6 +525,10 @@ ingress:
         # intermediate is a TLS profile for use when you do not need compatibility with
         # legacy clients and want to remain highly secure while being compatible with
         # most clients currently in use.
+
+        # The supported groups list includes by default the following groups
+        # in suggested preference order (ordering may not be honored by all implementations):
+        # X25519MLKEM768, X25519, secp256r1, secp384r1.
 
         # This profile is equivalent to a Custom profile specified as:
         #   minTLSVersion: VersionTLS12
@@ -520,7 +545,9 @@ ingress:
         intermediate: {}
         # modern is a TLS security profile for use with clients that support TLS 1.3 and
         # do not need backward compatibility for older clients.
-
+        # The supported groups list includes by default the following groups
+        # in suggested preference order (ordering may not be honored by all implementations):
+        # X25519MLKEM768, X25519, secp256r1, secp384r1.
         # This profile is equivalent to a Custom profile specified as:
         #   minTLSVersion: VersionTLS13
         #   ciphers:
@@ -530,6 +557,10 @@ ingress:
         modern: {}
         # old is a TLS profile for use when services need to be accessed by very old
         # clients or libraries and should be used only as a last resort.
+
+        # The supported groups list includes by default the following groups
+        # in suggested preference order (ordering may not be honored by all implementations):
+        # X25519MLKEM768, X25519, secp256r1, secp384r1.
 
         # This profile is equivalent to a Custom profile specified as:
         #   minTLSVersion: VersionTLS10
@@ -547,11 +578,14 @@ ingress:
         #     - ECDHE-RSA-AES128-SHA256
         #     - ECDHE-ECDSA-AES128-SHA
         #     - ECDHE-RSA-AES128-SHA
+        #     - ECDHE-ECDSA-AES256-SHA384
+        #     - ECDHE-RSA-AES256-SHA384
         #     - ECDHE-ECDSA-AES256-SHA
         #     - ECDHE-RSA-AES256-SHA
         #     - AES128-GCM-SHA256
         #     - AES256-GCM-SHA384
         #     - AES128-SHA256
+        #     - AES256-SHA256
         #     - AES128-SHA
         #     - AES256-SHA
         #     - DES-CBC3-SHA
@@ -559,10 +593,16 @@ ingress:
         # type is one of Old, Intermediate, Modern or Custom. Custom provides the
         # ability to specify individual TLS security profile parameters.
 
-        # The profiles are based on version 5.7 of the Mozilla Server Side TLS
-        # configuration guidelines. The cipher lists consist of the configuration's
-        # "ciphersuites" followed by the Go-specific "ciphers" from the guidelines.
-        # See: https://ssl-config.mozilla.org/guidelines/5.7.json
+        # The cipher and groups lists in these profiles are based on version 5.8 of the
+        # Mozilla Server Side TLS configuration guidelines.
+        # See: https://ssl-config.mozilla.org/guidelines/5.8.json
+
+        # The groups are listed in suggested preference order, with the most preferred group first.
+        # Note that not all platform components honor the ordering: Go-based components use Go's
+        # internal preference order and treat this list as a filter of allowed groups rather than
+        # an ordered preference.
+        # Note that X25519MLKEM768 is a post-quantum hybrid group that is not
+        # FIPS-approved and should be ignored by components running in FIPS mode.
 
         # The profiles are intent based, so they may change over time as new ciphers are
         # developed and existing ciphers are found to be insecure. Depending on
