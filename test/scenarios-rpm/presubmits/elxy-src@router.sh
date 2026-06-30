@@ -6,8 +6,6 @@ scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
     launch_vm "${RPM_INSTALLER_IMAGE}"
 }
-
-
 scenario_setup_vms() {
     rpm_configure_vm
     rpm_install_microshift
