@@ -33,6 +33,5 @@ scenario_run_tests() {
     install_microshift "${WEB_SERVER_URL}/rpm-repos/${reponame}" "${target_version}"
 
     run_tests host1 \
-        --variable "EXPECTED_OS_VERSION:10.2" \
-        suites/standard1/version.robot
+        suites/router/
 }
