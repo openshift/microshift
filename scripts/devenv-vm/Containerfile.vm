@@ -1,0 +1,37 @@
+ARG RHEL_VERSION=9.8
+FROM registry.redhat.io/rhel9-eus/rhel-${RHEL_VERSION}-bootc:${RHEL_VERSION}
+
+# Remove host entitlement symlink so subscription-manager registers a fresh subscription
+RUN rm -f /etc/pki/entitlement-host
+
+# Create builder user before running configure scripts (they reference $USER)
+RUN useradd -m -G wheel builder && \
+    echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+ENV USER=builder
+
+# Register subscription, run configure-vm.sh and configure-composer.sh, then unregister.
+# All in one step to avoid stale subscription from cached layers.
+RUN --mount=type=bind,target=/opt/microshift,rw \
+    --mount=type=secret,id=rhsm_org \
+    --mount=type=secret,id=rhsm_key \
+    --mount=type=secret,id=pull_secret \
+    subscription-manager register \
+        --org="$(cat /run/secrets/rhsm_org)" \
+        --activationkey="$(cat /run/secrets/rhsm_key)" && \
+    /opt/microshift/scripts/devenv-builder/configure-vm.sh \
+        --no-build --skip-dnf-update /run/secrets/pull_secret
+
+# configure-composer.sh calls systemctl --now which fails during container build
+# because there is no systemd. The packages and symlinks are installed; services
+# will start when the VM boots with systemd.
+RUN --mount=type=bind,target=/opt/microshift,rw \
+    /opt/microshift/scripts/devenv-builder/configure-composer.sh || true
+
+# Unregister so the subscription is not baked into the image
+RUN subscription-manager unregister || true
+
+# Enable sshd for remote access
+RUN systemctl enable sshd
+
+# Disable tmpfs on /tmp so it uses the root filesystem
+RUN systemctl mask tmp.mount

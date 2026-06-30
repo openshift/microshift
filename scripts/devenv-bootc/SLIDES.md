@@ -1,11 +1,22 @@
-# MicroShift Containerized Dev Environment
+# MicroShift Dev Environment
 
 ---
 
 ## Goal
 
 Run the full MicroShift build and test pipeline (RPMs, bootc images, ISOs, VMs)
-from any Linux host with podman — no dedicated RHEL VM required.
+from any Linux host.
+
+---
+
+## Summary
+
+| Approach | SELinux | Rootful podman | systemd | ISO builds | Status |
+|----------|---------|---------------|---------|------------|--------|
+| Toolbox | ✅ | ❌ | ❌ | ❌ | Blocked |
+| Privileged container | ❌ | ✅ | ✅ | ❌ | Blocked |
+| Podman machine | N/A | N/A | N/A | N/A | Incompatible with RHEL |
+| libvirt VM + virtiofs | ✅ | ✅ | ✅ | ✅ | **Working** |
 
 ---
 
@@ -195,10 +206,55 @@ None of these are present in standard RHEL bootc images.
 
 ---
 
-## Next Steps
+## Approach 4: devenv-vm (libvirt + virtiofs) ✅ Working
 
-| Option | Pros | Cons |
-|--------|------|------|
-| Toolbox + `image-builder-cli` | SELinux works, no VM needed | Requires porting ostree builds from osbuild-composer |
-| Direct `qemu-kvm` / `virt-install` | Full kernel, real SELinux, no nesting issues | More scripting, no podman machine UX |
-| Fedora CoreOS + configure-vm.sh | Works with podman machine | Not RHEL, different package set |
+---
+
+### Technique
+
+- Build RHEL bootc container image with all deps pre-installed
+  (configure-vm.sh and configure-composer.sh run during `podman build`)
+- Convert to qcow2 disk using `image-builder-cli --bootc-ref`
+  with a blueprint for user/SSH key setup
+- Boot via `virt-install` with virtiofs filesystem sharing
+- SSH for shell/exec access, libvirt for lifecycle management
+
+---
+
+### Setup flow
+
+1. `setup`: `podman build` bootc image → `image-builder-cli` qcow2
+2. `start`: `virt-install --import` with virtiofs mount of project root
+3. VM boots with full RHEL kernel, SELinux enforcing, systemd, libvirtd
+
+---
+
+### File sharing
+
+- Single virtiofs mount of entire project root → `/var/microshift` in VM
+- Bidirectional, real-time — edit on host, build in VM
+- No worktrees needed — VM works on whatever branch is checked out
+
+---
+
+### What Works
+
+- Full RHEL kernel with SELinux enforcing
+- RPM builds, container image builds, bootc ISO builds
+- `sudo podman` — no SHM lock or nesting issues
+- osbuild-composer, composer-cli — systemd runs natively
+- libvirt/KVM for nested VMs (test scenarios)
+- Mirror registry (quay/redis/postgres)
+- `virsh console` for debugging
+- Visible in `virt-manager`
+- Survives VM reboot (virtiofs remounted on start)
+
+---
+
+### Key Insight
+
+A real VM avoids all container-based limitations:
+- No SELinux xattr issues (real kernel, real filesystem)
+- No rootful podman conflicts (independent podman instance)
+- No systemd limitations (VM runs its own init)
+- virtiofs provides container-like file sharing performance
