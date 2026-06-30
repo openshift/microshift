@@ -1,3 +1,100 @@
-- kubernetes image-arm64 cb701a76af41b535bbbc3db709ac5b0da52fb632 to a466682e3867da746be24d7d56c6641612721d6c
+- api embedded-component 5346161d1bf2a4b45d998678f00e1e8d224acf7b to 3d22ba1007502a22d83aebecb29457d8ef124c5a
+  - e096b7be 2026-06-24T09:40:03-04:00 OCPBUGS-63219: Add protocol to AWS NLB parameters
+  - 8f87a41c 2026-06-24T08:01:53-04:00 Add MutableTopology feature gate for spec.controlPlaneTopology
+  - fd7d48b8 2026-06-23T12:34:23-03:00 chore: SPLAT-2588: enable feature on Hypershift
+  - 3d2c4233 2026-06-23T11:29:45+01:00 - Adding cabilities for crdcompatibilitychecker and capi CRs
+  - 5300823d 2026-06-22T17:33:15-03:00 fix(tools): use external topology for hypershift Sippy queries
+  - f74255e3 2026-06-22T17:33:12-03:00 fix(tools): display hypershift in HTML/markdown reports for external topology
+  - cc00868b 2026-06-22T17:33:12-03:00 test(tools): add unit tests for featuregate-test-analyzer
+  - c85beac3 2026-06-22T10:41:40-04:00 Add v1 type CRIOCredentialProviderConfig
+  - 6f5089fa 2026-06-22T13:57:57+05:30 Add API integration tests
+  - 09b9bcb8 2026-06-22T13:57:55+05:30 Add Secrets Store CSI driver configuration to ClusterCSIDriver API
+  - 1d2fb194 2026-06-16T09:39:23+02:00 STOR-2966: Promote ExternalSnapshotMetadata feature gate to TechPreviewNoUpgrade
+  - 3f52e05e 2026-06-09T15:44:21+02:00 Add SELinuxMountGAReadiness FG
+
+- cluster-ingress-operator embedded-component bf13f251347308b80b170582de455c59cb0510be to 8908668eac379bd29431c70f195618efa0337522
+  - d76f79cc 2026-06-26T00:38:57Z Revert "NE-2664: deploy haproxy as sidecar (#1439)"
+  - a78ff4ec 2026-06-19T10:00:23-03:00 deploy haproxy as sidecar
+  - 398622a0 2026-06-18T17:50:52-04:00 OCPBUGS-90505: Guard subscriptionCache creation with OLM capability check
+  - 6f3c80ba 2026-06-18T17:50:45-04:00 OCPBUGS-90505: Guard OLM watches with capability check in gatewayclass controller
+
+- cluster-kube-apiserver-operator embedded-component e3c762513675e506be2be1e219f1ef621db18275 to 5e0353a93bfa9a7dbe3a5afe9e9e3b0aa66fe585
+  - 039a08d 2026-06-25T11:13:10+03:00 Wire health reporter
+  - 4dd7f19 2026-06-25T11:03:52+03:00 Bump library-go
+  - a1e06e7 2026-06-24T17:50:06+03:00 Update openshift dependencies
+  - cc13111 2026-06-22T15:06:38+02:00 NO-JIRA: add kms preflight to NP to allow egress
+  - a960532 2026-06-12T13:35:26+02:00 add openshift/kms parent to kms test suites
+
+- cluster-network-operator embedded-component c376140ed1842c6a5f78cb74c55b4b49ba212041 to a95f01f7abe520b3c315d1cb262840fb686126b7
+  - c90d9fb 2026-06-24T14:14:20+02:00 Add CodeRabbit configuration for automated PR reviews
+  - 8db6228 2026-06-18T10:50:36-07:00 Watch Network and Infrastructure in proxyconfig controller
+  - b223b6c 2026-06-09T18:00:33+02:00 Update openshift/api and openshift/client-go to latest
+
+- cluster-policy-controller embedded-component bb429f5b2a7d77791110b06d8ec5c017183e3ab9 to 050c1ee6aeb0838daf75858fd853cca1e0098fa9
+  - a03103a 2026-06-19T15:45:24+02:00 update OWNERS file
+  - 69f126c 2026-06-19T11:46:31+02:00 add serviceAccountToken volume type to psalabelsyncer
+  - aefcd82 2026-06-19T11:43:58+02:00 go mod vendor
+  - ab6e156 2026-06-19T11:42:00+02:00 bump openshift/api
+
+- kubernetes embedded-component d8d517e6bbe7cf7359026cac26bb96ea45e18806 to a466682e3867da746be24d7d56c6641612721d6c
+  - 410f58272 2026-06-16T23:18:18-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for standalone clusters
   - 7ffb8b2ae 2026-06-15T13:17:06-04:00 UPSTREAM: <carry>: fix kubernetes/conformance to filter on [Conformance] label
+
+- machine-config-operator embedded-component fb5bfe252ba774a014af1059223cea3d07ef14dd to c3ce5f2d89bae99230e4d763cd413bc312d5cac7
+  - 5676f30e 2026-06-24T08:28:02-05:00 Remove verbose ignition config logging from bootstrap MCS
+  - fb2491ab 2026-06-23T11:59:01-04:00 test: remove stub upgrade test
+  - 95e21734 2026-06-23T17:55:50+05:30 NO-ISSUE: Temporarily disable sandboxed-containers extension from tests
+  - ba2edec9 2026-06-22T15:40:19-04:00 upgrademonitor: skip no-op MCN SSA calls
+  - ea5455d8 2026-06-22T10:23:33-04:00 temporarily remove sandboxed-containers from extensions test
+  - 9fac87e5 2026-06-19T20:40:14+05:30 Migrate OS layering tests from openshift-tests-private
+  - 449a1f79 2026-06-19T12:01:03+05:30 Revert "OKD-294: Migrate runtime from runc to crun on an upgrade for OKD"
+  - f617a2c5 2026-06-18T10:28:19-04:00 bootimage: add reset cluster bootimage capability
+  - fa12d23e 2026-06-18T10:28:19-04:00 bootimage: remove configmap version checks
+  - db282613 2026-06-18T10:28:19-04:00 bootimage: rename patchSkipped to reconcileSkipped
+  - 0ebbf630 2026-06-18T10:27:15-04:00 bootimage: make vsphere updates atomic
+  - 50a50881 2026-06-09T13:29:35Z Block runc on RHEL 10 in bootstrap render path
+  - fd486c21 2026-06-09T13:29:35Z Block MachineConfig rendering when runc is configured on RHEL 10 pools
+
+- operator-framework-olm embedded-component 32225496430f8607ece581277f56e254fed708be to 0adff33f0e0251265c6574319131f6918e9f8993
+  - 80043d4c 2026-06-25T00:05:29Z :seedling: Bump github.com/containerd/containerd from 1.7.32 to 1.7.33 (#3858)
+  - aef2567a 2026-06-25T00:04:48Z Upgrade hashstructure and mapstructure to v2 (#3854)
+  - 07fd0b98 2026-06-25T00:04:32Z :seedling: Bump github.com/prometheus/common from 0.68.1 to 0.69.0 (#3857)
+  - 20fa2f20 2026-06-25T00:04:17Z :seedling: Bump github.com/onsi/ginkgo/v2 from 2.31.0 to 2.32.0 (#3856)
+  - 546c08d1 2026-06-25T00:04:01Z Bump actions/checkout from 6 to 7 (#3855)
+  - 3a95edb6 2026-06-25T00:03:46Z Apply cluster TLS security profile to packageserver serving options (#3849)
+  - 83332273 2026-06-25T00:03:27Z :seedling: Bump the k8s-dependencies group across 1 directory with 8 updates (#3850)
+
+- route-controller-manager embedded-component e454c01fbe561cce9973f54b1ddbcdd35a9d18ff to 01ccbfb991fdbc559820a04c4932fc5ddf2339d0
+  - d825fa2 2026-06-23T23:22:09-04:00 Update go.mod to match Go 1.26.3 builder images
+  - d809961 2026-06-06T09:48:07Z Updating ose-route-controller-manager-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-route-controller-manager.yml
+
+- service-ca-operator embedded-component 35cf51895f4dc77dca8a709e7635980753f87e17 to 883c387c71c59767f08e21ca57c810b56ab16d01
+  - e258072 2026-06-25T21:42:09+01:00 Update CONTRIBUTING.md to match updates to template
+  - 0ef0d32 2026-06-25T15:53:28+01:00 Merge in changes from PR#363
+  - 5e8bcab 2026-06-24T21:16:29+01:00 Add AI SDLC context files
+
+- ovn-kubernetes image-amd64 62baca4832f3aeb3fc7032d38619835c04208c95 to f0527039dfc4901637721e7cecfdb9d0ea1c9c38
+  - 10d5782c 2026-06-16T20:56:43-07:00 Fix perma-failing security presubmit job
+  - 133ba1e4 2026-05-08T09:45:38+02:00 Promote EVPN E2Es from informing to blocking tests
+
+- kubernetes image-amd64 d8d517e6bbe7cf7359026cac26bb96ea45e18806 to a466682e3867da746be24d7d56c6641612721d6c
+  - 410f58272 2026-06-16T23:18:18-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for standalone clusters
+  - 7ffb8b2ae 2026-06-15T13:17:06-04:00 UPSTREAM: <carry>: fix kubernetes/conformance to filter on [Conformance] label
+
+- service-ca-operator image-amd64 35cf51895f4dc77dca8a709e7635980753f87e17 to 883c387c71c59767f08e21ca57c810b56ab16d01
+  - e258072 2026-06-25T21:42:09+01:00 Update CONTRIBUTING.md to match updates to template
+  - 0ef0d32 2026-06-25T15:53:28+01:00 Merge in changes from PR#363
+  - 5e8bcab 2026-06-24T21:16:29+01:00 Add AI SDLC context files
+
+- router image-arm64 3553702970b094986d91f218e3191487de46e476 to 2a6e5d1fe0879778088728603a8bf256dbb4cedb
+  - 42ee1e6 2026-06-08T06:07:59Z Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/openshift-enterprise-haproxy-router.yml
+
+- ovn-kubernetes image-arm64 62baca4832f3aeb3fc7032d38619835c04208c95 to f0527039dfc4901637721e7cecfdb9d0ea1c9c38
+  - 10d5782c 2026-06-16T20:56:43-07:00 Fix perma-failing security presubmit job
+  - 133ba1e4 2026-05-08T09:45:38+02:00 Promote EVPN E2Es from informing to blocking tests
+
+- service-ca-operator image-arm64 35cf51895f4dc77dca8a709e7635980753f87e17 to 883c387c71c59767f08e21ca57c810b56ab16d01
+  - e258072 2026-06-25T21:42:09+01:00 Update CONTRIBUTING.md to match updates to template
+  - 0ef0d32 2026-06-25T15:53:28+01:00 Merge in changes from PR#363
+  - 5e8bcab 2026-06-24T21:16:29+01:00 Add AI SDLC context files
 

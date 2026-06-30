@@ -162,7 +162,7 @@ github.com/felixge/httpsnoop
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
 github.com/fsnotify/fsnotify/internal
-# github.com/fxamacker/cbor/v2 v2.9.0
+# github.com/fxamacker/cbor/v2 v2.9.2
 ## explicit; go 1.20
 github.com/fxamacker/cbor/v2
 # github.com/gabriel-vasile/mimetype v1.4.10
@@ -484,7 +484,7 @@ github.com/opencontainers/runtime-spec/specs-go
 github.com/opencontainers/selinux/go-selinux
 github.com/opencontainers/selinux/go-selinux/label
 github.com/opencontainers/selinux/pkg/pwalkdir
-# github.com/openshift/api v0.0.0-20260511191110-9b69e5fa27e9
+# github.com/openshift/api v0.0.0-20260618181827-d22a47a846dc
 ## explicit; go 1.25.0
 github.com/openshift/api
 github.com/openshift/api/annotations
@@ -734,7 +734,7 @@ github.com/openshift/client-go/user/informers/externalversions/internalinterface
 github.com/openshift/client-go/user/informers/externalversions/user
 github.com/openshift/client-go/user/informers/externalversions/user/v1
 github.com/openshift/client-go/user/listers/user/v1
-# github.com/openshift/cluster-policy-controller v0.0.0-20260420102459-bb429f5b2a7d
+# github.com/openshift/cluster-policy-controller v0.0.0-20260622225645-050c1ee6aeb0
 ## explicit; go 1.25.0
 github.com/openshift/cluster-policy-controller/pkg/client/genericinformers
 github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller
@@ -798,8 +798,8 @@ github.com/openshift/library-go/pkg/route/validation
 github.com/openshift/library-go/pkg/security/ldaputil
 github.com/openshift/library-go/pkg/security/uid
 github.com/openshift/library-go/pkg/serviceability
-# github.com/openshift/route-controller-manager v0.0.0-20260611182032-e454c01fbe56
-## explicit; go 1.25.0
+# github.com/openshift/route-controller-manager v0.0.0-20260625182940-01ccbfb991fd
+## explicit; go 1.26.3
 github.com/openshift/route-controller-manager/pkg/cmd/controller
 github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager
 github.com/openshift/route-controller-manager/pkg/route/ingress
@@ -1029,7 +1029,7 @@ go.yaml.in/yaml/v2
 # go.yaml.in/yaml/v3 v3.0.4
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
-# golang.org/x/crypto v0.51.0
+# golang.org/x/crypto v0.53.0
 ## explicit; go 1.25.0
 golang.org/x/crypto/cryptobyte
 golang.org/x/crypto/cryptobyte/asn1
@@ -1045,12 +1045,12 @@ golang.org/x/crypto/sha3
 # golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa
 ## explicit; go 1.25.0
 golang.org/x/exp/slices
-# golang.org/x/mod v0.35.0
+# golang.org/x/mod v0.36.0
 ## explicit; go 1.25.0
 golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.54.0
+# golang.org/x/net v0.56.0
 ## explicit; go 1.25.0
 golang.org/x/net/bpf
 golang.org/x/net/context
@@ -1075,11 +1075,11 @@ golang.org/x/net/websocket
 ## explicit; go 1.25.0
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sync v0.20.0
+# golang.org/x/sync v0.21.0
 ## explicit; go 1.25.0
 golang.org/x/sync/errgroup
 golang.org/x/sync/singleflight
-# golang.org/x/sys v0.44.0
+# golang.org/x/sys v0.46.0
 ## explicit; go 1.25.0
 golang.org/x/sys/cpu
 golang.org/x/sys/plan9
@@ -1088,10 +1088,10 @@ golang.org/x/sys/windows
 golang.org/x/sys/windows/registry
 golang.org/x/sys/windows/svc
 golang.org/x/sys/windows/svc/mgr
-# golang.org/x/term v0.43.0
+# golang.org/x/term v0.44.0
 ## explicit; go 1.25.0
 golang.org/x/term
-# golang.org/x/text v0.37.0
+# golang.org/x/text v0.38.0
 ## explicit; go 1.25.0
 golang.org/x/text/cases
 golang.org/x/text/encoding
@@ -1119,7 +1119,7 @@ golang.org/x/text/unicode/norm
 # golang.org/x/time v0.15.0
 ## explicit; go 1.25.0
 golang.org/x/time/rate
-# golang.org/x/tools v0.44.0
+# golang.org/x/tools v0.45.0
 ## explicit; go 1.25.0
 golang.org/x/tools/container/intsets
 golang.org/x/tools/go/ast/astutil
@@ -2245,8 +2245,8 @@ k8s.io/kube-aggregator/pkg/registry/apiservice/rest
 # k8s.io/kube-controller-manager v1.35.3 => ./deps/github.com/openshift/kubernetes/staging/src/k8s.io/kube-controller-manager
 ## explicit; go 1.25.0
 k8s.io/kube-controller-manager/config/v1alpha1
-# k8s.io/kube-openapi v0.0.0-20260304202019-5b3e3fdb0acf
-## explicit; go 1.23.0
+# k8s.io/kube-openapi v0.0.0-20260618221249-bc653b64f974
+## explicit; go 1.24.0
 k8s.io/kube-openapi/cmd/openapi-gen
 k8s.io/kube-openapi/cmd/openapi-gen/args
 k8s.io/kube-openapi/pkg/aggregator
@@ -2262,6 +2262,11 @@ k8s.io/kube-openapi/pkg/handler
 k8s.io/kube-openapi/pkg/handler3
 k8s.io/kube-openapi/pkg/internal
 k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json
+k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json/internal
+k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json/internal/jsonflags
+k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json/internal/jsonopts
+k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json/internal/jsonwire
+k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json/jsontext
 k8s.io/kube-openapi/pkg/internal/third_party/govalidator
 k8s.io/kube-openapi/pkg/openapiconv
 k8s.io/kube-openapi/pkg/schemaconv
@@ -2411,6 +2416,7 @@ k8s.io/kubernetes/openshift-kube-apiserver/admission/route/hostassignment
 k8s.io/kubernetes/openshift-kube-apiserver/admission/scheduler/apis/podnodeconstraints
 k8s.io/kubernetes/openshift-kube-apiserver/admission/scheduler/apis/podnodeconstraints/v1
 k8s.io/kubernetes/openshift-kube-apiserver/admission/scheduler/nodeenv
+k8s.io/kubernetes/openshift-kube-apiserver/admission/scheduler/nodeselectoradjuster
 k8s.io/kubernetes/openshift-kube-apiserver/admission/scheduler/podnodeconstraints
 k8s.io/kubernetes/openshift-kube-apiserver/admission/storage/csiinlinevolumesecurity
 k8s.io/kubernetes/openshift-kube-apiserver/authorization/browsersafe
@@ -3347,7 +3353,7 @@ sigs.k8s.io/kustomize/kyaml/yaml/walk
 ## explicit; go 1.18
 sigs.k8s.io/randfill
 sigs.k8s.io/randfill/bytesource
-# sigs.k8s.io/structured-merge-diff/v6 v6.3.2
+# sigs.k8s.io/structured-merge-diff/v6 v6.4.0
 ## explicit; go 1.23
 sigs.k8s.io/structured-merge-diff/v6/fieldpath
 sigs.k8s.io/structured-merge-diff/v6/merge
