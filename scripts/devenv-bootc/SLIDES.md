@@ -9,7 +9,64 @@ from any Linux host with podman — no dedicated RHEL VM required.
 
 ---
 
-## Approach 1: devenv-bootc (Privileged Container)
+## Approach 1: devenv-toolbox (Toolbox Container)
+
+---
+
+### Technique
+
+- Uses `toolbox create/enter/run` with a custom UBI9-based image
+- Shares host's filesystem, network, `/dev/kvm`, SELinux kernel
+- No `--privileged`, no nested systemd — uses host's init system
+- `chcon` works because toolbox sees the real SELinux via `/sys/fs/selinux`
+
+---
+
+### What Works
+
+- RPM builds (`make rpm`)
+- Container image builds (`podman build`)
+- `chcon` / SELinux xattrs (host kernel, no overlay xattr limitation)
+- Host filesystem access (no bind-mount needed)
+- subscription-manager registration
+- configure-vm.sh (package installation)
+
+---
+
+### Limitations
+
+- **No rootful podman** — toolbox maps host root to `nobody` via user namespaces.
+  `sudo podman` fails with "permission denied" on `/dev/shm/libpod_lock`
+  because the SHM lock file is owned by host root, inaccessible inside toolbox.
+  - Mirror registry (`mirror_registry.sh`) uses `sudo podman` for quay/redis/postgres
+  - Not a simple fix — containers use UID/GID mapping and privileged port binding
+- **No systemd inside the container** — toolbox shares host PID 1
+  - `osbuild-composer` requires systemd (socket activation, D-Bus)
+  - Cannot run `systemctl enable/start` for container-local services
+  - `manage_composer_config.sh` depends on osbuild-composer
+- **ostree image builds** — current build system uses `osbuild-composer`
+  (composer-cli). Porting to `image-builder-cli` would remove the systemd
+  dependency but requires rewriting the ostree image build pipeline.
+- **bootc ISO builds** — `image-builder-cli` works without systemd and
+  supports `--bootc-ref` for building from container images directly.
+  This is the viable path for ISO generation in a toolbox environment.
+
+---
+
+### Key Insight
+
+Toolbox solves the SELinux problem but introduces two new blockers:
+- **No rootful podman** — mirror registry and other `sudo podman` workflows fail
+- **No systemd** — osbuild-composer and service management don't work
+
+The build pipeline splits into:
+- **Works now:** RPMs, container images, rootless podman builds
+- **Blocked:** mirror registry, osbuild-composer, ISO builds via `sudo podman`
+- **Needs porting:** ostree images (from `osbuild-composer` to `image-builder-cli`)
+
+---
+
+## Approach 2: devenv-bootc (Privileged Container)
 
 ---
 
@@ -68,7 +125,7 @@ from any Linux host with podman — no dedicated RHEL VM required.
 
 ---
 
-## Approach 2: devenv-bootc-vm (Podman Machine)
+## Approach 3: devenv-bootc-vm (Podman Machine)
 
 ---
 
@@ -135,3 +192,13 @@ from any Linux host with podman — no dedicated RHEL VM required.
 - rpm-ostree/bootc deployment model
 
 None of these are present in standard RHEL bootc images.
+
+---
+
+## Next Steps
+
+| Option | Pros | Cons |
+|--------|------|------|
+| Toolbox + `image-builder-cli` | SELinux works, no VM needed | Requires porting ostree builds from osbuild-composer |
+| Direct `qemu-kvm` / `virt-install` | Full kernel, real SELinux, no nesting issues | More scripting, no podman machine UX |
+| Fedora CoreOS + configure-vm.sh | Works with podman machine | Not RHEL, different package set |
