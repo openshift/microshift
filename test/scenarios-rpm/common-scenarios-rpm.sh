@@ -38,7 +38,35 @@ rpm_configure_vm() {
 # Install MicroShift from the local RPM repo.
 rpm_install_microshift() {
     local -r reponame=$(basename "${LOCAL_REPO}")
-    install_microshift "${WEB_SERVER_URL}/rpm-repos/${reponame}" "$(local_rpm_version)"
+    local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
+    local -r target_version=$(local_rpm_version)
+
+    local -r tmp_file=$(mktemp)
+    tee "${tmp_file}" >/dev/null <<EOF
+[microshift-local]
+name=MicroShift Local Repository
+baseurl=${repo_url}
+enabled=1
+gpgcheck=0
+EOF
+    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
+    run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/microshift-local.repo"
+    rm -f "${tmp_file}"
+
+    run_command_on_vm host1 "sudo dnf install -q -R 2 -y --allowerasing 'microshift-${target_version}'"
+    # Wait for NetworkManager to reconnect after the RPM %post scriptlet restarts it.
+    # The install keeps the local repo for scenarios that install additional RPMs.
+    local nm_status
+    nm_status=$(run_command_on_vm host1 "sudo nmcli -w 30 networking connectivity check" 2>&1) || true
+    echo "Post-install connectivity: ${nm_status}"
+    if [[ "${nm_status}" != *"full"* ]]; then
+        echo "WARNING: Network connectivity is '${nm_status}' after RPM install (expected 'full')"
+    fi
+    run_command_on_vm host1 "sudo systemctl start microshift.service"
+
+    wait_for_microshift_endpoint /readyz
+    wait_for_microshift_endpoint /livez
+    echo "MicroShift is ready"
 }
 
 configure_microshift_mirror() {
@@ -163,34 +191,3 @@ wait_for_microshift_endpoint() {
     return 1
 }
 
-install_microshift() {
-    local -r repo_url=$1
-    local -r target_version=$2
-
-    local -r tmp_file=$(mktemp)
-    tee "${tmp_file}" >/dev/null <<EOF
-[microshift-local]
-name=MicroShift Local Repository
-baseurl=${repo_url}
-enabled=1
-gpgcheck=0
-EOF
-    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-    run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/microshift-local.repo"
-    rm -f "${tmp_file}"
-
-    run_command_on_vm host1 "sudo dnf install -q -R 2 -y --allowerasing 'microshift-${target_version}'"
-    # Wait for NetworkManager to reconnect after the RPM %post scriptlet restarts it.
-    # The install keeps the local repo for scenarios that install additional RPMs.
-    local nm_status
-    nm_status=$(run_command_on_vm host1 "sudo nmcli -w 30 networking connectivity check" 2>&1) || true
-    echo "Post-install connectivity: ${nm_status}"
-    if [[ "${nm_status}" != *"full"* ]]; then
-        echo "WARNING: Network connectivity is '${nm_status}' after RPM install (expected 'full')"
-    fi
-    run_command_on_vm host1 "sudo systemctl start microshift.service"
-
-    wait_for_microshift_endpoint /readyz
-    wait_for_microshift_endpoint /livez
-    echo "MicroShift is ready"
-}
