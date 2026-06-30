@@ -27,9 +27,6 @@ COMPOSER_CLI_BUILDS=true
 if [ -v CI_JOB_NAME ] && [[ "${CI_JOB_NAME}" =~ .*bootc.* ]]; then
     COMPOSER_CLI_BUILDS=false
 fi
-if [ $# -gt 0 ] && [ "$1" = "-rpm_only" ]; then
-    COMPOSER_CLI_BUILDS=false
-fi
 
 # Allow for a dry-run option to save on testing time
 BUILD_DRY_RUN=${BUILD_DRY_RUN:-false}
