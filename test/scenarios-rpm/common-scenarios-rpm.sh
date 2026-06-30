@@ -28,6 +28,18 @@ RPM_RHEL_MAJOR="${RPM_RHEL_VERSION%%.*}"
 RPM_INSTALLER_IMAGE="rhel${RPM_RHEL_VERSION//./}-installer"
 echo "RPM scenario targeting RHEL ${RPM_RHEL_VERSION} (installer: ${RPM_INSTALLER_IMAGE})"
 
+# Default scenario_setup_vms for RPM scenarios.
+# Configures firewall, RHSM, repos, and installs MicroShift.
+# Scenarios can override this to add extra steps.
+scenario_setup_vms() {
+    configure_vm_firewall host1
+    subscription_manager_register host1
+    configure_rpm_repos
+
+    local -r reponame=$(basename "${LOCAL_REPO}")
+    install_microshift "${WEB_SERVER_URL}/rpm-repos/${reponame}" "$(local_rpm_version)"
+}
+
 configure_microshift_mirror() {
     local -r repo=$1
 

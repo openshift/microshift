@@ -1674,6 +1674,35 @@ action_login() {
     fi
 }
 
+action_setup() {
+    start_junit
+    trap "close_junit" EXIT
+
+    if ! load_global_settings; then
+        record_junit "setup" "load_global_settings" "FAILED"
+        return 1
+    fi
+    record_junit "setup" "load_global_settings" "OK"
+
+    if ! load_scenario_script; then
+        record_junit "setup" "load_scenario_script" "FAILED"
+        return 1
+    fi
+    record_junit "setup" "load_scenario_script" "OK"
+
+    # shellcheck disable=SC2154
+    trap 'rc=$? ; \
+        [ "${rc}" -ne 0 ] && record_junit "setup" "scenario_setup_vms" "FAILED" ; \
+        collect_pcp_reports || true ; \
+        sos_report true || rc=1 ; \
+        close_junit ; exit "${rc}"' EXIT
+
+    if type scenario_setup_vms &>/dev/null; then
+        scenario_setup_vms
+        record_junit "setup" "scenario_setup_vms" "OK"
+    fi
+}
+
 action_run() {
     start_junit
     trap "close_junit" EXIT
@@ -1756,7 +1785,7 @@ JUNIT_OUTPUT_FILE="${SCENARIO_INFO_DIR}/${SCENARIO}/phase_${action}/junit.xml"
 cd "${SCRIPTDIR}/.."
 
 case "${action}" in
-    create|run|cleanup|login)
+    create|setup|run|cleanup|login)
         "action_${action}" "$@"
         ;;
     boot)
@@ -1769,10 +1798,12 @@ case "${action}" in
     rerun)
         action_cleanup "$@"
         action_create "$@"
+        action_setup "$@"
         action_run "$@"
         ;;
     create-and-run)
         action_create "$@"
+        action_setup "$@"
         action_run "$@"
         ;;
     *)

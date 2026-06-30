@@ -5,23 +5,26 @@ source "${TESTDIR}/scenarios-rpm/common-scenarios-rpm.sh"
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
     launch_vm "${RPM_INSTALLER_IMAGE}" --network default,"${VM_MULTUS_NETWORK}"
-    configure_vm_firewall host1
-    subscription_manager_register host1
-    configure_rpm_repos
 }
 
 scenario_remove_vms() {
     remove_vm host1
 }
 
-scenario_run_tests() {
+scenario_setup_vms() {
+    configure_vm_firewall host1
+    subscription_manager_register host1
+    configure_rpm_repos
+
     local -r reponame=$(basename "${LOCAL_REPO}")
     install_microshift "${WEB_SERVER_URL}/rpm-repos/${reponame}" "$(local_rpm_version)"
 
     # greenboot-healthcheck is installed as a dependency but never ran (boot-time oneshot).
     # The RF test's Setup waits for it to be in "exited" state, so start it explicitly.
     run_command_on_vm host1 "sudo systemctl start greenboot-healthcheck.service"
+}
 
+scenario_run_tests() {
     local -r vmname=$(full_vm_name host1)
     local -r vm_ip1=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
     local -r vm_ip2=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | tail -1)

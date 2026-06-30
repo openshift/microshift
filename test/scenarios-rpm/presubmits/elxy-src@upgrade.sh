@@ -5,14 +5,17 @@ source "${TESTDIR}/scenarios-rpm/common-scenarios-rpm.sh"
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
     launch_vm "${RPM_INSTALLER_IMAGE}"
-    configure_vm_firewall host1
-    subscription_manager_register host1
-    configure_rpm_repos
-    configure_microshift_mirror "${PREVIOUS_RELEASE_REPO}"
 }
 
 scenario_remove_vms() {
     remove_vm host1
+}
+
+scenario_setup_vms() {
+    configure_vm_firewall host1
+    subscription_manager_register host1
+    configure_rpm_repos
+    configure_microshift_mirror "${PREVIOUS_RELEASE_REPO}"
 }
 
 scenario_run_tests() {
