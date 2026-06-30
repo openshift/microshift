@@ -29,6 +29,10 @@ scenario_run_tests() {
     local -r target_version=$(local_rpm_version)
     install_microshift "${WEB_SERVER_URL}/rpm-repos/${reponame}" "${target_version}"
 
+    # greenboot-healthcheck is installed as a dependency but never ran (boot-time oneshot).
+    # The RF test's Setup waits for it to be in "exited" state, so start it explicitly.
+    run_command_on_vm host1 "sudo systemctl start greenboot-healthcheck.service"
+
     local -r vmname=$(full_vm_name host1)
     local -r vm_ip1=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)
     local -r vm_ip2=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | tail -1)

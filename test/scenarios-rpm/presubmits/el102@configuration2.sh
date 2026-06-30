@@ -18,7 +18,11 @@ scenario_create_vms() {
     # Pin the RHEL release to avoid package conflicts with other minor versions.
     run_command_on_vm host1 "sudo subscription-manager release --set 10.2"
     # Enable the fast-datapath repo for MicroShift networking (OVN-Kubernetes).
-    run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
+    local -r arch=$(uname -m)
+    configure_cdn_repo \
+        "fast-datapath" \
+        "Red Hat Fast Datapath for RHEL 9" \
+        "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/fast-datapath/os"
     # Install the dependencies for MicroShift networking (OVN-Kubernetes).
     run_command_on_vm host1 "sudo dnf install -y NetworkManager-ovs containers-common"
 }

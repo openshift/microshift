@@ -16,7 +16,11 @@ scenario_create_vms() {
     configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
     configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
     run_command_on_vm host1 "sudo subscription-manager release --set 10.2"
-    run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
+    local -r arch=$(uname -m)
+    configure_cdn_repo \
+        "fast-datapath" \
+        "Red Hat Fast Datapath for RHEL 9" \
+        "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/fast-datapath/os"
     run_command_on_vm host1 "sudo dnf install -y NetworkManager-ovs containers-common"
 }
 
@@ -28,6 +32,10 @@ scenario_run_tests() {
     local -r reponame=$(basename "${LOCAL_REPO}")
     local -r target_version=$(local_rpm_version)
     install_microshift "${WEB_SERVER_URL}/rpm-repos/${reponame}" "${target_version}"
+
+    # greenboot-healthcheck is installed as a dependency but never ran (boot-time oneshot).
+    # The RF test's Setup waits for it to be in "exited" state, so start it explicitly.
+    run_command_on_vm host1 "sudo systemctl start greenboot-healthcheck.service"
 
     local -r vmname=$(full_vm_name host1)
     local -r vm_ip1=$("${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" ip -n "${vmname}" | head -1)

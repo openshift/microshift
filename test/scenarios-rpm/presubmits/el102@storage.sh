@@ -18,7 +18,11 @@ scenario_create_vms() {
     # Pin the RHEL release to avoid package conflicts with other minor versions.
     run_command_on_vm host1 "sudo subscription-manager release --set 10.2"
     # Enable the fast-datapath repo for MicroShift networking (OVN-Kubernetes).
-    run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
+    local -r arch=$(uname -m)
+    configure_cdn_repo \
+        "fast-datapath" \
+        "Red Hat Fast Datapath for RHEL 9" \
+        "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/fast-datapath/os"
     # Install the dependencies for MicroShift networking (OVN-Kubernetes).
     run_command_on_vm host1 "sudo dnf install -y NetworkManager-ovs containers-common"
 }
@@ -31,6 +35,9 @@ scenario_run_tests() {
     local -r reponame=$(basename "${LOCAL_REPO}")
     local -r target_version=$(local_rpm_version)
     install_microshift "${WEB_SERVER_URL}/rpm-repos/${reponame}" "${target_version}"
+
+    # Wait for LVMS pods — greenboot normally handles this, but SKIP_GREENBOOT=true in RPM mode
+    run_command_on_vm host1 "sudo /usr/bin/oc --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig wait --for=condition=Available deployment/lvms-operator -n openshift-storage --timeout=300s"
 
     run_tests host1 \
         suites/storage/

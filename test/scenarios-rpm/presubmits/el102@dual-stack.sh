@@ -15,7 +15,11 @@ scenario_create_vms() {
     configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
     configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
     run_command_on_vm host1 "sudo subscription-manager release --set 10.2"
-    run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
+    local -r arch=$(uname -m)
+    configure_cdn_repo \
+        "fast-datapath" \
+        "Red Hat Fast Datapath for RHEL 9" \
+        "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/fast-datapath/os"
     run_command_on_vm host1 "sudo dnf install -y NetworkManager-ovs containers-common"
 }
 

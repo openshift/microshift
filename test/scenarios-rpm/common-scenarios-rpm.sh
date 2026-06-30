@@ -87,7 +87,9 @@ EOF
     rm -f "${tmp_file}"
 
     run_command_on_vm host1 "sudo dnf install -q -R 2 -y --allowerasing 'microshift-${target_version}'"
-    run_command_on_vm host1 "sudo rm -f /etc/yum.repos.d/microshift-local.repo"
+    # Keep the local repo for scenarios that install additional RPMs (e.g. microshift-low-latency)
+    # Wait for NetworkManager to reconnect after the RPM %post scriptlet restarts it
+    run_command_on_vm host1 "sudo nmcli -w 30 networking connectivity check || true"
     run_command_on_vm host1 "sudo systemctl start microshift.service"
 
     wait_for_microshift_endpoint /readyz
