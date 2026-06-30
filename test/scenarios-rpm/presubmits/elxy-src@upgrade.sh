@@ -12,9 +12,7 @@ scenario_remove_vms() {
 }
 
 scenario_setup_vms() {
-    configure_vm_firewall host1
-    subscription_manager_register host1
-    configure_rpm_repos
+    rpm_configure_vm
     configure_microshift_mirror "${PREVIOUS_RELEASE_REPO}"
 }
 

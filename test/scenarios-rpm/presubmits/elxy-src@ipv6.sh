@@ -15,6 +15,11 @@ scenario_create_vms() {
     launch_vm "${RPM_INSTALLER_IMAGE}" --network "${VM_IPV6_NETWORK}"
 }
 
+
+scenario_setup_vms() {
+    rpm_setup_and_install_microshift
+}
+
 scenario_remove_vms() {
     remove_vm host1
 }

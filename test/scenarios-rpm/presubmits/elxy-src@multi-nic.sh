@@ -12,12 +12,7 @@ scenario_remove_vms() {
 }
 
 scenario_setup_vms() {
-    configure_vm_firewall host1
-    subscription_manager_register host1
-    configure_rpm_repos
-
-    local -r reponame=$(basename "${LOCAL_REPO}")
-    install_microshift "${WEB_SERVER_URL}/rpm-repos/${reponame}" "$(local_rpm_version)"
+    rpm_setup_and_install_microshift
 
     # greenboot-healthcheck is installed as a dependency but never ran (boot-time oneshot).
     # The RF test's Setup waits for it to be in "exited" state, so start it explicitly.
