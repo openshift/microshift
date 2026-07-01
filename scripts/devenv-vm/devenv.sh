@@ -3,8 +3,6 @@ set -eou pipefail
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOTDIR="$( cd "${SCRIPTDIR}/../../" && pwd )"
-WORKTREE_BASE="${ROOTDIR}/.worktrees"
-VM_BASE="${ROOTDIR}/_output/vm-images"
 
 CONTAINERFILE="${SCRIPTDIR}/Containerfile.vm"
 
@@ -28,15 +26,7 @@ function resolve_names() {
     RHEL_VERSION=$(jq -r --arg b "${DEVENV_BRANCH}" '.[$b] // empty' "${SCRIPTDIR}/rhel-versions.json")
     IMAGE_NAME="microshift-vm:${BRANCH_TAG}"
     VM_NAME="microshift-devenv-${BRANCH_TAG}"
-    VM_DIR="${VM_BASE}/${BRANCH_TAG}"
-    SOURCE_DIR="${WORKTREE_BASE}/${BRANCH_TAG}"
-
-    # Create worktree if it doesn't exist
-    if [ ! -d "${SOURCE_DIR}" ]; then
-        echo "Creating worktree for branch '${DEVENV_BRANCH}'..."
-        mkdir -p "${WORKTREE_BASE}"
-        git -C "${ROOTDIR}" worktree add --detach "${SOURCE_DIR}" "${DEVENV_BRANCH}"
-    fi
+    VM_DIR="${ROOTDIR}/_output/${VM_NAME}"
 }
 
 function usage() {
@@ -69,6 +59,13 @@ function usage() {
     exit 1
 }
 
+function resolve_rhsm() {
+    if [ -z "${RHSM_ORG:-}" ] || [ -z "${RHSM_ACTIVATION_KEY:-}" ]; then
+        echo "ERROR: RHSM_ORG and RHSM_ACTIVATION_KEY env vars are required"
+        exit 1
+    fi
+}
+
 function check_prerequisites() {
     if ! command -v podman &>/dev/null; then
         echo "ERROR: podman is not installed"
@@ -83,20 +80,22 @@ function check_prerequisites() {
         echo "ERROR: /dev/kvm not found — KVM is required"
         exit 1
     fi
-    for cmd in virt-install virsh; do
-        if ! command -v "${cmd}" &>/dev/null; then
-            echo "ERROR: ${cmd} is not installed. Run: sudo dnf install -y virt-install"
-            exit 1
-        fi
-    done
-    if ! sudo systemctl is-active --quiet libvirtd; then
-        echo "Starting libvirtd..."
-        sudo systemctl enable --now libvirtd
+    if ! command -v virt-install &>/dev/null || ! command -v virsh &>/dev/null; then
+        echo "Installing libvirt prerequisites..."
+        "${ROOTDIR}/scripts/devenv-builder/manage-vm.sh" config
     fi
     if ! sudo systemctl is-active --quiet nfs-server; then
         echo "Starting nfs-server..."
         sudo dnf install -y nfs-utils 2>/dev/null
         sudo systemctl enable --now nfs-server
+    fi
+    if command -v firewall-cmd &>/dev/null; then
+        for svc in nfs mountd rpc-bind; do
+            if ! sudo firewall-cmd --zone=libvirt --query-service="${svc}" --quiet 2>/dev/null; then
+                sudo firewall-cmd --zone=libvirt --add-service="${svc}" --permanent --quiet
+            fi
+        done
+        sudo firewall-cmd --reload --quiet
     fi
 }
 
@@ -123,16 +122,18 @@ function vm_ip() {
         fi
         sleep 2
     done
-    echo "ERROR: Could not determine VM IP address"
-    exit 1
+    echo "ERROR: Could not determine VM IP address" >&2
+    return 1
 }
 
 function vm_ssh() {
+    local ip
+    ip=$(vm_ip) || exit 1
     ssh -i "${VM_DIR}/ssh_key" \
         -o StrictHostKeyChecking=no \
         -o UserKnownHostsFile=/dev/null \
         -o LogLevel=ERROR \
-        "builder@$(vm_ip)" "$@"
+        "builder@${ip}" "$@"
 }
 
 function vm_exec() {
@@ -140,9 +141,11 @@ function vm_exec() {
 }
 
 function vm_exec_as_microshift() {
+    local ip
+    ip=$(vm_ip) || exit 1
     ssh -i "${VM_DIR}/ssh_key" \
         -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
-        "microshift@$(vm_ip)" "cd /var/microshift && $*"
+        "microshift@${ip}" "cd /var/microshift && $(printf '%q ' "$@")"
 }
 
 function wait_for_ssh() {
@@ -166,10 +169,6 @@ function wait_for_ssh() {
 
 function cmd_setup() {
     check_prerequisites
-    if [ -z "${RHSM_ORG:-}" ] || [ -z "${RHSM_ACTIVATION_KEY:-}" ]; then
-        echo "ERROR: RHSM_ORG and RHSM_ACTIVATION_KEY env vars are required"
-        exit 1
-    fi
 
     mkdir -p "${VM_DIR}"
 
@@ -179,13 +178,22 @@ function cmd_setup() {
         ssh-keygen -t ed25519 -f "${VM_DIR}/ssh_key" -N "" -q
     fi
 
+    # Create worktree for the build so configure scripts come from the target branch
+    local worktree_base="${ROOTDIR}/.worktrees"
+    local build_dir="${worktree_base}/${VM_NAME}"
+    if [ ! -d "${build_dir}" ]; then
+        echo "Creating worktree for branch '${DEVENV_BRANCH}'..."
+        mkdir -p "${worktree_base}"
+        git -C "${ROOTDIR}" worktree add --detach "${build_dir}" "${DEVENV_BRANCH}"
+    fi
+
     # Build the bootc container image
     local rhsm_org_file rhsm_key_file
     rhsm_org_file=$(mktemp)
     rhsm_key_file=$(mktemp)
     echo -n "${RHSM_ORG}" > "${rhsm_org_file}"
     echo -n "${RHSM_ACTIVATION_KEY}" > "${rhsm_key_file}"
-    trap "rm -f '${rhsm_org_file}' '${rhsm_key_file}'" RETURN
+    trap "rm -f '${rhsm_org_file}' '${rhsm_key_file}'" EXIT
 
     local -a build_args=(
         --authfile "${PULL_SECRET}"
@@ -197,8 +205,8 @@ function cmd_setup() {
         -f "${CONTAINERFILE}"
     )
 
-    echo "Building bootc image '${IMAGE_NAME}' (RHEL ${RHEL_VERSION}) from '${SOURCE_DIR}'..."
-    sudo podman build "${build_args[@]}" "${SOURCE_DIR}"
+    echo "Building bootc image '${IMAGE_NAME}' (RHEL ${RHEL_VERSION}) from '${build_dir}'..."
+    sudo podman build "${build_args[@]}" "${build_dir}"
 
     # Create blueprint with builder user and SSH key
     local blueprint
@@ -206,13 +214,9 @@ function cmd_setup() {
     cat > "${blueprint}" <<EOF
 [[customizations.user]]
 name = "builder"
-password = ""
+password = "devenv"
 key = "$(cat "${VM_DIR}/ssh_key.pub")"
 groups = ["wheel"]
-
-[[customizations.filesystem]]
-mountpoint = "/"
-minsize = "50 GiB"
 
 [customizations.kernel]
 append = "systemd.zram=0"
@@ -235,20 +239,16 @@ EOF
             --output-dir /output \
             qcow2
 
-    # Move the qcow2 to the VM directory and fix ownership
-    sudo mv -f "${output_dir}"/*.qcow2 "${VM_DIR}/disk.qcow2"
-    sudo chown "$(id -u):$(id -g)" "${VM_DIR}/disk.qcow2"
+    # Move the qcow2 to the VM directory as the base image and fix ownership
+    sudo mv -f "${output_dir}"/*.qcow2 "${VM_DIR}/base.qcow2"
+    sudo chown "$(id -u):$(id -g)" "${VM_DIR}/base.qcow2"
     rm -rf "${output_dir}" "${blueprint}"
 
-    echo "Disk image created at '${VM_DIR}/disk.qcow2'"
+    echo "Base image created at '${VM_DIR}/base.qcow2'"
 }
 
 function cmd_start() {
     check_prerequisites
-    if [ -z "${RHSM_ORG:-}" ] || [ -z "${RHSM_ACTIVATION_KEY:-}" ]; then
-        echo "ERROR: RHSM_ORG and RHSM_ACTIVATION_KEY env vars are required"
-        exit 1
-    fi
 
     # Already running
     if vm_running; then
@@ -267,19 +267,24 @@ function cmd_start() {
         local host_ip
         host_ip=$(sudo virsh net-dumpxml default | grep -oP "ip address='\K[^']+")
         vm_exec sudo mkdir -p /var/microshift
-        vm_exec sudo mount -t nfs "${host_ip}:${SOURCE_DIR}" /var/microshift
+        vm_exec sudo mount -t nfs "${host_ip}:${ROOTDIR}" /var/microshift
         echo "VM '${VM_NAME}' started"
         return 0
     fi
 
-    if [ ! -f "${VM_DIR}/disk.qcow2" ]; then
-        echo "ERROR: Disk image not found. Run '$(basename "$0") setup' first."
+    if [ ! -f "${VM_DIR}/base.qcow2" ]; then
+        echo "ERROR: Base image not found. Run '$(basename "$0") setup' first."
         exit 1
     fi
 
-    # Export the worktree via NFS
-    if ! grep -qs "${SOURCE_DIR}" /etc/exports; then
-        echo "${SOURCE_DIR} *(rw,sync,no_subtree_check,no_root_squash,insecure)" | sudo tee -a /etc/exports > /dev/null
+    # Create a working copy of the base image and resize for dev use
+    echo "Creating VM disk from base image..."
+    cp -f "${VM_DIR}/base.qcow2" "${VM_DIR}/disk.qcow2"
+    qemu-img resize "${VM_DIR}/disk.qcow2" 50G
+
+    # Export the project root via NFS
+    if ! grep -Fqs "${ROOTDIR}" /etc/exports; then
+        echo "${ROOTDIR} *(rw,sync,no_subtree_check,no_root_squash,insecure)" | sudo tee -a /etc/exports > /dev/null
         sudo exportfs -ra
     fi
 
@@ -306,7 +311,7 @@ function cmd_start() {
 
     # Mount the project root via NFS
     vm_exec sudo mkdir -p /var/microshift
-    vm_exec sudo mount -t nfs "${host_ip}:${SOURCE_DIR}" /var/microshift
+    vm_exec sudo mount -t nfs "${host_ip}:${ROOTDIR}" /var/microshift
 
     # Create microshift user matching host UID/GID with /var/microshift as home
     local host_uid host_gid
@@ -386,9 +391,11 @@ function cmd_shell() {
         echo "ERROR: VM '${VM_NAME}' is not running. Run '$(basename "$0") start' first."
         exit 1
     fi
+    local ip
+    ip=$(vm_ip) || exit 1
     ssh -i "${VM_DIR}/ssh_key" \
         -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
-        -t "microshift@$(vm_ip)" "cd /var/microshift && exec bash --login"
+        -t "microshift@${ip}" "cd /var/microshift && exec bash --login"
 }
 
 function cmd_exec() {
@@ -404,11 +411,13 @@ function cmd_exec() {
 
 function cmd_status() {
     if vm_running; then
-        echo "VM '${VM_NAME}': running (IP $(vm_ip))"
+        local ip
+        ip=$(vm_ip 2>/dev/null) || ip="unknown"
+        echo "VM '${VM_NAME}': running (IP ${ip})"
     elif vm_exists; then
         echo "VM '${VM_NAME}': stopped"
-    elif [ -f "${VM_DIR}/disk.qcow2" ]; then
-        echo "VM '${VM_NAME}': not defined (disk image exists)"
+    elif [ -f "${VM_DIR}/base.qcow2" ]; then
+        echo "VM '${VM_NAME}': not defined (base image exists)"
     else
         echo "VM '${VM_NAME}': not found"
     fi
@@ -426,8 +435,8 @@ while [ $# -gt 0 ]; do
     shift
 
     case "${command}" in
-        setup)  resolve_names; cmd_setup ;;
-        start)  resolve_names; cmd_start ;;
+        setup)  resolve_rhsm; resolve_names; cmd_setup ;;
+        start)  resolve_rhsm; resolve_names; cmd_start ;;
         stop)   resolve_names; cmd_stop ;;
         delete) resolve_names; cmd_delete ;;
         shell)  resolve_names; cmd_shell ;;

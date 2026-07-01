@@ -16,7 +16,8 @@ from any Linux host.
 | Toolbox | ✅ | ❌ | ❌ | ❌ | Blocked |
 | Privileged container | ❌ | ✅ | ✅ | ❌ | Blocked |
 | Podman machine | N/A | N/A | N/A | N/A | Incompatible with RHEL |
-| libvirt VM + virtiofs | ✅ | ✅ | ✅ | ✅ | **Working** |
+| Kata Containers | ❌ | ❌ | ❌ | ❌ | Wrong abstraction |
+| libvirt VM + NFS | ✅ | ✅ | ✅ | ✅ | **Working** |
 
 ---
 
@@ -206,7 +207,77 @@ None of these are present in standard RHEL bootc images.
 
 ---
 
-## Approach 4: devenv-vm (libvirt + virtiofs) ✅ Working
+## Approach 4: Kata Containers (Investigation)
+
+---
+
+### Concept
+
+- Kata Containers run each container inside a lightweight VM (QEMU/Cloud Hypervisor)
+- Real kernel = potential SELinux support, no overlay xattr limitations
+- virtiofs for host filesystem sharing (same technology as devenv-vm)
+
+---
+
+### Problem: No Podman Support
+
+- Kata is designed for containerd/CRI-O, not standalone podman
+- `podman run --runtime kata` is not officially supported upstream
+- The MicroShift build pipeline uses `sudo podman` extensively
+  (mirror registry, container image builds, bootc-image-builder)
+
+---
+
+### Problem: Guest Kernel Too Minimal
+
+- Default Kata guest kernel lacks modules needed for podman inside the VM:
+  `CONFIG_TMPFS_POSIX_ACL`, `CONFIG_TMPFS_XATTR`, overlay modules
+- Running `sudo podman` inside a Kata container requires a custom-built
+  guest kernel — defeats the ease-of-setup goal
+- `bootc-image-builder` needs loop devices, full overlayfs, and privileged
+  access that the lightweight guest doesn't provide
+
+---
+
+### Problem: systemd Is Not a Full Init
+
+- Kata runs systemd as PID 1 only to launch the kata-agent
+- This is a minimal init, not a full RHEL systemd environment
+- `osbuild-composer` needs socket activation, D-Bus, and full service
+  management — untested and likely broken inside a Kata sandbox
+
+---
+
+### Problem: No Bidirectional Workspace Sharing
+
+- Kata's virtiofs shares container volumes (rootfs, configmaps, secrets)
+  from host into the guest sandbox
+- Not designed for mounting an arbitrary project directory as a shared
+  development workspace with bidirectional edit-on-host, build-in-VM access
+- virtiofs cannot be used as an overlayfs upper layer without a custom
+  kernel patch, which ISO build tools require
+
+---
+
+### Key Insight
+
+Kata Containers solve a different problem — VM-level isolation for
+*running* containerized workloads in multi-tenant environments. The
+MicroShift dev environment needs a *full OS environment* for *building*
+(RPMs, images, ISOs), which requires:
+
+- A complete RHEL kernel with all modules
+- Full systemd with service management
+- Rootful podman with overlay storage
+- Bidirectional host filesystem sharing for development
+
+Kata would reintroduce most of the same limitations seen in Approaches 1–3,
+plus add the complexity of unsupported Podman integration and custom kernel
+builds.
+
+---
+
+## Approach 5: devenv-vm (libvirt + NFS) ✅ Working
 
 ---
 
@@ -216,24 +287,28 @@ None of these are present in standard RHEL bootc images.
   (configure-vm.sh and configure-composer.sh run during `podman build`)
 - Convert to qcow2 disk using `image-builder-cli --bootc-ref`
   with a blueprint for user/SSH key setup
-- Boot via `virt-install` with virtiofs filesystem sharing
+- Resize working copy to 50 GiB; `bootc-generic-growpart` expands /var on first boot
+- `/tmp` symlinked to `/var/tmp` (composefs root is read-only; tmpfs wastes RAM)
+- Boot via `virt-install`, NFS mount of project root
 - SSH for shell/exec access, libvirt for lifecycle management
 
 ---
 
 ### Setup flow
 
-1. `setup`: `podman build` bootc image → `image-builder-cli` qcow2
-2. `start`: `virt-install --import` with virtiofs mount of project root
+1. `setup`: `podman build` bootc image → `image-builder-cli` qcow2 (base image)
+2. `start`: copy base → working disk, `qemu-img resize 50G`,
+   `virt-install --import`, NFS mount of project root
 3. VM boots with full RHEL kernel, SELinux enforcing, systemd, libvirtd
 
 ---
 
 ### File sharing
 
-- Single virtiofs mount of entire project root → `/var/microshift` in VM
+- NFS export of project root → `/var/microshift` in VM
 - Bidirectional, real-time — edit on host, build in VM
 - No worktrees needed — VM works on whatever branch is checked out
+- Firewall rules for NFS/mountd/rpc-bind added automatically to libvirt zone
 
 ---
 
@@ -245,9 +320,9 @@ None of these are present in standard RHEL bootc images.
 - osbuild-composer, composer-cli — systemd runs natively
 - libvirt/KVM for nested VMs (test scenarios)
 - Mirror registry (quay/redis/postgres)
-- `virsh console` for debugging
+- `virsh console` for debugging (builder/builder password)
 - Visible in `virt-manager`
-- Survives VM reboot (virtiofs remounted on start)
+- Base image preserved across delete/start cycles
 
 ---
 
@@ -257,4 +332,4 @@ A real VM avoids all container-based limitations:
 - No SELinux xattr issues (real kernel, real filesystem)
 - No rootful podman conflicts (independent podman instance)
 - No systemd limitations (VM runs its own init)
-- virtiofs provides container-like file sharing performance
+- NFS provides transparent file sharing with the host
