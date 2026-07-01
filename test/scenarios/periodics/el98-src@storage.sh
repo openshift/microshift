@@ -12,9 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 \
-        suites/osconfig/lifecycle.robot \
-        suites/core-api/ \
-        suites/otp-workloads/oc-cli.robot \
-        suites/otp-workloads/statefulset-pvc.robot
+    run_tests host1 suites/storage/
 }
