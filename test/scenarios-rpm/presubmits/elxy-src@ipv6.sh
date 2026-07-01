@@ -1,6 +1,6 @@
 #!/bin/bash
-# shellcheck source=test/scenarios-rpm/common-scenarios-rpm.sh
-source "${TESTDIR}/scenarios-rpm/common-scenarios-rpm.sh"
+# shellcheck source=test/bin/scenario_rpm.sh
+source "${TESTDIR}/bin/scenario_rpm.sh"
 
 # Redefine network-related settings to use the dedicated IPv6 network bridge
 # shellcheck disable=SC2034  # used elsewhere

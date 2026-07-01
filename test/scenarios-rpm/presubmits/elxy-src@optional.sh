@@ -1,6 +1,6 @@
 #!/bin/bash
-# shellcheck source=test/scenarios-rpm/common-scenarios-rpm.sh
-source "${TESTDIR}/scenarios-rpm/common-scenarios-rpm.sh"
+# shellcheck source=test/bin/scenario_rpm.sh
+source "${TESTDIR}/bin/scenario_rpm.sh"
 
 # Each optional suite restarts MicroShift with its own kustomizePaths config,
 # adding ~10 minutes of restart overhead to the total execution time.
