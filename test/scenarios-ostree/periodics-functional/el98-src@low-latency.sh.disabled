@@ -30,7 +30,7 @@ scenario_run_tests() {
         fi
         sleep 5
     done
-    
+
     # --exitonfailure because tests within suites are meant to be ordered,
     # so don't advance to next test if current failed.
 

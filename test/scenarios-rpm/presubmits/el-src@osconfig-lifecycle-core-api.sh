@@ -1,10 +1,14 @@
 #!/bin/bash
-
-# Sourced from scenario.sh and uses functions defined there.
+# shellcheck source=test/bin/scenario_rpm.sh
+source "${TESTDIR}/bin/scenario_rpm.sh"
 
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
-    launch_vm rhel-9.8
+    prepare_kickstart host1 kickstart-liveimg.ks.template ""
+    launch_vm "${RPM_INSTALLER_IMAGE}"
+}
+scenario_setup_vms() {
+    rpm_configure_vm
+    rpm_install_microshift
 }
 
 scenario_remove_vms() {
