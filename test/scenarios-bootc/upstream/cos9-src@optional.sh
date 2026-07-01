@@ -2,6 +2,11 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+# Each optional suite restarts MicroShift with its own kustomizePaths config,
+# adding ~10 minutes of restart overhead to the total execution time.
+# shellcheck disable=SC2034  # used elsewhere
+TEST_EXECUTION_TIMEOUT=60m
+
 # Redefine network-related settings to use the dedicated network bridge
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
