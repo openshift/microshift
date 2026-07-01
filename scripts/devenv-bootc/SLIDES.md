@@ -286,7 +286,7 @@ builds.
 - Build RHEL bootc container image with all deps pre-installed
   (configure-vm.sh and configure-composer.sh run during `podman build`)
 - Convert to qcow2 disk using `image-builder-cli --bootc-ref`
-  with a blueprint for user/SSH key setup
+  with a blueprint for kernel args
 - Resize working copy to 50 GiB; `bootc-generic-growpart` expands /var on first boot
 - `/tmp` symlinked to `/var/tmp` (composefs root is read-only; tmpfs wastes RAM)
 - Boot via `virt-install`, NFS mount of project root
@@ -320,7 +320,7 @@ builds.
 - osbuild-composer, composer-cli — systemd runs natively
 - libvirt/KVM for nested VMs (test scenarios)
 - Mirror registry (quay/redis/postgres)
-- `virsh console` for debugging (builder/builder password)
+- `virsh console` for debugging (password in `_output/<vm>/builder_password`)
 - Visible in `virt-manager`
 - Base image preserved across delete/start cycles
 

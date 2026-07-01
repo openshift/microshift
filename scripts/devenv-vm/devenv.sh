@@ -178,6 +178,12 @@ function cmd_setup() {
         ssh-keygen -t ed25519 -f "${VM_DIR}/ssh_key" -N "" -q
     fi
 
+    # Generate random password for builder user (console access)
+    if [ ! -f "${VM_DIR}/builder_password" ]; then
+        openssl rand -base64 12 > "${VM_DIR}/builder_password"
+        chmod 600 "${VM_DIR}/builder_password"
+    fi
+
     # Create worktree for the build so configure scripts come from the target branch
     local worktree_base="${ROOTDIR}/.worktrees"
     local build_dir="${worktree_base}/${VM_NAME}"
@@ -201,6 +207,8 @@ function cmd_setup() {
         --secret "id=rhsm_org,src=${rhsm_org_file}"
         --secret "id=rhsm_key,src=${rhsm_key_file}"
         --secret "id=pull_secret,src=${PULL_SECRET}"
+        --secret "id=builder_password,src=${VM_DIR}/builder_password"
+        --secret "id=ssh_pub_key,src=${VM_DIR}/ssh_key.pub"
         -t "${IMAGE_NAME}"
         -f "${CONTAINERFILE}"
     )
@@ -212,12 +220,6 @@ function cmd_setup() {
     local blueprint
     blueprint=$(mktemp --suffix=.toml)
     cat > "${blueprint}" <<EOF
-[[customizations.user]]
-name = "builder"
-password = "devenv"
-key = "$(cat "${VM_DIR}/ssh_key.pub")"
-groups = ["wheel"]
-
 [customizations.kernel]
 append = "systemd.zram=0"
 EOF
@@ -320,11 +322,7 @@ function cmd_start() {
     vm_exec sudo groupadd -g "${host_gid}" microshift 2>/dev/null || true
     vm_exec sudo useradd -m -u "${host_uid}" -g "${host_gid}" -d /var/home/microshift -s /bin/bash -G wheel microshift 2>/dev/null || true
     vm_ssh -- "echo 'microshift ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/microshift > /dev/null"
-    vm_exec sudo mkdir -p /etc/ssh/authorized_keys
-    vm_exec sudo cp /home/builder/.ssh/authorized_keys /etc/ssh/authorized_keys/microshift
-    vm_exec sudo chmod 644 /etc/ssh/authorized_keys/microshift
-    vm_ssh -- "echo 'AuthorizedKeysFile /etc/ssh/authorized_keys/%u .ssh/authorized_keys' | sudo tee /etc/ssh/sshd_config.d/10-authorized-keys.conf > /dev/null"
-    vm_exec sudo systemctl restart sshd
+    vm_exec sudo cp /etc/ssh/authorized_keys/builder /etc/ssh/authorized_keys/microshift
     vm_exec sudo git config --system --add safe.directory '*'
 
     # Copy pull secret

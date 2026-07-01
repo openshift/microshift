@@ -5,8 +5,16 @@ FROM registry.redhat.io/rhel9-eus/rhel-${RHEL_VERSION}-bootc:${RHEL_VERSION}
 RUN rm -f /etc/pki/entitlement-host
 
 # Create builder user before running configure scripts (they reference $USER)
-RUN useradd -m -G wheel -p "$(openssl passwd -6 builder)" builder && \
-    echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+RUN --mount=type=secret,id=builder_password \
+    --mount=type=secret,id=ssh_pub_key \
+    useradd -m -G wheel \
+        -p "$(openssl passwd -6 "$(cat /run/secrets/builder_password)")" builder && \
+    echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder && \
+    mkdir -p /etc/ssh/authorized_keys && \
+    cp /run/secrets/ssh_pub_key /etc/ssh/authorized_keys/builder && \
+    chmod 644 /etc/ssh/authorized_keys/builder && \
+    echo 'AuthorizedKeysFile /etc/ssh/authorized_keys/%u .ssh/authorized_keys' \
+        > /etc/ssh/sshd_config.d/10-authorized-keys.conf
 ENV USER=builder
 
 # Register subscription
