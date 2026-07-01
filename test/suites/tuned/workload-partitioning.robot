@@ -258,6 +258,10 @@ Cleanup And Create NS
     VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
 
 Setup Suite And Wait For Healthcheck
-    [Documentation]    Run setup suit and wait for healthcheck to succeed
-    Setup Suite
+    [Documentation]    Run setup suite and wait for healthcheck to succeed.
+    ...    Inlined from Setup Suite to ensure healthcheck passes before
+    ...    reading kubeconfig, which does not exist until MicroShift is ready.
+    Check Required Env Variables
+    Login MicroShift Host
     Wait For MicroShift Healthcheck Success
+    Setup Kubeconfig
