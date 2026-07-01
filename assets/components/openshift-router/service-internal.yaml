@@ -2,28 +2,21 @@
 # Ingress Controller specific annotations are applied at runtime.
 kind: Service
 apiVersion: v1
+# name, namespace and annotations are set at runtime.
 spec:
   type: ClusterIP
   internalTrafficPolicy: Cluster
   ports:
-    - name: http
-      port: 80
-      protocol: TCP
-      targetPort: http
-    - name: https
-      port: 443
-      protocol: TCP
-      targetPort: https
-    - name: metrics
-      port: 1936
-      protocol: TCP
-      targetPort: metrics
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: https
+  - name: metrics
+    port: 1936
+    protocol: TCP
+    targetPort: metrics
   sessionAffinity: None
-  selector:
-    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
-  ipFamilyPolicy: '{{.IPFamily}}'
-metadata:
-  labels:
-    ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
-  name: router-internal-default
-  namespace: openshift-ingress

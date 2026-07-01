@@ -1,41 +1,35 @@
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 authentication:
+  x509:
+    clientCAFile: /etc/kubernetes/kubelet-ca.crt
   anonymous:
     enabled: false
-  x509:
-    clientCAFile: "{{ .clientCAFile }}"
 cgroupDriver: systemd
-cgroupsPerQOS: true
+cgroupRoot: /
 clusterDNS:
-  - "{{ .clusterDNSIP }}"
+  - {{.ClusterDNSIP}}
 clusterDomain: cluster.local
 containerLogMaxSize: 50Mi
-containerRuntimeEndpoint: unix:///var/run/crio/crio.sock
-enforceNodeAllocatable: []
-failSwapOn: false
-featureGates:
-  APIPriorityAndFairness: true
-  DownwardAPIHugePages: true
-  PodSecurity: true
-  RotateKubeletServerCertificate: false # TODO
-kubeAPIBurst: 100
-kubeAPIQPS: 50
+enableSystemLogQuery: true
+failSwapOn: true
 maxPods: 250
+kubeAPIQPS: 50
+kubeAPIBurst: 100
+podPidsLimit: 4096
+protectKernelDefaults: true
+rotateCertificates: true
+serializeImagePulls: false
+staticPodPath: /etc/kubernetes/manifests
 memorySwap:
   swapBehavior: NoSwap
+systemCgroups: /system.slice
+nodeStatusUpdateFrequency: 10s
 nodeStatusReportFrequency: 5m
-rotateCertificates: false # TODO
-serializeImagePulls: false
-serverTLSBootstrap: false # TODO
-tlsCertFile: "{{ .tlsCertFile }}"
-tlsCipherSuites: [{{ .tlsCipherSuites }}]
-tlsMinVersion: "{{ .tlsMinVersion }}"
-tlsPrivateKeyFile: "{{ .tlsPrivateKeyFile }}"
-volumePluginDir: "{{ .volumePluginDir }}"
-{{- if .resolvConf }}
-resolvConf: "{{ .resolvConf }}"
+serverTLSBootstrap: true
+tlsMinVersion: {{.TLSMinVersion}}
+{{- if eq .Infra.Status.ControlPlaneTopology "DualReplica" }}
+shutdownGracePeriod: 90s
+shutdownGracePeriodCriticalPods: 60s
 {{- end }}
-{{ if .userProvidedConfig }}
-{{- .userProvidedConfig -}}
-{{ end }}
+
