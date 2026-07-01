@@ -265,7 +265,7 @@ get_scenario_type_from_path() {
     local type
 
     case "${1}" in
-    */scenarios/*|*/scenarios-ostree/*)
+    */scenarios-ostree/*)
         type="ostree"
         ;;
     */scenarios-bootc/*)

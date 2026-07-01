@@ -10,7 +10,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 # Directory to crawl for scenarios when creating/running in batch mode.
 # The CI system will override this depending on the job its running.
-SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
+SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios-ostree}"
 # Directory where all the scenarios will be copied for execution, preserving
 # the original scenario type derived from its directory name.
 SCENARIOS_TO_RUN="${OUTPUTDIR}/scenarios-$(get_scenario_type_from_path "${SCENARIO_SOURCES}")"
