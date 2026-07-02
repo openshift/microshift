@@ -1,0 +1,9 @@
+- kubernetes embedded-component a674efabac8b5044e6256ce4e2385914be215376 to 63adf010aa20e104c0b7043b47f42f50c9f72b17
+  - a95a1c954 2026-06-05T17:14:15+05:30 UPSTREAM: 138358: Update github.com/moby/spdystream from v0.5.0 to v0.5.1 for CVE-2026-35469
+
+- kubernetes image-amd64 a674efabac8b5044e6256ce4e2385914be215376 to 63adf010aa20e104c0b7043b47f42f50c9f72b17
+  - a95a1c954 2026-06-05T17:14:15+05:30 UPSTREAM: 138358: Update github.com/moby/spdystream from v0.5.0 to v0.5.1 for CVE-2026-35469
+
+- kubernetes image-arm64 a674efabac8b5044e6256ce4e2385914be215376 to 63adf010aa20e104c0b7043b47f42f50c9f72b17
+  - a95a1c954 2026-06-05T17:14:15+05:30 UPSTREAM: 138358: Update github.com/moby/spdystream from v0.5.0 to v0.5.1 for CVE-2026-35469
+
