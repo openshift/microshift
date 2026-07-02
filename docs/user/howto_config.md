@@ -124,7 +124,6 @@ ingress:
     tlsSecurityProfile:
         custom:
             ciphers: []
-            groups: []
             minTLSVersion: ""
         intermediate: {}
         modern: {}
@@ -294,7 +293,6 @@ ingress:
     tlsSecurityProfile:
         custom:
             ciphers: []
-            groups: []
             minTLSVersion: ""
         intermediate: {}
         modern: {}
