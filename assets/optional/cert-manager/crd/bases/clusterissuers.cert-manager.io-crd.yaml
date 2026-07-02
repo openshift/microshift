@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/component: crds
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.19.4
+    app.kubernetes.io/version: v1.19.5
   name: clusterissuers.cert-manager.io
 spec:
   group: cert-manager.io
@@ -521,7 +521,7 @@ spec:
                                     description: |-
                                       The IP address or hostname of an authoritative DNS server supporting
                                       RFC2136 in the form host:port. If the host is an IPv6 address it must be
-                                      enclosed in square brackets (e.g [2001:db8::1]) ; port is optional.
+                                      enclosed in square brackets (e.g [2001:db8::1]); port is optional.
                                       This field is required.
                                     type: string
                                   protocol:
