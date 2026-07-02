@@ -1,12 +1,3 @@
-- csi-external-snapshotter embedded-component 7503ea30886b6e5565ffa02935cf8d2ca299f281 to 2c14afc50a30de62cb00cc8263b061383cfbd3b5
-  - 822424a 2026-06-17T13:30:16Z UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
-
-- machine-config-operator embedded-component 45a196b7ba10a6175895db65a81d08e88fdfd5f2 to 52ada8cd24588ffe90276d909a7dc376f9e845b7
-  - 8af9ca14 2026-06-18T14:23:38-04:00 mcc: replace wildcard permissions with explicit verbs and resources in MCC ClusterRole & scope configmap access to target namespace via Role instead of ClusterRole
-
-- csi-external-snapshotter image-amd64 7503ea30886b6e5565ffa02935cf8d2ca299f281 to 2c14afc50a30de62cb00cc8263b061383cfbd3b5
-  - 822424a 2026-06-17T13:30:16Z UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
-
-- csi-external-snapshotter image-arm64 7503ea30886b6e5565ffa02935cf8d2ca299f281 to 2c14afc50a30de62cb00cc8263b061383cfbd3b5
-  - 822424a 2026-06-17T13:30:16Z UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
+- machine-config-operator embedded-component 52ada8cd24588ffe90276d909a7dc376f9e845b7 to 3bbd3e775e85c571a91a6309267385525736f493
+  - 5e30ef0d 2026-06-29T15:09:07Z Remove verbose ignition config logging from bootstrap MCS
 
