@@ -7,24 +7,21 @@ metadata:
   namespace: openshift-ingress
   labels:
     app: router
-    ingresscontroller.operator.openshift.io/owning-ingresscontroller: default
-  name: router-default
 spec:
   type: LoadBalancer
   selector:
-    ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
+    app: router
   # This also has the effect of marking LB pool targets as unhealthy when no
   # router pods are present on a node behind the service.
   externalTrafficPolicy: Local
   internalTrafficPolicy: Cluster
   ports:
-    - name: http
-      protocol: TCP
-      port: {{ .RouterHttpPort }}
-      targetPort: http
-    - name: https
-      protocol: TCP
-      port: {{ .RouterHttpsPort }}
-      targetPort: https
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: https
   sessionAffinity: None
-  ipFamilyPolicy: '{{.IPFamily}}'
