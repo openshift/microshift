@@ -1,3 +1,4 @@
-- machine-config-operator embedded-component 51f9b31f3f6981021f0da3ad32030ed1028bce0b to 9bcea08436e8ed3d8d0a60667a64cbe58a9a1028
-  - 94cf308a 2026-06-23T07:42:39-04:00 controller & test: process rebuild annotation on machine-os-builder restart & increase test timeout
+- machine-config-operator embedded-component 9bcea08436e8ed3d8d0a60667a64cbe58a9a1028 to eb72ebdbfd7d0b7da2de9499661fc006828e5193
+  - e6dd7d48 2026-06-30T18:56:02Z Remove verbose ignition config logging from bootstrap MCS
+  - 794e6c3c 2026-06-24T10:20:34-04:00 tests: update custom containerfile OCB test to work in disconnected environments
 
