@@ -2034,6 +2034,7 @@ type IngressControllerTuningOptions struct {
 	// processes in router containers with the following metric:
 	// 'container_memory_working_set_bytes{container="router",namespace="openshift-ingress"}/container_processes{container="router",namespace="openshift-ingress"}'.
 	//
+	// +kubebuilder:validation:XValidation:rule="self == 0 || self == -1 || (self >= 2000 && self <= 2000000)",message="maxConnections must be 0, -1, or between 2000 and 2000000"
 	// +optional
 	MaxConnections int32 `json:"maxConnections,omitempty"`
 

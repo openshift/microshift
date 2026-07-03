@@ -184,7 +184,7 @@ func (c *Config) fillDefaults() error {
 		ForwardedHeaderPolicy:    "Append",
 		HTTPEmptyRequestsPolicy:  "Respond",
 		ServingCertificateSecret: "router-certs-default",
-		TLSSecurityProfile: &configv1.TLSSecurityProfile{
+		TLSSecurityProfile: &TLSSecurityProfile{
 			Type: configv1.TLSProfileIntermediateType,
 		},
 		AccessLogging: AccessLogging{
