@@ -1,0 +1,56 @@
+File,Status,Old Name,New Name,Notes
+main.yaml,NEW,,e2e-aws-tests-rpm-presubmit-el9-x86,RPM presubmit (replaces ostree e2e-aws-tests)
+main.yaml,NEW,,e2e-aws-tests-rpm-presubmit-el10-x86,RPM presubmit (replaces ostree e2e-aws-tests-arm)
+main.yaml,NEW,,e2e-aws-tests-ostree-periodic-el9-functional-x86,Split from e2e-aws-tests-periodic
+main.yaml,NEW,,e2e-aws-tests-ostree-periodic-el9-functional-arm,Split from e2e-aws-tests-periodic-arm
+main.yaml,NEW,,e2e-aws-tests-bootc-periodic-el9-functional-x86,Split from e2e-aws-tests-bootc-periodic-el9
+main.yaml,NEW,,e2e-aws-tests-bootc-periodic-el10-functional-x86,Split from e2e-aws-tests-bootc-periodic-el10
+main.yaml,NEW,,e2e-aws-tests-bootc-periodic-el9-functional-arm,Split from e2e-aws-tests-bootc-periodic-arm-el9
+main.yaml,NEW,,e2e-aws-tests-bootc-periodic-el10-functional-arm,Split from e2e-aws-tests-bootc-periodic-arm-el10
+main.yaml,DELETED,e2e-aws-tests,,Ostree presubmit - moved to nightly
+main.yaml,DELETED,e2e-aws-tests-arm,,Ostree presubmit - moved to nightly
+main.yaml,DELETED,e2e-aws-tests-bootc-el9,,Bootc presubmit - moved to nightly
+main.yaml,DELETED,e2e-aws-tests-bootc-el10,,Bootc presubmit - moved to nightly
+main.yaml,DELETED,e2e-aws-tests-bootc-arm-el9,,Bootc presubmit - moved to nightly
+main.yaml,DELETED,e2e-aws-tests-bootc-arm-el10,,Bootc presubmit - moved to nightly
+main.yaml,RENAMED,e2e-aws-tests-bootc-upstream-periodic,e2e-aws-tests-bootc-upstream-periodic-x86,Added -x86
+main.yaml,RENAMED,e2e-aws-tests-cache-nightly,e2e-aws-tests-cache-nightly-x86,Added -x86
+main.yaml,RENAMED,e2e-aws-tests-cache,e2e-aws-tests-cache-x86,Added -x86
+main.yaml,RENAMED,e2e-aws-tests-periodic,e2e-aws-tests-ostree-periodic-el9-lifecycle-x86,Lifecycle split + naming convention
+main.yaml,RENAMED,e2e-aws-tests-periodic-arm,e2e-aws-tests-ostree-periodic-el9-lifecycle-arm,Lifecycle split + naming convention
+main.yaml,RENAMED,e2e-aws-tests-bootc-periodic-el9,e2e-aws-tests-bootc-periodic-el9-lifecycle-x86,Lifecycle split + -x86
+main.yaml,RENAMED,e2e-aws-tests-bootc-periodic-el10,e2e-aws-tests-bootc-periodic-el10-lifecycle-x86,Lifecycle split + -x86
+main.yaml,RENAMED,e2e-aws-tests-bootc-periodic-arm-el9,e2e-aws-tests-bootc-periodic-el9-lifecycle-arm,Reordered + lifecycle
+main.yaml,RENAMED,e2e-aws-tests-bootc-periodic-arm-el10,e2e-aws-tests-bootc-periodic-el10-lifecycle-arm,Reordered + lifecycle
+main.yaml,RENAMED,e2e-aws-tests-release,e2e-aws-tests-ostree-release-el9-x86,Naming convention
+main.yaml,RENAMED,e2e-aws-tests-release-arm,e2e-aws-tests-ostree-release-el9-arm,Naming convention
+main.yaml,RENAMED,e2e-aws-tests-bootc-release-el9,e2e-aws-tests-bootc-release-el9-x86,Added -x86
+main.yaml,RENAMED,e2e-aws-tests-bootc-release-el10,e2e-aws-tests-bootc-release-el10-x86,Added -x86
+main.yaml,RENAMED,e2e-aws-tests-bootc-release-arm-el9,e2e-aws-tests-bootc-release-el9-arm,Reordered -arm
+main.yaml,RENAMED,e2e-aws-tests-bootc-release-arm-el10,e2e-aws-tests-bootc-release-el10-arm,Reordered -arm
+main.yaml,RENAMED,e2e-aws-tests-bootc-upstream,e2e-aws-tests-bootc-presubmit-upstream-x86,Added trigger + arch
+main.yaml,RENAMED,e2e-aws-tests-bootc-upstream-arm,e2e-aws-tests-bootc-presubmit-upstream-arm,Added trigger
+main.yaml,RENAMED,e2e-aws-tests-bootc-c2cc,e2e-aws-tests-bootc-presubmit-c2cc-x86,Added trigger + arch
+main.yaml,RENAMED,e2e-aws-tests-bootc-c2cc-arm,e2e-aws-tests-bootc-presubmit-c2cc-arm,Added trigger
+periodics.yaml,NEW,,e2e-aws-tests-bootc-x86-nightly-el9-functional,Split from e2e-aws-tests-bootc-nightly-el9
+periodics.yaml,NEW,,e2e-aws-tests-bootc-x86-nightly-el10-functional,Split from e2e-aws-tests-bootc-nightly-el10
+periodics.yaml,NEW,,e2e-aws-tests-bootc-arm-nightly-el9-functional,Split from e2e-aws-tests-bootc-arm-nightly-el9
+periodics.yaml,NEW,,e2e-aws-tests-bootc-arm-nightly-el10-functional,Split from e2e-aws-tests-bootc-arm-nightly-el10
+periodics.yaml,NEW,,e2e-aws-tests-ostree-x86-nightly-el9-functional,Split from e2e-aws-tests-nightly
+periodics.yaml,NEW,,e2e-aws-tests-ostree-arm-nightly-el9-functional,Split from e2e-aws-tests-arm-nightly
+periodics.yaml,NEW,,e2e-aws-tests-bootc-x86-nightly-el10-lifecycle,New (el10 was 1 job - now split)
+periodics.yaml,NEW,,e2e-aws-tests-bootc-arm-nightly-el10-lifecycle,New (el10 was 1 job - now split)
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-nightly-el9,e2e-aws-tests-bootc-x86-nightly-el9-lifecycle,Naming convention + lifecycle
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-nightly-el10,e2e-aws-tests-bootc-x86-nightly-el10-lifecycle,Naming convention + lifecycle
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-arm-nightly-el9,e2e-aws-tests-bootc-arm-nightly-el9-lifecycle,Added -lifecycle
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-arm-nightly-el10,e2e-aws-tests-bootc-arm-nightly-el10-lifecycle,Added -lifecycle
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-c2cc-nightly,e2e-aws-tests-bootc-x86-nightly-c2cc,Naming convention
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-c2cc-arm-nightly,e2e-aws-tests-bootc-arm-nightly-c2cc,Reordered
+periodics.yaml,RENAMED,e2e-aws-tests-nightly,e2e-aws-tests-ostree-x86-nightly-el9-lifecycle,Naming convention
+periodics.yaml,RENAMED,e2e-aws-tests-arm-nightly,e2e-aws-tests-ostree-arm-nightly-el9-lifecycle,Naming convention
+periodics.yaml,RENAMED,e2e-aws-tests-release-periodic,e2e-aws-tests-ostree-x86-release-periodic-el9,Naming convention
+periodics.yaml,RENAMED,e2e-aws-tests-release-arm-periodic,e2e-aws-tests-ostree-arm-release-periodic-el9,Naming convention
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-release-periodic-el9,e2e-aws-tests-bootc-x86-release-periodic-el9,Naming convention
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-release-periodic-el10,e2e-aws-tests-bootc-x86-release-periodic-el10,Naming convention
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-release-arm-periodic-el9,e2e-aws-tests-bootc-arm-release-periodic-el9,Reordered
+periodics.yaml,RENAMED,e2e-aws-tests-bootc-release-arm-periodic-el10,e2e-aws-tests-bootc-arm-release-periodic-el10,Reordered

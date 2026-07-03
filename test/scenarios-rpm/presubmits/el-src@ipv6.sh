@@ -1,0 +1,30 @@
+#!/bin/bash
+# shellcheck source=test/bin/scenario_rpm.sh
+source "${TESTDIR}/bin/scenario_rpm.sh"
+
+# Redefine network-related settings to use the dedicated IPv6 network bridge
+# shellcheck disable=SC2034  # used elsewhere
+VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
+# shellcheck disable=SC2034  # used elsewhere
+WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
+# shellcheck disable=SC2034  # used elsewhere
+MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
+
+scenario_create_vms() {
+    prepare_kickstart host1 kickstart-liveimg.ks.template "" false true
+    launch_vm "${RPM_INSTALLER_IMAGE}" --network "${VM_IPV6_NETWORK}"
+}
+scenario_setup_vms() {
+    rpm_configure_vm
+    rpm_install_microshift
+    # Reboot to ensure clean IPv6 network state after NM restart
+    rpm_reboot_and_wait
+}
+
+scenario_remove_vms() {
+    remove_vm host1
+}
+
+scenario_run_tests() {
+    run_tests host1 suites/ipv6/singlestack.robot
+}
