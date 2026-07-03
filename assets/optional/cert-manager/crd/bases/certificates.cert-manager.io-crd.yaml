@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/component: crds
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.19.4
+    app.kubernetes.io/version: v1.20.3
   name: certificates.cert-manager.io
 spec:
   group: cert-manager.io
@@ -453,9 +453,6 @@ spec:
                         will be generated whenever a re-issuance occurs.
                         Default is `Always`.
                         The default was changed from `Never` to `Always` in cert-manager >=v1.18.0.
-                        The new default can be disabled by setting the
-                        `--feature-gates=DefaultPrivateKeyRotationPolicyAlways=false` option on
-                        the controller component.
                       enum:
                         - Never
                         - Always
@@ -811,6 +808,10 @@ spec:
                   type: integer
               type: object
           type: object
+      selectableFields:
+        - jsonPath: .spec.issuerRef.group
+        - jsonPath: .spec.issuerRef.kind
+        - jsonPath: .spec.issuerRef.name
       served: true
       storage: true
       subresources:

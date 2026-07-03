@@ -106,8 +106,10 @@ rules:
   - certificates/finalizers
   - certificates/status
   - clusterissuers
+  - clusterissuers/finalizers
   - clusterissuers/status
   - issuers
+  - issuers/finalizers
   - issuers/status
   verbs:
   - create
@@ -156,6 +158,14 @@ rules:
 - apiGroups:
   - config.openshift.io
   resources:
+  - apiservers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - config.openshift.io
+  resources:
   - certmanagers
   - clusteroperators
   - clusteroperators/status
@@ -187,6 +197,8 @@ rules:
   - gateways/finalizers
   - httproutes
   - httproutes/finalizers
+  - listenersets
+  - listenersets/finalizers
   verbs:
   - create
   - delete
