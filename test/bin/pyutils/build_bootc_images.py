@@ -31,9 +31,8 @@ NEXT_REPO = common.get_env_var('NEXT_REPO')
 BREW_REPO = common.get_env_var('BREW_REPO')
 HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
-# Switch to quay.io/centos-bootc/bootc-image-builder:latest if any new upstream
-# features are required
-BIB_IMAGE = "registry.redhat.io/rhel9/bootc-image-builder:latest"
+BIB_IMAGE_RHEL9 = "registry.redhat.io/rhel9/bootc-image-builder:latest"
+BIB_IMAGE = "registry.redhat.io/rhel10/bootc-image-builder:latest"
 IBC_IMAGE = "ghcr.io/osbuild/image-builder-cli:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
@@ -48,7 +47,7 @@ def cleanup_atexit(dry_run):
         common.terminate_process(pid)
 
     # Terminate running image builder containers
-    for builder_image in [BIB_IMAGE, IBC_IMAGE]:
+    for builder_image in [BIB_IMAGE_RHEL9, BIB_IMAGE, IBC_IMAGE]:
         podman_args = [
             "sudo", "podman", "ps",
             "--filter", f"ancestor={builder_image}",
@@ -334,6 +333,12 @@ def process_containerfile(groupdir, containerfile, dry_run):
         common.run_command(["sed", f"s/^/{cf_outname}: /", cf_logfile], dry_run)
 
 
+def get_bib_image(bootc_imgref):
+    if "rhel9" in bootc_imgref or "rhel-9" in bootc_imgref:
+        return BIB_IMAGE_RHEL9
+    return BIB_IMAGE_DEFAULT
+
+
 def process_image_bootc(groupdir, bootcfile, dry_run):
     bf_path, bf_outname, bf_outdir, bf_logfile = get_process_file_names(
         groupdir, bootcfile, BOOTC_ISO_DIR)
@@ -371,18 +376,19 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     try:
         # Redirect the output to the log file
         with open(bf_logfile, 'w') as logfile:
+            # Read the image reference and select the matching BIB
+            bf_imgref = common.read_file_valid_lines(bf_outfile).strip()
+            bib_image = get_bib_image(bf_imgref)
+
             # Download the bootc image builder itself in case
             # it requires authorization for accessing the image
             pull_args = [
                 "sudo", "podman", "pull",
-                "--authfile", PULL_SECRET, BIB_IMAGE
+                "--authfile", PULL_SECRET, bib_image
             ]
             start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
             common.record_junit(bf_path, "pull-bootc-bib", "OK", start)
-
-            # Read the image reference
-            bf_imgref = common.read_file_valid_lines(bf_outfile).strip()
 
             # Download the image to be used by bootc image builder.
             # Locally built images should also be downloaded in case they were
@@ -409,7 +415,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             ]
             # Add the bootc image builder command line using local images
             build_args += [
-                BIB_IMAGE,
+                bib_image,
                 "--type", "anaconda-iso",
                 bf_imgref
             ]
