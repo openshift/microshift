@@ -160,6 +160,22 @@ action_download() {
     done
 }
 
+action_download_isos() {
+    local -r dst_base="${IMAGEDIR}"
+    local -r iso_dest="${dst_base}/${VM_POOL_BASENAME}"
+
+    mkdir -p "${iso_dest}"
+
+    local -r src_base="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/${TAG_SUBDIR}"
+    local -r iso_src="${src_base}/${VM_POOL_BASENAME}"
+
+    echo "Downloading installer ISOs from '${iso_src}'"
+    run_aws_cli s3 sync --quiet --exclude '*' --include '*-installer.iso' "${iso_src}" "${iso_dest}"
+
+    local -r iso_size="$(du -csh "${iso_dest}" | awk 'END{print $1}')"
+    echo "Downloaded ${iso_size} of installer ISOs"
+}
+
 action_verify() {
     if check_contents ; then
         echo OK
@@ -304,7 +320,7 @@ fi
 
 # Run actions
 case "${action}" in
-    upload|download|verify|setlast|getlast|dellast|keep)
+    upload|download|download_isos|verify|setlast|getlast|dellast|keep)
         "action_${action}" "$@"
         ;;
     -h|help)

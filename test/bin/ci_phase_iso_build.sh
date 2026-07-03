@@ -27,6 +27,9 @@ COMPOSER_CLI_BUILDS=true
 if [ -v CI_JOB_NAME ] && [[ "${CI_JOB_NAME}" =~ .*bootc.* ]]; then
     COMPOSER_CLI_BUILDS=false
 fi
+if [ $# -gt 0 ] && [ "$1" = "-rpm_only" ]; then
+    COMPOSER_CLI_BUILDS=false
+fi
 
 # Allow for a dry-run option to save on testing time
 BUILD_DRY_RUN=${BUILD_DRY_RUN:-false}
@@ -36,6 +39,19 @@ dry_run() {
 
 # Try downloading the 'last' build cache.
 # Return 0 on success or 1 otherwise.
+download_build_cache_isos() {
+    local -r cache_last="$(\
+        ./bin/manage_build_cache.sh getlast \
+            -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" | \
+            awk '/LAST:/ {print $NF}' \
+        )"
+    if [[ -z "${cache_last}" ]]; then
+        echo "ERROR: Could not determine the 'last' build cache tag for branch '${SCENARIO_BUILD_BRANCH}'"
+        return 1
+    fi
+    ./bin/manage_build_cache.sh download_isos -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}"
+}
+
 download_build_cache() {
     local -r cache_last="$(\
         ./bin/manage_build_cache.sh getlast \
@@ -123,7 +139,7 @@ run_bootc_image_build() {
 
     if [ -v CI_JOB_NAME ] ; then
         # Skip all image builds for release testing CI jobs because all the images are fetched from the cache.
-        if [[ "${CI_JOB_NAME}" =~ .*release(-arm)?(-el(9|10))?$ ]]; then
+        if [[ "${CI_JOB_NAME}" =~ -release- ]] && [[ ! "${CI_JOB_NAME}" =~ -periodic ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -X
             return
         fi
@@ -135,7 +151,11 @@ run_bootc_image_build() {
             return
         fi
 
-        local -r os="${CI_JOB_NAME##*-}"
+        # Extract RHEL version from job name (works regardless of arch/category suffix position)
+        local os=""
+        if [[ "${CI_JOB_NAME}" =~ -(el(9|10))(-|$) ]]; then
+            os="${BASH_REMATCH[1]}"
+        fi
 
         if [[ "${os}" == "el9" || "${os}" == "el10" ]]; then
 
@@ -215,6 +235,15 @@ if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
         echo "ERROR: Access to the build cache is not available"
         exit 1
     fi
+elif [ $# -gt 0 ] && [ "$1" = "-rpm_only" ] ; then
+    mkdir -p "${VM_DISK_BASEDIR}"
+    if ${HAS_CACHE_ACCESS} ; then
+        download_build_cache_isos
+    else
+        echo "ERROR: RPM-only mode requires installer ISOs from the build cache, but cache access is not available"
+        exit 1
+    fi
+    $(dry_run) bash -x ./bin/build_rpms.sh
 else
     GOT_CACHED_DATA=false
     if ${HAS_CACHE_ACCESS} ; then
