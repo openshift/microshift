@@ -764,6 +764,10 @@
             "custom": {
               "description": "custom is a user-defined TLS security profile. Be extremely careful using a custom\nprofile as invalid configurations can be catastrophic. An example custom profile\nlooks like this:\n\n  minTLSVersion: VersionTLS11\n  ciphers:\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256",
               "type": "object",
+              "required": [
+                "ciphers",
+                "minTLSVersion"
+              ],
               "properties": {
                 "ciphers": {
                   "description": "ciphers is used to specify the cipher algorithms that are negotiated\nduring the TLS handshake. Operators may remove entries that their operands\ndo not support. For example, to use only ECDHE-RSA-AES128-GCM-SHA256 (yaml):\n\n  ciphers:\n    - ECDHE-RSA-AES128-GCM-SHA256\n\nTLS 1.3 cipher suites (e.g. TLS_AES_128_GCM_SHA256) are not configurable\nand are always enabled when TLS 1.3 is negotiated.",
@@ -787,22 +791,22 @@
               "nullable": true
             },
             "intermediate": {
-              "description": "intermediate is a TLS profile for use when you do not need compatibility with\nlegacy clients and want to remain highly secure while being compatible with\nmost clients currently in use.\n\nThis profile is equivalent to a Custom profile specified as:\n  minTLSVersion: VersionTLS12\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305",
+              "description": "intermediate is a TLS profile for use when you do not need compatibility with\nlegacy clients and want to remain highly secure while being compatible with\nmost clients currently in use.",
               "type": "object",
               "nullable": true
             },
             "modern": {
-              "description": "modern is a TLS security profile for use with clients that support TLS 1.3 and\ndo not need backward compatibility for older clients.\n\nThis profile is equivalent to a Custom profile specified as:\n  minTLSVersion: VersionTLS13\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256",
+              "description": "modern is a TLS security profile for use with clients that support TLS 1.3 and\ndo not need backward compatibility for older clients.",
               "type": "object",
               "nullable": true
             },
             "old": {
-              "description": "old is a TLS profile for use when services need to be accessed by very old\nclients or libraries and should be used only as a last resort.\n\nThis profile is equivalent to a Custom profile specified as:\n  minTLSVersion: VersionTLS10\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - ECDHE-ECDSA-AES128-SHA256\n    - ECDHE-RSA-AES128-SHA256\n    - ECDHE-ECDSA-AES128-SHA\n    - ECDHE-RSA-AES128-SHA\n    - ECDHE-ECDSA-AES256-SHA\n    - ECDHE-RSA-AES256-SHA\n    - AES128-GCM-SHA256\n    - AES256-GCM-SHA384\n    - AES128-SHA256\n    - AES128-SHA\n    - AES256-SHA\n    - DES-CBC3-SHA",
+              "description": "old is a TLS profile for use when services need to be accessed by very old\nclients or libraries and should be used only as a last resort.",
               "type": "object",
               "nullable": true
             },
             "type": {
-              "description": "type is one of Old, Intermediate, Modern or Custom. Custom provides the\nability to specify individual TLS security profile parameters.\n\nThe profiles are based on version 5.7 of the Mozilla Server Side TLS\nconfiguration guidelines. The cipher lists consist of the configuration's\n\"ciphersuites\" followed by the Go-specific \"ciphers\" from the guidelines.\nSee: https://ssl-config.mozilla.org/guidelines/5.7.json\n\nThe profiles are intent based, so they may change over time as new ciphers are\ndeveloped and existing ciphers are found to be insecure. Depending on\nprecisely which ciphers are available to a process, the list may be reduced.",
+              "description": "type is one of Old, Intermediate, Modern or Custom. Custom provides the\nability to specify individual TLS security profile parameters.\n\nThe profiles are based on the Mozilla Server Side TLS configuration\nguidelines. The cipher lists consist of the configuration's\n\"ciphersuites\" followed by the \"ciphers\" from the guidelines.\n\nThe profiles are intent based, so they may change over time as new ciphers are\ndeveloped and existing ciphers are found to be insecure. Depending on\nprecisely which ciphers are available to a process, the list may be reduced.",
               "type": "string",
               "enum": [
                 "Old",

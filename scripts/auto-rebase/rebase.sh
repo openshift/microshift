@@ -681,6 +681,9 @@ update_openshift_manifests() {
     # Drop MCO's boilerplate and keep KubeletConfiguration only
     yq -i '.contents.inline' "${REPOROOT}/assets/core/kubelet.yaml"
 
+    sed -i '/{{- if eq .Infra.Status.ControlPlaneTopology/,/{{- end }}/d' "${REPOROOT}/assets/core/kubelet.yaml"
+
+
     yq -i '.authentication.x509.clientCAFile = "{{ .clientCAFile }}" | .authentication.x509.clientCAFile style="double"' "${REPOROOT}/assets/core/kubelet.yaml"
     yq -i '.clusterDNS = [ "{{ .clusterDNSIP }}" ] | .clusterDNS[] style="double"' "${REPOROOT}/assets/core/kubelet.yaml"
     yq -i '.tlsCertFile = "{{ .tlsCertFile }}" | .tlsCertFile style="double"' "${REPOROOT}/assets/core/kubelet.yaml"

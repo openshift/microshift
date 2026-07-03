@@ -406,11 +406,14 @@ func durationToHAProxyTimespec(duration time.Duration) string {
 // security profile type is provided.  Note that the return value must not be
 // mutated by the caller; the caller must make a copy if it needs to mutate the
 // value.
-func tlsProfileSpecForSecurityProfile(profile *configv1.TLSSecurityProfile) *configv1.TLSProfileSpec {
+func tlsProfileSpecForSecurityProfile(profile *config.TLSSecurityProfile) *configv1.TLSProfileSpec {
 	if profile != nil {
 		if profile.Type == configv1.TLSProfileCustomType {
 			if profile.Custom != nil {
-				return &profile.Custom.TLSProfileSpec
+				return &configv1.TLSProfileSpec{
+					Ciphers:       profile.Custom.Ciphers,
+					MinTLSVersion: profile.Custom.MinTLSVersion,
+				}
 			}
 			return &configv1.TLSProfileSpec{}
 		} else if spec, ok := configv1.TLSProfiles[profile.Type]; ok {
