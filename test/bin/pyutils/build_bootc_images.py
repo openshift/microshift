@@ -225,7 +225,7 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
             f.write('\n')
 
         # Cleanup RPM files
-        rpm_list = list(map(str, image_path.glob("microshift-release-info-*.rpm")))
+        rpm_list = glob.glob(f"{image_path}/microshift-release-info-{version}*.rpm")
         common.run_command(["rm", "-f"] + rpm_list, dry_run)
     # Restore the current directory
     common.popd()
@@ -358,7 +358,7 @@ def process_containerfile(groupdir, containerfile, dry_run):
 def get_bib_image(bootc_imgref):
     if "rhel9" in bootc_imgref or "rhel-9" in bootc_imgref:
         return BIB_IMAGE_RHEL9
-    return BIB_IMAGE_DEFAULT
+    return BIB_IMAGE
 
 
 def process_image_bootc(groupdir, bootcfile, dry_run):
