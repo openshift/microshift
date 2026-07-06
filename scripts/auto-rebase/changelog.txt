@@ -1,3 +1,4 @@
-- machine-config-operator embedded-component 52ada8cd24588ffe90276d909a7dc376f9e845b7 to 3bbd3e775e85c571a91a6309267385525736f493
-  - 5e30ef0d 2026-06-29T15:09:07Z Remove verbose ignition config logging from bootstrap MCS
+- machine-config-operator embedded-component 3bbd3e775e85c571a91a6309267385525736f493 to b0e5302421b634a835a6b9642801a94a31963ccd
+  - ff9060bd 2026-07-01T19:38:13Z chore: update AMIs
+  - 5ac3d4f6 2026-06-30T13:05:42Z Fix kubelet certificate wait loop in criometricsproxy.yaml and update init container's volumeMount to /var/lib/kubelet
 
