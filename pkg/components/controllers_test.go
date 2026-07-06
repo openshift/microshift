@@ -38,7 +38,7 @@ func newTestConfig() *config.Config {
 				MaxConnections:              50000,
 			},
 			ForwardedHeaderPolicy: "Append",
-			TLSSecurityProfile: &configv1.TLSSecurityProfile{
+			TLSSecurityProfile: &config.TLSSecurityProfile{
 				Type: configv1.TLSProfileIntermediateType,
 			},
 			ServingCertificateSecret: "router-certs-default",
