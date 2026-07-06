@@ -1,0 +1,3 @@
+- cluster-network-operator embedded-component ba7a5ec20d3b4cb620bae7bfa1363e34b9048563 to dc98c59e223f325acb113a697771e737266876a5
+  - 92c457e 2026-05-29T10:16:39-04:00 Fix: whereabouts-token-watcher DaemonSet improvements
+
