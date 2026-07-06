@@ -429,7 +429,15 @@ Delete Custom CA Secret
     Oc Delete    configmap/router-ca-certs-custom -n openshift-ingress
 
 Check Access Logs
-    [Documentation]    Retrieve and check if a pattern appears in the router's access logs.
+    [Documentation]    Send traffic through the router to generate access log entries,
+    ...    then verify the pattern appears in the logs container output.
+    [Arguments]    ${pattern}
+    Access Hello Microshift    ${HTTP_PORT}
+    Wait Until Keyword Succeeds    10x    2s
+    ...    Access Logs Should Contain    ${pattern}
+
+Access Logs Should Contain
+    [Documentation]    Check that the router's access logs contain the given pattern.
     [Arguments]    ${pattern}
     ${logs}=    Oc Logs    deployment/router-default -c logs    openshift-ingress
     Should Contain    ${logs}    ${pattern}
