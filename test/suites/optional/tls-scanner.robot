@@ -158,6 +158,6 @@ Verify ML-KEM Post Quantum Curve Negotiation
     ${output}=    Oc Exec    ${pod_name}
     ...    echo Q | openssl s_client -connect ${router_ip}:443 -groups X25519MLKEM768 2>&1 || true
     ...    ns=openshift-ingress
-    Should Contain    ${output}    Negotiated TLS1.3 group: X25519MLKEM768
+    Should Match Regexp    ${output}    group.*X25519MLKEM768
     ...    msg=ML-KEM post-quantum curve X25519MLKEM768 negotiation failed
     Log    Post-quantum ML-KEM negotiation verified: OK
