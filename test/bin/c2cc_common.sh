@@ -264,26 +264,32 @@ c2cc_run_tests() {
     host2_vm=$(full_vm_name host2) || return 1
     host3_vm=$(full_vm_name host3) || return 1
 
-    local host2_ip host3_ip
+    local host1_ip host2_ip host3_ip
+    host1_ip=$(get_host_ip host1) || return 1
     host2_ip=$(get_host_ip host2) || return 1
     host3_ip=$(get_host_ip host3) || return 1
-    readonly host2_ip host3_ip
+    readonly host1_ip host2_ip host3_ip
 
+    local -r kubeconfig_a="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-a"
     local -r kubeconfig_b="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-b"
     local -r kubeconfig_c="${SCENARIO_INFO_DIR}/${SCENARIO}/kubeconfig-c"
 
-    # Wait for host2 and host3 to be fully ready (run_tests only waits for host1)
+    # Wait for all hosts to be fully ready before fetching kubeconfigs
+    wait_for_microshift_to_be_ready host1
     wait_for_microshift_to_be_ready host2
     wait_for_microshift_to_be_ready host3
 
+    run_command_on_vm host1 "sudo cp /var/lib/microshift/resources/kubeadmin/${host1_ip}/kubeconfig /tmp/kubeconfig-a && sudo chmod 644 /tmp/kubeconfig-a"
     run_command_on_vm host2 "sudo cp /var/lib/microshift/resources/kubeadmin/${host2_ip}/kubeconfig /tmp/kubeconfig-b && sudo chmod 644 /tmp/kubeconfig-b"
     run_command_on_vm host3 "sudo cp /var/lib/microshift/resources/kubeadmin/${host3_ip}/kubeconfig /tmp/kubeconfig-c && sudo chmod 644 /tmp/kubeconfig-c"
+    copy_file_from_vm host1 "/tmp/kubeconfig-a" "${kubeconfig_a}"
     copy_file_from_vm host2 "/tmp/kubeconfig-b" "${kubeconfig_b}"
     copy_file_from_vm host3 "/tmp/kubeconfig-c" "${kubeconfig_c}"
 
     local dual_cidr_vars=""
     if [ -n "${CLUSTER_A_POD_CIDR_DUAL}" ]; then
-        local host2_ipv6 host3_ipv6
+        local host1_ipv6 host2_ipv6 host3_ipv6
+        host1_ipv6=$(get_host_ipv6 host1) || return 1
         host2_ipv6=$(get_host_ipv6 host2) || return 1
         host3_ipv6=$(get_host_ipv6 host3) || return 1
         dual_cidr_vars+=" --variable CLUSTER_A_POD_CIDR_DUAL:${CLUSTER_A_POD_CIDR_DUAL}"
@@ -292,6 +298,7 @@ c2cc_run_tests() {
         dual_cidr_vars+=" --variable CLUSTER_B_SVC_CIDR_DUAL:${CLUSTER_B_SVC_CIDR_DUAL}"
         dual_cidr_vars+=" --variable CLUSTER_C_POD_CIDR_DUAL:${CLUSTER_C_POD_CIDR_DUAL}"
         dual_cidr_vars+=" --variable CLUSTER_C_SVC_CIDR_DUAL:${CLUSTER_C_SVC_CIDR_DUAL}"
+        dual_cidr_vars+=" --variable HOST1_IPV6:${host1_ipv6}"
         dual_cidr_vars+=" --variable HOST2_IPV6:${host2_ipv6}"
         dual_cidr_vars+=" --variable HOST3_IPV6:${host3_ipv6}"
     fi
@@ -301,6 +308,7 @@ c2cc_run_tests() {
         --variable "CLUSTER_A_POD_CIDR:${CLUSTER_A_POD_CIDR}" \
         --variable "CLUSTER_A_SVC_CIDR:${CLUSTER_A_SVC_CIDR}" \
         --variable "CLUSTER_A_DOMAIN:${CLUSTER_A_DOMAIN}" \
+        --variable "KUBECONFIG_A:${kubeconfig_a}" \
         --variable "CLUSTER_B_POD_CIDR:${CLUSTER_B_POD_CIDR}" \
         --variable "CLUSTER_B_SVC_CIDR:${CLUSTER_B_SVC_CIDR}" \
         --variable "CLUSTER_B_DOMAIN:${CLUSTER_B_DOMAIN}" \

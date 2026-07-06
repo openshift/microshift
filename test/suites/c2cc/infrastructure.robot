@@ -188,14 +188,8 @@ Dual Stack Node Annotation Set
 Setup
     [Documentation]    Set up SSH connections and kubeconfigs for all clusters.
     Check Required Env Variables
-    Login MicroShift Host
-    Setup Kubeconfig
-    Register Local Cluster    cluster-a
-    Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
-    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
+    Register All C2CC Clusters
 
 Teardown
     [Documentation]    Close all connections and clean up kubeconfigs.
     Teardown All Remote Clusters
-    Remove Kubeconfig
-    Logout MicroShift Host

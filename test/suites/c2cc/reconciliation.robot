@@ -135,16 +135,12 @@ Reconcile Dual Stack Service IP Rule After Deletion
 Setup
     [Documentation]    Set up SSH connections and kubeconfigs for all clusters.
     Check Required Env Variables
-    Login MicroShift Host
-    Setup Kubeconfig
-    Register Local Cluster    cluster-a
+    Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG_A}
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
 
 Teardown
     [Documentation]    Close all connections and clean up kubeconfigs.
     Teardown All Remote Clusters
-    Remove Kubeconfig
-    Logout MicroShift Host
 
 Get Node Name On Cluster
     [Documentation]    Get the name of the first node on the given cluster.
