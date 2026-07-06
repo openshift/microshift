@@ -1,166 +1,150 @@
-- api embedded-component 5346161d1bf2a4b45d998678f00e1e8d224acf7b to 6bba8bc85ccc7fef33c4d19aaba85e3683fd3bc9
-  - cc6e909a 2026-06-29T11:21:29+01:00 Move pre-flight checks earlier to start of genGroup
-  - e9fc655c 2026-06-29T11:21:27+01:00 Update verify protobuf scripts
-  - cba640f1 2026-06-29T11:21:26+01:00 Enable codegen protobuf on legacy APIs
-  - f1e1d672 2026-06-29T11:21:25+01:00 Add the ability to skip protobuf generation for certain versions
-  - 85578e6e 2026-06-29T11:21:24+01:00 Add verification of generated protobuf files
-  - 10804f69 2026-06-29T11:18:37+01:00 Implement protobuf generator within codegen
-  - ce609dbc 2026-06-29T11:18:36+01:00 Add gogoproto to vendor
-  - 36b8e4d2 2026-06-29T11:18:35+01:00 Bootstrap initial go-to-protobuf generator in codegen
-  - 0b97f9b9 2026-06-26T09:06:58-07:00 AUTOSCALE-827: add KarpenterOperator feature gate
-  - e096b7be 2026-06-24T09:40:03-04:00 OCPBUGS-63219: Add protocol to AWS NLB parameters
-  - 8f87a41c 2026-06-24T08:01:53-04:00 Add MutableTopology feature gate for spec.controlPlaneTopology
-  - fd7d48b8 2026-06-23T12:34:23-03:00 chore: SPLAT-2588: enable feature on Hypershift
-  - 3d2c4233 2026-06-23T11:29:45+01:00 - Adding cabilities for crdcompatibilitychecker and capi CRs
-  - 5300823d 2026-06-22T17:33:15-03:00 fix(tools): use external topology for hypershift Sippy queries
-  - f74255e3 2026-06-22T17:33:12-03:00 fix(tools): display hypershift in HTML/markdown reports for external topology
-  - cc00868b 2026-06-22T17:33:12-03:00 test(tools): add unit tests for featuregate-test-analyzer
-  - 97133a45 2026-06-22T15:54:14-04:00 Promote VSphereMixedNodeEnv to GA
-  - c85beac3 2026-06-22T10:41:40-04:00 Add v1 type CRIOCredentialProviderConfig
-  - 6f5089fa 2026-06-22T13:57:57+05:30 Add API integration tests
-  - 09b9bcb8 2026-06-22T13:57:55+05:30 Add Secrets Store CSI driver configuration to ClusterCSIDriver API
-  - 1d2fb194 2026-06-16T09:39:23+02:00 STOR-2966: Promote ExternalSnapshotMetadata feature gate to TechPreviewNoUpgrade
-  - 3f52e05e 2026-06-09T15:44:21+02:00 Add SELinuxMountGAReadiness FG
+- api embedded-component 6bba8bc85ccc7fef33c4d19aaba85e3683fd3bc9 to 02e2c3de12fb849770deaa3ac9bb3b160a1cb4d8
+  - 9f503bcd 2026-07-02T13:00:10-04:00 fix(crd): adjust storage settings for CRIOCredentialProviderConfig versions
+  - 6c8739bc 2026-07-02T12:30:27+01:00 Updates API review skill
+  - 02030eb8 2026-07-01T17:56:40-04:00 Fix Typo
+  - 483b3d02 2026-07-01T16:52:04-04:00 Fix integration test
+  - 9f8751d7 2026-07-01T13:41:53-04:00  make update During code generation, the manifest-merge tool combines this override with the v1 schema generated from Go types to produce a final CRD that serves both versions:
+  - 9ab6f8f9 2026-07-01T13:28:01-04:00 Add v1alpha1 schema override for InternalReleaseImage
+  - 63d1eff4 2026-06-26T21:53:42+02:00 Adding documentation related to some cases for the network observability instalation field
+  - 831b00a7 2026-06-26T13:21:48-04:00 Update generated code after rebase
+  - 13e4ae16 2026-06-26T13:07:27-04:00 AGENT-1522: Graduate InternalReleaseImage from v1alpha1 to v1
+  - a62c9890 2026-06-25T16:10:17+02:00 config/v1alpha1: tombstone remote write auth fields and add tests
+  - 08db43df 2026-06-25T14:06:14+02:00 config/v1alpha1: regenerate after tombstoned auth field godoc fix
+  - 0ef6b40c 2026-06-25T12:01:51+02:00 config/v1alpha1: fix tombstoned remote write auth field godoc
+  - 62a162bf 2026-06-25T11:10:52+02:00 config/v1alpha1: keep deprecated remote write auth fields for crdify
+  - 0fa312d8 2026-06-24T16:16:45+02:00 config/v1alpha1: align remote write auth union with review feedback
+  - 1bb239b7 2026-06-23T13:25:14+02:00 config/v1alpha1: rename remote write SafeAuthorization to Authorization
+  - 6a8233b0 2026-05-20T14:36:40-03:00 Add feature gate for multiple HAProxy versions
 
-- cluster-ingress-operator embedded-component bf13f251347308b80b170582de455c59cb0510be to 6d4e06c4f11b2536386d14b701a766be34742adf
-  - d76f79cc 2026-06-26T00:38:57Z Revert "NE-2664: deploy haproxy as sidecar (#1439)"
-  - f322b5de 2026-06-24T15:02:18-04:00 Fix useOLM guard logic and and add remediation guidance
-  - a78ff4ec 2026-06-19T10:00:23-03:00 deploy haproxy as sidecar
-  - 398622a0 2026-06-18T17:50:52-04:00 OCPBUGS-90505: Guard subscriptionCache creation with OLM capability check
-  - 6f3c80ba 2026-06-18T17:50:45-04:00 OCPBUGS-90505: Guard OLM watches with capability check in gatewayclass controller
-  - 0421cc19 2026-06-15T22:29:43-04:00 OCPBUGS-86833: Detect orphaned OSSM subscription after noOLM migration
+- cluster-ingress-operator embedded-component 6d4e06c4f11b2536386d14b701a766be34742adf to 7b7406ee0d4bf03de360d53c9cc4a83ee14332cc
+  - 45f06392 2026-06-29T18:36:05-03:00 deploy haproxy as sidecar
 
-- cluster-kube-apiserver-operator embedded-component e3c762513675e506be2be1e219f1ef621db18275 to 6ffdb079b3aa9249b101b58e6590a22c6cf5cb5f
-  - 020339b 2026-06-29T16:50:32+03:00 Bump library-go for sync
-  - 039a08d 2026-06-25T11:13:10+03:00 Wire health reporter
-  - 4dd7f19 2026-06-25T11:03:52+03:00 Bump library-go
-  - a1e06e7 2026-06-24T17:50:06+03:00 Update openshift dependencies
-  - cc13111 2026-06-22T15:06:38+02:00 NO-JIRA: add kms preflight to NP to allow egress
-  - a960532 2026-06-12T13:35:26+02:00 add openshift/kms parent to kms test suites
+- cluster-kube-apiserver-operator embedded-component 6ffdb079b3aa9249b101b58e6590a22c6cf5cb5f to 6b0696abb88d7e2f7a8275f831519234851121c0
+  - 0ba9af7 2026-07-02T12:14:17+02:00 Fix inaccuracies in AGENTS.md and ARCHITECTURE.md
+  - 11ba053 2026-07-02T11:42:39+02:00 Address review feedback on AGENTS.md and ARCHITECTURE.md
+  - 16b5200 2026-07-01T08:36:04+03:00 Add new test suite for KMS to KMS migration
+  - d6d43ac 2026-07-01T08:13:24+05:30 test: Add network policy enforcement tests
+  - 2d10c6b 2026-06-26T12:51:19+02:00 Add CLAUDE.md
+  - ecca0ca 2026-06-26T12:51:19+02:00 Add AGENTS.md and ARCHITECTURE.md for developer and AI agent reference
+  - f515794 2026-06-26T12:51:19+02:00 Add common CONTRIBUTING.md
 
-- cluster-kube-controller-manager-operator embedded-component c35307f04313369c9ba4dcab3308506a3987065e to 8bef9812e7a3ec026397acd34633a7ecd479f357
-  - c3f74d9 2026-06-26T15:00:24+02:00 Use %w for error wrapping consistently
+- cluster-network-operator embedded-component 7b341b420baeb655d65e551a1f04e3bcbe2631f1 to 8f06c7ead50937cb25d0f829d2cff003eff12bb8
+  - 8d52d3a 2026-06-30T09:56:50+02:00 Add path-specific review instructions to CodeRabbit config
 
-- cluster-network-operator embedded-component c376140ed1842c6a5f78cb74c55b4b49ba212041 to 7b341b420baeb655d65e551a1f04e3bcbe2631f1
-  - c90d9fb 2026-06-24T14:14:20+02:00 Add CodeRabbit configuration for automated PR reviews
-  - 8db6228 2026-06-18T10:50:36-07:00 Watch Network and Infrastructure in proxyconfig controller
-  - b223b6c 2026-06-09T18:00:33+02:00 Update openshift/api and openshift/client-go to latest
-  - 050d838 2026-05-09T08:13:12-04:00 Add missing CNCC NetworkPolicies
-  - 39ffe54 2026-05-09T08:08:17-04:00 Add proper CVO annotations to CNO default-deny NP
+- machine-config-operator embedded-component f05e48737d9db0a62f45f6ef06fc7382a4333fed to 28f12d28b9be52db0830b5d6ed0b6f141bbd2ae7
+  - 28f12d28 2026-07-03T08:36:38Z OCPBUGS-64681: fix: add arbiter to control plane mcp sync (#5436)
+  - f88cf20d 2026-07-01T00:04:09Z chore: update AMIs
+  - ba9dad39 2026-06-29T11:45:04-05:00 Remove verbose ControllerConfig logging from bootstrap MCS
+  - 4c2e88be 2026-06-11T15:54:45-04:00 create digest configmap without oc binary
 
-- cluster-policy-controller embedded-component bb429f5b2a7d77791110b06d8ec5c017183e3ab9 to 050c1ee6aeb0838daf75858fd853cca1e0098fa9
-  - a03103a 2026-06-19T15:45:24+02:00 update OWNERS file
-  - 69f126c 2026-06-19T11:46:31+02:00 add serviceAccountToken volume type to psalabelsyncer
-  - aefcd82 2026-06-19T11:43:58+02:00 go mod vendor
-  - ab6e156 2026-06-19T11:42:00+02:00 bump openshift/api
+- operator-framework-olm embedded-component cea3be72ef5704256bd35ab88acfa9ab03edf6df to 834f3e052edb84e6f316563d9a6f23035c03945f
+  - e461cff5 2026-07-01T13:26:34-04:00 Apply cluster TLS security profile to packageserver serving options
+  - 24e9dd6f 2026-06-30T15:03:07+02:00 OPRUN-4612: Add E2E tests for ExperimentalListPackageCustomSchemas gRPC endpoint
 
-- csi-external-snapshotter embedded-component e695e2bd0b548afd0fce049d86d4af29dd34e574 to b5e4b73f9a761ff8a59f31b982a63e1cdbb76ed8
-  - 9c6d440 2026-06-26T14:15:39+02:00 UPSTREAM: <carry>: disable verify-subtree check
-  - ae3f2e8 2026-06-26T14:13:11+02:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
-  - 30b4b2b 2026-06-25T14:54:26+02:00 UPSTREAM: <carry>: Add OpenShift files
-
-- kubernetes embedded-component d8d517e6bbe7cf7359026cac26bb96ea45e18806 to a466682e3867da746be24d7d56c6641612721d6c
-  - 410f58272 2026-06-16T23:18:18-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for standalone clusters
-  - 7ffb8b2ae 2026-06-15T13:17:06-04:00 UPSTREAM: <carry>: fix kubernetes/conformance to filter on [Conformance] label
-
-- machine-config-operator embedded-component fb5bfe252ba774a014af1059223cea3d07ef14dd to f05e48737d9db0a62f45f6ef06fc7382a4333fed
-  - 6618f142 2026-06-30T06:18:16Z OCPEDGE-2473: feat: enabled graceful shutdown for TNF clusters (#6036)
-  - 1ccbd74e 2026-06-27T12:19:59+05:30 NO-ISSUE: Use DebugNodeWithChrootStd for FIPS check to separate stdout from stderr
-  - 3a9d76eb 2026-06-26T12:53:29-04:00 OCPBUGS-88333: Fix bootupd workaround in old nodes
-  - 46030024 2026-06-25T12:46:37+05:30 NO-ISSUE: Use /proc/sys/crypto/fips_enabled for FIPS check in tests
-  - 5676f30e 2026-06-24T08:28:02-05:00 Remove verbose ignition config logging from bootstrap MCS
-  - fb2491ab 2026-06-23T11:59:01-04:00 test: remove stub upgrade test
-  - 95e21734 2026-06-23T17:55:50+05:30 NO-ISSUE: Temporarily disable sandboxed-containers extension from tests
-  - ba2edec9 2026-06-22T15:40:19-04:00 upgrademonitor: skip no-op MCN SSA calls
-  - ea5455d8 2026-06-22T10:23:33-04:00 temporarily remove sandboxed-containers from extensions test
-  - 754cec07 2026-06-22T08:44:40+02:00 OCPBUGS-59958: Updated Unit Test, added extra getconfig check
-  - 9fac87e5 2026-06-19T20:40:14+05:30 Migrate OS layering tests from openshift-tests-private
-  - 449a1f79 2026-06-19T12:01:03+05:30 Revert "OKD-294: Migrate runtime from runc to crun on an upgrade for OKD"
-  - f617a2c5 2026-06-18T10:28:19-04:00 bootimage: add reset cluster bootimage capability
-  - fa12d23e 2026-06-18T10:28:19-04:00 bootimage: remove configmap version checks
-  - db282613 2026-06-18T10:28:19-04:00 bootimage: rename patchSkipped to reconcileSkipped
-  - 0ebbf630 2026-06-18T10:27:15-04:00 bootimage: make vsphere updates atomic
-  - a552644b 2026-06-17T17:42:55+02:00 NO-ISSUE: Remove dead code
-  - 51e1b0df 2026-06-17T12:41:32+02:00 OCPBUGS-59958: move cleanUpDuplicatedMC to after pool loop in syncNodeConfigHandler
-  - 50a50881 2026-06-09T13:29:35Z Block runc on RHEL 10 in bootstrap render path
-  - fd486c21 2026-06-09T13:29:35Z Block MachineConfig rendering when runc is configured on RHEL 10 pools
-
-- operator-framework-olm embedded-component 32225496430f8607ece581277f56e254fed708be to cea3be72ef5704256bd35ab88acfa9ab03edf6df
-  - a6faf7ea 2026-06-29T10:49:09-04:00 fix: warn-and-continue when cluster TLS profile lookup fails at startup (#3860)
-  - 6907f19c 2026-06-29T10:46:02-04:00 Revert "Merge pull request #1334 from redhat-chai-bot/revert-1330-1782684731"
-  - 4b0c882b 2026-06-28T22:12:12Z Revert "Merge pull request #1330 from openshift-bot/synchronize-upstream"
-  - 80043d4c 2026-06-25T00:05:29Z :seedling: Bump github.com/containerd/containerd from 1.7.32 to 1.7.33 (#3858)
-  - aef2567a 2026-06-25T00:04:48Z Upgrade hashstructure and mapstructure to v2 (#3854)
-  - 07fd0b98 2026-06-25T00:04:32Z :seedling: Bump github.com/prometheus/common from 0.68.1 to 0.69.0 (#3857)
-  - 20fa2f20 2026-06-25T00:04:17Z :seedling: Bump github.com/onsi/ginkgo/v2 from 2.31.0 to 2.32.0 (#3856)
-  - 546c08d1 2026-06-25T00:04:01Z Bump actions/checkout from 6 to 7 (#3855)
-  - 3a95edb6 2026-06-25T00:03:46Z Apply cluster TLS security profile to packageserver serving options (#3849)
-  - 83332273 2026-06-25T00:03:27Z :seedling: Bump the k8s-dependencies group across 1 directory with 8 updates (#3850)
-
-- route-controller-manager embedded-component e454c01fbe561cce9973f54b1ddbcdd35a9d18ff to 01ccbfb991fdbc559820a04c4932fc5ddf2339d0
-  - d825fa2 2026-06-23T23:22:09-04:00 Update go.mod to match Go 1.26.3 builder images
-  - d809961 2026-06-06T09:48:07Z Updating ose-route-controller-manager-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-route-controller-manager.yml
-
-- service-ca-operator embedded-component 35cf51895f4dc77dca8a709e7635980753f87e17 to 6391e070d2ab026324b032a6fa5fc7d6be0d2cb5
-  - e258072 2026-06-25T21:42:09+01:00 Update CONTRIBUTING.md to match updates to template
-  - 0ef0d32 2026-06-25T15:53:28+01:00 Merge in changes from PR#363
-  - 5e8bcab 2026-06-24T21:16:29+01:00 Add AI SDLC context files
-  - 6b9cb8c 2026-06-24T12:03:49+02:00 feat: have CVO inject the centralized TLS configuration into the operator's config
-
-- oc image-amd64 74e525a6a4523a23a5db585c411943b0a0a338da to a7ad57244d4327c77d0fa190bb6d215d2d5faa86
-  - fa71bfe5 2026-06-29T14:27:49+02:00 Add ARCHITECTURE.md, adopt shared CONTRIBUTING.md, slim README
-  - 15da98fa 2026-06-24T18:47:01+05:30 Assert expected tempDir in codesign extraction tests
-  - 2419b54b 2026-06-23T15:13:38+05:30 Catch exact '..' entry in archive containment check
-  - 9710f19c 2026-06-23T13:59:01+05:30 Fix zipslip in image archive unpack and refine codesign guard
-  - d7534960 2026-06-19T14:54:01+05:30 Fix tar slip path traversal in codesign archive extraction
-
-- csi-external-snapshotter image-amd64 e695e2bd0b548afd0fce049d86d4af29dd34e574 to b5e4b73f9a761ff8a59f31b982a63e1cdbb76ed8
-  - 9c6d440 2026-06-26T14:15:39+02:00 UPSTREAM: <carry>: disable verify-subtree check
-  - ae3f2e8 2026-06-26T14:13:11+02:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
-  - 30b4b2b 2026-06-25T14:54:26+02:00 UPSTREAM: <carry>: Add OpenShift files
-
-- router image-amd64 3553702970b094986d91f218e3191487de46e476 to 92a1fe6420e7fa5cff3ac1e4234b866e8f742c9f
-  - 0e72c4d 2026-06-29T16:03:08-03:00 Add HAProxy standalone images for 2.8 and 3.2
-  - 42ee1e6 2026-06-08T06:07:59Z Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/openshift-enterprise-haproxy-router.yml
-
-- ovn-kubernetes image-amd64 62baca4832f3aeb3fc7032d38619835c04208c95 to f0527039dfc4901637721e7cecfdb9d0ea1c9c38
-  - 10d5782c 2026-06-16T20:56:43-07:00 Fix perma-failing security presubmit job
-  - 133ba1e4 2026-05-08T09:45:38+02:00 Promote EVPN E2Es from informing to blocking tests
-
-- kubernetes image-amd64 d8d517e6bbe7cf7359026cac26bb96ea45e18806 to a466682e3867da746be24d7d56c6641612721d6c
-  - 410f58272 2026-06-16T23:18:18-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for standalone clusters
-  - 7ffb8b2ae 2026-06-15T13:17:06-04:00 UPSTREAM: <carry>: fix kubernetes/conformance to filter on [Conformance] label
-
-- service-ca-operator image-amd64 35cf51895f4dc77dca8a709e7635980753f87e17 to 6391e070d2ab026324b032a6fa5fc7d6be0d2cb5
-  - e258072 2026-06-25T21:42:09+01:00 Update CONTRIBUTING.md to match updates to template
-  - 0ef0d32 2026-06-25T15:53:28+01:00 Merge in changes from PR#363
-  - 5e8bcab 2026-06-24T21:16:29+01:00 Add AI SDLC context files
-  - 6b9cb8c 2026-06-24T12:03:49+02:00 feat: have CVO inject the centralized TLS configuration into the operator's config
-
-- oc image-arm64 74e525a6a4523a23a5db585c411943b0a0a338da to a7ad57244d4327c77d0fa190bb6d215d2d5faa86
-  - fa71bfe5 2026-06-29T14:27:49+02:00 Add ARCHITECTURE.md, adopt shared CONTRIBUTING.md, slim README
-  - 15da98fa 2026-06-24T18:47:01+05:30 Assert expected tempDir in codesign extraction tests
-  - 2419b54b 2026-06-23T15:13:38+05:30 Catch exact '..' entry in archive containment check
-  - 9710f19c 2026-06-23T13:59:01+05:30 Fix zipslip in image archive unpack and refine codesign guard
-  - d7534960 2026-06-19T14:54:01+05:30 Fix tar slip path traversal in codesign archive extraction
-
-- csi-external-snapshotter image-arm64 e695e2bd0b548afd0fce049d86d4af29dd34e574 to b5e4b73f9a761ff8a59f31b982a63e1cdbb76ed8
-  - 9c6d440 2026-06-26T14:15:39+02:00 UPSTREAM: <carry>: disable verify-subtree check
-  - ae3f2e8 2026-06-26T14:13:11+02:00 UPSTREAM: <carry>: Updating ose-csi-snapshot-controller-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/ose-csi-snapshot-controller.yml
-  - 30b4b2b 2026-06-25T14:54:26+02:00 UPSTREAM: <carry>: Add OpenShift files
-
-- router image-arm64 3553702970b094986d91f218e3191487de46e476 to 92a1fe6420e7fa5cff3ac1e4234b866e8f742c9f
-  - 0e72c4d 2026-06-29T16:03:08-03:00 Add HAProxy standalone images for 2.8 and 3.2
-  - 42ee1e6 2026-06-08T06:07:59Z Updating openshift-enterprise-haproxy-router-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/af322abdd1a4d7d0161a69a16369a0ab1748515a/images/openshift-enterprise-haproxy-router.yml
-
-- ovn-kubernetes image-arm64 62baca4832f3aeb3fc7032d38619835c04208c95 to 6617c2a2ce4ab2e060e649672c91cf349d8500f7
+- ovn-kubernetes image-amd64 f0527039dfc4901637721e7cecfdb9d0ea1c9c38 to fc46681bd5720c0139c394eea3d2ab686a2cf46f
   - 91d29f7b 2026-06-18T18:51:01+05:30 Dockerfile.base: Bump OVN to 26.03
-  - 10d5782c 2026-06-16T20:56:43-07:00 Fix perma-failing security presubmit job
-  - 133ba1e4 2026-05-08T09:45:38+02:00 Promote EVPN E2Es from informing to blocking tests
+  - 8e2a679f 2026-06-15T15:05:50Z sync test annotations with upstream changes
+  - dfcb2426 2026-06-12T14:10:55+02:00 Fix UDN controller startup timeout during pod sync
+  - 3ac5bf95 2026-06-11T12:15:58-04:00 Use TLS config params in the ovnkube-identity webhook
+  - 857ce9a9 2026-06-11T12:15:58-04:00 Add CLI flags for configuring TLS to ovnkube-identity
+  - 8512a3bf 2026-06-11T16:27:20+02:00 Address review feedback on CUDN transport metric
+  - 75597a67 2026-06-11T16:27:20+02:00 Add transport label to CUDN count metric
+  - 9ebc3afa 2026-06-10T12:41:53-04:00 Adding missing labels for UDN workloads
+  - 268848f5 2026-06-10T10:20:30+02:00 e2e: fix UDN subnet overlap with downstream service CIDR
+  - d59e62b0 2026-06-09T15:07:42-04:00 cni: gracefully handle missing device info file for primary UDN
+  - 85979507 2026-06-09T10:05:01+02:00 e2e(virt): Add evpn failed migration test
+  - 08dee44f 2026-06-09T10:05:01+02:00 test(evpn): add unit tests for neighbor timing during live migration
+  - 94cf737b 2026-06-09T10:05:01+02:00 fix(evpn): remove dead EEXIST check from LinkFDBSet caller
+  - 8fd2cad4 2026-06-09T10:05:01+02:00 refactor: rename LinkFDBAdd to LinkFDBSet, use NeighSet
+  - ff611433 2026-06-09T10:05:01+02:00 refactor: rename LinkNeighAdd to LinkNeighSet
+  - 9e8bb31c 2026-06-09T10:05:01+02:00 fix(evpn): gate neighbor programming on migration domain readiness
+  - a11c389d 2026-06-09T08:10:33+02:00 area-maintainers: introduce kubevirt area with merge bot
+  - 2d545a0b 2026-06-08T15:02:18-07:00 contrib: refresh OVN pods on kind-helm.sh --deploy
+  - 1160194c 2026-06-08T14:49:52-04:00 Make TFT report failure for DPU CI jobs
+  - f8f3c2b5 2026-06-08T14:49:52-04:00 Route DPU host no-overlay traffic through OVN
+  - 95380fd4 2026-06-08T14:49:52-04:00 Peer DPU sim FRR over gateway network
+  - 107c5d5b 2026-06-08T14:49:52-04:00 Handle renamed FRR-K8S controller in DPU sim
+  - 7fc0f4b1 2026-06-08T14:49:52-04:00 Add DPU simulator no-overlay CI lane
+  - d7ac03e4 2026-06-08T14:49:52-04:00 Support manual DPU simulator Helm installs
+  - ca608635 2026-06-08T09:26:08-07:00 ovn: drop unreachable IPAMClaim reconciler after non-IC removal
+  - 7a7f4caa 2026-06-08T09:26:08-07:00 ovn: drop dead IPAMClaim watch after non-IC removal
+  - 047d5d36 2026-06-08T08:55:12-07:00 Sync reconcile pod-selector address sets at creation time
+  - e08225fc 2026-06-08T14:08:17Z RA contrioller: add unicast allowas-in origin to raw FRR config
+  - 4b4d0b9a 2026-06-08T14:01:09Z RA controller: rename evpn_rawconfig to rawconfig for future broader use
+  - c83b6f3d 2026-06-08T13:19:21Z e2e: configure framework TestContext to verify service accounts
+  - 0fe6e3d9 2026-06-06T09:54:52-04:00 dpulease: fix nil pointer panic in CNI health check
+  - 09cf4944 2026-06-05T17:43:18+02:00 [FYI] prevent duplicate logical_router_static_route
+  - d9cefde5 2026-06-04T17:55:23-04:00 Use FRR-K8S next-hop API in kind installs
+  - 4ab105d4 2026-06-04T20:14:49+02:00 ci: wait for service reachability after dual-stack conversion
+  - 351aa103 2026-06-04T13:35:15-04:00 Bump OpenTelemetry to v1.41.0
+  - cc84a978 2026-06-04T13:35:15-04:00 Stop using deprecated frr-k8s DisableMP field
+  - fa24ddb5 2026-06-04T13:28:56-04:00 Fix using docker for dpu-sim CI lane
+  - a0c9fa1f 2026-06-04T13:21:57-04:00 Set DPU host BGP next-hop for no-overlay routes
+  - fc34b18f 2026-06-04T09:45:23-07:00 tests,e2e: add BFD route-cleanup coverage and fix stale wording
+  - ebc865ca 2026-06-04T09:45:23-07:00 tests,e2e: drop orphaned external-gw-pod-ips constant
+  - 1355df27 2026-06-04T09:45:23-07:00 tests: cover external-gateway route deletion for APB-managed routes
+  - c824eb88 2026-06-04T09:45:23-07:00 node: run periodic external-gateway conntrack cleanup for APB namespaces
+  - be576f25 2026-06-04T09:45:22-07:00 tests,e2e: remove legacy external-gateway annotation specs
+  - 52634fa1 2026-06-04T09:45:22-07:00 util,node,config: drop legacy external-gateway annotations
+  - 2d0beded 2026-06-04T09:45:22-07:00 apbroute: stop honoring legacy external-gateway annotations
+  - 0afda7bf 2026-06-04T09:45:22-07:00 ovn: remove legacy external-gateway annotation handling
+  - 1d8db6ee 2026-06-04T10:47:34-04:00 Bump frr-k8s for next-hop API
+  - 7525f9ce 2026-06-04T11:11:50+02:00 e2e: wait for localnet multi network policy convergence
+  - be80cc06 2026-05-15T09:04:49-07:00 test/e2e: drop dead multi-node-per-zone branching
+  - 1e20211e 2026-05-15T09:04:49-07:00 docs/installation: drop manual zone-name labeling step
+  - ffed9316 2026-05-15T09:04:49-07:00 test/e2e/kubevirt: simplify worker selection for live-migration
+  - fbeeaea7 2026-05-15T09:04:49-07:00 dist, helm, contrib: drop manual zone-name labeling
 
-- service-ca-operator image-arm64 35cf51895f4dc77dca8a709e7635980753f87e17 to 6391e070d2ab026324b032a6fa5fc7d6be0d2cb5
-  - e258072 2026-06-25T21:42:09+01:00 Update CONTRIBUTING.md to match updates to template
-  - 0ef0d32 2026-06-25T15:53:28+01:00 Merge in changes from PR#363
-  - 5e8bcab 2026-06-24T21:16:29+01:00 Add AI SDLC context files
-  - 6b9cb8c 2026-06-24T12:03:49+02:00 feat: have CVO inject the centralized TLS configuration into the operator's config
+- ovn-kubernetes image-arm64 6617c2a2ce4ab2e060e649672c91cf349d8500f7 to fc46681bd5720c0139c394eea3d2ab686a2cf46f
+  - 8e2a679f 2026-06-15T15:05:50Z sync test annotations with upstream changes
+  - dfcb2426 2026-06-12T14:10:55+02:00 Fix UDN controller startup timeout during pod sync
+  - 3ac5bf95 2026-06-11T12:15:58-04:00 Use TLS config params in the ovnkube-identity webhook
+  - 857ce9a9 2026-06-11T12:15:58-04:00 Add CLI flags for configuring TLS to ovnkube-identity
+  - 8512a3bf 2026-06-11T16:27:20+02:00 Address review feedback on CUDN transport metric
+  - 75597a67 2026-06-11T16:27:20+02:00 Add transport label to CUDN count metric
+  - 9ebc3afa 2026-06-10T12:41:53-04:00 Adding missing labels for UDN workloads
+  - 268848f5 2026-06-10T10:20:30+02:00 e2e: fix UDN subnet overlap with downstream service CIDR
+  - d59e62b0 2026-06-09T15:07:42-04:00 cni: gracefully handle missing device info file for primary UDN
+  - 85979507 2026-06-09T10:05:01+02:00 e2e(virt): Add evpn failed migration test
+  - 08dee44f 2026-06-09T10:05:01+02:00 test(evpn): add unit tests for neighbor timing during live migration
+  - 94cf737b 2026-06-09T10:05:01+02:00 fix(evpn): remove dead EEXIST check from LinkFDBSet caller
+  - 8fd2cad4 2026-06-09T10:05:01+02:00 refactor: rename LinkFDBAdd to LinkFDBSet, use NeighSet
+  - ff611433 2026-06-09T10:05:01+02:00 refactor: rename LinkNeighAdd to LinkNeighSet
+  - 9e8bb31c 2026-06-09T10:05:01+02:00 fix(evpn): gate neighbor programming on migration domain readiness
+  - a11c389d 2026-06-09T08:10:33+02:00 area-maintainers: introduce kubevirt area with merge bot
+  - 2d545a0b 2026-06-08T15:02:18-07:00 contrib: refresh OVN pods on kind-helm.sh --deploy
+  - 1160194c 2026-06-08T14:49:52-04:00 Make TFT report failure for DPU CI jobs
+  - f8f3c2b5 2026-06-08T14:49:52-04:00 Route DPU host no-overlay traffic through OVN
+  - 95380fd4 2026-06-08T14:49:52-04:00 Peer DPU sim FRR over gateway network
+  - 107c5d5b 2026-06-08T14:49:52-04:00 Handle renamed FRR-K8S controller in DPU sim
+  - 7fc0f4b1 2026-06-08T14:49:52-04:00 Add DPU simulator no-overlay CI lane
+  - d7ac03e4 2026-06-08T14:49:52-04:00 Support manual DPU simulator Helm installs
+  - ca608635 2026-06-08T09:26:08-07:00 ovn: drop unreachable IPAMClaim reconciler after non-IC removal
+  - 7a7f4caa 2026-06-08T09:26:08-07:00 ovn: drop dead IPAMClaim watch after non-IC removal
+  - 047d5d36 2026-06-08T08:55:12-07:00 Sync reconcile pod-selector address sets at creation time
+  - e08225fc 2026-06-08T14:08:17Z RA contrioller: add unicast allowas-in origin to raw FRR config
+  - 4b4d0b9a 2026-06-08T14:01:09Z RA controller: rename evpn_rawconfig to rawconfig for future broader use
+  - c83b6f3d 2026-06-08T13:19:21Z e2e: configure framework TestContext to verify service accounts
+  - 0fe6e3d9 2026-06-06T09:54:52-04:00 dpulease: fix nil pointer panic in CNI health check
+  - 09cf4944 2026-06-05T17:43:18+02:00 [FYI] prevent duplicate logical_router_static_route
+  - d9cefde5 2026-06-04T17:55:23-04:00 Use FRR-K8S next-hop API in kind installs
+  - 4ab105d4 2026-06-04T20:14:49+02:00 ci: wait for service reachability after dual-stack conversion
+  - 351aa103 2026-06-04T13:35:15-04:00 Bump OpenTelemetry to v1.41.0
+  - cc84a978 2026-06-04T13:35:15-04:00 Stop using deprecated frr-k8s DisableMP field
+  - fa24ddb5 2026-06-04T13:28:56-04:00 Fix using docker for dpu-sim CI lane
+  - a0c9fa1f 2026-06-04T13:21:57-04:00 Set DPU host BGP next-hop for no-overlay routes
+  - fc34b18f 2026-06-04T09:45:23-07:00 tests,e2e: add BFD route-cleanup coverage and fix stale wording
+  - ebc865ca 2026-06-04T09:45:23-07:00 tests,e2e: drop orphaned external-gw-pod-ips constant
+  - 1355df27 2026-06-04T09:45:23-07:00 tests: cover external-gateway route deletion for APB-managed routes
+  - c824eb88 2026-06-04T09:45:23-07:00 node: run periodic external-gateway conntrack cleanup for APB namespaces
+  - be576f25 2026-06-04T09:45:22-07:00 tests,e2e: remove legacy external-gateway annotation specs
+  - 52634fa1 2026-06-04T09:45:22-07:00 util,node,config: drop legacy external-gateway annotations
+  - 2d0beded 2026-06-04T09:45:22-07:00 apbroute: stop honoring legacy external-gateway annotations
+  - 0afda7bf 2026-06-04T09:45:22-07:00 ovn: remove legacy external-gateway annotation handling
+  - 1d8db6ee 2026-06-04T10:47:34-04:00 Bump frr-k8s for next-hop API
+  - 7525f9ce 2026-06-04T11:11:50+02:00 e2e: wait for localnet multi network policy convergence
+  - be80cc06 2026-05-15T09:04:49-07:00 test/e2e: drop dead multi-node-per-zone branching
+  - 1e20211e 2026-05-15T09:04:49-07:00 docs/installation: drop manual zone-name labeling step
+  - ffed9316 2026-05-15T09:04:49-07:00 test/e2e/kubevirt: simplify worker selection for live-migration
+  - fbeeaea7 2026-05-15T09:04:49-07:00 dist, helm, contrib: drop manual zone-name labeling
 
