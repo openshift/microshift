@@ -27,9 +27,6 @@ const (
 	haproxyMaxTimeoutMilliseconds = 2147483647 * time.Millisecond
 )
 
-// isFIPSEnabled reports whether the cluster has FIPS enabled.
-var isFIPSEnabled = detectFIPS()
-
 var (
 	tlsVersion13Ciphers = sets.NewString(
 		"TLS_AES_128_GCM_SHA256",
@@ -266,7 +263,8 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		return err
 	}
 
-	extraParams, err := generateIngressParams(cfg, isFIPSEnabled)
+	fipsEnabled := detectFIPS()
+	extraParams, err := generateIngressParams(cfg, fipsEnabled)
 	if err != nil {
 		return err
 	}
