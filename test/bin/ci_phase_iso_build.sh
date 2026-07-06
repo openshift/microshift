@@ -70,18 +70,18 @@ update_build_cache() {
     # build artifacts may be cached
     $(dry_run) bash -x ./bin/build_rpms.sh
 
+    # Build templates and run registry mirroring to be used by bootc image builds
+    $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints-bootc/templates
+
     # Build the ostree layers in parallel
     $(dry_run) bash -xc './bin/build_images.sh -l ./image-blueprints/layer1-base && ./bin/build_images.sh -l ./image-blueprints/layer4-release' &
     pid_ostree=$!
 
-    # Build templates and run registry mirroring to be used by bootc image builds
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints-bootc/templates
-    $(dry_run) bash -x ./bin/mirror_registry.sh
-
-    # Build the bootc layers in parallel
-    $(dry_run) bash -xc './bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base  -l ./image-blueprints-bootc/el9/layer4-release' &
+    # Build the bootc layers in parallel, skipping extraction and mirroring (-E)
+    # as they were already done by the templates build above
+    $(dry_run) bash -xc './bin/build_bootc_images.sh -E -l ./image-blueprints-bootc/el9/layer1-base  -l ./image-blueprints-bootc/el9/layer4-release' &
     pid_bootc9=$!
-    $(dry_run) bash -xc './bin/build_bootc_images.sh -l ./image-blueprints-bootc/el10/layer1-base -l ./image-blueprints-bootc/el10/layer4-release' &
+    $(dry_run) bash -xc './bin/build_bootc_images.sh -E -l ./image-blueprints-bootc/el10/layer1-base -l ./image-blueprints-bootc/el10/layer4-release' &
     pid_bootc10=$!
 
     # Wait for all the build processes to complete, exit early and clean up if any command fails
