@@ -85,8 +85,17 @@ else
     progress=""
 fi
 
+# Limit amount of parallel scenarios for the C2CC jobs
+# to avoid over-provisioning the resources.
+jobs_arg=""
+if [[ "${SCENARIO_SOURCES}" =~ c2cc ]]; then
+    jobs_arg="-j 10"
+fi
+
 TEST_OK=true
+# shellcheck disable=SC2086
 if ! parallel \
+    ${jobs_arg} \
     ${progress} \
     --results "${SCENARIO_INFO_DIR}/{/.}/boot_and_run.log" \
     --joblog "${BOOT_TEST_JOB_LOG}" \
