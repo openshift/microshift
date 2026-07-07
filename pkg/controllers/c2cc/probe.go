@@ -285,9 +285,25 @@ func (pm *probeManager) updateStatus(ctx context.Context, name string, status mi
 			return fmt.Errorf("failed to get RemoteCluster %q: %w", name, err)
 		}
 
-		// Preserve LastSuccessfulProbe from the existing status if this probe failed
+		// Preserve LastSuccessfulProbe from the existing status if no target succeeded this tick
 		if rc.Status.LastSuccessfulProbe != nil && status.LastSuccessfulProbe == nil {
 			status.LastSuccessfulProbe = rc.Status.LastSuccessfulProbe
+		}
+
+		// Preserve per-target latency from the existing CR when the in-memory
+		// window is empty (e.g., after pod restart before samples accumulate).
+		if len(rc.Status.TargetResults) > 0 {
+			existing := make(map[string]*microshiftv1alpha1.LatencyStats, len(rc.Status.TargetResults))
+			for i := range rc.Status.TargetResults {
+				if rc.Status.TargetResults[i].Latency != nil {
+					existing[rc.Status.TargetResults[i].Target] = rc.Status.TargetResults[i].Latency
+				}
+			}
+			for i := range status.TargetResults {
+				if status.TargetResults[i].Latency == nil {
+					status.TargetResults[i].Latency = existing[status.TargetResults[i].Target]
+				}
+			}
 		}
 
 		rc.Status = status
