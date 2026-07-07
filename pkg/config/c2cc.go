@@ -86,8 +86,8 @@ type ResolvedRemoteCluster struct {
 	ClusterNetwork []*net.IPNet
 	ServiceNetwork []*net.IPNet
 	Domain         string
-	DNSIP          string // 10th IP of ServiceNetwork[0], computed during validation when Domain is set
-	ProbeIP        string // 11th IP of ServiceNetwork[0], deterministic probe service ClusterIP
+	DNSIPs         []string       // 10th IP of each ServiceNetwork entry (one per address family)
+	ProbeIPs       map[int]string // 11th IP of each ServiceNetwork entry, keyed by family
 }
 
 func (rc *ResolvedRemoteCluster) NextHopForFamily(family int) (net.IP, bool) {
@@ -96,10 +96,15 @@ func (rc *ResolvedRemoteCluster) NextHopForFamily(family int) (net.IP, bool) {
 }
 
 func (rc *ResolvedRemoteCluster) PrimaryNextHop() net.IP {
-	if len(rc.ClusterNetwork) == 0 {
-		return nil
+	// Prefer IPv4 when available (matching OVN-K's IPv4-first ordering convention),
+	// fallback to IPv6 for IPv6-only clusters.
+	if ip, ok := rc.NextHops[netlink.FAMILY_V4]; ok {
+		return ip
 	}
-	return rc.NextHops[ipFamilyOfIPNet(rc.ClusterNetwork[0])]
+	if ip, ok := rc.NextHops[netlink.FAMILY_V6]; ok {
+		return ip
+	}
+	return nil
 }
 
 func ipFamilyOfIPNet(ipNet *net.IPNet) int {
@@ -223,13 +228,16 @@ func (c *C2CC) parseRemoteClusters() ([]ResolvedRemoteCluster, []error) {
 
 		resolved[i].Domain = rc.Domain
 
-		if len(resolved[i].ServiceNetwork) > 0 {
-			probeIP, err := cidr.Host(resolved[i].ServiceNetwork[0], 11)
+		// Compute probe IP for each service network (one per address family)
+		resolved[i].ProbeIPs = make(map[int]string, len(resolved[i].ServiceNetwork))
+		for j, svcNet := range resolved[i].ServiceNetwork {
+			probeIP, err := cidr.Host(svcNet, 11)
 			if err != nil {
-				errs = append(errs, fmt.Errorf("%s: failed to compute probe IP from serviceNetwork[0]: %w", label, err))
-			} else {
-				resolved[i].ProbeIP = probeIP.String()
+				errs = append(errs, fmt.Errorf("%s: failed to compute probe IP from serviceNetwork[%d]: %w", label, j, err))
+				continue
 			}
+			family := ipFamilyOfIPNet(svcNet)
+			resolved[i].ProbeIPs[family] = probeIP.String()
 		}
 	}
 
@@ -437,11 +445,13 @@ func validateRemoteCluster(
 	}
 
 	if rc.Domain != "" && len(rc.ServiceNetwork) > 0 {
-		dnsIP, err := getClusterDNS(rc.ServiceNetwork[0])
-		if err != nil {
-			errs = append(errs, fmt.Errorf("%s: failed to compute DNS IP from serviceNetwork[0] %q: %w", label, rc.ServiceNetwork[0], err))
-		} else {
-			res.DNSIP = dnsIP
+		for i, svcNetStr := range rc.ServiceNetwork {
+			dnsIP, err := getClusterDNS(svcNetStr)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("%s: failed to compute DNS IP from serviceNetwork[%d] %q: %w", label, i, svcNetStr, err))
+			} else {
+				res.DNSIPs = append(res.DNSIPs, dnsIP)
+			}
 		}
 	}
 
@@ -550,7 +560,7 @@ func RenderC2CCDNSBlocks(resolved []ResolvedRemoteCluster, cacheTTL, cacheNegati
 		if rc.Domain == "" {
 			continue
 		}
-		blocks = append(blocks, formatDNSBlock(rc.Domain, rc.DNSIP, cacheTTL, cacheNegativeTTL))
+		blocks = append(blocks, formatDNSBlock(rc.Domain, rc.DNSIPs, cacheTTL, cacheNegativeTTL))
 	}
 	if len(blocks) == 0 {
 		return ""
@@ -558,7 +568,7 @@ func RenderC2CCDNSBlocks(resolved []ResolvedRemoteCluster, cacheTTL, cacheNegati
 	return "\n" + strings.Join(blocks, "\n")
 }
 
-func formatDNSBlock(domain, dnsIP string, cacheTTL, cacheNegativeTTL int) string {
+func formatDNSBlock(domain string, dnsIPs []string, cacheTTL, cacheNegativeTTL int) string {
 	return fmt.Sprintf(`    %s:5353 {
         bufsize 1232
         errors
@@ -570,5 +580,5 @@ func formatDNSBlock(domain, dnsIP string, cacheTTL, cacheNegativeTTL int) string
         cache %d {
             denial 9984 %d
         }
-    }`, domain, domain, dnsIP, cacheTTL, cacheNegativeTTL)
+    }`, domain, domain, strings.Join(dnsIPs, " "), cacheTTL, cacheNegativeTTL)
 }

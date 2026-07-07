@@ -788,7 +788,7 @@ func TestC2CC_ProbeIntervalValidation(t *testing.T) {
 	})
 }
 
-func TestC2CC_ProbeIP(t *testing.T) {
+func TestC2CC_ProbeIPs(t *testing.T) {
 	stubHostIPs(t, nil)
 
 	t.Run("IPv4 service network", func(t *testing.T) {
@@ -801,7 +801,7 @@ func TestC2CC_ProbeIP(t *testing.T) {
 		})
 		require.NoError(t, cfg.C2CC.validate(cfg))
 		require.Len(t, cfg.C2CC.Resolved, 1)
-		assert.Equal(t, "10.46.0.11", cfg.C2CC.Resolved[0].ProbeIP)
+		assert.Equal(t, "10.46.0.11", cfg.C2CC.Resolved[0].ProbeIPs[2]) // netlink.FAMILY_V4 = 2
 	})
 
 	t.Run("IPv6 service network", func(t *testing.T) {
@@ -814,10 +814,10 @@ func TestC2CC_ProbeIP(t *testing.T) {
 		})
 		require.NoError(t, cfg.C2CC.validate(cfg))
 		require.Len(t, cfg.C2CC.Resolved, 1)
-		assert.Equal(t, "fd04::b", cfg.C2CC.Resolved[0].ProbeIP)
+		assert.Equal(t, "fd04::b", cfg.C2CC.Resolved[0].ProbeIPs[10]) // netlink.FAMILY_V6 = 10
 	})
 
-	t.Run("dual-stack uses first service network", func(t *testing.T) {
+	t.Run("dual-stack populates both families", func(t *testing.T) {
 		cfg := mkDualStackC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
 				NextHop:        []string{"10.100.0.2", "fd00::2"},
@@ -827,14 +827,59 @@ func TestC2CC_ProbeIP(t *testing.T) {
 		})
 		require.NoError(t, cfg.C2CC.validate(cfg))
 		require.Len(t, cfg.C2CC.Resolved, 1)
-		assert.Equal(t, "10.46.0.11", cfg.C2CC.Resolved[0].ProbeIP)
+		assert.Equal(t, "10.46.0.11", cfg.C2CC.Resolved[0].ProbeIPs[2]) // IPv4
+		assert.Equal(t, "fd04::b", cfg.C2CC.Resolved[0].ProbeIPs[10])   // IPv6
 	})
 }
 
-func TestC2CC_DNSIP(t *testing.T) {
+func TestC2CC_PrimaryNextHop(t *testing.T) {
 	stubHostIPs(t, nil)
 
-	t.Run("DNSIP populated when domain is set", func(t *testing.T) {
+	t.Run("IPv4-only returns IPv4", func(t *testing.T) {
+		cfg := mkC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        []string{"10.100.0.2"},
+				ClusterNetwork: []string{"10.45.0.0/16"},
+				ServiceNetwork: []string{"10.46.0.0/16"},
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		require.Len(t, cfg.C2CC.Resolved, 1)
+		assert.Equal(t, "10.100.0.2", cfg.C2CC.Resolved[0].PrimaryNextHop().String())
+	})
+
+	t.Run("IPv6-only returns IPv6", func(t *testing.T) {
+		cfg := mkIPv6OnlyC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        []string{"fd00::2"},
+				ClusterNetwork: []string{"fd03::/48"},
+				ServiceNetwork: []string{"fd04::/112"},
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		require.Len(t, cfg.C2CC.Resolved, 1)
+		assert.Equal(t, "fd00::2", cfg.C2CC.Resolved[0].PrimaryNextHop().String())
+	})
+
+	t.Run("dual-stack prefers IPv4 even when IPv6 is first", func(t *testing.T) {
+		cfg := mkDualStackC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        []string{"10.100.0.2", "fd00::2"},
+				ClusterNetwork: []string{"fd03::/48", "10.45.0.0/16"}, // IPv6 first
+				ServiceNetwork: []string{"fd04::/112", "10.46.0.0/16"},
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		require.Len(t, cfg.C2CC.Resolved, 1)
+		// Should still return IPv4 because PrimaryNextHop prefers IPv4
+		assert.Equal(t, "10.100.0.2", cfg.C2CC.Resolved[0].PrimaryNextHop().String())
+	})
+}
+
+func TestC2CC_DNSIPs(t *testing.T) {
+	stubHostIPs(t, nil)
+
+	t.Run("DNSIPs populated when domain is set", func(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
 				NextHop:        []string{"10.100.0.2"},
@@ -844,10 +889,10 @@ func TestC2CC_DNSIP(t *testing.T) {
 			}},
 		})
 		require.NoError(t, cfg.C2CC.validate(cfg))
-		assert.Equal(t, "10.46.0.10", cfg.C2CC.Resolved[0].DNSIP)
+		assert.Equal(t, []string{"10.46.0.10"}, cfg.C2CC.Resolved[0].DNSIPs)
 	})
 
-	t.Run("DNSIP empty when domain is not set", func(t *testing.T) {
+	t.Run("DNSIPs empty when domain is not set", func(t *testing.T) {
 		cfg := mkC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
 				NextHop:        []string{"10.100.0.2"},
@@ -856,10 +901,10 @@ func TestC2CC_DNSIP(t *testing.T) {
 			}},
 		})
 		require.NoError(t, cfg.C2CC.validate(cfg))
-		assert.Empty(t, cfg.C2CC.Resolved[0].DNSIP)
+		assert.Empty(t, cfg.C2CC.Resolved[0].DNSIPs)
 	})
 
-	t.Run("DNSIP for IPv6 service network", func(t *testing.T) {
+	t.Run("DNSIPs for IPv6 service network", func(t *testing.T) {
 		cfg := mkIPv6OnlyC2CCConfig(C2CC{
 			RemoteClusters: []RemoteCluster{{
 				NextHop:        []string{"fd00::2"},
@@ -869,7 +914,20 @@ func TestC2CC_DNSIP(t *testing.T) {
 			}},
 		})
 		require.NoError(t, cfg.C2CC.validate(cfg))
-		assert.Equal(t, "fd04::a", cfg.C2CC.Resolved[0].DNSIP)
+		assert.Equal(t, []string{"fd04::a"}, cfg.C2CC.Resolved[0].DNSIPs)
+	})
+
+	t.Run("DNSIPs for dual-stack service network", func(t *testing.T) {
+		cfg := mkDualStackC2CCConfig(C2CC{
+			RemoteClusters: []RemoteCluster{{
+				NextHop:        []string{"10.100.0.2", "fd00::2"},
+				ClusterNetwork: []string{"10.45.0.0/16", "fd03::/48"},
+				ServiceNetwork: []string{"10.46.0.0/16", "fd04::/112"},
+				Domain:         "cluster-b.remote",
+			}},
+		})
+		require.NoError(t, cfg.C2CC.validate(cfg))
+		assert.Equal(t, []string{"10.46.0.10", "fd04::a"}, cfg.C2CC.Resolved[0].DNSIPs)
 	})
 }
 
@@ -897,7 +955,7 @@ func TestRenderC2CCDNSBlocks(t *testing.T) {
 			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16")},
 			ServiceNetwork: []*net.IPNet{parseCIDR(t, "10.46.0.0/16")},
 			Domain:         "cluster-b.remote",
-			DNSIP:          "10.46.0.10",
+			DNSIPs:         []string{"10.46.0.10"},
 		}}
 		result := RenderC2CCDNSBlocks(resolved, 10, 10)
 		assert.True(t, strings.HasPrefix(result, "\n"), "result should start with newline for YAML block scalar")
@@ -911,7 +969,7 @@ func TestRenderC2CCDNSBlocks(t *testing.T) {
 	t.Run("custom TTLs", func(t *testing.T) {
 		resolved := []ResolvedRemoteCluster{{
 			Domain: "cluster-b.remote",
-			DNSIP:  "10.46.0.10",
+			DNSIPs: []string{"10.46.0.10"},
 		}}
 		result := RenderC2CCDNSBlocks(resolved, 30, 60)
 		assert.Contains(t, result, "cache 30 {")
@@ -921,7 +979,7 @@ func TestRenderC2CCDNSBlocks(t *testing.T) {
 	t.Run("zero TTLs", func(t *testing.T) {
 		resolved := []ResolvedRemoteCluster{{
 			Domain: "cluster-b.remote",
-			DNSIP:  "10.46.0.10",
+			DNSIPs: []string{"10.46.0.10"},
 		}}
 		result := RenderC2CCDNSBlocks(resolved, 0, 0)
 		assert.Contains(t, result, "cache 0 {")
@@ -932,11 +990,11 @@ func TestRenderC2CCDNSBlocks(t *testing.T) {
 		resolved := []ResolvedRemoteCluster{
 			{
 				Domain: "cluster-b.remote",
-				DNSIP:  "10.46.0.10",
+				DNSIPs: []string{"10.46.0.10"},
 			},
 			{
 				Domain: "cluster-c.remote",
-				DNSIP:  "10.56.0.10",
+				DNSIPs: []string{"10.56.0.10"},
 			},
 		}
 		result := RenderC2CCDNSBlocks(resolved, 10, 10)
@@ -950,7 +1008,7 @@ func TestRenderC2CCDNSBlocks(t *testing.T) {
 		resolved := []ResolvedRemoteCluster{
 			{
 				Domain: "cluster-b.remote",
-				DNSIP:  "10.46.0.10",
+				DNSIPs: []string{"10.46.0.10"},
 			},
 			{
 				Domain: "",
@@ -959,6 +1017,19 @@ func TestRenderC2CCDNSBlocks(t *testing.T) {
 		result := RenderC2CCDNSBlocks(resolved, 10, 10)
 		assert.Contains(t, result, "cluster-b.remote:5353")
 		assert.NotContains(t, result, "cluster-c")
+	})
+
+	t.Run("dual-stack DNS IPs", func(t *testing.T) {
+		resolved := []ResolvedRemoteCluster{{
+			NextHops:       map[int]net.IP{netlink.FAMILY_V4: net.ParseIP("10.100.0.2"), netlink.FAMILY_V6: net.ParseIP("fd00::2")},
+			ClusterNetwork: []*net.IPNet{parseCIDR(t, "10.45.0.0/16"), parseCIDR(t, "fd03::/48")},
+			ServiceNetwork: []*net.IPNet{parseCIDR(t, "10.46.0.0/16"), parseCIDR(t, "fd04::/112")},
+			Domain:         "cluster-b.remote",
+			DNSIPs:         []string{"10.46.0.10", "fd04::a"},
+		}}
+		result := RenderC2CCDNSBlocks(resolved, 10, 10)
+		assert.Contains(t, result, "cluster-b.remote:5353")
+		assert.Contains(t, result, "forward . 10.46.0.10 fd04::a")
 	})
 }
 
