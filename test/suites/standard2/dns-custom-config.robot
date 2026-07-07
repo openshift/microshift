@@ -11,7 +11,7 @@ Resource            ../../resources/hosts.resource
 Library             ../../resources/journalctl.py
 
 Suite Setup         Setup Suite With Namespace
-Suite Teardown      Teardown Suite With Namespace
+Suite Teardown      Teardown DNS Suite
 
 Test Tags           slow
 
@@ -131,13 +131,19 @@ ConfigMap Should Contain Hostname
     ...    configmap    openshift-dns    dns-default    .data.Corefile
     Should Contain    ${corefile_data}    ${hostname}
 
+Teardown DNS Suite
+    [Documentation]    Restart MicroShift to restore clean state after the last test
+    ...    (per-test teardowns skip the restart), then tear down namespace.
+    Restart MicroShift
+    Teardown Suite With Namespace
+
 Teardown Custom Corefile
-    [Documentation]    Remove custom Corefile, drop-in config, fake IP, and restart
+    [Documentation]    Remove custom Corefile, drop-in config, and fake IP without restarting.
+    ...    The next test's setup will restart MicroShift.
     Run Keywords
     ...    Remove Drop In MicroShift Config    20-dns-custom
     ...    AND    Remove Custom Corefile
     ...    AND    Remove Fake IP From NIC    ${FAKE_LISTEN_IP}
-    ...    AND    Restart MicroShift
 
 Remove Custom Corefile
     [Documentation]    Remove the custom Corefile from the host
