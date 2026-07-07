@@ -15,12 +15,19 @@ ${API_PORT}     ${EMPTY}    # overridden by scenario.sh in CI
 
 *** Keywords ***
 Get Kubeconfig
-    [Documentation]    Get the kubeconfig file from the host argument and return contents
+    [Documentation]    Get the kubeconfig file from the host argument and return contents.
+    ...    Uses a temp file and SCP download to avoid logging the kubeconfig in RF logs.
     [Arguments]    ${host}
-    ${kubeconfig}    ${rc}=    Execute Command
-    ...    cat /var/lib/microshift/resources/kubeadmin/${host}/kubeconfig
-    ...    sudo=True    return_rc=True
-    Should Be Equal As Integers    ${rc}    0
+
+    ${remote_tmp}=    Command Should Work    mktemp
+    Command Should Work    cp --preserve /var/lib/microshift/resources/kubeadmin/${host}/kubeconfig ${remote_tmp}
+    Command Should Work    chown ${USHIFT_USER} ${remote_tmp}
+
+    ${local_tmp}=    Create Random Temp File
+    SSHLibrary.Get File    ${remote_tmp}    ${local_tmp}
+    Command Should Work    rm -f ${remote_tmp}
+    ${kubeconfig}=    OperatingSystem.Get File    ${local_tmp}
+    Remove File    ${local_tmp}
     Should Not Be Empty    ${kubeconfig}
     RETURN    ${kubeconfig}
 
