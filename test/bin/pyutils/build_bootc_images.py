@@ -31,9 +31,8 @@ NEXT_REPO = common.get_env_var('NEXT_REPO')
 BREW_REPO = common.get_env_var('BREW_REPO')
 HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
-# Switch to quay.io/centos-bootc/bootc-image-builder:latest if any new upstream
-# features are required
-BIB_IMAGE = "registry.redhat.io/rhel9/bootc-image-builder:latest"
+BIB_IMAGE_RHEL9 = "registry.redhat.io/rhel9/bootc-image-builder:latest"
+BIB_IMAGE = "registry.redhat.io/rhel10/bootc-image-builder:latest"
 IBC_IMAGE = "ghcr.io/osbuild/image-builder-cli:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
@@ -48,7 +47,7 @@ def cleanup_atexit(dry_run):
         common.terminate_process(pid)
 
     # Terminate running image builder containers
-    for builder_image in [BIB_IMAGE, IBC_IMAGE]:
+    for builder_image in [BIB_IMAGE_RHEL9, BIB_IMAGE, IBC_IMAGE]:
         podman_args = [
             "sudo", "podman", "ps",
             "--filter", f"ancestor={builder_image}",
@@ -226,7 +225,7 @@ def extract_container_images(version, repo_spec, outfile, dry_run=False):
             f.write('\n')
 
         # Cleanup RPM files
-        rpm_list = list(map(str, image_path.glob("microshift-release-info-*.rpm")))
+        rpm_list = glob.glob(f"{image_path}/microshift-release-info-{version}*.rpm")
         common.run_command(["rm", "-f"] + rpm_list, dry_run)
     # Restore the current directory
     common.popd()
@@ -356,6 +355,12 @@ def process_containerfile(groupdir, containerfile, dry_run):
         common.run_command(["sed", f"s/^/{cf_outname}: /", cf_logfile], dry_run)
 
 
+def get_bib_image(bootc_imgref):
+    if "rhel9" in bootc_imgref or "rhel-9" in bootc_imgref:
+        return BIB_IMAGE_RHEL9
+    return BIB_IMAGE
+
+
 def process_image_bootc(groupdir, bootcfile, dry_run):
     bf_path, bf_outname, bf_outdir, bf_logfile = get_process_file_names(
         groupdir, bootcfile, BOOTC_ISO_DIR)
@@ -393,18 +398,19 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
     try:
         # Redirect the output to the log file
         with open(bf_logfile, 'w') as logfile:
+            # Read the image reference and select the matching BIB
+            bf_imgref = common.read_file_valid_lines(bf_outfile).strip()
+            bib_image = get_bib_image(bf_imgref)
+
             # Download the bootc image builder itself in case
             # it requires authorization for accessing the image
             pull_args = [
                 "sudo", "podman", "pull",
-                "--authfile", PULL_SECRET, BIB_IMAGE
+                "--authfile", PULL_SECRET, bib_image
             ]
             start = time.time()
             common.retry_on_exception(3, common.run_command_in_shell, pull_args, dry_run, logfile, logfile)
             common.record_junit(bf_path, "pull-bootc-bib", "OK", start)
-
-            # Read the image reference
-            bf_imgref = common.read_file_valid_lines(bf_outfile).strip()
 
             # Download the image to be used by bootc image builder.
             # Locally built images should also be downloaded in case they were
@@ -431,7 +437,7 @@ def process_image_bootc(groupdir, bootcfile, dry_run):
             ]
             # Add the bootc image builder command line using local images
             build_args += [
-                BIB_IMAGE,
+                bib_image,
                 "--type", "anaconda-iso",
                 bf_imgref
             ]
@@ -676,7 +682,7 @@ def main():
     parser = argparse.ArgumentParser(description="Build image layers using Bootc Image Builder and Podman.")
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: skip executing build commands.")
     parser.add_argument("-f", "--force-rebuild", action="store_true", help="Force rebuilding images that already exist.")
-    parser.add_argument("-E", "--no-extract-images", action="store_true", help="Skip container image extraction.")
+    parser.add_argument("-E", "--no-extract-images", action="store_true", help="Skip container image extraction, template processing, and registry mirroring.")
     parser.add_argument("-X", "--skip-all-builds", action="store_true", help="Skip all image builds.")
     parser.add_argument("-b", "--build-type",
                         choices=["image-bootc", "image-installer", "containerfile", "container-encapsulate"],
@@ -731,11 +737,11 @@ def main():
 
         # Determine versions of RPM packages
         set_rpm_version_info_vars()
-        # Prepare container images list for mirroring registries
-        common.delete_file(CONTAINER_LIST)
         if args.no_extract_images:
-            common.print_msg("Skipping container image extraction")
+            common.print_msg("Skipping container image extraction and mirroring")
         else:
+            # Prepare container images list for mirroring registries
+            common.delete_file(CONTAINER_LIST)
             extract_container_images(SOURCE_VERSION, LOCAL_REPO, CONTAINER_LIST, args.dry_run)
             # The following images are specific to layers that use fake rpms built from source
             extract_container_images(f"{FAKE_NEXT_MAJOR_VERSION}.{FAKE_NEXT_MINOR_VERSION}.*", NEXT_REPO, CONTAINER_LIST, args.dry_run)
@@ -754,20 +760,20 @@ def main():
                 extract_container_images(BREW_EC_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
             if BREW_NIGHTLY_RELEASE_VERSION:
                 extract_container_images(BREW_NIGHTLY_RELEASE_VERSION, BREW_REPO, CONTAINER_LIST, args.dry_run)
-        # Sort the images list, only leaving unique entries
-        common.sort_uniq_file(CONTAINER_LIST)
-        # Process package source templates
-        ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
-        for ifile in os.listdir(ipkgdir):
-            # Create full path for output and input file names
-            ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
-            ifile = os.path.join(ipkgdir, ifile)
-            run_template_cmd(ifile, ofile, args.dry_run)
+            # Sort the images list, only leaving unique entries
+            common.sort_uniq_file(CONTAINER_LIST)
+            # Process package source templates
+            ipkgdir = f"{SCRIPTDIR}/../package-sources-bootc"
+            for ifile in os.listdir(ipkgdir):
+                # Create full path for output and input file names
+                ofile = os.path.join(BOOTC_IMAGE_DIR, ifile)
+                ifile = os.path.join(ipkgdir, ifile)
+                run_template_cmd(ifile, ofile, args.dry_run)
 
-        tpldir = os.path.join(SCRIPTDIR, "..", "image-blueprints-bootc", "templates")
-        process_template_files(tpldir, args.dry_run)
-        # Run the mirror registry
-        common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
+            tpldir = os.path.join(SCRIPTDIR, "..", "image-blueprints-bootc", "templates")
+            process_template_files(tpldir, args.dry_run)
+            # Run the mirror registry
+            common.run_command([f"{SCRIPTDIR}/mirror_registry.sh"], args.dry_run)
         # Skip all image builds
         if args.skip_all_builds:
             common.print_msg("Skipping all image builds")
