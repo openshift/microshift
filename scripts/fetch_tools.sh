@@ -282,6 +282,53 @@ EOF
     fi
 }
 
+gettool_omc() {
+    local ver="3.15.0"
+    declare -A checksums=(
+        ["x86_64"]="201b78b0f6b960e6243fe8dbc716c13d6eb28a18122473cb705afff454d77eba"
+        ["aarch64"]="538c9ced0b2faace26e8cd426d5f1e56e50939b0a6d823125065825bf8ca2d2a")
+
+    local checksum="${checksums[${ARCH}]}"
+    local filename="omc"
+    local dest="${DEST_DIR}/${filename}"
+
+    [[ -e "${dest}" ]] && return 0
+    echo "Installing ${filename} to ${DEST_DIR}"
+
+    if [[ "${ARCH}" == "aarch64" ]]; then
+        local url="https://github.com/gmeghnag/omc/releases/download/v${ver}/omc_Linux_aarch64.tar.gz"
+        local tarball="omc_Linux_aarch64.tar.gz"
+
+        curl -sSfL --retry 5 --retry-delay 3 -o "${WORK_DIR}/${tarball}" "${url}"
+        echo -n "${checksum} -" >"${WORK_DIR}/checksum.txt"
+        if ! sha256sum -c "${WORK_DIR}/checksum.txt" < "${WORK_DIR}/${tarball}" &>/dev/null; then
+            echo "  Checksum for ${tarball} doesn't match"
+            return 1
+        fi
+        (cd "${WORK_DIR}" && tar xzf "${tarball}")
+        chmod +x "${WORK_DIR}/${filename}"
+        mkdir -p "$(dirname "${dest}")"
+        mv "${WORK_DIR}/${filename}" "${dest}"
+    else
+        local url="https://github.com/gmeghnag/omc/releases/download/v${ver}/omc_Linux_x86_64"
+        _install "${url}" "${checksum}" "${filename}" "omc_Linux_x86_64"
+    fi
+}
+
+gettool_omg() {
+    local ver="1.2.6"
+    local venv="${DEST_DIR}/omg-venv"
+
+    if "${venv}/bin/omg" --help &>/dev/null; then
+        return 0
+    fi
+    echo "Installing omg ${ver} to ${venv}"
+
+    python3 -m venv "${venv}"
+    "${venv}/bin/python3" -m pip install --upgrade pip
+    "${venv}/bin/pip" install "o-must-gather==${ver}"
+}
+
 gettool_tar-diff() {
     # See https://github.com/containers/tar-diff
     local ver="v0.1.2"
