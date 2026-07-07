@@ -23,18 +23,26 @@ var (
 )
 
 func (c *C2CCRouteManager) deployProbe(ctx context.Context) error {
-	_, svcNet, err := net.ParseCIDR(c.cfg.Network.ServiceNetwork[0])
-	if err != nil {
-		return fmt.Errorf("failed to parse local service network: %w", err)
-	}
-	probeIP, err := cidr.Host(svcNet, 11)
-	if err != nil {
-		return fmt.Errorf("failed to compute probe service ClusterIP: %w", err)
+	var probeIPs []string
+	for _, svcNetStr := range c.cfg.Network.ServiceNetwork {
+		_, svcNet, err := net.ParseCIDR(svcNetStr)
+		if err != nil {
+			return fmt.Errorf("failed to parse local service network %q: %w", svcNetStr, err)
+		}
+		probeIP, err := cidr.Host(svcNet, 11)
+		if err != nil {
+			return fmt.Errorf("failed to compute probe service ClusterIP from %q: %w", svcNetStr, err)
+		}
+		probeIPs = append(probeIPs, probeIP.String())
 	}
 
 	params := assets.RenderParams{
 		"ReleaseImage":          release.Image,
-		"ProbeServiceClusterIP": probeIP.String(),
+		"ProbeServiceClusterIP": probeIPs[0],
+		"DualStack":             len(probeIPs) > 1,
+	}
+	if len(probeIPs) > 1 {
+		params["ProbeServiceClusterIPSecondary"] = probeIPs[1]
 	}
 
 	if err := assets.ApplyNamespaces(ctx, c2ccNamespace, c.kubeconfig); err != nil {
@@ -56,7 +64,7 @@ func (c *C2CCRouteManager) deployProbe(ctx context.Context) error {
 		return fmt.Errorf("failed to apply c2cc service: %w", err)
 	}
 
-	klog.V(4).Infof("C2CC probe assets deployed (probe ClusterIP=%s)", probeIP)
+	klog.V(4).Infof("C2CC probe assets deployed (probe ClusterIPs=%v)", probeIPs)
 	return nil
 }
 

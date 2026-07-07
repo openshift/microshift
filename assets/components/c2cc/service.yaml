@@ -5,6 +5,12 @@ metadata:
   name: c2cc-probe
 spec:
   clusterIP: '{{ .ProbeServiceClusterIP }}'
+{{- if .DualStack }}
+  ipFamilyPolicy: RequireDualStack
+  clusterIPs:
+  - '{{ .ProbeServiceClusterIP }}'
+  - '{{ .ProbeServiceClusterIPSecondary }}'
+{{- end }}
   ports:
   - name: probe
     port: 8080
