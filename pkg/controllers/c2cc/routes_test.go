@@ -15,11 +15,11 @@ func TestNewLinuxRouteManager_DesiredState(t *testing.T) {
 
 	mgr := newLinuxRouteManager(cfg)
 
-	require.Len(t, mgr.desiredDsts, 2)
-	assert.Equal(t, "10.45.0.0/16", mgr.desiredDsts[0].String())
-	assert.Equal(t, "10.46.0.0/16", mgr.desiredDsts[1].String())
-	assert.Equal(t, net.ParseIP("192.168.1.10").To4(), mgr.desiredGWs["10.45.0.0/16"].To4())
-	assert.Equal(t, net.ParseIP("192.168.1.10").To4(), mgr.desiredGWs["10.46.0.0/16"].To4())
+	require.Len(t, mgr.desired, 2)
+	assert.Equal(t, "10.45.0.0/16", mgr.desired[0].dst.String())
+	assert.Equal(t, "10.46.0.0/16", mgr.desired[1].dst.String())
+	assert.Equal(t, net.ParseIP("192.168.1.10").To4(), mgr.desired[0].gw.To4())
+	assert.Equal(t, net.ParseIP("192.168.1.10").To4(), mgr.desired[1].gw.To4())
 }
 
 func TestNewLinuxRouteManager_MultipleRemotes(t *testing.T) {
@@ -30,16 +30,20 @@ func TestNewLinuxRouteManager_MultipleRemotes(t *testing.T) {
 
 	mgr := newLinuxRouteManager(cfg)
 
-	require.Len(t, mgr.desiredDsts, 4)
-	assert.Equal(t, net.ParseIP("192.168.1.10").To4(), mgr.desiredGWs["10.45.0.0/16"].To4())
-	assert.Equal(t, net.ParseIP("192.168.1.20").To4(), mgr.desiredGWs["10.55.0.0/16"].To4())
+	require.Len(t, mgr.desired, 4)
+
+	gwByDst := make(map[string]string)
+	for _, rt := range mgr.desired {
+		gwByDst[rt.key] = rt.gw.String()
+	}
+	assert.Equal(t, "192.168.1.10", gwByDst["10.45.0.0/16"])
+	assert.Equal(t, "192.168.1.20", gwByDst["10.55.0.0/16"])
 }
 
 func TestNewLinuxRouteManager_EmptyConfig(t *testing.T) {
 	cfg := testConfigWithRemotes(t)
 	mgr := newLinuxRouteManager(cfg)
-	assert.Empty(t, mgr.desiredDsts)
-	assert.Empty(t, mgr.desiredGWs)
+	assert.Empty(t, mgr.desired)
 }
 
 func TestNewLinuxRouteManager_DualStack(t *testing.T) {
@@ -53,12 +57,12 @@ func TestNewLinuxRouteManager_DualStack(t *testing.T) {
 
 	mgr := newLinuxRouteManager(cfg)
 
-	require.Len(t, mgr.desiredDsts, 4, "should have 2 IPv4 + 2 IPv6 routes")
+	require.Len(t, mgr.desired, 4, "should have 2 IPv4 + 2 IPv6 routes")
 
 	// Build map for easier assertion
 	gwByDst := make(map[string]string)
-	for i, dst := range mgr.desiredDsts {
-		gwByDst[dst.String()] = mgr.desiredGWs[mgr.desiredDstKeys[i]].String()
+	for _, rt := range mgr.desired {
+		gwByDst[rt.key] = rt.gw.String()
 	}
 
 	// IPv4 routes use IPv4 gateway
@@ -86,11 +90,11 @@ func TestNewLinuxRouteManager_DualStackMultipleRemotes(t *testing.T) {
 
 	mgr := newLinuxRouteManager(cfg)
 
-	require.Len(t, mgr.desiredDsts, 8, "should have 4 IPv4 + 4 IPv6 routes")
+	require.Len(t, mgr.desired, 8, "should have 4 IPv4 + 4 IPv6 routes")
 
 	gwByDst := make(map[string]string)
-	for i, dst := range mgr.desiredDsts {
-		gwByDst[dst.String()] = mgr.desiredGWs[mgr.desiredDstKeys[i]].String()
+	for _, rt := range mgr.desired {
+		gwByDst[rt.key] = rt.gw.String()
 	}
 
 	// Remote cluster 1 - IPv4
@@ -118,11 +122,11 @@ func TestNewLinuxRouteManager_DualStackMissingGateway(t *testing.T) {
 
 	mgr := newLinuxRouteManager(cfg)
 
-	require.Len(t, mgr.desiredDsts, 2, "should only have IPv4 routes (IPv6 skipped due to missing gateway)")
+	require.Len(t, mgr.desired, 2, "should only have IPv4 routes (IPv6 skipped due to missing gateway)")
 
-	for i, dst := range mgr.desiredDsts {
+	for _, rt := range mgr.desired {
 		// All routes should be IPv4
-		assert.Contains(t, []string{"10.45.0.0/16", "10.46.0.0/16"}, dst.String())
-		assert.Equal(t, "192.168.1.10", mgr.desiredGWs[mgr.desiredDstKeys[i]].String())
+		assert.Contains(t, []string{"10.45.0.0/16", "10.46.0.0/16"}, rt.dst.String())
+		assert.Equal(t, "192.168.1.10", rt.gw.String())
 	}
 }
