@@ -553,11 +553,10 @@ RemoteCluster CR Name From IP
     RETURN    c2cc-${dashed}
 
 Primary NextHop IP For Host
-    [Documentation]    Return the IP used as primary next-hop for a host. In IPv6-primary
-    ...    scenarios (IP_FAMILY=ipv6), the IPv6 address is primary; otherwise IPv4.
+    [Documentation]    Return the IP used as primary next-hop for a host. Always returns IPv4
+    ...    when available (matching OVN-K's IPv4-first convention), fallback to IPv6.
     [Arguments]    ${ipv4}    ${ipv6}=${EMPTY}
-    ${is_ipv6_primary}=    Evaluate    '${IP_FAMILY}' == 'ipv6' and '${ipv6}' != ''
-    ${result}=    Set Variable If    ${is_ipv6_primary}    ${ipv6}    ${ipv4}
+    ${result}=    Set Variable If    '${ipv4}' != ''    ${ipv4}    ${ipv6}
     RETURN    ${result}
 
 Verify RemoteCluster Unhealthy On Observers

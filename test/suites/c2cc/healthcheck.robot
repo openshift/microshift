@@ -46,6 +46,16 @@ RemoteCluster CR Has Managed-By Label
     cluster-b
     cluster-c
 
+Correct Dual Stack RemoteCluster CR Spec
+    [Documentation]    In dual-stack, verify probe targets contain both address families.
+    Skip If    '${CLUSTER_A_SVC_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    Verify RemoteCluster CR Spec    cluster-a    ${CLUSTER_B_SVC_CIDR_DUAL}
+    Verify RemoteCluster CR Spec    cluster-a    ${CLUSTER_C_SVC_CIDR_DUAL}
+    Verify RemoteCluster CR Spec    cluster-b    ${CLUSTER_A_SVC_CIDR_DUAL}
+    Verify RemoteCluster CR Spec    cluster-b    ${CLUSTER_C_SVC_CIDR_DUAL}
+    Verify RemoteCluster CR Spec    cluster-c    ${CLUSTER_A_SVC_CIDR_DUAL}
+    Verify RemoteCluster CR Spec    cluster-c    ${CLUSTER_B_SVC_CIDR_DUAL}
+
 
 *** Keywords ***
 Setup
@@ -106,7 +116,7 @@ Verify RemoteCluster CR Spec
     END
     ${targets}=    Oc On Cluster
     ...    ${alias}
-    ...    oc get remoteclusters.microshift.io -l app.kubernetes.io/managed-by=c2cc-route-manager -o jsonpath='{.items[*].spec.probeTarget}'
+    ...    oc get remoteclusters.microshift.io -l app.kubernetes.io/managed-by=c2cc-route-manager -o jsonpath='{.items[*].spec.probeTargets[*]}'
     Should Contain    ${targets}    ${expected_target}
     ${intervals}=    Oc On Cluster
     ...    ${alias}

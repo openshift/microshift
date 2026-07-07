@@ -78,12 +78,12 @@ RemoteCluster Status Has LastSuccessfulProbe
         END
     END
 
-RemoteCluster Status Has Latency Stats
+RemoteCluster Status Has Latency Stats Per Target
     [Documentation]    Verify that all latency stat fields (avg/min/max/last/stddev) are populated
-    ...    on all RemoteCluster CRs across all clusters.
+    ...    per target in TargetResults on all RemoteCluster CRs across all clusters.
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         Wait Until Keyword Succeeds    2m    10s
-        ...    Verify Latency Stats Populated    ${alias}
+        ...    Verify Per Target Latency Stats Populated    ${alias}
     END
 
 Probe Deployment Self-Heals After Deletion
@@ -119,6 +119,21 @@ RemoteCluster Status Becomes Unhealthy When Probe Fails
     ...    Delete Probe Deny Policy    cluster-b
     ...    AND    Wait Until Keyword Succeeds    3m    10s
     ...    Verify RemoteCluster State By Name    cluster-a    ${cr_name}    Healthy
+
+Probe Service Has Correct Dual Stack ClusterIPs
+    [Documentation]    In dual-stack, verify the probe service has secondary ClusterIPs.
+    Skip If    '${CLUSTER_A_SVC_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    Verify Probe Service ClusterIP Secondary    cluster-a    ${CLUSTER_A_SVC_CIDR_DUAL}
+    Verify Probe Service ClusterIP Secondary    cluster-b    ${CLUSTER_B_SVC_CIDR_DUAL}
+    Verify Probe Service ClusterIP Secondary    cluster-c    ${CLUSTER_C_SVC_CIDR_DUAL}
+
+RemoteCluster Has TargetResults In Dual Stack
+    [Documentation]    In dual-stack, verify TargetResults contains entries for both families.
+    Skip If    '${CLUSTER_A_SVC_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
+        Wait Until Keyword Succeeds    2m    10s
+        ...    Verify TargetResults Populated    ${alias}
+    END
 
 
 *** Keywords ***
@@ -183,20 +198,39 @@ Delete Probe Deny Policy
     Oc On Cluster    ${alias}
     ...    oc delete networkpolicy deny-probe-ingress -n ${C2CC_NAMESPACE} --ignore-not-found
 
-Verify Latency Stats Populated
+Verify Per Target Latency Stats Populated
     [Documentation]    Check that all latency fields (avg/min/max/last/stddev) are populated
-    ...    on all RemoteCluster CRs for the given cluster.
+    ...    in TargetResults for all RemoteCluster CRs.
     [Arguments]    ${alias}
     FOR    ${field}    IN    avg    min    max    last    stddev
         ${stdout}=    Oc On Cluster    ${alias}
-        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.latency.${field}}'
+        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.targetResults[*].latency.${field}}'
         Should Not Be Empty    ${stdout}
         @{values}=    Split String    ${stdout}
         ${count}=    Get Length    ${values}
-        # "2" is expected because there are two remote clusters,
-        # so the above jsonpath provides values from both remote cluster CR.
-        Should Be Equal As Integers    ${count}    2    Expected 2 latency ${field} values, got ${count}
+        # In single-stack: 2 remotes × 1 target = 2 values
+        # In dual-stack: 2 remotes × 2 targets = 4 values
+        Should Be True    ${count} >= 2    Expected at least 2 per-target latency ${field} values, got ${count}
         FOR    ${v}    IN    @{values}
             Should Not Be Empty    ${v}
         END
     END
+
+Verify Probe Service ClusterIP Secondary
+    [Documentation]    Verify that the probe service has a secondary ClusterIP matching the dual-stack CIDR.
+    [Arguments]    ${alias}    ${svc_cidr_dual}
+    ${expected_ip}=    Compute 11th IP    ${svc_cidr_dual}
+    ${actual_ips}=    Oc On Cluster    ${alias}
+    ...    oc get service ${PROBE_DEPLOYMENT} -n ${C2CC_NAMESPACE} -o jsonpath='{.spec.clusterIPs}'
+    Should Contain    ${actual_ips}    ${expected_ip}
+
+Verify TargetResults Populated
+    [Documentation]    Verify that TargetResults contains per-family probe results.
+    [Arguments]    ${alias}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.targetResults[*].target}'
+    Should Not Be Empty    ${stdout}
+    # In dual-stack with 2 remotes, we expect 4 total targets (2 families × 2 remotes)
+    @{targets}=    Split String    ${stdout}
+    ${count}=    Get Length    ${targets}
+    Should Be True    ${count} >= 4    Expected at least 4 target results in dual-stack, got ${count}
