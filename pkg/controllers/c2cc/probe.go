@@ -243,13 +243,11 @@ func (pm *probeManager) buildStatus(state string, now *metav1.Time, targetResult
 		TargetResults: targetResults,
 	}
 
-	if state == stateHealthy {
-		status.LastSuccessfulProbe = now
-	}
-
 	for _, tr := range targetResults {
 		if tr.Error != "" {
 			status.Errors = append(status.Errors, fmt.Sprintf("%s: %s", tr.Target, tr.Error))
+		} else {
+			status.LastSuccessfulProbe = now
 		}
 	}
 
