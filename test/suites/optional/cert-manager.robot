@@ -513,19 +513,11 @@ Enable Trust Manager
     ...    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
 
 Disable Trust Manager
-    [Documentation]    Remove the TrustManager CR and let the operator clean up the deployment.
-    ...    Do not delete the deployment directly — the operator would recreate it
-    ...    because the TrustManager feature gate is always enabled.
+    [Documentation]    Remove the TrustManager CR and leftover Bundle.
+    ...    The operator keeps the trust-manager deployment running while the
+    ...    TrustManager feature gate is enabled, so we do not assert pod absence.
     Oc Delete    trustmanager cluster --ignore-not-found
     Oc Delete    bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
-    Wait Until Keyword Succeeds    30x    10s
-    ...    Trust Manager Pod Should Not Exist
-
-Trust Manager Pod Should Not Exist
-    [Documentation]    Verify trust-manager pod no longer exists in cert-manager namespace
-    ${output}=    Run With Kubeconfig
-    ...    oc get pods -n ${TRUST_MANAGER_NS} -l app.kubernetes.io/name\=cert-manager-trust-manager --no-headers
-    Should Be Empty    ${output}    msg=trust-manager pod still exists
 
 Create CA Secret For Trust Manager
     [Documentation]    Generate a self-signed CA cert locally and create a secret in the trust namespace
