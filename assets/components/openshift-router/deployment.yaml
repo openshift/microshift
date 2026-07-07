@@ -1,4 +1,7 @@
 # Deployment with default values
+#
+# Methods hashableDeployment() and deploymentConfigChanged()
+# must be updated when adding new fields to this manifest.
 kind: Deployment
 apiVersion: apps/v1
 spec:
@@ -11,15 +14,71 @@ spec:
       labels:
         ingresscontroller.operator.openshift.io/deployment-ingresscontroller: default
     spec:
+      # manually configure the service account, so we can configure it only in the router container.
+      automountServiceAccountToken: false
       serviceAccountName: router
       priorityClassName: system-cluster-critical
+      shareProcessNamespace: true
+      initContainers:
+        - name: init-router
+          imagePullPolicy: IfNotPresent
+          terminationMessagePolicy: FallbackToLogsOnError
+          command: ["/bin/bash", "-c", "cp -R -p /var/lib/haproxy/* /mnt/config/"]
+          volumeMounts:
+            - mountPath: /mnt/config
+              name: haproxy-config
+        - name: haproxy
+          imagePullPolicy: IfNotPresent
+          restartPolicy: Always
+          securityContext:
+            # See https://bugzilla.redhat.com/2007246
+            allowPrivilegeEscalation: true
+            readOnlyRootFilesystem: true
+          terminationMessagePolicy: FallbackToLogsOnError
+          command: ["/var/lib/haproxy/start-haproxy"]
+          # admin.sock should follow routerHAProxyAdminSocket const
+          args: ["-W", "-db", "-S", "/var/lib/haproxy/run/admin.sock,mode,600", "-f", "/var/lib/haproxy/conf/haproxy.config"]
+          livenessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "echo show version | socat - /var/lib/haproxy/run/haproxy.sock"]
+            failureThreshold: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+            terminationGracePeriodSeconds: 10
+          readinessProbe:
+            failureThreshold: 3
+            exec:
+              command: ["/bin/sh", "-c", "echo show version | socat - /var/lib/haproxy/run/haproxy.sock"]
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 120
+            exec:
+              # admin.sock should follow routerHAProxyAdminSocket const
+              command: ["/bin/sh", "-c", "echo show version | socat - /var/lib/haproxy/run/admin.sock"]
+            periodSeconds: 1
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /var/lib/haproxy
+              name: haproxy-config
+            - mountPath: /etc/pki/tls/private
+              name: default-certificate
+              readOnly: true
+            - mountPath: /var/run/configmaps/service-ca
+              name: service-ca-bundle
+              readOnly: true
       containers:
         - name: router
           imagePullPolicy: IfNotPresent
           securityContext:
-            # See https://bugzilla.redhat.com/2007246
-            allowPrivilegeEscalation: true
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
           env:
             - name: ROUTER_SERVICE_NAMESPACE
@@ -96,61 +155,6 @@ spec:
               value: '{{ .RouterCompressionMime }}'
             - name: ROUTER_ENABLE_EXTERNAL_CERTIFICATE
               value: "true"
-            {{- if .ClientAuthCAPath }}
-            - name: ROUTER_MUTUAL_TLS_AUTH
-              value: '{{ .ClientAuthPolicy }}'
-            - name: ROUTER_MUTUAL_TLS_AUTH_CA
-              value: '{{ .ClientAuthCAPath }}'
-            - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
-              value: '{{ .ClientAuthFilter }}'
-            {{- end }}
-            {{- if .AccessLoggingEnabled }}
-            - name: ROUTER_SYSLOG_ADDRESS
-            {{- if .AccessLoggingSyslogAddress }}
-              value: '{{ .AccessLoggingSyslogAddress }}'
-            {{- else }}
-              value: /var/lib/rsyslog/rsyslog.sock
-            {{- /* AccessLoggingSyslogAddress*/}}
-            {{- end }}
-            - name: ROUTER_LOG_LEVEL
-              value: info
-            {{- if .AccessLoggingMaxLength}}
-            - name: ROUTER_LOG_MAX_LENGTH
-              value: '{{ .AccessLoggingMaxLength }}'
-            {{- /* AccessLoggingMaxLength */}}
-            {{- end }}
-            {{- if .AccessLoggingSyslogFacility }}
-            - name: ROUTER_LOG_FACILITY
-              value: {{ .AccessLoggingSyslogFacility }}
-            {{- end }}
-            {{- if .HttpLogFormat }}
-            - name: ROUTER_SYSLOG_FORMAT
-              value: '"{{ .HttpLogFormat }}"'
-            {{- /* HttpLogFormat */}}
-            {{- end }}
-            {{- if .HttpCaptureHeadersRequest }}
-            - name: ROUTER_CAPTURE_HTTP_REQUEST_HEADERS
-              value: '{{ .HttpCaptureHeadersRequest }}'
-            {{- /* HttpCaptureHeadersRequest */}}
-            {{- end }}
-            {{- if .HttpCaptureHeadersResponse }}
-            - name: ROUTER_CAPTURE_HTTP_RESPONSE_HEADERS
-              value: '{{ .HttpCaptureHeadersResponse }}'
-            {{- /* HttpCaptureHeadersResponse */}}
-            {{- end }}
-            {{- if .HttpCaptureCookies }}
-            - name: ROUTER_CAPTURE_HTTP_COOKIE
-              value: '{{ .HttpCaptureCookies }}'
-            {{- /* HttpCaptureCookies */}}
-            {{- end }}
-            {{- /* AccessLoggingEnabled */}}
-            {{- end }}
-            {{- if .HttpErrorCodePages }}
-            - name: ROUTER_ERRORFILE_503
-              value: /var/lib/haproxy/errorfiles/error-page-503.http
-            - name: ROUTER_ERRORFILE_404
-              value: /var/lib/haproxy/errorfiles/error-page-404.http
-            {{- end }}
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -181,30 +185,20 @@ spec:
             timeoutSeconds: 1
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 25m
+              memory: 64Mi
           volumeMounts:
+            - mountPath: /var/lib/haproxy
+              name: haproxy-config
             - mountPath: /etc/pki/tls/private
               name: default-certificate
               readOnly: true
             - mountPath: /var/run/configmaps/service-ca
               name: service-ca-bundle
               readOnly: true
-            {{- if .ClientCAMapName }}
-            - mountPath: '{{ .ClientCAMountPath }}'
-              name: '{{ .ClientCAMapName}}'
+            - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              name: kube-api-access
               readOnly: true
-            {{- end }}
-            {{- if .HttpErrorCodePages }}
-            - mountPath: /var/lib/haproxy/errorfiles
-              name: error-code-pages
-              readOnly: true
-            {{- end }}
-            {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
-            - mountPath: /var/lib/rsyslog
-              name: rsyslog-socket
-              readOnly: false
-            {{- end }}
           image: '{{ .ReleaseImage.haproxy_router }}'
           ports:
             - name: http
@@ -218,29 +212,6 @@ spec:
               protocol: TCP
           args:
             - -v=4
-        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
-        - name: logs
-          imagePullPolicy: IfNotPresent
-          terminationMessagePolicy: FallbackToLogsOnError
-          image: '{{ .ReleaseImage.haproxy_router }}'
-          imagePullPolicy: IfNotPresent
-          command:
-            - /sbin/rsyslogd
-            - -n
-            - -i
-            - /tmp/rsyslogd.pid
-            - -f
-            - /etc/rsyslog/rsyslog.conf
-          resources:
-            requests:
-              cpu: 50m
-              memory: 128Mi
-          volumeMounts:
-            - mountPath: /var/lib/rsyslog
-              name: rsyslog-socket
-            - mountPath: /etc/rsyslog
-              name: rsyslog-config
-        {{- end}}
       tolerations:
         # Ensure the pod isn't deleted during serial NoExecuteTaintManager tests.
         # Remember that NoExecute uses Delete, not Evict, because removing the pod
@@ -254,6 +225,8 @@ spec:
           secret:
             defaultMode: 420
             secretName: '{{ .ServingCertificateSecret }}'
+        - name: haproxy-config
+          emptyDir: {}
         - name: service-ca-bundle
           configMap:
             defaultMode: 420
@@ -262,29 +235,23 @@ spec:
                 path: service-ca.crt
             name: service-ca-bundle
             optional: false
-        {{- if .ClientCAMapName }}
-        - name: '{{ .ClientCAMapName }}'
-          configMap:
-            defaultMode: 420
-            items:
-            - key: '{{ .ClientCABundleFilename }}'
-              path: '{{ .ClientCABundleFilename }}'
-            name: '{{ .ClientCAMapName }}'
-            optional: false
-        {{- end }}
-        {{- if .HttpErrorCodePages }}
-        - name: error-code-pages
-          configMap:
-            name: {{ .HttpErrorCodePages }}
-        {{- end }}
-        {{- if and .AccessLoggingEnabled (not .AccessLoggingSyslogAddress) }}
-        - name: rsyslog-socket
-          emptyDir: {}
-        - name: rsyslog-config
-          configMap:
-            name: access-logs-rsyslog-config
-            optional: false
-        {{- end }}
+        - name: kube-api-access
+          projected:
+            defaultMode: 0400
+            sources:
+              - serviceAccountToken:
+                  expirationSeconds: 3600
+                  path: token
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
+              - downwardAPI:
+                  items:
+                    - path: namespace
+                      fieldRef:
+                        fieldPath: metadata.namespace
       restartPolicy: Always
       dnsPolicy: ClusterFirst
       nodeSelector:
