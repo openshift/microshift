@@ -323,10 +323,10 @@ Wait For Service Endpoints
     ...    Ensures OVN-K has synced the EndpointSlice and programmed the OVN load balancer.
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         Wait Until Keyword Succeeds    120s    5s
-        ...    Service Endpoints Should Exist    ${alias}    ${NAMESPACES}[${alias}]
+        ...    Verify Service Endpoints Exist    ${alias}    ${NAMESPACES}[${alias}]
     END
 
-Service Endpoints Should Exist
+Verify Service Endpoints Exist
     [Documentation]    Verify the hello-microshift endpoint has at least one address.
     [Arguments]    ${alias}    ${ns}
     ${stdout}=    Oc On Cluster    ${alias}
@@ -418,7 +418,7 @@ Curl From Cluster
     ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- curl -sS --max-time 10 ${url}
     RETURN    ${stdout}
 
-Test Connectivity Between Clusters
+Verify Connectivity Between Clusters
     [Documentation]    Verify pod on ${source} can reach ${endpoint_type} IP on ${destination}.
     [Arguments]    ${source}    ${destination}    ${endpoint_type}
     IF    '${endpoint_type}' == 'pod'
@@ -431,7 +431,7 @@ Test Connectivity Between Clusters
     ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
     Should Contain    ${stdout}    Hello from
 
-Test Source IP Preserved Between Clusters
+Verify Source IP Preserved Between Clusters
     [Documentation]    Verify ${source} to ${destination} pod-to-${endpoint_type} traffic preserves the source pod IP (no SNAT).
     [Arguments]    ${source}    ${destination}    ${endpoint_type}
     IF    '${endpoint_type}' == 'pod'
@@ -472,13 +472,13 @@ Test Dual Stack Source IP Preserved Between Clusters
     ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
     Should Contain    ${stdout}    source: ${curl_pod_ip}
 
-DNS Resolve From Cluster
+Verify DNS Resolution From Cluster
     [Documentation]    Resolve a DNS name from curl-pod on the given cluster. Retries for up to 60s.
     [Arguments]    ${alias}    ${fqdn}
     Wait Until Keyword Succeeds    12x    5s
-    ...    DNS Lookup Should Succeed    ${alias}    ${fqdn}
+    ...    Verify DNS Lookup    ${alias}    ${fqdn}
 
-DNS Lookup Should Succeed
+Verify DNS Lookup
     [Documentation]    Resolve a DNS name from curl-pod using getent hosts.
     [Arguments]    ${alias}    ${fqdn}
     ${stdout}=    Oc On Cluster    ${alias}
@@ -492,14 +492,14 @@ Verify All RemoteClusters Healthy
         ...    Verify RemoteCluster State    ${alias}    Healthy
     END
 
-Curl DNS From Cluster
+Verify Curl DNS From Cluster
     [Documentation]    Curl a service by DNS name from curl-pod on the given cluster.
     [Arguments]    ${alias}    ${fqdn}    ${port}
     ${stdout}=    Wait Until Keyword Succeeds    12x    5s
-    ...    Curl DNS Should Succeed    ${alias}    ${fqdn}    ${port}
+    ...    Verify Curl DNS    ${alias}    ${fqdn}    ${port}
     RETURN    ${stdout}
 
-Curl DNS Should Succeed
+Verify Curl DNS
     [Documentation]    Single attempt to curl a DNS name from curl-pod.
     [Arguments]    ${alias}    ${fqdn}    ${port}
     ${stdout}=    Oc On Cluster    ${alias}
@@ -507,10 +507,10 @@ Curl DNS Should Succeed
     Should Contain    ${stdout}    Hello from
     RETURN    ${stdout}
 
-Curl Remote Service Via DNS
+Verify Remote Service Via DNS
     [Documentation]    Verify pod on ${source} can reach a service on ${destination} using the remote DNS name.
     [Arguments]    ${source}    ${destination}
-    ${stdout}=    Curl DNS From Cluster    ${source}
+    ${stdout}=    Verify Curl DNS From Cluster    ${source}
     ...    hello-microshift.${NAMESPACES}[${destination}].svc.${DOMAIN_MAP}[${destination}]    8080
     Should Contain    ${stdout}    Hello from
 
@@ -576,13 +576,14 @@ IP Command For CIDR
     RETURN    ${cmd}
 
 Verify C2CC Infrastructure For Remote
-    [Documentation]    Verify C2CC infrastructure for one remote cluster's CIDRs.
+    [Documentation]    Verify all C2CC infrastructure for one remote cluster's CIDRs.
     [Arguments]    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}    ${ip_cmd}=${IP_CMD}
     Verify Routes In Table 200    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${ip_cmd}
     Verify All IP Rules    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}    ${local_svc_cidr}    ${ip_cmd}
     Verify NFTables Bypass Rules    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
     Verify OVN Static Routes    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
     Verify Node SNAT Annotation    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
+    Verify C2CC Tracking Annotation    ${alias}    ${remote_pod_cidr}    ${remote_svc_cidr}
 
 Verify C2CC Infrastructure On Cluster
     [Documentation]    Run all C2CC infrastructure checks for all remote CIDRs on the given cluster.
@@ -608,29 +609,13 @@ Verify C2CC Infrastructure For CIDR Family
     END
     Verify Routes In Table 201    ${alias}    ${local_svc_cidr}    ${ip_cmd}
 
-Verify Cross Cluster Connectivity
-    [Documentation]    Verify a representative subset of cross-cluster connectivity.
-    ...    Tests one direction per cluster pair, alternating pod/service.
-    Test Connectivity Between Clusters    cluster-a    cluster-b    pod
-    Test Connectivity Between Clusters    cluster-a    cluster-c    service
-    Test Connectivity Between Clusters    cluster-b    cluster-a    service
-    Test Connectivity Between Clusters    cluster-b    cluster-c    pod
-    Test Connectivity Between Clusters    cluster-c    cluster-a    pod
-    Test Connectivity Between Clusters    cluster-c    cluster-b    service
-
-Verify Cross Cluster DNS
-    [Documentation]    Verify a representative subset of cross-cluster DNS resolution.
-    Curl Remote Service Via DNS    cluster-a    cluster-b
-    Curl Remote Service Via DNS    cluster-b    cluster-c
-    Curl Remote Service Via DNS    cluster-c    cluster-a
-
 Wait For OVN-K Pods Ready On Cluster
     [Documentation]    Wait for all OVN-K pods to be Running and Ready on the given cluster.
     [Arguments]    ${alias}    ${timeout}=5m    ${retry}=15s
     Wait Until Keyword Succeeds    ${timeout}    ${retry}
-    ...    OVN-K Pods Should Be Ready    ${alias}
+    ...    Verify OVN-K Pods Ready    ${alias}
 
-OVN-K Pods Should Be Ready
+Verify OVN-K Pods Ready
     [Documentation]    Assert all pods in openshift-ovn-kubernetes are Ready.
     [Arguments]    ${alias}
     Oc On Cluster    ${alias}
@@ -698,10 +683,10 @@ Reboot Clusters Simultaneously
     FOR    ${alias}    IN    @{cluster_aliases}
         ${old_bootid}=    Get From Dictionary    ${boot_ids}    ${alias}
         Wait Until Keyword Succeeds    10m    15s
-        ...    Cluster Should Be Rebooted    ${alias}    ${old_bootid}
+        ...    Verify Cluster Has Rebooted    ${alias}    ${old_bootid}
     END
 
-Cluster Should Be Rebooted
+Verify Cluster Has Rebooted
     [Documentation]    Assert that a cluster has rebooted and greenboot health check has passed.
     [Arguments]    ${alias}    ${old_bootid}
     Reconnect Cluster    ${alias}
@@ -731,3 +716,97 @@ Reconnect Cluster
     END
     ${kubeconfig}=    Get From Dictionary    ${C2CC_KUBECONFIGS}    ${alias}
     Reconnect To Cluster    ${alias}    ${host}    ${port}    ${kubeconfig}    timeout=10m
+
+C2CC Suite Setup
+    [Documentation]    Standard 3-cluster suite setup: login to download kubeconfig,
+    ...    then register all three clusters as remote. Optionally deploys test workloads.
+    [Arguments]    ${deploy_workloads}=${FALSE}
+    Check Required Env Variables
+    Login MicroShift Host
+    Setup Kubeconfig
+    Logout MicroShift Host
+    Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG}
+    Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
+    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
+    IF    ${deploy_workloads}
+        Deploy Test Workloads
+    END
+
+C2CC Suite Teardown
+    [Documentation]    Standard suite teardown: optionally cleans up workloads,
+    ...    tears down remote clusters, and removes kubeconfig.
+    [Arguments]    ${cleanup_workloads}=${FALSE}
+    IF    ${cleanup_workloads}
+        Cleanup Test Workloads
+    END
+    Teardown All Remote Clusters
+    Remove Kubeconfig
+
+Verify Full C2CC Connectivity
+    [Documentation]    Verify pod-to-pod, pod-to-service connectivity and source IP preservation
+    ...    across all 6 cluster pairs.
+    FOR    ${src}    ${dst}    IN
+    ...    cluster-a    cluster-b
+    ...    cluster-a    cluster-c
+    ...    cluster-b    cluster-a
+    ...    cluster-b    cluster-c
+    ...    cluster-c    cluster-a
+    ...    cluster-c    cluster-b
+        Verify Connectivity Between Clusters    ${src}    ${dst}    pod
+        Verify Connectivity Between Clusters    ${src}    ${dst}    service
+        Verify Source IP Preserved Between Clusters    ${src}    ${dst}    pod
+        Verify Source IP Preserved Between Clusters    ${src}    ${dst}    service
+    END
+
+Verify Full C2CC DNS
+    [Documentation]    Verify CoreDNS Corefile contains C2CC server blocks and
+    ...    cross-cluster DNS resolution works for all pairs.
+    FOR    ${alias}    IN    @{ALL_CLUSTERS}
+        FOR    ${remote}    IN    @{ALL_CLUSTERS}
+            IF    '${remote}' != '${alias}'
+                ${domain}=    Get From Dictionary    ${DOMAIN_MAP}    ${remote}
+                Verify Corefile Contains C2CC Server Block    ${alias}    ${domain}
+            END
+        END
+    END
+    FOR    ${src}    ${dst}    IN
+    ...    cluster-a    cluster-b
+    ...    cluster-a    cluster-c
+    ...    cluster-b    cluster-a
+    ...    cluster-b    cluster-c
+    ...    cluster-c    cluster-a
+    ...    cluster-c    cluster-b
+        Verify Remote Service Via DNS    ${src}    ${dst}
+    END
+
+Verify C2CC Health Probes
+    [Documentation]    Verify all RemoteCluster CRs report Healthy with populated timestamps.
+    FOR    ${alias}    IN    @{ALL_CLUSTERS}
+        Verify RemoteCluster State    ${alias}    Healthy
+        ${stdout}=    Oc On Cluster    ${alias}
+        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.lastProbeTime}'
+        Should Not Be Empty    ${stdout}
+        ${stdout}=    Oc On Cluster    ${alias}
+        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.lastSuccessfulProbe}'
+        Should Not Be Empty    ${stdout}
+    END
+
+Verify All Clusters Healthy
+    [Documentation]    Wait for all clusters to pass the MicroShift health check.
+    [Arguments]    ${timeout}=5m    ${retry}=15s
+    FOR    ${cluster}    IN    @{ALL_CLUSTERS}
+        Wait Until Keyword Succeeds    ${timeout}    ${retry}
+        ...    Verify Cluster Is Healthy    ${cluster}
+    END
+
+Verify Full C2CC Stack
+    [Documentation]    Comprehensive verification of all C2CC components across all clusters.
+    ...    Wraps connectivity, infrastructure, health probes, and DNS checks
+    ...    with retry logic for post-disruption convergence.
+    Wait Until Keyword Succeeds    10m    10s    Verify Full C2CC Connectivity
+    FOR    ${cluster}    IN    @{ALL_CLUSTERS}
+        Wait Until Keyword Succeeds    10m    10s
+        ...    Verify C2CC Infrastructure On Cluster    ${cluster}
+    END
+    Wait Until Keyword Succeeds    10m    10s    Verify C2CC Health Probes
+    Wait Until Keyword Succeeds    10m    10s    Verify Full C2CC DNS

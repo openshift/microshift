@@ -3,21 +3,21 @@ Documentation       Cross-cluster connectivity tests for C2CC.
 ...                 Deploys test workloads on all clusters and verifies pod-to-pod
 ...                 and pod-to-service communication in both directions.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
-Suite Setup         Setup
-Suite Teardown      Teardown
+Suite Setup         C2CC Suite Setup    deploy_workloads=${TRUE}
+Suite Teardown      C2CC Suite Teardown    cleanup_workloads=${TRUE}
 
 Test Tags           c2cc
 
 
 *** Test Cases ***
-Test Cross Cluster Connectivity
+Verify Cross Cluster Connectivity
     [Documentation]    Verify pods on all clusters can reach pods/services on all other clusters.
-    [Template]    Test Connectivity Between Clusters
+    [Template]    Verify Connectivity Between Clusters
     cluster-a    cluster-b    pod
     cluster-a    cluster-b    service
     cluster-a    cluster-c    pod
@@ -31,9 +31,9 @@ Test Cross Cluster Connectivity
     cluster-c    cluster-b    pod
     cluster-c    cluster-b    service
 
-Test Cross Cluster Source IP Preservation
+Verify Cross Cluster Source IP Preservation
     [Documentation]    Verify cross cluster traffic preserves source pod IP (no SNAT).
-    [Template]    Test Source IP Preserved Between Clusters
+    [Template]    Verify Source IP Preserved Between Clusters
     cluster-a    cluster-b    pod
     cluster-a    cluster-b    service
     cluster-a    cluster-c    pod
@@ -80,14 +80,3 @@ Test Dual Stack Cross Cluster Source IP Preservation
     Test Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-b    service
 
 
-*** Keywords ***
-Setup
-    [Documentation]    Set up clusters and deploy test workloads on all.
-    Check Required Env Variables
-    Register All C2CC Clusters
-    Deploy Test Workloads
-
-Teardown
-    [Documentation]    Remove test workloads and close connections.
-    Cleanup Test Workloads
-    Teardown All Remote Clusters

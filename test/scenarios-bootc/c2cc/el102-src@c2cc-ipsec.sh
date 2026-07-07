@@ -26,5 +26,5 @@ scenario_run_tests() {
     configure_c2cc_hosts "c2cc_ipsec_pre_greenboot" "c2cc_ipsec_greenboot"
     configure_ipsec
 
-    c2cc_run_tests "suites/c2cc-ipsec/"
+    c2cc_run_tests "suites/c2cc/ipsec/"
 }

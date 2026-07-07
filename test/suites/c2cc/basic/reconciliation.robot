@@ -3,13 +3,13 @@ Documentation       Negative/fault-injection tests for C2CC controller reconcili
 ...                 Each test deletes or corrupts a specific piece of C2CC networking state,
 ...                 then waits for the controller to detect the disruption and self-heal.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
-Suite Setup         Setup
-Suite Teardown      Teardown
+Suite Setup         C2CC Suite Setup
+Suite Teardown      C2CC Suite Teardown
 
 Test Tags           c2cc
 
@@ -132,16 +132,6 @@ Reconcile Dual Stack Service IP Rule After Deletion
 
 
 *** Keywords ***
-Setup
-    [Documentation]    Set up SSH connections and kubeconfigs for all clusters.
-    Check Required Env Variables
-    Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG_A}
-    Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
-
-Teardown
-    [Documentation]    Close all connections and clean up kubeconfigs.
-    Teardown All Remote Clusters
-
 Get Node Name On Cluster
     [Documentation]    Get the name of the first node on the given cluster.
     [Arguments]    ${alias}

@@ -4,13 +4,13 @@ Documentation       Verify C2CC probe pod deployment and health status reporting
 ...                 ClusterIP, RemoteCluster CRs transition to Healthy, and the
 ...                 deployment self-heals after deletion.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
-Suite Setup         Setup
-Suite Teardown      Teardown
+Suite Setup         C2CC Suite Setup
+Suite Teardown      C2CC Suite Teardown
 
 Test Tags           c2cc
 
@@ -50,31 +50,20 @@ RemoteCluster Status Becomes Healthy
     Wait Until Keyword Succeeds    3m    10s
     ...    Verify RemoteCluster State    cluster-c    Healthy
 
-RemoteCluster Status Has LastProbeTime
-    [Documentation]    Verify that LastProbeTime is populated on all RemoteCluster CRs.
+RemoteCluster Status Has Probe Timestamps
+    [Documentation]    Verify that LastProbeTime and LastSuccessfulProbe are populated
+    ...    on all RemoteCluster CRs across all clusters.
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
-        ${stdout}=    Oc On Cluster    ${alias}
-        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.lastProbeTime}'
-        Should Not Be Empty    ${stdout}
-        @{timestamps}=    Split String    ${stdout}
-        ${count}=    Get Length    ${timestamps}
-        Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster states, got ${count}
-        FOR    ${t}    IN    @{timestamps}
-            Should Not Be Empty    ${t}
-        END
-    END
-
-RemoteCluster Status Has LastSuccessfulProbe
-    [Documentation]    Verify that LastSuccessfulProbe is populated on all RemoteCluster CRs.
-    FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
-        ${stdout}=    Oc On Cluster    ${alias}
-        ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.lastSuccessfulProbe}'
-        Should Not Be Empty    ${stdout}
-        @{timestamps}=    Split String    ${stdout}
-        ${count}=    Get Length    ${timestamps}
-        Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster states, got ${count}
-        FOR    ${t}    IN    @{timestamps}
-            Should Not Be Empty    ${t}
+        FOR    ${field}    IN    lastProbeTime    lastSuccessfulProbe
+            ${stdout}=    Oc On Cluster    ${alias}
+            ...    oc get remoteclusters.microshift.io -o jsonpath='{.items[*].status.${field}}'
+            Should Not Be Empty    ${stdout}
+            @{timestamps}=    Split String    ${stdout}
+            ${count}=    Get Length    ${timestamps}
+            Should Be Equal As Integers    ${count}    2    Expected 2 RemoteCluster ${field} values, got ${count}
+            FOR    ${t}    IN    @{timestamps}
+                Should Not Be Empty    ${t}
+            END
         END
     END
 
@@ -137,15 +126,6 @@ RemoteCluster Has TargetResults In Dual Stack
 
 
 *** Keywords ***
-Setup
-    [Documentation]    Set up SSH connections and kubeconfigs for all clusters.
-    Check Required Env Variables
-    Register All C2CC Clusters
-
-Teardown
-    [Documentation]    Close all connections and clean up kubeconfigs.
-    Teardown All Remote Clusters
-
 Verify Probe Pod Is Ready
     [Documentation]    Check that the probe deployment has 1 available replica.
     [Arguments]    ${alias}

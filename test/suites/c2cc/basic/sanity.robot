@@ -2,13 +2,13 @@
 Documentation       Sanity checks for a multi-cluster C2CC environment.
 ...                 Verifies that all clusters are running and MicroShift is healthy.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
-Suite Setup         Setup
-Suite Teardown      Teardown
+Suite Setup         C2CC Suite Setup
+Suite Teardown      C2CC Suite Teardown
 
 Test Tags           c2cc
 
@@ -44,15 +44,6 @@ C2CC Controller Is Running On Cluster
 
 
 *** Keywords ***
-Setup
-    [Documentation]    Set up SSH connections and kubeconfigs for all clusters.
-    Check Required Env Variables
-    Register All C2CC Clusters
-
-Teardown
-    [Documentation]    Close all connections and clean up kubeconfigs.
-    Teardown All Remote Clusters
-
 Verify Cluster Is Running
     [Documentation]    Check the /readyz endpoint on the given cluster.
     [Arguments]    ${alias}

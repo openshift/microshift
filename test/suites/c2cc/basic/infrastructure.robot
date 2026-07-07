@@ -3,13 +3,13 @@ Documentation       Verify C2CC controller sets up all networking infrastructure
 ...                 Checks Linux routes, IP rules, nftables bypass, OVN static routes,
 ...                 and node annotations on both clusters.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
-Suite Setup         Setup
-Suite Teardown      Teardown
+Suite Setup         C2CC Suite Setup
+Suite Teardown      C2CC Suite Teardown
 
 Test Tags           c2cc
 
@@ -184,12 +184,3 @@ Dual Stack Node Annotation Set
     Verify Node SNAT Annotation    cluster-c    ${CLUSTER_B_POD_CIDR_DUAL}    ${CLUSTER_B_SVC_CIDR_DUAL}
 
 
-*** Keywords ***
-Setup
-    [Documentation]    Set up SSH connections and kubeconfigs for all clusters.
-    Check Required Env Variables
-    Register All C2CC Clusters
-
-Teardown
-    [Documentation]    Close all connections and clean up kubeconfigs.
-    Teardown All Remote Clusters
