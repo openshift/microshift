@@ -78,17 +78,30 @@ Wait For MicroShift Service
     ...    MicroShift Service Is Active
 
 Restart MicroShift
-    [Documentation]    Restart the MicroShift service with a delay to avoid too
-    ...    many start requests.
+    [Documentation]    Restart the MicroShift service, waiting for any in-progress
+    ...    state transition to settle before issuing the restart.
+    Wait Until Keyword Succeeds    10x    5s
+    ...    MicroShift Service Is Not Transitioning
+    # Clear start-limit-hit so systemctl restart is not rejected after
+    # rapid failures (e.g. invalid config that was since removed).
+    Execute Command    systemctl reset-failed microshift.service    sudo=True
     ${ushift_pid}=    MicroShift Process ID
     ${ushift_etcd_pid}=    MicroShift Etcd Process ID
-    Sleep    10s
     Systemctl    restart    microshift.service
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Wait Until MicroShift Etcd Process ID Changes    ${ushift_etcd_pid}
     # Kubeconfig may change between restarts, ensure we are taking the latest one.
     Setup Kubeconfig
     Wait For MicroShift
+
+MicroShift Service Is Not Transitioning
+    [Documentation]    Verify microshift.service is not in a transitional ActiveState
+    ...    (activating, deactivating, reloading). This covers all transient
+    ...    sub-states including auto-restart and start-pre/start/stop phases.
+    ${state}=    Get Systemd Setting    microshift.service    ActiveState
+    Should Not Be Equal As Strings    ${state}    activating
+    Should Not Be Equal As Strings    ${state}    deactivating
+    Should Not Be Equal As Strings    ${state}    reloading
 
 Stop MicroShift
     [Documentation]    Stop the MicroShift service
