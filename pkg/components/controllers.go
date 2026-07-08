@@ -36,6 +36,10 @@ var (
 		"TLS_AES_128_CCM_8_SHA256",
 	)
 
+	// fipsApprovedTLS13Ciphers contains only GCM-based ciphers.
+	// CCM ciphers (TLS_AES_128_CCM_SHA256, TLS_AES_128_CCM_8_SHA256) are excluded
+	// because OpenSSL's FIPS provider does not enable them and HAProxy does not
+	// support CCM mode cipher suites.
 	fipsApprovedTLS13Ciphers = sets.NewString(
 		"TLS_AES_128_GCM_SHA256",
 		"TLS_AES_256_GCM_SHA384",
@@ -45,6 +49,8 @@ var (
 // detectFIPS reports whether the cluster is operating in FIPS
 // mode by checking the FIPS_ENABLED environment variable if set or
 // the /proc/sys/crypto/fips_enabled file otherwise.
+// FIPS_ENABLED is an optional override for testing environments where
+// /proc/sys/crypto/fips_enabled may not reflect the desired FIPS state.
 func detectFIPS() bool {
 	if v, ok := os.LookupEnv("FIPS_ENABLED"); ok {
 		if result, err := strconv.ParseBool(v); err != nil {
@@ -534,7 +540,7 @@ func generateIngressParams(cfg *config.Config, fipsEnabled bool) (assets.RenderP
 	// handshakes when a client offers a non-FIPS cipher first if that cipher
 	// is listed in ssl-default-bind-ciphersuites but excluded by the OS FIPS policy.
 	if fipsEnabled {
-		fipsCiphers := tls13Ciphers[:0]
+		var fipsCiphers []string
 		for _, c := range tls13Ciphers {
 			if fipsApprovedTLS13Ciphers.Has(c) {
 				fipsCiphers = append(fipsCiphers, c)

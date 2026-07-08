@@ -147,8 +147,8 @@ Verify ML-KEM Post Quantum Curve Negotiation
     ...    negotiates successfully via oc exec into the router pod, which
     ...    has OpenSSL 3.5+ (the host OpenSSL may be too old for ML-KEM).
     ...    Skipped on FIPS clusters where ML-KEM is not configured.
-    ${curves}=    Oc Get JsonPath    deployment    openshift-ingress    router-default
-    ...    .spec.template.spec.containers[0].env[?(@.name=="ROUTER_CURVES")].value
+    ${curves}=    Oc Get JsonPath    pod    openshift-ingress    ${EMPTY}
+    ...    .items[*].spec.containers[*].env[?(@.name=="ROUTER_CURVES")].value
     Skip If    "X25519MLKEM768" not in """${curves}"""
     ...    ROUTER_CURVES does not include X25519MLKEM768 (FIPS mode); skipping ML-KEM test
     ${router_ip}=    Oc Get JsonPath    svc    openshift-ingress    router-default
@@ -158,6 +158,6 @@ Verify ML-KEM Post Quantum Curve Negotiation
     ${output}=    Oc Exec    ${pod_name}
     ...    echo Q | openssl s_client -connect ${router_ip}:443 -groups X25519MLKEM768 2>&1 || true
     ...    ns=openshift-ingress
-    Should Match Regexp    ${output}    group.*X25519MLKEM768
-    ...    msg=ML-KEM post-quantum curve X25519MLKEM768 negotiation failed
+    Should Contain    ${output}    X25519MLKEM768
+    ...    msg=ML-KEM post-quantum curve X25519MLKEM768 negotiation failed; openssl output: ${output}
     Log    Post-quantum ML-KEM negotiation verified: OK
