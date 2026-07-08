@@ -17,7 +17,6 @@ limitations under the License.
 package rest
 
 import (
-	"context"
 	"testing"
 
 	"k8s.io/client-go/kubernetes/fake"
@@ -35,9 +34,6 @@ func BenchmarkEnsureRBACPolicy(b *testing.B) {
 			ClusterRoleBindingsToSplit: bootstrappolicy.ClusterRoleBindingsToSplit(),
 		}
 		coreClientSet := fake.NewSimpleClientset()
-		done, err := ensureRBACPolicy(context.Background(), policy, coreClientSet)
-		if err != nil || !done {
-			b.Fatalf("ensureRBACPolicy failed or did not complete: done=%v err=%v", done, err)
-		}
+		_, _ = ensureRBACPolicy(policy, coreClientSet)
 	}
 }
