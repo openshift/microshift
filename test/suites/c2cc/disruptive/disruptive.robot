@@ -16,12 +16,12 @@ Test Tags           disruptive
 
 
 *** Variables ***
-${RECOVERY_TIMEOUT}         5m
-${RECOVERY_RETRY}           15s
-${HOST2_VM_NAME}            ${EMPTY}
-${HOST3_VM_NAME}            ${EMPTY}
-${DISABLED_VM}              ${EMPTY}
-@{DISABLED_IFACES}          @{EMPTY}
+${RECOVERY_TIMEOUT}     5m
+${RECOVERY_RETRY}       15s
+${HOST2_VM_NAME}        ${EMPTY}
+${HOST3_VM_NAME}        ${EMPTY}
+${DISABLED_VM}          ${EMPTY}
+@{DISABLED_IFACES}      @{EMPTY}
 
 
 *** Test Cases ***
