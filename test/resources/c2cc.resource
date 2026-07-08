@@ -16,6 +16,8 @@ Resource            microshift-host.resource
 ${CLUSTER_A_POD_CIDR}           ${EMPTY}
 ${CLUSTER_A_SVC_CIDR}           ${EMPTY}
 ${CLUSTER_A_DOMAIN}             ${EMPTY}
+${KUBECONFIG_A}                 ${EMPTY}
+${HOST1_IPV6}                   ${EMPTY}
 ${CLUSTER_B_POD_CIDR}           ${EMPTY}
 ${CLUSTER_B_SVC_CIDR}           ${EMPTY}
 ${CLUSTER_B_DOMAIN}             ${EMPTY}
@@ -68,14 +70,6 @@ ${IP_CMD}                       ${{'ip -6' if '${IP_FAMILY}' == 'ipv6' else 'ip 
 
 
 *** Keywords ***
-Register Local Cluster
-    [Documentation]    Register the primary cluster (host1) for use with generic cluster keywords.
-    ...    Must be called after Login MicroShift Host and Setup Kubeconfig.
-    [Arguments]    ${alias}
-    ${conn}=    SSHLibrary.Get Connection
-    Set To Dictionary    ${C2CC_KUBECONFIGS}    ${alias}    ${KUBECONFIG}
-    Set To Dictionary    ${C2CC_SSH_IDS}    ${alias}    ${conn.index}
-
 Register Remote Cluster
     [Documentation]    Open an SSH connection to a remote cluster and register it by alias.
     [Arguments]    ${alias}    ${host}    ${ssh_port}    ${kubeconfig}
@@ -93,21 +87,19 @@ Register Remote Cluster
     Set To Dictionary    ${C2CC_SSH_IDS}    ${alias}    ${alias}
     Append To List    ${C2CC_REMOTE_ALIASES}    ${alias}
 
+Register All C2CC Clusters
+    [Documentation]    Register all three C2CC clusters as remote clusters.
+    Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG_A}
+    Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
+    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
+
 Teardown All Remote Clusters
     [Documentation]    Close SSH connections for all registered remote clusters.
-    ...    If cluster-a was registered as a local cluster, switch back to it
-    ...    so that Logout MicroShift Host can close it. If all clusters were
-    ...    registered as remote (e.g. upgrade tests), skip the switch-back.
-    ${has_local}=    Evaluate    'cluster-a' not in ${C2CC_REMOTE_ALIASES}
     FOR    ${alias}    IN    @{C2CC_REMOTE_ALIASES}
         SSHLibrary.Switch Connection    ${alias}
         SSHLibrary.Close Connection
     END
     VAR    @{C2CC_REMOTE_ALIASES}=    @{EMPTY}    scope=SUITE
-    IF    ${has_local}
-        ${local_conn}=    Get From Dictionary    ${C2CC_SSH_IDS}    cluster-a
-        SSHLibrary.Switch Connection    ${local_conn}
-    END
 
 Command On Cluster
     [Documentation]    Run a shell command on the specified cluster via SSH.

@@ -141,11 +141,7 @@ IPsec Tunnel Recovers After Remote Stop Start
 Setup
     [Documentation]    Register all clusters, verify IPsec tunnels, deploy test workloads.
     Check Required Env Variables
-    Login MicroShift Host
-    Setup Kubeconfig
-    Register Local Cluster    cluster-a
-    Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
-    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
+    Register All C2CC Clusters
     Deploy Test Workloads
 
 Teardown
@@ -153,8 +149,6 @@ Teardown
     Cleanup Test Workloads
     Ensure IPsec Running On All Clusters
     Teardown All Remote Clusters
-    Remove Kubeconfig
-    Logout MicroShift Host
 
 Ensure IPsec Running On All Clusters
     [Documentation]    Make sure ipsec service is running on all clusters.

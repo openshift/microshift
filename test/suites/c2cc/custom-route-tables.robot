@@ -76,9 +76,7 @@ Old Default Tables Are Not Cleaned Up
 Setup
     [Documentation]    Register clusters, apply custom routing drop-in, restart MicroShift.
     Check Required Env Variables
-    Login MicroShift Host
-    Setup Kubeconfig
-    Register Local Cluster    cluster-a
+    Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG_A}
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
     Apply Custom Routing Config
     Restart And Wait For Healthy
@@ -89,8 +87,6 @@ Teardown
     Restart And Wait For Healthy
     Flush Custom Tables
     Teardown All Remote Clusters
-    Remove Kubeconfig
-    Logout MicroShift Host
 
 Apply Custom Routing Config
     [Documentation]    Write a drop-in that overrides routing table IDs.

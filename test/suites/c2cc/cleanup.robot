@@ -143,19 +143,13 @@ C2CC Controller Logged Cleanup
 Setup
     [Documentation]    Register clusters, then disable C2CC on Cluster A and wait for restart.
     Check Required Env Variables
-    Login MicroShift Host
-    Setup Kubeconfig
-    Register Local Cluster    cluster-a
-    Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
-    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
+    Register All C2CC Clusters
     Disable C2CC On Cluster    cluster-a
 
 Teardown
     [Documentation]    Re-enable C2CC on Cluster A, then close connections.
     Enable C2CC On Cluster    cluster-a
     Teardown All Remote Clusters
-    Remove Kubeconfig
-    Logout MicroShift Host
 
 Disable C2CC On Cluster
     [Documentation]    Move the C2CC config drop-in aside and restart MicroShift.
