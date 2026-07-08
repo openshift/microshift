@@ -47,36 +47,36 @@ Verify Cross Cluster Source IP Preservation
     cluster-c    cluster-b    pod
     cluster-c    cluster-b    service
 
-Test Dual Stack Cross Cluster Connectivity
+Verify Dual Stack Cross Cluster Connectivity
     [Documentation]    Verify dual-stack pods on all clusters can reach pods/services on all other clusters.
     Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
-    Test Dual Stack Connectivity Between Clusters    cluster-a    cluster-b    pod
-    Test Dual Stack Connectivity Between Clusters    cluster-a    cluster-b    service
-    Test Dual Stack Connectivity Between Clusters    cluster-a    cluster-c    pod
-    Test Dual Stack Connectivity Between Clusters    cluster-a    cluster-c    service
-    Test Dual Stack Connectivity Between Clusters    cluster-b    cluster-a    pod
-    Test Dual Stack Connectivity Between Clusters    cluster-b    cluster-a    service
-    Test Dual Stack Connectivity Between Clusters    cluster-b    cluster-c    pod
-    Test Dual Stack Connectivity Between Clusters    cluster-b    cluster-c    service
-    Test Dual Stack Connectivity Between Clusters    cluster-c    cluster-a    pod
-    Test Dual Stack Connectivity Between Clusters    cluster-c    cluster-a    service
-    Test Dual Stack Connectivity Between Clusters    cluster-c    cluster-b    pod
-    Test Dual Stack Connectivity Between Clusters    cluster-c    cluster-b    service
+    Verify Dual Stack Connectivity Between Clusters    cluster-a    cluster-b    pod
+    Verify Dual Stack Connectivity Between Clusters    cluster-a    cluster-b    service
+    Verify Dual Stack Connectivity Between Clusters    cluster-a    cluster-c    pod
+    Verify Dual Stack Connectivity Between Clusters    cluster-a    cluster-c    service
+    Verify Dual Stack Connectivity Between Clusters    cluster-b    cluster-a    pod
+    Verify Dual Stack Connectivity Between Clusters    cluster-b    cluster-a    service
+    Verify Dual Stack Connectivity Between Clusters    cluster-b    cluster-c    pod
+    Verify Dual Stack Connectivity Between Clusters    cluster-b    cluster-c    service
+    Verify Dual Stack Connectivity Between Clusters    cluster-c    cluster-a    pod
+    Verify Dual Stack Connectivity Between Clusters    cluster-c    cluster-a    service
+    Verify Dual Stack Connectivity Between Clusters    cluster-c    cluster-b    pod
+    Verify Dual Stack Connectivity Between Clusters    cluster-c    cluster-b    service
 
-Test Dual Stack Cross Cluster Source IP Preservation
+Verify Dual Stack Cross Cluster Source IP Preservation
     [Documentation]    Verify dual-stack cross cluster traffic preserves source pod IP (no SNAT).
     Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-a    cluster-b    pod
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-a    cluster-b    service
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-a    cluster-c    pod
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-a    cluster-c    service
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-b    cluster-a    pod
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-b    cluster-a    service
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-b    cluster-c    pod
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-b    cluster-c    service
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-a    pod
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-a    service
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-b    pod
-    Test Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-b    service
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-a    cluster-b    pod
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-a    cluster-b    service
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-a    cluster-c    pod
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-a    cluster-c    service
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-b    cluster-a    pod
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-b    cluster-a    service
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-b    cluster-c    pod
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-b    cluster-c    service
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-a    pod
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-a    service
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-b    pod
+    Verify Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-b    service
 
 

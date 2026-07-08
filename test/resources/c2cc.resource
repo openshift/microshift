@@ -445,7 +445,7 @@ Verify Source IP Preserved Between Clusters
     ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
     Should Contain    ${stdout}    source: ${curl_pod_ip}
 
-Test Dual Stack Connectivity Between Clusters
+Verify Dual Stack Connectivity Between Clusters
     [Documentation]    Verify pod on ${source} can reach ${endpoint_type} dual-stack IP on ${destination}.
     [Arguments]    ${source}    ${destination}    ${endpoint_type}
     IF    '${endpoint_type}' == 'pod'
@@ -458,7 +458,7 @@ Test Dual Stack Connectivity Between Clusters
     ${stdout}=    Curl From Cluster    ${source}    ${ip_dest}    8080
     Should Contain    ${stdout}    Hello from
 
-Test Dual Stack Source IP Preserved Between Clusters
+Verify Dual Stack Source IP Preserved Between Clusters
     [Documentation]    Verify dual-stack traffic preserves the source pod IP (no SNAT).
     [Arguments]    ${source}    ${destination}    ${endpoint_type}
     IF    '${endpoint_type}' == 'pod'
