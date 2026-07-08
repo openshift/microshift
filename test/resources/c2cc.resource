@@ -718,25 +718,19 @@ Reconnect Cluster
     Reconnect To Cluster    ${alias}    ${host}    ${port}    ${kubeconfig}    timeout=10m
 
 C2CC Suite Setup
-    [Documentation]    Standard 3-cluster suite setup: login to download kubeconfig,
-    ...    then register all three clusters as remote. Optionally deploys test workloads.
+    [Documentation]    Standard 3-cluster suite setup: registers all three clusters
+    ...    as remote and optionally deploys test workloads.
     [Arguments]    ${deploy_workloads}=${FALSE}
     Check Required Env Variables
-    Login MicroShift Host
-    Setup Kubeconfig
-    Logout MicroShift Host
-    Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG}
-    Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
-    Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
+    Register All C2CC Clusters
     IF    ${deploy_workloads}    Deploy Test Workloads
 
 C2CC Suite Teardown
-    [Documentation]    Standard suite teardown: optionally cleans up workloads,
-    ...    tears down remote clusters, and removes kubeconfig.
+    [Documentation]    Standard suite teardown: optionally cleans up workloads
+    ...    and tears down remote clusters.
     [Arguments]    ${cleanup_workloads}=${FALSE}
     IF    ${cleanup_workloads}    Cleanup Test Workloads
     Teardown All Remote Clusters
-    Remove Kubeconfig
 
 Verify Full C2CC Connectivity
     [Documentation]    Verify pod-to-pod, pod-to-service connectivity and source IP preservation
