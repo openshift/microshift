@@ -232,8 +232,11 @@
                 "type": "string"
               },
               "nextHop": {
-                "description": "IP address of the remote cluster's node, used as next-hop for routing.",
-                "type": "string"
+                "description": "IP addresses of the remote cluster's node, used as next-hop for routing.\nAt most one IPv4 and one IPv6 address. Dual-stack clusters need both.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               },
               "serviceNetwork": {
                 "description": "Service CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.",

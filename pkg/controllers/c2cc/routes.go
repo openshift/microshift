@@ -16,11 +16,16 @@ const (
 	c2ccRulePriority = 100
 )
 
+type routeTarget struct {
+	dst *net.IPNet
+	key string // dst.String(), pre-computed
+	gw  net.IP
+}
+
 type linuxRouteManager struct {
 	policyRouteTable
 
-	desiredDsts []*net.IPNet
-	desiredGWs  map[string]net.IP
+	desired []routeTarget
 }
 
 func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
@@ -30,13 +35,20 @@ func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 			proto:    cfg.C2CC.ResolvedRouteTableID,
 			priority: c2ccRulePriority,
 		},
-		desiredGWs: make(map[string]net.IP),
 	}
 
 	for i := range cfg.C2CC.Resolved {
-		for _, cidr := range cfg.C2CC.Resolved[i].AllCIDRs() {
-			m.desiredDsts = append(m.desiredDsts, cidr)
-			m.desiredGWs[cidr.String()] = cfg.C2CC.Resolved[i].NextHop
+		rc := &cfg.C2CC.Resolved[i]
+		for _, cidr := range rc.AllCIDRs() {
+			gw, ok := rc.NextHopForFamily(ipFamilyOf(cidr))
+			if !ok {
+				continue
+			}
+			m.desired = append(m.desired, routeTarget{
+				dst: cidr,
+				key: cidr.String(),
+				gw:  gw,
+			})
 		}
 	}
 
@@ -44,11 +56,11 @@ func newLinuxRouteManager(cfg *config.Config) *linuxRouteManager {
 }
 
 func (m *linuxRouteManager) reconcile(ctx context.Context) error {
-	desired := make([]netlink.Route, 0, len(m.desiredDsts))
-	for _, cidr := range m.desiredDsts {
+	desired := make([]netlink.Route, 0, len(m.desired))
+	for _, rt := range m.desired {
 		desired = append(desired, netlink.Route{
-			Dst:      cidr,
-			Gw:       m.desiredGWs[cidr.String()],
+			Dst:      rt.dst,
+			Gw:       rt.gw,
 			Table:    m.table,
 			Protocol: netlink.RouteProtocol(m.proto),
 		})
@@ -77,25 +89,24 @@ func (m *linuxRouteManager) reconcileRules() error {
 	}
 
 	var errs []error
-	for _, cidr := range m.desiredDsts {
-		dst := cidr.String()
-		if _, exists := actualByDst[dst]; exists {
-			delete(actualByDst, dst)
+	for _, rt := range m.desired {
+		if _, exists := actualByDst[rt.key]; exists {
+			delete(actualByDst, rt.key)
 			continue
 		}
 		rule := netlink.NewRule()
-		rule.Dst = cidr
+		rule.Dst = rt.dst
 		rule.Table = m.table
 		rule.Priority = m.priority
-		rule.Family = ipFamilyOf(cidr)
+		rule.Family = ipFamilyOf(rt.dst)
 		if err := netlink.RuleAdd(rule); err != nil {
 			if !errors.Is(err, syscall.EEXIST) {
-				klog.Errorf("Failed to add ip rule for %s: %v", dst, err)
-				errs = append(errs, fmt.Errorf("failed to add rule %s: %w", dst, err))
+				klog.Errorf("Failed to add ip rule for %s: %v", rt.key, err)
+				errs = append(errs, fmt.Errorf("failed to add rule %s: %w", rt.key, err))
 			}
 			continue
 		}
-		klog.V(2).Infof("IP rule add: to %s lookup %d priority %d", dst, m.table, m.priority)
+		klog.V(2).Infof("IP rule add: to %s lookup %d priority %d", rt.key, m.table, m.priority)
 	}
 
 	for dst, r := range actualByDst {

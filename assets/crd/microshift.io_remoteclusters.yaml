@@ -44,13 +44,17 @@ spec:
                 default: 10s
                 description: Interval between probe attempts (e.g. "10s", "1m").
                 type: string
-              probeTarget:
-                description: IP:port of the remote cluster's probe service (11th IP
-                  in remote service CIDR, port 8080).
-                type: string
+              probeTargets:
+                description: IP:port targets to probe (one per address family, max
+                  2).
+                items:
+                  type: string
+                maxItems: 2
+                minItems: 1
+                type: array
             required:
             - probeInterval
-            - probeTarget
+            - probeTargets
             type: object
           status:
             description: RemoteClusterStatus is populated by the probe pod with health
@@ -66,27 +70,6 @@ spec:
               lastSuccessfulProbe:
                 format: date-time
                 type: string
-              latency:
-                description: Latency statistics from recent probes (rolling window
-                  of 20 samples).
-                properties:
-                  avg:
-                    type: string
-                  last:
-                    type: string
-                  max:
-                    type: string
-                  min:
-                    type: string
-                  stddev:
-                    type: string
-                required:
-                - avg
-                - last
-                - max
-                - min
-                - stddev
-                type: object
               state:
                 default: NeverProbed
                 enum:
@@ -94,6 +77,50 @@ spec:
                 - Healthy
                 - Unhealthy
                 type: string
+              targetResults:
+                description: |-
+                  Per-target probe results (one entry per ProbeTargets element).
+                  Each entry includes target-specific state and latency statistics.
+                items:
+                  description: TargetResult contains the probe result for a single
+                    target.
+                  properties:
+                    error:
+                      type: string
+                    latency:
+                      description: |-
+                        LatencyStats contains latency statistics computed from a rolling window of probe samples.
+                        All duration values are serialized as Go duration strings (e.g. "1.234ms").
+                      properties:
+                        avg:
+                          type: string
+                        last:
+                          type: string
+                        max:
+                          type: string
+                        min:
+                          type: string
+                        stddev:
+                          type: string
+                      required:
+                      - avg
+                      - last
+                      - max
+                      - min
+                      - stddev
+                      type: object
+                    state:
+                      enum:
+                      - Healthy
+                      - Unhealthy
+                      type: string
+                    target:
+                      type: string
+                  required:
+                  - state
+                  - target
+                  type: object
+                type: array
             required:
             - state
             type: object

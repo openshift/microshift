@@ -42,11 +42,15 @@ func newOVNRouteManager(nbClient client.Client, nodeName string, resolved []conf
 
 	var desired []LogicalRouterStaticRoute
 	for i := range resolved {
-		nexthop := resolved[i].NextHop.String()
-		for _, cidr := range resolved[i].AllCIDRs() {
+		rc := &resolved[i]
+		for _, cidr := range rc.AllCIDRs() {
+			gw, ok := rc.NextHopForFamily(ipFamilyOf(cidr))
+			if !ok {
+				continue
+			}
 			desired = append(desired, LogicalRouterStaticRoute{
 				IPPrefix:    cidr.String(),
-				Nexthop:     nexthop,
+				Nexthop:     gw.String(),
 				ExternalIDs: map[string]string{ownerControllerKey: c2ccOwnerController},
 			})
 		}

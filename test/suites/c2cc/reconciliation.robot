@@ -85,6 +85,51 @@ Reconcile SNAT Annotation Preserves Foreign Subnets
     Should Contain    ${annotation}    ${FOREIGN_CIDR}
     [Teardown]    Remove Foreign Subnet From SNAT Annotation    cluster-a
 
+Reconcile Dual Stack Linux Route In Table 200 After Deletion
+    [Documentation]    Delete a dual-stack route from table 200, verify the controller restores it.
+    Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    ${ip_cmd}=    IP Command For CIDR    ${CLUSTER_B_POD_CIDR_DUAL}
+    Delete Route From Table 200 On Cluster    cluster-a    ${CLUSTER_B_POD_CIDR_DUAL}    ${ip_cmd}
+    Wait Until Keyword Succeeds    ${RECONCILE_TIMEOUT}    ${RECONCILE_RETRY}
+    ...    Verify Routes In Table 200
+    ...    cluster-a    ${CLUSTER_B_POD_CIDR_DUAL}    ${CLUSTER_B_SVC_CIDR_DUAL}    ${ip_cmd}
+
+Reconcile Dual Stack IP Rule For Table 200 After Deletion
+    [Documentation]    Delete a dual-stack IP rule for table 200, verify the controller restores it.
+    Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    ${ip_cmd}=    IP Command For CIDR    ${CLUSTER_B_POD_CIDR_DUAL}
+    Delete IP Rule For Table 200 On Cluster    cluster-a    ${CLUSTER_B_POD_CIDR_DUAL}    ${ip_cmd}
+    Wait Until Keyword Succeeds    ${RECONCILE_TIMEOUT}    ${RECONCILE_RETRY}
+    ...    Verify IP Rules For Table 200
+    ...    cluster-a    ${CLUSTER_B_POD_CIDR_DUAL}    ${CLUSTER_B_SVC_CIDR_DUAL}    ${ip_cmd}
+
+Reconcile Dual Stack Service Route In Table 201 After Deletion
+    [Documentation]    Delete a dual-stack service route from table 201, verify the controller restores it.
+    Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    ${ip_cmd}=    IP Command For CIDR    ${CLUSTER_A_SVC_CIDR_DUAL}
+    Delete Service Route From Table 201 On Cluster    cluster-a    ${CLUSTER_A_SVC_CIDR_DUAL}    ${ip_cmd}
+    Wait Until Keyword Succeeds    ${RECONCILE_TIMEOUT}    ${RECONCILE_RETRY}
+    ...    Verify Routes In Table 201    cluster-a    ${CLUSTER_A_SVC_CIDR_DUAL}    ${ip_cmd}
+
+Reconcile Dual Stack Service IP Rule After Deletion
+    [Documentation]    Delete a dual-stack service IP rule, verify the controller restores it.
+    Skip If    '${CLUSTER_A_POD_CIDR_DUAL}' == ''    Dual-stack CIDRs not configured
+    ${ip_cmd}=    IP Command For CIDR    ${CLUSTER_B_POD_CIDR_DUAL}
+    Delete Service IP Rule On Cluster
+    ...    cluster-a
+    ...    ${CLUSTER_B_POD_CIDR_DUAL}
+    ...    ${CLUSTER_A_SVC_CIDR_DUAL}
+    ...    ${ip_cmd}
+    Wait Until Keyword Succeeds
+    ...    ${RECONCILE_TIMEOUT}
+    ...    ${RECONCILE_RETRY}
+    ...    Verify Service IP Rules
+    ...    cluster-a
+    ...    ${CLUSTER_B_POD_CIDR_DUAL}
+    ...    ${CLUSTER_B_SVC_CIDR_DUAL}
+    ...    ${CLUSTER_A_SVC_CIDR_DUAL}
+    ...    ${ip_cmd}
+
 
 *** Keywords ***
 Setup
@@ -110,24 +155,24 @@ Get Node Name On Cluster
 
 Delete Route From Table 200 On Cluster
     [Documentation]    Delete a specific route from policy routing table 200.
-    [Arguments]    ${alias}    ${cidr}
-    Disruptive Command On Cluster    ${alias}    ${IP_CMD} route del ${cidr} table 200
+    [Arguments]    ${alias}    ${cidr}    ${ip_cmd}=${IP_CMD}
+    Disruptive Command On Cluster    ${alias}    ${ip_cmd} route del ${cidr} table 200
 
 Delete IP Rule For Table 200 On Cluster
     [Documentation]    Delete an IP rule directing traffic to table 200.
-    [Arguments]    ${alias}    ${cidr}
-    Disruptive Command On Cluster    ${alias}    ${IP_CMD} rule del to ${cidr} lookup 200
+    [Arguments]    ${alias}    ${cidr}    ${ip_cmd}=${IP_CMD}
+    Disruptive Command On Cluster    ${alias}    ${ip_cmd} rule del to ${cidr} lookup 200
 
 Delete Service Route From Table 201 On Cluster
     [Documentation]    Delete a service route from table 201.
-    [Arguments]    ${alias}    ${cidr}
-    Disruptive Command On Cluster    ${alias}    ${IP_CMD} route del ${cidr} table 201
+    [Arguments]    ${alias}    ${cidr}    ${ip_cmd}=${IP_CMD}
+    Disruptive Command On Cluster    ${alias}    ${ip_cmd} route del ${cidr} table 201
 
 Delete Service IP Rule On Cluster
     [Documentation]    Delete a service IP rule from table 201.
-    [Arguments]    ${alias}    ${from_cidr}    ${to_cidr}
+    [Arguments]    ${alias}    ${from_cidr}    ${to_cidr}    ${ip_cmd}=${IP_CMD}
     Disruptive Command On Cluster    ${alias}
-    ...    ${IP_CMD} rule del from ${from_cidr} to ${to_cidr} lookup 201
+    ...    ${ip_cmd} rule del from ${from_cidr} to ${to_cidr} lookup 201
 
 Delete NFTables C2CC Rule On Cluster
     [Documentation]    Delete an nftables bypass rule by discovering its handle.

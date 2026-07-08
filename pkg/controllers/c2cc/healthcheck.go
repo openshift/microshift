@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"slices"
+	"sort"
 	"strings"
 
 	microshiftv1alpha1 "github.com/openshift/microshift/pkg/apis/microshift/v1alpha1"
@@ -62,7 +64,7 @@ func (h *healthcheckCRManager) reconcile(ctx context.Context) error {
 
 		delete(existingByName, name)
 
-		if got.Spec.ProbeTarget == want.Spec.ProbeTarget && got.Spec.ProbeInterval == want.Spec.ProbeInterval {
+		if slices.Equal(got.Spec.ProbeTargets, want.Spec.ProbeTargets) && got.Spec.ProbeInterval == want.Spec.ProbeInterval {
 			continue
 		}
 
@@ -88,7 +90,12 @@ func (h *healthcheckCRManager) reconcile(ctx context.Context) error {
 func (h *healthcheckCRManager) buildDesiredCRs() map[string]*microshiftv1alpha1.RemoteCluster {
 	desired := make(map[string]*microshiftv1alpha1.RemoteCluster, len(h.cfg.C2CC.Resolved))
 	for _, rc := range h.cfg.C2CC.Resolved {
-		name := crNameForRemote(rc.NextHop)
+		name := crNameForRemote(rc.PrimaryNextHop())
+		var targets []string
+		for _, probeIP := range rc.ProbeIPs {
+			targets = append(targets, net.JoinHostPort(probeIP, fmt.Sprintf("%d", probePort)))
+		}
+		sort.Strings(targets) // deterministic order for comparison
 		desired[name] = &microshiftv1alpha1.RemoteCluster{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: name,
@@ -97,7 +104,7 @@ func (h *healthcheckCRManager) buildDesiredCRs() map[string]*microshiftv1alpha1.
 				},
 			},
 			Spec: microshiftv1alpha1.RemoteClusterSpec{
-				ProbeTarget:   net.JoinHostPort(rc.ProbeIP, fmt.Sprintf("%d", probePort)),
+				ProbeTargets:  targets,
 				ProbeInterval: metav1.Duration{Duration: h.cfg.C2CC.ResolvedProbeInterval},
 			},
 		}

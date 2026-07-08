@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"sync"
 	"time"
 
@@ -21,6 +22,9 @@ const (
 	unhealthyThreshold = 3
 	probeHTTPTimeout   = 5 * time.Second
 	informerResync     = 30 * time.Second
+
+	stateHealthy   = "Healthy"
+	stateUnhealthy = "Unhealthy"
 )
 
 // RunProbe is the entrypoint for the healthcheck-probe subcommand.
@@ -60,7 +64,7 @@ func RunProbe(ctx context.Context) error {
 	pm := &probeManager{
 		client:    msClient,
 		probes:    make(map[string]context.CancelFunc),
-		latencies: make(map[string]*latencyWindow),
+		latencies: make(map[string]map[string]*latencyWindow),
 	}
 
 	factory := microshiftinformers.NewSharedInformerFactory(msClient, informerResync)
@@ -75,7 +79,7 @@ func RunProbe(ctx context.Context) error {
 		UpdateFunc: func(oldObj, newObj interface{}) {
 			oldRC, ok1 := oldObj.(*microshiftv1alpha1.RemoteCluster)
 			newRC, ok2 := newObj.(*microshiftv1alpha1.RemoteCluster)
-			if ok1 && ok2 && (oldRC.Spec.ProbeTarget != newRC.Spec.ProbeTarget ||
+			if ok1 && ok2 && (!slices.Equal(oldRC.Spec.ProbeTargets, newRC.Spec.ProbeTargets) ||
 				oldRC.Spec.ProbeInterval != newRC.Spec.ProbeInterval) {
 				pm.restartProbe(ctx, newRC)
 			}
@@ -113,8 +117,8 @@ func RunProbe(ctx context.Context) error {
 type probeManager struct {
 	client    microshiftclientset.Interface
 	mu        sync.Mutex
-	probes    map[string]context.CancelFunc
-	latencies map[string]*latencyWindow
+	probes    map[string]context.CancelFunc        // keyed by CR name
+	latencies map[string]map[string]*latencyWindow // CR name → target → latency window
 }
 
 func (pm *probeManager) startProbe(ctx context.Context, rc *microshiftv1alpha1.RemoteCluster) {
@@ -127,11 +131,14 @@ func (pm *probeManager) startProbe(ctx context.Context, rc *microshiftv1alpha1.R
 
 	probeCtx, cancel := context.WithCancel(ctx)
 	pm.probes[rc.Name] = cancel
-	pm.latencies[rc.Name] = &latencyWindow{}
+	pm.latencies[rc.Name] = make(map[string]*latencyWindow, len(rc.Spec.ProbeTargets))
+	for _, target := range rc.Spec.ProbeTargets {
+		pm.latencies[rc.Name][target] = &latencyWindow{}
+	}
 
-	klog.Infof("Starting probe for %q (target=%s, interval=%s)",
-		rc.Name, rc.Spec.ProbeTarget, rc.Spec.ProbeInterval.Duration)
-	go pm.runProbeLoop(probeCtx, rc.Name, rc.Spec.ProbeTarget, rc.Spec.ProbeInterval.Duration, pm.latencies[rc.Name])
+	klog.Infof("Starting probe for %q (targets=%v, interval=%s)",
+		rc.Name, rc.Spec.ProbeTargets, rc.Spec.ProbeInterval.Duration)
+	go pm.runProbeLoop(probeCtx, rc.Name, rc.Spec.ProbeTargets, rc.Spec.ProbeInterval.Duration, pm.latencies[rc.Name])
 }
 
 func (pm *probeManager) restartProbe(ctx context.Context, rc *microshiftv1alpha1.RemoteCluster) {
@@ -162,10 +169,9 @@ func (pm *probeManager) stopAll() {
 	}
 }
 
-func (pm *probeManager) runProbeLoop(ctx context.Context, name, target string, interval time.Duration, window *latencyWindow) {
+func (pm *probeManager) runProbeLoop(ctx context.Context, name string, targets []string, interval time.Duration, windows map[string]*latencyWindow) {
 	httpClient := &http.Client{Timeout: probeHTTPTimeout}
-	consecutiveFailures := 0
-	url := "http://" + target + "/"
+	consecutiveFailures := make(map[string]int, len(targets))
 
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
@@ -175,37 +181,77 @@ func (pm *probeManager) runProbeLoop(ctx context.Context, name, target string, i
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			rtt, probeErr := doProbe(ctx, httpClient, url)
 			now := metav1.Now()
-
-			status := microshiftv1alpha1.RemoteClusterStatus{
-				LastProbeTime: &now,
-			}
-
-			if probeErr != nil {
-				consecutiveFailures++
-				klog.V(2).Infof("Probe %q failed (%d consecutive): %v", name, consecutiveFailures, probeErr)
-
-				if consecutiveFailures >= unhealthyThreshold {
-					status.State = "Unhealthy"
-				} else {
-					status.State = "Healthy"
-				}
-				status.Errors = []string{probeErr.Error()}
-			} else {
-				consecutiveFailures = 0
-				status.State = "Healthy"
-				status.LastSuccessfulProbe = &now
-				window.add(rtt)
-			}
-
-			status.Latency = window.stats()
+			targetResults := pm.probeAllTargets(ctx, name, targets, httpClient, consecutiveFailures, windows)
+			state := pm.deriveAggregateState(targetResults)
+			status := pm.buildStatus(state, &now, targetResults)
 
 			if err := pm.updateStatus(ctx, name, status); err != nil {
 				klog.Errorf("Failed to update status for %q: %v", name, err)
 			}
 		}
 	}
+}
+
+func (pm *probeManager) probeAllTargets(ctx context.Context, name string, targets []string, httpClient *http.Client,
+	consecutiveFailures map[string]int, windows map[string]*latencyWindow) []microshiftv1alpha1.TargetResult {
+	targetResults := make([]microshiftv1alpha1.TargetResult, 0, len(targets))
+	for _, target := range targets {
+		url := "http://" + target + "/"
+		rtt, probeErr := doProbe(ctx, httpClient, url)
+
+		result := microshiftv1alpha1.TargetResult{Target: target}
+
+		if probeErr != nil {
+			consecutiveFailures[target]++
+			klog.V(2).Infof("Probe %q target %s failed (%d consecutive): %v",
+				name, target, consecutiveFailures[target], probeErr)
+			result.State = pm.deriveTargetState(consecutiveFailures[target])
+			result.Error = probeErr.Error()
+		} else {
+			consecutiveFailures[target] = 0
+			result.State = stateHealthy
+			windows[target].add(rtt)
+		}
+
+		result.Latency = windows[target].stats()
+		targetResults = append(targetResults, result)
+	}
+	return targetResults
+}
+
+func (pm *probeManager) deriveTargetState(failures int) string {
+	if failures >= unhealthyThreshold {
+		return stateUnhealthy
+	}
+	return stateHealthy
+}
+
+func (pm *probeManager) deriveAggregateState(targetResults []microshiftv1alpha1.TargetResult) string {
+	for _, tr := range targetResults {
+		if tr.State == stateUnhealthy {
+			return stateUnhealthy
+		}
+	}
+	return stateHealthy
+}
+
+func (pm *probeManager) buildStatus(state string, now *metav1.Time, targetResults []microshiftv1alpha1.TargetResult) microshiftv1alpha1.RemoteClusterStatus {
+	status := microshiftv1alpha1.RemoteClusterStatus{
+		State:         state,
+		LastProbeTime: now,
+		TargetResults: targetResults,
+	}
+
+	for _, tr := range targetResults {
+		if tr.Error != "" {
+			status.Errors = append(status.Errors, fmt.Sprintf("%s: %s", tr.Target, tr.Error))
+		} else {
+			status.LastSuccessfulProbe = now
+		}
+	}
+
+	return status
 }
 
 func doProbe(ctx context.Context, client *http.Client, url string) (time.Duration, error) {
@@ -239,12 +285,25 @@ func (pm *probeManager) updateStatus(ctx context.Context, name string, status mi
 			return fmt.Errorf("failed to get RemoteCluster %q: %w", name, err)
 		}
 
-		// Preserve LastSuccessfulProbe & Latency from the existing status if this probe failed
+		// Preserve LastSuccessfulProbe from the existing status if no target succeeded this tick
 		if rc.Status.LastSuccessfulProbe != nil && status.LastSuccessfulProbe == nil {
 			status.LastSuccessfulProbe = rc.Status.LastSuccessfulProbe
 		}
-		if rc.Status.Latency != nil && status.Latency == nil {
-			status.Latency = rc.Status.Latency
+
+		// Preserve per-target latency from the existing CR when the in-memory
+		// window is empty (e.g., after pod restart before samples accumulate).
+		if len(rc.Status.TargetResults) > 0 {
+			existing := make(map[string]*microshiftv1alpha1.LatencyStats, len(rc.Status.TargetResults))
+			for i := range rc.Status.TargetResults {
+				if rc.Status.TargetResults[i].Latency != nil {
+					existing[rc.Status.TargetResults[i].Target] = rc.Status.TargetResults[i].Latency
+				}
+			}
+			for i := range status.TargetResults {
+				if status.TargetResults[i].Latency == nil {
+					status.TargetResults[i].Latency = existing[status.TargetResults[i].Target]
+				}
+			}
 		}
 
 		rc.Status = status

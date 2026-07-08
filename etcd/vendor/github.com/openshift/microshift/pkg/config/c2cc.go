@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"sort"
 	"strings"
 	"time"
 
@@ -68,8 +69,9 @@ type C2CC struct {
 }
 
 type RemoteCluster struct {
-	// IP address of the remote cluster's node, used as next-hop for routing.
-	NextHop string `json:"nextHop"`
+	// IP addresses of the remote cluster's node, used as next-hop for routing.
+	// At most one IPv4 and one IPv6 address. Dual-stack clusters need both.
+	NextHop []string `json:"nextHop"`
 	// Pod CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
 	ClusterNetwork []string `json:"clusterNetwork"`
 	// Service CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
@@ -81,12 +83,43 @@ type RemoteCluster struct {
 }
 
 type ResolvedRemoteCluster struct {
-	NextHop        net.IP
+	NextHops       map[int]net.IP // key: netlink.FAMILY_V4 or netlink.FAMILY_V6
 	ClusterNetwork []*net.IPNet
 	ServiceNetwork []*net.IPNet
 	Domain         string
-	DNSIP          string // 10th IP of ServiceNetwork[0], computed during validation when Domain is set
-	ProbeIP        string // 11th IP of ServiceNetwork[0], deterministic probe service ClusterIP
+	DNSIPs         []string       // 10th IP of each ServiceNetwork entry (one per address family)
+	ProbeIPs       map[int]string // 11th IP of each ServiceNetwork entry, keyed by family
+}
+
+func (rc *ResolvedRemoteCluster) NextHopForFamily(family int) (net.IP, bool) {
+	ip, ok := rc.NextHops[family]
+	return ip, ok
+}
+
+func (rc *ResolvedRemoteCluster) PrimaryNextHop() net.IP {
+	// Prefer IPv4 when available (matching OVN-K's IPv4-first ordering convention),
+	// fallback to IPv6 for IPv6-only clusters.
+	if ip, ok := rc.NextHops[netlink.FAMILY_V4]; ok {
+		return ip
+	}
+	if ip, ok := rc.NextHops[netlink.FAMILY_V6]; ok {
+		return ip
+	}
+	return nil
+}
+
+func ipFamilyOfIPNet(ipNet *net.IPNet) int {
+	if ipNet.IP.To4() != nil {
+		return netlink.FAMILY_V4
+	}
+	return netlink.FAMILY_V6
+}
+
+func familyName(family int) string {
+	if family == netlink.FAMILY_V4 {
+		return "IPv4"
+	}
+	return "IPv6"
 }
 
 func (rc *ResolvedRemoteCluster) AllCIDRs() []*net.IPNet {
@@ -114,7 +147,7 @@ func (c *C2CC) AllRemoteCIDRStrings() []string {
 }
 
 func (rc *RemoteCluster) isEmpty() bool {
-	return rc.NextHop == "" && len(rc.ClusterNetwork) == 0 && len(rc.ServiceNetwork) == 0 && rc.Domain == ""
+	return len(rc.NextHop) == 0 && len(rc.ClusterNetwork) == 0 && len(rc.ServiceNetwork) == 0 && rc.Domain == ""
 }
 
 func (c *C2CC) stripEmptyRemoteClusters() {
@@ -155,11 +188,26 @@ func (c *C2CC) parseRemoteClusters() ([]ResolvedRemoteCluster, []error) {
 		rc := &c.RemoteClusters[i]
 		label := fmt.Sprintf("remoteClusters[%d]", i)
 
-		ip := net.ParseIP(rc.NextHop)
-		if ip == nil {
-			errs = append(errs, fmt.Errorf("%s.nextHop %q is not a valid IP address", label, rc.NextHop))
+		if len(rc.NextHop) == 0 {
+			errs = append(errs, fmt.Errorf("%s.nextHop must not be empty", label))
 		}
-		resolved[i].NextHop = ip
+		resolved[i].NextHops = make(map[int]net.IP, len(rc.NextHop))
+		for j, hopStr := range rc.NextHop {
+			ip := net.ParseIP(hopStr)
+			if ip == nil {
+				errs = append(errs, fmt.Errorf("%s.nextHop[%d] %q is not a valid IP address", label, j, hopStr))
+				continue
+			}
+			family := netlink.FAMILY_V4
+			if ip.To4() == nil {
+				family = netlink.FAMILY_V6
+			}
+			if _, dup := resolved[i].NextHops[family]; dup {
+				errs = append(errs, fmt.Errorf("%s.nextHop has multiple %s addresses (max 1 per family)", label, familyName(family)))
+				continue
+			}
+			resolved[i].NextHops[family] = ip
+		}
 
 		if len(rc.ClusterNetwork) == 0 {
 			errs = append(errs, fmt.Errorf("%s.clusterNetwork must not be empty", label))
@@ -181,13 +229,16 @@ func (c *C2CC) parseRemoteClusters() ([]ResolvedRemoteCluster, []error) {
 
 		resolved[i].Domain = rc.Domain
 
-		if len(resolved[i].ServiceNetwork) > 0 {
-			probeIP, err := cidr.Host(resolved[i].ServiceNetwork[0], 11)
+		// Compute probe IP for each service network (one per address family)
+		resolved[i].ProbeIPs = make(map[int]string, len(resolved[i].ServiceNetwork))
+		for j, svcNet := range resolved[i].ServiceNetwork {
+			probeIP, err := cidr.Host(svcNet, 11)
 			if err != nil {
-				errs = append(errs, fmt.Errorf("%s: failed to compute probe IP from serviceNetwork[0]: %w", label, err))
-			} else {
-				resolved[i].ProbeIP = probeIP.String()
+				errs = append(errs, fmt.Errorf("%s: failed to compute probe IP from serviceNetwork[%d]: %w", label, j, err))
+				continue
 			}
+			family := ipFamilyOfIPNet(svcNet)
+			resolved[i].ProbeIPs[family] = probeIP.String()
 		}
 	}
 
@@ -359,14 +410,16 @@ func validateRemoteCluster(
 	label := fmt.Sprintf("remoteClusters[%d]", i)
 	var errs []error
 
-	normalizedNextHop := res.NextHop.String()
-	if res.NextHop.Equal(nodeIP) || (nodeIPv6 != nil && res.NextHop.Equal(nodeIPv6)) {
-		errs = append(errs, fmt.Errorf("%s.nextHop %q must not equal the local node IP (routing loop)", label, normalizedNextHop))
-	}
-	if prev, ok := seenNextHops[normalizedNextHop]; ok {
-		errs = append(errs, fmt.Errorf("%s.nextHop %q duplicates remoteClusters[%d]", label, normalizedNextHop, prev))
-	} else {
-		seenNextHops[normalizedNextHop] = i
+	for _, hop := range res.NextHops {
+		normalized := hop.String()
+		if hop.Equal(nodeIP) || (nodeIPv6 != nil && hop.Equal(nodeIPv6)) {
+			errs = append(errs, fmt.Errorf("%s.nextHop %q must not equal the local node IP (routing loop)", label, normalized))
+		}
+		if prev, ok := seenNextHops[normalized]; ok {
+			errs = append(errs, fmt.Errorf("%s.nextHop %q duplicates remoteClusters[%d]", label, normalized, prev))
+		} else {
+			seenNextHops[normalized] = i
+		}
 	}
 
 	for j, cidrNet := range res.ClusterNetwork {
@@ -393,12 +446,19 @@ func validateRemoteCluster(
 	}
 
 	if rc.Domain != "" && len(rc.ServiceNetwork) > 0 {
-		dnsIP, err := getClusterDNS(rc.ServiceNetwork[0])
-		if err != nil {
-			errs = append(errs, fmt.Errorf("%s: failed to compute DNS IP from serviceNetwork[0] %q: %w", label, rc.ServiceNetwork[0], err))
-		} else {
-			res.DNSIP = dnsIP
+		for i, svcNetStr := range rc.ServiceNetwork {
+			dnsIP, err := getClusterDNS(svcNetStr)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("%s: failed to compute DNS IP from serviceNetwork[%d] %q: %w", label, i, svcNetStr, err))
+			} else {
+				res.DNSIPs = append(res.DNSIPs, dnsIP)
+			}
 		}
+		// Ensure IPv4 DNS IPs come first to match OVN-K's IPv4-first convention.
+		// CoreDNS forward plugin tries upstreams in listed order.
+		sort.Slice(res.DNSIPs, func(i, j int) bool {
+			return net.ParseIP(res.DNSIPs[i]).To4() != nil && net.ParseIP(res.DNSIPs[j]).To4() == nil
+		})
 	}
 
 	errs = append(errs, validateIPFamilyConsistencyNets(res.ClusterNetwork, label+".clusterNetwork")...)
@@ -406,6 +466,7 @@ func validateRemoteCluster(
 	errs = append(errs, validateNetworkShapeNets(res.ClusterNetwork, res.ServiceNetwork, label)...)
 	errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, res.ClusterNetwork, label)...)
 	errs = append(errs, validateRemoteIPFamilyCompatibility(localV4, localV6, res.ServiceNetwork, label)...)
+	errs = append(errs, validateNextHopCoverage(res.NextHops, res.ClusterNetwork, res.ServiceNetwork, label)...)
 
 	return errs
 }
@@ -462,6 +523,23 @@ func validateRemoteIPFamilyCompatibility(localV4, localV6 bool, remoteCIDRs []*n
 	return errs
 }
 
+func validateNextHopCoverage(nextHops map[int]net.IP, clusterNetwork, serviceNetwork []*net.IPNet, label string) []error {
+	needed := make(map[int]bool)
+	for _, cidr := range clusterNetwork {
+		needed[ipFamilyOfIPNet(cidr)] = true
+	}
+	for _, cidr := range serviceNetwork {
+		needed[ipFamilyOfIPNet(cidr)] = true
+	}
+	var errs []error
+	for family := range needed {
+		if _, ok := nextHops[family]; !ok {
+			errs = append(errs, fmt.Errorf("%s has %s CIDRs but no %s nextHop", label, familyName(family), familyName(family)))
+		}
+	}
+	return errs
+}
+
 func checkCIDRConflicts(cidr *net.IPNet, cidrStr, label string, seenCIDRs []labeledCIDR, hostIPs []net.IP) []error {
 	var errs []error
 	for _, existing := range seenCIDRs {
@@ -488,7 +566,7 @@ func RenderC2CCDNSBlocks(resolved []ResolvedRemoteCluster, cacheTTL, cacheNegati
 		if rc.Domain == "" {
 			continue
 		}
-		blocks = append(blocks, formatDNSBlock(rc.Domain, rc.DNSIP, cacheTTL, cacheNegativeTTL))
+		blocks = append(blocks, formatDNSBlock(rc.Domain, rc.DNSIPs, cacheTTL, cacheNegativeTTL))
 	}
 	if len(blocks) == 0 {
 		return ""
@@ -496,7 +574,7 @@ func RenderC2CCDNSBlocks(resolved []ResolvedRemoteCluster, cacheTTL, cacheNegati
 	return "\n" + strings.Join(blocks, "\n")
 }
 
-func formatDNSBlock(domain, dnsIP string, cacheTTL, cacheNegativeTTL int) string {
+func formatDNSBlock(domain string, dnsIPs []string, cacheTTL, cacheNegativeTTL int) string {
 	return fmt.Sprintf(`    %s:5353 {
         bufsize 1232
         errors
@@ -508,5 +586,5 @@ func formatDNSBlock(domain, dnsIP string, cacheTTL, cacheNegativeTTL int) string
         cache %d {
             denial 9984 %d
         }
-    }`, domain, domain, dnsIP, cacheTTL, cacheNegativeTTL)
+    }`, domain, domain, strings.Join(dnsIPs, " "), cacheTTL, cacheNegativeTTL)
 }

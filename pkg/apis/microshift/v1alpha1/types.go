@@ -22,9 +22,10 @@ type RemoteCluster struct {
 }
 
 type RemoteClusterSpec struct {
-	// IP:port of the remote cluster's probe service (11th IP in remote service CIDR, port 8080).
-	// +kubebuilder:validation:Required
-	ProbeTarget string `json:"probeTarget"`
+	// IP:port targets to probe (one per address family, max 2).
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=2
+	ProbeTargets []string `json:"probeTargets"`
 
 	// Interval between probe attempts (e.g. "10s", "1m").
 	// +kubebuilder:default="10s"
@@ -42,9 +43,10 @@ type RemoteClusterStatus struct {
 	LastProbeTime *metav1.Time `json:"lastProbeTime,omitempty"`
 	// +optional
 	Errors []string `json:"errors,omitempty"`
-	// Latency statistics from recent probes (rolling window of 20 samples).
+	// Per-target probe results (one entry per ProbeTargets element).
+	// Each entry includes target-specific state and latency statistics.
 	// +optional
-	Latency *LatencyStats `json:"latency,omitempty"`
+	TargetResults []TargetResult `json:"targetResults,omitempty"`
 }
 
 // LatencyStats contains latency statistics computed from a rolling window of probe samples.
@@ -55,6 +57,17 @@ type LatencyStats struct {
 	Max    metav1.Duration `json:"max"`
 	Last   metav1.Duration `json:"last"`
 	Stddev metav1.Duration `json:"stddev"`
+}
+
+// TargetResult contains the probe result for a single target.
+type TargetResult struct {
+	Target string `json:"target"`
+	// +kubebuilder:validation:Enum=Healthy;Unhealthy
+	State string `json:"state"`
+	// +optional
+	Error string `json:"error,omitempty"`
+	// +optional
+	Latency *LatencyStats `json:"latency,omitempty"`
 }
 
 // +kubebuilder:object:root=true
