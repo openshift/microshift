@@ -160,17 +160,6 @@ check_umask_and_permissions
 enable_rt_repositories          "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
 enable_beta_or_eus_repositories "${VERSION_ID}" "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json"
 
-# Create the RHEL 9.8 composer configuration from the host OS template when
-# the host is not yet running RHEL 9.8, so osbuild-composer can build 9.8 images.
-if [[ "${VERSION_ID}" != "9.8" ]]; then
-    sudo cp "/etc/osbuild-composer/repositories/rhel-${VERSION_ID}.json" \
-            "/etc/osbuild-composer/repositories/rhel-9.8.json"
-    sudo sed -i "s|/${VERSION_ID}/|/9.8/|g" "/etc/osbuild-composer/repositories/rhel-9.8.json"
-    # Disable GPG check for 9.8 repos — the RHEL 9.6 host's rpmkeys cannot
-    # handle RHEL 9.8's post-quantum key 4 until the host is upgraded.
-    sudo sed -i 's/"check_gpg": true/"check_gpg": false/g' "/etc/osbuild-composer/repositories/rhel-9.8.json"
-fi
-
 # This step must come in the end to make sure all the potential configuration
 # changes are picked up by the service
 enable_or_restart_composer_services
