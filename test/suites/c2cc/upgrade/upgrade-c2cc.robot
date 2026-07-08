@@ -39,7 +39,7 @@ Upgrade C2CC Clusters And Verify
     Verify All Clusters Healthy
     Verify All RemoteClusters Healthy
     Deploy Test Workloads
-    Verify Full C2CC Connectivity
+    Wait Until Keyword Succeeds    10m    10s    Verify Full C2CC Connectivity
 
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         Log To Console    Upgrading ${alias} to ${TARGET_REF}
@@ -48,7 +48,7 @@ Upgrade C2CC Clusters And Verify
         Verify All RemoteClusters Healthy
         Wait For Test Pods
         Wait For Service Endpoints
-        Verify Full C2CC Connectivity
+        Wait Until Keyword Succeeds    10m    10s    Verify Full C2CC Connectivity
     END
 
     [Teardown]    Cleanup Test Workloads

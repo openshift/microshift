@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation       Verify C2CC controller sets up all networking infrastructure correctly.
 ...                 Checks Linux routes, IP rules, nftables bypass, OVN static routes,
-...                 and node annotations on both clusters.
+...                 and node annotations on all clusters.
 
 Resource            ../../../resources/microshift-process.resource
 Resource            ../../../resources/kubeconfig.resource
