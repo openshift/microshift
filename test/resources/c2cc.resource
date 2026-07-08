@@ -728,17 +728,13 @@ C2CC Suite Setup
     Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG}
     Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
     Register Remote Cluster    cluster-c    ${HOST3_IP}    ${HOST3_SSH_PORT}    ${KUBECONFIG_C}
-    IF    ${deploy_workloads}
-        Deploy Test Workloads
-    END
+    IF    ${deploy_workloads}    Deploy Test Workloads
 
 C2CC Suite Teardown
     [Documentation]    Standard suite teardown: optionally cleans up workloads,
     ...    tears down remote clusters, and removes kubeconfig.
     [Arguments]    ${cleanup_workloads}=${FALSE}
-    IF    ${cleanup_workloads}
-        Cleanup Test Workloads
-    END
+    IF    ${cleanup_workloads}    Cleanup Test Workloads
     Teardown All Remote Clusters
     Remove Kubeconfig
 

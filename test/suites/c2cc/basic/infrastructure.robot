@@ -182,5 +182,3 @@ Dual Stack Node Annotation Set
     Verify Node SNAT Annotation    cluster-b    ${CLUSTER_C_POD_CIDR_DUAL}    ${CLUSTER_C_SVC_CIDR_DUAL}
     Verify Node SNAT Annotation    cluster-c    ${CLUSTER_A_POD_CIDR_DUAL}    ${CLUSTER_A_SVC_CIDR_DUAL}
     Verify Node SNAT Annotation    cluster-c    ${CLUSTER_B_POD_CIDR_DUAL}    ${CLUSTER_B_SVC_CIDR_DUAL}
-
-

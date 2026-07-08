@@ -78,5 +78,3 @@ Verify Dual Stack Cross Cluster Source IP Preservation
     Verify Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-a    service
     Verify Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-b    pod
     Verify Dual Stack Source IP Preserved Between Clusters    cluster-c    cluster-b    service
-
-

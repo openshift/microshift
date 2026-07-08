@@ -45,5 +45,3 @@ Verify Remote Service Reachable Via DNS
     cluster-b    cluster-c
     cluster-c    cluster-a
     cluster-c    cluster-b
-
-

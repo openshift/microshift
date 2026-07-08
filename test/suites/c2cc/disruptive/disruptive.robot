@@ -130,4 +130,3 @@ Restore NICs And Reconnect
         Enable All NICs For VM    ${vm_name}    ${DISABLED_IFACES}
         Reconnect To Cluster    ${alias}    ${host_ip}    ${ssh_port}    ${kubeconfig}
     END
-
