@@ -132,7 +132,10 @@ Setup
     Setup Kubeconfig
 
 Teardown
-    [Documentation]    Test suite teardown
+    [Documentation]    Restart MicroShift to restore clean state after the last test
+    ...    (per-test teardowns skip the restart), then clean up.
+    Remove Drop In MicroShift Config    ${DNS_DROPIN}
+    Restart MicroShift
     Remove Kubeconfig
     Logout MicroShift Host
 
@@ -169,20 +172,20 @@ DNS Resource Value Should Match Empty
 Apply DNS Resource Config
     [Documentation]    Remove any existing drop-in, apply a new DNS resource config and restart MicroShift
     [Arguments]    ${config}
-    Remove DNS Resource Config
+    Remove Drop In MicroShift Config    ${DNS_DROPIN}
     Drop In MicroShift Config    ${config}    ${DNS_DROPIN}
     Restart MicroShift
 
 Apply Invalid DNS Resource Config
     [Documentation]    Apply an invalid DNS resource config that should prevent MicroShift from starting
     [Arguments]    ${config}
-    Remove DNS Resource Config
+    Remove Drop In MicroShift Config    ${DNS_DROPIN}
     Drop In MicroShift Config    ${config}    ${DNS_DROPIN}
     ${cursor}=    Get Journal Cursor
     VAR    ${CURSOR}=    ${cursor}    scope=TEST
     Run Keyword And Expect Error    0 != 1    Restart MicroShift
 
 Remove DNS Resource Config
-    [Documentation]    Remove the DNS resource drop-in config and restart MicroShift
+    [Documentation]    Remove the DNS resource drop-in config without restarting.
+    ...    The next test's setup will restart MicroShift.
     Remove Drop In MicroShift Config    ${DNS_DROPIN}
-    Restart MicroShift
