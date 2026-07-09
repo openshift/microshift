@@ -161,6 +161,21 @@ Named VolumeSnapshot Should Be Deleted
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} volumesnapshot/${name}    --for=Delete --timeout=${timeout}
 
+No Topolvm LogicalVolumes Should Exist
+    [Documentation]    Wait until all topolvm LogicalVolumes are deleted.
+    ...    ${timeout}    Period of time to wait for all LogicalVolumes to be removed.
+    [Arguments]    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
+    Wait Until Keyword Succeeds    ${timeout}    5s
+    ...    Verify No LogicalVolumes Exist
+
+Verify No LogicalVolumes Exist
+    [Documentation]    Assert that no topolvm LogicalVolumes currently exist.
+    ${output}    ${rc}=    Run With Kubeconfig
+    ...    oc get logicalvolumes.topolvm.io -o name --no-headers
+    ...    allow_fail=${TRUE}
+    ...    return_rc=${TRUE}
+    Should Be Empty    ${output}
+
 Oc Create
     [Documentation]    Run 'oc create' on a specific resource in the current test namespace
     ...    Returns the combined STDOUT/STDERR output of the command.
