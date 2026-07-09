@@ -187,12 +187,13 @@ $ sudo tcpdump -ni enp1s0 -c 10 esp
 
 The `failureshunt=drop` and `negotiationshunt=drop` options prevent plaintext fallback, but they are enforced by Libreswan itself — they offer no protection if the IPsec service is stopped or a connection definition is removed.
 For defense in depth, add kernel-level nftables rules that drop any traffic reaching local pod or service CIDRs without IPsec protection (requires kernel 5.10+ for the `meta ipsec missing` match).
+The rules must be attached to the `forward` hook: inbound cross-cluster packets are not addressed to the host itself but forwarded by the host into the OVN network, so an `input`-hook chain would never see them.
 
 On **Host A**:
 
 ```bash
 sudo nft add table inet c2cc_ipsec
-sudo nft 'add chain inet c2cc_ipsec enforce { type filter hook input priority -150; policy accept; }'
+sudo nft 'add chain inet c2cc_ipsec enforce { type filter hook forward priority -150; policy accept; }'
 sudo nft add rule inet c2cc_ipsec enforce ip daddr 10.42.0.0/16 meta ipsec missing counter drop
 sudo nft add rule inet c2cc_ipsec enforce ip daddr 10.43.0.0/16 meta ipsec missing counter drop
 ```
@@ -206,7 +207,7 @@ The `counter` keyword lets you watch the drop count — it should stay at zero w
 $ sudo nft list table inet c2cc_ipsec
 table inet c2cc_ipsec {
 	chain enforce {
-		type filter hook input priority -150; policy accept;
+		type filter hook forward priority -150; policy accept;
 		ip daddr 10.42.0.0/16 meta ipsec missing counter packets 0 bytes 0 drop
 		ip daddr 10.43.0.0/16 meta ipsec missing counter packets 0 bytes 0 drop
 	}

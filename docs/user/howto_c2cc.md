@@ -424,9 +424,11 @@ Remember to remove the remote CIDRs from the firewall trusted zone as well.
   (or spoof) the configured next-hop IP can inject traffic into the
   cluster, and because SNAT is bypassed, that traffic can carry an
   attacker-chosen source IP that matches NetworkPolicy allow rules. Use
-  [IPsec](./howto_c2cc_ipsec.md) for production deployments — it provides
-  both encryption and mutual authentication, and rejects unauthenticated
-  hosts (including host-originated traffic to pods) at the network layer.
+  [IPsec](./howto_c2cc_ipsec.md) together with the nftables enforcement
+  described there for production deployments — that combination provides
+  encryption and mutual authentication, and drops unauthenticated traffic
+  (including host-originated traffic to pods) at the network layer even
+  when the IPsec service itself is stopped or misconfigured.
 - **NetworkPolicies are your responsibility.** C2CC does not create
   NetworkPolicy resources. Namespaces with default-deny ingress must
   explicitly allow the remote pod CIDRs (`ipBlock` selectors work, since

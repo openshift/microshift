@@ -96,10 +96,13 @@ Add NFTables IPsec Enforcement Rules
     ...    Uses 'meta ipsec missing' match (kernel 5.10+) to detect unencrypted packets.
     ...    In tunnel mode, decrypted packets have pod/service CIDRs as dst — plaintext
     ...    packets arriving without ESP are caught by this rule.
+    ...    The chain hooks into forward: inbound cross-cluster packets are not addressed
+    ...    to the host but forwarded into the OVN network (local gateway mode), so an
+    ...    input-hook chain would never see them.
     [Arguments]    ${alias}    ${local_pod_cidr}
     Command On Cluster    ${alias}    nft add table inet c2cc_ipsec_test
     Command On Cluster    ${alias}
-    ...    nft 'add chain inet c2cc_ipsec_test enforce { type filter hook input priority -150; policy accept; }'
+    ...    nft 'add chain inet c2cc_ipsec_test enforce { type filter hook forward priority -150; policy accept; }'
     Command On Cluster    ${alias}
     ...    nft add rule inet c2cc_ipsec_test enforce ip daddr ${local_pod_cidr} meta ipsec missing counter drop
 
