@@ -4,26 +4,24 @@ Documentation       Disruptive/resilience tests for C2CC.
 ...                 NIC outage), waits for recovery, and verifies that C2CC
 ...                 infrastructure and cross-cluster connectivity are restored.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
-Suite Setup         Setup
-Suite Teardown      Teardown
+Suite Setup         C2CC Suite Setup    deploy_workloads=${TRUE}
+Suite Teardown      C2CC Suite Teardown    cleanup_workloads=${TRUE}
 
 Test Tags           disruptive
 
 
 *** Variables ***
-${RECOVERY_TIMEOUT}         5m
-${RECOVERY_RETRY}           15s
-${INFRA_VERIFY_TIMEOUT}     3m
-${INFRA_VERIFY_RETRY}       10s
-${HOST2_VM_NAME}            ${EMPTY}
-${HOST3_VM_NAME}            ${EMPTY}
-${DISABLED_VM}              ${EMPTY}
-@{DISABLED_IFACES}          @{EMPTY}
+${RECOVERY_TIMEOUT}     5m
+${RECOVERY_RETRY}       15s
+${HOST2_VM_NAME}        ${EMPTY}
+${HOST3_VM_NAME}        ${EMPTY}
+${DISABLED_VM}          ${EMPTY}
+@{DISABLED_IFACES}      @{EMPTY}
 
 
 *** Test Cases ***
@@ -121,22 +119,8 @@ Recovery After NM Restart On One Cluster And MicroShift Restart On Another Clust
 *** Keywords ***
 Verify All Clusters Are Healthy
     [Documentation]    Wait for each cluster's healthcheck, then verify full C2CC recovery.
-    FOR    ${cluster}    IN    @{ALL_CLUSTERS}
-        Wait Until Keyword Succeeds    ${RECOVERY_TIMEOUT}    ${RECOVERY_RETRY}
-        ...    Verify Cluster Is Healthy    ${cluster}
-    END
-    Verify Full Recovery On All Clusters
-
-Verify Full Recovery On All Clusters
-    [Documentation]    Wait for RemoteCluster CRs to converge, verify C2CC infrastructure
-    ...    on all clusters, then verify cross-cluster connectivity and DNS.
-    Verify All RemoteClusters Healthy
-    FOR    ${cluster}    IN    @{ALL_CLUSTERS}
-        Wait Until Keyword Succeeds    ${INFRA_VERIFY_TIMEOUT}    ${INFRA_VERIFY_RETRY}
-        ...    Verify C2CC Infrastructure On Cluster    ${cluster}
-    END
-    Verify Cross Cluster Connectivity
-    Verify Cross Cluster DNS
+    Verify All Clusters Healthy    timeout=${RECOVERY_TIMEOUT}    retry=${RECOVERY_RETRY}
+    Verify Full C2CC Stack
 
 Restore NICs And Reconnect
     [Documentation]    Re-enable NICs if they were left disabled by a failed NIC-outage test.
@@ -146,14 +130,3 @@ Restore NICs And Reconnect
         Enable All NICs For VM    ${vm_name}    ${DISABLED_IFACES}
         Reconnect To Cluster    ${alias}    ${host_ip}    ${ssh_port}    ${kubeconfig}
     END
-
-Setup
-    [Documentation]    Set up clusters and deploy test workloads.
-    Check Required Env Variables
-    Register All C2CC Clusters
-    Deploy Test Workloads
-
-Teardown
-    [Documentation]    Remove test workloads and close connections.
-    Cleanup Test Workloads
-    Teardown All Remote Clusters

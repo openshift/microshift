@@ -7,13 +7,13 @@ Documentation       IPsec E2E tests for C2CC.
 ...                 source IP preservation, policy enforcement (SA flush/restore),
 ...                 plaintext rejection, host-to-pod rejection, and MTU validation.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
-Resource            ../../resources/ipsec.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
+Resource            ../../../resources/ipsec.resource
 
-Suite Setup         Setup
+Suite Setup         C2CC Suite Setup    deploy_workloads=${TRUE}
 Suite Teardown      Teardown
 
 Test Tags           c2cc    ipsec
@@ -45,7 +45,7 @@ ESP Encapsulation On Wire
 Cross Cluster Connectivity Through IPsec
     [Documentation]    Verify pods on all clusters can reach pods/services on all
     ...    other clusters through the IPsec tunnel.
-    [Template]    Test Connectivity Between Clusters
+    [Template]    Verify Connectivity Between Clusters
     cluster-a    cluster-b    pod
     cluster-a    cluster-b    service
     cluster-a    cluster-c    pod
@@ -62,7 +62,7 @@ Cross Cluster Connectivity Through IPsec
 Source IP Preserved Through IPsec
     [Documentation]    Verify cross-cluster traffic through IPsec preserves the
     ...    source pod IP (no SNAT).
-    [Template]    Test Source IP Preserved Between Clusters
+    [Template]    Verify Source IP Preserved Between Clusters
     cluster-a    cluster-b    pod
     cluster-a    cluster-b    service
     cluster-a    cluster-c    pod
@@ -106,7 +106,7 @@ Near MTU Packet Through IPsec Tunnel
 Cross Cluster DNS Through IPsec
     [Documentation]    Verify pods can resolve and reach services on remote
     ...    clusters via DNS name through the IPsec tunnel.
-    [Template]    Curl Remote Service Via DNS
+    [Template]    Verify Remote Service Via DNS
     cluster-a    cluster-b
     cluster-a    cluster-c
     cluster-b    cluster-a
@@ -138,17 +138,10 @@ IPsec Tunnel Recovers After Remote Stop Start
 
 
 *** Keywords ***
-Setup
-    [Documentation]    Register all clusters, verify IPsec tunnels, deploy test workloads.
-    Check Required Env Variables
-    Register All C2CC Clusters
-    Deploy Test Workloads
-
 Teardown
-    [Documentation]    Remove test workloads, ensure IPsec is running, close connections.
-    Cleanup Test Workloads
+    [Documentation]    Ensure IPsec is running, then remove test workloads and close connections.
     Ensure IPsec Running On All Clusters
-    Teardown All Remote Clusters
+    C2CC Suite Teardown    cleanup_workloads=${TRUE}
 
 Ensure IPsec Running On All Clusters
     [Documentation]    Make sure ipsec service is running on all clusters.

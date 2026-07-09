@@ -3,10 +3,10 @@ Documentation       Verify C2CC cleanup when the feature is disabled.
 ...                 Removes the C2CC config drop-in on Cluster A, restarts MicroShift,
 ...                 and verifies all C2CC networking state has been cleaned up.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -142,14 +142,13 @@ C2CC Controller Logged Cleanup
 *** Keywords ***
 Setup
     [Documentation]    Register clusters, then disable C2CC on Cluster A and wait for restart.
-    Check Required Env Variables
-    Register All C2CC Clusters
+    C2CC Suite Setup
     Disable C2CC On Cluster    cluster-a
 
 Teardown
     [Documentation]    Re-enable C2CC on Cluster A, then close connections.
     Enable C2CC On Cluster    cluster-a
-    Teardown All Remote Clusters
+    C2CC Suite Teardown
 
 Disable C2CC On Cluster
     [Documentation]    Move the C2CC config drop-in aside and restart MicroShift.

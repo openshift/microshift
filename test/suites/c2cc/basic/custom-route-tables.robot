@@ -10,10 +10,10 @@ Documentation       Verify C2CC respects custom routing table IDs from configura
 ...                 table IDs while C2CC is enabled results in duplicated rules in both
 ...                 old and new tables. The old tables are only cleaned up by rebooting.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -75,9 +75,7 @@ Old Default Tables Are Not Cleaned Up
 *** Keywords ***
 Setup
     [Documentation]    Register clusters, apply custom routing drop-in, restart MicroShift.
-    Check Required Env Variables
-    Register Remote Cluster    cluster-a    ${USHIFT_HOST}    ${SSH_PORT}    ${KUBECONFIG_A}
-    Register Remote Cluster    cluster-b    ${HOST2_IP}    ${HOST2_SSH_PORT}    ${KUBECONFIG_B}
+    C2CC Suite Setup
     Apply Custom Routing Config
     Restart And Wait For Healthy
 
@@ -86,7 +84,7 @@ Teardown
     Remove Custom Routing Config
     Restart And Wait For Healthy
     Flush Custom Tables
-    Teardown All Remote Clusters
+    C2CC Suite Teardown
 
 Apply Custom Routing Config
     [Documentation]    Write a drop-in that overrides routing table IDs.

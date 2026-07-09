@@ -3,13 +3,13 @@ Documentation       Verify C2CC RemoteCluster CRD and CR lifecycle.
 ...                 Checks that the CRD is registered, CRs are created per remote cluster,
 ...                 and CR specs match the expected probe targets.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
-Suite Setup         Setup
-Suite Teardown      Teardown
+Suite Setup         C2CC Suite Setup
+Suite Teardown      C2CC Suite Teardown
 
 Test Tags           c2cc
 
@@ -58,15 +58,6 @@ Correct Dual Stack RemoteCluster CR Spec
 
 
 *** Keywords ***
-Setup
-    [Documentation]    Set up SSH connections and kubeconfigs for all clusters.
-    Check Required Env Variables
-    Register All C2CC Clusters
-
-Teardown
-    [Documentation]    Close all connections and clean up kubeconfigs.
-    Teardown All Remote Clusters
-
 Wait For RemoteCluster CRD
     [Documentation]    Waits for remoteclusters.microshift.io CRD to be registered.
     [Arguments]    ${alias}

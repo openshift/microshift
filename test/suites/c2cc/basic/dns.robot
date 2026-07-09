@@ -4,19 +4,19 @@ Documentation       Cross-cluster DNS tests for C2CC.
 ...                 DNS resolution works across clusters, and service access via
 ...                 DNS names works end-to-end.
 
-Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/kubeconfig.resource
-Resource            ../../resources/oc.resource
-Resource            ../../resources/c2cc.resource
+Resource            ../../../resources/microshift-process.resource
+Resource            ../../../resources/kubeconfig.resource
+Resource            ../../../resources/oc.resource
+Resource            ../../../resources/c2cc.resource
 
-Suite Setup         Setup
-Suite Teardown      Teardown
+Suite Setup         C2CC Suite Setup    deploy_workloads=${TRUE}
+Suite Teardown      C2CC Suite Teardown    cleanup_workloads=${TRUE}
 
 Test Tags           c2cc
 
 
 *** Test Cases ***
-Test Corefile Contains C2CC Server Block
+Verify Corefile Contains C2CC Server Block
     [Documentation]    Verify every cluster's Corefile has a server block for every other cluster domain.
     [Template]    Verify Corefile Contains C2CC Server Block
     cluster-a    ${CLUSTER_B_DOMAIN}
@@ -26,9 +26,9 @@ Test Corefile Contains C2CC Server Block
     cluster-c    ${CLUSTER_A_DOMAIN}
     cluster-c    ${CLUSTER_B_DOMAIN}
 
-Test Resolve Remote Service DNS
+Verify Resolve Remote Service DNS
     [Documentation]    Verify pods can resolve a service on all clusters via DNS.
-    [Template]    DNS Resolve From Cluster
+    [Template]    Verify DNS Resolution From Cluster
     cluster-a    hello-microshift.${NAMESPACES}[cluster-b].svc.${DOMAIN_MAP}[cluster-b]
     cluster-a    hello-microshift.${NAMESPACES}[cluster-c].svc.${DOMAIN_MAP}[cluster-c]
     cluster-b    hello-microshift.${NAMESPACES}[cluster-a].svc.${DOMAIN_MAP}[cluster-a]
@@ -36,25 +36,12 @@ Test Resolve Remote Service DNS
     cluster-c    hello-microshift.${NAMESPACES}[cluster-a].svc.${DOMAIN_MAP}[cluster-a]
     cluster-c    hello-microshift.${NAMESPACES}[cluster-b].svc.${DOMAIN_MAP}[cluster-b]
 
-Test Curl Remote Service Via DNS
+Verify Remote Service Reachable Via DNS
     [Documentation]    Verify pod on a cluster can reach a service on all clusters using the remote DNS name.
-    [Template]    Curl Remote Service Via DNS
+    [Template]    Verify Remote Service Via DNS
     cluster-a    cluster-b
     cluster-a    cluster-c
     cluster-b    cluster-a
     cluster-b    cluster-c
     cluster-c    cluster-a
     cluster-c    cluster-b
-
-
-*** Keywords ***
-Setup
-    [Documentation]    Set up clusters and deploy test workloads on all.
-    Check Required Env Variables
-    Register All C2CC Clusters
-    Deploy Test Workloads
-
-Teardown
-    [Documentation]    Remove test workloads and close connections.
-    Cleanup Test Workloads
-    Teardown All Remote Clusters

@@ -39,5 +39,5 @@ scenario_run_tests() {
     configure_c2cc_hosts
     # IP_FAMILY=ipv6 so IP_CMD defaults to 'ip -6' for primary (IPv6) CIDRs.
     # Dual-stack (IPv4) tests derive ip_cmd from CIDR content via IP Command For CIDR.
-    c2cc_run_tests "suites/c2cc/" "2001:db8::/64" ipv6
+    c2cc_run_tests "suites/c2cc/basic/" "2001:db8::/64" ipv6
 }
