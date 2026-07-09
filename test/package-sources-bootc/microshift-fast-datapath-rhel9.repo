@@ -9,3 +9,7 @@ sslcacert = /etc/rhsm/ca/redhat-uep.pem
 sslclientkey = {{ .Env.SSL_CLIENT_KEY_FILE }}
 sslclientcert = {{ .Env.SSL_CLIENT_CERT_FILE }}
 skip_if_unavailable = 0
+# FDP ships tuned packages whose version can beat the OS-provided ones.
+# If el9 tuned profile RPM is installed on el10,
+# it won't work because of change in TuneD search paths.
+excludepkgs = tuned*
