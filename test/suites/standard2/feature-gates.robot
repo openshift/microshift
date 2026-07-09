@@ -84,9 +84,13 @@ Setup
     Setup Kubeconfig    # for readiness checks
 
 Teardown
-    [Documentation]    Test suite teardown
-    Logout MicroShift Host
+    [Documentation]    Start MicroShift to restore clean state after the last test
+    ...    (per-test teardowns leave MicroShift stopped), then clean up.
+    Remove Drop In MicroShift Config    10-featuregates
+    Remove Feature Gate Lock File If Exists
+    Restart MicroShift
     Remove Kubeconfig
+    Logout MicroShift Host
 
 Save Journal Cursor
     [Documentation]
@@ -105,11 +109,11 @@ Setup Custom Feature Gates Test
     Feature Gate Lock File Should Exist
 
 Teardown Custom Feature Gates Test
-    [Documentation]    Remove custom feature gates config and restart MicroShift
+    [Documentation]    Remove custom feature gates config without restarting.
+    ...    The next test's setup will start MicroShift.
     Stop MicroShift
     Remove Drop In MicroShift Config    10-featuregates
     Remove Feature Gate Lock File If Exists
-    Start MicroShift
 
 Remove Feature Gate Lock File If Exists
     [Documentation]    Remove the feature gate lock file if it exists, for test cleanup
