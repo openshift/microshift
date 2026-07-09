@@ -110,10 +110,14 @@ Setup
     Setup Kubeconfig
 
 Teardown
-    [Documentation]    Test suite teardown
+    [Documentation]    Restart MicroShift to restore clean state after the last test
+    ...    (per-test teardowns skip the restart), then clean up.
+    Remove Drop In MicroShift Config    10-telemetry
+    Restore Pull Secrets
+    Restart MicroShift
     Wait For MicroShift Healthcheck Success
-    Logout MicroShift Host
     Remove Kubeconfig
+    Logout MicroShift Host
 
 Check Required Telemetry Variables
     [Documentation]    Check if the required telemetry variables are set
@@ -140,10 +144,9 @@ Setup Telemetry Configuration
 
 Remove Telemetry Configuration
     [Documentation]    Removes the telemetry feature from MicroShift configuration file
-    ...    and restarts microshift.service
+    ...    without restarting. The next test's setup will restart MicroShift.
     Remove Drop In MicroShift Config    10-telemetry
     Restore Pull Secrets
-    Restart MicroShift
 
 Configure Pull Secrets
     [Documentation]    Sets up the pull secrets for the MicroShift cluster.
