@@ -44,48 +44,15 @@ func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- st
 	defer close(stopped)
 	defer close(ready)
 
-	if err := applyDefaultRBACs(ctx, s.cfg); err != nil {
-		klog.Errorf("%s unable to apply default RBACs: %v", s.Name(), err)
-		return err
-	}
-
 	priorityClasses := []string{"core/priority-class-openshift-user-critical.yaml"}
 	if err := assets.ApplyPriorityClasses(ctx, priorityClasses, s.cfg.KubeConfigPath(config.KubeAdmin)); err != nil {
 		klog.Errorf("%s unable to apply PriorityClasses: %v", s.Name(), err)
 		return err
 	}
 
-	// TO-DO add readiness check
 	if err := components.StartComponents(s.cfg, ctx); err != nil {
 		return err
 	}
 	klog.Infof("%s launched ocp componets", s.Name())
 	return ctx.Err()
-}
-
-func applyDefaultRBACs(ctx context.Context, cfg *config.Config) error {
-	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
-	var (
-		cr = []string{
-			"controllers/kube-controller-manager/csr_approver_clusterrole.yaml",
-			"controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrole.yaml",
-			"controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrole.yaml",
-			"controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrole.yaml",
-		}
-		crb = []string{
-			"controllers/kube-controller-manager/csr_approver_clusterrolebinding.yaml",
-			"controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrolebinding.yaml",
-			"controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml",
-			"controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrolebinding.yaml",
-		}
-	)
-	if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {
-		klog.Warningf("failed to apply cluster roles %v", err)
-		return err
-	}
-	if err := assets.ApplyClusterRoleBindings(ctx, crb, kubeconfigPath); err != nil {
-		klog.Warningf("failed to apply cluster roles %v", err)
-		return err
-	}
-	return nil
 }
