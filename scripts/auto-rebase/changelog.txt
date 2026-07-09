@@ -1,9 +1,8 @@
-- kubernetes embedded-component a674efabac8b5044e6256ce4e2385914be215376 to 63adf010aa20e104c0b7043b47f42f50c9f72b17
-  - a95a1c954 2026-06-05T17:14:15+05:30 UPSTREAM: 138358: Update github.com/moby/spdystream from v0.5.0 to v0.5.1 for CVE-2026-35469
+- machine-config-operator embedded-component db6eb19fbdb721937f9fdc72d0ff55344c08508f to c660c90115ce8334f3c4365b2fb4e5a3c954a94e
+  - 384c0661 2026-07-01T19:39:39+00:00 chore: update AMIs
+  - 55860315 2026-07-01T15:12:31+00:00 Remove verbose ignition config logging from bootstrap MCS
+  - 9a234076 2026-07-01T12:33:22+00:00 tests: update custom containerfile OCB test to work in disconnected environments
 
-- kubernetes image-amd64 a674efabac8b5044e6256ce4e2385914be215376 to 63adf010aa20e104c0b7043b47f42f50c9f72b17
-  - a95a1c954 2026-06-05T17:14:15+05:30 UPSTREAM: 138358: Update github.com/moby/spdystream from v0.5.0 to v0.5.1 for CVE-2026-35469
-
-- kubernetes image-arm64 a674efabac8b5044e6256ce4e2385914be215376 to 63adf010aa20e104c0b7043b47f42f50c9f72b17
-  - a95a1c954 2026-06-05T17:14:15+05:30 UPSTREAM: 138358: Update github.com/moby/spdystream from v0.5.0 to v0.5.1 for CVE-2026-35469
+- router image-arm64 0b3d3db1b41dde99861efcd35b4ea4f5ee0d360f to 2ea2a16ff8a5f25e4212bee0a5206dc8aa697534
+  - e6744e3 2026-06-18T14:43:18+05:30 OCPBUGS-86716: Strip X-SSL-Client-* headers for plain HTTP
 
