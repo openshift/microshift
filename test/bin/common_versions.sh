@@ -130,7 +130,7 @@ RHOCP_MINOR_Y=""
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. If the mirror for current minor is not
 # available yet, it should point to an older release.
-RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/dependencies/rpms/4.22-el9-beta"
+RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/dependencies/rpms/5.0-el9-beta"
 export RHOCP_MAJOR_Y
 export RHOCP_MINOR_Y
 export RHOCP_MINOR_Y_BETA
