@@ -65,7 +65,9 @@ Invalid Audit Profile Prevents Startup
     Stop MicroShift
     Command Should Fail    timeout 30 systemctl start microshift
 
-    [Teardown]    Remove Drop In MicroShift Config    10-audit
+    [Teardown]    Run Keywords
+    ...    Remove Drop In MicroShift Config    10-audit
+    ...    AND    Restart MicroShift
 
 Invalid Audit Rotation Values Prevent Startup
     [Documentation]    Non-integer rotation parameters should prevent MicroShift from starting.
@@ -73,7 +75,9 @@ Invalid Audit Rotation Values Prevent Startup
     Stop MicroShift
     Command Should Fail    timeout 30 systemctl start microshift
 
-    [Teardown]    Remove Drop In MicroShift Config    10-audit
+    [Teardown]    Run Keywords
+    ...    Remove Drop In MicroShift Config    10-audit
+    ...    AND    Restart MicroShift
 
 Audit Profile None Produces No Logs
     [Documentation]    With profile None, no audit entries should be written.

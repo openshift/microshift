@@ -66,7 +66,7 @@ ${DNS_LIMIT_LESS_THAN_REQUEST}      SEPARATOR=\n
 *** Test Cases ***
 Default DNS Resources
     [Documentation]    Verify default DNS resources when no custom config is applied
-    [Setup]    Remove DNS Resource Config
+    [Setup]    Run Keywords    Remove DNS Resource Config    AND    Restart MicroShift
     DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.cpu    50m
     DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.memory    70Mi
 
@@ -107,13 +107,13 @@ Invalid Resource Quantity Prevents Start
     [Documentation]    Verify MicroShift fails to start with invalid resource quantity
     [Setup]    Apply Invalid DNS Resource Config    ${DNS_INVALID_QUANTITY}
     Pattern Should Appear In Log Output    ${CURSOR}    invalid dns resource request
-    [Teardown]    Remove DNS Resource Config
+    [Teardown]    Run Keywords    Remove DNS Resource Config    AND    Restart MicroShift
 
 Limit Less Than Request Prevents Start
     [Documentation]    Verify MicroShift fails to start when limit is less than request
     [Setup]    Apply Invalid DNS Resource Config    ${DNS_LIMIT_LESS_THAN_REQUEST}
     Pattern Should Appear In Log Output    ${CURSOR}    must be greater than or equal to request
-    [Teardown]    Remove DNS Resource Config
+    [Teardown]    Run Keywords    Remove DNS Resource Config    AND    Restart MicroShift
 
 DNS Resolution After Resource Change
     [Documentation]    Verify CoreDNS resolves cluster-local services after resource change
@@ -180,6 +180,7 @@ Apply Invalid DNS Resource Config
     [Documentation]    Apply an invalid DNS resource config that should prevent MicroShift from starting
     [Arguments]    ${config}
     Remove Drop In MicroShift Config    ${DNS_DROPIN}
+    Restart MicroShift
     Drop In MicroShift Config    ${config}    ${DNS_DROPIN}
     ${cursor}=    Get Journal Cursor
     VAR    ${CURSOR}=    ${cursor}    scope=TEST
