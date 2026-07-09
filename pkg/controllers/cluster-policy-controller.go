@@ -22,6 +22,7 @@ import (
 	clusterpolicycontroller "github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller"
 	"github.com/openshift/library-go/pkg/controller/controllercmd"
 	"github.com/openshift/library-go/pkg/operator/events"
+	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	corev1 "k8s.io/api/core/v1"
 	unstructuredv1 "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -32,6 +33,7 @@ import (
 
 type ClusterPolicyController struct {
 	run        func(context.Context) error
+	applyRBAC  func(context.Context) error
 	kubeconfig string
 
 	configErr error
@@ -45,11 +47,31 @@ func NewClusterPolicyController(cfg *config.Config) *ClusterPolicyController {
 
 func (s *ClusterPolicyController) Name() string { return "cluster-policy-controller" }
 func (s *ClusterPolicyController) Dependencies() []string {
-	return []string{"kube-apiserver", "infrastructure-services-manager"}
+	return []string{"kube-apiserver"}
 }
 
 func (s *ClusterPolicyController) configure(cfg *config.Config) error {
 	s.kubeconfig = cfg.KubeConfigPath(config.ClusterPolicyController)
+	s.applyRBAC = func(ctx context.Context) error {
+		kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
+		cr := []string{
+			"controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrole.yaml",
+			"controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrole.yaml",
+			"controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrole.yaml",
+		}
+		crb := []string{
+			"controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrolebinding.yaml",
+			"controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml",
+			"controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrolebinding.yaml",
+		}
+		if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {
+			return fmt.Errorf("failed to apply cluster-policy-controller RBAC: %w", err)
+		}
+		if err := assets.ApplyClusterRoleBindings(ctx, crb, kubeconfigPath); err != nil {
+			return fmt.Errorf("failed to apply cluster-policy-controller RBAC: %w", err)
+		}
+		return nil
+	}
 
 	scheme := runtime.NewScheme()
 	if err := openshiftcontrolplanev1.AddToScheme(scheme); err != nil {
@@ -101,6 +123,10 @@ func (s *ClusterPolicyController) Run(ctx context.Context, ready chan<- struct{}
 		return fmt.Errorf("configuration failed: %w", s.configErr)
 	}
 
-	close(ready) // todo
+	if err := s.applyRBAC(ctx); err != nil {
+		return err
+	}
+
+	close(ready)
 	return s.run(ctx)
 }
