@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"sort"
 	"strings"
 	"time"
 
@@ -454,11 +453,6 @@ func validateRemoteCluster(
 				res.DNSIPs = append(res.DNSIPs, dnsIP)
 			}
 		}
-		// Ensure IPv4 DNS IPs come first to match OVN-K's IPv4-first convention.
-		// CoreDNS forward plugin tries upstreams in listed order.
-		sort.Slice(res.DNSIPs, func(i, j int) bool {
-			return net.ParseIP(res.DNSIPs[i]).To4() != nil && net.ParseIP(res.DNSIPs[j]).To4() == nil
-		})
 	}
 
 	errs = append(errs, validateIPFamilyConsistencyNets(res.ClusterNetwork, label+".clusterNetwork")...)
