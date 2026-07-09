@@ -15,7 +15,12 @@ COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo /etc/yum.repos.d/
 
 # Install the test agent and cleanup
-RUN dnf install -y microshift-test-agent pcp pcp-zeroconf && \
+#
+# TODO: Remove kernel-modules-extra when OVN-Kubernetes completes its nftables
+# migration (OCPBUGS-98161). CentOS 10 moved legacy iptables kernel modules
+# (xt_CT, xt_comment, iptable_raw, ip_tables) to this package, and OVN-K
+# still depends on them.
+RUN dnf install -y kernel-modules-extra microshift-test-agent pcp pcp-zeroconf && \
     systemctl enable microshift-test-agent pmcd pmlogger && \
     rm -vf /etc/yum.repos.d/microshift-*.repo && \
     rm -rvf $USHIFT_RPM_REPO_PATH && \
