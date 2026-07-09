@@ -37,3 +37,4 @@ Test Case Teardown
     [Documentation]    Clean up test suite resources
     Oc Delete    -f ${SOURCE_POD} -n ${NAMESPACE}
     Remove Namespace    ${NAMESPACE}
+    No Topolvm LogicalVolumes Should Exist
