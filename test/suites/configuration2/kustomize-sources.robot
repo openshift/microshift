@@ -91,7 +91,6 @@ Multiple Kustomize Paths
     ...    AND    Remove Manifest Directory    ${MANIFEST_DIR_2}
     ...    AND    Oc Delete    namespace ksrc-multi-ns-1 --ignore-not-found
     ...    AND    Oc Delete    namespace ksrc-multi-ns-2 --ignore-not-found
-    ...    AND    Restart MicroShift
 
 Path Without Kustomization File Is Ignored
     [Documentation]    A path that exists but has no kustomization.yaml should be silently ignored.
@@ -103,7 +102,6 @@ Path Without Kustomization File Is Ignored
     [Teardown]    Run Keywords
     ...    Remove Drop In MicroShift Config    10-kustomize
     ...    AND    Remove Manifest Directory    ${MANIFEST_DIR_1}
-    ...    AND    Restart MicroShift
 
 Non Existent Path Is Ignored
     [Documentation]    A non-existent path in kustomizePaths should be silently ignored.
@@ -111,9 +109,7 @@ Non Existent Path Is Ignored
 
     Restart MicroShift
 
-    [Teardown]    Run Keywords
-    ...    Remove Drop In MicroShift Config    10-kustomize
-    ...    AND    Restart MicroShift
+    [Teardown]    Remove Drop In MicroShift Config    10-kustomize
 
 Unset Kustomize Paths Uses Defaults
     [Documentation]    Setting kustomizePaths to null should result in the default paths.
@@ -146,7 +142,6 @@ Glob Patterns In Kustomize Paths
     ...    AND    Remove Manifest Directory    ${GLOB_BASE}
     ...    AND    Oc Delete    namespace ksrc-glob-ns-a --ignore-not-found
     ...    AND    Oc Delete    namespace ksrc-glob-ns-b --ignore-not-found
-    ...    AND    Restart MicroShift
 
 
 *** Keywords ***
@@ -157,15 +152,18 @@ Setup
     Setup Kubeconfig
 
 Teardown
-    [Documentation]    Test suite teardown
-    Logout MicroShift Host
+    [Documentation]    Restart MicroShift to restore clean state after the last test
+    ...    (per-test teardowns skip the restart), then clean up.
+    Remove Drop In MicroShift Config    10-kustomize
+    Restart MicroShift
     Remove Kubeconfig
+    Logout MicroShift Host
 
 Cleanup Kustomize Test
-    [Documentation]    Standard cleanup for a single-path kustomize test
+    [Documentation]    Standard cleanup for a single-path kustomize test without restarting.
+    ...    The next test's setup will restart MicroShift.
     [Arguments]    ${namespace}    ${manifest_dir}
     Run Keywords
     ...    Remove Drop In MicroShift Config    10-kustomize
     ...    AND    Remove Manifest Directory    ${manifest_dir}
     ...    AND    Oc Delete    namespace ${namespace} --ignore-not-found
-    ...    AND    Restart MicroShift
