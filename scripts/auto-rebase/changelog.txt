@@ -1,19 +1,7 @@
-- cluster-ingress-operator embedded-component 006a3edb4eec250bc414da316d912fc5231d195b to e40a071867464abf192020eb0354a84436ce04e7
-  - 0631003 2026-07-02T19:04:32-04:00 Remove SetImageDefaults that overrode CSV image SHAs
-  - 610d7e7 2026-07-02T19:04:31-04:00 NE-2519: Move Sail Library to official release branch
-  - 2e7573c 2026-07-02T19:04:31-04:00 fix(log): Add INFO logs alongside event recorder calls
-  - 1a9786b 2026-07-02T19:04:31-04:00 OCPBUGS-79467: Change default log level from DEBUG to INFO
-  - 3bb7c8d 2026-07-02T19:04:31-04:00 NE-2471: Add downstream image defaults for main OSSM branch
-  - 17878a9 2026-07-02T19:04:31-04:00 NE-2471: E2E Tests for Gateway API with Sail Library
-  - cdf6f94 2026-07-02T19:04:31-04:00 NE-2471: Separate Sail Library RBAC permissions into dedicated ClusterRole
-  - f35800a 2026-07-02T19:04:31-04:00 NE-2471: Clean up and improve Sail Library integration
-  - 6d852f2 2026-07-02T19:04:31-04:00 NE-2471: Improve Sail Library integration with notification channel
-  - 1a3f21c 2026-07-02T19:04:31-04:00 NE-2471: Add migration from OLM to Sail Library
-  - 4e9c395 2026-07-02T19:04:28-04:00 NE-2471: Add Istio Install via Sail Library
-  - 77e1cb1 2026-07-02T17:12:38-04:00 NE-2471: Vendor openshift/api with GatewayAPIWithoutOLM feature gate
-  - a9429d5 2026-06-29T21:06:20Z address comments
-  - 4297f42 2026-06-29T21:06:20Z NE-2376: Remove restriction of unmanaged x-k8s.io
-
-- machine-config-operator embedded-component eb72ebdbfd7d0b7da2de9499661fc006828e5193 to b65072348db26e02bbc27f3db64f62053fa63ee5
-  - bb2259d5 2026-07-01T19:38:56Z chore: update AMIs
+- kubernetes image-arm64 690775342de24ee56631e38e3f17592b14a6b202 to 2df3632e823a813f64218dfc6f5c2e70d28ecdf0
+  - 507a37b60 2026-06-29T17:19:02Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - c029d48d2 2026-06-11T16:59:07Z Release commit for Kubernetes v1.33.13
+  - a5e33bdfe 2026-06-09T15:20:21+02:00 Bump images and versions to go 1.25.11 and distroless iptables
+  - 2d5d3f0a2 2026-05-21T13:45:59-07:00 fix(endpoint): avoid panic on services with empty IPFamilies
+  - 024e61db8 2026-05-12T09:55:21Z Update CHANGELOG/CHANGELOG-1.33.md for v1.33.12
 
