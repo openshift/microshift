@@ -1,3 +1,3 @@
-- cluster-network-operator embedded-component ba7a5ec20d3b4cb620bae7bfa1363e34b9048563 to dc98c59e223f325acb113a697771e737266876a5
-  - 92c457e 2026-05-29T10:16:39-04:00 Fix: whereabouts-token-watcher DaemonSet improvements
+- router image-arm64 cbd6d0481c2ddb72901fdbfb3c3d87a2867b1e2b to 61ef15ff311cbc9f18f503f76edfb651a288291e
+  - eba53ed 2026-06-29T23:16:23+05:30 OCPBUGS-86714: Strip X-SSL-Client-* headers for plain HTTP
 
