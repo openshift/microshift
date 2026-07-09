@@ -11,7 +11,7 @@ Resource            ../../../resources/c2cc.resource
 Suite Setup         Setup
 Suite Teardown      Teardown
 
-Test Tags           c2cc
+Test Tags           c2cc    basic
 
 
 *** Variables ***

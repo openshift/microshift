@@ -12,7 +12,7 @@ Library             SSHLibrary
 Suite Setup         Setup
 Suite Teardown      Teardown
 
-Test Tags           c2cc    ostree
+Test Tags           c2cc    ostree    upgrade
 
 
 *** Variables ***

@@ -10,7 +10,7 @@ Resource            ../../../resources/c2cc.resource
 Suite Setup         Setup
 Suite Teardown      Teardown
 
-Test Tags           disruptive
+Test Tags           c2cc    disruptive
 
 
 *** Test Cases ***

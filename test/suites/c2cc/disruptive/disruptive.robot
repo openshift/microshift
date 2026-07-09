@@ -12,7 +12,7 @@ Resource            ../../../resources/c2cc.resource
 Suite Setup         C2CC Suite Setup    deploy_workloads=${TRUE}
 Suite Teardown      C2CC Suite Teardown    cleanup_workloads=${TRUE}
 
-Test Tags           disruptive
+Test Tags           c2cc    disruptive
 
 
 *** Variables ***

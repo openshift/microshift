@@ -16,5 +16,5 @@ scenario_remove_vms() {
 scenario_run_tests() {
     # shellcheck disable=SC2119
     configure_c2cc_hosts
-    c2cc_run_tests "suites/c2cc/basic/" "192.0.2.0/24"
+    c2cc_run_tests "suites/c2cc/" "192.0.2.0/24" "" "basic"
 }
