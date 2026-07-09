@@ -33,6 +33,7 @@ HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 BIB_IMAGE_RHEL9 = "registry.redhat.io/rhel9/bootc-image-builder:latest"
 BIB_IMAGE = "registry.redhat.io/rhel10/bootc-image-builder:latest"
+BIB_IMAGE_CENTOS = "quay.io/centos-bootc/bootc-image-builder:latest"
 IBC_IMAGE = "ghcr.io/osbuild/image-builder-cli:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
@@ -47,7 +48,7 @@ def cleanup_atexit(dry_run):
         common.terminate_process(pid)
 
     # Terminate running image builder containers
-    for builder_image in [BIB_IMAGE_RHEL9, BIB_IMAGE, IBC_IMAGE]:
+    for builder_image in [BIB_IMAGE_RHEL9, BIB_IMAGE, BIB_IMAGE_CENTOS, IBC_IMAGE]:
         podman_args = [
             "sudo", "podman", "ps",
             "--filter", f"ancestor={builder_image}",
@@ -355,9 +356,14 @@ def process_containerfile(groupdir, containerfile, dry_run):
         common.run_command(["sed", f"s/^/{cf_outname}: /", cf_logfile], dry_run)
 
 
-def get_bib_image(bootc_imgref):
-    if "rhel9" in bootc_imgref or "rhel-9" in bootc_imgref:
+def get_bib_image(img):
+    # CentOS Stream family
+    if any(x in img for x in ("stream9", "stream10", "cos9", "cos10")):
+        return BIB_IMAGE_CENTOS
+    # RHEL 9 family
+    if "rhel9" in img or "rhel-9" in img:
         return BIB_IMAGE_RHEL9
+    # Default to RHEL 10 family
     return BIB_IMAGE
 
 
