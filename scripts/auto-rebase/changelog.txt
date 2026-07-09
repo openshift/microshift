@@ -1,4 +1,37 @@
-- machine-config-operator embedded-component 3bbd3e775e85c571a91a6309267385525736f493 to b0e5302421b634a835a6b9642801a94a31963ccd
-  - ff9060bd 2026-07-01T19:38:13Z chore: update AMIs
-  - 5ac3d4f6 2026-06-30T13:05:42Z Fix kubelet certificate wait loop in criometricsproxy.yaml and update init container's volumeMount to /var/lib/kubelet
+- kubernetes embedded-component a8c502a90d898d46e989ddeb5f00b0f1a4f02298 to 72d01d1a9470f51f856b9b4b04e058e7645e4fb4
+  - 5e73cca32 2026-06-25T16:47:13Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - ad7c7374b 2026-06-11T17:37:08Z Release commit for Kubernetes v1.34.9
+  - 2a666d32a 2026-06-09T15:17:32+02:00 Bump images and versions to go 1.25.11 and distroless iptables
+  - 718d9e6d5 2026-06-02T23:20:40+08:00 kubeadm: fix dry-run CA copy paths in init certs
+  - b135fbae1 2026-05-21T13:38:07-07:00 fix(endpoint): avoid panic on services with empty IPFamilies
+  - 1b82d45b7 2026-05-21T15:13:13-05:00 fix(csi): preserve mount dir on NodePublish error during remount
+  - 58b007228 2026-05-21T15:10:35-05:00 feat(volume): add IsRemount to MounterArgs
+  - 1e8b97d19 2026-05-20T14:06:17-04:00 Restore ability to plumb binary data through envvar values
+  - 811df220e 2026-05-12T10:01:17Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.8
+
+- machine-config-operator embedded-component b0e5302421b634a835a6b9642801a94a31963ccd to 2a6f8182a071a30a1a55eb2616e1d0584c5a8ad0
+  - d3930f6f 2026-07-01T15:11:32Z Remove verbose ControllerConfig logging from bootstrap MCS
+  - 4b76446a 2026-06-23T22:28:42Z bootimage: make vsphere updates atomic
+
+- kubernetes image-amd64 a8c502a90d898d46e989ddeb5f00b0f1a4f02298 to 72d01d1a9470f51f856b9b4b04e058e7645e4fb4
+  - 5e73cca32 2026-06-25T16:47:13Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - ad7c7374b 2026-06-11T17:37:08Z Release commit for Kubernetes v1.34.9
+  - 2a666d32a 2026-06-09T15:17:32+02:00 Bump images and versions to go 1.25.11 and distroless iptables
+  - 718d9e6d5 2026-06-02T23:20:40+08:00 kubeadm: fix dry-run CA copy paths in init certs
+  - b135fbae1 2026-05-21T13:38:07-07:00 fix(endpoint): avoid panic on services with empty IPFamilies
+  - 1b82d45b7 2026-05-21T15:13:13-05:00 fix(csi): preserve mount dir on NodePublish error during remount
+  - 58b007228 2026-05-21T15:10:35-05:00 feat(volume): add IsRemount to MounterArgs
+  - 1e8b97d19 2026-05-20T14:06:17-04:00 Restore ability to plumb binary data through envvar values
+  - 811df220e 2026-05-12T10:01:17Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.8
+
+- kubernetes image-arm64 a8c502a90d898d46e989ddeb5f00b0f1a4f02298 to 72d01d1a9470f51f856b9b4b04e058e7645e4fb4
+  - 5e73cca32 2026-06-25T16:47:13Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - ad7c7374b 2026-06-11T17:37:08Z Release commit for Kubernetes v1.34.9
+  - 2a666d32a 2026-06-09T15:17:32+02:00 Bump images and versions to go 1.25.11 and distroless iptables
+  - 718d9e6d5 2026-06-02T23:20:40+08:00 kubeadm: fix dry-run CA copy paths in init certs
+  - b135fbae1 2026-05-21T13:38:07-07:00 fix(endpoint): avoid panic on services with empty IPFamilies
+  - 1b82d45b7 2026-05-21T15:13:13-05:00 fix(csi): preserve mount dir on NodePublish error during remount
+  - 58b007228 2026-05-21T15:10:35-05:00 feat(volume): add IsRemount to MounterArgs
+  - 1e8b97d19 2026-05-20T14:06:17-04:00 Restore ability to plumb binary data through envvar values
+  - 811df220e 2026-05-12T10:01:17Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.8
 
