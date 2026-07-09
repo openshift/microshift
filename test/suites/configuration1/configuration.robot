@@ -106,9 +106,7 @@ Deploy MicroShift With LVMS By Default
     [Setup]    Deploy Storage Config    ${LVMS_DEFAULT}
     LVMS Is Deployed
     CSI Snapshot Controller Is Deployed
-    [Teardown]    Run Keywords
-    ...    Remove Storage Drop In Config
-    ...    Restart MicroShift
+    [Teardown]    Remove Storage Drop In Config
 
 Deploy MicroShift Without LVMS
     [Documentation]    Verify that LVMS is not deployed when storage.driver == none, and that CSI snapshotting
@@ -119,9 +117,7 @@ Deploy MicroShift Without LVMS
     # Reduce the default timeout to 2 minutes for a quicker failure
     Run Keyword And Expect Error    1 != 0
     ...    LVMS Is Deployed    timeout=${DEFAULT_WAIT_TIMEOUT}
-    [Teardown]    Run Keywords
-    ...    Remove Storage Drop In Config
-    ...    Restart MicroShift
+    [Teardown]    Remove Storage Drop In Config
 
 Deploy MicroShift Without CSI Snapshotter
     [Documentation]    Verify that only LVMS is deployed when .storage.optionalCsiComponents is an empty array.
@@ -132,9 +128,7 @@ Deploy MicroShift Without CSI Snapshotter
     Run Keyword And Expect Error    1 != 0
     ...    CSI Snapshot Controller Is Deployed    timeout=${DEFAULT_WAIT_TIMEOUT}
 
-    [Teardown]    Run Keywords
-    ...    Remove Storage Drop In Config
-    ...    Restart MicroShift
+    [Teardown]    Remove Storage Drop In Config
 
 Crio Uses Crun Runtime
     [Documentation]    Verify that crio uses crun as its default runtime
@@ -163,12 +157,14 @@ Setup
     Save Journal Cursor
 
 Teardown
-    [Documentation]    Test suite teardown
+    [Documentation]    Restart MicroShift to restore clean state after the last test
+    ...    (per-test teardowns skip the restart), then clean up.
     Remove Drop In MicroShift Config    10-loglevel
     Remove Drop In MicroShift Config    10-audit
+    Remove Drop In MicroShift Config    10-storage
     Restart MicroShift
-    Logout MicroShift Host
     Remove Kubeconfig
+    Logout MicroShift Host
 
 Save Journal Cursor
     [Documentation]
