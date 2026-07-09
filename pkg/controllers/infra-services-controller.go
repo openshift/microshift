@@ -37,7 +37,7 @@ func NewInfrastructureServices(cfg *config.Config) *InfrastructureServicesManage
 
 func (s *InfrastructureServicesManager) Name() string { return "infrastructure-services-manager" }
 func (s *InfrastructureServicesManager) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-crd-manager", "route-controller-manager"}
+	return []string{"kube-apiserver", "cluster-policy-controller", "openshift-crd-manager", "route-controller-manager"}
 }
 
 func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
