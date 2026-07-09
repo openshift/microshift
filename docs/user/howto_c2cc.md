@@ -311,7 +311,7 @@ When a remote cluster has a `domain` configured, MicroShift's CoreDNS
 forwards queries for that domain to the remote cluster's DNS service.
 Any Service on the remote cluster is resolvable as:
 
-```
+```text
 <service>.<namespace>.svc.<domain>
 ```
 
@@ -445,9 +445,10 @@ Remember to remove the remote CIDRs from the firewall trusted zone as well.
   no encapsulation — it leaves the host as plain IP at the pod MTU.
   MicroShift defaults the pod MTU to the MTU of the physical interface;
   on jumbo-frame networks it can be set explicitly by creating
-  `/etc/microshift/ovn.yaml` with an `mtu:` value. When encrypting the
-  traffic with IPsec, leave headroom for the ESP overhead when sizing the
-  pod MTU; see the [IPsec guide](./howto_c2cc_ipsec.md).
+  `/etc/microshift/ovn.yaml` with an `mtu:` value (changing it requires a
+  node reboot to take effect). When encrypting the traffic with IPsec,
+  leave headroom for the ESP overhead when sizing the pod MTU; see the
+  [IPsec guide](./howto_c2cc_ipsec.md).
 - **Scale.** Configuration is static and full-mesh (each cluster lists
   every other cluster), so it does not scale to large fleets without
   external configuration automation. C2CC is validated with up to 3
