@@ -17,17 +17,24 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
 
 	openshiftcontrolplanev1 "github.com/openshift/api/openshiftcontrolplane/v1"
+	securityv1 "github.com/openshift/api/security/v1"
 	clusterpolicycontroller "github.com/openshift/cluster-policy-controller/pkg/cmd/cluster-policy-controller"
 	"github.com/openshift/library-go/pkg/controller/controllercmd"
 	"github.com/openshift/library-go/pkg/operator/events"
 	"github.com/openshift/microshift/pkg/assets"
 	"github.com/openshift/microshift/pkg/config"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	unstructuredv1 "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
+	klog "k8s.io/klog/v2"
 	"k8s.io/utils/clock"
 )
 
@@ -127,6 +134,40 @@ func (s *ClusterPolicyController) Run(ctx context.Context, ready chan<- struct{}
 		return err
 	}
 
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- s.run(ctx)
+	}()
+
+	if err := waitForNamespaceSecurityAllocation(ctx, s.kubeconfig); err != nil {
+		return err
+	}
+	klog.Infof("%s is ready", s.Name())
 	close(ready)
-	return s.run(ctx)
+
+	return <-errCh
+}
+
+// waitForNamespaceSecurityAllocation waits until the namespace-security-allocation-controller
+// has annotated the default namespace with the UID range annotation, proving it is running
+// and processing namespaces. This must happen before infrastructure-services-manager starts
+// creating deployments, because the SCC admission plugin blocks until these annotations exist.
+func waitForNamespaceSecurityAllocation(ctx context.Context, kubeconfigPath string) error {
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	if err != nil {
+		return fmt.Errorf("failed to build kubeconfig for readiness check: %w", err)
+	}
+	kubeClient, err := kubernetes.NewForConfig(restConfig)
+	if err != nil {
+		return fmt.Errorf("failed to create kube client for readiness check: %w", err)
+	}
+
+	return wait.PollUntilContextCancel(ctx, time.Second, true, func(ctx context.Context) (bool, error) {
+		ns, err := kubeClient.CoreV1().Namespaces().Get(ctx, "default", metav1.GetOptions{})
+		if err != nil {
+			return false, nil
+		}
+		_, ok := ns.Annotations[securityv1.UIDRangeAnnotation]
+		return ok, nil
+	})
 }
