@@ -1,6 +1,46 @@
-- oc image-arm64 a7ad57244d4327c77d0fa190bb6d215d2d5faa86 to 78b1fe82b2435d35d528fe795194f7fff941bbb2
-  - f15cc462 2026-07-07T14:55:28+02:00 CNTRLPLANE-3786: bump x/crypto to the latest version
+- api embedded-component 02e2c3de12fb849770deaa3ac9bb3b160a1cb4d8 to caa451755f91938514989d7dbcf80f81e927f9df
+  - 9d23c8b5 2026-07-02T11:48:12+05:30 Add TOMBSTONE for the field rename
+  - 97d16139 2026-06-26T18:43:04+05:30 Rename rotationPollIntervalSeconds to minimumRefreshAge
+
+- cluster-csi-snapshot-controller-operator embedded-component d7262f23f8c661ef6a215377b9571b615a1ae0b8 to ef7a4c8b7f5c5e6cba4486dcc37f50521e7bc655
+  - 9c26521 2026-06-11T15:37:03+02:00 STOR-2967: Update SnapshotMetadataService CRD asset from v1alpha1 to v1beta1
+
+- cluster-kube-apiserver-operator embedded-component 6b0696abb88d7e2f7a8275f831519234851121c0 to 168b9d142a1e9b1a5616a74742259ddacb5eb5c0
+  - df13cb3 2026-07-02T15:43:34+02:00 NO-JIRA: Automatic agentic rebase: Update library-go to fd74bb5
+
+- cluster-kube-controller-manager-operator embedded-component 8bef9812e7a3ec026397acd34633a7ecd479f357 to fe03a642284390a233f8b52cf885f667a6163f98
+  - 86b3e7a 2026-07-03T14:30:15+02:00 Add 10-minute degraded inertia for NodeControllerDegraded
+
+- cluster-kube-scheduler-operator embedded-component d43423b583269eea8236040424609c3f108ac9c4 to bb57dd7a1fa265950b9769aa0c036832a51791c7
+  - 7a1aa96 2026-07-03T14:30:15+02:00 Add 10-minute degraded inertia for NodeControllerDegraded
+
+- cluster-network-operator embedded-component 8f06c7ead50937cb25d0f829d2cff003eff12bb8 to 125f66d06478ad6874e0fe72c353af6999ecf69f
+  - d11954f 2026-07-02T18:31:33-04:00 Add OCP centralized TLS profile support
+  - 07ef4b3 2026-07-01T11:38:49-04:00 Refactor HyperShift config initialization to facilitate unit testing
+  - c222262 2026-06-15T13:35:05-04:00 OCPBUGS-87977: Bump github.com/containernetworking/cni v0.8.0 -> v1.3.0   Fixes CVE-2021-20206 (path traversal in CNI plugin FindInPath).   CNO only uses cnitypes.Route and cnitypes.DNS from pkg/types and   never calls the vulnerable functions, but the module is compiled   into the binary and scanners correctly flag it.
+
+- machine-config-operator embedded-component 28f12d28b9be52db0830b5d6ed0b6f141bbd2ae7 to 5dbdd0a3ee7cca9ec6a4f72c0c2139966e32dba3
+  - 8765d59f 2026-07-03T18:09:10+05:30 Add ValidatingAdmissionPolicy to block network policy updates
+  - 7041e266 2026-07-03T12:46:26+05:30 Skip no-op network policy applies using informer lister cache
+  - 8958ba9d 2026-07-02T09:39:36-04:00 manifests: inject proxy into mcc deployment
+  - f15385e8 2026-07-01T16:26:28+05:30 Fix MOSB failure: add allow-all-egress policy for builder pods
+  - 79e4d5f0 2026-06-29T20:29:53+05:30 Fix default-deny SSA ownership: use raw patch to bypass omitempty
+  - f5c41463 2026-06-22T13:16:33+05:30 Fix SSA field ownership: use explicit empty slices for default-deny
+  - a1341ccd 2026-06-22T13:07:43+05:30 Fix VAP self-block on MOB policy deletion and SSA field ownership gap
+  - a99acadd 2026-06-11T21:24:04+05:30 MCO-2153: Harden network policy e2e tests against silent regressions
+  - 7de6d83f 2026-06-11T16:42:37+05:30 MCO-2153: Add ValidatingAdmissionPolicy to block network policy deletion and e2e tests
+  - 7762f52f 2026-06-08T16:42:20+05:30 MCO-2153: Switch NetworkPolicy management to Server-Side Apply
+  - f4e3a6af 2026-06-08T13:06:02+05:30 MCO-2152: Move drift protection tests to MCO-2153 scope
+  - ee17801a 2026-06-06T14:24:37+05:30 Files Created: - manifests/networkpolicy/00-default-deny.yaml: Default deny-all policy   selecting all pods with no ingress/egress rules. - manifests/networkpolicy/01-allow-machine-config-operator.yaml: Allow   policy for MCO (egress all, ingress TCP 9001 metrics). - manifests/networkpolicy/02-allow-machine-config-controller.yaml: Allow   policy for MCC (egress all, ingress TCP 9001 metrics). - manifests/networkpolicy/03-allow-machine-os-builder.yaml: Conditional   allow policy for MOB (egress all, ingress TCP 9001 metrics). - pkg/operator/network_policy_test.go: Added 7 unit tests covering all   lifecycle scenarios.
+
+- operator-framework-olm embedded-component 834f3e052edb84e6f316563d9a6f23035c03945f to dfbca9456f355d9c0931c65f5d0c7c0a95609fec
+  - da1e3b9b 2026-07-03T00:03:32Z :seedling: Bump github.com/onsi/gomega from 1.42.0 to 1.42.1 (#3861)
+
+- oc image-amd64 a7ad57244d4327c77d0fa190bb6d215d2d5faa86 to 439aadae1b6322e322257bd13239e658fb9753b7
   - 86dfa4a9 2026-07-02T17:54:48-04:00 Fix the references of functions
   - 05c178ed 2026-06-29T09:59:57-04:00 Add test/e2e/admin/upgrade
   - 755f331f 2026-06-29T09:56:23-04:00 Move test/e2e/accept.go to its own folder
+
+- oc image-arm64 78b1fe82b2435d35d528fe795194f7fff941bbb2 to 0ec4cb02de4306d82fd4c2ec786184b6d993ba1b
+  - 926ebdc9 2026-07-08T04:11:58-04:00 Bump gitignore dependency
 
