@@ -1,0 +1,19 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ${HTTP01_CERT_NAME}
+  namespace: ${NAMESPACE}
+spec:
+  commonName: ${DNS_NAME}
+  dnsNames:
+  - ${DNS_NAME}
+  duration: 1h
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: ${HTTP01_ISSUER_NAME}
+  renewBefore: 58m
+  secretName: ${HTTP01_SECRET_NAME}
+  usages:
+  - server auth

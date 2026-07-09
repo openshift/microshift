@@ -23,35 +23,35 @@ Test Tags           cert-manager    certificates    tls
 
 
 *** Variables ***
-${CERT_NAME}                    test-certificate
-${SECRET_NAME}                  test-cert-secret
-${ISSUER_NAME}                  test-issuer
-${CERT_COMMON_NAME}             example.com
-${CERT_DNS_NAME}                example.com
-${ROUTE_NAME}                   hello-app
-${CERT_ISSUER_YAML}             SEPARATOR=\n
-...                             ---
-...                             apiVersion: cert-manager.io/v1
-...                             kind: ClusterIssuer
-...                             metadata:
-...                             \ \ name: ${ISSUER_NAME}
-...                             spec:
-...                             \ \ selfSigned: {}
+${CERT_NAME}                        test-certificate
+${SECRET_NAME}                      test-cert-secret
+${ISSUER_NAME}                      test-issuer
+${CERT_COMMON_NAME}                 example.com
+${CERT_DNS_NAME}                    example.com
+${ROUTE_NAME}                       hello-app
+${CLUSTER_ISSUER_TMPL}              ./assets/cert-manager/cluster-issuer.yaml.template
+${CERTIFICATE_TMPL}                 ./assets/cert-manager/certificate.yaml.template
+${INGRESS_RBAC_TMPL}                ./assets/cert-manager/ingress-rbac.yaml.template
+${INGRESS_ROUTE_TMPL}               ./assets/cert-manager/ingress-route.yaml.template
+${HTTP01_ISSUER_TMPL}               ./assets/cert-manager/http01-issuer.yaml.template
+${HTTP01_CERTIFICATE_TMPL}          ./assets/cert-manager/http01-certificate.yaml.template
+${TRUST_BUNDLE_SRC_SECRET_TMPL}     ./assets/cert-manager/trust-bundle-source-secret.yaml.template
+${CA_CERTIFICATE_TMPL}              ./assets/cert-manager/ca-certificate.yaml.template
+${TRUST_BUNDLE_SECRET_TMPL}         ./assets/cert-manager/trust-bundle-secret.yaml.template
 
-${HTTP01_ISSUER_NAME}           letsencrypt-http01
-${HTTP01_CERT_NAME}             cert-from-${HTTP01_ISSUER_NAME}
-${HTTP01_SECRET_NAME}           ${HTTP01_CERT_NAME}
-${PEBBLE_DEPLOYMENT_FILE}       ./assets/cert-manager/pebble-server.yaml
-${HOSTSFILE_ENABLED}            SEPARATOR=\n
-...                             ---
-...                             dns:
-...                             \ \ hosts:
-...                             \ \ \ \ status: Enabled
+${HTTP01_ISSUER_NAME}               letsencrypt-http01
+${HTTP01_CERT_NAME}                 cert-from-${HTTP01_ISSUER_NAME}
+${HTTP01_SECRET_NAME}               ${HTTP01_CERT_NAME}
+${PEBBLE_DEPLOYMENT_FILE}           ./assets/cert-manager/pebble-server.yaml
+${HOSTSFILE_ENABLED}                SEPARATOR=\n
+...                                 ---
+...                                 dns:
+...                                 \ \ hosts:
+...                                 \ \ \ \ status: Enabled
 
-${TRUST_MANAGER_BUNDLE_NAME}    test-trust-bundle
-${TRUST_MANAGER_OPERATOR_NS}    cert-manager-operator
-${TRUST_MANAGER_NS}             cert-manager
-${TRUST_MANAGER_CR_FILE}        ./assets/cert-manager/trust-manager-cr.yaml
+${TRUST_MANAGER_BUNDLE_NAME}        test-trust-bundle
+${TRUST_MANAGER_NS}                 cert-manager
+${TRUST_MANAGER_CR_FILE}            ./assets/cert-manager/trust-manager-cr.yaml
 
 
 *** Test Cases ***
@@ -59,19 +59,15 @@ Create Ingress route with Custom certificate
     [Documentation]    Create route with a custom certificate
     [Setup]    Run Keywords
     Verify Cert Manager Kustomization Success
-    ${cert_issuer_yaml}=    Create Cert Issuer YAML
-    Apply YAML Manifest    ${cert_issuer_yaml}
+    Apply Template    ${CLUSTER_ISSUER_TMPL}
     Oc Wait    -n ${NAMESPACE} clusterissuer ${ISSUER_NAME}
     ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
-    ${cert_yaml}=    Create Certificate YAML For Test
-    Apply YAML Manifest    ${cert_yaml}
+    Apply Template    ${CERTIFICATE_TMPL}
     Oc Wait    -n ${NAMESPACE} certificate ${CERT_NAME}
     ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
-    ${rbac_yaml}=    Create Ingress RBAC YAML
-    Apply YAML Manifest    ${rbac_yaml}
+    Apply Template    ${INGRESS_RBAC_TMPL}
     Deploy Hello MicroShift
-    ${route_yaml}=    Create Ingress Route YAML
-    Apply YAML Manifest    ${route_yaml}
+    Apply Template    ${INGRESS_ROUTE_TMPL}
     Oc Wait    -n ${NAMESPACE} route ${ROUTE_NAME}
     ...    --for=jsonpath='.status.ingress' --timeout=${DEFAULT_WAIT_TIMEOUT}
     [Teardown]    Run Keywords
@@ -82,32 +78,29 @@ Test Cert manager with local acme server
     [Tags]    http01    acme
     [Setup]    Setup Pebble Server    ${NAMESPACE}
 
-    ${dns_name}=    Generate Random HostName
-    Setup DNS For Test    ${USHIFT_HOST}    ${dns_name}
+    ${DNS_NAME}=    Generate Random HostName
+    VAR    ${DNS_NAME}=    ${DNS_NAME}    scope=TEST
+    Setup DNS For Test    ${USHIFT_HOST}    ${DNS_NAME}
     Oc Get JsonPath    ingressclass    ${EMPTY}    openshift-ingress    .metadata.name
-    ${http01_issuer_yaml}=    Create HTTP01 Issuer YAML
-    Apply YAML Manifest    ${http01_issuer_yaml}
+    Apply Template    ${HTTP01_ISSUER_TMPL}
     Oc Wait    -n ${NAMESPACE} issuer ${HTTP01_ISSUER_NAME}
     ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
 
-    ${cert_yaml}=    Create Certificate YAML    ${dns_name}
-    Apply YAML Manifest    ${cert_yaml}
+    Apply Template    ${HTTP01_CERTIFICATE_TMPL}
     Oc Wait    -n ${NAMESPACE} certificate ${HTTP01_CERT_NAME}    --for="condition=Ready" --timeout=300s
 
     Verify Certificate    ${HTTP01_CERT_NAME}    ${NAMESPACE}
 
     [Teardown]    Run Keywords
     ...    Cleanup HTTP01 Resources
-    ...    AND    Cleanup DNS For Test    ${dns_name}
+    ...    AND    Cleanup DNS For Test    ${DNS_NAME}
 
 Trust Manager Deployment
     [Documentation]    Verify trust-manager can be enabled and deploys successfully
     [Tags]    trust-manager
     [Setup]    Enable Trust Manager
-    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
-    ${status}=    Oc Get JsonPath    trustmanager    ${EMPTY}    cluster
-    ...    .status.conditions[?(@.type=="Ready")].status
-    Should Be Equal    ${status}    True    msg=TrustManager CR is not ready
+    Wait Until Keyword Succeeds    30x    10s
+    ...    TrustManager CR Should Be Ready
     [Teardown]    Disable Trust Manager
 
 Trust Manager Bundle Creates ConfigMap
@@ -116,8 +109,7 @@ Trust Manager Bundle Creates ConfigMap
     [Setup]    Enable Trust Manager
 
     Create CA Secret For Trust Manager
-    ${bundle_yaml}=    Create Trust Bundle From Source Secret YAML
-    Apply Trust Manager YAML    ${bundle_yaml}
+    Apply Template    ${TRUST_BUNDLE_SRC_SECRET_TMPL}
     Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
     ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
 
@@ -138,18 +130,15 @@ Trust Manager Bundle With Cert Manager CA
     [Tags]    trust-manager
     [Setup]    Enable Trust Manager
 
-    ${issuer_yaml}=    Create Cert Issuer YAML
-    Apply Trust Manager YAML    ${issuer_yaml}
+    Apply Template    ${CLUSTER_ISSUER_TMPL}
     Oc Wait    -n ${NAMESPACE} clusterissuer ${ISSUER_NAME}
     ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
 
-    ${ca_cert_yaml}=    Create CA Certificate YAML
-    Apply Trust Manager YAML    ${ca_cert_yaml}
+    Apply Template    ${CA_CERTIFICATE_TMPL}
     Oc Wait    -n ${TRUST_MANAGER_NS} certificate ca-certificate
     ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
 
-    ${bundle_yaml}=    Create Trust Bundle From Secret YAML
-    Apply Trust Manager YAML    ${bundle_yaml}
+    Apply Template    ${TRUST_BUNDLE_SECRET_TMPL}
     Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
     ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
 
@@ -162,7 +151,7 @@ Trust Manager Bundle With Cert Manager CA
 
     [Teardown]    Run Keywords
     ...    Cleanup Trust Bundle
-    ...    AND    Oc Delete    certificate/ca-certificate -n ${TRUST_MANAGER_NS}
+    ...    AND    Oc Delete    certificate/ca-certificate -n ${TRUST_MANAGER_NS} --ignore-not-found
     ...    AND    Remove ClusterIssuer
     ...    AND    Disable Trust Manager
 
@@ -188,16 +177,18 @@ Deploy Hello MicroShift
 
 Remove ClusterIssuer
     [Documentation]    Remove the cluster issuer
-    Oc Delete    clusterissuer/${ISSUER_NAME}
+    Oc Delete    clusterissuer/${ISSUER_NAME} --ignore-not-found
 
-Apply YAML Manifest
-    [Documentation]    Apply YAML manifest to the cluster
-    [Arguments]    ${yaml_content}
-    ${temp_file}=    Create Random Temp File    ${yaml_content}
-    ${result}=    Oc Apply    -f ${temp_file}
-    Remove File    ${temp_file}
-    Should Contain    ${result}    created    msg=Failed to apply YAML manifest
-    Log    Applied manifest: ${result}
+Apply Template
+    [Documentation]    Generate YAML from template and apply to cluster
+    [Arguments]    ${template_file}
+    ${tmp}=    Create Random Temp File
+    Generate File From Template    ${template_file}    ${tmp}
+    TRY
+        Oc Apply    -f ${tmp}
+    FINALLY
+        Remove File    ${tmp}
+    END
 
 Generate Random HostName
     [Documentation]    Generate Random Hostname
@@ -222,135 +213,6 @@ Check Pebble Deployment Ready
     [Arguments]    ${namespace}
     ${result}=    Oc Get JsonPath    deployment    ${namespace}    pebble    .status.readyReplicas
     Should Be Equal    ${result}    1    msg=Pebble deployment not ready yet
-
-Create Cert Issuer YAML
-    [Documentation]    Creates cluster issuer YAML
-    ${cert_issuer_yaml}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiVersion: cert-manager.io/v1
-    ...    kind: ClusterIssuer
-    ...    metadata:
-    ...    \ \ name: ${ISSUER_NAME}
-    ...    spec:
-    ...    \ \ selfSigned: {}
-    RETURN    ${cert_issuer_yaml}
-
-Create Certificate YAML For Test
-    [Documentation]    Creates certificate YAML for basic test
-    ${cert_yaml}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiVersion: cert-manager.io/v1
-    ...    kind: Certificate
-    ...    metadata:
-    ...    \ \ name: ${CERT_NAME}
-    ...    \ \ namespace: ${NAMESPACE}
-    ...    spec:
-    ...    \ \ secretName: ${SECRET_NAME}
-    ...    \ \ issuerRef:
-    ...    \ \ \ \ name: ${ISSUER_NAME}
-    ...    \ \ \ \ kind: ClusterIssuer
-    ...    \ \ commonName: ${CERT_COMMON_NAME}
-    ...    \ \ dnsNames:
-    ...    \ \ - ${CERT_DNS_NAME}
-    ...    \ \ - www.${CERT_DNS_NAME}
-    RETURN    ${cert_yaml}
-
-Create Ingress RBAC YAML
-    [Documentation]    Creates RBAC YAML for ingress
-    ${rbac_yaml}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiVersion: rbac.authorization.k8s.io/v1
-    ...    kind: Role
-    ...    metadata:
-    ...    \ \ name: secret-reader
-    ...    \ \ namespace: ${NAMESPACE}
-    ...    rules:
-    ...    - apiGroups: [""]
-    ...    \ \ resources: ["secrets"]
-    ...    \ \ resourceNames: ["${SECRET_NAME}"]
-    ...    \ \ verbs: ["get", "list", "watch"]
-    ...    ---
-    ...    apiVersion: rbac.authorization.k8s.io/v1
-    ...    kind: RoleBinding
-    ...    metadata:
-    ...    \ \ name: ingress-secret-reader
-    ...    \ \ namespace: ${NAMESPACE}
-    ...    roleRef:
-    ...    \ \ apiGroup: rbac.authorization.k8s.io
-    ...    \ \ kind: Role
-    ...    \ \ name: secret-reader
-    ...    subjects:
-    ...    - kind: ServiceAccount
-    ...    \ \ name: router
-    ...    \ \ namespace: openshift-ingress
-    RETURN    ${rbac_yaml}
-
-Create Ingress Route YAML
-    [Documentation]    Creates route YAML for ingress
-    ${route_yaml}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiVersion: route.openshift.io/v1
-    ...    kind: Route
-    ...    metadata:
-    ...    \ \ name: ${ROUTE_NAME}
-    ...    \ \ namespace: ${NAMESPACE}
-    ...    spec:
-    ...    \ \ port:
-    ...    \ \ \ \ targetPort: 8080
-    ...    \ \ tls:
-    ...    \ \ \ \ externalCertificate:
-    ...    \ \ \ \ \ \ name: ${SECRET_NAME}
-    ...    \ \ \ \ termination: edge
-    ...    \ \ to:
-    ...    \ \ \ \ kind: Service
-    ...    \ \ \ \ name: hello-microshift
-    RETURN    ${route_yaml}
-
-Create HTTP01 Issuer YAML
-    [Documentation]    Creates HTTP01 issuer YAML
-    ${http01_issuer_yaml}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiVersion: cert-manager.io/v1
-    ...    kind: Issuer
-    ...    metadata:
-    ...    \ \ name: ${HTTP01_ISSUER_NAME}
-    ...    \ \ namespace: ${NAMESPACE}
-    ...    spec:
-    ...    \ \ acme:
-    ...    \ \ \ \ server: "https://pebble.${NAMESPACE}.svc.cluster.local:14000/dir"
-    ...    \ \ \ \ skipTLSVerify: true
-    ...    \ \ \ \ privateKeySecretRef:
-    ...    \ \ \ \ \ \ name: acme-account-key
-    ...    \ \ \ \ solvers:
-    ...    \ \ \ \ - http01:
-    ...    \ \ \ \ \ \ \ \ ingress:
-    ...    \ \ \ \ \ \ \ \ \ \ ingressClassName: openshift-ingress
-    RETURN    ${http01_issuer_yaml}
-
-Create Certificate YAML
-    [Documentation]    Creates certificate YAML with the specified DNS name
-    [Arguments]    ${dns_name}
-    ${cert_yaml}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiVersion: cert-manager.io/v1
-    ...    kind: Certificate
-    ...    metadata:
-    ...    \ \ name: ${HTTP01_CERT_NAME}
-    ...    \ \ namespace: ${NAMESPACE}
-    ...    spec:
-    ...    \ \ commonName: ${dns_name}
-    ...    \ \ dnsNames:
-    ...    \ \ - ${dns_name}
-    ...    \ \ duration: 1h
-    ...    \ \ issuerRef:
-    ...    \ \ \ \ group: cert-manager.io
-    ...    \ \ \ \ kind: Issuer
-    ...    \ \ \ \ name: ${HTTP01_ISSUER_NAME}
-    ...    \ \ renewBefore: 58m
-    ...    \ \ secretName: ${HTTP01_SECRET_NAME}
-    ...    \ \ usages:
-    ...    \ \ - server auth
-    RETURN    ${cert_yaml}
 
 Verify Certificate
     [Documentation]    Verifies the issued certificate content (same logic as Go tests)
@@ -405,10 +267,10 @@ Verify Certificate Common Name
 
 Cleanup HTTP01 Resources
     [Documentation]    Cleanup HTTP01 test resources
-    Oc Delete    certificate/${HTTP01_CERT_NAME} -n ${NAMESPACE}
-    Oc Delete    issuer/${HTTP01_ISSUER_NAME} -n ${NAMESPACE}
-    Oc Delete    deployment/pebble -n ${NAMESPACE}
-    Oc Delete    service/pebble -n ${NAMESPACE}
+    Oc Delete    certificate/${HTTP01_CERT_NAME} -n ${NAMESPACE} --ignore-not-found
+    Oc Delete    issuer/${HTTP01_ISSUER_NAME} -n ${NAMESPACE} --ignore-not-found
+    Oc Delete    deployment/pebble -n ${NAMESPACE} --ignore-not-found
+    Oc Delete    service/pebble -n ${NAMESPACE} --ignore-not-found
 
 Configure DNS For Domain
     [Documentation]    Configure DNS configmap in openshift-dns namespace and restart DNS pod
@@ -528,80 +390,14 @@ Create CA Secret For Trust Manager
     ...    -subj    /CN\=test-ca.example.com
     ...    stderr=STDOUT
     Should Be Equal As Integers    ${result.rc}    0
-    Run With Kubeconfig
-    ...    oc create secret generic ca-source-secret -n ${TRUST_MANAGER_NS} --from-file=tls.crt=${cert_file}
+    Oc Create    secret generic ca-source-secret -n ${TRUST_MANAGER_NS} --from-file=tls.crt=${cert_file}
     Remove File    ${cert_file}
 
-Create Trust Bundle From Source Secret YAML
-    [Documentation]    Creates a Bundle CR YAML sourced from a manually created secret in the trust namespace
-    ${yaml}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiVersion: trust.cert-manager.io/v1alpha1
-    ...    kind: Bundle
-    ...    metadata:
-    ...    \ \ name: ${TRUST_MANAGER_BUNDLE_NAME}
-    ...    spec:
-    ...    \ \ sources:
-    ...    \ \ \ \ - secret:
-    ...    \ \ \ \ \ \ \ \ name: ca-source-secret
-    ...    \ \ \ \ \ \ \ \ key: tls.crt
-    ...    \ \ target:
-    ...    \ \ \ \ configMap:
-    ...    \ \ \ \ \ \ key: ca-bundle.crt
-    ...    \ \ \ \ namespaceSelector:
-    ...    \ \ \ \ \ \ matchLabels:
-    ...    \ \ \ \ \ \ \ \ kubernetes.io/metadata.name: ${NAMESPACE}
-    RETURN    ${yaml}
-
-Create CA Certificate YAML
-    [Documentation]    Creates a cert-manager CA Certificate in the trust namespace
-    ${yaml}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiVersion: cert-manager.io/v1
-    ...    kind: Certificate
-    ...    metadata:
-    ...    \ \ name: ca-certificate
-    ...    \ \ namespace: ${TRUST_MANAGER_NS}
-    ...    spec:
-    ...    \ \ isCA: true
-    ...    \ \ commonName: test-ca.example.com
-    ...    \ \ secretName: ca-certificate-secret
-    ...    \ \ issuerRef:
-    ...    \ \ \ \ name: ${ISSUER_NAME}
-    ...    \ \ \ \ kind: ClusterIssuer
-    RETURN    ${yaml}
-
-Create Trust Bundle From Secret YAML
-    [Documentation]    Creates a Bundle CR YAML sourced from a cert-manager CA secret in the trust namespace
-    ${yaml}=    CATENATE    SEPARATOR=\n
-    ...    ---
-    ...    apiVersion: trust.cert-manager.io/v1alpha1
-    ...    kind: Bundle
-    ...    metadata:
-    ...    \ \ name: ${TRUST_MANAGER_BUNDLE_NAME}
-    ...    spec:
-    ...    \ \ sources:
-    ...    \ \ \ \ - secret:
-    ...    \ \ \ \ \ \ \ \ name: ca-certificate-secret
-    ...    \ \ \ \ \ \ \ \ key: tls.crt
-    ...    \ \ target:
-    ...    \ \ \ \ configMap:
-    ...    \ \ \ \ \ \ key: ca-bundle.crt
-    ...    \ \ \ \ namespaceSelector:
-    ...    \ \ \ \ \ \ matchLabels:
-    ...    \ \ \ \ \ \ \ \ kubernetes.io/metadata.name: ${NAMESPACE}
-    RETURN    ${yaml}
-
-Apply Trust Manager YAML
-    [Documentation]    Apply YAML manifest, allowing both created and configured/unchanged results
-    [Arguments]    ${yaml_content}
-    ${temp_file}=    Create Random Temp File    ${yaml_content}
-    TRY
-        ${result}=    Oc Apply    -f ${temp_file}
-        Log    Applied manifest: ${result}
-    FINALLY
-        Remove File    ${temp_file}
-    END
+TrustManager CR Should Be Ready
+    [Documentation]    Check TrustManager CR has Ready=True status condition
+    ${status}=    Oc Get JsonPath    trustmanager    ${EMPTY}    cluster
+    ...    .status.conditions[?(@.type=="Ready")].status
+    Should Be Equal    ${status}    True    msg=TrustManager CR is not ready
 
 Cleanup Trust Bundle
     [Documentation]    Remove the test trust-manager Bundle CR and its target ConfigMap
