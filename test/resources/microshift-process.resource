@@ -73,24 +73,74 @@ MicroShift Service Is Active
     Should Be Equal As Strings    ${state}    active
 
 Wait For MicroShift Service
-    [Documentation]    Wait for MicroShift service to be active
-    Wait Until Keyword Succeeds    50x    10s
+    [Documentation]    Wait for MicroShift service to be active.
+    ...    Budget covers TimeoutStartSec=4m (240s) with margin.
+    Wait Until Keyword Succeeds    30x    10s
     ...    MicroShift Service Is Active
 
-Restart MicroShift
-    [Documentation]    Restart the MicroShift service, waiting for any in-progress
-    ...    state transition to settle before issuing the restart.
-    Wait Until Keyword Succeeds    10x    5s
+Restart MicroShift    # robocop: off=LEN01
+    [Documentation]    Restart the MicroShift service safely, handling all systemd
+    ...    states including auto-restart loops after failures.
+    ...
+    ...    Background: microshift.service has Restart=always. After a startup
+    ...    failure (e.g. invalid config), systemd auto-restarts the process
+    ...    repeatedly. Each attempt fails and increments the rate-limit counter.
+    ...    Once StartLimitBurst (default 5) is exceeded within
+    ...    StartLimitIntervalSec (default 10s), systemd triggers start-limit-hit
+    ...    and the service enters the "failed" state, refusing further starts.
+    ...
+    ...    Step 1 — Wait for transition to settle (30x 10s = 300s).
+    ...    Poll ActiveState until it leaves activating/deactivating/reloading.
+    ...    This lets the auto-restart loop run its course and hit start-limit-hit
+    ...    before we proceed. Without this wait, reset-failed (step 2) clears the
+    ...    rate-limit counter, but pending auto-restarts keep firing and
+    ...    re-increment it — our restart in step 4 would be rejected.
+    ...    Budget covers TimeoutStartSec=4m (240s) for legitimate slow startups.
+    ...
+    ...    Step 2 — Clear start-limit-hit via reset-failed.
+    ...    Safe to call now because the auto-restart loop has settled (step 1
+    ...    confirmed the service is no longer transitioning). Resets the
+    ...    rate-limit counter and clears the "failed" state so the next start
+    ...    is accepted.
+    ...
+    ...    Step 3 — Capture current PIDs for both microshift and microshift-etcd.
+    ...    Taken after stability is confirmed (step 1) so the PIDs are stable
+    ...    and will not change before our restart in step 4.
+    ...
+    ...    Step 4 — Issue systemctl restart (synchronous).
+    ...    The Systemctl keyword runs the command, checks RC=0, and waits for
+    ...    SubState=running. For Type=notify, this blocks until the new process
+    ...    sends READY=1 or TimeoutStartSec expires.
+    ...
+    ...    Step 5 — Verify PID changes for microshift and microshift-etcd.
+    ...    Confirms both processes actually restarted as new PIDs. Passes
+    ...    instantly since step 4 already waited for the service to be running.
+    ...    Defense-in-depth against Restart=always auto-restart racing with our
+    ...    restart — ensures the running process is ours, not a stale
+    ...    auto-restarted instance that happened to reach SubState=running.
+    ...
+    ...    Step 6 — Refresh kubeconfig and wait for readiness.
+    ...    Certificates may rotate across restarts, so kubeconfig must be
+    ...    re-fetched. Wait For MicroShift polls /readyz and /livez as a
+    ...    final sanity check that the API surface is fully available.
+    ...
+    ...    All wait budgets are 30x 10s (300s), covering TimeoutStartSec=4m
+    ...    (240s) with margin.
+    #
+    # Step 1: wait for auto-restart loop to settle
+    Wait Until Keyword Succeeds    30x    10s
     ...    MicroShift Service Is Not Transitioning
-    # Clear start-limit-hit so systemctl restart is not rejected after
-    # rapid failures (e.g. invalid config that was since removed).
+    # Step 2: clear start-limit-hit
     Execute Command    systemctl reset-failed microshift.service    sudo=True
+    # Step 3: snapshot PIDs before restart
     ${ushift_pid}=    MicroShift Process ID
     ${ushift_etcd_pid}=    MicroShift Etcd Process ID
+    # Step 4: synchronous restart
     Systemctl    restart    microshift.service
+    # Step 5: confirm PID changes
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Wait Until MicroShift Etcd Process ID Changes    ${ushift_etcd_pid}
-    # Kubeconfig may change between restarts, ensure we are taking the latest one.
+    # Step 6: refresh kubeconfig and verify readiness
     Setup Kubeconfig
     Wait For MicroShift
 
