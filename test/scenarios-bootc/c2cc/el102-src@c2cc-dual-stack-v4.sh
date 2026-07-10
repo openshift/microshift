@@ -37,5 +37,7 @@ scenario_remove_vms() {
 scenario_run_tests() {
     # shellcheck disable=SC2119
     configure_c2cc_hosts
+    # IP_FAMILY=dual-stack (not 'ipv6'), so IP_CMD defaults to 'ip -4' for primary (IPv4) CIDRs.
+    # Dual-stack (IPv6) tests derive ip_cmd from CIDR content via IP Command For CIDR.
     c2cc_run_tests "suites/c2cc/basic/" "192.0.2.0/24" dual-stack
 }
