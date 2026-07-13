@@ -37,17 +37,12 @@ func NewInfrastructureServices(cfg *config.Config) *InfrastructureServicesManage
 
 func (s *InfrastructureServicesManager) Name() string { return "infrastructure-services-manager" }
 func (s *InfrastructureServicesManager) Dependencies() []string {
-	return []string{"kube-apiserver", "openshift-crd-manager", "route-controller-manager"}
+	return []string{"kube-apiserver", "cluster-policy-controller", "openshift-crd-manager", "route-controller-manager"}
 }
 
 func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
 	defer close(ready)
-
-	if err := applyDefaultRBACs(ctx, s.cfg); err != nil {
-		klog.Errorf("%s unable to apply default RBACs: %v", s.Name(), err)
-		return err
-	}
 
 	priorityClasses := []string{"core/priority-class-openshift-user-critical.yaml"}
 	if err := assets.ApplyPriorityClasses(ctx, priorityClasses, s.cfg.KubeConfigPath(config.KubeAdmin)); err != nil {
@@ -55,37 +50,9 @@ func (s *InfrastructureServicesManager) Run(ctx context.Context, ready chan<- st
 		return err
 	}
 
-	// TO-DO add readiness check
 	if err := components.StartComponents(s.cfg, ctx); err != nil {
 		return err
 	}
 	klog.Infof("%s launched ocp componets", s.Name())
 	return ctx.Err()
-}
-
-func applyDefaultRBACs(ctx context.Context, cfg *config.Config) error {
-	kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
-	var (
-		cr = []string{
-			"controllers/kube-controller-manager/csr_approver_clusterrole.yaml",
-			"controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrole.yaml",
-			"controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrole.yaml",
-			"controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrole.yaml",
-		}
-		crb = []string{
-			"controllers/kube-controller-manager/csr_approver_clusterrolebinding.yaml",
-			"controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrolebinding.yaml",
-			"controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml",
-			"controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrolebinding.yaml",
-		}
-	)
-	if err := assets.ApplyClusterRoles(ctx, cr, kubeconfigPath); err != nil {
-		klog.Warningf("failed to apply cluster roles %v", err)
-		return err
-	}
-	if err := assets.ApplyClusterRoleBindings(ctx, crb, kubeconfigPath); err != nil {
-		klog.Warningf("failed to apply cluster roles %v", err)
-		return err
-	}
-	return nil
 }
