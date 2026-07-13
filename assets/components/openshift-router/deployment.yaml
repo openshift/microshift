@@ -131,6 +131,8 @@ spec:
               value: '{{ .ThreadCount }}'
             - name: SSL_MIN_VERSION
               value: '{{ .RouterSSLMinVersion }}'
+            - name: ROUTER_CURVES
+              value: '{{ .RouterTLSCurves }}'
             - name: ROUTER_USE_PROXY_PROTOCOL
               value: "false"
             - name: GRACEFUL_SHUTDOWN_DELAY

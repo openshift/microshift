@@ -35,7 +35,46 @@ var (
 		"TLS_AES_128_CCM_SHA256",
 		"TLS_AES_128_CCM_8_SHA256",
 	)
+
+	// fipsApprovedTLS13Ciphers contains only GCM-based ciphers.
+	// CCM ciphers (TLS_AES_128_CCM_SHA256, TLS_AES_128_CCM_8_SHA256) are excluded
+	// because OpenSSL's FIPS provider does not enable them and HAProxy does not
+	// support CCM mode cipher suites.
+	fipsApprovedTLS13Ciphers = sets.NewString(
+		"TLS_AES_128_GCM_SHA256",
+		"TLS_AES_256_GCM_SHA384",
+	)
 )
+
+// detectFIPS reports whether the cluster is operating in FIPS
+// mode by checking the FIPS_ENABLED environment variable if set or
+// the /proc/sys/crypto/fips_enabled file otherwise.
+// FIPS_ENABLED is an optional override for testing environments where
+// /proc/sys/crypto/fips_enabled may not reflect the desired FIPS state.
+func detectFIPS() bool {
+	if v, ok := os.LookupEnv("FIPS_ENABLED"); ok {
+		if result, err := strconv.ParseBool(v); err != nil {
+			klog.Warningf("Failed to parse FIPS_ENABLED environment variable: %v; falling back to procfs", err)
+		} else {
+			klog.Infof("Found FIPS_ENABLED environment variable: value=%s, result=%v", v, result)
+			return result
+		}
+	}
+
+	result := false
+	data, err := os.ReadFile("/proc/sys/crypto/fips_enabled")
+	if err != nil {
+		klog.Warningf("Failed to read /proc/sys/crypto/fips_enabled: %v; assuming FIPS is not enabled", err)
+		return result
+	}
+	if len(data) == 0 {
+		klog.Warningf("Got empty /proc/sys/crypto/fips_enabled; assuming FIPS is not enabled")
+		return result
+	}
+	result = strings.TrimSpace(string(data)) == "1"
+	klog.Infof("Read /proc/sys/crypto/fips_enabled: data=%s, result=%v", string(data), result)
+	return result
+}
 
 func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfigPath string) error {
 	var (
@@ -230,7 +269,8 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		return err
 	}
 
-	extraParams, err := generateIngressParams(cfg)
+	fipsEnabled := detectFIPS()
+	extraParams, err := generateIngressParams(cfg, fipsEnabled)
 	if err != nil {
 		return err
 	}
@@ -454,7 +494,7 @@ func validateClientTLS(patterns []string) error {
 	return nil
 }
 
-func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
+func generateIngressParams(cfg *config.Config, fipsEnabled bool) (assets.RenderParams, error) {
 	routerMode := "v4"
 	if cfg.IsIPv6() {
 		routerMode = "v4v6"
@@ -495,10 +535,32 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		}
 	}
 
+	// On FIPS-enabled clusters, remove non-FIPS-compliant TLS 1.3 cipher
+	// suites (e.g. TLS_CHACHA20_POLY1305_SHA256). HAProxy would fail TLS
+	// handshakes when a client offers a non-FIPS cipher first if that cipher
+	// is listed in ssl-default-bind-ciphersuites but excluded by the OS FIPS policy.
+	if fipsEnabled {
+		var fipsCiphers []string
+		for _, c := range tls13Ciphers {
+			if fipsApprovedTLS13Ciphers.Has(c) {
+				fipsCiphers = append(fipsCiphers, c)
+			}
+		}
+		tls13Ciphers = fipsCiphers
+	}
+
 	RouterCiphers := strings.Join(otherCiphers, ":")
 	RouterCiphersSuites := ""
 	if len(tls13Ciphers) != 0 {
 		RouterCiphersSuites = strings.Join(tls13Ciphers, ":")
+	}
+
+	// Default TLS supportedGroups (curves) include X25519MLKEM768 for
+	// post-quantum readiness. In FIPS mode, ML-KEM and X25519 are not
+	// supported by OpenSSL FIPS 140-3.
+	tlsCurves := "X25519MLKEM768:X25519:P-256:P-384:P-521"
+	if fipsEnabled {
+		tlsCurves = "P-256:P-384:P-521"
 	}
 
 	var RouterSSLMinVersion string
@@ -592,6 +654,7 @@ func generateIngressParams(cfg *config.Config) (assets.RenderParams, error) {
 		"RouterCiphers":               RouterCiphers,
 		"RouterCiphersSuites":         RouterCiphersSuites,
 		"RouterSSLMinVersion":         RouterSSLMinVersion,
+		"RouterTLSCurves":             tlsCurves,
 		"RouterAllowWildcardRoutes":   RouterAllowWildcardRoutes,
 		"ClientCAMapName":             clientCAMapName,
 		"ClientAuthPolicy":            clientAuthPolicy,
