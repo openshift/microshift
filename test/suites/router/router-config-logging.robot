@@ -9,6 +9,7 @@ Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/router.resource
+Variables           configs.py
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -17,27 +18,7 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${BASE_DOMAIN}                  apps.example.com
-
-${CONFIG_COOKIE_EXACT_100}      SEPARATOR=\n
-...                             ---
-...                             ingress:
-...                             \ \ accessLogging:
-...                             \ \ \ \ httpCaptureCookies:
-...                             \ \ \ \ - matchType: Exact
-...                             \ \ \ \ \ \ maxLength: 100
-...                             \ \ \ \ \ \ name: foo
-...                             \ \ \ \ status: Enabled
-
-${CONFIG_COOKIE_EXACT_10}       SEPARATOR=\n
-...                             ---
-...                             ingress:
-...                             \ \ accessLogging:
-...                             \ \ \ \ httpCaptureCookies:
-...                             \ \ \ \ - matchType: Exact
-...                             \ \ \ \ \ \ maxLength: 10
-...                             \ \ \ \ \ \ name: foo
-...                             \ \ \ \ status: Enabled
+${BASE_DOMAIN}      apps.example.com
 
 
 *** Test Cases ***
@@ -46,28 +27,16 @@ HTTP Capture Cookies Prefix Match
     ...    prefix in router logs across HTTP, edge, and reencrypt routes.
     ...    OCP-81996
 
-    ${config}=    Catenate    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ accessLogging:
-    ...    \ \ \ \ httpCaptureCookies:
-    ...    \ \ \ \ - matchType: Prefix
-    ...    \ \ \ \ \ \ maxLength: 100
-    ...    \ \ \ \ \ \ namePrefix: foo
-    ...    \ \ \ \ status: Enabled
-    Setup Router Config And Restart    ${config}
+    Setup Router Config And Restart    ${CONFIG_COOKIE_PREFIX}
 
     Deploy Web Server Signed
     Deploy Test Client Pod
     VAR    ${routehost}=    route-unsec81996.${BASE_DOMAIN}
     VAR    ${edge_host}=    route-edge81996.${BASE_DOMAIN}
     VAR    ${reen_host}=    route-reen81996.${BASE_DOMAIN}
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
-    Route Should Be Admitted    route-http
-    Create OC Route    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${edge_host}
-    Route Should Be Admitted    route-edge
-    Create OC Route    ${NAMESPACE}    reencrypt    route-reen    service-secure    --hostname=${reen_host}
-    Route Should Be Admitted    route-reen
+    Create OC Route And Admit    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
+    Create OC Route And Admit    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${edge_host}
+    Create OC Route And Admit    ${NAMESPACE}    reencrypt    route-reen    service-secure    --hostname=${reen_host}
     ${router_ip}=    Get Router Pod IP
     Curl All Cookie Routes And Verify Logs    ${routehost}    ${edge_host}    ${reen_host}    ${router_ip}
     [Teardown]    Run Keywords
@@ -83,8 +52,7 @@ HTTP Capture Cookies Exact Match And MaxLength
     Deploy Web Server
     Deploy Test Client Pod
     VAR    ${routehost}=    route-unsec81997.${BASE_DOMAIN}
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
-    Route Should Be Admitted    route-http
+    Create OC Route And Admit    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
     ${router_ip}=    Get Router Pod IP
     Wait Until Curl With Cookie Succeeds From Pod
     ...    ${CLIENT_POD_NAME}
@@ -120,31 +88,16 @@ HTTP Capture Headers Request And Response
     ...    in router logs, including for edge and reencrypt routes.
     ...    OCP-82000
 
-    ${config}=    Catenate    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ accessLogging:
-    ...    \ \ \ \ httpCaptureHeaders:
-    ...    \ \ \ \ \ \ request:
-    ...    \ \ \ \ \ \ - maxLength: 120
-    ...    \ \ \ \ \ \ \ \ name: Host
-    ...    \ \ \ \ \ \ response:
-    ...    \ \ \ \ \ \ - maxLength: 120
-    ...    \ \ \ \ \ \ \ \ name: "Server"
-    ...    \ \ \ \ status: Enabled
-    Setup Router Config And Restart    ${config}
+    Setup Router Config And Restart    ${CONFIG_CAPTURE_HEADERS_120}
 
     Deploy Web Server Signed
     Deploy Test Client Pod
     VAR    ${routehost}=    route-unsec82000.${BASE_DOMAIN}
     VAR    ${edge_host}=    route-edge82000.${BASE_DOMAIN}
     VAR    ${reen_host}=    route-reen82000.${BASE_DOMAIN}
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
-    Route Should Be Admitted    route-http
-    Create OC Route    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${edge_host}
-    Route Should Be Admitted    route-edge
-    Create OC Route    ${NAMESPACE}    reencrypt    route-reen    service-secure    --hostname=${reen_host}
-    Route Should Be Admitted    route-reen
+    Create OC Route And Admit    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
+    Create OC Route And Admit    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${edge_host}
+    Create OC Route And Admit    ${NAMESPACE}    reencrypt    route-reen    service-secure    --hostname=${reen_host}
     Verify Header Capture Config And Logs    ${routehost}    ${edge_host}    ${reen_host}
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart
@@ -155,24 +108,11 @@ HTTP Capture Headers MaxLength Adherence
     ...    OCP-82003
 
     VAR    ${routehost}=    route-unsec82003.${BASE_DOMAIN}
-    ${config}=    Catenate    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ accessLogging:
-    ...    \ \ \ \ httpCaptureHeaders:
-    ...    \ \ \ \ \ \ request:
-    ...    \ \ \ \ \ \ - maxLength: 16
-    ...    \ \ \ \ \ \ \ \ name: Host
-    ...    \ \ \ \ \ \ response:
-    ...    \ \ \ \ \ \ - maxLength: 5
-    ...    \ \ \ \ \ \ \ \ name: "Server"
-    ...    \ \ \ \ status: Enabled
-    Setup Router Config And Restart    ${config}
+    Setup Router Config And Restart    ${CONFIG_CAPTURE_HEADERS_MAXLEN}
 
     Deploy Web Server
     Deploy Test Client Pod
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
-    Route Should Be Admitted    route-http
+    Create OC Route And Admit    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
     ${router_ip}=    Get Router Pod IP
     Wait Until Curl Succeeds From Pod
     ...    ${CLIENT_POD_NAME}    ${NAMESPACE}    http://${routehost}/index.html    ${routehost}:80:${router_ip}
@@ -194,19 +134,13 @@ Custom HTTP Error Pages
 
     Create Configmap From Files    ${ROUTER_NS}    custom-82004-error-code-pages
     ...    --from-file=./assets/router/error-page-503.http    --from-file=./assets/router/error-page-404.http
-    ${config}=    Catenate    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ httpErrorCodePages:
-    ...    \ \ \ \ name: custom-82004-error-code-pages
-    Setup Router Config And Restart    ${config}
+    Setup Router Config And Restart    ${CONFIG_ERROR_PAGES}
 
     Deploy Web Server
     Deploy Test Client Pod
     VAR    ${routehost}=    route-unsec82004.${BASE_DOMAIN}
     VAR    ${noexist_host}=    not-exist82004.${BASE_DOMAIN}
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
-    Route Should Be Admitted    route-http
+    Create OC Route And Admit    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
     Verify Custom Error Pages    ${routehost}    ${noexist_host}
     [Teardown]    Run Keywords
     ...    Remove Router Config And Restart

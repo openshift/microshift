@@ -9,6 +9,7 @@ Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/router.resource
+Variables           configs.py
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -17,56 +18,7 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${BASE_DOMAIN}                      apps.example.com
-
-${CONFIG_TUNING_CUSTOM}             SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ forwardedHeaderPolicy: "Replace"
-...                                 \ \ httpCompression:
-...                                 \ \ \ \ mimeTypes:
-...                                 \ \ \ \ - "image"
-...                                 \ \ logEmptyRequests: "Ignore"
-...                                 \ \ tuningOptions:
-...                                 \ \ \ \ clientFinTimeout: "2s"
-...                                 \ \ \ \ clientTimeout: "60s"
-...                                 \ \ \ \ headerBufferBytes: 65536
-...                                 \ \ \ \ headerBufferMaxRewriteBytes: 16384
-...                                 \ \ \ \ healthCheckInterval: "10s"
-...                                 \ \ \ \ maxConnections: 100000
-...                                 \ \ \ \ serverFinTimeout: "2s"
-...                                 \ \ \ \ serverTimeout: "60s"
-...                                 \ \ \ \ threadCount: 8
-...                                 \ \ \ \ tlsInspectDelay: "10s"
-...                                 \ \ \ \ tunnelTimeout: "2h"
-
-${CONFIG_MTLS18_SUBJECT_FILTER}     SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ clientTLS:
-...                                 \ \ \ \ allowedSubjectPatterns: ["/CN=example-test.com"]
-...                                 \ \ \ \ clientCA:
-...                                 \ \ \ \ \ \ name: "ocp80518"
-...                                 \ \ \ \ clientCertificatePolicy: "Required"
-
-${CONFIG_WILDCARD_ALLOWED}          SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ routeAdmissionPolicy:
-...                                 \ \ \ \ wildcardPolicy: "WildcardsAllowed"
-
-${CONFIG_WILDCARD_DISALLOWED}       SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ routeAdmissionPolicy:
-...                                 \ \ \ \ wildcardPolicy: "WildcardsDisallowed"
-
-${CONFIG_LOG_FORMAT_2}              SEPARATOR=\n
-...                                 ---
-...                                 ingress:
-...                                 \ \ accessLogging:
-...                                 \ \ \ \ httpLogFormat: "%ci:%cp %si:%sp %HU %ST"
-...                                 \ \ \ \ status: Enabled
+${BASE_DOMAIN}      apps.example.com
 
 
 *** Test Cases ***
@@ -166,18 +118,11 @@ HTTP Log Format
     ...    output with the correct format.
     ...    OCP-82014
 
-    ${config_log_format_1}=    Catenate    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ accessLogging:
-    ...    \ \ \ \ httpLogFormat: "\%{+Q}r"
-    ...    \ \ \ \ status: Enabled
-    Setup Router Config And Restart    ${config_log_format_1}
+    Setup Router Config And Restart    ${CONFIG_LOG_FORMAT_1}
     Deploy Web Server
     Deploy Test Client Pod
     VAR    ${routehost}=    route-unsec82014.${BASE_DOMAIN}
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
-    Route Should Be Admitted    route-http
+    Create OC Route And Admit    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
     ${router_ip}=    Get Router Pod IP
     Wait Until Curl Succeeds From Pod
     ...    ${CLIENT_POD_NAME}    ${NAMESPACE}

@@ -9,6 +9,8 @@ Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/router.resource
+Variables           configs.py
+Library             configs.py
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -17,55 +19,7 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${BASE_DOMAIN}                  apps.example.com
-
-${CONFIG_OLD_TLS}               SEPARATOR=\n
-...                             ---
-...                             ingress:
-...                             \ \ tlsSecurityProfile:
-...                             \ \ \ \ old: {}
-...                             \ \ \ \ type: Old
-
-${CONFIG_INTERMEDIATE_TLS}      SEPARATOR=\n
-...                             ---
-...                             ingress:
-...                             \ \ tlsSecurityProfile:
-...                             \ \ \ \ intermediate: {}
-...                             \ \ \ \ type: Intermediate
-
-${CONFIG_MODERN_TLS}            SEPARATOR=\n
-...                             ---
-...                             ingress:
-...                             \ \ tlsSecurityProfile:
-...                             \ \ \ \ modern: {}
-...                             \ \ \ \ type: Modern
-
-${CONFIG_CUSTOM_TLS}            SEPARATOR=\n
-...                             ---
-...                             ingress:
-...                             \ \ tlsSecurityProfile:
-...                             \ \ \ \ custom:
-...                             \ \ \ \ \ \ ciphers:
-...                             \ \ \ \ \ \ - DHE-RSA-AES256-GCM-SHA384
-...                             \ \ \ \ \ \ - ECDHE-ECDSA-AES256-GCM-SHA384
-...                             \ \ \ \ \ \ minTLSVersion: VersionTLS12
-...                             \ \ \ \ type: Custom
-
-${CONFIG_MTLS17_REQUIRED}       SEPARATOR=\n
-...                             ---
-...                             ingress:
-...                             \ \ clientTLS:
-...                             \ \ \ \ clientCA:
-...                             \ \ \ \ \ \ name: "ocp80517"
-...                             \ \ \ \ clientCertificatePolicy: "Required"
-
-${CONFIG_MTLS17_OPTIONAL}       SEPARATOR=\n
-...                             ---
-...                             ingress:
-...                             \ \ clientTLS:
-...                             \ \ \ \ clientCA:
-...                             \ \ \ \ \ \ name: "ocp80517"
-...                             \ \ \ \ clientCertificatePolicy: "Optional"
+${BASE_DOMAIN}      apps.example.com
 
 
 *** Test Cases ***
@@ -75,14 +29,9 @@ Custom Default Certificate
     ...    OCP-80508
     [Setup]    Prepare Custom Cert For Test    80508    route-edge80508.${BASE_DOMAIN}
 
-    ${config}=    Catenate    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ certificateSecret: "router-test-cert"
-    Setup Router Config And Restart    ${config}
+    Setup Router Config And Restart    ${CONFIG_CUSTOM_CERT}
 
-    Create OC Route    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${CERT_EDGE_HOST}
-    Route Should Be Admitted    route-edge
+    Create OC Route And Admit    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${CERT_EDGE_HOST}
     Verify Custom Cert Is Active
     Deploy Test Client Pod
     Copy Files To Pod    ${NAMESPACE}    ${CLIENT_POD_NAME}    ${CERT_TMPDIR}    /data/certs
@@ -180,11 +129,7 @@ Prepare Custom Cert For Test
     VAR    ${CERT_TMPDIR}=    ${tmpdir}    scope=TEST
     VAR    ${CERT_EDGE_HOST}=    ${edge_host}    scope=TEST
     Generate CA Certificate    ${tmpdir}/ca.key    ${tmpdir}/ca.crt    /CN=MS-default-CA
-    ${san}=    Catenate    SEPARATOR=\n
-    ...    [ v3_req ]
-    ...    subjectAltName = @alt_names
-    ...    [ alt_names ]
-    ...    DNS.1 = *.${BASE_DOMAIN}
+    ${san}=    San Extension    ${BASE_DOMAIN}
     Generate CSR And Key    ${tmpdir}/usr.key    ${tmpdir}/usr.csr    /CN=example-ne.com
     Sign CSR With CA    ${tmpdir}/usr.csr    ${tmpdir}/ca.crt    ${tmpdir}/ca.key    ${tmpdir}/usr.crt    ${san}
     Run With Kubeconfig
@@ -218,6 +163,5 @@ Deploy MTLS Test Workloads
     Deploy Web Server
     Deploy Test Client Pod
     Copy Files To Pod    ${NAMESPACE}    ${CLIENT_POD_NAME}    ${MTLS_TMPDIR}    /data/certs
-    Create OC Route    ${NAMESPACE}    edge    route-edge    service-unsecure
+    Create OC Route And Admit    ${NAMESPACE}    edge    route-edge    service-unsecure
     ...    --hostname=${MTLS_EDGE_HOST}    --cert=${MTLS_TMPDIR}/usr.crt    --key=${MTLS_TMPDIR}/usr.key
-    Route Should Be Admitted    route-edge

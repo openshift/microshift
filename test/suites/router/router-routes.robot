@@ -44,15 +44,13 @@ Edge And Passthrough Routes
     VAR    ${pass_host}=    route-pass-60266.${BASE_DOMAIN}
     VAR    ${edge_host}=    route-edge-60266.${BASE_DOMAIN}
 
-    Create OC Route    ${NAMESPACE}    passthrough    ms-pass    service-secure    --hostname=${pass_host}
-    Route Should Be Admitted    ms-pass
+    Create OC Route And Admit    ${NAMESPACE}    passthrough    ms-pass    service-secure    --hostname=${pass_host}
     Wait Until HTTPS Curl Succeeds From Pod
     ...    ${srv_pod}    ${NAMESPACE}    https://${pass_host}:443    ${pass_host}:443:${router_ip}
     ${haproxy}=    Read Haproxy Config
     Should Contain    ${haproxy}    backend be_tcp:${NAMESPACE}:ms-pass
 
-    Create OC Route    ${NAMESPACE}    edge    ms-edge    service-unsecure    --hostname=${edge_host}
-    Route Should Be Admitted    ms-edge
+    Create OC Route And Admit    ${NAMESPACE}    edge    ms-edge    service-unsecure    --hostname=${edge_host}
     Wait Until HTTPS Curl Succeeds From Pod
     ...    ${srv_pod}    ${NAMESPACE}    https://${edge_host}:443    ${edge_host}:443:${router_ip}
     ${haproxy}=    Read Haproxy Config
@@ -71,15 +69,13 @@ HTTP And Reencrypt Routes
     VAR    ${http_host}=    route-http-60283.${BASE_DOMAIN}
     VAR    ${reen_host}=    route-reen-60283.${BASE_DOMAIN}
 
-    Create OC Route    ${NAMESPACE}    http    ms-http    service-unsecure    --hostname=${http_host}
-    Route Should Be Admitted    ms-http
+    Create OC Route And Admit    ${NAMESPACE}    http    ms-http    service-unsecure    --hostname=${http_host}
     Wait Until Curl Succeeds From Pod
     ...    ${srv_pod}    ${NAMESPACE}    http://${http_host}:80    ${http_host}:80:${router_ip}
     ${haproxy}=    Read Haproxy Config
     Should Contain    ${haproxy}    backend be_http:${NAMESPACE}:ms-http
 
-    Create OC Route    ${NAMESPACE}    reencrypt    ms-reen    service-secure    --hostname=${reen_host}
-    Route Should Be Admitted    ms-reen
+    Create OC Route And Admit    ${NAMESPACE}    reencrypt    ms-reen    service-secure    --hostname=${reen_host}
     Wait Until HTTPS Curl Succeeds From Pod
     ...    ${srv_pod}    ${NAMESPACE}    https://${reen_host}:443    ${reen_host}:443:${router_ip}
     ${haproxy}=    Read Haproxy Config

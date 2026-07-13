@@ -76,6 +76,12 @@ Create OC Route
         Run With Kubeconfig    oc create route ${route_type} ${route_name} --service=${service_name} -n ${ns} ${extra}
     END
 
+Create OC Route And Admit
+    [Documentation]    Create an OpenShift route and wait for it to be admitted.
+    [Arguments]    ${ns}    ${route_type}    ${route_name}    ${service_name}    @{extra_args}
+    Create OC Route    ${ns}    ${route_type}    ${route_name}    ${service_name}    @{extra_args}
+    Route Should Be Admitted    ${route_name}    ${ns}
+
 Route Should Be Admitted
     [Documentation]    Verify the route is admitted by the default ingress controller.
     [Arguments]    ${route_name}    ${ns}=${NAMESPACE}    ${timeout}=120s
@@ -114,16 +120,17 @@ Route Admission Status Should Be
     Should Be Equal As Strings    ${status}    ${expected}
 
 Create And Admit Four Route Types
-    [Documentation]    Create HTTP, edge, passthrough, and reencrypt routes and wait for reencrypt to be admitted.
+    [Documentation]    Create HTTP, edge, passthrough, and reencrypt routes and wait for each to be admitted.
     [Arguments]    ${http_host}    ${edge_host}    ${pass_host}    ${reen_host}
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${http_host}
-    Create OC Route    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${edge_host}
-    Create OC Route    ${NAMESPACE}    passthrough    route-passth    service-secure    --hostname=${pass_host}
-    Create OC Route    ${NAMESPACE}    reencrypt    route-reen    service-secure    --hostname=${reen_host}
-    Route Should Be Admitted    route-http
-    Route Should Be Admitted    route-edge
-    Route Should Be Admitted    route-passth
-    Route Should Be Admitted    route-reen
+    Create OC Route And Admit    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${http_host}
+    Create OC Route And Admit    ${NAMESPACE}    edge    route-edge    service-unsecure    --hostname=${edge_host}
+    Create OC Route And Admit
+    ...    ${NAMESPACE}
+    ...    passthrough
+    ...    route-passth
+    ...    service-secure
+    ...    --hostname=${pass_host}
+    Create OC Route And Admit    ${NAMESPACE}    reencrypt    route-reen    service-secure    --hostname=${reen_host}
 
 Curl From Pod
     [Documentation]    Run curl from a pod via oc exec. Returns stdout.

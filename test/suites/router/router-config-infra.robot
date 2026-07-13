@@ -9,6 +9,8 @@ Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/router.resource
+Variables           configs.py
+Library             configs.py
 
 Suite Setup         Setup Suite With Namespace
 Suite Teardown      Teardown Suite With Namespace
@@ -17,71 +19,9 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${BASE_DOMAIN}                          apps.example.com
-${ALT_HTTP_PORT}                        10080
-${ALT_HTTPS_PORT}                       10443
-
-${LOGGING_INVALID_MAXLENGTH_NEG1}       SEPARATOR=\n
-...                                     ---
-...                                     ingress:
-...                                     \ \ accessLogging:
-...                                     \ \ \ \ httpCaptureCookies:
-...                                     \ \ \ \ - matchType: Exact
-...                                     \ \ \ \ \ \ maxLength: -1
-...                                     \ \ \ \ \ \ name: foo
-...                                     \ \ \ \ status: Enabled
-
-${LOGGING_INVALID_MAXLENGTH_ZERO}       SEPARATOR=\n
-...                                     ---
-...                                     ingress:
-...                                     \ \ accessLogging:
-...                                     \ \ \ \ httpCaptureCookies:
-...                                     \ \ \ \ - matchType: Exact
-...                                     \ \ \ \ \ \ maxLength: 0
-...                                     \ \ \ \ \ \ name: foo
-...                                     \ \ \ \ status: Enabled
-
-${LOGGING_INVALID_COOKIE_NAME}          SEPARATOR=\n
-...                                     ---
-...                                     ingress:
-...                                     \ \ accessLogging:
-...                                     \ \ \ \ httpCaptureCookies:
-...                                     \ \ \ \ - matchType: Exact
-...                                     \ \ \ \ \ \ maxLength: 100
-...                                     \ \ \ \ \ \ name: "foo 33#?-"
-...                                     \ \ \ \ status: Enabled
-
-${LOGGING_INVALID_HEADER_MAXLENGTH}     SEPARATOR=\n
-...                                     ---
-...                                     ingress:
-...                                     \ \ accessLogging:
-...                                     \ \ \ \ httpCaptureHeaders:
-...                                     \ \ \ \ \ \ request:
-...                                     \ \ \ \ \ \ - maxLength: -1
-...                                     \ \ \ \ \ \ \ \ name: Host
-...                                     \ \ \ \ \ \ response:
-...                                     \ \ \ \ \ \ - maxLength: 10
-...                                     \ \ \ \ \ \ \ \ name: "Server"
-...                                     \ \ \ \ status: Enabled
-
-${LOGGING_INVALID_STATUS}               SEPARATOR=\n
-...                                     ---
-...                                     ingress:
-...                                     \ \ accessLogging:
-...                                     \ \ \ \ httpCaptureHeaders:
-...                                     \ \ \ \ \ \ request:
-...                                     \ \ \ \ \ \ - maxLength: 10
-...                                     \ \ \ \ \ \ \ \ name: Host
-...                                     \ \ \ \ status: Enable
-
-${LOGGING_COOKIES_NO_STATUS}            SEPARATOR=\n
-...                                     ---
-...                                     ingress:
-...                                     \ \ accessLogging:
-...                                     \ \ \ \ httpCaptureCookies:
-...                                     \ \ \ \ - matchType: Prefix
-...                                     \ \ \ \ \ \ maxLength: 100
-...                                     \ \ \ \ \ \ namePrefix: foo
+${BASE_DOMAIN}          apps.example.com
+${ALT_HTTP_PORT}        10080
+${ALT_HTTPS_PORT}       10443
 
 
 *** Test Cases ***
@@ -92,14 +32,7 @@ Custom Listening IPs And Ports
     ...    OCP-73203
 
     ${iface}    ${host_ip}=    Get First Host Interface And IP Via SSH
-    ${config}=    Catenate    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ listenAddress:
-    ...    \ \ - ${iface}
-    ...    \ \ ports:
-    ...    \ \ \ \ http: ${ALT_HTTP_PORT}
-    ...    \ \ \ \ https: ${ALT_HTTPS_PORT}
+    ${config}=    Config Custom Listen    ${iface}    ${ALT_HTTP_PORT}    ${ALT_HTTPS_PORT}
     Setup Router Config And Restart    ${config}
 
     Verify Custom LB Ports And IP    ${host_ip}
@@ -121,19 +54,11 @@ Enable Disable Router
     ...    and setting it back to Managed restores the router LB with correct IPs and ports.
     ...    OCP-73209
 
-    ${config_removed}=    Catenate    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ status: Removed
-    Drop In MicroShift Config    ${config_removed}    10-router
+    Drop In MicroShift Config    ${CONFIG_ROUTER_REMOVED}    10-router
     Restart MicroShift
     Oc Wait    namespace/openshift-ingress    --for=delete --timeout=300s
 
-    ${config_managed}=    Catenate    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ status: Managed
-    Setup Router Config And Restart    ${config_managed}
+    Setup Router Config And Restart    ${CONFIG_ROUTER_MANAGED}
 
     ${svc_type}=    Oc Get JsonPath    service    ${ROUTER_NS}    router-default    .spec.type
     Should Be Equal As Strings    ${svc_type}    LoadBalancer
@@ -212,33 +137,13 @@ Curl Four Routes Via Custom Ports
 Verify Syslog Logging
     [Documentation]    Apply syslog config and verify log delivery, then verify facility change.
     [Arguments]    ${syslog_ip}
-    VAR    ${config1}=    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ accessLogging:
-    ...    \ \ \ \ destination:
-    ...    \ \ \ \ \ \ syslog:
-    ...    \ \ \ \ \ \ \ \ address: ${syslog_ip}
-    ...    \ \ \ \ \ \ \ \ port: 514
-    ...    \ \ \ \ \ \ type: Syslog
-    ...    \ \ \ \ status: Enabled
+    ${config1}=    Config Syslog    ${syslog_ip}
     Setup Router Config And Restart    ${config1}
     VAR    ${routehost}=    route-unsec82015.${BASE_DOMAIN}
-    Create OC Route    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
-    Route Should Be Admitted    route-http
+    Create OC Route And Admit    ${NAMESPACE}    http    route-http    service-unsecure    --hostname=${routehost}
     Verify Syslog Haproxy Config    ${syslog_ip}    local1
     Verify Syslog Log Delivery    ${routehost}
-    VAR    ${config2}=    SEPARATOR=\n
-    ...    ---
-    ...    ingress:
-    ...    \ \ accessLogging:
-    ...    \ \ \ \ destination:
-    ...    \ \ \ \ \ \ syslog:
-    ...    \ \ \ \ \ \ \ \ address: ${syslog_ip}
-    ...    \ \ \ \ \ \ \ \ port: 514
-    ...    \ \ \ \ \ \ \ \ facility: local2
-    ...    \ \ \ \ \ \ type: Syslog
-    ...    \ \ \ \ status: Enabled
+    ${config2}=    Config Syslog    ${syslog_ip}    facility=local2
     Setup Router Config And Restart    ${config2}
     Verify Syslog Haproxy Config    ${syslog_ip}    local2
 

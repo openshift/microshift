@@ -95,6 +95,13 @@ scenario_action="create-and-run"
 if [[ "${SCENARIO_SOURCES}" =~ c2cc ]]; then
     jobs_arg="-j 8"
     scenario_action="create-run-shutdown"
+elif [[ "${SCENARIO_SOURCES}" =~ .*releases.* ]]; then
+    # Release scenarios have grown (e.g. the router scenarios were split
+    # from 1 into 5) and no longer fit if every scenario's VMs stay up for
+    # the whole job. Shut down passed scenarios' VMs as they finish so the
+    # hypervisor only ever holds the still-running scenarios' VMs.
+    jobs_arg="-j 20"
+    scenario_action="create-run-shutdown"
 fi
 
 TEST_OK=true
