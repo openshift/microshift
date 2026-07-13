@@ -2,15 +2,30 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+# Each optional suite restarts MicroShift with its own kustomizePaths config,
+# adding ~10 minutes of restart overhead to the total execution time.
+# shellcheck disable=SC2034  # used elsewhere
+TEST_EXECUTION_TIMEOUT=60m
+
+# shellcheck disable=SC2034  # used elsewhere
+# Increase greenboot timeout for optional packages (more services to start)
+GREENBOOT_TIMEOUT=1200
+
 # Redefine network-related settings to use the dedicated network bridge
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
 WEB_SERVER_URL="http://${VM_BRIDGE_IP}:${WEB_SERVER_PORT}"
 
 scenario_create_vms() {
+    # Skip sriov network on ARM because the igb driver is not supported.
+    local networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK},sriov"
+    if [[ "${UNAME_M}" =~ aarch64 ]]; then
+        networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
+    fi
+
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template cos10-bootc-source-optionals
-    # Two nics - one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm centos10-bootc --network "${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}" --vm_disksize 25
+    # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
+    launch_vm centos10-bootc --network "${networks}" --vm_disksize 25 --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -19,11 +34,11 @@ scenario_remove_vms() {
 
 scenario_run_tests() {
     local skip_args=""
-
-    skip_args="--skip sriov"
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args+=" --skip tls-scanner"
+        skip_args="--skip sriov --skip tls-scanner"
     fi
+    # Skip generic device plugin on RHEL 10 until we can get the correct kernel-devel package.
+    skip_args+=" --skip generic-device-plugin"
     # shellcheck disable=SC2086
     run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \

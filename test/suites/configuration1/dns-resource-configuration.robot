@@ -118,9 +118,7 @@ Limit Less Than Request Prevents Start
 DNS Resolution After Resource Change
     [Documentation]    Verify CoreDNS resolves cluster-local services after resource change
     [Setup]    Apply DNS Resource Config    ${DNS_CUSTOM_RESOURCES}
-    ${output}=    Oc Exec    router-default    nslookup kubernetes.default.svc.cluster.local
-    ...    openshift-ingress    deployment
-    Should Contain    ${output}    kubernetes.default.svc.cluster.local
+    DNS Should Resolve    kubernetes.default.svc.cluster.local
     [Teardown]    Remove DNS Resource Config
 
 
@@ -185,6 +183,19 @@ Apply Invalid DNS Resource Config
     ${cursor}=    Get Journal Cursor
     VAR    ${CURSOR}=    ${cursor}    scope=TEST
     Run Keyword And Expect Error    0 != 1    Restart MicroShift
+
+DNS Should Resolve
+    [Documentation]    Wait for CoreDNS to resolve the given hostname
+    [Arguments]    ${hostname}
+    Wait Until Keyword Succeeds    10x    5s
+    ...    DNS Lookup Should Succeed    ${hostname}
+
+DNS Lookup Should Succeed
+    [Documentation]    Assert that CoreDNS resolves the given hostname
+    [Arguments]    ${hostname}
+    ${output}=    Oc Exec    router-default    nslookup ${hostname}
+    ...    openshift-ingress    deployment
+    Should Contain    ${output}    ${hostname}
 
 Remove DNS Resource Config
     [Documentation]    Remove the DNS resource drop-in config without restarting.
