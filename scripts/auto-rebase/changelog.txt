@@ -1,6 +1,0 @@
-- machine-config-operator embedded-component 33b3550f9b402d1716f1362149f4bee0ac01d245 to 8850344945a77a0361f34c5cbe9891429128e1f4
-  - ec706ae0 2026-07-02T16:03:00+00:00 Remove verbose ignition config logging from bootstrap MCS
-
-- router image-arm64 8f68a7349a85ac34dc9de9c88767c60000713575 to e5c059ea7a57d1ee5436b253cf214f144c9a7f27
-  - 4dddbe9 2026-07-07T21:05:47+05:30 OCPBUGS-86715: Strip X-SSL-Client-* headers for plain HTTP
-
