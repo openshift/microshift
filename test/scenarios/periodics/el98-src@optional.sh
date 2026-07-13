@@ -7,6 +7,10 @@
 # shellcheck disable=SC2034  # used elsewhere
 TEST_EXECUTION_TIMEOUT=60m
 
+# shellcheck disable=SC2034  # used elsewhere
+# Increase greenboot timeout for optional packages (more services to start)
+GREENBOOT_TIMEOUT=1200
+
 # Redefine network-related settings to use the dedicated network bridge
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_MULTUS_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
