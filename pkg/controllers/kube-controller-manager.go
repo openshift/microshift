@@ -121,12 +121,12 @@ func configure(ctx context.Context, cfg *config.Config) (args []string, applyFn 
 		if err := assets.ApplyClusterRoles(ctx, []string{
 			"controllers/kube-controller-manager/csr_approver_clusterrole.yaml",
 		}, kubeconfigPath); err != nil {
-			return fmt.Errorf("failed to apply kube-controller-manager RBAC: %w", err)
+			return fmt.Errorf("failed to apply kube-controller-manager cluster roles: %w", err)
 		}
 		if err := assets.ApplyClusterRoleBindings(ctx, []string{
 			"controllers/kube-controller-manager/csr_approver_clusterrolebinding.yaml",
 		}, kubeconfigPath); err != nil {
-			return fmt.Errorf("failed to apply kube-controller-manager RBAC: %w", err)
+			return fmt.Errorf("failed to apply kube-controller-manager cluster role bindings: %w", err)
 		}
 		return nil
 	}
