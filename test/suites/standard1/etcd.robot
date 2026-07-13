@@ -79,7 +79,7 @@ Set MemoryHigh Limit Unlimited
     [Tags]    configuration    restart    slow
     [Setup]    Setup With Custom Config    ${MEMLIMIT0}
     Expect MemoryHigh    infinity
-    [Teardown]    Restore Default Config
+    [Teardown]    Remove Drop In MicroShift Config    10-etcd
 
 Set MemoryHigh Limit 256MB
     [Documentation]    Set the memory limit for etcd to 256MB and ensure it takes effect
@@ -87,7 +87,7 @@ Set MemoryHigh Limit 256MB
     [Setup]    Setup With Custom Config    ${MEMLIMIT256}
     # Expecting the setting to be 256 * 1024 * 1024
     Expect MemoryHigh    268435456
-    [Teardown]    Restore Default Config
+    [Teardown]    Remove Drop In MicroShift Config    10-etcd
 
 
 *** Keywords ***

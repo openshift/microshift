@@ -66,7 +66,7 @@ ${DNS_LIMIT_LESS_THAN_REQUEST}      SEPARATOR=\n
 *** Test Cases ***
 Default DNS Resources
     [Documentation]    Verify default DNS resources when no custom config is applied
-    [Setup]    Remove DNS Resource Config
+    [Setup]    Run Keywords    Remove DNS Resource Config    AND    Restart MicroShift
     DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.cpu    50m
     DNS Resource Value Should Be    ${DNS_RESOURCE_PATH}.requests.memory    70Mi
 
@@ -107,13 +107,13 @@ Invalid Resource Quantity Prevents Start
     [Documentation]    Verify MicroShift fails to start with invalid resource quantity
     [Setup]    Apply Invalid DNS Resource Config    ${DNS_INVALID_QUANTITY}
     Pattern Should Appear In Log Output    ${CURSOR}    invalid dns resource request
-    [Teardown]    Remove DNS Resource Config
+    [Teardown]    Run Keywords    Remove DNS Resource Config    AND    Restart MicroShift
 
 Limit Less Than Request Prevents Start
     [Documentation]    Verify MicroShift fails to start when limit is less than request
     [Setup]    Apply Invalid DNS Resource Config    ${DNS_LIMIT_LESS_THAN_REQUEST}
     Pattern Should Appear In Log Output    ${CURSOR}    must be greater than or equal to request
-    [Teardown]    Remove DNS Resource Config
+    [Teardown]    Run Keywords    Remove DNS Resource Config    AND    Restart MicroShift
 
 DNS Resolution After Resource Change
     [Documentation]    Verify CoreDNS resolves cluster-local services after resource change
@@ -132,7 +132,10 @@ Setup
     Setup Kubeconfig
 
 Teardown
-    [Documentation]    Test suite teardown
+    [Documentation]    Restart MicroShift to restore clean state after the last test
+    ...    (per-test teardowns skip the restart), then clean up.
+    Remove Drop In MicroShift Config    ${DNS_DROPIN}
+    Restart MicroShift
     Remove Kubeconfig
     Logout MicroShift Host
 
@@ -169,20 +172,21 @@ DNS Resource Value Should Match Empty
 Apply DNS Resource Config
     [Documentation]    Remove any existing drop-in, apply a new DNS resource config and restart MicroShift
     [Arguments]    ${config}
-    Remove DNS Resource Config
+    Remove Drop In MicroShift Config    ${DNS_DROPIN}
     Drop In MicroShift Config    ${config}    ${DNS_DROPIN}
     Restart MicroShift
 
 Apply Invalid DNS Resource Config
     [Documentation]    Apply an invalid DNS resource config that should prevent MicroShift from starting
     [Arguments]    ${config}
-    Remove DNS Resource Config
+    Remove Drop In MicroShift Config    ${DNS_DROPIN}
+    Restart MicroShift
     Drop In MicroShift Config    ${config}    ${DNS_DROPIN}
     ${cursor}=    Get Journal Cursor
     VAR    ${CURSOR}=    ${cursor}    scope=TEST
     Run Keyword And Expect Error    0 != 1    Restart MicroShift
 
 Remove DNS Resource Config
-    [Documentation]    Remove the DNS resource drop-in config and restart MicroShift
+    [Documentation]    Remove the DNS resource drop-in config without restarting.
+    ...    The next test's setup will restart MicroShift.
     Remove Drop In MicroShift Config    ${DNS_DROPIN}
-    Restart MicroShift
