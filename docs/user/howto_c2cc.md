@@ -67,9 +67,12 @@ restored automatically within seconds.
 
 ## Prerequisites
 
-- Two or more hosts running MicroShift with the default OVN-Kubernetes CNI
-  (C2CC requires OVN-Kubernetes; it is not available with
-  `network.cniPlugin: none`).
+- Two or more hosts with MicroShift installed and the default OVN-Kubernetes
+  CNI (C2CC requires OVN-Kubernetes; it is not available with
+  `network.cniPlugin: none`). Ideally, MicroShift has not been started yet so
+  that cluster and service CIDRs can be set before the first boot. If
+  MicroShift has already run, wipe its state first with
+  `microshift-cleanup-data --all` (this deletes all workloads).
 - IP connectivity between the hosts on the underlay network (same L2
   segment, or routable next-hops).
 - **Non-overlapping pod and service CIDRs across all clusters.**
@@ -178,11 +181,16 @@ host IP untrusted blocks host-originated traffic from reaching local pods.
 (The IPsec setup requires opening UDP 500/4500 and ESP separately — see the
 [IPsec guide](./howto_c2cc_ipsec.md).)
 
-### Restart MicroShift
+### Start MicroShift
 
 ```bash
-sudo systemctl restart microshift
+sudo systemctl start microshift
 ```
+
+> **Note:** If MicroShift was already running and you changed
+> `network.clusterNetwork` or `network.serviceNetwork`, you must wipe its
+> data first with `microshift-cleanup-data --all` (this deletes all
+> workloads) and then start the service.
 
 MicroShift validates the C2CC configuration on startup.
 If validation fails (overlapping CIDRs, a routing loop, an invalid next-hop,
