@@ -1,10 +1,5 @@
 [microshift-gitops]
-name = Red Hat OpenShift GitOps {{ .Env.GITOPS_VERSION }} for RHEL 9 {{ .Env.UNAME_M }} (RPMs)
-baseurl = https://cdn.redhat.com/content/dist/layered/rhel9/{{ .Env.UNAME_M }}/gitops/{{ .Env.GITOPS_VERSION }}/os
+name = Red Hat OpenShift GitOps {{ .Env.GITOPS_VERSION }} for RHEL 9 {{ .Env.UNAME_M }} (RPMs) - Brew Candidate
+baseurl = https://download.eng.bos.redhat.com/brewroot/repos/gitops-{{ .Env.GITOPS_VERSION }}-rhel-9-candidate/latest/{{ .Env.UNAME_M }}/
 enabled = 1
-gpgcheck = 1
-gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-sslverify = 1
-sslcacert = /etc/rhsm/ca/redhat-uep.pem
-sslclientkey = {{ .Env.SSL_CLIENT_KEY_FILE }}
-sslclientcert = {{ .Env.SSL_CLIENT_CERT_FILE }}
+gpgcheck = 0
