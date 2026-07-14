@@ -1,0 +1,21 @@
+[Unit]
+Description=MicroShift Prometheus
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image={{ prometheus_image }}
+ContainerName={{ prometheus_container_name }}
+PublishPort={{ prometheus_host_address }}:{{ prometheus_port }}:{{ prometheus_container_port }}
+Volume={{ prometheus_config_dir }}:/etc/prometheus:ro,z
+Volume={{ prometheus_data_volume }}:/prometheus
+StopTimeout={{ prometheus_stop_timeout }}
+Exec=--config.file=/etc/prometheus/prometheus.yml --config.auto-reload --config.auto-reload-interval={{ prometheus_auto_reload_interval }} --storage.tsdb.path=/prometheus --web.enable-lifecycle --web.listen-address=0.0.0.0:{{ prometheus_container_port }} --storage.tsdb.retention.time={{ prometheus_retention_time }}{% if prometheus_retention_size | length > 0 %} --storage.tsdb.retention.size={{ prometheus_retention_size }}{% endif %}
+
+[Service]
+Restart=always
+TimeoutStartSec=120
+TimeoutStopSec={{ (prometheus_stop_timeout | int) + 10 }}
+
+[Install]
+WantedBy=default.target

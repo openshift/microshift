@@ -1,82 +1,150 @@
 ---
 # add-kubelet-logging tasks
 
-- name: Check to ensure promdir target exists
-  ansible.builtin.stat:
-    path: "{{ prometheus_dir }}"
-  register: promdir
-
-- name: Check if the file exists
-  ansible.builtin.stat:
-    path: "{{ sa_token_file }}"
-  register: token_file
-  delegate_to: localhost
-  become: false
-
-- name: Deal with metrics service account token file
-  when: token_file.stat.exists
+- name: Configure kubelet targets for managed Prometheus container
+  when: prometheus_container_managed | default(false) | bool
   block:
-    - name: Load sa-token file from localhost
-      ansible.builtin.slurp:
-        src: "{{ sa_token_file }}"
-      register: bearer_token_slurp
-      delegate_to: localhost
-      become: false
-      no_log: true
+    - name: Check Prometheus config directory
+      ansible.builtin.stat:
+        path: "{{ prometheus_config_dir }}"
+      register: promdir
 
-    - name: Decode bearer token
-      ansible.builtin.set_fact:
-        bearer_token: "{{ bearer_token_slurp.content | b64decode }}"
-      no_log: true
+    - name: Check Prometheus scrape config directory
+      ansible.builtin.stat:
+        path: "{{ prometheus_scrape_config_dir }}"
+      register: prometheus_scrape_dir
 
-    - name: Create metrics service account token file in prometheus folder
-      ansible.builtin.copy:
-        content: "{{ bearer_token }}"
-        dest: "{{ kubelet_auth_token_file }}"
-        mode: '0644'
-      when: promdir.stat.exists
-      no_log: true
+    - name: Verify Prometheus config directories
+      ansible.builtin.assert:
+        that:
+          - promdir.stat.isdir | default(false)
+          - prometheus_scrape_dir.stat.isdir | default(false)
+        fail_msg: "Prometheus configuration directories do not exist"
 
-    - name: Remove the sa-token file
-      ansible.builtin.file:
+    - name: Check for new metrics service account token
+      ansible.builtin.stat:
         path: "{{ sa_token_file }}"
-        state: absent
+      register: token_file
       delegate_to: localhost
       become: false
 
-- name: Append kubelet scrape config target to prometheus config
-  ansible.builtin.blockinfile:
-    path: "{{ prometheus_config }}"
-    block: |
-      # kubelet targets
-      {% for host in groups['microshift'] %}
-        - job_name: kubelet-{{ host }}
-          scheme: https
-          authorization:
-            credentials_file: "{{ kubelet_auth_token_file }}"
-          tls_config:
-            insecure_skip_verify: true
-          static_configs:
-            - targets:
-                - {{ hostvars[host].ansible_host }}:10250
-              labels:
-                instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
+    - name: Install new metrics service account token
+      when: token_file.stat.exists
+      block:
+        - name: Verify new metrics service account token
+          ansible.builtin.assert:
+            that:
+              - token_file.stat.size | default(0) | int > 0
+            fail_msg: "Metrics service account token {{ sa_token_file }} is empty"
 
-        - job_name: kubelet-{{ host }}-cadvisor
-          scheme: https
-          authorization:
-            credentials_file: "{{ kubelet_auth_token_file }}"
-          tls_config:
-            insecure_skip_verify: true
-          metrics_path: /metrics/cadvisor
-          static_configs:
-            - targets:
-                - {{ hostvars[host].ansible_host }}:10250
-              labels:
-                instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
-      {% endfor %}
+        - name: Load metrics service account token
+          ansible.builtin.slurp:
+            src: "{{ sa_token_file }}"
+          register: bearer_token_slurp
+          delegate_to: localhost
+          become: false
+          no_log: true
 
-- name: Restart prometheus to pick up new target
-  ansible.builtin.systemd:
-    state: restarted
-    name: prometheus
+        - name: Write Prometheus metrics service account token
+          ansible.builtin.copy:
+            content: "{{ bearer_token_slurp.content | b64decode }}"
+            dest: "{{ kubelet_auth_token_file }}"
+            mode: '0644'
+            setype: container_file_t
+          register: prometheus_token_install
+          no_log: true
+
+        - name: Remove temporary metrics service account token
+          ansible.builtin.file:
+            path: "{{ sa_token_file }}"
+            state: absent
+          delegate_to: localhost
+          become: false
+
+    - name: Check installed metrics service account token
+      ansible.builtin.stat:
+        path: "{{ kubelet_auth_token_file }}"
+      register: prometheus_token
+
+    - name: Verify installed metrics service account token
+      ansible.builtin.assert:
+        that:
+          - prometheus_token.stat.isreg | default(false)
+          - prometheus_token.stat.size | default(0) | int > 0
+        fail_msg: "Prometheus metrics token {{ kubelet_auth_token_file }} is missing or empty"
+
+    # Normalize retained tokens when no replacement token was supplied.
+    - name: Set Prometheus metrics service account token permissions
+      ansible.builtin.file:
+        path: "{{ kubelet_auth_token_file }}"
+        state: file
+        mode: '0644'
+        setype: container_file_t
+      register: prometheus_token_permissions
+
+    - name: Write and validate Prometheus kubelet configuration
+      block:
+        - name: Write Prometheus kubelet configuration
+          ansible.builtin.template:
+            src: kubelet.yml.j2
+            dest: "{{ prometheus_kubelet_scrape_config }}"
+            mode: '0644'
+            setype: container_file_t
+            backup: true
+          register: prometheus_kubelet_config_template
+
+        - name: Validate Prometheus configuration with kubelet targets
+          ansible.builtin.command:
+            argv:
+              - podman
+              - exec
+              - "{{ prometheus_managed_container_name }}"
+              - /bin/promtool
+              - check
+              - config
+              - /etc/prometheus/prometheus.yml
+          changed_when: false
+
+      rescue:
+        - name: Restore previous Prometheus kubelet configuration
+          ansible.builtin.copy:
+            src: "{{ prometheus_kubelet_config_template.backup_file }}"
+            dest: "{{ prometheus_kubelet_scrape_config }}"
+            remote_src: true
+            mode: '0644'
+            setype: container_file_t
+          when:
+            - prometheus_kubelet_config_template is defined
+            - prometheus_kubelet_config_template.backup_file is defined
+
+        - name: Remove invalid new Prometheus kubelet configuration
+          ansible.builtin.file:
+            path: "{{ prometheus_kubelet_scrape_config }}"
+            state: absent
+          when:
+            - prometheus_kubelet_config_template is defined
+            - prometheus_kubelet_config_template.changed | default(false)
+            - prometheus_kubelet_config_template.backup_file is not defined
+
+        - name: Report Prometheus kubelet configuration validation failure
+          ansible.builtin.fail:
+            msg: >-
+              {{ ansible_failed_result.stderr
+              | default(ansible_failed_result.stdout, true)
+              | default(ansible_failed_result.msg, true)
+              | default('Prometheus kubelet configuration could not be written or validated', true) }}
+
+    # POST applies managed changes immediately; auto-reload converges later disk changes.
+    - name: Reload Prometheus to pick up kubelet targets
+      ansible.builtin.uri:
+        url: "{{ prometheus_local_url }}/-/reload"
+        method: POST
+        status_code: 200
+      register: prometheus_reload
+      retries: 5
+      delay: 3
+      until: prometheus_reload.status == 200
+      when: >-
+        prometheus_kubelet_config_template.changed
+        or (prometheus_token_install.changed | default(false))
+        or prometheus_token_permissions.changed
