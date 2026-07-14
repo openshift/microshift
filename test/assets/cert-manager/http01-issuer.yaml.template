@@ -1,0 +1,16 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: ${HTTP01_ISSUER_NAME}
+  namespace: ${NAMESPACE}
+spec:
+  acme:
+    server: "https://pebble.${NAMESPACE}.svc.cluster.local:14000/dir"
+    skipTLSVerify: true
+    privateKeySecretRef:
+      name: acme-account-key
+    solvers:
+    - http01:
+        ingress:
+          ingressClassName: openshift-ingress

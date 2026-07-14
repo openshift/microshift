@@ -1,0 +1,25 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: secret-reader
+  namespace: ${NAMESPACE}
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["${SECRET_NAME}"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ingress-secret-reader
+  namespace: ${NAMESPACE}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: secret-reader
+subjects:
+- kind: ServiceAccount
+  name: router
+  namespace: openshift-ingress
