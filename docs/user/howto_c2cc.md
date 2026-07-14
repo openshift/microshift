@@ -4,7 +4,7 @@ Cluster-to-Cluster Connectivity (C2CC) enables direct Pod-to-Pod and
 Pod-to-Service communication between independent MicroShift clusters.
 It targets edge deployments where multiple single-node MicroShift instances
 on the same network segment (or reachable via routable next-hops) need to
-consume each other's workloads without an external interconnect solution.
+consume each other's workloads without an 3rd party interconnect solution.
 
 C2CC provides:
 
@@ -153,7 +153,7 @@ on every host (full mesh, N×(N-1) entries in total).
 
 ### Configure the firewall
 
-MicroShift intentionally does not manage firewall rules for C2CC — edge
+MicroShift intentionally does not manage firewall rules — edge
 deployments often have site-specific firewall policies.
 On each host, add the *remote* cluster's pod and service CIDRs to the
 trusted zone:
@@ -420,40 +420,46 @@ Remember to remove the remote CIDRs from the firewall trusted zone as well.
 
 ## Considerations
 
-- **No authentication or encryption by default.** Any host that can reach
-  (or spoof) the configured next-hop IP can inject traffic into the
-  cluster, and because SNAT is bypassed, that traffic can carry an
-  attacker-chosen source IP that matches NetworkPolicy allow rules. Use
-  [IPsec](./howto_c2cc_ipsec.md) together with the nftables enforcement
-  described there for production deployments — that combination provides
-  encryption and mutual authentication, and drops unauthenticated traffic
-  (including host-originated traffic to pods) at the network layer even
-  when the IPsec service itself is stopped or misconfigured.
-- **NetworkPolicies are your responsibility.** C2CC does not create
-  NetworkPolicy resources. Namespaces with default-deny ingress must
-  explicitly allow the remote pod CIDRs (`ipBlock` selectors work, since
-  original pod source IPs are preserved).
-- **Restart required for changes.** The C2CC configuration is read at
-  startup; any change (adding/removing remotes, DNS TTLs, routing tables)
-  requires a MicroShift restart.
-- **Changing routing table IDs leaves stale state.** MicroShift does not
-  clean up C2CC routes on shutdown (by design, so workloads keep network
-  connectivity if the MicroShift process stops). If you change `routing.*`
-  table IDs while C2CC is enabled, the routes and rules in the old tables
-  remain until a reboot or manual cleanup (`ip route flush table <old-id>`).
-- **MTU.** C2CC does not adjust MTU, and cross-cluster traffic itself adds
-  no encapsulation — it leaves the host as plain IP at the pod MTU.
-  MicroShift defaults the pod MTU to the MTU of the physical interface;
-  on jumbo-frame networks it can be set explicitly by creating
-  `/etc/microshift/ovn.yaml` with an `mtu:` value (changing it requires a
-  node reboot to take effect). When encrypting the traffic with IPsec,
-  leave headroom for the ESP overhead when sizing the pod MTU; see the
-  [IPsec guide](./howto_c2cc_ipsec.md).
-- **Scale.** Configuration is static and full-mesh (each cluster lists
-  every other cluster), so it does not scale to large fleets without
-  external configuration automation. C2CC is validated with up to 3
-  interconnected clusters.
-- **Validation failures block startup.** Invalid C2CC configuration
-  (overlapping CIDRs, routing loops, bad masks, duplicate next-hops or
-  domains) prevents MicroShift from starting; check
-  `journalctl -u microshift` for the specific error.
+### No authentication or encryption by default.
+Any host that can reach (or spoof) the configured next-hop IP can inject traffic
+into the cluster, and because SNAT is bypassed, that traffic can carry an
+attacker-chosen source IP that matches NetworkPolicy allow rules. Use
+[IPsec](./howto_c2cc_ipsec.md) together with the nftables enforcement described
+there for production deployments — that combination provides encryption and
+mutual authentication, and drops unauthenticated traffic (including
+host-originated traffic to pods) at the network layer even when the IPsec
+service itself is stopped or misconfigured.
+
+### NetworkPolicies are your responsibility.
+C2CC does not create NetworkPolicy resources. Namespaces with default-deny
+ingress must explicitly allow the remote pod CIDRs (`ipBlock` selectors work,
+since original pod source IPs are preserved).
+
+### Restart required for changes.
+The C2CC configuration is read at startup; any change (adding/removing remotes,
+DNS TTLs, routing tables) requires a MicroShift restart.
+
+### Changing routing table IDs leaves stale state.
+MicroShift does not clean up C2CC routes on shutdown (by design, so workloads
+keep network connectivity if the MicroShift process stops). If you change
+`routing.*` table IDs while C2CC is enabled, the routes and rules in the old
+tables remain until a reboot or manual cleanup (`ip route flush table <old-id>`).
+
+### MTU
+C2CC does not adjust MTU, and cross-cluster traffic itself adds no
+encapsulation — it leaves the host as plain IP at the pod MTU.  MicroShift
+defaults the pod MTU to the MTU of the physical interface; on jumbo-frame
+networks it can be set explicitly by creating `/etc/microshift/ovn.yaml` with an
+`mtu:` value (changing it requires a node reboot to take effect). When
+encrypting the traffic with IPsec, leave headroom for the ESP overhead when
+sizing the pod MTU; see the [IPsec guide](./howto_c2cc_ipsec.md).
+
+### Scale
+Configuration is static and full-mesh (each cluster lists every other cluster),
+so it does not scale to large fleets without external configuration automation.
+C2CC is validated with up to 3 interconnected clusters.
+
+### Validation failures block startup
+Invalid C2CC configuration (overlapping CIDRs, routing loops, bad masks,
+duplicate next-hops or domains) prevents MicroShift from starting; check
+`journalctl -u microshift` for the specific error.
