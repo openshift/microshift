@@ -25,8 +25,8 @@ clean_podman_images() {
     if [ "${FULL_CLEAN}" = 1 ] ; then
         title "Cleaning up container images"
 
-        sudo podman rmi -af
-        podman rmi -af
+        sudo podman rmi -af || true
+        podman rmi -af || true
         # Ensure the user-specific container storage is deleted
         sudo rm -rf ~/.local/share/containers/
     fi
