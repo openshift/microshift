@@ -1,4 +1,4 @@
-package v1alpha1
+package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	GroupName     = "config.openshift.io"
-	GroupVersion  = schema.GroupVersion{Group: GroupName, Version: "v1alpha1"}
+	GroupName     = "etcd.openshift.io"
+	GroupVersion  = schema.GroupVersion{Group: GroupName, Version: "v1"}
 	schemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
 	// Install is a function which adds this version to a scheme
 	Install = schemeBuilder.AddToScheme
@@ -27,20 +27,13 @@ func Resource(resource string) schema.GroupResource {
 	return schema.GroupResource{Group: GroupName, Resource: resource}
 }
 
-// Adds the list of known types to api.Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(GroupVersion,
-		&ClusterMonitoring{},
-		&ClusterMonitoringList{},
-		&InsightsDataGather{},
-		&InsightsDataGatherList{},
-		&Backup{},
-		&BackupList{},
-		&CRIOCredentialProviderConfig{},
-		&CRIOCredentialProviderConfigList{},
-		&PKI{},
-		&PKIList{},
-	)
 	metav1.AddToGroupVersion(scheme, GroupVersion)
+
+	scheme.AddKnownTypes(GroupVersion,
+		&PacemakerCluster{},
+		&PacemakerClusterList{},
+	)
+
 	return nil
 }
