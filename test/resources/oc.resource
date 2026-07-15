@@ -27,7 +27,8 @@ Oc Get
 Oc Get JsonPath
     [Documentation]    Run 'oc get' for a specific instance of a type in a namespace
     ...    with jsonpath provided. Returns output of the command without any parsing.
-    [Arguments]    ${type}    ${namespace}    ${resource}    ${jsonpath}
+    ...    An optional label selector can be provided to filter resources.
+    [Arguments]    ${type}    ${namespace}    ${resource}    ${jsonpath}    ${label}=${EMPTY}
 
     IF    "${namespace}"=="${EMPTY}"
         VAR    ${namespace_arg}=    -A
@@ -35,7 +36,13 @@ Oc Get JsonPath
         VAR    ${namespace_arg}=    -n ${namespace}
     END
 
-    ${text}=    Run With Kubeconfig    oc get ${namespace_arg} -o=jsonpath='{ ${jsonpath} }' ${type} ${resource}
+    VAR    ${label_arg}=    ${EMPTY}
+    IF    "${label}"!="${EMPTY}"
+        VAR    ${label_arg}=    -l ${label}
+    END
+
+    ${text}=    Run With Kubeconfig
+    ...    oc get ${namespace_arg} ${label_arg} -o=jsonpath='{ ${jsonpath} }' ${type} ${resource}
 
     RETURN    ${text}
 
