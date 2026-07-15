@@ -6,6 +6,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/oc.resource
+Resource            ../../resources/optional-config.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -57,13 +58,18 @@ Metrics Server Reports Node Metrics
 
 *** Keywords ***
 Setup
-    [Documentation]    Login, setup kubeconfig, and extract client certs for mTLS.
+    [Documentation]    Login, setup kubeconfig, enable metrics optionals, and extract client certs for mTLS.
     Setup Suite
+    Setup MicroShift With Optionals
+    ...    080-microshift-metrics-server
+    ...    081-microshift-kube-state-metrics
+    ...    082-microshift-node-exporter
     Extract Metrics Client Certs
 
 Teardown
-    [Documentation]    Remove temporary client certs and tear down suite.
+    [Documentation]    Remove temporary client certs, restore config, and tear down suite.
     Cleanup Metrics Client Certs
+    Teardown MicroShift With Optionals
     Teardown Suite
 
 Extract Metrics Client Certs
