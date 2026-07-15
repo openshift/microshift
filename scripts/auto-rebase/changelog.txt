@@ -1,0 +1,118 @@
+- api embedded-component a3d85be7fdb14831fea2b3dbe2a6be12ced23aa0 to 2dd36ba36332f069adb63635ebb65d3d474b3154
+  - 2a646c59 2026-07-09T11:18:16-04:00 fix: make the CEL error message more descriptive advised by Joel
+  - 36c4759e 2026-07-09T09:22:24-04:00 CONSOLE-5163: Add ratcheting validation tests for componentRoutes MaxItems=250
+  - c638d3ad 2026-07-09T09:15:16-04:00 Fix joel's review comments
+  - 724146a6 2026-07-08T12:18:18-04:00 Remove AzureClusterHostedDNSInstall feature gate
+  - 12c595cf 2026-07-07T16:47:47-04:00 CONSOLE-5163: Add openshift.io/ as reserved label key prefix
+  - 6cfe9142 2026-06-30T01:25:28-04:00 update empty resoucre CRIOCredentialProviderConfig to v1
+  - 1bdeb2d8 2026-06-11T14:48:24-04:00 Enhance IngressSpec documentation to specify a maximum of 250 component routes.
+  - 9bb12169 2026-06-11T14:32:30-04:00 Update config/v1/types_ingress.go
+  - 628b8ca3 2026-06-04T17:19:51-04:00 Update enhancement PR URL for IngressComponentRouteLabels feature gate
+  - afa3235b 2026-06-02T15:10:15-04:00 fix the review comments and run make update
+  - 6740a1bb 2026-06-02T11:19:29-04:00 Apply suggestions from code review
+  - 97f9faf7 2026-06-01T17:13:09-04:00 make update
+  - 0e5ff489 2026-06-01T16:44:26-04:00 Enhance ComponentRouteSpec labels validation documentation
+  - 2090d437 2026-06-01T11:23:47-04:00 CONSOLE-5163: Replace CEL regex with type-level validation
+  - a58bd908 2026-05-29T14:17:20-04:00 fix the failing ci
+  - 091391ae 2026-05-29T00:24:18-04:00 Address the second round of review comments
+  - 2c69bb1e 2026-05-28T23:37:11-04:00 Apply suggestions from code review
+  - 09357780 2026-05-27T16:59:11-04:00 Implement @saschagrunert 's review comments
+  - b5a6dab4 2026-05-27T14:40:48-04:00 Update config/v1/types_ingress.go
+  - 1fde3f0c 2026-05-14T09:19:24-04:00 CONSOLE-5163: Add labels field to Ingress componentRoutes
+  - 6d5edf7d 2026-05-12T15:17:31-04:00 CONSOLE-5163: Add labels field to Ingress componentRoutes
+
+- cluster-kube-apiserver-operator embedded-component 7c2e3d4ca6d3b979d5eb34805e40667f9bfb21c6 to 350a8de0174b9fc4f3c8d2549afb5321b3348639
+  - 681cec6 2026-07-10T01:08:54+02:00 CNTRLPLANE-3234: wire KMS health reporter status writer
+  - fc34e53 2026-07-08T14:42:26+02:00 Add 10-minute degraded inertia for StaticPodsDegraded
+
+- cluster-network-operator embedded-component 125f66d06478ad6874e0fe72c353af6999ecf69f to e7f4de6204c26e2f8784fc4c7e2b508b08324fb5
+  - aa45339 2026-07-10T16:39:07+02:00 Add pre-merge checks and custom checks to CodeRabbit configuration
+  - eeac17c 2026-07-09T10:15:20-04:00 OCPBUGS-88531: Propagate restart-date annotation to CNO operand pod templates
+  - 5c6d85c 2026-07-09T15:43:46+03:00 Update OWNERS file
+  - f42c41c 2026-06-16T18:55:20-04:00 DPU host: use configurable mgmt-port-resource-count instead of node query
+  - 236717c 2026-05-27T10:10:31+02:00 OCPBUGS-62144: Restart pods when rendering egressIP settings
+
+- machine-config-operator embedded-component f6d6db3c6582352d810c4294e59ae5e37d4d13e7 to aba5cf4f88838e98bac8832d69616a4757ff704d
+  - 8453052c 2026-07-10T13:05:15-04:00 Add an additional rebuild guard
+  - 3ac9456c 2026-07-10T12:52:06-04:00 Fix OSImageStream version-skew rejection during upgrades
+  - 52da16f7 2026-07-10T01:57:55-04:00 fix log typo
+  - 84ceaed6 2026-07-10T01:57:55-04:00 fix e2e deletion test
+  - 5c8f7809 2026-07-10T01:57:55-04:00 fix bootstrap-e2e tests
+  - f6eec095 2026-07-10T01:57:55-04:00 simplify IRI version dependency in Bootstrap and Renderer
+  - 6ac4e33b 2026-07-10T01:57:55-04:00 update openshift/api and openshift/client-go dependencies
+  - 80f38933 2026-07-10T01:57:45-04:00 bumped openshift/api and openshift/client-go dependencies
+  - 623aa3d5 2026-07-10T01:46:43-04:00 bump InternalReleaseImage from v1alpha1 to v1
+  - d74ea9c7 2026-07-08T21:42:14+05:30 Add Osimagestream TC
+
+- oc image-amd64 22c69c0ff5da7e390b42880141e43d555e38ef41 to 06090012bda409d3d22e350718c1aef9e8ef4e62
+  - 10c6a5a1 2026-07-09T01:22:29+05:30 NO-JIRA: Fix staticcheck warnings in pkg/cli/admin/mustgather Address several staticcheck findings in the must-gather package: - Remove unnecessary fmt.Sprintf calls wrapping plain strings (S1039) - Eliminate unused make() allocation overwritten on next line (SA4006) - Use time.Since instead of time.Now().Sub (S1012) - Remove redundant return at end of function (S1023) Signed-off-by: Ankit Mahajan  ankimaha@redhat.com
+
+- router image-amd64 92a1fe6420e7fa5cff3ac1e4234b866e8f742c9f to 63387d7dbb87809de7e95c406f6816697af8d207
+  - 3a51f90 2026-07-07T20:02:46-03:00 OCPBUGS-87204: Prevent SSRF via FQDN-typed EndpointSlices
+
+- oc image-arm64 22c69c0ff5da7e390b42880141e43d555e38ef41 to 06090012bda409d3d22e350718c1aef9e8ef4e62
+  - 10c6a5a1 2026-07-09T01:22:29+05:30 NO-JIRA: Fix staticcheck warnings in pkg/cli/admin/mustgather Address several staticcheck findings in the must-gather package: - Remove unnecessary fmt.Sprintf calls wrapping plain strings (S1039) - Eliminate unused make() allocation overwritten on next line (SA4006) - Use time.Since instead of time.Now().Sub (S1012) - Remove redundant return at end of function (S1023) Signed-off-by: Ankit Mahajan  ankimaha@redhat.com
+
+- router image-arm64 92a1fe6420e7fa5cff3ac1e4234b866e8f742c9f to 63387d7dbb87809de7e95c406f6816697af8d207
+  - 3a51f90 2026-07-07T20:02:46-03:00 OCPBUGS-87204: Prevent SSRF via FQDN-typed EndpointSlices
+
+- ovn-kubernetes image-arm64 fc46681bd5720c0139c394eea3d2ab686a2cf46f to 8e2e1542642847da592268a0ab94a207eb8d3605
+  - d801b10b 2026-07-02T13:06:04Z sync test annotations with upstream changes
+  - 1fd388e1 2026-07-02T13:04:27Z sync openshift/go.mod with upstream dependencies
+  - d7c007bd 2026-07-01T11:51:28-07:00 Fix RA string w(<nil>)  no subnets
+  - eece31fe 2026-07-01T11:16:27+05:30 perf(networkmanager): increase networkReconciler Threadiness for parallel UDN startup
+  - cecfd82e 2026-06-30T14:16:49-04:00 hybrid-overlay: fix flow sync test race
+  - 9ed1fe92 2026-06-30T10:29:31-04:00 Add UDN NBDB programmed duration metric for node controllers
+  - 07b58f72 2026-06-30T10:29:31-04:00 Add UDN scale metrics for cluster manager
+  - 2b8b438b 2026-06-29T16:43:28-07:00 node: don't short-circuit management port IP ingress to the physical bridge
+  - f35fae4d 2026-06-29T15:13:02-05:00 Decreasing log level for three obj_retry messages
+  - cab9578a 2026-06-27T16:23:42-07:00 chore: Fix allocatePodAnnotation() return value
+  - 5492d396 2026-06-27T15:41:46-07:00 chore: Update egress healthcheck to avoid duplicate proto registration
+  - 1816998e 2026-06-26T14:36:22+02:00 node: reconcile DPU/DPUHost gateway annotations on IP change
+  - b1ff103d 2026-06-26T08:32:55-04:00 Apply TLS configuration to the ovnkube metrics server
+  - e167d644 2026-06-26T08:32:55-04:00 Add TLS configuration CLI flags to ovnkube
+  - ffc78922 2026-06-26T08:32:55-04:00 Convert metrics server tests from Go testing to Ginkgo BDD style
+  - cb359f13 2026-06-26T08:32:55-04:00 Consolidate StartMetricsServer and StartOVNMetricsServer
+  - 95943010 2026-06-26T08:32:55-04:00 Remove unused fields and parameters from metrics server API
+  - 0b5d900b 2026-06-26T14:05:57+02:00 node: fix DPUHost controller crash when node-primary-ifaddr is not yet set
+  - 9a5ec9b3 2026-06-25T12:11:22-07:00 helm: remove legacy node charts
+  - 5236136c 2026-06-24T21:46:00+02:00 agents: add AGENTS.md project context for AI coding agents
+  - 9cede2d1 2026-06-24T17:43:49+02:00 Skip IP collision scan for L2/localnet pod deletion
+  - bb68b08d 2026-06-24T14:47:28+02:00 Add CodeRabbit path instructions and global review guidelines
+  - 3ddc00fe 2026-06-24T12:06:16+02:00 e2e: add BUM suppression test for L2 EVPN MAC-VRF networks
+  - d61248e5 2026-06-24T09:10:42+02:00 Customizes workqueue prometheus metrics
+  - 00371400 2026-06-23T15:02:54-04:00 OKEP 6019: VRF-Lite Shared Gateway Mode
+  - 9217f566 2026-06-23T10:48:13-07:00 ovn: scope GR-to-cluster-router routes to node subnet in no-overlay mode
+  - ac54646d 2026-06-23T14:28:45+02:00 Fix data race in EVPN node controller test
+  - 33b1f648 2026-06-23T13:09:06+03:00 chore: bump sriovnet lib
+  - 6a5d0280 2026-06-23T10:50:06+02:00 area-merge: remove token downscoping, use app installation permissions
+  - 7fd7daf4 2026-06-22T16:01:27-04:00 node: set gateway FDB on DPU host representor
+  - 0f6123af 2026-06-22T18:53:09+02:00 docs: document ovn-kubernetes-merge-bot GitHub App
+  - 8f757007 2026-06-22T18:53:09+02:00 area-merge: use GitHub App token for branch protection bypass
+  - bde5fa52 2026-06-18T11:10:37-07:00 Bump ubuntu version to 26.04 to get OVN 26.03
+  - 38219975 2026-06-18T19:55:00+02:00 doc: fix typo: 'resolover' to 'resolver'
+  - 18c34456 2026-06-18T18:40:04+02:00 e2e(kubevirt): fix secondary VMI status IPv6 address expectation
+  - 4a989e72 2026-06-18T15:58:30+02:00 contrib: bump KubeVirt to v1.8.4
+  - 0ff47eb2 2026-06-18T10:57:26+02:00 Add an explicit ai-slop label for coderabbit slop detection
+  - c3ef8c45 2026-06-17T22:00:43+02:00 Update perf report comment to edit instead of creating new ones
+  - 450a9549 2026-06-17T17:30:07+02:00 Address review comment: exported common metrics helper functions.
+  - f1c5dc5b 2026-06-17T17:30:07+02:00 Address review feedback on condition metrics
+  - 2423d9b8 2026-06-17T17:30:07+02:00 Add RA, CUDN, and VTEP condition metrics
+  - bdbe9960 2026-06-17T15:29:45+02:00 cluster manager: clear stale pidfile before start
+  - a897883e 2026-06-17T16:09:27+05:30 fix: correct typos and nil error return in unidling controller
+  - 31c5d10a 2026-06-17T10:01:32+02:00 Improves egressIP in ovn with libovsdb batch ops and addressSets fix
+  - 0d3ee580 2026-06-16T19:30:14+05:30 Eliminate Node DeepCopy overhead in node event handlers
+  - a8fe1eee 2026-06-16T19:18:52+05:30 test: enable relaxed service names in kind
+  - 381fb6b9 2026-06-16T08:29:42+01:00 area-merge: fall back to created_at for queued runs with null started_at
+  - 10efbffd 2026-06-16T08:18:27+01:00 area-merge: deduplicate check runs by name, keep latest only
+  - 031f8dfa 2026-06-15T15:40:43+02:00 docs(kubevirt): clean up comments
+  - 63e64280 2026-06-15T11:49:43+02:00 unit test: shut down FakeOVN in UDN sync tests
+  - dd7f58c0 2026-06-13T13:12:36-04:00 Simplify interface sysctl utils
+  - 35d3f58d 2026-06-13T10:56:18-04:00 Fix capitalization of SetForwardingModeForInterface
+  - 4e4e1e29 2026-06-13T11:31:43+05:30 Bump OVN RPM to 26.03.1-50.fc43
+  - 14921d77 2026-06-12T13:49:16+02:00 e2e: use generic Kubernetes sets
+  - fa5e0b54 2026-06-12T13:49:16+02:00 e2e: require stable ETP=local nodeport responses
+  - b677c3c4 2026-06-09T11:56:26+02:00 node: inconsistent managementPortRepresentor state
+  - a7b0a76b 2026-06-09T11:56:26+02:00   node: cleanup tolerate missing representor link
+  - e4f6aaef 2026-05-25T19:18:25+05:30 Mid-Screen-Responsive
+
