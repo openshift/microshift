@@ -141,6 +141,8 @@ spec:
             --db-nb-cluster-local-proto=tcp \
             --no-monitor"
 
+          rm -f /run/ovn/ovnnb_db.sock
+
           echo "$(date -Iseconds) - starting nbdb"
 
           exec /usr/share/ovn/scripts/ovn-ctl \
@@ -285,6 +287,8 @@ spec:
             --db-sb-cluster-local-addr=$(bracketify ${K8S_NODE_IP}) \
             --db-sb-cluster-local-proto=tcp \
             --no-monitor"
+
+          rm -f /run/ovn/ovnsb_db.sock
 
           echo "$(date -Iseconds) - starting sbdb "
           exec /usr/share/ovn/scripts/ovn-ctl \
