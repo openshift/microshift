@@ -22,6 +22,17 @@ check_semver_no_suffix() {
 }
 
 
+# Generate CBOM (Cryptographic Bill of Materials)
+if [[ "${CRYPTO_SCAN:-}" == "true" ]]; then
+    ./scripts/auto-rebase/crypto_scan.sh
+    if [[ -n "$(git status -s cbom-microshift.json sbom-microshift-crypto.spdx.json)" ]]; then
+        echo "Updating CBOM"
+        git add cbom-microshift.json sbom-microshift-crypto.spdx.json
+        git commit -m "update cbom"
+    fi
+    exit 0
+fi
+
 echo "Environment:"
 printenv
 
