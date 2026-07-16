@@ -1,62 +1,23 @@
-- api embedded-component a3d85be7fdb14831fea2b3dbe2a6be12ced23aa0 to 2dd36ba36332f069adb63635ebb65d3d474b3154
-  - 2a646c59 2026-07-09T11:18:16-04:00 fix: make the CEL error message more descriptive advised by Joel
-  - 36c4759e 2026-07-09T09:22:24-04:00 CONSOLE-5163: Add ratcheting validation tests for componentRoutes MaxItems=250
-  - c638d3ad 2026-07-09T09:15:16-04:00 Fix joel's review comments
-  - 724146a6 2026-07-08T12:18:18-04:00 Remove AzureClusterHostedDNSInstall feature gate
-  - 12c595cf 2026-07-07T16:47:47-04:00 CONSOLE-5163: Add openshift.io/ as reserved label key prefix
-  - 6cfe9142 2026-06-30T01:25:28-04:00 update empty resoucre CRIOCredentialProviderConfig to v1
-  - 1bdeb2d8 2026-06-11T14:48:24-04:00 Enhance IngressSpec documentation to specify a maximum of 250 component routes.
-  - 9bb12169 2026-06-11T14:32:30-04:00 Update config/v1/types_ingress.go
-  - 628b8ca3 2026-06-04T17:19:51-04:00 Update enhancement PR URL for IngressComponentRouteLabels feature gate
-  - afa3235b 2026-06-02T15:10:15-04:00 fix the review comments and run make update
-  - 6740a1bb 2026-06-02T11:19:29-04:00 Apply suggestions from code review
-  - 97f9faf7 2026-06-01T17:13:09-04:00 make update
-  - 0e5ff489 2026-06-01T16:44:26-04:00 Enhance ComponentRouteSpec labels validation documentation
-  - 2090d437 2026-06-01T11:23:47-04:00 CONSOLE-5163: Replace CEL regex with type-level validation
-  - a58bd908 2026-05-29T14:17:20-04:00 fix the failing ci
-  - 091391ae 2026-05-29T00:24:18-04:00 Address the second round of review comments
-  - 2c69bb1e 2026-05-28T23:37:11-04:00 Apply suggestions from code review
-  - 09357780 2026-05-27T16:59:11-04:00 Implement @saschagrunert 's review comments
-  - b5a6dab4 2026-05-27T14:40:48-04:00 Update config/v1/types_ingress.go
-  - 1fde3f0c 2026-05-14T09:19:24-04:00 CONSOLE-5163: Add labels field to Ingress componentRoutes
-  - 6d5edf7d 2026-05-12T15:17:31-04:00 CONSOLE-5163: Add labels field to Ingress componentRoutes
+- api embedded-component 2dd36ba36332f069adb63635ebb65d3d474b3154 to 8bc26b0fcc2d981007c4c725a73df8ed05578b33
+  - 2796bf49 2026-07-13T16:59:39+01:00 Sippy timestamp filter should use Millisecond unix timestamp for proper filtering
+  - 1b05df00 2026-07-10T16:25:20+02:00 update generated manifests
+  - af8fc1ce 2026-07-10T16:25:20+02:00 OCPBUGS-91634: MAPI/CAPI: Fix ImageDigestFormat validation to allow deep registry paths
 
-- cluster-kube-apiserver-operator embedded-component 7c2e3d4ca6d3b979d5eb34805e40667f9bfb21c6 to 350a8de0174b9fc4f3c8d2549afb5321b3348639
-  - 681cec6 2026-07-10T01:08:54+02:00 CNTRLPLANE-3234: wire KMS health reporter status writer
-  - fc34e53 2026-07-08T14:42:26+02:00 Add 10-minute degraded inertia for StaticPodsDegraded
+- cluster-ingress-operator embedded-component 7b7406ee0d4bf03de360d53c9cc4a83ee14332cc to c5165343c3e197352fa2abdac9fa6cdbd1c2e693
+  - b36d9f99 2026-07-08T16:29:47-03:00 Add new HAProxy 2.8 image reference
 
-- cluster-network-operator embedded-component 125f66d06478ad6874e0fe72c353af6999ecf69f to e7f4de6204c26e2f8784fc4c7e2b508b08324fb5
-  - aa45339 2026-07-10T16:39:07+02:00 Add pre-merge checks and custom checks to CodeRabbit configuration
-  - eeac17c 2026-07-09T10:15:20-04:00 OCPBUGS-88531: Propagate restart-date annotation to CNO operand pod templates
-  - 5c6d85c 2026-07-09T15:43:46+03:00 Update OWNERS file
-  - f42c41c 2026-06-16T18:55:20-04:00 DPU host: use configurable mgmt-port-resource-count instead of node query
-  - 236717c 2026-05-27T10:10:31+02:00 OCPBUGS-62144: Restart pods when rendering egressIP settings
+- cluster-kube-apiserver-operator embedded-component 350a8de0174b9fc4f3c8d2549afb5321b3348639 to 52b56f2d75d65fa8bc01d57ddd7cae9aa364e360
+  - 83b778f 2026-07-14T10:27:40+03:00 Bump library-go to sync
 
-- machine-config-operator embedded-component f6d6db3c6582352d810c4294e59ae5e37d4d13e7 to aba5cf4f88838e98bac8832d69616a4757ff704d
-  - 8453052c 2026-07-10T13:05:15-04:00 Add an additional rebuild guard
-  - 3ac9456c 2026-07-10T12:52:06-04:00 Fix OSImageStream version-skew rejection during upgrades
-  - 52da16f7 2026-07-10T01:57:55-04:00 fix log typo
-  - 84ceaed6 2026-07-10T01:57:55-04:00 fix e2e deletion test
-  - 5c8f7809 2026-07-10T01:57:55-04:00 fix bootstrap-e2e tests
-  - f6eec095 2026-07-10T01:57:55-04:00 simplify IRI version dependency in Bootstrap and Renderer
-  - 6ac4e33b 2026-07-10T01:57:55-04:00 update openshift/api and openshift/client-go dependencies
-  - 80f38933 2026-07-10T01:57:45-04:00 bumped openshift/api and openshift/client-go dependencies
-  - 623aa3d5 2026-07-10T01:46:43-04:00 bump InternalReleaseImage from v1alpha1 to v1
-  - d74ea9c7 2026-07-08T21:42:14+05:30 Add Osimagestream TC
+- cluster-network-operator embedded-component e7f4de6204c26e2f8784fc4c7e2b508b08324fb5 to 76e94f220c5088324e41bdf237049ebf621546b9
+  - 1bf7454 2026-07-12T10:24:21+03:00 Refresh Reviewers & Approvers lists
 
-- oc image-amd64 22c69c0ff5da7e390b42880141e43d555e38ef41 to 06090012bda409d3d22e350718c1aef9e8ef4e62
-  - 10c6a5a1 2026-07-09T01:22:29+05:30 NO-JIRA: Fix staticcheck warnings in pkg/cli/admin/mustgather Address several staticcheck findings in the must-gather package: - Remove unnecessary fmt.Sprintf calls wrapping plain strings (S1039) - Eliminate unused make() allocation overwritten on next line (SA4006) - Use time.Since instead of time.Now().Sub (S1012) - Remove redundant return at end of function (S1023) Signed-off-by: Ankit Mahajan  ankimaha@redhat.com
+- machine-config-operator embedded-component aba5cf4f88838e98bac8832d69616a4757ff704d to 9d62fc7479da51613e3867addb57672271dd73e1
+  - 19dda4cd 2026-07-14T16:19:50Z MCO-2427: move password, bootimages and cpms suites to longduration suite
+  - 418bc5b3 2026-07-14T10:49:29+02:00 MCO-2407: Move OSImageStream sync to MCC
+  - ce89998a 2026-07-10T13:55:08-04:00 upgrade CRIOCredentialProviderConfig to v1
 
-- router image-amd64 92a1fe6420e7fa5cff3ac1e4234b866e8f742c9f to 63387d7dbb87809de7e95c406f6816697af8d207
-  - 3a51f90 2026-07-07T20:02:46-03:00 OCPBUGS-87204: Prevent SSRF via FQDN-typed EndpointSlices
-
-- oc image-arm64 22c69c0ff5da7e390b42880141e43d555e38ef41 to 06090012bda409d3d22e350718c1aef9e8ef4e62
-  - 10c6a5a1 2026-07-09T01:22:29+05:30 NO-JIRA: Fix staticcheck warnings in pkg/cli/admin/mustgather Address several staticcheck findings in the must-gather package: - Remove unnecessary fmt.Sprintf calls wrapping plain strings (S1039) - Eliminate unused make() allocation overwritten on next line (SA4006) - Use time.Since instead of time.Now().Sub (S1012) - Remove redundant return at end of function (S1023) Signed-off-by: Ankit Mahajan  ankimaha@redhat.com
-
-- router image-arm64 92a1fe6420e7fa5cff3ac1e4234b866e8f742c9f to 63387d7dbb87809de7e95c406f6816697af8d207
-  - 3a51f90 2026-07-07T20:02:46-03:00 OCPBUGS-87204: Prevent SSRF via FQDN-typed EndpointSlices
-
-- ovn-kubernetes image-arm64 fc46681bd5720c0139c394eea3d2ab686a2cf46f to 8e2e1542642847da592268a0ab94a207eb8d3605
+- ovn-kubernetes image-amd64 fc46681bd5720c0139c394eea3d2ab686a2cf46f to 8e2e1542642847da592268a0ab94a207eb8d3605
   - d801b10b 2026-07-02T13:06:04Z sync test annotations with upstream changes
   - 1fd388e1 2026-07-02T13:04:27Z sync openshift/go.mod with upstream dependencies
   - d7c007bd 2026-07-01T11:51:28-07:00 Fix RA string w(<nil>)  no subnets
