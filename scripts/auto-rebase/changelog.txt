@@ -1,0 +1,17 @@
+- api embedded-component 319dc2e492034aab82d4820dd8d8e9a84e31b459 to f9b2d1ae30ebf759bc287c38474b41f246852cae
+  - 2cc7c8d 2026-07-13T10:08:31+00:00 add new serviceAccountToken fs type
+
+- cluster-ingress-operator embedded-component 7ec6093b5e31b50a57eab3653dca09b1bd174fee to fa958db6ac41da40aa032efa02cd4bb7365e59b9
+  - fa958db 2026-07-08T06:41:54+00:00 [release-4.18] OCPBUGS-86715: Add configuration override for X-SSL strip (#1477)
+
+- cluster-policy-controller embedded-component 5fd852525909ce6eab52972ba9ce8fcf56528eb9 to 3b44245d8fe9d9b1083998d8d956c7bc4d96a066
+  - bd81255 2026-07-13T21:57:32+02:00 add serviceAccountToken volume type to psalabelsyncer
+  - d14020e 2026-07-13T21:57:29+02:00 chore: go mod vendor
+  - ac3143d 2026-07-13T21:57:21+02:00 bump(openshift/api): to the latest release-4.18
+
+- machine-config-operator embedded-component 8850344945a77a0361f34c5cbe9891429128e1f4 to cf863831da46119a4c80382e5228397095898f1d
+  - 78cc2163 2026-07-10T16:20:31+00:00 Remove verbose ControllerConfig logging from bootstrap MCS
+
+- router image-amd64 8f68a7349a85ac34dc9de9c88767c60000713575 to e5c059ea7a57d1ee5436b253cf214f144c9a7f27
+  - 4dddbe9 2026-07-07T21:05:47+05:30 OCPBUGS-86715: Strip X-SSL-Client-* headers for plain HTTP
+
