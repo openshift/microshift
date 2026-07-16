@@ -151,7 +151,9 @@ Named VolumeSnapshot Should Be Ready
     ...    ${name}    Name of volumesnapshot to wait for
     ...    ${timeout}    Period of time to wait for volumeSnapshot ready "readyToUse" state.
     [Arguments]    ${name}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    Oc Wait    volumesnapshot/${name} -n ${NAMESPACE}    --for=jsonpath='{.status.readyToUse}=true'
+    Oc Wait
+    ...    volumesnapshot/${name} -n ${NAMESPACE}
+    ...    --for=jsonpath='{.status.readyToUse}=true' --timeout=${timeout}
 
 Named VolumeSnapshot Should Be Deleted
     [Documentation]    Wait for volumesnapshot with ${name} to be deleted
