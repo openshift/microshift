@@ -1,21 +1,12 @@
-- api embedded-component 6755619009c291e10c1903d20c579eae4bac9854 to 7df7d59279ddc13d010f5d25fe99ca21b0499542
-  - 524067dc 2026-06-24T22:11:40-04:00 [release-4.20] NE-2480: Promote GatewayAPIWithoutOLM feature gate to TechPreview
+- api embedded-component 7df7d59279ddc13d010f5d25fe99ca21b0499542 to 36dec0bfafe4403a1e04f3b10766b553342f10e2
+  - 89a277dd 2026-07-10T10:00:18Z add new serviceAccountToken fs type
 
-- kubernetes embedded-component 690775342de24ee56631e38e3f17592b14a6b202 to 2df3632e823a813f64218dfc6f5c2e70d28ecdf0
-  - 507a37b60 2026-06-29T17:19:02Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - c029d48d2 2026-06-11T16:59:07Z Release commit for Kubernetes v1.33.13
-  - a5e33bdfe 2026-06-09T15:20:21+02:00 Bump images and versions to go 1.25.11 and distroless iptables
-  - 2d5d3f0a2 2026-05-21T13:45:59-07:00 fix(endpoint): avoid panic on services with empty IPFamilies
-  - 024e61db8 2026-05-12T09:55:21Z Update CHANGELOG/CHANGELOG-1.33.md for v1.33.12
+- cluster-policy-controller embedded-component 47c783103216aa5e1242632127a5d8f98b8b7455 to 67083fab6cea4dde724efd5be5a22bda1f8437d1
+  - ab624b3 2026-07-10T16:26:47+02:00 add serviceAccountToken volume type to psalabelsyncer
+  - 62dfa43 2026-07-10T16:26:42+02:00 chore: go mod vendor
+  - c67bd6a 2026-07-10T16:26:33+02:00 bump(openshift/api): to the latest release-4.20
 
-- machine-config-operator embedded-component b65072348db26e02bbc27f3db64f62053fa63ee5 to 5824eb86b016c7923acf94ae1dab8d638e672771
-  - 255b4f36 2026-07-06T20:02:13Z Remove verbose ControllerConfig logging from bootstrap MCS
-  - acec8dae 2026-07-02T15:41:34Z Fix kubelet certificate wait loop in criometricsproxy.yaml and update init container's volumeMount to /var/lib/kubelet
-
-- kubernetes image-amd64 690775342de24ee56631e38e3f17592b14a6b202 to 2df3632e823a813f64218dfc6f5c2e70d28ecdf0
-  - 507a37b60 2026-06-29T17:19:02Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - c029d48d2 2026-06-11T16:59:07Z Release commit for Kubernetes v1.33.13
-  - a5e33bdfe 2026-06-09T15:20:21+02:00 Bump images and versions to go 1.25.11 and distroless iptables
-  - 2d5d3f0a2 2026-05-21T13:45:59-07:00 fix(endpoint): avoid panic on services with empty IPFamilies
-  - 024e61db8 2026-05-12T09:55:21Z Update CHANGELOG/CHANGELOG-1.33.md for v1.33.12
+- machine-config-operator embedded-component 5824eb86b016c7923acf94ae1dab8d638e672771 to 089ca7ab5cd8444ff0da467b7f5b0c39005661e9
+  - 551a6385 2026-07-09T13:42:42Z fix: update arbiter crio config
+  - f18672ef 2026-07-06T15:00:12Z bootimage: make vsphere updates atomic
 
