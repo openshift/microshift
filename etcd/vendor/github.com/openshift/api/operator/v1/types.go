@@ -147,17 +147,27 @@ type GenerationStatus struct {
 	// group is the group of the thing you're tracking
 	// +kubebuilder:validation:Required
 	Group string `json:"group"`
+
 	// resource is the resource type of the thing you're tracking
 	// +kubebuilder:validation:Required
 	Resource string `json:"resource"`
+
 	// namespace is where the thing you're tracking is
 	// +kubebuilder:validation:Required
 	Namespace string `json:"namespace"`
+
 	// name is the name of the thing you're tracking
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
+
+	// TODO: Add validation for lastGeneration. The value for this field should generally increase, except when the associated
+	// resource has been deleted and re-created. To accurately validate this field, we should introduce a new UID field and only
+	// enforce an increasing value in lastGeneration when the UID remains unchanged. A change in the UID indicates that the resource
+	// was re-created, allowing the lastGeneration value to reset or decrease.
+
 	// lastGeneration is the last generation of the workload controller involved
 	LastGeneration int64 `json:"lastGeneration"`
+
 	// hash is an optional field set for resources without generation that are content sensitive like secrets and configmaps
 	Hash string `json:"hash"`
 }
@@ -246,18 +256,27 @@ type StaticPodOperatorStatus struct {
 	// +listType=map
 	// +listMapKey=nodeName
 	// +optional
+	// +kubebuilder:validation:XValidation:rule="size(self.filter(status, status.?targetRevision.orValue(0) != 0)) <= 1",message="no more than 1 node status may have a nonzero targetRevision"
 	NodeStatuses []NodeStatus `json:"nodeStatuses,omitempty"`
 }
 
 // NodeStatus provides information about the current state of a particular node managed by this operator.
+// +kubebuilder:validation:XValidation:rule="has(self.currentRevision) || !has(oldSelf.currentRevision)",message="cannot be unset once set",fieldPath=".currentRevision"
+// +kubebuilder:validation:XValidation:rule="oldSelf.hasValue() || !has(self.currentRevision)",message="currentRevision can not be set on creation of a nodeStatus",optionalOldSelf=true,fieldPath=.currentRevision
+// +kubebuilder:validation:XValidation:rule="oldSelf.hasValue() || !has(self.targetRevision)",message="targetRevision can not be set on creation of a nodeStatus",optionalOldSelf=true,fieldPath=.targetRevision
 type NodeStatus struct {
 	// nodeName is the name of the node
 	// +kubebuilder:validation:Required
 	NodeName string `json:"nodeName"`
 
-	// currentRevision is the generation of the most recently successful deployment
-	CurrentRevision int32 `json:"currentRevision"`
-	// targetRevision is the generation of the deployment we're trying to apply
+	// currentRevision is the generation of the most recently successful deployment.
+	// Can not be set on creation of a nodeStatus. Updates must only increase the value.
+	// +kubebuilder:validation:XValidation:rule="self >= oldSelf",message="must only increase"
+	// +optional
+	CurrentRevision int32 `json:"currentRevision,omitempty"`
+	// targetRevision is the generation of the deployment we're trying to apply.
+	// Can not be set on creation of a nodeStatus.
+	// +optional
 	TargetRevision int32 `json:"targetRevision,omitempty"`
 
 	// lastFailedRevision is the generation of the deployment we tried and failed to deploy.
