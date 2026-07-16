@@ -1,4 +1,4 @@
-package v1alpha1
+package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -469,8 +469,8 @@ const (
 // PacemakerCluster is a cluster-scoped singleton resource. The name of this instance is "cluster". This
 // resource provides a view into the health and status of a pacemaker-managed cluster in Two Node OpenShift with Fencing deployments.
 //
-// Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.
-// +openshift:compatibility-gen:level=4
+// Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+// +openshift:compatibility-gen:level=1
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:path=pacemakerclusters,scope=Cluster,singular=pacemakercluster
 // +kubebuilder:subresource:status
@@ -723,8 +723,8 @@ type PacemakerClusterResourceStatus struct {
 // resource; only one instance named "cluster" may exist. This list type exists only to satisfy Kubernetes API
 // conventions.
 //
-// Compatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.
-// +openshift:compatibility-gen:level=4
+// Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+// +openshift:compatibility-gen:level=1
 type PacemakerClusterList struct {
 	metav1.TypeMeta `json:",inline"`
 

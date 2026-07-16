@@ -1,4 +1,4 @@
-package v1alpha1
+package v1
 
 // This file contains a collection of methods that can be used from go-restful to
 // generate Swagger API documentation for its models. Please read this PR for more
@@ -12,7 +12,7 @@ package v1alpha1
 
 // AUTO-GENERATED FUNCTIONS START HERE
 var map_PacemakerCluster = map[string]string{
-	"":         "PacemakerCluster represents the current state of the pacemaker cluster as reported by the pcs status command. PacemakerCluster is a cluster-scoped singleton resource. The name of this instance is \"cluster\". This resource provides a view into the health and status of a pacemaker-managed cluster in Two Node OpenShift with Fencing deployments.\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
+	"":         "PacemakerCluster represents the current state of the pacemaker cluster as reported by the pcs status command. PacemakerCluster is a cluster-scoped singleton resource. The name of this instance is \"cluster\". This resource provides a view into the health and status of a pacemaker-managed cluster in Two Node OpenShift with Fencing deployments.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 	"metadata": "metadata is the standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
 	"status":   "status contains the actual pacemaker cluster status information collected from the cluster. The goal of this status is to be able to quickly identify if pacemaker is in a healthy state. In Two Node OpenShift with Fencing, a healthy pacemaker cluster has 2 nodes, both of which have healthy kubelet, etcd, and fencing resources. This field is optional on creation - the status collector populates it immediately after creating the resource via the status subresource.",
 }
@@ -33,7 +33,7 @@ func (PacemakerClusterFencingAgentStatus) SwaggerDoc() map[string]string {
 }
 
 var map_PacemakerClusterList = map[string]string{
-	"":         "PacemakerClusterList contains a list of PacemakerCluster objects. PacemakerCluster is a cluster-scoped singleton resource; only one instance named \"cluster\" may exist. This list type exists only to satisfy Kubernetes API conventions.\n\nCompatibility level 4: No compatibility is provided, the API can change at any point for any reason. These capabilities should not be used by applications needing long term support.",
+	"":         "PacemakerClusterList contains a list of PacemakerCluster objects. PacemakerCluster is a cluster-scoped singleton resource; only one instance named \"cluster\" may exist. This list type exists only to satisfy Kubernetes API conventions.\n\nCompatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 	"metadata": "metadata is the standard list's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
 	"items":    "items is a list of PacemakerCluster objects.",
 }
