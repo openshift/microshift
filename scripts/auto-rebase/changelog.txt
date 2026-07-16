@@ -1,3 +1,157 @@
-- kubernetes image-arm64 72d01d1a9470f51f856b9b4b04e058e7645e4fb4 to ba6535cbb8719c3ba6c3923f2725ba050c87faab
+- api embedded-component 876752f4da3e5d7849dfec0da72095a28be42400 to 1cb630ce7109e6c4780332bb8140c8c4f7157426
+  - 9353b2fa 2026-07-09T17:30:41Z add new serviceAccountToken fs type
+
+- cluster-kube-apiserver-operator embedded-component 424f27c9c415373b7f60756b5a1c24f48f248512 to dc1c217c263cd220ddd2ed6fe827a466d47e3ebb
+  - 0d0ed18 2026-04-06T18:44:40Z scc: fix uid{Min,Max}Range for nested-container
+
+- cluster-network-operator embedded-component b5955e9ede2128e8558c41ce87c1e8a11e09a515 to 92a79d5cbc9e9040ee631c1a2f1ebf4e5cdd8cff
+  - 11ac150 2026-07-13T16:31:59-04:00 Bump github.com/containernetworking/cni v0.8.0 -> v1.3.0
+
+- cluster-policy-controller embedded-component 8b775487512fb543bff470ff1042bd3ac31b29be to e510507e20f6eb09694c880ecd79fa512a2b3470
+  - 789493d 2026-07-10T12:45:31+02:00 add serviceAccountToken volume type to psalabelsyncer
+  - b57e008 2026-07-10T12:45:23+02:00 chore: go mod vendor
+  - 0c80fc9 2026-07-10T12:45:03+02:00 bump(openshift/api,client-go): to the latest release-4.21
+
+- kubernetes embedded-component 72d01d1a9470f51f856b9b4b04e058e7645e4fb4 to ba6535cbb8719c3ba6c3923f2725ba050c87faab
   - 5e6c814d4 2026-06-30T12:39:41+05:30 UPSTREAM: <carry>: OCPBUGS-94059: backport kubernetes/conformance umbrella suite
+
+- machine-config-operator embedded-component 2a6f8182a071a30a1a55eb2616e1d0584c5a8ad0 to afbe2d9ef55cc9ad19243f370e9225ead5861cba
+  - af692dbd 2026-07-07T00:21:11Z manifests: inject proxy into mcc deployment
+  - 1f723981 2026-07-02T11:03:31-04:00 Annotate MOSB with job UID when reusing an existing build job
+  - a52bfa99 2026-06-22T10:11:26-04:00 Allow empty firstOptIn annotation in reconciler
+  - 8a9d126f 2026-06-22T09:47:47-04:00 Added check for missingAnnotation
+  - 8ee6781e 2026-06-13T05:01:05Z fix: update arbiter crio config
+
+- kubernetes image-amd64 72d01d1a9470f51f856b9b4b04e058e7645e4fb4 to ba6535cbb8719c3ba6c3923f2725ba050c87faab
+  - 5e6c814d4 2026-06-30T12:39:41+05:30 UPSTREAM: <carry>: OCPBUGS-94059: backport kubernetes/conformance umbrella suite
+
+- ovn-kubernetes image-arm64 d586f851c25d8f7cd04840cda79a0a6a98ea8485 to d7530a4dd33b6c8ccd6d8d0cf3114f6b7da5373b
+  - bbff4537 2026-05-05T11:41:01-04:00 [dpu-sim] Refactor DPU/DPU Host mode to be more readable.
+  - b29d4fae 2026-05-05T11:41:01-04:00 [dpu-sim] Add dpu-host-gateway-representor-interface config option
+  - 7d0d5c11 2026-05-05T11:41:01-04:00 [dpu-sim] Allow gateway options override for DPU Host Helm Chart
+  - f4f3ad32 2026-05-05T14:37:39Z docs: add EVPN design doc
+  - 9b7d64bb 2026-05-05T06:46:53-04:00 Delete etc directory
+  - fe2e8203 2026-05-04T17:29:46-04:00 Allow CI workflow dispatcher on release branches
+  - f96bfb13 2026-05-04T17:29:46-04:00 Update release docs for 1.3 release
+  - 1cc9eefa 2026-05-04T17:29:46-04:00 Change OVN_DAEMONSET_VERSION to 1.3.0
+  - 18f51409 2026-05-04T17:29:46-04:00 OVN-Kubernetes 1.3 release
+  - 4f17b5ef 2026-05-04T17:27:41-04:00 Hint that one should git add LICENSES after make third-party-licenses
+  - 8c54e459 2026-05-04T21:38:30+02:00 Run make -C go-controller third-party-licenses && git add LICENSES
+  - 3ec476de 2026-05-04T23:58:33+05:30 Resolves mismatched and broken links
+  - c06aa645 2026-05-04T17:17:32Z docs: use dummy interfaces instead of loopback for VTEP IP in EVPN okep
+  - f60bbac9 2026-05-04T14:21:57Z docs: add L2 SVI and static FDB/neighbor entries to EVPN okep
+  - 6426a2c7 2026-05-04T14:22:34+02:00 Fix managed BGP empty-cluster test race
+  - 3778429c 2026-05-04T14:11:19+02:00 docs: add no-overlay feature documentation
+  - bafdd335 2026-05-04T11:53:02+02:00 Rename VID allocation functions to ID allocation
+  - 684b496d 2026-05-04T11:53:02+02:00 Enforce VNI uniqueness per VTEP in EVPN networks
+  - a8a4597d 2026-05-04T09:12:49Z evpn e2e: return errors on cleanup functions
+  - f414dad9 2026-05-04T09:12:49Z evpn e2e: cleanup unused function
+  - e2da0a21 2026-05-04T09:12:49Z evpn e2e: create L2 SVI for MACVRFs on external FRR
+  - c3e1ee2c 2026-05-02T14:24:49+02:00 vtep: deduplicate warning events in handleManagedModeNotSupported
+  - 2600a631 2026-05-02T14:24:26+02:00 routeadvertisements: set GE field in vtepCIDRPrefixSelectors to restrict ToReceive filter to exact host routes
+  - 36db9e62 2026-05-01T14:34:28+05:30 Fixing unneccesary spaces
+  - a2896b16 2026-04-30T16:59:24-07:00 docs: Clarify helm install doc / fix basic-deploy.sh
+  - d7fc5d0f 2026-04-30T15:02:47-07:00 cni: remove incorrect DPU-host flow-check path from waitForPodInterface
+  - 872fcdac 2026-04-30T10:25:44-04:00 chassis-id: relax uuid requirement
+  - 29b9f2d5 2026-04-30T16:21:06+02:00 BGP e2e: avoid reuse of CUDN VRF names
+  - 084ef870 2026-04-30T16:17:09+02:00 BGP e2e: check CUDN GR routes in BGP pod-to-external test
+  - c62708e0 2026-04-30T10:07:09-04:00 UDN docs: clarify how to enable the feature
+  - b750fadf 2026-04-30T09:59:36-04:00 Adds Dynamic UDN docs
+  - b3f9f16a 2026-04-30T13:15:48+02:00 E2E: handle empty EgressIP status in service e2e tests
+  - d5307076 2026-04-30T11:28:58+02:00 Add user facing docs for ClusterNetworkConnect
+  - 74e347fa 2026-04-30T10:18:34+02:00 Move ovnPodAnnotationName from util to const
+  - b06057cc 2026-04-30T10:18:34+02:00 Simplify pod creation in some other files.
+  - 23237c22 2026-04-30T10:18:30+02:00 AddresssetManager: add multinetwork UT
+  - 9ca91e95 2026-04-30T10:18:27+02:00 Cleanup UTs from namespace address set.
+  - a6f37a70 2026-04-30T10:05:26+02:00 Remove and deprecate namespace address set.
+  - 1ccc1c0d 2026-04-29T14:30:39-07:00 docs: remove extra content from helm/ovn-kubernetes/README.md.gotmpl
+  - 7aba0ef7 2026-04-29T11:54:10-07:00 docs: refresh kubeadm install guide
+  - 254397cc 2026-04-29T10:17:20-07:00 Update docs regarding helm install
+  - 7a1ba299 2026-04-29T13:40:36+02:00 Enable IPsec for interconnect deployments
+  - 185d76d9 2026-04-29T12:06:32+02:00 Skip _stackmanager execution for libreswan 5.3+
+  - 3e586049 2026-04-29T11:24:31+02:00 Address set: add existing IPs check on setAddresses.
+  - 5e7908c2 2026-04-28T12:41:05-04:00 Update retest-action base image from Alpine 3.10 to 3.21
+  - ad46e42d 2026-04-28T08:54:17Z test: fix layer2 UDN controller test flake in kubevirt live-migration
+  - b66b0927 2026-04-28T10:05:39+02:00 fix UDN unit test to use new node controller constructor
+  - a0e535ac 2026-04-27T17:12:58Z EVPN: add allowas-in origin for BGP neighbors
+  - 4b7ffe0f 2026-04-27T16:49:36Z Bump the go_modules group across 3 directories with 2 updates
+  - 53822e35 2026-04-27T12:12:24-04:00 Fake NM: make it per network activity
+  - 5b9cf808 2026-04-27T12:12:24-04:00 cluster manager: integrate status manager with d-udn
+  - 726bdd19 2026-04-27T12:12:24-04:00 e2e egress fw: fixes for Dynamic UDN
+  - 267f18d2 2026-04-27T12:12:24-04:00 networkmanager: skip dynamic UDN for bare NADs
+  - 9c6e65bc 2026-04-27T12:12:24-04:00 cluster manager: fixes race with NAD deletion
+  - 9f7ece70 2026-04-27T12:12:24-04:00 Update e2e for Dynamic Subnet Allocation
+  - c1e81f8e 2026-04-27T12:12:24-04:00 Adds dynamic allocation for cluster manager
+  - 6760a289 2026-04-24T14:03:49-07:00 cleanup stale L2 primary UDN tunnel ID annotations on restart
+  - e1d509a8 2026-04-24T17:54:42+02:00 UT: get rid of the fake address set factory
+  - 7d049570 2026-04-24T17:54:38+02:00 Replace selectedNamespace = nil with more obvious struct.
+  - 960efda8 2026-04-24T17:18:18+02:00 Move hostNamespace handling to the addressset_manager.go
+  - f90bfac4 2026-04-24T11:07:08-04:00 Bump frr to 10.6.0 to pick up more coredump fixes
+  - caac89aa 2026-04-24T11:07:08-04:00 Bump metallb frr to 10.5.3
+  - d58942dd 2026-04-24T16:03:30+02:00 UT: stop setting HostNetworkNamespace across unrelated UTs
+  - 5b649e92 2026-04-24T16:03:30+02:00 addresssetManager: fix resetting address sets on restart.
+  - cc84bac9 2026-04-24T16:03:30+02:00 AddresssetManager: add legacy netpol mode.
+  - ef4338f1 2026-04-23T17:38:57-07:00 Fix minor coreabbit bug findings
+  - 208b4f9b 2026-04-23T15:48:18-07:00 Add missing gtw opt for isolated, fix comma escape
+  - 944ff5a3 2026-04-23T13:50:25-04:00 Fixes panic due to chassis delete with nil predicate value
+  - f503a50a 2026-04-23T10:12:00-07:00 Skip event recording for suppressed errors in node reconciliation
+  - 7965632a 2026-04-23T15:25:21+02:00 Fix inverted error check for ANP unsupported priority
+  - fbb03f8c 2026-04-23T14:14:42+05:30 Fix namespace handle leak in VRF manager
+  - 85c28ccb 2026-04-22T11:14:50-07:00 Remove ./daemonset.sh script
+  - 80be988d 2026-04-22T11:08:17-07:00 Deprecate kind.sh, symlink it to kind-helm.sh
+  - 2cc1ad3d 2026-04-22T11:08:17-07:00 Update upgrade-ovn.sh script
+  - ec8d9811 2026-04-22T11:08:17-07:00 Add missing metrics configuration
+  - 29b190d8 2026-04-22T11:08:17-07:00 Remove USE_HELM flag and default to always use helm
+  - 79e3c44b 2026-04-22T11:08:15-07:00 Move old crds j2 files into helm crds
+  - eaa8ee76 2026-04-22T10:55:45-07:00 Migrate remaining features from kind to kind-helm.sh
+  - 33dce5ba 2026-04-22T10:55:45-07:00 Remove the extra -helm suffix from CI test targets
+  - 5b1ee08e 2026-04-21T14:56:44-04:00 Include license files in container images
+  - 9b87f69b 2026-04-21T14:56:43-04:00 Add third-party license generation
+  - e4b71f53 2026-04-21T14:51:08-04:00 e2e: preload netshoot image for no_overlay suite
+  - 1b2426bf 2026-04-21T14:51:08-04:00 e2e: preload netshoot image for kubevirt tests instead of iperf
+  - 44c2f83d 2026-04-21T13:06:03-04:00 Bump frr to 10.5.3 to pick up more coredump fixes
+  - b0426d09 2026-04-21T12:44:18-04:00 e2e: preload frr image
+  - 998d0d90 2026-04-21T12:35:21-04:00 contrib: Allow to override FRR image version for metallb
+  - f5e9b820 2026-04-21T12:33:47-04:00 Fail job if sed -i is ineffective
+  - 99fee87e 2026-04-21T12:32:53-04:00 e2e: retry MetalLB LB wget checks under ETP local
+  - 20e9e0c0 2026-04-21T12:32:53-04:00 metallb: make ip pool reflect job ip family mode
+  - 9af7b326 2026-04-21T12:32:53-04:00 e2e: collect info about ip6 routes for bgp speakers
+  - 982f5db8 2026-04-21T12:32:53-04:00 e2e: wait for bgp route installed in external container
+  - 752cd3ad 2026-04-21T12:32:53-04:00 e2e: do not skip frr service coredumps
+  - be63c277 2026-04-21T12:32:53-04:00 Upgrade MetalLB from v0.14.9 to v0.15.3
+  - 2a571a00 2026-04-21T15:05:29+02:00 RegisterNADReconciler never returns an error, remove.
+  - b0b70ae0 2026-04-21T15:05:29+02:00 CNC: update to use RegisterNADReconciler to avoid races
+  - b562ed3b 2026-04-21T11:58:44+02:00 Add e2e tests for CNC annotation ValidatingAdmissionPolicy
+  - e426fae9 2026-04-21T11:58:44+02:00 Add ValidatingAdmissionPolicy for CNC annotations
+  - 0318088a 2026-04-20T21:01:04Z e2e, kubevirt: Fix ipamless localnet iperf flake by adding connectivity pre-check
+  - 6b2bbc72 2026-04-20T12:28:36-04:00 Address review: merge CUDN condition into UpdateSubsystemCondition and add e2e test
+  - 579b3143 2026-04-20T12:28:36-04:00 Report NetworkAllocationSucceeded status condition for CUDNs
+  - d656ea7f 2026-04-20T07:13:17-07:00 Fix add_dns_hostnames for ipv4, and other minor bug
+  - 328d097c 2026-04-17T05:35:15-07:00 Migrate all CI tests to helm
+  - 9b2be298 2026-04-16T10:02:27-07:00 Add SPDX license headers and CI enforcement
+  - 702e28ae 2026-04-16T10:02:50+02:00 E2E: Replace GetNetwork("kind") with PrimaryNetwork()
+  - 52ee5110 2026-04-16T12:23:17+05:30 Adding meta-descriptions plugin for SEO 1
+  - 9b392c3e 2026-04-16T12:14:15+05:30 Adding meta-descriptions plugin for SEO
+  - 6d526acc 2026-04-15T18:31:26+02:00 Cluster manager shouldn't error out on localnets with no subnet
+  - 626c58c1 2026-04-14T19:08:30+02:00 Add blog for kubecon demo on debugging network policies with netobserv
+  - ea282804 2026-04-14T20:34:47+05:30 Add node IP to HostNetworkNamespace address_set
+  - 2f18b02a 2026-04-14T14:44:08+02:00 Use Add instead of AddRateLimited in UDN svc controller event handlers
+  - f26c6811 2026-04-13T19:27:18+02:00 Improve EndpointSlice mirror controller scale bottlenecks
+  - 545e61fa 2026-04-13T12:19:39-04:00 Adds gateway annotation parsing to cache
+  - fe27ce9e 2026-04-13T16:44:01+05:30 Website UI Revamp
+  - 39e34326 2026-04-13T11:45:21+02:00 Fix subnet IP allocator to reject out-of-range IPs
+  - d5278136 2026-04-11T17:19:48-07:00 Fix IPv6/dualstack support in kind-helm.sh and migrate CI tests
+  - e3f43f00 2026-04-10T11:55:41-04:00 Fix reconciling updates for hostNetworkNamespace Addr set
+  - 35d53c41 2026-04-10T11:55:41-04:00 Node controller: fallback to latest informer object
+  - c8e5a58d 2026-04-10T11:55:41-04:00 cluster manager: fix checks for node-subnet allocation
+  - 1d60b690 2026-04-10T11:55:41-04:00 node: guard gateway reconcile during partial-init cleanup
+  - 97982888 2026-04-10T11:55:41-04:00 Move CDN to node-level driven controller
+  - 6f6d3567 2026-04-10T08:29:39-07:00 Support nodeSelector in AddressSetManager
+  - 8d14570b 2026-04-09T18:03:26-07:00 Fix node tracker missing node-subnets annotation transitions
+  - 11e77a28 2026-04-09T14:31:48+02:00 Fix shared AddressSetManager stale cache on UDN controller recreation
+  - 13e9373c 2026-04-09T13:53:58+02:00 github actions: update actions version due to deprecation of nodejs 20
+  - fcc61cc8 2026-04-08T15:47:28-07:00 Add optional VF resources fields for UDN in helm charts and daemonsets
+  - 8d712716 2026-04-07T14:42:40-04:00 adopters: add KubeStellar Console
+  - 373e2c86 2026-03-30T20:35:13-04:00 Fix DPU healthcheck by propagating namespace configuration to ovnkube
+  - fe163a70 2026-03-12T11:48:25+01:00 Fix invalid characters in e2e artifact directory paths
 
