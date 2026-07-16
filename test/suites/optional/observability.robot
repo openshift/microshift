@@ -57,6 +57,29 @@ Kube Events Logs Are Exported
     Wait Until Keyword Succeeds    10x    5s
     ...    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {service_name="kube_events"}
 
+KSM Metrics Are Exported Via Scrape Drop-In
+    [Documentation]    The prometheus receiver should scrape kube-state-metrics via the
+    ...    scrape.d drop-in and export kube_node_info to the prometheus exporter.
+
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    kube_node_info
+
+Node Exporter Metrics Are Exported Via Scrape Drop-In
+    [Documentation]    The prometheus receiver should scrape node-exporter via the
+    ...    scrape.d drop-in and export node_cpu_seconds_total to the prometheus exporter.
+
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    node_cpu_seconds_total
+
+Metrics Server Metrics Are Exported Via Scrape Drop-In
+    [Documentation]    The prometheus receiver should scrape metrics-server via the
+    ...    scrape.d drop-in and export metrics to the prometheus exporter.
+    ...    TODO: replace rest_client_requests_total with a metrics-server-specific metric
+    ...    once confirmed against actual metrics-server /metrics output.
+
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    rest_client_requests_total
+
 Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration
     ...    and thus indicate the provided default config should be reviewed.
@@ -71,7 +94,11 @@ Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
     Setup Suite
-    Setup MicroShift With Optionals    003-microshift-observability
+    Setup MicroShift With Optionals
+    ...    003-microshift-observability
+    ...    080-microshift-metrics-server
+    ...    081-microshift-kube-state-metrics
+    ...    082-microshift-node-exporter
     ${ns}    Create Unique Namespace
     VAR    ${NAMESPACE}    ${ns}    scope=SUITE
     Configure Firewall And Observability

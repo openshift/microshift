@@ -623,6 +623,7 @@ install -p -m644 assets/optional/ai-model-serving/release-ai-model-serving-x86_6
 
 # observability
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability/scrape.d
 install -p -m644 packaging/observability/*.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/
 # Explicit copy of large config as default. Not using symlink to avoid accidental package upgrade overwriting user config if the user edits the config without copying (i.e. edits the target of symlink).
 install -p -m644 packaging/observability/opentelemetry-collector-large.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/opentelemetry-collector.yaml
@@ -681,6 +682,9 @@ cat assets/optional/metrics-server/kustomization.aarch64.yaml >> %{buildroot}/%{
 cat assets/optional/metrics-server/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/kustomization.yaml
 %endif
 
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability/scrape.d
+install -p -m644 packaging/observability/scrape.d/metrics-server.yaml %{buildroot}/%{_sysconfdir}/microshift/observability/scrape.d/
+
 # metrics-server-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/metrics-server/release-metrics-server-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
@@ -705,6 +709,9 @@ cat assets/optional/node-exporter/kustomization.aarch64.yaml >> %{buildroot}/%{_
 cat assets/optional/node-exporter/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/kustomization.yaml
 %endif
 
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability/scrape.d
+install -p -m644 packaging/observability/scrape.d/node-exporter.yaml %{buildroot}/%{_sysconfdir}/microshift/observability/scrape.d/
+
 # node-exporter-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/node-exporter/release-node-exporter-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
@@ -727,6 +734,9 @@ cat assets/optional/kube-state-metrics/kustomization.aarch64.yaml >> %{buildroot
 %ifarch x86_64
 cat assets/optional/kube-state-metrics/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/kustomization.yaml
 %endif
+
+install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability/scrape.d
+install -p -m644 packaging/observability/scrape.d/kube-state-metrics.yaml %{buildroot}/%{_sysconfdir}/microshift/observability/scrape.d/
 
 # kube-state-metrics-release-info
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
@@ -923,6 +933,7 @@ fi
 %files observability
 %dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
 %dir %{_sysconfdir}/microshift/observability/
+%dir %{_sysconfdir}/microshift/observability/scrape.d/
 %{_unitdir}/microshift-observability.service
 %config(noreplace) %{_sysconfdir}/microshift/observability/opentelemetry-collector.yaml
 %{_sysconfdir}/microshift/observability/opentelemetry-collector-*.yaml
@@ -938,6 +949,7 @@ fi
 %files metrics-server
 %dir %{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
 %{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/*
+%config(noreplace) %{_sysconfdir}/microshift/observability/scrape.d/metrics-server.yaml
 
 %files metrics-server-release-info
 %{_datadir}/microshift/release/release-metrics-server-{x86_64,aarch64}.json
@@ -945,12 +957,14 @@ fi
 %files metrics-node-exporter
 %dir %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
 %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/*
+%config(noreplace) %{_sysconfdir}/microshift/observability/scrape.d/node-exporter.yaml
 
 %files metrics-node-exporter-release-info
 %{_datadir}/microshift/release/release-node-exporter-{x86_64,aarch64}.json
 %files metrics-kube-state
 %dir %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
 %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/*
+%config(noreplace) %{_sysconfdir}/microshift/observability/scrape.d/kube-state-metrics.yaml
 
 %files metrics-kube-state-release-info
 %{_datadir}/microshift/release/release-kube-state-metrics-{x86_64,aarch64}.json

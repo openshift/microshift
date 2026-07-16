@@ -1,0 +1,37 @@
+scrape_configs:
+  - job_name: kube-state-metrics
+    scrape_interval: 30s
+    scheme: https
+    tls_config:
+      ca_file: /var/lib/microshift/certs/service-ca/ca.crt
+      cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
+      key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
+      server_name: kube-state-metrics.openshift-monitoring.svc
+    kubernetes_sd_configs:
+      - kubeconfig_file: /var/lib/microshift/resources/observability-client/kubeconfig
+        role: endpoints
+        namespaces:
+          names:
+            - openshift-monitoring
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: kube-state-metrics;https-main
+  - job_name: kube-state-metrics-self
+    scrape_interval: 30s
+    scheme: https
+    tls_config:
+      ca_file: /var/lib/microshift/certs/service-ca/ca.crt
+      cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
+      key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
+      server_name: kube-state-metrics.openshift-monitoring.svc
+    kubernetes_sd_configs:
+      - kubeconfig_file: /var/lib/microshift/resources/observability-client/kubeconfig
+        role: endpoints
+        namespaces:
+          names:
+            - openshift-monitoring
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: kube-state-metrics;https-self

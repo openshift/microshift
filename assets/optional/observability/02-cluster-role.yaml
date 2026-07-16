@@ -64,3 +64,8 @@ rules:
       - get
       - list
       - watch
+  # OpenTelemetry Component: prometheus receiver scraping metrics-server
+  - nonResourceURLs:
+      - /metrics
+    verbs:
+      - get
