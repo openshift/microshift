@@ -69,6 +69,14 @@ func main() {
 		Qualifiers: []string{withExcludedTestsFilter(`(name.contains('[Serial]') || labels.exists(l, l == '[Serial]')) && labels.exists(l, l == "Conformance")`)},
 	})
 
+	// kubernetes/conformance is used by OPCT to run the minimal true upstream
+	// Kubernetes conformance tests, not the broader view OCP takes of what
+	// "conformance" means.
+	kubeTestsExtension.AddSuite(e.Suite{
+		Name:       "kubernetes/conformance",
+		Qualifiers: []string{withExcludedTestsFilter(`labels.exists(l, l == "Conformance")`)},
+	})
+
 	kubeTestsExtension.AddSuite(e.Suite{
 		Name: "kubernetes/conformance/parallel",
 		Parents: []string{
