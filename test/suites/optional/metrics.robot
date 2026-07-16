@@ -91,43 +91,27 @@ Metrics Endpoint Should Contain
     [Documentation]    Scrape kube-state-metrics on the given port and assert the
     ...    response contains the expected metric name.
     [Arguments]    ${port}    ${expected}
-    ${metrics}=    Scrape Kube State Metrics    ${port}
+    ${metrics}=    Scrape Metrics From    kube-state-metrics    ${port}
     Should Contain    ${metrics}    ${expected}
 
 Node Exporter Should Contain
     [Documentation]    Scrape node-exporter and assert the response contains the
     ...    expected metric name.
     [Arguments]    ${expected}
-    ${metrics}=    Scrape Node Exporter
+    ${metrics}=    Scrape Metrics From    node-exporter    9100
     Should Contain    ${metrics}    ${expected}
 
-Scrape Kube State Metrics
-    [Documentation]    Curl the kube-state-metrics Service endpoint on the given port
+Scrape Metrics From
+    [Documentation]    Curl the named metrics Service endpoint on the given port
     ...    with mTLS client certs. Resolves the IP from the Endpoints object
     ...    to validate that the headless Service selector matches the pod.
-    [Arguments]    ${port}
+    [Arguments]    ${metrics_service}    ${port}
     ${ep_ip}=    Oc Get JsonPath
     ...    endpoints
     ...    ${METRICS_NS}
-    ...    kube-state-metrics
+    ...    ${metrics_service}
     ...    .subsets[0].addresses[0].ip
     Should Not Be Empty    ${ep_ip}
     ${stdout}=    Command Should Work
     ...    curl -sk --cert ${CLIENT_CERT} --key ${CLIENT_KEY} https://${ep_ip}:${port}/metrics
     Should Not Be Empty    ${stdout}
-    RETURN    ${stdout}
-
-Scrape Node Exporter
-    [Documentation]    Curl the node-exporter Service endpoint on port 9100 with mTLS
-    ...    client certs. Resolves the IP from the Endpoints object to validate
-    ...    that the headless Service selector matches the pod.
-    ${ep_ip}=    Oc Get JsonPath
-    ...    endpoints
-    ...    ${METRICS_NS}
-    ...    node-exporter
-    ...    .subsets[0].addresses[0].ip
-    Should Not Be Empty    ${ep_ip}
-    ${stdout}=    Command Should Work
-    ...    curl -sk --cert ${CLIENT_CERT} --key ${CLIENT_KEY} https://${ep_ip}:9100/metrics
-    Should Not Be Empty    ${stdout}
-    RETURN    ${stdout}
