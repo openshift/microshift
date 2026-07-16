@@ -1,3 +1,22 @@
-- machine-config-operator embedded-component 2c38780866bcb511359fbab5ae1b2411c027ef36 to 464f0b06a376d8b21e93eb1a3d3064fb69a65c42
-  - 6bec4fe8 2026-07-07T00:20:28Z manifests: inject proxy into mcc deployment
+- api embedded-component 694421e64aeeae4374e7e7394014ad40ab5a1f30 to 30edb45d20352a7052ecb4c92450c36d73fa354b
+  - d7298cfc 2026-07-09T15:44:11Z add new serviceAccountToken fs type
+
+- cluster-ingress-operator embedded-component 531cea1bee8c085e81b0394dd47296fc4bd3fdf0 to e26c93f0ffdee3272b8fc74e7f1486be25f5d59c
+  - 2999348 2026-07-02T14:51:36Z Fix useOLM guard logic and and add remediation guidance
+  - 22ccb89 2026-07-02T14:51:35Z OCPBUGS-86833: Detect orphaned OSSM subscription after noOLM migration
+
+- cluster-network-operator embedded-component ad6c2f8350892f7e330105c1ffb10818150eec35 to c1ea3224b639ac2ee98b4f4590a40474976aac5e
+  - cbd9654 2026-07-08T23:11:41-04:00 OCPBUGS-97939: bump containernetworking/cni v0.8.0 -> v1.3.0
+  - 1fc1b75 2026-07-03T14:51:02+02:00 Revert "[release-4.22] OCPBUGS-90721: NVIDIA-596: Enable dpu healthcheck"
+
+- cluster-policy-controller embedded-component 44985a1306411101c84dd5081598fc928b432321 to 2e306e143051492a84c5e47a7b3126e096fdf76a
+  - 9f2409f 2026-07-09T19:39:28+02:00 add serviceAccountToken volume type to psalabelsyncer
+  - 9e8d476 2026-07-09T19:39:23+02:00 chore: go mod vendor
+  - c5f0089 2026-07-09T19:39:11+02:00 bump(openshift/api): to the latest release-4.22
+
+- oc image-amd64 062bc5449c4987c92c76da4d315ef4969c22d638 to 7ec2e14b74e700fec86dc0936a61f6c12b79d083
+  - b5acc72d 2026-07-10T13:41:40+02:00 CNTRLPLANE-3828: bump x/crypto to the latest version
+
+- oc image-arm64 062bc5449c4987c92c76da4d315ef4969c22d638 to 7ec2e14b74e700fec86dc0936a61f6c12b79d083
+  - b5acc72d 2026-07-10T13:41:40+02:00 CNTRLPLANE-3828: bump x/crypto to the latest version
 

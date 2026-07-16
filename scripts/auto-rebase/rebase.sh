@@ -487,6 +487,21 @@ update_go_mod() {
         make patch-deps
     fi
 
+    # Bump client-go to match the openshift/api version pulled by CPC.
+    # CPC bumps openshift/api but not client-go, and MVS won't upgrade
+    # client-go on its own. The mismatch causes build failures because
+    # openshift/kubernetes imports client-go/config apply configurations
+    # that reference types removed from the newer openshift/api.
+    if [[ -z "${ver_stream:-}" ]] && [[ -f "${STAGING_DIR}/release_amd64.json" ]]; then
+        ver_stream="$(jq -r '.config.config.Labels["io.openshift.release"]' "${STAGING_DIR}/release_amd64.json")"
+    fi
+    local release_xy
+    release_xy="$(echo "${ver_stream:-}" | grep -oP '^\d+\.\d+' || true)"
+    if [[ -n "${release_xy}" ]]; then
+        echo "go get github.com/openshift/client-go@release-${release_xy}"
+        go get "github.com/openshift/client-go@release-${release_xy}"
+    fi
+
     go mod tidy
 }
 
