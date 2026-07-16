@@ -102,24 +102,32 @@ Node Exporter Should Contain
     Should Contain    ${metrics}    ${expected}
 
 Scrape Kube State Metrics
-    [Documentation]    Curl the kube-state-metrics pod on the given port with mTLS client certs.
+    [Documentation]    Curl the kube-state-metrics Service endpoint on the given port
+    ...    with mTLS client certs. Resolves the IP from the Endpoints object
+    ...    to validate that the headless Service selector matches the pod.
     [Arguments]    ${port}
-    ${pod_ip}=    Oc Get JsonPath
-    ...    pod
+    ${ep_ip}=    Oc Get JsonPath
+    ...    endpoints
     ...    ${METRICS_NS}
-    ...    ${EMPTY}
-    ...    .items[0].status.podIP
-    ...    label=app.kubernetes.io/name\=kube-state-metrics
-    Should Not Be Empty    ${pod_ip}
+    ...    kube-state-metrics
+    ...    .subsets[0].addresses[0].ip
+    Should Not Be Empty    ${ep_ip}
     ${stdout}=    Command Should Work
-    ...    curl -sk --cert ${CLIENT_CERT} --key ${CLIENT_KEY} https://${pod_ip}:${port}/metrics
+    ...    curl -sk --cert ${CLIENT_CERT} --key ${CLIENT_KEY} https://${ep_ip}:${port}/metrics
     Should Not Be Empty    ${stdout}
     RETURN    ${stdout}
 
 Scrape Node Exporter
-    [Documentation]    Curl the node-exporter on localhost:9100 with mTLS client certs.
-    ...    node-exporter uses hostNetwork and hostPort so it is reachable on the host.
+    [Documentation]    Curl the node-exporter Service endpoint on port 9100 with mTLS
+    ...    client certs. Resolves the IP from the Endpoints object to validate
+    ...    that the headless Service selector matches the pod.
+    ${ep_ip}=    Oc Get JsonPath
+    ...    endpoints
+    ...    ${METRICS_NS}
+    ...    node-exporter
+    ...    .subsets[0].addresses[0].ip
+    Should Not Be Empty    ${ep_ip}
     ${stdout}=    Command Should Work
-    ...    curl -sk --cert ${CLIENT_CERT} --key ${CLIENT_KEY} https://localhost:9100/metrics
+    ...    curl -sk --cert ${CLIENT_CERT} --key ${CLIENT_KEY} https://${ep_ip}:9100/metrics
     Should Not Be Empty    ${stdout}
     RETURN    ${stdout}
