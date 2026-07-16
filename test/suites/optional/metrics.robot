@@ -121,3 +121,4 @@ Scrape Metrics From
     ${stdout}=    Command Should Work
     ...    curl -s --resolve ${svc_host}:${port}:${ep_ip} --cacert ${SERVICE_CA} --cert ${CLIENT_CERT} --key ${CLIENT_KEY} https://${svc_host}:${port}/metrics
     Should Not Be Empty    ${stdout}
+    RETURN    ${stdout}
