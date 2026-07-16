@@ -7,9 +7,9 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
 	github.com/google/go-cmp v0.7.0
 	github.com/miekg/dns v1.1.63 // microshift
-	github.com/openshift/api v0.0.0-20251117165054-348370f055bf
+	github.com/openshift/api v0.0.0-20260710095909-1cb630ce7109
 	github.com/openshift/build-machinery-go v0.0.0-20251023084048-5d77c1a5e5af
-	github.com/openshift/client-go v0.0.0-20251015124057-db0dee36e235
+	github.com/openshift/client-go v0.0.0-20251205093018-96a6cbc1420c
 	github.com/openshift/library-go v0.0.0-20251112091634-ab97ebb73f0f
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.9.1
@@ -31,7 +31,7 @@ require (
 	github.com/go-kit/kit v0.9.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
-	github.com/openshift/cluster-policy-controller v0.0.0-20251120141414-8b775487512f
+	github.com/openshift/cluster-policy-controller v0.0.0-20260710135216-e510507e20f6
 	github.com/openshift/route-controller-manager v0.0.0-20260525064134-166a3e96f815
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/common v0.66.1
