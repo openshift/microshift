@@ -30,7 +30,7 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
-	github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2 // indirect
+	github.com/openshift/api v0.0.0-20260713195309-f9b2d1ae30eb // indirect
 	github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/vishvananda/netlink v1.1.0 // indirect
