@@ -133,6 +133,8 @@ spec:
           ovn_db_file="/etc/ovn/ovn${db}_db.db"
           OVN_ARGS="--db-nb-cluster-local-port=9643 --no-monitor"
 
+          rm -f /run/ovn/ovnnb_db.sock
+
           echo "$(date -Iseconds) - starting nbdb"
           exec /usr/share/ovn/scripts/ovn-ctl \
             ${OVN_ARGS} \
@@ -250,6 +252,8 @@ spec:
           ovn_db_file="/etc/ovn/ovn${db}_db.db"
 
           OVN_ARGS="--db-sb-cluster-local-port=9644 --no-monitor"
+
+          rm -f /run/ovn/ovnsb_db.sock
 
           echo "$(date -Iseconds) - starting sbdb "
           exec /usr/share/ovn/scripts/ovn-ctl \
