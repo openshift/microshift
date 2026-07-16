@@ -1,9 +1,0 @@
-- cluster-ingress-operator embedded-component 1a164c16e804a4cf4f8b7aca4b8cb24d265dedb4 to 9e8619560c6aafa5c12807bafbe4bcd51686be64
-  - 6479e51 2026-06-30T00:34:47+05:30 OCPBUGS-86714: Add configuration override for X-SSL strip
-
-- machine-config-operator embedded-component b26f17094e08099aaaa7ff4cac3c3656a94297fa to 1f2c985976b04cbb270b96fd6e0e5fdf12f7072d
-  - 4f76fbb8 2026-07-06T20:21:36+00:00 Remove verbose ignition config logging from bootstrap MCS
-
-- router image-amd64 cbd6d0481c2ddb72901fdbfb3c3d87a2867b1e2b to 61ef15ff311cbc9f18f503f76edfb651a288291e
-  - eba53ed 2026-06-29T23:16:23+05:30 OCPBUGS-86714: Strip X-SSL-Client-* headers for plain HTTP
-
