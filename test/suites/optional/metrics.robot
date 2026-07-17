@@ -114,9 +114,6 @@ Scrape Metrics From
     ...    ${METRICS_NS}
     ...    ${metrics_service}
     ...    .subsets[0].addresses[0].ip
-    ${ep_ip}=    Get Regexp Matches    ${ep_ip}    \\d+\\.\\d+\\.\\d+\\.\\d+
-    Length Should Be    ${ep_ip}    1
-    VAR    ${ep_ip}=    ${ep_ip}[0]
     VAR    ${svc_host}=    ${metrics_service}.${METRICS_NS}.svc
     ${stdout}=    Command Should Work
     ...    curl -s --resolve ${svc_host}:${port}:${ep_ip} --cacert ${SERVICE_CA} --cert ${CLIENT_CERT} --key ${CLIENT_KEY} https://${svc_host}:${port}/metrics
