@@ -1,22 +1,143 @@
-- api embedded-component 694421e64aeeae4374e7e7394014ad40ab5a1f30 to 30edb45d20352a7052ecb4c92450c36d73fa354b
-  - d7298cfc 2026-07-09T15:44:11Z add new serviceAccountToken fs type
+- machine-config-operator embedded-component 464f0b06a376d8b21e93eb1a3d3064fb69a65c42 to 7d862ad8711335f953fe5a22286a9b516a09d4a1
+  - 37e55290 2026-07-14T11:15:10+05:30 Cherry-pick for #5881
+  - 483032c8 2026-06-29T11:46:07Z OCPBUGS-59958: Updated Unit Test, added extra getconfig check
+  - 89fbbedc 2026-06-29T11:46:07Z OCPBUGS-59958: move cleanUpDuplicatedMC to after pool loop in syncNodeConfigHandler
 
-- cluster-ingress-operator embedded-component 531cea1bee8c085e81b0394dd47296fc4bd3fdf0 to e26c93f0ffdee3272b8fc74e7f1486be25f5d59c
-  - 2999348 2026-07-02T14:51:36Z Fix useOLM guard logic and and add remediation guidance
-  - 22ccb89 2026-07-02T14:51:35Z OCPBUGS-86833: Detect orphaned OSSM subscription after noOLM migration
+- ovn-kubernetes image-amd64 8d3b38cdbe7005e2f8443dc02b0e94b65a8f05e9 to 78cb67c567846efa557d17368122978575bdf3e9
+  - 4ed7d1ec 2026-06-11T15:36:43+05:30 sync test annotations with upstream changes
+  - b4194487 2026-06-11T15:35:36+05:30 e2e: fix UDN subnet overlap with downstream service CIDR
+  - 4439fbd8 2026-06-04T11:09:04-04:00 fix: fail license generation on module download errors
+  - 73c7c88d 2026-06-04T11:09:00-04:00 fix: Use default GOTOOLCHAIN=auto when generating license files
+  - 69abaab2 2026-06-03T12:48:16+02:00 Make BGP server host port configurable
+  - 5e373a9c 2026-06-03T12:48:16+02:00 e2e: split same-UDN NodePort backend paths
+  - 19e34082 2026-06-03T12:48:16+02:00 e2e: add NodePort-node backend for UDN service
+  - bef1aa03 2026-06-03T12:48:16+02:00 e2e: select CUDN pod IP by family
+  - b3475348 2026-06-03T12:48:16+02:00 e2e: expect ETP=Local NodePort tests to succeed
+  - ae449ce3 2026-06-03T12:48:16+02:00 iprulemanager: include address family in rule equality
+  - 5fb1ded4 2026-06-03T12:48:16+02:00 e2e: wait for VRF-lite node readiness
+  - 9b514ecb 2026-06-02T14:48:48+02:00 e2e: expect VRF egress interface IP for LGW no-overlay SNAT
+  - 3710b5ab 2026-06-02T14:48:11+02:00 e2e: unskip no-overlay cross-node NodePort cases
+  - b435536a 2026-06-02T14:48:11+02:00 Test cases for CUDN with transport NoOverlay routing unmanaged outboundSNAT enabled and disabled in SGW and LGW mode
+  - 21bce8d9 2026-06-02T14:48:11+02:00 LGW: set ct-commit-all on L2 UDN cluster routers
+  - e95849c9 2026-06-02T14:48:11+02:00 LGW: set ct-commit-all on UDN cluster router
+  - 0ddbc064 2026-06-02T14:48:07+02:00 LGW: route no-overlay UDN ingress via OVN
+  - 9f42f945 2026-06-02T14:36:34+02:00 UDN service OpenFlow: handle SNAT to masq ip
+  - 88c03903 2026-06-02T14:36:34+02:00 SGW: Add conntrack flows for no-overlay UDN cross-node traffic
+  - 122ab5c2 2026-06-02T14:36:34+02:00 SGW: use allowed_ext_ips for advertised UDN SNAT
+  - 1ba24787 2026-06-01T11:05:14+02:00 Implement OutboundSNAT for CUDN in shared gateway mode
+  - 50386fa3 2026-06-01T11:05:12+02:00 Add OutboundSNAT field to NetInfo interface
+  - 2fbcc1f8 2026-06-01T11:05:10+02:00 Implement OutboundSNAT for CUDN in local gateway mode
+  - 91683a3d 2026-06-01T11:05:08+02:00 Render OutboundSNAT config from CUDN CRD to NAD
+  - 497c201a 2026-05-27T18:02:30-04:00 unit test: fix EVPN UDN expected node IP address set
+  - ad54c5a5 2026-05-27T17:25:34+02:00 node: skip updateOVNEncapIPAndReconnect tests without root privileges
+  - e2e701ee 2026-05-27T15:36:52+02:00 util: assume pod network advertisement for certain transports
+  - d2d101d6 2026-05-27T09:52:45+02:00 Optimize addressManager sync and linkmanager syncLink
+  - a069246c 2026-05-27T08:48:19+02:00 Fix deadlock in webhook if Serve fails before cancellation
+  - b9ed3293 2026-05-27T08:48:19+02:00 Add comprehensive unit tests for ovnkube-identity webhook.Run()
+  - 9d4334cd 2026-05-27T08:48:19+02:00 Refactor ovnkubeidentity webhook server into separate package
+  - cbb5c4d0 2026-05-26T17:04:54-04:00 Ensure node IP address set for advertised SNAT
+  - 757f3099 2026-05-26T20:44:22+02:00 e2e: replace random allocations with ConfigMap-backed allocators
+  - 1ff56ce8 2026-05-25T09:45:12+02:00 Fix kubevirt live migration test flake by avoiding fake client race
+  - 5ec0be6b 2026-05-25T07:40:38+02:00 fix(evpn): re-program neighbors after kubevirt live migration
+  - 5aa65afe 2026-05-25T07:40:38+02:00 fix(evpn): use NeighSet instead of NeighAdd for PERMANENT neighbors
+  - 3fbc9381 2026-05-22T14:20:05-07:00 chore: skip cicd tests for doc changes
+  - 8bc78918 2026-05-22T08:36:40-07:00 Deprecate OVN_METRICS_MASTER_PORT in favor of OVN_METRICS_CONTROLLER_PORT
+  - 811879b7 2026-05-22T08:36:40-07:00 docs: drop obsolete central-mode SSL install guides
+  - f7ceb813 2026-05-22T08:36:40-07:00 ovn: drop --no-leader-only from OVN client invocations
+  - 3cf80961 2026-05-22T08:36:40-07:00 helm: fix Prometheus alert description template variable
+  - 8ef7ca88 2026-05-22T08:36:40-07:00 config: drop OvnAuthConfig central-mode fields, keep Egress IP healthcheck plumbing
+  - f4c700df 2026-05-22T08:36:40-07:00 helm: drop OVN_SSL_ENABLE and OVN_NORTH/OVN_SOUTH plumbing
+  - e2dddda6 2026-05-22T08:36:40-07:00 ovnkube.sh: drop network NB/SB containers and SSL plumbing
+  - 4dd7f126 2026-05-22T08:36:40-07:00 Remove central mode leftover code
+  - d4d225a8 2026-05-22T10:43:26-04:00 e2e: remove temporary multihoming NAD sync sleeps
+  - 33a96ff8 2026-05-21T20:31:59+02:00 e2e: always resolve agnhost image via DeploymentConfig
+  - 9eb9b572 2026-05-21T13:34:23-04:00 Create UDN VRFs in DPU mode
+  - 83507aff 2026-05-21T18:28:38+02:00 Adds ignore paths for performance tests
+  - 6bc965b5 2026-05-20T07:49:47+02:00 e2e(virt): Replace fake virt-launcher pod with proper VMI in UDPN test
+  - 84513297 2026-05-20T07:49:47+02:00 e2e(virt): Add test with three VMs same hostname
+  - 89a8c5a1 2026-05-20T07:49:47+02:00 kubevirt: Support handling vm hostname field
+  - afadc29a 2026-05-19T14:30:18-04:00 Configure advertised UDN nftables on node init
+  - ccdf1bcd 2026-05-19T13:28:43-04:00 Pass route advertisement flag to DPU nodes
+  - 513717d3 2026-05-19T08:58:46-04:00 Resolve simulated DPU representors by alias
+  - 8a4852e7 2026-05-18T10:24:51-07:00 e2e: extend primary L3 UDN test cases with multiple subnets
+  - 49cb7ca2 2026-05-18T10:24:51-07:00 egressip: reconcile routes when P-UDN subnets change
+  - adaece03 2026-05-18T10:24:51-07:00 UDN: reconcile BGP isolation on primary UDN subnet changes
+  - 14d98051 2026-05-18T10:24:51-07:00 BGP: cover primary UDN multi-subnet route filtering for route importing
+  - 18eb5671 2026-05-18T10:24:51-07:00 docs: clarify RouteAdvertisement handling for Layer3 multi-subnet UDN
+  - 0cf8456b 2026-05-18T10:24:51-07:00 egressfirewall: update ACL when P-UDN adds overlapping subnet
+  - 7d8e841b 2026-05-18T10:24:51-07:00 networkconnect: handle P-UDN multi-subnet CNC router policies
+  - 8308e803 2026-05-18T10:24:51-07:00 Add e2e test case for layer P-UDN multi-subnet support
+  - 3456af40 2026-05-18T10:24:51-07:00 P-UDN: Support multiple cluster-subnets per IP family in Layer3 topology
+  - 3a242db4 2026-05-18T10:18:24-07:00 Update CRD validation rules and add corresponding e2e test cases
+  - a689686a 2026-05-18T12:40:31-04:00 Fix performance report
+  - 26b5c617 2026-05-18T12:17:43+02:00 Remove dead raft variable definitions from ovnkube.sh
 
-- cluster-network-operator embedded-component ad6c2f8350892f7e330105c1ffb10818150eec35 to c1ea3224b639ac2ee98b4f4590a40474976aac5e
-  - cbd9654 2026-07-08T23:11:41-04:00 OCPBUGS-97939: bump containernetworking/cni v0.8.0 -> v1.3.0
-  - 1fc1b75 2026-07-03T14:51:02+02:00 Revert "[release-4.22] OCPBUGS-90721: NVIDIA-596: Enable dpu healthcheck"
-
-- cluster-policy-controller embedded-component 44985a1306411101c84dd5081598fc928b432321 to 2e306e143051492a84c5e47a7b3126e096fdf76a
-  - 9f2409f 2026-07-09T19:39:28+02:00 add serviceAccountToken volume type to psalabelsyncer
-  - 9e8d476 2026-07-09T19:39:23+02:00 chore: go mod vendor
-  - c5f0089 2026-07-09T19:39:11+02:00 bump(openshift/api): to the latest release-4.22
-
-- oc image-amd64 062bc5449c4987c92c76da4d315ef4969c22d638 to 7ec2e14b74e700fec86dc0936a61f6c12b79d083
-  - b5acc72d 2026-07-10T13:41:40+02:00 CNTRLPLANE-3828: bump x/crypto to the latest version
-
-- oc image-arm64 062bc5449c4987c92c76da4d315ef4969c22d638 to 7ec2e14b74e700fec86dc0936a61f6c12b79d083
-  - b5acc72d 2026-07-10T13:41:40+02:00 CNTRLPLANE-3828: bump x/crypto to the latest version
+- ovn-kubernetes image-arm64 8d3b38cdbe7005e2f8443dc02b0e94b65a8f05e9 to 78cb67c567846efa557d17368122978575bdf3e9
+  - 4ed7d1ec 2026-06-11T15:36:43+05:30 sync test annotations with upstream changes
+  - b4194487 2026-06-11T15:35:36+05:30 e2e: fix UDN subnet overlap with downstream service CIDR
+  - 4439fbd8 2026-06-04T11:09:04-04:00 fix: fail license generation on module download errors
+  - 73c7c88d 2026-06-04T11:09:00-04:00 fix: Use default GOTOOLCHAIN=auto when generating license files
+  - 69abaab2 2026-06-03T12:48:16+02:00 Make BGP server host port configurable
+  - 5e373a9c 2026-06-03T12:48:16+02:00 e2e: split same-UDN NodePort backend paths
+  - 19e34082 2026-06-03T12:48:16+02:00 e2e: add NodePort-node backend for UDN service
+  - bef1aa03 2026-06-03T12:48:16+02:00 e2e: select CUDN pod IP by family
+  - b3475348 2026-06-03T12:48:16+02:00 e2e: expect ETP=Local NodePort tests to succeed
+  - ae449ce3 2026-06-03T12:48:16+02:00 iprulemanager: include address family in rule equality
+  - 5fb1ded4 2026-06-03T12:48:16+02:00 e2e: wait for VRF-lite node readiness
+  - 9b514ecb 2026-06-02T14:48:48+02:00 e2e: expect VRF egress interface IP for LGW no-overlay SNAT
+  - 3710b5ab 2026-06-02T14:48:11+02:00 e2e: unskip no-overlay cross-node NodePort cases
+  - b435536a 2026-06-02T14:48:11+02:00 Test cases for CUDN with transport NoOverlay routing unmanaged outboundSNAT enabled and disabled in SGW and LGW mode
+  - 21bce8d9 2026-06-02T14:48:11+02:00 LGW: set ct-commit-all on L2 UDN cluster routers
+  - e95849c9 2026-06-02T14:48:11+02:00 LGW: set ct-commit-all on UDN cluster router
+  - 0ddbc064 2026-06-02T14:48:07+02:00 LGW: route no-overlay UDN ingress via OVN
+  - 9f42f945 2026-06-02T14:36:34+02:00 UDN service OpenFlow: handle SNAT to masq ip
+  - 88c03903 2026-06-02T14:36:34+02:00 SGW: Add conntrack flows for no-overlay UDN cross-node traffic
+  - 122ab5c2 2026-06-02T14:36:34+02:00 SGW: use allowed_ext_ips for advertised UDN SNAT
+  - 1ba24787 2026-06-01T11:05:14+02:00 Implement OutboundSNAT for CUDN in shared gateway mode
+  - 50386fa3 2026-06-01T11:05:12+02:00 Add OutboundSNAT field to NetInfo interface
+  - 2fbcc1f8 2026-06-01T11:05:10+02:00 Implement OutboundSNAT for CUDN in local gateway mode
+  - 91683a3d 2026-06-01T11:05:08+02:00 Render OutboundSNAT config from CUDN CRD to NAD
+  - 497c201a 2026-05-27T18:02:30-04:00 unit test: fix EVPN UDN expected node IP address set
+  - ad54c5a5 2026-05-27T17:25:34+02:00 node: skip updateOVNEncapIPAndReconnect tests without root privileges
+  - e2e701ee 2026-05-27T15:36:52+02:00 util: assume pod network advertisement for certain transports
+  - d2d101d6 2026-05-27T09:52:45+02:00 Optimize addressManager sync and linkmanager syncLink
+  - a069246c 2026-05-27T08:48:19+02:00 Fix deadlock in webhook if Serve fails before cancellation
+  - b9ed3293 2026-05-27T08:48:19+02:00 Add comprehensive unit tests for ovnkube-identity webhook.Run()
+  - 9d4334cd 2026-05-27T08:48:19+02:00 Refactor ovnkubeidentity webhook server into separate package
+  - cbb5c4d0 2026-05-26T17:04:54-04:00 Ensure node IP address set for advertised SNAT
+  - 757f3099 2026-05-26T20:44:22+02:00 e2e: replace random allocations with ConfigMap-backed allocators
+  - 1ff56ce8 2026-05-25T09:45:12+02:00 Fix kubevirt live migration test flake by avoiding fake client race
+  - 5ec0be6b 2026-05-25T07:40:38+02:00 fix(evpn): re-program neighbors after kubevirt live migration
+  - 5aa65afe 2026-05-25T07:40:38+02:00 fix(evpn): use NeighSet instead of NeighAdd for PERMANENT neighbors
+  - 3fbc9381 2026-05-22T14:20:05-07:00 chore: skip cicd tests for doc changes
+  - 8bc78918 2026-05-22T08:36:40-07:00 Deprecate OVN_METRICS_MASTER_PORT in favor of OVN_METRICS_CONTROLLER_PORT
+  - 811879b7 2026-05-22T08:36:40-07:00 docs: drop obsolete central-mode SSL install guides
+  - f7ceb813 2026-05-22T08:36:40-07:00 ovn: drop --no-leader-only from OVN client invocations
+  - 3cf80961 2026-05-22T08:36:40-07:00 helm: fix Prometheus alert description template variable
+  - 8ef7ca88 2026-05-22T08:36:40-07:00 config: drop OvnAuthConfig central-mode fields, keep Egress IP healthcheck plumbing
+  - f4c700df 2026-05-22T08:36:40-07:00 helm: drop OVN_SSL_ENABLE and OVN_NORTH/OVN_SOUTH plumbing
+  - e2dddda6 2026-05-22T08:36:40-07:00 ovnkube.sh: drop network NB/SB containers and SSL plumbing
+  - 4dd7f126 2026-05-22T08:36:40-07:00 Remove central mode leftover code
+  - d4d225a8 2026-05-22T10:43:26-04:00 e2e: remove temporary multihoming NAD sync sleeps
+  - 33a96ff8 2026-05-21T20:31:59+02:00 e2e: always resolve agnhost image via DeploymentConfig
+  - 9eb9b572 2026-05-21T13:34:23-04:00 Create UDN VRFs in DPU mode
+  - 83507aff 2026-05-21T18:28:38+02:00 Adds ignore paths for performance tests
+  - 6bc965b5 2026-05-20T07:49:47+02:00 e2e(virt): Replace fake virt-launcher pod with proper VMI in UDPN test
+  - 84513297 2026-05-20T07:49:47+02:00 e2e(virt): Add test with three VMs same hostname
+  - 89a8c5a1 2026-05-20T07:49:47+02:00 kubevirt: Support handling vm hostname field
+  - afadc29a 2026-05-19T14:30:18-04:00 Configure advertised UDN nftables on node init
+  - ccdf1bcd 2026-05-19T13:28:43-04:00 Pass route advertisement flag to DPU nodes
+  - 513717d3 2026-05-19T08:58:46-04:00 Resolve simulated DPU representors by alias
+  - 8a4852e7 2026-05-18T10:24:51-07:00 e2e: extend primary L3 UDN test cases with multiple subnets
+  - 49cb7ca2 2026-05-18T10:24:51-07:00 egressip: reconcile routes when P-UDN subnets change
+  - adaece03 2026-05-18T10:24:51-07:00 UDN: reconcile BGP isolation on primary UDN subnet changes
+  - 14d98051 2026-05-18T10:24:51-07:00 BGP: cover primary UDN multi-subnet route filtering for route importing
+  - 18eb5671 2026-05-18T10:24:51-07:00 docs: clarify RouteAdvertisement handling for Layer3 multi-subnet UDN
+  - 0cf8456b 2026-05-18T10:24:51-07:00 egressfirewall: update ACL when P-UDN adds overlapping subnet
+  - 7d8e841b 2026-05-18T10:24:51-07:00 networkconnect: handle P-UDN multi-subnet CNC router policies
+  - 8308e803 2026-05-18T10:24:51-07:00 Add e2e test case for layer P-UDN multi-subnet support
+  - 3456af40 2026-05-18T10:24:51-07:00 P-UDN: Support multiple cluster-subnets per IP family in Layer3 topology
+  - 3a242db4 2026-05-18T10:18:24-07:00 Update CRD validation rules and add corresponding e2e test cases
+  - a689686a 2026-05-18T12:40:31-04:00 Fix performance report
+  - 26b5c617 2026-05-18T12:17:43+02:00 Remove dead raft variable definitions from ovnkube.sh
 
