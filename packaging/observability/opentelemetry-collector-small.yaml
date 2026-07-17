@@ -1,6 +1,7 @@
 # Following file contains OpenTelemetry Collector configuration that exports:
 # - Resource usage metrics of MicroShift's Containers, Pods, Volumes, and Node
 # - Kubernetes Events
+# - Metrics from optional component scrape configs (scrape.d drop-ins)
 
 receivers:
   prometheus:

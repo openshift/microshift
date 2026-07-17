@@ -4,6 +4,7 @@
 # - Host's CPU, memory, disk, and network usage metrics
 # - System journals for selected MicroShift services and dependencies, priority < Info
 # - Metrics exposed by Pods that have "prometheus.io/scrape": "true" annotation
+# - Metrics from optional component scrape configs (scrape.d drop-ins)
 
 receivers:
   kubeletstats:

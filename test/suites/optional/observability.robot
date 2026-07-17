@@ -74,11 +74,9 @@ Node Exporter Metrics Are Exported Via Scrape Drop-In
 Metrics Server Metrics Are Exported Via Scrape Drop-In
     [Documentation]    The prometheus receiver should scrape metrics-server via the
     ...    scrape.d drop-in and export metrics to the prometheus exporter.
-    ...    TODO: replace rest_client_requests_total with a metrics-server-specific metric
-    ...    once confirmed against actual metrics-server /metrics output.
 
     Wait Until Keyword Succeeds    60s    5s
-    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    rest_client_requests_total
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    metrics_server_kubelet_request_total
 
 Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration

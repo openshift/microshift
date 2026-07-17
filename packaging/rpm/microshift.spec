@@ -949,6 +949,7 @@ fi
 %files metrics-server
 %dir %{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server
 %{_prefix}/lib/microshift/manifests.d/080-microshift-metrics-server/*
+%dir %{_sysconfdir}/microshift/observability/scrape.d
 %config(noreplace) %{_sysconfdir}/microshift/observability/scrape.d/metrics-server.yaml
 
 %files metrics-server-release-info
@@ -957,6 +958,7 @@ fi
 %files metrics-node-exporter
 %dir %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
 %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/*
+%dir %{_sysconfdir}/microshift/observability/scrape.d
 %config(noreplace) %{_sysconfdir}/microshift/observability/scrape.d/node-exporter.yaml
 
 %files metrics-node-exporter-release-info
@@ -964,6 +966,7 @@ fi
 %files metrics-kube-state
 %dir %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
 %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/*
+%dir %{_sysconfdir}/microshift/observability/scrape.d
 %config(noreplace) %{_sysconfdir}/microshift/observability/scrape.d/kube-state-metrics.yaml
 
 %files metrics-kube-state-release-info

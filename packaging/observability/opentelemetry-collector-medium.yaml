@@ -2,6 +2,7 @@
 # - Resource usage metrics of MicroShift's Containers, Pods, Volumes, and Node
 # - Kubernetes Events
 # - System journal for MicroShift service, priority < Info
+# - Metrics from optional component scrape configs (scrape.d drop-ins)
 
 receivers:
   prometheus:
