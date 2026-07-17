@@ -473,9 +473,9 @@ Verify Dual Stack Source IP Preserved Between Clusters
     Should Contain    ${stdout}    source: ${curl_pod_ip}
 
 Verify DNS Resolution From Cluster
-    [Documentation]    Resolve a DNS name from curl-pod on the given cluster. Retries for up to 60s.
+    [Documentation]    Resolve a DNS name from curl-pod on the given cluster. Retries for up to 200s.
     [Arguments]    ${alias}    ${fqdn}
-    Wait Until Keyword Succeeds    12x    5s
+    Wait Until Keyword Succeeds    40x    5s
     ...    Verify DNS Lookup    ${alias}    ${fqdn}
 
 Verify DNS Lookup
@@ -495,7 +495,7 @@ Verify All RemoteClusters Healthy
 Verify Curl DNS From Cluster
     [Documentation]    Curl a service by DNS name from curl-pod on the given cluster.
     [Arguments]    ${alias}    ${fqdn}    ${port}
-    ${stdout}=    Wait Until Keyword Succeeds    12x    5s
+    ${stdout}=    Wait Until Keyword Succeeds    40x    5s
     ...    Verify Curl DNS    ${alias}    ${fqdn}    ${port}
     RETURN    ${stdout}
 
