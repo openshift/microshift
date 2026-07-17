@@ -7,10 +7,11 @@ rules:
   - apiGroups: [""]
     resources: ["nodes/stats"]
     verbs: ["get"]
-  # OpenTelemetry Component: k8s_event receiver
+  # OpenTelemetry Component: k8s_event receiver, prometheus receiver (endpoints SD)
   - apiGroups:
     - ""
     resources:
+    - endpoints
     - events
     - namespaces
     - namespaces/status
@@ -64,7 +65,7 @@ rules:
       - get
       - list
       - watch
-  # OpenTelemetry Component: prometheus receiver scraping metrics-server
+  # OpenTelemetry Component: prometheus receiver (kube-rbac-proxy authorization)
   - nonResourceURLs:
       - /metrics
     verbs:

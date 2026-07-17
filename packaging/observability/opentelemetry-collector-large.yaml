@@ -112,7 +112,7 @@ service:
       receivers: [ journald ]
       processors: [ resourcedetection/system ]
       exporters: [ otlp ]
-    metrics/pods:
+    metrics/scrape:
       receivers: [ prometheus ]
       processors: [ batch ]
       exporters: [ otlp ]

@@ -303,6 +303,7 @@ Requires: microshift-release-info = %{version}
 The microshift-metrics-node-exporter-release-info package provides release information files for this
 release. These files contain the list of container image references used by node-exporter
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+
 %package metrics-kube-state
 Summary: Kubernetes kube-state-metrics for MicroShift
 ExclusiveArch: x86_64 aarch64
@@ -963,6 +964,7 @@ fi
 
 %files metrics-node-exporter-release-info
 %{_datadir}/microshift/release/release-node-exporter-{x86_64,aarch64}.json
+
 %files metrics-kube-state
 %dir %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
 %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/*
