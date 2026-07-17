@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"k8s.io/client-go/kubernetes"
+
 	"github.com/openshift/library-go/pkg/operator/events"
 	"github.com/openshift/library-go/pkg/operator/resource/resourceapply"
 	"github.com/openshift/microshift/pkg/config"
@@ -33,6 +35,21 @@ var metricsClientCAConsumerPaths = []string{
 	"/usr/lib/microshift/manifests.d/082-microshift-node-exporter",
 }
 
+func waitForNamespace(ctx context.Context, clientset kubernetes.Interface, namespace string) error {
+	return wait.PollUntilContextTimeout(ctx, 2*time.Second, 5*time.Minute, true, func(ctx context.Context) (bool, error) {
+		_, err := clientset.CoreV1().Namespaces().Get(ctx, namespace, metav1.GetOptions{})
+		if err == nil {
+			return true, nil
+		}
+		if !apierrors.IsNotFound(err) {
+			klog.Errorf("getting namespace %s: %v", namespace, err)
+			return false, nil
+		}
+		klog.V(2).Infof("Waiting for namespace %s to be created by kustomize", namespace)
+		return false, nil
+	})
+}
+
 // ProvisionMetricsServerCerts provisions the TLS client certificate and kubelet
 // serving CA that metrics-server needs to authenticate to kubelet and verify its
 // serving certificate when scraping /metrics/resource. These are provisioned at
@@ -55,19 +72,7 @@ func ProvisionMetricsServerCerts(ctx context.Context, cfg *config.Config) error 
 		return fmt.Errorf("creating clientset: %w", err)
 	}
 
-	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, 5*time.Minute, true, func(ctx context.Context) (bool, error) {
-		_, err := clientset.CoreV1().Namespaces().Get(ctx, metricsNamespace, metav1.GetOptions{})
-		if err == nil {
-			return true, nil
-		}
-		if !apierrors.IsNotFound(err) {
-			klog.Errorf("getting namespace %s: %v", metricsNamespace, err)
-			return false, nil
-		}
-		klog.V(2).Infof("Waiting for namespace %s to be created by kustomize", metricsNamespace)
-		return false, nil
-	})
-	if err != nil {
+	if err := waitForNamespace(ctx, clientset, metricsNamespace); err != nil {
 		return fmt.Errorf("waiting for namespace %s: %w", metricsNamespace, err)
 	}
 
@@ -172,19 +177,7 @@ func ProvisionMetricsClientCA(ctx context.Context, cfg *config.Config) error {
 		return fmt.Errorf("creating clientset: %w", err)
 	}
 
-	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, 5*time.Minute, true, func(ctx context.Context) (bool, error) {
-		_, err := clientset.CoreV1().Namespaces().Get(ctx, metricsNamespace, metav1.GetOptions{})
-		if err == nil {
-			return true, nil
-		}
-		if !apierrors.IsNotFound(err) {
-			klog.Errorf("getting namespace %s: %v", metricsNamespace, err)
-			return false, nil
-		}
-		klog.V(2).Infof("Waiting for namespace %s to be created by kustomize", metricsNamespace)
-		return false, nil
-	})
-	if err != nil {
+	if err := waitForNamespace(ctx, clientset, metricsNamespace); err != nil {
 		return fmt.Errorf("waiting for namespace %s: %w", metricsNamespace, err)
 	}
 
