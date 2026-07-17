@@ -79,6 +79,13 @@ Requires: cri-tools >= 1.36.0, cri-tools < 1.37.0
 # the missing package when it is not available.
 Recommends: containernetworking-plugins
 Requires: iptables
+# RHEL 10 moved iptables compat kernel modules (nft_compat, xt_CT) from
+# kernel-modules-core to kernel-modules-extra. These are needed by OVN-K
+# and kubelet until OVN-K completes its nftables migration (OCPBUGS-98161).
+# The dependency is unconditional because the RPM is built on el9 (where
+# %{rhel} is 9) but cross-installed on el10, so conditionals do not work.
+# On RHEL 9 this is a no-op as the modules are already in kernel-modules-core.
+Requires: kernel-modules-extra
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
 Requires: microshift-greenboot = %{version}
