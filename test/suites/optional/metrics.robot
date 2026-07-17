@@ -109,11 +109,10 @@ Scrape Metrics From
     ...    with mTLS client certs. Resolves the IP from the Endpoints object
     ...    to validate that the headless Service selector matches the pod.
     [Arguments]    ${metrics_service}    ${port}
-    ${ep_ip}=    Oc Get JsonPath
-    ...    endpoints
-    ...    ${METRICS_NS}
-    ...    ${metrics_service}
-    ...    .subsets[0].addresses[0].ip
+    # Oc Get JsonPath uses Run With Kubeconfig which merges stderr into stdout;
+    # the v1 Endpoints deprecation warning from K8s 1.33+ pollutes the IP value.
+    ${ep_ip}=    Command Should Work
+    ...    oc get endpoints -n ${METRICS_NS} ${metrics_service} -o jsonpath\='{.subsets[0].addresses[0].ip}' --kubeconfig\=/var/lib/microshift/resources/kubeadmin/kubeconfig
     VAR    ${svc_host}=    ${metrics_service}.${METRICS_NS}.svc
     ${stdout}=    Command Should Work
     ...    curl -s --resolve ${svc_host}:${port}:${ep_ip} --cacert ${SERVICE_CA} --cert ${CLIENT_CERT} --key ${CLIENT_KEY} https://${svc_host}:${port}/metrics
