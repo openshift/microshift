@@ -258,6 +258,116 @@ type IngressControllerSpec struct {
 	//
 	// +optional
 	HTTPCompression HTTPCompressionPolicy `json:"httpCompression,omitempty"`
+
+	// idleConnectionTerminationPolicy maps directly to HAProxy's
+	// idle-close-on-response option and controls whether HAProxy
+	// keeps idle frontend connections open during a soft stop
+	// (router reload).
+	//
+	// Allowed values for this field are "Immediate" and
+	// "Deferred". The default value is "Deferred".
+	//
+	// When set to "Immediate", idle connections are closed
+	// immediately during router reloads. This ensures immediate
+	// propagation of route changes but may impact clients
+	// sensitive to connection resets.
+	//
+	// When set to "Deferred", HAProxy will maintain idle
+	// connections during a soft reload instead of closing them
+	// immediately. These connections remain open until any of the
+	// following occurs:
+	//
+	//   - A new request is received on the connection, in which
+	//     case HAProxy handles it in the old process and closes
+	//     the connection after sending the response.
+	//
+	//   - HAProxy's `timeout http-keep-alive` duration expires.
+	//     By default this is 300 seconds, but it can be changed
+	//     using httpKeepAliveTimeout tuning option.
+	//
+	//   - The client's keep-alive timeout expires, causing the
+	//     client to close the connection.
+	//
+	// Setting Deferred can help prevent errors in clients or load
+	// balancers that do not properly handle connection resets.
+	// Additionally, this option allows you to retain the pre-2.4
+	// HAProxy behaviour: in HAProxy version 2.2 (OpenShift
+	// versions < 4.14), maintaining idle connections during a
+	// soft reload was the default behaviour, but starting with
+	// HAProxy 2.4, the default changed to closing idle
+	// connections immediately.
+	//
+	// Important Consideration:
+	//
+	//   - Using Deferred will result in temporary inconsistencies
+	//     for the first request on each persistent connection
+	//     after a route update and router reload. This request
+	//     will be processed by the old HAProxy process using its
+	//     old configuration. Subsequent requests will use the
+	//     updated configuration.
+	//
+	// Operational Considerations:
+	//
+	//   - Keeping idle connections open during reloads may lead
+	//     to an accumulation of old HAProxy processes if
+	//     connections remain idle for extended periods,
+	//     especially in environments where frequent reloads
+	//     occur.
+	//
+	//   - Consider monitoring the number of HAProxy processes in
+	//     the router pods when Deferred is set.
+	//
+	//   - You may need to enable or adjust the
+	//     `ingress.operator.openshift.io/hard-stop-after`
+	//     duration (configured via an annotation on the
+	//     IngressController resource) in environments with
+	//     frequent reloads to prevent resource exhaustion.
+	//
+	// +optional
+	// +kubebuilder:default:="Deferred"
+	// +default="Deferred"
+	IdleConnectionTerminationPolicy IngressControllerConnectionTerminationPolicy `json:"idleConnectionTerminationPolicy,omitempty"`
+
+	// closedClientConnectionPolicy controls how the IngressController
+	// behaves when the client closes the TCP connection while the TLS
+	// handshake or HTTP request is in progress. This option maps directly
+	// to HAProxy’s "abortonclose" option.
+	//
+	// Valid values are: "Abort" and "Continue".
+	// The default value is "Continue".
+	//
+	// When set to "Abort", the router will stop processing the TLS handshake
+	// if it is in progress, and it will not send an HTTP request to the backend server
+	// if the request has not yet been sent when the client closes the connection.
+	//
+	// When set to "Continue", the router will complete the TLS handshake
+	// if it is in progress, or send an HTTP request to the backend server
+	// and wait for the backend server's response, regardless of
+	// whether the client has closed the connection.
+	//
+	// Setting "Abort" can help free CPU resources otherwise spent on TLS computation
+	// for connections the client has already closed, and can reduce request queue
+	// size, thereby reducing the load on saturated backend servers.
+	//
+	// Important Considerations:
+	//
+	//   - The default policy ("Continue") is HTTP-compliant, and requests
+	//     for aborted client connections will still be served.
+	//     Use the "Continue" policy to allow a client to send a request
+	//     and then immediately close its side of the connection while
+	//     still receiving a response on the half-closed connection.
+	//
+	//   - When clients use keep-alive connections, the most common case for premature
+	//     closure is when the user wants to cancel the transfer or when a timeout
+	//     occurs. In that case, the "Abort" policy may be used to reduce resource consumption.
+	//
+	//   - Using RSA keys larger than 2048 bits can significantly slow down
+	//     TLS computations. Consider using the "Abort" policy to reduce CPU usage.
+	//
+	// +optional
+	// +kubebuilder:default:="Continue"
+	// +default="Continue"
+	ClosedClientConnectionPolicy IngressControllerClosedClientConnectionPolicy `json:"closedClientConnectionPolicy,omitempty"`
 }
 
 // httpCompressionPolicy turns on compression for the specified MIME types.
@@ -1833,6 +1943,36 @@ type IngressControllerTuningOptions struct {
 	// +optional
 	ConnectTimeout *metav1.Duration `json:"connectTimeout,omitempty"`
 
+	// httpKeepAliveTimeout defines the maximum allowed time to wait for
+	// a new HTTP request to appear on a connection from the client to the router.
+	//
+	// This field expects an unsigned duration string of a decimal number, with optional
+	// fraction and a unit suffix, e.g. "300ms", "1.5s" or "2m45s".
+	// Valid time units are "ms", "s", "m".
+	// The allowed range is from 1 millisecond to 15 minutes.
+	//
+	// When omitted, this means the user has no opinion and the platform is left
+	// to choose a reasonable default. This default is subject to change over time.
+	// The current default is 300s.
+	//
+	// Low values (tens of milliseconds or less) can cause clients to close and reopen connections
+	// for each request, leading to reduced connection sharing.
+	// For HTTP/2, special care should be taken with low values.
+	// A few seconds is a reasonable starting point to avoid holding idle connections open
+	// while still allowing subsequent requests to reuse the connection.
+	//
+	// High values (minutes or more) favor connection reuse but may cause idle
+	// connections to linger longer.
+	//
+	// +kubebuilder:validation:Type:=string
+	// +kubebuilder:validation:XValidation:rule="self.matches('^([0-9]+(\\\\.[0-9]+)?(ms|s|m))+$')",message="httpKeepAliveTimeout must be a valid duration string composed of an unsigned integer value, optionally followed by a decimal fraction and a unit suffix (ms, s, m)"
+	// +kubebuilder:validation:XValidation:rule="!self.matches('^([0-9]+(\\\\.[0-9]+)?(ms|s|m))+$') || duration(self) <= duration('15m')",message="httpKeepAliveTimeout must be less than or equal to 15 minutes"
+	// +kubebuilder:validation:XValidation:rule="!self.matches('^([0-9]+(\\\\.[0-9]+)?(ms|s|m))+$') || duration(self) >= duration('1ms')",message="httpKeepAliveTimeout must be greater than or equal to 1 millisecond"
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=16
+	// +optional
+	HTTPKeepAliveTimeout *metav1.Duration `json:"httpKeepAliveTimeout,omitempty"`
+
 	// tlsInspectDelay defines how long the router can hold data to find a
 	// matching route.
 	//
@@ -2068,3 +2208,54 @@ type IngressControllerList struct {
 
 	Items []IngressController `json:"items"`
 }
+
+// IngressControllerConnectionTerminationPolicy defines the behaviour
+// for handling idle connections during a soft reload of the router.
+//
+// +kubebuilder:validation:Enum=Immediate;Deferred
+type IngressControllerConnectionTerminationPolicy string
+
+const (
+	// IngressControllerConnectionTerminationPolicyImmediate specifies
+	// that idle connections should be closed immediately during a
+	// router reload.
+	IngressControllerConnectionTerminationPolicyImmediate IngressControllerConnectionTerminationPolicy = "Immediate"
+
+	// IngressControllerConnectionTerminationPolicyDeferred
+	// specifies that idle connections should remain open until a
+	// terminating event, such as a new request, the expiration of
+	// the proxy keep-alive timeout, or the client closing the
+	// connection.
+	IngressControllerConnectionTerminationPolicyDeferred IngressControllerConnectionTerminationPolicy = "Deferred"
+)
+
+// IngressControllerClosedClientConnectionPolicy controls how the IngressController
+// behaves when the client closes the TCP connection while the TLS
+// handshake or HTTP request is in progress.
+//
+// +kubebuilder:validation:Enum=Abort;Continue
+type IngressControllerClosedClientConnectionPolicy string
+
+const (
+	// IngressControllerClosedClientConnectionPolicyAbort aborts processing early when the client
+	// closes the connection.
+	//
+	// This affects two types of processing: TLS handshake computation on the router
+	// and request handling.
+	//
+	// When the client closes the connection, the router will stop processing
+	// the TLS handshake, preventing unnecessary CPU work.
+	//
+	// If the HTTP request has not yet been sent to the backend, it will be aborted.
+	// If the request is already being processed by the backend, the router will
+	// half-close the connection to signal this condition to the backend server,
+	// which can then decide how to proceed.
+	IngressControllerClosedClientConnectionPolicyAbort IngressControllerClosedClientConnectionPolicy = "Abort"
+
+	// IngressControllerClosedClientConnectionPolicyContinue continues processing even if the client
+	// closes the connection.
+	//
+	// The router will complete the TLS handshake and wait for the backend
+	// server's response regardless of the client having closed the connection.
+	IngressControllerClosedClientConnectionPolicyContinue IngressControllerClosedClientConnectionPolicy = "Continue"
+)

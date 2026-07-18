@@ -507,24 +507,42 @@ type AWSPlatformStatus struct {
 	// +listType=atomic
 	// +optional
 	ResourceTags []AWSResourceTag `json:"resourceTags,omitempty"`
+
+	// cloudLoadBalancerConfig holds configuration related to DNS and cloud
+	// load balancers. It allows configuration of in-cluster DNS as an alternative
+	// to the platform default DNS implementation.
+	// When using the ClusterHosted DNS type, Load Balancer IP addresses
+	// must be provided for the API and internal API load balancers as well as the
+	// ingress load balancer.
+	//
+	// +default={"dnsType": "PlatformDefault"}
+	// +kubebuilder:default={"dnsType": "PlatformDefault"}
+	// +openshift:enable:FeatureGate=AWSClusterHostedDNS
+	// +optional
+	// +nullable
+	CloudLoadBalancerConfig *CloudLoadBalancerConfig `json:"cloudLoadBalancerConfig,omitempty"`
 }
 
 // AWSResourceTag is a tag to apply to AWS resources created for the cluster.
 type AWSResourceTag struct {
-	// key is the key of the tag
+	// key sets the key of the AWS resource tag key-value pair. Key is required when defining an AWS resource tag.
+	// Key should consist of between 1 and 128 characters, and may
+	// contain only the set of alphanumeric characters, space (' '), '_', '.', '/', '=', '+', '-', ':', and '@'.
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=128
-	// +kubebuilder:validation:Pattern=`^[0-9A-Za-z_.:/=+-@]+$`
+	// +kubebuilder:validation:XValidation:rule=`self.matches('^[0-9A-Za-z_.:/=+-@ ]+$')`,message="invalid AWS resource tag key. The string can contain only the set of alphanumeric characters, space (' '), '_', '.', '/', '=', '+', '-', ':', '@'"
 	// +required
 	Key string `json:"key"`
-	// value is the value of the tag.
+	// value sets the value of the AWS resource tag key-value pair. Value is required when defining an AWS resource tag.
+	// Value should consist of between 1 and 256 characters, and may
+	// contain only the set of alphanumeric characters, space (' '), '_', '.', '/', '=', '+', '-', ':', and '@'.
 	// Some AWS service do not support empty values. Since tags are added to resources in many services, the
 	// length of the tag value must meet the requirements of all services.
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=256
-	// +kubebuilder:validation:Pattern=`^[0-9A-Za-z_.:/=+-@]+$`
+	// +kubebuilder:validation:XValidation:rule=`self.matches('^[0-9A-Za-z_.:/=+-@ ]+$')`,message="invalid AWS resource tag value. The string can contain only the set of alphanumeric characters, space (' '), '_', '.', '/', '=', '+', '-', ':', '@'"
 	// +required
 	Value string `json:"value"`
 }
@@ -647,12 +665,12 @@ type GCPPlatformStatus struct {
 	// Tombstone the field as a reminder.
 	// ClusterHostedDNS ClusterHostedDNS `json:"clusterHostedDNS,omitempty"`
 
-	// cloudLoadBalancerConfig is a union that contains the IP addresses of API,
-	// API-Int and Ingress Load Balancers created on the cloud platform. These
-	// values would not be populated on on-prem platforms. These Load Balancer
-	// IPs are used to configure the in-cluster DNS instances for API, API-Int
-	// and Ingress services. `dnsType` is expected to be set to `ClusterHosted`
-	// when these Load Balancer IP addresses are populated and used.
+	// cloudLoadBalancerConfig holds configuration related to DNS and cloud
+	// load balancers. It allows configuration of in-cluster DNS as an alternative
+	// to the platform default DNS implementation.
+	// When using the ClusterHosted DNS type, Load Balancer IP addresses
+	// must be provided for the API and internal API load balancers as well as the
+	// ingress load balancer.
 	//
 	// +default={"dnsType": "PlatformDefault"}
 	// +kubebuilder:default={"dnsType": "PlatformDefault"}
@@ -1579,7 +1597,7 @@ type PowerVSServiceEndpoint struct {
 	// Power Cloud - https://cloud.ibm.com/apidocs/power-cloud
 	//
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Pattern=`^[a-z0-9-]+$`
+	// +kubebuilder:validation:Enum=CIS;COS;COSConfig;DNSServices;GlobalCatalog;GlobalSearch;GlobalTagging;HyperProtect;IAM;KeyProtect;Power;ResourceController;ResourceManager;VPC
 	Name string `json:"name"`
 
 	// url is fully qualified URI with scheme https, that overrides the default generated
@@ -1725,6 +1743,7 @@ type NutanixPlatformSpec struct {
 	// failureDomains configures failure domains information for the Nutanix platform.
 	// When set, the failure domains defined here may be used to spread Machines across
 	// prism element clusters to improve fault tolerance of the cluster.
+	// +openshift:validation:FeatureGateAwareMaxItems:featureGate=NutanixMultiSubnets,maxItems=32
 	// +listType=map
 	// +listMapKey=name
 	// +optional
@@ -1751,13 +1770,15 @@ type NutanixFailureDomain struct {
 	Cluster NutanixResourceIdentifier `json:"cluster"`
 
 	// subnets holds a list of identifiers (one or more) of the cluster's network subnets
+	// If the feature gate NutanixMultiSubnets is enabled, up to 32 subnets may be configured.
 	// for the Machine's VM to connect to. The subnet identifiers (uuid or name) can be
 	// obtained from the Prism Central console or using the prism_central API.
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=1
-	// +listType=map
-	// +listMapKey=type
+	// +openshift:validation:FeatureGateAwareMaxItems:featureGate="",maxItems=1
+	// +openshift:validation:FeatureGateAwareMaxItems:featureGate=NutanixMultiSubnets,maxItems=32
+	// +openshift:validation:FeatureGateAwareXValidation:featureGate=NutanixMultiSubnets,rule="self.all(x, self.exists_one(y, x == y))",message="each subnet must be unique"
+	// +listType=atomic
 	Subnets []NutanixResourceIdentifier `json:"subnets"`
 }
 

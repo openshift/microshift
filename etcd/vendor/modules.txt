@@ -189,7 +189,7 @@ github.com/munnerz/goautoneg
 # github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f
 ## explicit
 github.com/mxk/go-flowrate/flowrate
-# github.com/openshift/api v0.0.0-20241004095111-b1f700bdd8d2
+# github.com/openshift/api v0.0.0-20260713195309-f9b2d1ae30eb
 ## explicit; go 1.22.0
 github.com/openshift/api/config/v1
 github.com/openshift/api/operator/v1
