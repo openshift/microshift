@@ -285,6 +285,43 @@ The microshift-metrics-server-release-info package provides release information 
 release. These files contain the list of container image references used by the metrics-server
 and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
 
+%package metrics-node-exporter
+Summary: Prometheus node-exporter for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description metrics-node-exporter
+The microshift-metrics-node-exporter package provides the Prometheus node-exporter for MicroShift.
+Install this package to expose host-level hardware and OS metrics.
+
+%package metrics-node-exporter-release-info
+Summary: Release information for node-exporter for MicroShift
+BuildArch: noarch
+Requires: microshift-release-info = %{version}
+
+%description metrics-node-exporter-release-info
+The microshift-metrics-node-exporter-release-info package provides release information files for this
+release. These files contain the list of container image references used by node-exporter
+and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+%package metrics-kube-state
+Summary: Kubernetes kube-state-metrics for MicroShift
+ExclusiveArch: x86_64 aarch64
+Requires: microshift = %{version}
+
+%description metrics-kube-state
+The microshift-metrics-kube-state package provides kube-state-metrics for MicroShift.
+Install this package to expose Kubernetes object state metrics via a secure endpoint.
+
+%package metrics-kube-state-release-info
+Summary: Release information for kube-state-metrics for MicroShift
+BuildArch: noarch
+Requires: microshift-release-info = %{version}
+
+%description metrics-kube-state-release-info
+The microshift-metrics-kube-state-release-info package provides release information files for this
+release. These files contain the list of container image references used by kube-state-metrics
+and can be used to embed those images into osbuilder blueprints or bootc containerfiles.
+
 %package sriov
 Summary: SR-IOV Network Operator for MicroShift
 ExclusiveArch: x86_64 aarch64
@@ -648,6 +685,53 @@ cat assets/optional/metrics-server/kustomization.x86_64.yaml >> %{buildroot}/%{_
 mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
 install -p -m644 assets/optional/metrics-server/release-metrics-server-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
 
+# node-exporter
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/01-security-context-constraints.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/02-kube-rbac-proxy-secret.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/02-accelerators-collector-configmap.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/03-daemonset.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/04-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+install -p -m644 assets/optional/node-exporter/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+
+%ifarch %{arm} aarch64
+cat assets/optional/node-exporter/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/node-exporter/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/kustomization.yaml
+%endif
+
+# node-exporter-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/node-exporter/release-node-exporter-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
+# kube-state-metrics
+install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/00-namespace.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/01-service-account.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/01-cluster-role.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/01-cluster-role-binding.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/02-kube-rbac-proxy-secret.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/02-custom-resource-state-configmap.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/03-deployment.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/04-service.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+install -p -m644 assets/optional/kube-state-metrics/kustomization.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+
+%ifarch %{arm} aarch64
+cat assets/optional/kube-state-metrics/kustomization.aarch64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/kustomization.yaml
+%endif
+%ifarch x86_64
+cat assets/optional/kube-state-metrics/kustomization.x86_64.yaml >> %{buildroot}/%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/kustomization.yaml
+%endif
+
+# kube-state-metrics-release-info
+mkdir -p -m755 %{buildroot}%{_datadir}/microshift/release
+install -p -m644 assets/optional/kube-state-metrics/release-kube-state-metrics-{x86_64,aarch64}.json %{buildroot}%{_datadir}/microshift/release/
+
 # sriov
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd
@@ -858,6 +942,19 @@ fi
 %files metrics-server-release-info
 %{_datadir}/microshift/release/release-metrics-server-{x86_64,aarch64}.json
 
+%files metrics-node-exporter
+%dir %{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter
+%{_prefix}/lib/microshift/manifests.d/082-microshift-node-exporter/*
+
+%files metrics-node-exporter-release-info
+%{_datadir}/microshift/release/release-node-exporter-{x86_64,aarch64}.json
+%files metrics-kube-state
+%dir %{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics
+%{_prefix}/lib/microshift/manifests.d/081-microshift-kube-state-metrics/*
+
+%files metrics-kube-state-release-info
+%{_datadir}/microshift/release/release-kube-state-metrics-{x86_64,aarch64}.json
+
 %files sriov
 %dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov
 %dir %{_prefix}/lib/microshift/manifests.d/070-microshift-sriov/crd
@@ -873,8 +970,14 @@ fi
 # Use Git command to generate the log and replace the VERSION string
 # LANG=C git log --date="format:%a %b %d %Y" --pretty="tformat:* %cd %an <%ae> VERSION%n- %s%n" packaging/rpm/microshift.spec
 %changelog
+* Tue Jun 23 2026 Jonathan H. Cope <jcope@redhat.com> 5.0
+- Add node-exporter as optional rpm package
+
 * Mon Jun 22 2026 Jonathan H. Cope <jcope@redhat.com> 5.0
 - Add metrics-server as optional rpm package
+
+* Mon Jun 22 2026 Jonathan H. Cope <jcope@redhat.com> 5.0
+- add kube-state-metrics as optional rpm package
 
 * Tue Jan 20 2026 Pablo Acevedo Montserrat <pacevedo@redhat.com> 4.21.0
 - Add multus as dependency for sriov

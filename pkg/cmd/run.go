@@ -311,6 +311,13 @@ func RunMicroshift(cfg *config.Config) error {
 				klog.Errorf("Failed to provision metrics-server certs: %v", err)
 			}
 		}()
+		// Provision shared resources for optional monitoring components.
+		// Runs concurrently because it polls for the namespace created by kustomize.
+		go func() {
+			if err := components.ProvisionMetricsClientCA(runCtx, cfg); err != nil {
+				klog.Errorf("Failed to provision metrics-client-ca: %v", err)
+			}
+		}()
 
 		// Watch for SIGTERM or service error to exit, now that we are ready.
 		select {
