@@ -1,31 +1,19 @@
-- api embedded-component 876752f4da3e5d7849dfec0da72095a28be42400 to 1cb630ce7109e6c4780332bb8140c8c4f7157426
-  - 9353b2fa 2026-07-09T17:30:41Z add new serviceAccountToken fs type
+- cluster-ingress-operator embedded-component cadbee7826ca38851b6aee0a3bd92445f9a6ab62 to 10416e8b0535b9d03fe8788bd5d8167a334f8269
+  - 588b798 2026-07-16T13:14:59-04:00 OCPBUGS-98966: Bump Istio version from v1.27.3 to v1.27.8
 
-- cluster-kube-apiserver-operator embedded-component 424f27c9c415373b7f60756b5a1c24f48f248512 to dc1c217c263cd220ddd2ed6fe827a466d47e3ebb
-  - 0d0ed18 2026-04-06T18:44:40Z scc: fix uid{Min,Max}Range for nested-container
+- cluster-network-operator embedded-component 92a79d5cbc9e9040ee631c1a2f1ebf4e5cdd8cff to 72b5cba20082e859643ae3c4fc4e83ef2ae6fe20
+  - 898b4bf 2026-07-15T14:50:52Z DROP: detect --enable-interconnect support at runtime
+  - 494981a 2026-07-15T14:50:52Z Remove --enable-interconnect flag from OVN-K manifests
 
-- cluster-network-operator embedded-component b5955e9ede2128e8558c41ce87c1e8a11e09a515 to 92a79d5cbc9e9040ee631c1a2f1ebf4e5cdd8cff
-  - 11ac150 2026-07-13T16:31:59-04:00 Bump github.com/containernetworking/cni v0.8.0 -> v1.3.0
+- machine-config-operator embedded-component afbe2d9ef55cc9ad19243f370e9225ead5861cba to 0ba66a27bc734f20b2982d2d874b8bada58b78fd
+  - 0f8f3fb7 2026-06-29T11:46:51Z OCPBUGS-59958: Updated Unit Test, added extra getconfig check
+  - beb68093 2026-06-29T11:46:51Z OCPBUGS-59958: move cleanUpDuplicatedMC to after pool loop in syncNodeConfigHandler
 
-- cluster-policy-controller embedded-component 8b775487512fb543bff470ff1042bd3ac31b29be to e510507e20f6eb09694c880ecd79fa512a2b3470
-  - 789493d 2026-07-10T12:45:31+02:00 add serviceAccountToken volume type to psalabelsyncer
-  - b57e008 2026-07-10T12:45:23+02:00 chore: go mod vendor
-  - 0c80fc9 2026-07-10T12:45:03+02:00 bump(openshift/api,client-go): to the latest release-4.21
+- oc image-amd64 fdf8dabaedf6cf89f60547f57cc5f5f3e8d8798b to 0276efa6de22b45e3c2915423fd203555382ff1c
+  - 05e22189 2026-07-14T09:22:09+02:00 OCPBUGS-98550: bump go to v1.25
+  - 2020b43c 2026-07-13T16:28:32+02:00 OCPBUGS-98550: bump x/crypto to the latest version
 
-- kubernetes embedded-component 72d01d1a9470f51f856b9b4b04e058e7645e4fb4 to ba6535cbb8719c3ba6c3923f2725ba050c87faab
-  - 5e6c814d4 2026-06-30T12:39:41+05:30 UPSTREAM: <carry>: OCPBUGS-94059: backport kubernetes/conformance umbrella suite
-
-- machine-config-operator embedded-component 2a6f8182a071a30a1a55eb2616e1d0584c5a8ad0 to afbe2d9ef55cc9ad19243f370e9225ead5861cba
-  - af692dbd 2026-07-07T00:21:11Z manifests: inject proxy into mcc deployment
-  - 1f723981 2026-07-02T11:03:31-04:00 Annotate MOSB with job UID when reusing an existing build job
-  - a52bfa99 2026-06-22T10:11:26-04:00 Allow empty firstOptIn annotation in reconciler
-  - 8a9d126f 2026-06-22T09:47:47-04:00 Added check for missingAnnotation
-  - 8ee6781e 2026-06-13T05:01:05Z fix: update arbiter crio config
-
-- kubernetes image-amd64 72d01d1a9470f51f856b9b4b04e058e7645e4fb4 to ba6535cbb8719c3ba6c3923f2725ba050c87faab
-  - 5e6c814d4 2026-06-30T12:39:41+05:30 UPSTREAM: <carry>: OCPBUGS-94059: backport kubernetes/conformance umbrella suite
-
-- ovn-kubernetes image-arm64 d586f851c25d8f7cd04840cda79a0a6a98ea8485 to d7530a4dd33b6c8ccd6d8d0cf3114f6b7da5373b
+- ovn-kubernetes image-amd64 d586f851c25d8f7cd04840cda79a0a6a98ea8485 to d7530a4dd33b6c8ccd6d8d0cf3114f6b7da5373b
   - bbff4537 2026-05-05T11:41:01-04:00 [dpu-sim] Refactor DPU/DPU Host mode to be more readable.
   - b29d4fae 2026-05-05T11:41:01-04:00 [dpu-sim] Add dpu-host-gateway-representor-interface config option
   - 7d0d5c11 2026-05-05T11:41:01-04:00 [dpu-sim] Allow gateway options override for DPU Host Helm Chart
@@ -154,4 +142,8 @@
   - 8d712716 2026-04-07T14:42:40-04:00 adopters: add KubeStellar Console
   - 373e2c86 2026-03-30T20:35:13-04:00 Fix DPU healthcheck by propagating namespace configuration to ovnkube
   - fe163a70 2026-03-12T11:48:25+01:00 Fix invalid characters in e2e artifact directory paths
+
+- oc image-arm64 fdf8dabaedf6cf89f60547f57cc5f5f3e8d8798b to 0276efa6de22b45e3c2915423fd203555382ff1c
+  - 05e22189 2026-07-14T09:22:09+02:00 OCPBUGS-98550: bump go to v1.25
+  - 2020b43c 2026-07-13T16:28:32+02:00 OCPBUGS-98550: bump x/crypto to the latest version
 
