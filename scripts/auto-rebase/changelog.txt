@@ -1,27 +1,8 @@
-- cluster-ingress-operator embedded-component 7ce99b2c11f456e0e6e3cfa80ebf7682466eb0ea to a3c5d8daff2a53d7e05649a31a233fa1f0cf0977
-  - 5757b42 2026-06-18T14:56:09+05:30 OCPBUGS-86716: Add configuration override for X-SSL strip
+- api embedded-component 482f1b56dcc4d97ab9d3f7c22f102ecb54af83bb to 1ebdd7bba8e6c503a1f61c6d467ed877783826e1
+  - 884b471a 2026-07-10T14:15:59+00:00 add new serviceAccountToken fs type
 
-- machine-config-operator embedded-component c660c90115ce8334f3c4365b2fb4e5a3c954a94e to 60bbe3be66669898ce9124c75e997ee8ffa48cae
-  - 94b6b470 2026-07-08T23:31:40+00:00 Remove verbose ControllerConfig logging from bootstrap MCS
-
-- router image-amd64 0b3d3db1b41dde99861efcd35b4ea4f5ee0d360f to 2ea2a16ff8a5f25e4212bee0a5206dc8aa697534
-  - e6744e3 2026-06-18T14:43:18+05:30 OCPBUGS-86716: Strip X-SSL-Client-* headers for plain HTTP
-
-- ovn-kubernetes image-amd64 cb4cebc4fe27b0e07d0eb3c4411470a520373e5c to 767a5511bc0e65c1c6982113c477b37df1d3e2be
-  - a24dbcc9 2026-01-08T21:34:03+02:00 test/e2e/kubevirt: Check IPAMClaim status update
-  - d8bc99f8 2026-01-08T21:33:55+02:00 allocator, persistentips: update IPAM claim status for both success and failure
-  - 40e63c67 2026-01-08T20:31:13+02:00 test/e2e:: Fix duplicate IP validation test for IP family enforcement
-  - e3beead7 2026-01-08T20:31:13+02:00 test/e2e: add IP family validation tests for layer2 primary networks
-  - 9ae71681 2026-01-08T20:31:13+02:00 test/e2e: Move createVMWithStaticIP helper function
-  - cd875aa0 2026-01-08T20:31:12+02:00 test/e2e/kubevirt: Refactor duplicate VM pod err event waiter to shared helper
-  - 48f13641 2026-01-08T20:31:12+02:00 allocator/pod: add IP family validation for layer2 primary networks
-
-- ovn-kubernetes image-arm64 cb4cebc4fe27b0e07d0eb3c4411470a520373e5c to 767a5511bc0e65c1c6982113c477b37df1d3e2be
-  - a24dbcc9 2026-01-08T21:34:03+02:00 test/e2e/kubevirt: Check IPAMClaim status update
-  - d8bc99f8 2026-01-08T21:33:55+02:00 allocator, persistentips: update IPAM claim status for both success and failure
-  - 40e63c67 2026-01-08T20:31:13+02:00 test/e2e:: Fix duplicate IP validation test for IP family enforcement
-  - e3beead7 2026-01-08T20:31:13+02:00 test/e2e: add IP family validation tests for layer2 primary networks
-  - 9ae71681 2026-01-08T20:31:13+02:00 test/e2e: Move createVMWithStaticIP helper function
-  - cd875aa0 2026-01-08T20:31:12+02:00 test/e2e/kubevirt: Refactor duplicate VM pod err event waiter to shared helper
-  - 48f13641 2026-01-08T20:31:12+02:00 allocator/pod: add IP family validation for layer2 primary networks
+- cluster-policy-controller embedded-component 748524784686a5f397490563882cbfb88f9acd01 to d1ea75b45228a6af17f3a1899ab4bd214e28f54b
+  - 890a4e2 2026-07-13T12:23:38+02:00 add serviceAccountToken volume type to psalabelsyncer
+  - 041c3e1 2026-07-13T12:23:35+02:00 chore: go mod vendor
+  - a9b932c 2026-07-13T12:23:29+02:00 bump(openshift/api): to the latest release-4.19
 
