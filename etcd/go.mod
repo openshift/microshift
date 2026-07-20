@@ -5,16 +5,16 @@ go 1.26.3
 replace github.com/openshift/microshift => ../
 
 require (
-	github.com/openshift/api v0.0.0-20260618181827-d22a47a846dc
+	github.com/openshift/api v0.0.0-20260715165912-72066cc9718b
 	github.com/openshift/build-machinery-go v0.0.0-20251023084048-5d77c1a5e5af
 	github.com/openshift/microshift v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.2
-	go.etcd.io/etcd/server/v3 v3.6.5
-	k8s.io/apimachinery v1.35.3
-	k8s.io/cli-runtime v1.35.3
-	k8s.io/component-base v1.35.3
+	go.etcd.io/etcd/server/v3 v3.6.8
+	k8s.io/apimachinery v1.36.2
+	k8s.io/cli-runtime v1.36.2
+	k8s.io/component-base v1.36.2
 	k8s.io/klog/v2 v2.140.0
-	k8s.io/kubectl v1.35.3
+	k8s.io/kubectl v1.36.2
 	sigs.k8s.io/yaml v1.6.0
 )
 
@@ -52,9 +52,8 @@ require (
 	github.com/google/gnostic-models v0.7.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.1 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.0 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.0 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
@@ -64,7 +63,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/oklog/run v1.2.0 // indirect
-	github.com/openshift/library-go v0.0.0-20260520180710-3a6f949c22c3 // indirect
+	github.com/openshift/library-go v0.0.0-20260715193157-1a5091f58ece // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -98,14 +97,14 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
-	k8s.io/api v1.35.3 // indirect
-	k8s.io/apiserver v1.35.3 // indirect
-	k8s.io/client-go v1.35.3 // indirect
+	k8s.io/api v1.36.2 // indirect
+	k8s.io/apiserver v1.36.2 // indirect
+	k8s.io/client-go v1.36.2 // indirect
 	k8s.io/kube-openapi v0.0.0-20260618221249-bc653b64f974 // indirect
-	k8s.io/kubelet v1.35.3 // indirect
-	k8s.io/utils v0.0.0-20260210185600-b8788abfbbc2 // indirect
-	sigs.k8s.io/kustomize/api v0.20.1 // indirect
-	sigs.k8s.io/kustomize/kyaml v0.20.1 // indirect
+	k8s.io/kubelet v1.36.2 // indirect
+	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3 // indirect
+	sigs.k8s.io/kustomize/api v0.21.1 // indirect
+	sigs.k8s.io/kustomize/kyaml v0.21.1 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.4.0 // indirect
 )
@@ -141,13 +140,13 @@ require (
 	go.uber.org/zap v1.27.1 // indirect
 	golang.org/x/crypto v0.53.0 // indirect
 	google.golang.org/grpc v1.81.1 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
+	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 )
 
 replace (
-	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20251120221002-696928a6a0d7 // from kubernetes
+	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260424201627-4d4cc33d669d // from kubernetes
 	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20260608152018-bf6c0094589a // from etcd
 	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.0.0-20260608152018-bf6c0094589a // from etcd
 	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260608152018-bf6c0094589a // from etcd
@@ -189,3 +188,7 @@ replace (
 	k8s.io/sample-cli-plugin => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/sample-cli-plugin
 	k8s.io/sample-controller => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/sample-controller
 )
+
+replace k8s.io/cri-streaming => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/cri-streaming
+
+replace k8s.io/streaming => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/streaming
