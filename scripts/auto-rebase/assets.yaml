@@ -288,6 +288,16 @@ assets:
       - file: release-multus-aarch64.json
       - file: release-multus-x86_64.json
 
+  - dir: components/c2cc/
+    ignore: "C2CC probe pod assets - MicroShift specific"
+    files:
+      - file: clusterrole.yaml
+      - file: clusterrolebinding.yaml
+      - file: deployment.yaml
+      - file: namespace.yaml
+      - file: service.yaml
+      - file: serviceaccount.yaml
+
   - dir: optional/observability/
     ignore: "they don't exist in upstream repository - only in microshift"
     files:
