@@ -61,22 +61,25 @@ KSM Metrics Are Exported Via Scrape Drop-In
     [Documentation]    The prometheus receiver should scrape kube-state-metrics via the
     ...    scrape.d drop-in and export kube_node_info to the prometheus exporter.
 
-    Wait Until Keyword Succeeds    60s    5s
-    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    kube_node_info
+    VAR    ${METRIC}    kube_node_info    scope=TEST
+    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
 Node Exporter Metrics Are Exported Via Scrape Drop-In
     [Documentation]    The prometheus receiver should scrape node-exporter via the
     ...    scrape.d drop-in and export node_cpu_seconds_total to the prometheus exporter.
 
-    Wait Until Keyword Succeeds    60s    5s
-    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    node_cpu_seconds_total
+    VAR    ${METRIC}    node_cpu_seconds_total    scope=TEST
+    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
 Metrics Server Metrics Are Exported Via Scrape Drop-In
     [Documentation]    The prometheus receiver should scrape metrics-server via the
     ...    scrape.d drop-in and export metrics to the prometheus exporter.
 
-    Wait Until Keyword Succeeds    60s    5s
-    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    metrics_server_kubelet_request_total
+    VAR    ${METRIC}    metrics_server_kubelet_request_total    scope=TEST
+    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
 Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration
