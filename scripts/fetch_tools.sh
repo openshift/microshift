@@ -134,8 +134,11 @@ gettool_govulncheck() {
 }
 
 gettool_controller-gen() {
-    local ver="v0.17.1"
-    GOBIN=${DEST_DIR} GOFLAGS="" go install sigs.k8s.io/controller-tools/cmd/controller-gen@${ver}
+    local commit="a0be4596dbc5"
+    git clone --quiet --branch release-4.18 --single-branch \
+        https://github.com/openshift/controller-tools.git "${WORK_DIR}/controller-tools"
+    git -C "${WORK_DIR}/controller-tools" checkout --quiet "${commit}"
+    GOBIN=${DEST_DIR} GOFLAGS="" go install -C "${WORK_DIR}/controller-tools" ./cmd/controller-gen
 }
 
 gettool_gomplate() {
