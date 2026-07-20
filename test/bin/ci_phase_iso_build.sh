@@ -153,6 +153,13 @@ run_bootc_image_build() {
             return
         fi
 
+        # C2CC scenarios require both el9 and el10 presubmit images
+        if [[ "${CI_JOB_NAME}" =~ .*c2cc.* ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base -l ./image-blueprints-bootc/el10/layer1-base
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit -l ./image-blueprints-bootc/el10/layer2-presubmit
+            return
+        fi
+
         local -r os="${CI_JOB_NAME##*-}"
 
         if [[ "${os}" == "el9" || "${os}" == "el10" ]]; then
