@@ -218,9 +218,10 @@ assets:
       - file: 0000_03_config-operator_02_rangeallocations.crd.yaml
       - file: storage_version_migration.crd.yaml
         src:  0000_50_cluster-kube-storage-version-migrator-operator_01_storage_migration_crd.yaml
+      - file: microshift.io_remoteclusters.yaml
+        git_restore: True
       - file: route.crd.yaml
         src: /api/route/v1/zz_generated.crd-manifests/routes.crd.yaml
-
 
   - dir: release/
     ignore: "it contains files generated during rebase procedure"
