@@ -4,16 +4,16 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: ["1.18", "1.19", "1.20", "1.21"]
+        go-version: ["1.21", "1.22", "1.23", "1.24", "1.25"]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Install Go
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ matrix.go-version }}
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Test klog
       run: |
         go get -t -v ./...
@@ -25,20 +25,20 @@ jobs:
     if: github.base_ref
     steps:
       - name: Install Go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version: 1.23
       - name: Add GOBIN to PATH
         run: echo "PATH=$(go env GOPATH)/bin:$PATH" >>$GITHUB_ENV
       - name: Install dependencies
-        run: GO111MODULE=off go get golang.org/x/exp/cmd/apidiff
+        run: go install golang.org/x/exp/cmd/apidiff@latest
       - name: Checkout old code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
           path: "old"
       - name: Checkout new code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: "new"
       - name: APIDiff

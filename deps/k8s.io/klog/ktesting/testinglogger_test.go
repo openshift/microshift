@@ -12,8 +12,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os/exec"
 	"regexp"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -57,13 +59,13 @@ func TestInfo(t *testing.T) {
 		"should not print duplicate keys with the same value": {
 			text:          "test",
 			keysAndValues: []interface{}{"akey", "avalue", "akey", "avalue"},
-			expectedOutput: `Ixxx test akey="avalue" akey="avalue"
+			expectedOutput: `Ixxx test akey="avalue"
 `,
 		},
-		"should only print the last duplicate key when the values are passed to Info": {
+		"should print no duplicate keys when the values are passed to Info": {
 			text:          "test",
 			keysAndValues: []interface{}{"akey", "avalue", "akey", "avalue2"},
-			expectedOutput: `Ixxx test akey="avalue" akey="avalue2"
+			expectedOutput: `Ixxx test akey="avalue2"
 `,
 		},
 		"should only print the duplicate key that is passed to Info if one was passed to the logger": {
@@ -136,9 +138,36 @@ func TestInfo(t *testing.T) {
 	}
 }
 
-func TestCallDepth(t *testing.T) {
-	logger := ktesting.NewLogger(t, ktesting.NewConfig())
+// TestCallDepthOutput produces output which gets checked by TestCallDepthVerify.
+func TestCallDepthOutput(t *testing.T) {
+	logger := ktesting.NewLogger(t, ktesting.DefaultConfig)
 	logger.Info("hello world")
+	logger.V(1).Info("you shouldn't see this with -testing.v=0")
+	callDepthHelper(logger.V(1), "you should see this with -testing.v=0 -testing.vmodule=helper_test=1")
+}
+
+// TestCallDepthVerify runs TestCallDepth with appropriate flags and checks the output.
+//
+// Invoking `go test` is necessary because we want to verify that it correctly unwinds the stack,
+// which means that we have to let it print output. We cannot intercept that log output from
+// within a test.
+func TestCallDepthVerify(t *testing.T) {
+	cmd, args := "go", "test -v -run=TestCallDepthOutput k8s.io/klog/v2/ktesting -args -testing.v=0 -testing.vmodule=helper_test=1"
+	output, err := exec.Command("go", strings.Split(args, " ")...).CombinedOutput()
+	if err != nil {
+		t.Fatalf("failed to %s %s: %v", cmd, args, err)
+	}
+	t.Log("Got output:\n", string(output))
+
+	expect := `(?m)^[[:space:]]*testinglogger_test.go:.*hello world$
+^[[:space:]]*testinglogger_test.go:.*you should see this`
+	matched, err := regexp.MatchString(expect, string(output))
+	if err != nil {
+		t.Fatalf("failed to parse regexp: %v\n\n%s", err, expect)
+	}
+	if !matched {
+		t.Fatalf("expected output\n%s\n\nto match regexp\n%s", string(output), expect)
+	}
 }
 
 type logToBuf struct {

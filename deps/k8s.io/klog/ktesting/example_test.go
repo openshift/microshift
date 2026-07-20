@@ -19,6 +19,7 @@ package ktesting_test
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"k8s.io/klog/v2/ktesting"
@@ -30,12 +31,22 @@ func ExampleUnderlier() {
 			ktesting.Verbosity(4),
 			ktesting.BufferLogs(true),
 			ktesting.AnyToString(func(value interface{}) string {
-				return fmt.Sprintf("### %+v ###", value)
+				// This simple demo formats with %+v,
+				// splits into multiple lines at spaces (much too simplistic for unknown data, but works here),
+				// then adds ### as delimiters.
+				str := fmt.Sprintf("%+v", value)
+				str = strings.ReplaceAll(str, " ", "\n")
+				return fmt.Sprintf("### %s ###", str)
 			}),
 		),
 	)
 
-	logger.Error(errors.New("failure"), "I failed", "what", "something", "data", struct{ Field int }{Field: 1})
+	logger.Error(errors.New("failure"), "I failed", "what", "something",
+		// The AnyToString callback logs this with multiple lines.
+		"data", struct{ X, Y int }{10, 20},
+		// This with a single line.
+		"moreData", struct{ Field int }{Field: 1},
+	)
 	logger.WithValues("request", 42).WithValues("anotherValue", "fish").Info("hello world")
 	logger.WithValues("request", 42, "anotherValue", "fish").Info("hello world 2", "yetAnotherValue", "thanks")
 	logger.WithName("example").Info("with name")
@@ -65,13 +76,16 @@ func ExampleUnderlier() {
 	}
 
 	// Output:
-	// ERROR I failed err="failure" what="something" data=### {Field:1} ###
+	// ERROR I failed err="failure" what="something" data=<
+	// 	### {X:10
+	// 	Y:20} ###
+	//  > moreData=### {Field:1} ###
 	// INFO hello world request=### 42 ### anotherValue="fish"
 	// INFO hello world 2 request=### 42 ### anotherValue="fish" yetAnotherValue="thanks"
 	// INFO example: with name
 	// INFO higher verbosity
 	//
-	// log entry #0: {Timestamp:0001-01-01 00:00:00 +0000 UTC Type:ERROR Prefix: Message:I failed Verbosity:0 Err:failure WithKVList:[] ParameterKVList:[what something data {Field:1}]}
+	// log entry #0: {Timestamp:0001-01-01 00:00:00 +0000 UTC Type:ERROR Prefix: Message:I failed Verbosity:0 Err:failure WithKVList:[] ParameterKVList:[what something data {X:10 Y:20} moreData {Field:1}]}
 	// log entry #1: {Timestamp:0001-01-01 00:00:00 +0000 UTC Type:INFO Prefix: Message:hello world Verbosity:0 Err:<nil> WithKVList:[request 42 anotherValue fish] ParameterKVList:[]}
 	// log entry #2: {Timestamp:0001-01-01 00:00:00 +0000 UTC Type:INFO Prefix: Message:hello world 2 Verbosity:0 Err:<nil> WithKVList:[request 42 anotherValue fish] ParameterKVList:[yetAnotherValue thanks]}
 	// log entry #3: {Timestamp:0001-01-01 00:00:00 +0000 UTC Type:INFO Prefix:example Message:with name Verbosity:0 Err:<nil> WithKVList:[] ParameterKVList:[]}
