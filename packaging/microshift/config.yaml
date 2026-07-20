@@ -41,6 +41,44 @@ apiServer:
         # to serve from the API server. Allowed values: VersionTLS12, VersionTLS13.
         # Defaults to VersionTLS12.
         minVersion: VersionTLS12
+clusterToCluster:
+    # DNS cache settings for CoreDNS server blocks generated for remote clusters.
+    dns:
+        # Maximum TTL (seconds) for denial (NXDOMAIN/NODATA) DNS cache entries in CoreDNS
+        # server blocks generated for remote clusters. Must be >= 0. Setting to 0 disables denial caching.
+        cacheNegativeTTL: 10
+        # Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks
+        # generated for remote clusters. Must be >= 0. Setting to 0 disables positive caching.
+        cacheTTL: 10
+    # Interval between healthcheck probe attempts to each remote cluster.
+    # Parsed as a Go duration string (e.g. "10s", "1m"). Must be between 1s and 5m.
+    probeInterval: 10s
+    # List of remote clusters to establish connectivity with.
+    # C2CC is disabled when this list is empty.
+    remoteClusters:
+        - # Pod CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
+          clusterNetwork: []
+          # DNS domain suffix for the remote cluster (e.g., "cluster-b.remote").
+          # Services are reachable as <svc>.<ns>.svc.<domain>.
+          # Optional — if empty, no DNS forwarding is configured for this remote.
+          domain: ""
+          # IP addresses of the remote cluster's node, used as next-hop for routing.
+          # At most one IPv4 and one IPv6 address. Dual-stack clusters need both.
+          nextHop: []
+          # Service CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
+          serviceNetwork: []
+    # Linux policy routing table settings for C2CC routes.
+    routing:
+        # Linux policy routing table ID for direct routes to remote cluster CIDRs.
+        # The route protocol number is set to the same value.
+        # Must be between 1 and 252 (253-255 are reserved by the kernel).
+        # Must differ from serviceRouteTableID.
+        routeTableID: 200
+        # Linux policy routing table ID for service routes via the OVN management port.
+        # The route protocol number is set to the same value.
+        # Must be between 1 and 252 (253-255 are reserved by the kernel).
+        # Must differ from routeTableID.
+        serviceRouteTableID: 201
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll".
     # Defaults to "Normal".

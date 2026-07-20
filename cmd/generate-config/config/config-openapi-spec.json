@@ -2,6 +2,7 @@
   "type": "object",
   "required": [
     "apiServer",
+    "clusterToCluster",
     "debugging",
     "dns",
     "etcd",
@@ -173,6 +174,97 @@
                 "VersionTLS12",
                 "VersionTLS13"
               ]
+            }
+          }
+        }
+      }
+    },
+    "clusterToCluster": {
+      "type": "object",
+      "required": [
+        "dns",
+        "routing"
+      ],
+      "properties": {
+        "dns": {
+          "description": "DNS cache settings for CoreDNS server blocks generated for remote clusters.",
+          "type": "object",
+          "properties": {
+            "cacheNegativeTTL": {
+              "description": "Maximum TTL (seconds) for denial (NXDOMAIN/NODATA) DNS cache entries in CoreDNS\nserver blocks generated for remote clusters. Must be \u003e= 0. Setting to 0 disables denial caching.",
+              "type": "integer",
+              "default": 10,
+              "minimum": 0
+            },
+            "cacheTTL": {
+              "description": "Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks\ngenerated for remote clusters. Must be \u003e= 0. Setting to 0 disables positive caching.",
+              "type": "integer",
+              "default": 10,
+              "minimum": 0
+            }
+          }
+        },
+        "probeInterval": {
+          "description": "Interval between healthcheck probe attempts to each remote cluster.\nParsed as a Go duration string (e.g. \"10s\", \"1m\"). Must be between 1s and 5m.",
+          "type": "string",
+          "default": "10s"
+        },
+        "remoteClusters": {
+          "description": "List of remote clusters to establish connectivity with.\nC2CC is disabled when this list is empty.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "clusterNetwork",
+              "nextHop",
+              "serviceNetwork"
+            ],
+            "properties": {
+              "clusterNetwork": {
+                "description": "Pod CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "domain": {
+                "description": "DNS domain suffix for the remote cluster (e.g., \"cluster-b.remote\").\nServices are reachable as \u003csvc\u003e.\u003cns\u003e.svc.\u003cdomain\u003e.\nOptional — if empty, no DNS forwarding is configured for this remote.",
+                "type": "string"
+              },
+              "nextHop": {
+                "description": "IP addresses of the remote cluster's node, used as next-hop for routing.\nAt most one IPv4 and one IPv6 address. Dual-stack clusters need both.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "serviceNetwork": {
+                "description": "Service CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "routing": {
+          "description": "Linux policy routing table settings for C2CC routes.",
+          "type": "object",
+          "properties": {
+            "routeTableID": {
+              "description": "Linux policy routing table ID for direct routes to remote cluster CIDRs.\nThe route protocol number is set to the same value.\nMust be between 1 and 252 (253-255 are reserved by the kernel).\nMust differ from serviceRouteTableID.",
+              "type": "integer",
+              "default": 200,
+              "maximum": 252,
+              "minimum": 1
+            },
+            "serviceRouteTableID": {
+              "description": "Linux policy routing table ID for service routes via the OVN management port.\nThe route protocol number is set to the same value.\nMust be between 1 and 252 (253-255 are reserved by the kernel).\nMust differ from routeTableID.",
+              "type": "integer",
+              "default": 201,
+              "maximum": 252,
+              "minimum": 1
             }
           }
         }
