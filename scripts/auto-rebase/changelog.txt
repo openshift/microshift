@@ -1,12 +1,10 @@
-- api embedded-component 7df7d59279ddc13d010f5d25fe99ca21b0499542 to 36dec0bfafe4403a1e04f3b10766b553342f10e2
-  - 89a277dd 2026-07-10T10:00:18Z add new serviceAccountToken fs type
+- api embedded-component 36dec0bfafe4403a1e04f3b10766b553342f10e2 to 05da40ea98557f8351483a39db3d0e7d9076bc8f
+  - 47119573 2026-07-07T08:49:21-04:00 NE-2480: Promote GatewayAPIWithoutOLM feature gate to Default
 
-- cluster-policy-controller embedded-component 47c783103216aa5e1242632127a5d8f98b8b7455 to 67083fab6cea4dde724efd5be5a22bda1f8437d1
-  - ab624b3 2026-07-10T16:26:47+02:00 add serviceAccountToken volume type to psalabelsyncer
-  - 62dfa43 2026-07-10T16:26:42+02:00 chore: go mod vendor
-  - c67bd6a 2026-07-10T16:26:33+02:00 bump(openshift/api): to the latest release-4.20
+- cluster-ingress-operator embedded-component e40a071867464abf192020eb0354a84436ce04e7 to 4565e7d1f8d2c2d6502da376f0148e6a0689ce97
+  - 4aeee40 2026-07-06T09:16:29-04:00 Remove feature-set annotation from Sail Library RBAC manifests
+  - 9d4e6de 2026-06-10T18:58:33Z Ensure canary cert matches the default ingress controller's cert
 
-- machine-config-operator embedded-component 5824eb86b016c7923acf94ae1dab8d638e672771 to 089ca7ab5cd8444ff0da467b7f5b0c39005661e9
-  - 551a6385 2026-07-09T13:42:42Z fix: update arbiter crio config
-  - f18672ef 2026-07-06T15:00:12Z bootimage: make vsphere updates atomic
+- machine-config-operator embedded-component 089ca7ab5cd8444ff0da467b7f5b0c39005661e9 to 006db73edeaaa46107311d250f7ea9c10f5633e8
+  - 6b0c1a6e 2026-07-07T00:21:53Z manifests: inject proxy into mcc deployment
 
