@@ -47,8 +47,8 @@ scenario_run_tests() {
     # Note that rhocp or beta dependencies repository may not yet exist
     # for the current version. Then, just use whatever we can get for
     # the previous minor version.
-    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"       4 "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  4 "${MINOR_VERSION}"
     run_command_on_vm host1 "sudo subscription-manager release --set 9.8"
     configure_fast_datapath_repo
 
