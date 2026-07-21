@@ -5,7 +5,8 @@ Documentation       IPsec E2E tests for C2CC.
 ...
 ...                 Tests cover ESP encapsulation, connectivity through the tunnel,
 ...                 source IP preservation, policy enforcement (SA flush/restore),
-...                 plaintext rejection, host-to-pod rejection, and MTU validation.
+...                 plaintext rejection, host-to-pod rejection, MTU boundary (1500),
+...                 and tunnel recovery. Jumbo MTU tests are in the c2cc-ipsec-mtu scenario.
 
 Resource            ../../../resources/microshift-process.resource
 Resource            ../../../resources/kubeconfig.resource
@@ -28,19 +29,11 @@ IPsec Tunnels Established On All Clusters
     Verify All IPsec Tunnels On Cluster    cluster-c    expected_count=8
 
 ESP Encapsulation On Wire
-    [Documentation]    Capture packets on the wire and verify ESP encapsulation.
-    ...    Records XFRM byte counters before and after traffic, captures ESP packets
-    ...    via tcpdump, and verifies counters incremented.
-    ${baseline_a}=    Get XFRM Byte Counters    cluster-a
-    ${baseline_b}=    Get XFRM Byte Counters    cluster-b
-
+    [Documentation]    Verify all cross-cluster traffic is ESP-encapsulated by
+    ...    capturing packets via tcpdump and checking XFRM counters.
     ${pcap_file}=    Start Tcpdump For ESP On Cluster    cluster-b
-    ${ip_dest}=    Get Hello Pod IP    cluster-b
-    Curl From Cluster    cluster-a    ${ip_dest}    8080
+    Verify ESP Encapsulation On All Clusters
     Wait For Tcpdump And Verify ESP    cluster-b    ${pcap_file}
-
-    Verify XFRM Counters Incremented    cluster-a    ${baseline_a}
-    Verify XFRM Counters Incremented    cluster-b    ${baseline_b}
 
 Cross Cluster Connectivity Through IPsec
     [Documentation]    Verify pods on all clusters can reach pods/services on all
@@ -95,13 +88,14 @@ Host To Remote Pod Rejected Without IPsec
     ${pod_ip}=    Get Hello Pod IP    cluster-b
     Curl From Host Should Fail    cluster-a    ${pod_ip}    8080
 
-Near MTU Packet Through IPsec Tunnel
-    [Documentation]    Send near-MTU-sized payloads through IPsec tunnel-mode
-    ...    encapsulation.    Verifies no MTU blackhole from DF-bit issues.
-    ...    ESP overhead ~36-52B total.
-    ${ip_dest}=    Get Hello Pod IP    cluster-b
-    Send Large Payload And Verify    cluster-a    ${ip_dest}    1300
-    Send Large Payload And Verify    cluster-a    ${ip_dest}    1400
+MTU Boundary And TCP Transfer Through IPsec
+    [Documentation]    Validate DF-bit boundaries at the ESP-adjusted PMTU and
+    ...    large TCP transfers through IPsec on all cluster pairs.
+    Ping DF Bit Between All Clusters    64
+    Ping DF Bit Between All Clusters    1450
+    Ping DF Bit Should Fail Between All Clusters    1472
+    Large Payload Between All Clusters    1400
+    Large Payload Between All Clusters    65536
 
 Cross Cluster DNS Through IPsec
     [Documentation]    Verify pods can resolve and reach services on remote
@@ -150,23 +144,9 @@ Ensure IPsec Running On All Clusters
         Start IPsec Service On Cluster    ${alias}
     END
 
-Restore IPsec And Verify
-    [Documentation]    Restart ipsec and wait for tunnels to come back up.
-    [Arguments]    ${alias}
-    Restart IPsec Service On Cluster    ${alias}
-    Wait For IPsec Tunnel Reestablishment    ${alias}    expected_count=8
-
 Restore IPsec With Enforcement Cleanup
     [Documentation]    Remove enforcement rules and restore IPsec.
     [Arguments]    ${ipsec_alias}    ${enforcement_alias}
     Remove NFTables IPsec Enforcement Rules    ${enforcement_alias}
     Start IPsec Service On Cluster    ${ipsec_alias}
     Wait For IPsec Tunnel Reestablishment    ${ipsec_alias}    expected_count=8
-
-Send Large Payload And Verify
-    [Documentation]    Send a large payload via curl POST and verify it succeeds.
-    [Arguments]    ${alias}    ${ip}    ${size}
-    ${stdout}=    Oc On Cluster
-    ...    ${alias}
-    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- sh -c 'dd if=/dev/zero bs=${size} count=1 2>/dev/null | curl -sS --max-time 15 --data-binary @- http://${ip}:8080/cgi-bin/hello'
-    Should Contain    ${stdout}    Hello from
