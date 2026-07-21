@@ -7,9 +7,9 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
 	github.com/google/go-cmp v0.7.0
 	github.com/miekg/dns v1.1.63 // microshift
-	github.com/openshift/api v0.0.0-20260709172950-30edb45d2035
+	github.com/openshift/api v0.0.0-20260717133910-57eb58a15422
 	github.com/openshift/build-machinery-go v0.0.0-20251023084048-5d77c1a5e5af
-	github.com/openshift/client-go v0.0.0-20260330134249-7e1499aaacd7
+	github.com/openshift/client-go v0.0.0-20260720094807-fbc45213df28
 	github.com/openshift/library-go v0.0.0-20260303171201-5d9eb6295ff6
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.10.2
