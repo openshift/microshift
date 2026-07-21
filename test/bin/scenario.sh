@@ -1235,7 +1235,7 @@ sslclientcert=${cert}
 sslclientkey=${key}
 EOF
     copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-    run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${repo_id}.repo"
+    run_command_on_vm host1 "sudo cp '${tmp_file}' '/etc/yum.repos.d/${repo_id}.repo'"
     rm -f "${tmp_file}"
 }
 
@@ -1287,7 +1287,7 @@ gpgcheck=0
 skip_if_unavailable=0
 EOF
         copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-        run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${ocp_repo_name}.repo"
+        run_command_on_vm host1 "sudo cp '${tmp_file}' '/etc/yum.repos.d/${ocp_repo_name}.repo'"
         rm -f "${tmp_file}"
     fi
 }
@@ -1341,7 +1341,7 @@ gpgcheck=0
 skip_if_unavailable=0
 EOF
     copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-    run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/microshift-mirror-rpms.repo"
+    run_command_on_vm host1 "sudo cp '${tmp_file}' /etc/yum.repos.d/microshift-mirror-rpms.repo"
     rm -f "${tmp_file}"
 }
 
