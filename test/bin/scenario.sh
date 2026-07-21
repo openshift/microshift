@@ -1198,6 +1198,153 @@ configure_vm_firewall() {
     run_command_on_vm "${vmname}" "sudo firewall-cmd --reload"
 }
 
+#
+# RPM repository configuration helpers.
+# Used by RPM-based scenario scripts to configure yum/dnf repos on VMs.
+#
+
+# Configure a yum repository on host1 using CDN entitlement certificates
+# for authentication. Discovers the entitlement cert and key from
+# /etc/pki/entitlement/ on the VM and writes a .repo file with GPG
+# and SSL verification enabled.
+#
+# Arguments:
+#   repo_id  -- Repository identifier used as the .repo filename and
+#               section name (e.g. "rhocp-4.18").
+#   repo_name -- Human-readable repository name.
+#   baseurl   -- CDN URL for the repository content.
+configure_cdn_repo() {
+    local -r repo_id=$1
+    local -r repo_name=$2
+    local -r baseurl=$3
+
+    local -r cert=$(run_command_on_vm host1 "ls /etc/pki/entitlement/[0-9]*.pem | grep -v '\-key.pem' | head -n1")
+    local -r key=$(run_command_on_vm host1 "ls /etc/pki/entitlement/[0-9]*-key.pem | head -n1")
+    local -r tmp_file=$(mktemp)
+
+    tee "${tmp_file}" >/dev/null <<EOF
+[${repo_id}]
+name=${repo_name}
+baseurl=${baseurl}
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify=1
+sslcacert=/etc/rhsm/ca/redhat-uep.pem
+sslclientcert=${cert}
+sslclientkey=${key}
+EOF
+    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
+    run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${repo_id}.repo"
+    rm -f "${tmp_file}"
+}
+
+# Enable the Red Hat OpenShift Container Platform (rhocp) RPM repository
+# on host1. The first argument selects the method:
+#   - A 1-2 digit number (minor version): on RHEL 9, enables the repo via
+#     subscription-manager; on other RHEL versions, creates a CDN-backed
+#     repo file via configure_cdn_repo.
+#   - An HTTP URL: writes a .repo file pointing at a beta mirror with
+#     GPG checking disabled.
+#   - Empty string: no-op (the repo may not exist yet).
+#
+# Arguments:
+#   rhocp -- Minor version number (e.g. "18") or beta mirror URL.
+#   major -- OCP major version (e.g. "4").
+#   minor -- OCP minor version, used in the .repo filename for beta mirrors.
+configure_rhocp_repo() {
+    local -r rhocp=$1
+    local -r major=$2
+    local -r minor=$3
+
+    # The repository may be empty if the beta mirror is not up yet
+    if [[ -z "${rhocp}" ]] ; then
+        return
+    fi
+
+    if [[ "${rhocp}" =~ ^[0-9]{1,2}$ ]]; then
+        local -r rhel_ver=$(run_command_on_vm host1 "rpm -E %{rhel}")
+        if [[ "${rhel_ver}" == "9" ]]; then
+            run_command_on_vm host1 \
+                "sudo subscription-manager repos --enable rhocp-${major}.${rhocp}-for-rhel-9-\$(uname -m)-rpms"
+        else
+            local -r arch=$(uname -m)
+            configure_cdn_repo \
+                "rhocp-${major}.${rhocp}" \
+                "Red Hat OpenShift ${major}.${rhocp} for RHEL 9" \
+                "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/rhocp/${major}.${rhocp}/os"
+        fi
+    elif [[ "${rhocp}" =~ ^http ]]; then
+        local -r ocp_repo_name="rhocp-${major}.${minor}-for-rhel-9-mirrorbeta-rpms"
+        local -r tmp_file=$(mktemp)
+
+        tee "${tmp_file}" >/dev/null <<EOF
+[${ocp_repo_name}]
+name=Beta rhocp RPMs for RHEL 9
+baseurl=${rhocp}
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+        copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
+        run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${ocp_repo_name}.repo"
+        rm -f "${tmp_file}"
+    fi
+}
+
+# Enable the fast-datapath RPM repository on host1. On RHEL 9 the repo
+# is enabled via subscription-manager; on other RHEL versions a CDN-backed
+# repo file is created via configure_cdn_repo.
+configure_fast_datapath_repo() {
+    local -r rhel_ver=$(run_command_on_vm host1 "rpm -E %{rhel}")
+    if [[ "${rhel_ver}" == "9" ]]; then
+        run_command_on_vm host1 \
+            "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
+    else
+        local -r arch=$(uname -m)
+        configure_cdn_repo \
+            "fast-datapath" \
+            "Red Hat Fast Datapath for RHEL 9" \
+            "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/fast-datapath/os"
+    fi
+}
+
+# Configure a MicroShift RPM mirror repository on host1. Used in upgrade
+# and presubmit scenarios to make a previous MicroShift release available
+# for installation before testing an upgrade to the current version.
+# No-op when repo is empty or is a non-URL repo name (i.e. an already
+# enabled subscription-manager repo).
+#
+# Arguments:
+#   repo -- Mirror URL, subscription-manager repo name, or empty string.
+configure_microshift_mirror() {
+    local -r repo=$1
+
+    # `repo` might be empty if we install microshift from rhocp
+    if [[ -z "${repo}" ]] ; then
+        return
+    fi
+
+    # `repo` might be an enabled repo from a released version instead
+    # of a mirror.
+    if [[ ! "${repo}" =~ ^http ]]; then
+        return
+    fi
+
+    local -r tmp_file=$(mktemp)
+    tee "${tmp_file}" >/dev/null <<EOF
+[microshift-mirror-rpms]
+name=MicroShift Mirror
+baseurl=${repo}
+enabled=1
+gpgcheck=0
+skip_if_unavailable=0
+EOF
+    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
+    run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/microshift-mirror-rpms.repo"
+    rm -f "${tmp_file}"
+}
+
 # Function to report the full version of locally built RPMs, e.g. "4.17.0"
 local_rpm_version() {
     if [ ! -d "${LOCAL_REPO}" ]; then
