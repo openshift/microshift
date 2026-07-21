@@ -19,32 +19,32 @@ Test Tags           slow
 
 
 *** Variables ***
-${USHIFT_HOST}              ${EMPTY}
-${USHIFT_USER}              ${EMPTY}
-${API_PORT}                 6443
-${OSCAP_BASELINE_FILE}      /tmp/cis-baseline-results.xml
-${OSCAP_POST_FILE}          /tmp/cis-post-results.xml
-${OSCAP_REPORT_FILE}        /tmp/cis-post-report.html
-${OSCAP_PROFILE}            xccdf_org.ssgproject.content_profile_cis
-${SCAP_DS_FILE}             /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
-${CIS_REQUIREMENTS_FILE}    cis-requirements.yml
-${CIS_HARDEN_FILE}          cis-harden.yml
+${USHIFT_HOST}                  ${EMPTY}
+${USHIFT_USER}                  ${EMPTY}
+${API_PORT}                     6443
+${OSCAP_BASELINE_FILE}          /tmp/cis-baseline-results.xml
+${OSCAP_POST_FILE}              /tmp/cis-post-results.xml
+${OSCAP_REPORT_FILE}            /tmp/cis-post-report.html
+${OSCAP_PROFILE}                xccdf_org.ssgproject.content_profile_cis
+${SCAP_DS_FILE}                 /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
+${CIS_REQUIREMENTS_FILE}        cis-requirements.yml
+${CIS_HARDEN_FILE}              cis-harden.yml
 
 # Rules that MicroShift is known to cause. Any new failure outside this
 # set means MicroShift introduced an unexpected CIS regression.
 @{KNOWN_MICROSHIFT_RULES}
-...    sysctl_net_ipv4_ip_forward
-...    sysctl_net_ipv6_conf_all_forwarding
-...    sysctl_net_ipv4_conf_all_forwarding
-...    sysctl_net_ipv4_conf_default_forwarding
-...    sysctl_net_ipv6_conf_default_forwarding
-...    file_permissions_ungroupowned
-...    no_files_unowned_by_user
-...    no_files_or_dirs_ungroupowned
-...    no_files_or_dirs_unowned_by_user
-...    dir_perms_world_writable_sticky_bits
-...    file_permissions_unauthorized_world_writable
-...    audit_rules_privileged_commands
+...                             sysctl_net_ipv4_ip_forward
+...                             sysctl_net_ipv6_conf_all_forwarding
+...                             sysctl_net_ipv4_conf_all_forwarding
+...                             sysctl_net_ipv4_conf_default_forwarding
+...                             sysctl_net_ipv6_conf_default_forwarding
+...                             file_permissions_ungroupowned
+...                             no_files_unowned_by_user
+...                             no_files_or_dirs_ungroupowned
+...                             no_files_or_dirs_unowned_by_user
+...                             dir_perms_world_writable_sticky_bits
+...                             file_permissions_unauthorized_world_writable
+...                             audit_rules_privileged_commands
 
 
 *** Test Cases ***
@@ -77,14 +77,12 @@ Setup
     ...    run a post-install scan, and prepare for functional tests.
     Check Required Env Variables
     Login MicroShift Host
-    Apply CIS Hardening
-    Reboot And Reconnect
-    Run CIS Scan    ${OSCAP_BASELINE_FILE}
+    Harden And Scan Baseline
     Install And Enable MicroShift
     Reboot And Reconnect
     Configure Firewall After Hardening
     Wait Until Greenboot Health Check Exited
-    Run CIS Scan    ${OSCAP_POST_FILE}    report_file=${OSCAP_REPORT_FILE}
+    Run CIS Scan    ${OSCAP_POST_FILE}    oscap_report=${OSCAP_REPORT_FILE}
     Setup Kubeconfig
 
 Teardown
@@ -99,6 +97,12 @@ Teardown
     ...    SSHLibrary.Get File    ${OSCAP_REPORT_FILE}    ${OUTPUTDIR}/cis-post-report.html
     Run Keyword And Ignore Error
     ...    Logout MicroShift Host
+
+Harden And Scan Baseline
+    [Documentation]    Apply CIS hardening, reboot, and run the baseline scan.
+    Apply CIS Hardening
+    Reboot And Reconnect
+    Run CIS Scan    ${OSCAP_BASELINE_FILE}
 
 Apply CIS Hardening
     [Documentation]    Install prerequisites, upload assets, and run the CIS hardening playbook
@@ -157,9 +161,9 @@ Configure Firewall Trusted Sources
 
 Run CIS Scan
     [Documentation]    Execute the OpenSCAP CIS Level 2 scan and save results.
-    [Arguments]    ${results_file}    ${report_file}=${EMPTY}
-    ${report_arg}=    Set Variable If    "${report_file}" != "${EMPTY}"
-    ...    --report ${report_file}    ${EMPTY}
+    [Arguments]    ${results_file}    ${oscap_report}=${EMPTY}
+    ${report_arg}=    Set Variable If    "${oscap_report}" != "${EMPTY}"
+    ...    --report ${oscap_report}    ${EMPTY}
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    oscap xccdf eval --profile ${OSCAP_PROFILE} --results ${results_file} ${report_arg} ${SCAP_DS_FILE}
     ...    sudo=True
@@ -176,7 +180,10 @@ Get Failing Rule IDs
     Verify Remote File Exists With Sudo    ${results_file}
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    python3 -c "import xml.etree.ElementTree as ET; ns={'x':'http://checklists.nist.gov/xccdf/1.2'}; tree=ET.parse('${results_file}'); rules=[rr.get('idref').replace('xccdf_org.ssgproject.content_rule_','') for rr in tree.findall('.//x:rule-result',ns) if rr.find('x:result',ns).text=='fail']; print('\\n'.join(sorted(rules)))"
-    ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
+    ...    sudo=True
+    ...    return_rc=True
+    ...    return_stdout=True
+    ...    return_stderr=True
     Should Be Equal As Integers    ${rc}    0    msg=Failed to parse results: ${stderr}
     @{rules}=    Split String    ${stdout.strip()}    \n
     RETURN    ${rules}
@@ -191,12 +198,10 @@ Should Only Contain Expected Rules
     [Documentation]    Assert every rule in the delta is in the known MicroShift set.
     ...    Logs each unexpected rule and fails if any exist.
     [Arguments]    ${delta}
-    @{unexpected}=    Create List
+    VAR    @{unexpected}=    @{EMPTY}
     FOR    ${rule}    IN    @{delta}
         ${is_known}=    Evaluate    $rule in $KNOWN_MICROSHIFT_RULES
-        IF    not ${is_known}
-            Append To List    ${unexpected}    ${rule}
-        END
+        IF    not ${is_known}    Append To List    ${unexpected}    ${rule}
     END
     Log    Known MicroShift rules in delta: ${delta}
     IF    len($unexpected) > 0

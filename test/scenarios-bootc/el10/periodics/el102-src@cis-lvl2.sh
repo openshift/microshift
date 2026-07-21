@@ -3,6 +3,7 @@
 # Sourced from scenario.sh and uses functions defined there.
 
 # CIS hardening runs inside the Robot suite and takes ~20 minutes
+# shellcheck disable=SC2034  # used elsewhere
 TEST_EXECUTION_TIMEOUT=60m
 
 # The RPM-based image used to create the VM for this test does not
@@ -143,6 +144,7 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
+    # shellcheck disable=SC2034  # used elsewhere
     TEST_RANDOMIZATION=none
     run_tests host1 \
         --variable "SCAP_DS_FILE:/usr/share/xml/scap/ssg/content/ssg-rhel10-ds.xml" \
