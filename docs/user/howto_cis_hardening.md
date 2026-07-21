@@ -10,41 +10,41 @@ MicroShift introduces changes to a hardened system in three categories. These ru
 
 OVN-Kubernetes requires IP forwarding for pod networking. MicroShift enables `net.ipv4.ip_forward` and `net.ipv6.conf.all.forwarding` at startup.
 
-| Rule ID | OS |
-|:--------|:---|
-| `sysctl_net_ipv4_ip_forward` | RHEL 9, 10 |
-| `sysctl_net_ipv6_conf_all_forwarding` | RHEL 9, 10 |
-| `sysctl_net_ipv4_conf_all_forwarding` | RHEL 10 |
-| `sysctl_net_ipv4_conf_default_forwarding` | RHEL 10 |
-| `sysctl_net_ipv6_conf_default_forwarding` | RHEL 10 |
+| Rule ID | RHEL 9 | RHEL 10 |
+|:--------|:------:|:-------:|
+| `sysctl_net_ipv4_ip_forward` | x | x |
+| `sysctl_net_ipv6_conf_all_forwarding` | x | x |
+| `sysctl_net_ipv4_conf_all_forwarding` | | x |
+| `sysctl_net_ipv4_conf_default_forwarding` | | x |
+| `sysctl_net_ipv6_conf_default_forwarding` | | x |
 
 ### Container File Ownership
 
 Container images contain files owned by UIDs and GIDs that do not exist in the host's `/etc/passwd` and `/etc/group`. These are stored in `/var/lib/containers/storage/overlay/` and are an inherent characteristic of any container runtime.
 
-| Rule ID | OS |
-|:--------|:---|
-| `file_permissions_ungroupowned` | RHEL 9 |
-| `no_files_unowned_by_user` | RHEL 9 |
-| `no_files_or_dirs_ungroupowned` | RHEL 10 |
-| `no_files_or_dirs_unowned_by_user` | RHEL 10 |
+| Rule ID | RHEL 9 | RHEL 10 |
+|:--------|:------:|:-------:|
+| `file_permissions_ungroupowned` | x | |
+| `no_files_unowned_by_user` | x | |
+| `no_files_or_dirs_ungroupowned` | | x |
+| `no_files_or_dirs_unowned_by_user` | | x |
 
 ### Kubelet Volume Permissions
 
 Kubelet creates 0777 directories for ConfigMap and EmptyDir volumes so that pods running as any UID can access their projected configuration. It also creates 0666 container termination log files.
 
-| Rule ID | OS |
-|:--------|:---|
-| `dir_perms_world_writable_sticky_bits` | RHEL 9, 10 |
-| `file_permissions_unauthorized_world_writable` | RHEL 9, 10 |
+| Rule ID | RHEL 9 | RHEL 10 |
+|:--------|:------:|:-------:|
+| `dir_perms_world_writable_sticky_bits` | x | x |
+| `file_permissions_unauthorized_world_writable` | x | x |
 
 ### Audit Rules
 
 CIS requires audit rules for all setuid/setgid binaries. If MicroShift is installed after running the CIS hardening role, the audit rules will not cover binaries added by MicroShift RPMs.
 
-| Rule ID | OS |
-|:--------|:---|
-| `audit_rules_privileged_commands` | RHEL 9, 10 |
+| Rule ID | RHEL 9 | RHEL 10 |
+|:--------|:------:|:-------:|
+| `audit_rules_privileged_commands` | x | x |
 
 This rule can be resolved by regenerating audit rules after installing MicroShift:
 
@@ -96,17 +96,7 @@ For RHEL 10, the CIS benchmark adds per-interface forwarding checks:
 
 ## Firewall Configuration
 
-CIS hardening enables `firewalld` and locks down all traffic. MicroShift requires several ports and trusted network sources. See [Firewall Configuration](howto_firewall.md) for the full list.
-
-At minimum, the pod network and host-endpoint sources must be trusted:
-
-```bash
-sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
-sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
-sudo firewall-cmd --permanent --zone=trusted --add-source=fd01::/48
-sudo firewall-cmd --permanent --zone=public --add-port=6443/tcp
-sudo firewall-cmd --reload
-```
+CIS hardening enables `firewalld` and locks down all traffic. MicroShift requires several ports and trusted network sources to be opened as described in [Firewall Configuration](howto_firewall.md).
 
 ## References
 

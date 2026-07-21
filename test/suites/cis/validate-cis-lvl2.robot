@@ -27,8 +27,8 @@ ${OSCAP_POST_FILE}              /tmp/cis-post-results.xml
 ${OSCAP_REPORT_FILE}            /tmp/cis-post-report.html
 ${OSCAP_PROFILE}                xccdf_org.ssgproject.content_profile_cis
 ${SCAP_DS_FILE}                 /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
-${CIS_REQUIREMENTS_FILE}        cis-requirements.yml
-${CIS_HARDEN_FILE}              cis-harden.yml
+${CIS_REQUIREMENTS_FILE}        cis-requirements-el9.yml
+${CIS_HARDEN_FILE}              cis-harden-el9.yml
 
 # Rules that MicroShift is known to cause. Any new failure outside this
 # set means MicroShift introduced an unexpected CIS regression.
