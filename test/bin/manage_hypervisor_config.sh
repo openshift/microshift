@@ -37,7 +37,7 @@ firewall_settings() {
     # Enable mDNS over libvirt network
     sudo firewall-cmd --permanent --zone=libvirt "--${action}-service=mdns"
 
-    for netname in default "${VM_ISOLATED_NETWORK}" "${VM_MULTUS_NETWORK}" "${VM_IPV6_NETWORK}" "${VM_DUAL_STACK_NETWORK}"; do
+    for netname in default "${VM_ISOLATED_NETWORK}" "${VM_MULTUS_NETWORK}" "${VM_IPV6_NETWORK}" "${VM_DUAL_STACK_NETWORK}" jumbo jumbo-ipv6; do
         if ! sudo virsh net-info "${netname}" &>/dev/null ; then
             continue
         fi
@@ -132,6 +132,20 @@ action_create() {
         # falling back through the default route
         bridge_name=$(sudo virsh net-dumpxml ${VM_DUAL_STACK_NETWORK} | yq -p xml '.network.bridge.+@name')
         sudo ip link add name "${bridge_name}p0" up master "${bridge_name}" type dummy
+    fi
+
+    # Jumbo MTU network (IPv4)
+    if ! sudo virsh net-info jumbo &>/dev/null ; then
+        sudo virsh net-define    "${TESTDIR}/assets/network/jumbo-network.xml"
+        sudo virsh net-start     jumbo
+        sudo virsh net-autostart jumbo
+    fi
+
+    # Jumbo MTU network (IPv6)
+    if ! sudo virsh net-info jumbo-ipv6 &>/dev/null ; then
+        sudo virsh net-define    "${TESTDIR}/assets/network/jumbo-ipv6-network.xml"
+        sudo virsh net-start     jumbo-ipv6
+        sudo virsh net-autostart jumbo-ipv6
     fi
 
     # Firewall

@@ -723,6 +723,7 @@ EOF
 #           <boot_blueprint> \
 #           [--vmname <name>] \
 #           [--network <name>[,<name>...]] \
+#           [--network_mtu <size>] \
 #           [--vm_vcpus <vcpus>] \
 #           [--vm_memory <memory>] \
 #           [--vm_disksize <disksize>] \
@@ -739,6 +740,14 @@ EOF
 #   [--network <name>[,<name>...]]: A comma-separated list for the networks used
 #                                   when creating the VM. Each network entry will
 #                                   create a NIC and they are repeatable.
+#   [--network_mtu <size>]:         Sets the guest-visible MTU on every NIC via
+#                                   virt-install's mtu.size sub-option. Required
+#                                   in addition to a libvirt network's own <mtu>
+#                                   element — QEMU only negotiates a larger MTU
+#                                   with the guest's virtio-net driver when the
+#                                   domain's own <interface> XML requests it;
+#                                   the network-level MTU alone only affects the
+#                                   host-side bridge and tap devices.
 #   [--no_network]:                 Do not configure any network attachments (and
 #                                   therefore no NICs) for the VM.
 #   [--vm_vcpus <vcpus>]:           Number of vCPUs for the VM.
@@ -749,6 +758,7 @@ launch_vm() {
     # Set default values for the optional arguments
     local vmname="host1"
     local network="default"
+    local network_mtu=""
     local vm_memory=4096
     local vm_vcpus=2
     local vm_disksize=20
@@ -767,7 +777,7 @@ launch_vm() {
     # Parse the optional arguments
     while [ $# -gt 0 ]; do
         case "$1" in
-            --vmname|--vm_vcpus|--vm_memory|--vm_disksize)
+            --vmname|--vm_vcpus|--vm_memory|--vm_disksize|--network_mtu)
                 var="${1/--/}"
                 if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
                     declare "${var}=$2"
@@ -879,6 +889,12 @@ launch_vm() {
         if sudo virsh nwfilter-list | awk '{print $2}' | grep -qx "${n}"; then
             vm_network_args+=",filterref=${n}"
         fi
+
+        # Propagate MTU to the domain interface (see --network_mtu doc above).
+        if [ -n "${network_mtu}" ]; then
+            vm_network_args+=",mtu.size=${network_mtu}"
+        fi
+
         vm_network_args+=" "
     done
     if [ -z "${vm_network_args}" ] ; then

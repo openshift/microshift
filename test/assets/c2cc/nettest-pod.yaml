@@ -1,0 +1,19 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nettest-pod
+spec:
+  terminationGracePeriodSeconds: 0
+  containers:
+  - name: nettest
+    image: registry.access.redhat.com/ubi9/ubi:9.6
+    command: ["sleep", "infinity"]
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 10001
+      seccompProfile:
+        type: RuntimeDefault

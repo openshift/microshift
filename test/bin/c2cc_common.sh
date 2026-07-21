@@ -27,6 +27,36 @@ CLUSTER_C_SVC_CIDR_DUAL=""
 
 export TEST_RANDOMIZATION=suites
 
+# c2cc_setup_ipv6 overrides CIDRs and mirror registry for single-stack IPv6
+# scenarios. If a network name is provided, also sets VM_BRIDGE_IP and
+# WEB_SERVER_URL for that network (standard IPv6 scenarios). Jumbo IPv6
+# scenarios omit the network arg and set VM_BRIDGE_IP later, after creating
+# the jumbo-ipv6 network.
+# shellcheck disable=SC2120
+c2cc_setup_ipv6() {
+    local -r network="${1:-}"
+
+    # shellcheck disable=SC2034  # used by scenario.sh and kickstart templates
+    MIRROR_REGISTRY_URL="$(hostname):${MIRROR_REGISTRY_PORT}/microshift"
+
+    CLUSTER_A_POD_CIDR="fd01::/48"
+    CLUSTER_A_SVC_CIDR="fd02::/112"
+    CLUSTER_A_DOMAIN="cluster-a.remote"
+    CLUSTER_B_POD_CIDR="fd04::/48"
+    CLUSTER_B_SVC_CIDR="fd05::/112"
+    CLUSTER_B_DOMAIN="cluster-b.remote"
+    CLUSTER_C_POD_CIDR="fd07::/48"
+    CLUSTER_C_SVC_CIDR="fd08::/112"
+    CLUSTER_C_DOMAIN="cluster-c.remote"
+
+    if [[ -n "${network}" ]]; then
+        # shellcheck disable=SC2034  # used by scenario.sh
+        VM_BRIDGE_IP="$(get_vm_bridge_ip "${network}")"
+        # shellcheck disable=SC2034  # used by scenario.sh
+        WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
+    fi
+}
+
 get_host_ip() {
     local host=$1
     get_vm_property "${host}" ip || { echo "failed to get ${host} ip" >&2; return 1; }
@@ -188,11 +218,77 @@ ${network_yaml}IEOF
 EOF
 }
 
+# inject_kickstart_mtu configures jumbo MTU on the guest VM via kickstart.
+# The NIC and pod MTU must be set before MicroShift first starts — OVN-K
+# bakes the MTU into its database at initial creation and does not update
+# it on restart. Three mechanisms set the NIC MTU (NM conf.d, NM dispatcher,
+# systemd oneshot) and ovn.yaml sets the pod MTU.
+# Args: host mtu
+inject_kickstart_mtu() {
+    local -r host="${1}"
+    local -r mtu="${2}"
+
+    local -r ks_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms/${host}"
+    cat >> "${ks_dir}/post-microshift.cfg" <<EOF
+# NM conf.d -- default ethernet MTU for auto-created connections
+mkdir -p /etc/NetworkManager/conf.d
+cat > /etc/NetworkManager/conf.d/99-jumbo-mtu.conf <<'NMCONF'
+[connection-ethernet-jumbo]
+match-device=type:ethernet
+ethernet.mtu=${mtu}
+NMCONF
+
+# NM dispatcher -- runs ip link set during connection activation
+mkdir -p /etc/NetworkManager/dispatcher.d
+cat > /etc/NetworkManager/dispatcher.d/99-jumbo-mtu <<'DISPEOF'
+#!/bin/bash
+[ "\$2" != "up" ] && exit 0
+ip link set dev "\$1" mtu ${mtu} 2>&1 || logger -t jumbo-mtu "Failed to set MTU ${mtu} on \$1"
+DISPEOF
+chmod 755 /etc/NetworkManager/dispatcher.d/99-jumbo-mtu
+restorecon -R /etc/NetworkManager/dispatcher.d/ 2>&1 || logger -t jumbo-mtu "restorecon failed for dispatcher.d"
+
+# Systemd service -- runs before microshift.service.
+# Script in /etc/ because only /etc/ and /var/ persist across reboots on bootc.
+cat > /etc/set-jumbo-mtu.sh <<'SCRIPTEOF'
+#!/bin/bash
+for dev in \$(ip -o link show type ether | awk -F: '{print \$2}' | tr -d ' '); do
+    ip link set dev "\$dev" mtu ${mtu}
+done
+SCRIPTEOF
+chmod 755 /etc/set-jumbo-mtu.sh
+restorecon /etc/set-jumbo-mtu.sh 2>&1 || logger -t jumbo-mtu "restorecon failed for set-jumbo-mtu.sh"
+
+cat > /etc/systemd/system/set-jumbo-mtu.service <<'SVCEOF'
+[Unit]
+Description=Set jumbo frame MTU on ethernet interfaces
+Before=microshift.service
+After=NetworkManager-wait-online.service
+
+[Service]
+Type=oneshot
+ExecStart=/etc/set-jumbo-mtu.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+SVCEOF
+mkdir -p /etc/systemd/system/multi-user.target.wants
+ln -sf /etc/systemd/system/set-jumbo-mtu.service /etc/systemd/system/multi-user.target.wants/set-jumbo-mtu.service
+
+# Set pod MTU to match NIC MTU. MicroShift auto-detection fails in C2CC
+# VMs (no default route), falling back to 1500 regardless of NIC MTU.
+mkdir -p /etc/microshift
+echo "mtu: ${mtu}" > /etc/microshift/ovn.yaml
+EOF
+}
+
 c2cc_create_vms() {
     local -r boot_commit_ref="${1}"
     local -r boot_blueprint="${2}"
     local -r network="${3:-default}"
     local -r ip_family="${4:-ipv4}"
+    local -r network_mtu="${5:-}"
 
     # Prepare kickstart for all hosts
     # prepare_kickstart args: vmname template commit_ref fips_enabled ipv6_only
@@ -223,9 +319,19 @@ c2cc_create_vms() {
         "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}" \
         "${CLUSTER_C_POD_CIDR_DUAL}" "${CLUSTER_C_SVC_CIDR_DUAL}"
 
-    launch_vm "${boot_blueprint}" --vmname host1 --network "${network}"
-    launch_vm "${boot_blueprint}" --vmname host2 --network "${network}"
-    launch_vm "${boot_blueprint}" --vmname host3 --network "${network}"
+    # Set the NIC MTU via NetworkManager in the kickstart so the guest boots
+    # with the correct MTU before MicroShift starts.
+    local mtu_args=()
+    if [ -n "${network_mtu}" ]; then
+        mtu_args=(--network_mtu "${network_mtu}")
+        for host in host1 host2 host3; do
+            inject_kickstart_mtu "${host}" "${network_mtu}"
+        done
+    fi
+
+    launch_vm "${boot_blueprint}" --vmname host1 --network "${network}" "${mtu_args[@]}"
+    launch_vm "${boot_blueprint}" --vmname host2 --network "${network}" "${mtu_args[@]}"
+    launch_vm "${boot_blueprint}" --vmname host3 --network "${network}" "${mtu_args[@]}"
 }
 
 c2cc_remove_vms() {
@@ -238,6 +344,7 @@ c2cc_run_tests() {
     local -r suites_dir="${1}"
     local -r foreign_cidr="${2:-}"
     local -r ip_family="${3:-}"
+    local -r extra_vars="${4:-}"
 
     local foreign_cidr_var=""
     if [ -n "${foreign_cidr}" ]; then
@@ -317,6 +424,7 @@ c2cc_run_tests() {
         ${ip_family_var} \
         ${target_ref_var} \
         ${dual_cidr_vars} \
+        ${extra_vars} \
         --variable "BOOTC_REGISTRY:${MIRROR_REGISTRY_URL}" \
         "${suites_dir}"
 }
