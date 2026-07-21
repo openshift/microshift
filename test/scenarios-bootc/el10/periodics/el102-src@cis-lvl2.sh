@@ -109,12 +109,12 @@ scenario_create_vms() {
     # after CIS hardening so the scan reveals what MicroShift changes.
     local -r source_reponame=$(basename "${LOCAL_REPO}")
     local -r source_repo_url="${WEB_SERVER_URL}/rpm-repos/${source_reponame}"
-    local -r arch=$(uname -m)
+    local -r arch=$(run_command_on_vm host1 "uname -m")
 
-    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y1}"      "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}" "${arch}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}" "${arch}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1}"      "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}" "${arch}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" "${PREVIOUS_MAJOR_VERSION}" "${PREVIOUS_MINOR_VERSION}" "${arch}"
     configure_microshift_mirror "${PREVIOUS_RELEASE_REPO}"
     run_command_on_vm host1 "sudo subscription-manager release --set 10.2"
     configure_cdn_repo \

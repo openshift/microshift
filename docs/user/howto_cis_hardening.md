@@ -98,7 +98,7 @@ For RHEL 10, the CIS benchmark adds per-interface forwarding checks:
 
 CIS hardening enables `firewalld` and locks down all traffic. MicroShift requires several ports and trusted network sources. See [Firewall Configuration](howto_firewall.md) for the full list.
 
-At minimum, the pod and service networks must be trusted:
+At minimum, the pod network and host-endpoint sources must be trusted:
 
 ```bash
 sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
