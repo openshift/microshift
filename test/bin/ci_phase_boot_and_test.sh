@@ -85,15 +85,36 @@ else
     progress=""
 fi
 
-# Limit amount of parallel scenarios for the C2CC jobs to avoid
-# over-provisioning the resources: each C2CC scenario runs 3 VMs
-# (2 vCPUs / 4GiB each) and the c7g.metal instance has 64 cores / 128GiB.
-# Powering off the VMs of passed scenarios makes the job limit an
-# actual cap on the number of running VMs.
+# Each C2CC scenario runs 3 VMs (2 vCPUs / 4GiB each)
+# and the c7g.metal instance has 64 cores / 128GiB.
 jobs_arg=""
 scenario_action="create-and-run"
 if [[ "${SCENARIO_SOURCES}" =~ c2cc ]]; then
+    # Limit amount of parallel scenarios for the C2CC jobs
+    # to avoid over-provisioning the resources.
     jobs_arg="-j 8"
+
+    # Power off passed VMs so the job limit is an actual cap on running VMs.
+    scenario_action="create-run-shutdown"
+
+    # Each arch runs one RHEL version to halve the scenario count.
+    # The assignment rotates per commit so both combos get coverage:
+    #   flip=0: x86 → el98,  ARM → el102
+    #   flip=1: x86 → el102, ARM → el98
+    flip=$(( 16#$(git rev-parse HEAD | cut -c1) % 2 ))
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        delete_ver=(el102 el98)
+    else
+        delete_ver=(el98 el102)
+    fi
+    echo "C2CC arch split: deleting ${delete_ver[flip]}-* (flip=${flip})"
+    find "${SCENARIOS_TO_RUN}" -name "${delete_ver[flip]}-*.sh" -delete
+elif [[ "${SCENARIO_SOURCES}" =~ .*releases.* ]]; then
+    # Release scenarios have grown (e.g. the router scenarios were split
+    # from 1 into 5) and no longer fit if every scenario's VMs stay up for
+    # the whole job. Shut down passed scenarios' VMs as they finish so the
+    # hypervisor only ever holds the still-running scenarios' VMs.
+    jobs_arg="-j 20"
     scenario_action="create-run-shutdown"
 fi
 
