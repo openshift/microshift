@@ -10,6 +10,7 @@ List of the documents in alphabetical file name order.
 - [AMQ Broker on MicroShift](./howto_amq_broker.md)
 - [Cluster-to-Cluster Connectivity (C2CC)](./howto_c2cc.md)
 - [Encrypting C2CC Traffic with IPsec](./howto_c2cc_ipsec.md)
+- [CIS Level 2 Hardening for MicroShift](./howto_cis_hardening.md)
 - [MicroShift Configuration](./howto_config.md)
 - [Firewall Configuration](./howto_firewall.md)
 - [Gateway API](./howto_gateway_api.md)
