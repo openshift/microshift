@@ -11,6 +11,7 @@ Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-network.resource
+Resource            ../../resources/microshift-rpm.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -21,6 +22,8 @@ Test Tags           slow
 *** Variables ***
 ${USHIFT_HOST}                  ${EMPTY}
 ${USHIFT_USER}                  ${EMPTY}
+${SOURCE_REPO_URL}              ${EMPTY}
+${TARGET_VERSION}               ${EMPTY}
 ${API_PORT}                     6443
 ${OSCAP_BASELINE_FILE}          /tmp/cis-baseline-results.xml
 ${OSCAP_POST_FILE}              /tmp/cis-post-results.xml
@@ -126,9 +129,10 @@ Reboot And Reconnect
 Install And Enable MicroShift
     [Documentation]    Install MicroShift after CIS hardening so the scan
     ...    reveals what MicroShift changes to CIS compliance.
-    ...    Uses --nogpgcheck because locally-built nightly RPMs are
-    ...    unsigned and CIS hardening enforces gpgcheck=1 globally.
-    Command Should Work    dnf install -y --nogpgcheck microshift
+    ...    The local source repo is created after hardening, so the
+    ...    repo-level gpgcheck=0 is preserved (not overwritten by CIS).
+    Should Not Be Empty    ${SOURCE_REPO_URL}    SOURCE_REPO_URL variable is required
+    Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}
     Command Should Work    systemctl enable microshift
 
 Run Hardening Playbook
