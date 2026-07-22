@@ -46,5 +46,8 @@ scenario_run_tests() {
     run_tests host1 \
         --variable "SOURCE_REPO_URL:${source_repo_url}" \
         --variable "TARGET_VERSION:${target_version}" \
+        --variable "SCAP_DS_FILE:/usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml" \
+        --variable "CIS_REQUIREMENTS_FILE:cis-requirements-el9.yml" \
+        --variable "CIS_HARDEN_FILE:cis-harden-el9.yml" \
         suites/cis/
 }

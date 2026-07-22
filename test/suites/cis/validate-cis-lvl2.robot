@@ -29,9 +29,9 @@ ${OSCAP_BASELINE_FILE}          /tmp/cis-baseline-results.xml
 ${OSCAP_POST_FILE}              /tmp/cis-post-results.xml
 ${OSCAP_REPORT_FILE}            /tmp/cis-post-report.html
 ${OSCAP_PROFILE}                xccdf_org.ssgproject.content_profile_cis
-${SCAP_DS_FILE}                 /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
-${CIS_REQUIREMENTS_FILE}        cis-requirements-el9.yml
-${CIS_HARDEN_FILE}              cis-harden-el9.yml
+${SCAP_DS_FILE}                 ${EMPTY}
+${CIS_REQUIREMENTS_FILE}        ${EMPTY}
+${CIS_HARDEN_FILE}              ${EMPTY}
 
 # Rules that MicroShift is known to cause. Any new failure outside this
 # set means MicroShift introduced an unexpected CIS regression.
@@ -78,7 +78,7 @@ Smoke Test With Route
 Setup
     [Documentation]    Harden the system, run a baseline scan, install MicroShift,
     ...    run a post-install scan, and prepare for functional tests.
-    Check Required Env Variables
+    Validate Required Variables
     Login MicroShift Host
     Harden And Scan Baseline
     Install And Enable MicroShift
@@ -87,6 +87,15 @@ Setup
     Wait Until Greenboot Health Check Exited
     Run CIS Scan    ${OSCAP_POST_FILE}    oscap_report=${OSCAP_REPORT_FILE}
     Setup Kubeconfig
+
+Validate Required Variables
+    [Documentation]    Fail fast if any required variable is missing.
+    Check Required Env Variables
+    Should Not Be Empty    ${SOURCE_REPO_URL}    SOURCE_REPO_URL variable is required
+    Should Not Be Empty    ${TARGET_VERSION}    TARGET_VERSION variable is required
+    Should Not Be Empty    ${SCAP_DS_FILE}    SCAP_DS_FILE variable is required
+    Should Not Be Empty    ${CIS_REQUIREMENTS_FILE}    CIS_REQUIREMENTS_FILE variable is required
+    Should Not Be Empty    ${CIS_HARDEN_FILE}    CIS_HARDEN_FILE variable is required
 
 Teardown
     [Documentation]    Archive scan artifacts and close SSH
@@ -131,7 +140,6 @@ Install And Enable MicroShift
     ...    reveals what MicroShift changes to CIS compliance.
     ...    The local source repo is created after hardening, so the
     ...    repo-level gpgcheck=0 is preserved (not overwritten by CIS).
-    Should Not Be Empty    ${SOURCE_REPO_URL}    SOURCE_REPO_URL variable is required
     Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}
     Command Should Work    systemctl enable microshift
 
