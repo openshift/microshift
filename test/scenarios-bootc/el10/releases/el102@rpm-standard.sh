@@ -16,68 +16,6 @@ export TEST_RANDOMIZATION=none
 # Add extra timeout because it run both standard1 and standard2 suites.
 export TEST_EXECUTION_TIMEOUT=60m
 
-# On RHEL 10, rhocp and fast-datapath repos are not available via
-# subscription-manager. Create repo files pointing to the RHEL 9 CDN
-# using entitlement certificates as a workaround.
-configure_cdn_repo() {
-    local -r repo_id=$1
-    local -r repo_name=$2
-    local -r baseurl=$3
-
-    local -r cert=$(run_command_on_vm host1 "ls /etc/pki/entitlement/[0-9]*.pem | grep -v '\-key.pem' | head -n1")
-    local -r key=$(run_command_on_vm host1 "ls /etc/pki/entitlement/[0-9]*-key.pem | head -n1")
-    local -r tmp_file=$(mktemp)
-
-    tee "${tmp_file}" >/dev/null <<EOF
-[${repo_id}]
-name=${repo_name}
-baseurl=${baseurl}
-enabled=1
-gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-sslverify=1
-sslcacert=/etc/rhsm/ca/redhat-uep.pem
-sslclientcert=${cert}
-sslclientkey=${key}
-EOF
-    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-    run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${repo_id}.repo"
-    rm -f "${tmp_file}"
-}
-
-configure_rhocp_repo() {
-    local -r rhocp=$1
-    local -r version=$2
-    local -r arch=${3:-$(uname -m)}
-
-    # The repository may be empty if the beta mirror is not up yet
-    if [[ -z "${rhocp}" ]] ; then
-        return
-    fi
-
-    if [[ "${rhocp}" =~ ^[0-9]{1,2}$ ]]; then
-        configure_cdn_repo \
-            "rhocp-4.${rhocp}" \
-            "Red Hat OpenShift 4.${rhocp} for RHEL 9" \
-            "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/rhocp/4.${rhocp}/os"
-    elif [[ "${rhocp}" =~ ^http ]]; then
-        local -r ocp_repo_name="rhocp-4.${version}-for-rhel-9-mirrorbeta-rpms"
-        local -r tmp_file=$(mktemp)
-
-        tee "${tmp_file}" >/dev/null <<EOF
-[${ocp_repo_name}]
-name=Beta rhocp RPMs for RHEL 9
-baseurl=${rhocp}
-enabled=1
-gpgcheck=0
-skip_if_unavailable=0
-EOF
-        copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-        run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${ocp_repo_name}.repo"
-        rm -f "${tmp_file}"
-    fi
-}
-
 scenario_create_vms() {
     exit_if_brew_rpms_not_found
 
@@ -107,20 +45,16 @@ scenario_run_tests() {
 
     local -r reponame=$(basename "${BREW_REPO}")
     local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
-    local -r arch=$(uname -m)
 
     # Enable the rhocp and dependency repositories.
     #
     # Note that rhocp or beta dependencies repository may not yet exist
     # for the current version. Then, just use whatever we can get for
     # the previous minor version.
-    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"       4 "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  4 "${MINOR_VERSION}"
     run_command_on_vm host1 "sudo subscription-manager release --set 10.2"
-    configure_cdn_repo \
-        "fast-datapath" \
-        "Red Hat Fast Datapath for RHEL 9" \
-        "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/fast-datapath/os"
+    configure_fast_datapath_repo
 
     run_tests host1 \
         --exitonfailure \
