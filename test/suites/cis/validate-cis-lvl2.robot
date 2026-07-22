@@ -11,6 +11,7 @@ Resource            ../../resources/ostree-health.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-network.resource
+Resource            ../../resources/microshift-rpm.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -21,14 +22,16 @@ Test Tags           slow
 *** Variables ***
 ${USHIFT_HOST}                  ${EMPTY}
 ${USHIFT_USER}                  ${EMPTY}
+${SOURCE_REPO_URL}              ${EMPTY}
+${TARGET_VERSION}               ${EMPTY}
 ${API_PORT}                     6443
 ${OSCAP_BASELINE_FILE}          /tmp/cis-baseline-results.xml
 ${OSCAP_POST_FILE}              /tmp/cis-post-results.xml
 ${OSCAP_REPORT_FILE}            /tmp/cis-post-report.html
 ${OSCAP_PROFILE}                xccdf_org.ssgproject.content_profile_cis
-${SCAP_DS_FILE}                 /usr/share/xml/scap/ssg/content/ssg-rhel9-ds.xml
-${CIS_REQUIREMENTS_FILE}        cis-requirements-el9.yml
-${CIS_HARDEN_FILE}              cis-harden-el9.yml
+${SCAP_DS_FILE}                 ${EMPTY}
+${CIS_REQUIREMENTS_FILE}        ${EMPTY}
+${CIS_HARDEN_FILE}              ${EMPTY}
 
 # Rules that MicroShift is known to cause. Any new failure outside this
 # set means MicroShift introduced an unexpected CIS regression.
@@ -75,7 +78,7 @@ Smoke Test With Route
 Setup
     [Documentation]    Harden the system, run a baseline scan, install MicroShift,
     ...    run a post-install scan, and prepare for functional tests.
-    Check Required Env Variables
+    Validate Required Variables
     Login MicroShift Host
     Harden And Scan Baseline
     Install And Enable MicroShift
@@ -84,6 +87,15 @@ Setup
     Wait Until Greenboot Health Check Exited
     Run CIS Scan    ${OSCAP_POST_FILE}    oscap_report=${OSCAP_REPORT_FILE}
     Setup Kubeconfig
+
+Validate Required Variables
+    [Documentation]    Fail fast if any required variable is missing.
+    Check Required Env Variables
+    Should Not Be Empty    ${SOURCE_REPO_URL}    SOURCE_REPO_URL variable is required
+    Should Not Be Empty    ${TARGET_VERSION}    TARGET_VERSION variable is required
+    Should Not Be Empty    ${SCAP_DS_FILE}    SCAP_DS_FILE variable is required
+    Should Not Be Empty    ${CIS_REQUIREMENTS_FILE}    CIS_REQUIREMENTS_FILE variable is required
+    Should Not Be Empty    ${CIS_HARDEN_FILE}    CIS_HARDEN_FILE variable is required
 
 Teardown
     [Documentation]    Archive scan artifacts and close SSH
@@ -126,9 +138,10 @@ Reboot And Reconnect
 Install And Enable MicroShift
     [Documentation]    Install MicroShift after CIS hardening so the scan
     ...    reveals what MicroShift changes to CIS compliance.
-    ...    Uses --nogpgcheck because locally-built nightly RPMs are
-    ...    unsigned and CIS hardening enforces gpgcheck=1 globally.
-    Command Should Work    dnf install -y --nogpgcheck microshift
+    ...    Uses --nogpgcheck because CIS hardening forces gpgcheck=1
+    ...    on dependency repos that contain unsigned beta RPMs.
+    Install Third Party Packages With Warnings
+    Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}    extra_args=--nogpgcheck
     Command Should Work    systemctl enable microshift
 
 Run Hardening Playbook
