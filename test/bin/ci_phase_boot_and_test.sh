@@ -85,13 +85,27 @@ else
     progress=""
 fi
 
+# Limit amount of parallel scenarios for the C2CC jobs to avoid
+# over-provisioning the resources: each C2CC scenario runs 3 VMs
+# (2 vCPUs / 4GiB each) and the c7g.metal instance has 64 cores / 128GiB.
+# Powering off the VMs of passed scenarios makes the job limit an
+# actual cap on the number of running VMs.
+jobs_arg=""
+scenario_action="create-and-run"
+if [[ "${SCENARIO_SOURCES}" =~ c2cc ]]; then
+    jobs_arg="-j 8"
+    scenario_action="create-run-shutdown"
+fi
+
 TEST_OK=true
+# shellcheck disable=SC2086
 if ! parallel \
+    ${jobs_arg} \
     ${progress} \
     --results "${SCENARIO_INFO_DIR}/{/.}/boot_and_run.log" \
     --joblog "${BOOT_TEST_JOB_LOG}" \
     --delay 5 \
-    bash -x ./bin/scenario.sh create-and-run ::: "${SCENARIOS_TO_RUN}"/*.sh ; then
+    bash -x ./bin/scenario.sh "${scenario_action}" ::: "${SCENARIOS_TO_RUN}"/*.sh ; then
    TEST_OK=false
 fi
 

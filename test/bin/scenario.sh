@@ -1286,6 +1286,31 @@ stress_testing() {
     fi
 }
 
+# Power off all the VMs of the scenario without undefining them or
+# removing their storage. Frees the vCPUs and memory on the hypervisor
+# while keeping the domains and disks available for inspection.
+shutdown_scenario_vms() {
+    local vmdir
+    local vmname
+    local full_vmname
+    for vmdir in "${SCENARIO_INFO_DIR}/${SCENARIO}"/vms/*; do
+        if [ ! -d "${vmdir}" ]; then
+            # skip log files, etc.
+            continue
+        fi
+        vmname="$(basename "${vmdir}")"
+        full_vmname="$(full_vm_name "${vmname}")"
+        if sudo virsh dumpxml "${full_vmname}" >/dev/null; then
+            if ! sudo virsh dominfo "${full_vmname}" | grep '^State' | grep -q 'shut off'; then
+                sudo virsh destroy --graceful "${full_vmname}" || true
+            fi
+            if ! sudo virsh dominfo "${full_vmname}" | grep '^State' | grep -q 'shut off'; then
+                sudo virsh destroy "${full_vmname}" || true
+            fi
+        fi
+    done
+}
+
 # Apply RUN_HOST_OVERRIDE logic if needed
 apply_host_override() {
     local vmname="$1"
@@ -1393,6 +1418,27 @@ USHIFT_USER: "${USHIFT_USER:-redhat}"
 SSH_PRIV_KEY: "${SSH_PRIVATE_KEY:-}"
 SSH_PORT: ${ssh_port}
 EOF
+        # Populate variables for additional VMs in this scenario
+        local vms_dir="${SCENARIO_INFO_DIR}/${SCENARIO}/vms"
+        for vm_dir in "${vms_dir}"/*/; do
+            [ -d "${vm_dir}" ] || continue
+            local other_vm
+            other_vm=$(basename "${vm_dir}")
+            [ "${other_vm}" = "${vmname}" ] && continue
+
+            local var_prefix
+            var_prefix=$(echo "${other_vm}" | tr '[:lower:]-' '[:upper:]_')
+            for prop in ip ssh_port api_port lb_port; do
+                local prop_file="${vm_dir}/${prop}"
+                [ -f "${prop_file}" ] || continue
+                local val
+                val=$(cat "${prop_file}")
+                local var_name
+                var_name="${var_prefix}_$(echo "${prop}" | tr '[:lower:]' '[:upper:]')"
+                echo "${var_name}: ${val}" | tee -a "${variable_file}"
+            done
+        done
+
         wait_for_microshift_to_be_ready "${vmname}"
     fi
 
@@ -1764,6 +1810,11 @@ scenario.sh (create|boot|run|cleanup|rerun|recreate|login) scenario-script [args
 
   recreate -- cleanup and create for the same scenario.
 
+  create-and-run -- create and run for the same scenario.
+
+  create-run-shutdown -- Like create-and-run, but power off the VMs
+    when the tests pass. Failed scenarios keep their VMs running.
+
   cleanup -- Remove the VMs created for the scenario.
 
   login -- Login to a host for a scenario.
@@ -1815,6 +1866,18 @@ case "${action}" in
     create-and-run)
         action_create "$@"
         action_run "$@"
+        ;;
+    create-run-shutdown)
+        action_create "$@"
+        action_run "$@"
+        # Tests passed. Power the VMs down to return their CPU and
+        # memory to the hypervisor. Failed scenarios exit through the
+        # action traps above and keep their VMs running.
+        rc=0
+        sos_report true || rc=1
+        trap "close_junit" EXIT
+        shutdown_scenario_vms || echo "WARNING: failed to shut down the VMs for ${SCENARIO}"
+        exit "${rc}"
         ;;
     *)
         error "Unknown instruction ${action}"

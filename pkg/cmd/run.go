@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/microshift/pkg/admin/prerun"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/controllers"
+	"github.com/openshift/microshift/pkg/controllers/c2cc"
 	"github.com/openshift/microshift/pkg/gdp"
 	"github.com/openshift/microshift/pkg/kustomize"
 	"github.com/openshift/microshift/pkg/loadbalancerservice"
@@ -237,6 +238,7 @@ func RunMicroshift(cfg *config.Config) error {
 	util.Must(m.AddService(controllers.NewTelemetryManager(cfg)))
 	util.Must(m.AddService(controllers.NewHostsWatcherManager(cfg)))
 	util.Must(m.AddService(gdp.NewGenericDevicePlugin(cfg)))
+	util.Must(m.AddService(c2cc.NewC2CCRouteManager(cfg)))
 
 	// Storing and clearing the env, so other components don't send the READY=1 until MicroShift is fully ready
 	notifySocket := os.Getenv("NOTIFY_SOCKET")
