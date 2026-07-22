@@ -1,5 +1,9 @@
 # This OTEL config is only for testing purposes
 receivers:
+  prometheus:
+    config:
+      scrape_config_files:
+        - /etc/microshift/observability/scrape.d/*.yaml
   hostmetrics:
     root_path: /
     collection_interval: 10s
@@ -67,6 +71,10 @@ extensions:
 service:
   extensions: [ file_storage ]
   pipelines:
+    metrics/scrape:
+      receivers: [ prometheus ]
+      processors: [ resourcedetection/system ]
+      exporters: [ prometheus, prometheusremotewrite ]
     metrics/hostmetrics:
       receivers: [ hostmetrics ]
       processors: [ resourcedetection/system ]

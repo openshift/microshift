@@ -2,8 +2,13 @@
 # - Resource usage metrics of MicroShift's Containers, Pods, Volumes, and Node
 # - Kubernetes Events
 # - System journal for MicroShift service, priority < Info
+# - Metrics from optional component scrape configs (scrape.d drop-ins)
 
 receivers:
+  prometheus:
+    config:
+      scrape_config_files:
+        - /etc/microshift/observability/scrape.d/*.yaml
   kubeletstats:
     auth_type: tls
     ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt
@@ -48,6 +53,10 @@ extensions:
 service:
   extensions: [ file_storage ]
   pipelines:
+    metrics/scrape:
+      receivers: [ prometheus ]
+      processors: [ batch ]
+      exporters: [ otlp ]
     metrics/kubeletstats:
       receivers: [ kubeletstats ]
       processors: [ batch ]
