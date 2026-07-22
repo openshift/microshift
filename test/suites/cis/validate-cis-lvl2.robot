@@ -138,9 +138,10 @@ Reboot And Reconnect
 Install And Enable MicroShift
     [Documentation]    Install MicroShift after CIS hardening so the scan
     ...    reveals what MicroShift changes to CIS compliance.
-    ...    The local source repo is created after hardening, so the
-    ...    repo-level gpgcheck=0 is preserved (not overwritten by CIS).
-    Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}
+    ...    Uses --nogpgcheck because CIS hardening forces gpgcheck=1
+    ...    on dependency repos that contain unsigned beta RPMs.
+    Install Third Party Packages With Warnings
+    Install MicroShift RPM Packages From Repo    ${SOURCE_REPO_URL}    ${TARGET_VERSION}    extra_args=--nogpgcheck
     Command Should Work    systemctl enable microshift
 
 Run Hardening Playbook
