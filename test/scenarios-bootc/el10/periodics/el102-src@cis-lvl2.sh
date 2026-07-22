@@ -11,6 +11,9 @@ TEST_EXECUTION_TIMEOUT=60m
 # for greenboot to finish when creating the VM.
 export SKIP_GREENBOOT=true
 
+# CIS tests must run in order: harden, scan baseline, install, scan post.
+export TEST_RANDOMIZATION=none
+
 scenario_create_vms() {
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
     launch_vm rhel102-installer
@@ -40,8 +43,6 @@ scenario_run_tests() {
     local -r source_repo_url="${WEB_SERVER_URL}/rpm-repos/${source_reponame}"
     local -r target_version=$(local_rpm_version)
 
-    # shellcheck disable=SC2034  # used elsewhere
-    TEST_RANDOMIZATION=none
     run_tests host1 \
         --variable "SOURCE_REPO_URL:${source_repo_url}" \
         --variable "TARGET_VERSION:${target_version}" \
