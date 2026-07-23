@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component 1f2c985976b04cbb270b96fd6e0e5fdf12f7072d to 3bdd678e83da52e0754b393b82435eea968af3ed
+  - 6dc7dcb8 2026-07-13T19:37:25+00:00 Remove verbose ControllerConfig logging from bootstrap MCS
+
