@@ -100,11 +100,14 @@ Add NFTables IPsec Enforcement Rules
     ...    to the host but forwarded into the OVN network (local gateway mode), so an
     ...    input-hook chain would never see them.
     [Arguments]    ${alias}    ${local_pod_cidr}
+    ${is_ipv6}=    Evaluate    ':' in '''${local_pod_cidr}'''
+    ${daddr_family}=    Set Variable If    ${is_ipv6}    ip6    ip
     Command On Cluster    ${alias}    nft add table inet c2cc_ipsec_test
     Command On Cluster    ${alias}
     ...    nft 'add chain inet c2cc_ipsec_test enforce { type filter hook forward priority -150; policy accept; }'
-    Command On Cluster    ${alias}
-    ...    nft add rule inet c2cc_ipsec_test enforce ip daddr ${local_pod_cidr} meta ipsec missing counter drop
+    Command On Cluster
+    ...    ${alias}
+    ...    nft add rule inet c2cc_ipsec_test enforce ${daddr_family} daddr ${local_pod_cidr} meta ipsec missing counter drop
 
 Remove NFTables IPsec Enforcement Rules
     [Documentation]    Remove C2CC IPsec enforcement nftables table and all its rules.
@@ -115,17 +118,43 @@ Remove NFTables IPsec Enforcement Rules
 
 Curl Should Fail From Cluster
     [Documentation]    Verify curl from curl-pod times out or fails (no "Hello from" in response).
+    ...    Asserts a recognizable curl error to distinguish IPsec blocking from broken infra.
     [Arguments]    ${alias}    ${ip}    ${port}    ${ns}
+    ${is_ipv6}=    Evaluate    ':' in '''${ip}'''
+    ${url}=    Set Variable If
+    ...    ${is_ipv6}
+    ...    http://[${ip}]:${port}/cgi-bin/hello
+    ...    http://${ip}:${port}/cgi-bin/hello
     ${stdout}=    Oc On Cluster    ${alias}
-    ...    oc exec curl-pod -n ${ns} -- curl -sS --max-time 5 http://${ip}:${port}/cgi-bin/hello 2>&1 || true
+    ...    oc exec curl-pod -n ${ns} -- curl -sS --max-time 5 ${url} 2>&1 || true
     ...    allow_fail=${TRUE}
     Should Not Contain    ${stdout}    Hello from
+    Should Match Regexp    ${stdout}    (?i)(timed out|curl:|refused|unreachable)
+    ...    Expected curl timeout or connection error but got: ${stdout}
 
 Curl From Host Should Fail
     [Documentation]    Curl directly from the host (not from a pod) to a remote pod IP.
     ...    Expects failure — host-originated traffic is not matched by tunnel-mode
     ...    IPsec selectors scoped to pod/service CIDRs.
+    ...    Asserts a recognizable curl error to distinguish from broken infra.
     [Arguments]    ${alias}    ${pod_ip}    ${port}
+    ${is_ipv6}=    Evaluate    ':' in '''${pod_ip}'''
+    ${url}=    Set Variable If
+    ...    ${is_ipv6}
+    ...    http://[${pod_ip}]:${port}/cgi-bin/hello
+    ...    http://${pod_ip}:${port}/cgi-bin/hello
     ${stdout}=    Disruptive Command On Cluster    ${alias}
-    ...    curl -sS --max-time 5 http://${pod_ip}:${port}/cgi-bin/hello 2>&1 || true
+    ...    curl -sS --max-time 5 ${url} 2>&1 || true
     Should Not Contain    ${stdout}    Hello from
+    Should Match Regexp    ${stdout}    (?i)(timed out|curl:|refused|unreachable)
+    ...    Expected curl timeout or connection error but got: ${stdout}
+
+Verify ESP Encapsulation On All Clusters
+    [Documentation]    Record XFRM byte counters, send traffic, verify counters incremented.
+    ${baseline_a}=    Get XFRM Byte Counters    cluster-a
+    ${baseline_b}=    Get XFRM Byte Counters    cluster-b
+    ${baseline_c}=    Get XFRM Byte Counters    cluster-c
+    Verify Full C2CC Connectivity
+    Verify XFRM Counters Incremented    cluster-a    ${baseline_a}
+    Verify XFRM Counters Incremented    cluster-b    ${baseline_b}
+    Verify XFRM Counters Incremented    cluster-c    ${baseline_c}
