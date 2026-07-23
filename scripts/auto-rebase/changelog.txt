@@ -1,8 +1,0 @@
-- api embedded-component 482f1b56dcc4d97ab9d3f7c22f102ecb54af83bb to 1ebdd7bba8e6c503a1f61c6d467ed877783826e1
-  - 884b471a 2026-07-10T14:15:59Z add new serviceAccountToken fs type
-
-- cluster-policy-controller embedded-component 748524784686a5f397490563882cbfb88f9acd01 to d1ea75b45228a6af17f3a1899ab4bd214e28f54b
-  - 890a4e2 2026-07-13T12:23:38+02:00 add serviceAccountToken volume type to psalabelsyncer
-  - 041c3e1 2026-07-13T12:23:35+02:00 chore: go mod vendor
-  - a9b932c 2026-07-13T12:23:29+02:00 bump(openshift/api): to the latest release-4.19
-
