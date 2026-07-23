@@ -1,10 +1,9 @@
-- api embedded-component 36dec0bfafe4403a1e04f3b10766b553342f10e2 to 05da40ea98557f8351483a39db3d0e7d9076bc8f
-  - 47119573 2026-07-07T08:49:21-04:00 NE-2480: Promote GatewayAPIWithoutOLM feature gate to Default
+- cluster-ingress-operator embedded-component 4565e7d1f8d2c2d6502da376f0148e6a0689ce97 to 489deaedf44ad6a74c33afd3a1dbca52a129f79f
+  - 4d3f641 2026-07-20T17:37:09Z Adjust some logs and comments per review
+  - a4e7f2b 2026-07-20T17:37:09Z OCPBUGS-60859: e2e: Improve resilience of helper functions when managing gw api resourecs
+  - a72611a 2026-07-20T17:37:09Z OCPBUGS-60859: Fix logic on gatewayapi test cleanup
 
-- cluster-ingress-operator embedded-component e40a071867464abf192020eb0354a84436ce04e7 to 4565e7d1f8d2c2d6502da376f0148e6a0689ce97
-  - 4aeee40 2026-07-06T09:16:29-04:00 Remove feature-set annotation from Sail Library RBAC manifests
-  - 9d4e6de 2026-06-10T18:58:33Z Ensure canary cert matches the default ingress controller's cert
-
-- machine-config-operator embedded-component 089ca7ab5cd8444ff0da467b7f5b0c39005661e9 to 006db73edeaaa46107311d250f7ea9c10f5633e8
-  - 6b0c1a6e 2026-07-07T00:21:53Z manifests: inject proxy into mcc deployment
+- machine-config-operator embedded-component 006db73edeaaa46107311d250f7ea9c10f5633e8 to 4b444dec0a6048b49b11def88482e45b22a263f0
+  - c6332841 2026-06-29T11:47:34Z OCPBUGS-59958: Updated Unit Test, added extra getconfig check
+  - 9c95195f 2026-06-29T11:47:34Z OCPBUGS-59958: move cleanUpDuplicatedMC to after pool loop in syncNodeConfigHandler
 
