@@ -13,6 +13,7 @@ Resource            microshift-host.resource
 
 
 *** Variables ***
+${DF_SCRIPT}                    ${EXECDIR}/assets/c2cc/df-bit-send.py
 ${CLUSTER_A_POD_CIDR}           ${EMPTY}
 ${CLUSTER_A_SVC_CIDR}           ${EMPTY}
 ${CLUSTER_A_DOMAIN}             ${EMPTY}
@@ -299,13 +300,14 @@ Verify Corefile Does Not Contain C2CC Server Block
     Should Not Contain    ${stdout}    ${domain}:5353
 
 Deploy Test Workloads
-    [Documentation]    Create namespace and deploy hello-microshift + curl-pod on all clusters.
+    [Documentation]    Create namespace and deploy hello-microshift, curl-pod, and nettest-pod on all clusters.
     VAR    ${assets}=    ${EXECDIR}/assets/c2cc
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         ${ns}=    Create Unique Namespace On Cluster    ${alias}
         Set To Dictionary    ${NAMESPACES}    ${alias}    ${ns}
         Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/hello-microshift.yaml
         Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/curl-pod.yaml
+        Oc On Cluster    ${alias}    oc apply -n ${ns} -f ${assets}/nettest-pod.yaml
     END
     Wait For Test Pods
     Wait For Service Endpoints
@@ -315,7 +317,7 @@ Wait For Test Pods
     FOR    ${alias}    IN    cluster-a    cluster-b    cluster-c
         Oc On Cluster
         ...    ${alias}
-        ...    oc wait pod/hello-microshift pod/curl-pod -n ${NAMESPACES}[${alias}] --for=condition=Ready --timeout=120s
+        ...    oc wait pod/hello-microshift pod/curl-pod pod/nettest-pod -n ${NAMESPACES}[${alias}] --for=condition=Ready --timeout=120s
     END
 
 Wait For Service Endpoints
@@ -800,3 +802,111 @@ Verify Full C2CC Stack
     END
     Wait Until Keyword Succeeds    10m    10s    Verify C2CC Health Probes
     Wait Until Keyword Succeeds    10m    10s    Verify Full C2CC DNS
+
+Restart MicroShift On All Clusters
+    [Documentation]    Restart MicroShift on all clusters and wait for health.
+    FOR    ${alias}    IN    @{ALL_CLUSTERS}
+        Command On Cluster    ${alias}    systemctl restart --no-block microshift
+    END
+    FOR    ${alias}    IN    @{ALL_CLUSTERS}
+        Wait Until Keyword Succeeds    5m    15s
+        ...    Command On Cluster    ${alias}    microshift healthcheck --timeout=5m
+    END
+
+Verify Pod MTU On All Clusters
+    [Documentation]    Verify the pod network interface reports the expected MTU.
+    [Arguments]    ${expected_mtu}
+    FOR    ${alias}    IN    @{ALL_CLUSTERS}
+        ${mtu}=    Get Pod Interface MTU    ${alias}    nettest-pod    ${NAMESPACES}[${alias}]
+        Should Be Equal As Strings    ${mtu}    ${expected_mtu}
+        ...    ${alias}: pod MTU is ${mtu}, expected ${expected_mtu}
+    END
+
+Ping With DF Bit And Verify
+    [Documentation]    Send a DF-bit UDP datagram via df-bit-send.py and assert success.
+    ...    Auto-detects IPv4/IPv6. See the script for protocol details.
+    [Arguments]    ${alias}    ${dest_ip}    ${payload_size}
+    ${stdout}=    Oc On Cluster
+    ...    ${alias}
+    ...    oc exec -i nettest-pod -n ${NAMESPACES}[${alias}] -- python3 - ${dest_ip} ${payload_size} < ${DF_SCRIPT} 2>&1
+    ...    allow_fail=${TRUE}
+    Should Contain    ${stdout}    OK
+    ...    DF-bit UDP send of ${payload_size}B to ${dest_ip} failed: ${stdout}
+
+Ping With DF Bit Should Fail
+    [Documentation]    Send a UDP datagram with DF bit set. Asserts EMSGSIZE (Message too long).
+    ...    Proves the datagram exceeds the path MTU. Auto-detects IPv4 vs
+    ...    IPv6 from the destination address. Checks for the specific EMSGSIZE error
+    ...    to distinguish MTU rejection from other failures.
+    [Arguments]    ${alias}    ${dest_ip}    ${payload_size}
+    ${stdout}=    Oc On Cluster
+    ...    ${alias}
+    ...    oc exec -i nettest-pod -n ${NAMESPACES}[${alias}] -- python3 - ${dest_ip} ${payload_size} < ${DF_SCRIPT} 2>&1 || true
+    ...    allow_fail=${TRUE}
+    Should Not Contain    ${stdout}    OK
+    ...    DF-bit UDP send of ${payload_size}B should have been rejected but succeeded
+    Should Contain    ${stdout}    Message too long
+    ...    DF-bit UDP send of ${payload_size}B expected EMSGSIZE but got: ${stdout}
+
+Get Pod Interface MTU
+    [Documentation]    Return the MTU of the pod's eth0 interface.
+    [Arguments]    ${alias}    ${pod}    ${ns}
+    ${stdout}=    Oc On Cluster    ${alias}
+    ...    oc exec ${pod} -n ${ns} -- cat /sys/class/net/eth0/mtu
+    ${mtu}=    Strip String    ${stdout}
+    RETURN    ${mtu}
+
+Send Large Payload And Verify
+    [Documentation]    Send a large payload via curl POST and verify it succeeds.
+    [Arguments]    ${alias}    ${ip}    ${size}
+    ${is_ipv6}=    Evaluate    ':' in '''${ip}'''
+    ${url}=    Set Variable If
+    ...    ${is_ipv6}
+    ...    http://[${ip}]:8080/cgi-bin/hello
+    ...    http://${ip}:8080/cgi-bin/hello
+    ${stdout}=    Oc On Cluster
+    ...    ${alias}
+    ...    oc exec curl-pod -n ${NAMESPACES}[${alias}] -- sh -c 'head -c ${size} /dev/zero | curl -sS --max-time 15 --data-binary @- ${url}'
+    Should Contain    ${stdout}    Hello from
+
+Ping DF Bit Between All Clusters
+    [Documentation]    Send DF-bit UDP payload across all 6 cluster pairs.
+    [Arguments]    ${size}
+    FOR    ${src}    ${dst}    IN
+    ...    cluster-a    cluster-b
+    ...    cluster-a    cluster-c
+    ...    cluster-b    cluster-a
+    ...    cluster-b    cluster-c
+    ...    cluster-c    cluster-a
+    ...    cluster-c    cluster-b
+        ${ip}=    Get Hello Pod IP    ${dst}
+        Ping With DF Bit And Verify    ${src}    ${ip}    ${size}
+    END
+
+Ping DF Bit Should Fail Between All Clusters
+    [Documentation]    Send DF-bit UDP payload expecting rejection on all 6 pairs.
+    [Arguments]    ${size}
+    FOR    ${src}    ${dst}    IN
+    ...    cluster-a    cluster-b
+    ...    cluster-a    cluster-c
+    ...    cluster-b    cluster-a
+    ...    cluster-b    cluster-c
+    ...    cluster-c    cluster-a
+    ...    cluster-c    cluster-b
+        ${ip}=    Get Hello Pod IP    ${dst}
+        Ping With DF Bit Should Fail    ${src}    ${ip}    ${size}
+    END
+
+Large Payload Between All Clusters
+    [Documentation]    Send large TCP payload across all 6 cluster pairs.
+    [Arguments]    ${size}
+    FOR    ${src}    ${dst}    IN
+    ...    cluster-a    cluster-b
+    ...    cluster-a    cluster-c
+    ...    cluster-b    cluster-a
+    ...    cluster-b    cluster-c
+    ...    cluster-c    cluster-a
+    ...    cluster-c    cluster-b
+        ${ip}=    Get Hello Pod IP    ${dst}
+        Send Large Payload And Verify    ${src}    ${ip}    ${size}
+    END
