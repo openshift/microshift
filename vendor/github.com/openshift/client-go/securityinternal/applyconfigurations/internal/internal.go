@@ -23,7 +23,27 @@ func Parser() *typed.Parser {
 var parserOnce sync.Once
 var parser *typed.Parser
 var schemaYAML = typed.YAMLObject(`types:
-- name: FieldsV1.v1.meta.apis.pkg.apimachinery.k8s.io
+- name: com.github.openshift.api.securityinternal.v1.RangeAllocation
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: data
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: range
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1
   map:
     elementType:
       scalar: untyped
@@ -35,7 +55,7 @@ var schemaYAML = typed.YAMLObject(`types:
         elementType:
           namedType: __untyped_deduced_
         elementRelationship: separable
-- name: ManagedFieldsEntry.v1.meta.apis.pkg.apimachinery.k8s.io
+- name: io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry
   map:
     fields:
     - name: apiVersion
@@ -46,7 +66,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: fieldsV1
       type:
-        namedType: FieldsV1.v1.meta.apis.pkg.apimachinery.k8s.io
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1
     - name: manager
       type:
         scalar: string
@@ -58,8 +78,8 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: time
       type:
-        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
-- name: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+- name: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
   map:
     fields:
     - name: annotations
@@ -69,13 +89,13 @@ var schemaYAML = typed.YAMLObject(`types:
             scalar: string
     - name: creationTimestamp
       type:
-        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: deletionGracePeriodSeconds
       type:
         scalar: numeric
     - name: deletionTimestamp
       type:
-        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
     - name: finalizers
       type:
         list:
@@ -97,7 +117,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: ManagedFieldsEntry.v1.meta.apis.pkg.apimachinery.k8s.io
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry
           elementRelationship: atomic
     - name: name
       type:
@@ -109,7 +129,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: OwnerReference.v1.meta.apis.pkg.apimachinery.k8s.io
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference
           elementRelationship: associative
           keys:
           - uid
@@ -122,7 +142,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: uid
       type:
         scalar: string
-- name: OwnerReference.v1.meta.apis.pkg.apimachinery.k8s.io
+- name: io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference
   map:
     fields:
     - name: apiVersion
@@ -148,28 +168,8 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
       default: ""
     elementRelationship: atomic
-- name: Time.v1.meta.apis.pkg.apimachinery.k8s.io
+- name: io.k8s.apimachinery.pkg.apis.meta.v1.Time
   scalar: untyped
-- name: com.github.openshift.api.securityinternal.v1.RangeAllocation
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: data
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
-      default: {}
-    - name: range
-      type:
-        scalar: string
-      default: ""
 - name: __untyped_atomic_
   scalar: untyped
   list:
