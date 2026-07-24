@@ -17,7 +17,9 @@ limitations under the License.
 package textlogger_test
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -65,11 +67,11 @@ func ExampleNewLogger() {
 	someHelper(logger, "hello world")
 
 	// Output:
-	// I1224 12:30:40.000000     123 textlogger_test.go:54] "A debug message"
-	// I1224 12:30:40.000000     123 textlogger_test.go:56] "An info message"
-	// E1224 12:30:40.000000     123 textlogger_test.go:57] "An error" err="fake error"
-	// I1224 12:30:40.000000     123 textlogger_test.go:58] "With values" int=42 duration="1s" float=3.12 coordinates={"X":100,"Y":200} variables={"A":1,"B":2}
-	// I1224 12:30:40.000000     123 textlogger_test.go:65] "hello world"
+	// I1224 12:30:40.000000     123 textlogger_test.go:56] "A debug message"
+	// I1224 12:30:40.000000     123 textlogger_test.go:58] "An info message"
+	// E1224 12:30:40.000000     123 textlogger_test.go:59] "An error" err="fake error"
+	// I1224 12:30:40.000000     123 textlogger_test.go:60] "With values" int=42 duration="1s" float=3.12 coordinates={"X":100,"Y":200} variables={"A":1,"B":2}
+	// I1224 12:30:40.000000     123 textlogger_test.go:67] "hello world"
 }
 
 func someHelper(logger klog.Logger, msg string) {
@@ -107,4 +109,21 @@ func ExampleBacktrace() {
 	// Output:
 	// I1224 12:30:40.000000     123 ???:1] "First message"
 	// I1224 12:30:40.000000     123 fake.go:42] "Second message"
+}
+
+func ExampleWithHeader() {
+	var buffer bytes.Buffer
+	config := textlogger.NewConfig(
+		textlogger.WithHeader(false),
+		textlogger.Output(&buffer),
+	)
+	logger := textlogger.NewLogger(config)
+
+	logger.Error(errors.New("fake error"), "Something broke", "id", 42)
+	logger.WithName("name").WithValues("key", "value").WithCallDepth(0).Info("Still no header")
+	fmt.Println(buffer.String())
+
+	// Output:
+	// "Something broke" err="fake error" id=42
+	// "Still no header" logger="name" key="value"
 }
