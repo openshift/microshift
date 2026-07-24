@@ -944,6 +944,10 @@ func TestCommandLine(t *testing.T) {
     	If true, adds the file directory to the header of the log messages
   -alsologtostderr
     	log to standard error as well as files (no effect when -logtostderr=true)
+  -alsologtostderrthreshold value
+    	logs at or above this threshold go to stderr when -alsologtostderr=true (no effect when -logtostderr=true)
+  -legacy_stderr_threshold_behavior
+    	If true, stderrthreshold is ignored when logtostderr=true (legacy behavior). If false, stderrthreshold is honored even when logtostderr=true (default true)
   -log_backtrace_at value
     	when logging hits line file:N, emit a stack trace
   -log_dir string
@@ -961,7 +965,7 @@ func TestCommandLine(t *testing.T) {
   -skip_log_headers
     	If true, avoid headers when opening log files (no effect when -logtostderr=true)
   -stderrthreshold value
-    	logs at or above this threshold go to stderr when writing to files and stderr (no effect when -logtostderr=true or -alsologtostderr=true) (default 2)
+    	logs at or above this threshold go to stderr when writing to files and stderr (no effect when -logtostderr=true or -alsologtostderr=true unless -legacy_stderr_threshold_behavior=false) (default 2)
   -v value
     	number for the log level verbosity
   -vmodule value
@@ -1949,19 +1953,21 @@ func checkLogrEntryCorrectCaller(t *testing.T, wantFile string, wantLine int, en
 
 // existedFlag contains all existed flag, without KlogPrefix
 var existedFlag = map[string]struct{}{
-	"log_dir":           {},
-	"add_dir_header":    {},
-	"alsologtostderr":   {},
-	"log_backtrace_at":  {},
-	"log_file":          {},
-	"log_file_max_size": {},
-	"logtostderr":       {},
-	"one_output":        {},
-	"skip_headers":      {},
-	"skip_log_headers":  {},
-	"stderrthreshold":   {},
-	"v":                 {},
-	"vmodule":           {},
+	"log_dir":                          {},
+	"add_dir_header":                   {},
+	"alsologtostderr":                  {},
+	"alsologtostderrthreshold":         {},
+	"legacy_stderr_threshold_behavior": {},
+	"log_backtrace_at":                 {},
+	"log_file":                         {},
+	"log_file_max_size":                {},
+	"logtostderr":                      {},
+	"one_output":                       {},
+	"skip_headers":                     {},
+	"skip_log_headers":                 {},
+	"stderrthreshold":                  {},
+	"v":                                {},
+	"vmodule":                          {},
 }
 
 // KlogPrefix define new flag prefix
