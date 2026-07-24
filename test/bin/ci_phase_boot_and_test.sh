@@ -8,6 +8,8 @@ export PS4='+ $(date "+%T.%N") ${BASH_SOURCE#$HOME/}:$LINENO \011'
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck source=test/bin/common.sh
 source "${SCRIPTDIR}/common.sh"
+# shellcheck source=test/bin/brew_test_alignment.sh
+source "${SCRIPTDIR}/brew_test_alignment.sh"
 # Directory to crawl for scenarios when creating/running in batch mode.
 # The CI system will override this depending on the job its running.
 SCENARIO_SOURCES="${SCENARIO_SOURCES:-${TESTDIR}/scenarios}"
@@ -62,6 +64,18 @@ fi
 # Prepare all the scenarios that need to run into an output directory
 # where all the relevant scenarios will be copied for execution
 prepare_scenario_sources
+
+# For release jobs, align test suites/resources with the brew RPM source
+# commit to avoid false failures from HEAD tests against older brew RPMs.
+if [[ "${SCENARIO_SOURCES:-}" =~ .*releases.* ]]; then
+    # shellcheck source=test/bin/common_versions.sh
+    source "${SCRIPTDIR}/common_versions.sh"
+    get_brew_source_commit
+    if [[ -n "${BREW_SOURCE_COMMIT:-}" ]]; then
+        checkout_brew_aligned_tests || exit 1
+        trap 'restore_head_tests' EXIT
+    fi
+fi
 
 BOOT_TEST_JOB_LOG="${IMAGEDIR}/boot_test_jobs.txt"
 

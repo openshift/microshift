@@ -15,6 +15,8 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTDIR}/common.sh"
 # shellcheck source=test/bin/common_versions.sh
 source "${SCRIPTDIR}/common_versions.sh"
+# shellcheck source=test/bin/brew_test_alignment.sh
+source "${SCRIPTDIR}/brew_test_alignment.sh"
 
 LVM_SYSROOT_SIZE="15360"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
@@ -1864,6 +1866,10 @@ action_login() {
 action_run() {
     start_junit
     trap "close_junit" EXIT
+
+    if [[ "${BREW_TEST_ALIGNED:-false}" == "true" ]]; then
+        emit_brew_alignment_artifact
+    fi
 
     if ! load_global_settings; then
         record_junit "run" "load_global_settings" "FAILED"
