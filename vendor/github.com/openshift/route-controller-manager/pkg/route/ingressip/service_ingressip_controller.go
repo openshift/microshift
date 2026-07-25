@@ -476,7 +476,7 @@ func (ic *IngressIPController) recordAllocation(service *v1.Service, key string)
 		if err = ic.clearPersistedAllocation(serviceCopy, key, reallocateMessage); err != nil {
 			return err
 		}
-		ic.recorder.Eventf(serviceCopy, v1.EventTypeWarning, "IngressIPReallocated", reallocateMessage)
+		ic.recorder.Eventf(serviceCopy, v1.EventTypeWarning, "IngressIPReallocated", "%s", reallocateMessage)
 		return ic.allocate(serviceCopy, key)
 	} else {
 		// Ensure that the ingress ip is present in the service's spec.

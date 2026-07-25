@@ -60,10 +60,17 @@ ifndef OS_GIT_VERSION
 	OS_GIT_VERSION = $(SOURCE_GIT_TAG)
 endif
 
+# OS_MAJOR_VERSION is populated by ART
+# If building out of the ART pipeline, fallback to '0' and let implementations decide how they handle it
+ifndef OS_MAJOR_VERSION
+	OS_MAJOR_VERSION = "0"
+endif
+
 define version-ldflags
 -X $(1).versionFromGit="$(OS_GIT_VERSION)" \
 -X $(1).commitFromGit="$(SOURCE_GIT_COMMIT)" \
 -X $(1).gitTreeState="$(SOURCE_GIT_TREE_STATE)" \
--X $(1).buildDate="$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')"
+-X $(1).buildDate="$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+-X $(1).majorFromGit="$(OS_MAJOR_VERSION)"
 endef
 GO_LD_FLAGS ?=-ldflags "$(call version-ldflags,$(GO_PACKAGE)/pkg/version) $(GO_LD_EXTRAFLAGS)"
