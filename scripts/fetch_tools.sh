@@ -328,6 +328,11 @@ gettool_ginkgo() {
         return 1
     fi
 
+    # Workaround: use origin release branch instead of main to avoid
+    # cgroups/kubernetes type mismatch after origin bump(k8s) on Jul 24 2026.
+    # See: https://redhat.atlassian.net/browse/USHIFT-7427
+    sed -i 's|@main|@release-4.22|g' Makefile
+
     # Build the binary
     make all
 
