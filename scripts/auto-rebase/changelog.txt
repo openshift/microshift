@@ -1,7 +1,65 @@
-- oc image-arm64 994613040335f72809854babcb80b9d11a4e98d5 to a88e785e90aa96ac96da93359bacf3ea5c174733
+- api embedded-component 581cfdf7198613bd325c185eb3eac672670da633 to 9bcaa16cb258e544dd76b78ff2dc3f89af840f76
+  - ffbad1d3 2026-07-24T12:14:11+01:00 Check all hypershift variants when the featuregate is not platform specific
+  - 3199351b 2026-07-22T14:28:51+02:00 machineconfiguration/v1: add BGPVIPPeersJSON to ControllerConfigSpec
+  - b0927431 2026-07-22T14:28:49+02:00 config/v1: add BGPBasedVIPManagement feature gate and VIPManagement field
+  - 5bd0b76d 2026-07-21T09:05:02-05:00 NodeUID in status to detect replaced node with same name
+  - 91ec72c6 2026-07-21T15:06:54+03:00 Align with latest beta API of Vault
+  - a1e80c1b 2026-07-09T10:56:50+02:00 Promote OLMLifecycleAndCompatibility feature gate to Default
+
+- cluster-csi-snapshot-controller-operator embedded-component ef7a4c8b7f5c5e6cba4486dcc37f50521e7bc655 to 67648d56d6b312e661714f8e7bf0e9be1d532c1c
+  - ab3ec5d 2026-07-21T15:24:21+02:00 Bump all deps for 5.0.0
+
+- cluster-ingress-operator embedded-component b4daff58712de418c51d765a8686069a5f47e764 to d7aafd957d1c126f5241ab716ad55ad0d160c042
+  - a5c99e25 2026-06-23T14:17:24+01:00 OCPBUGS-90616: Add GRPCRoute to Gateway API e2e CRD test coverage
+
+- cluster-kube-apiserver-operator embedded-component ea8a9c50203113ca43db98ca925ab7fcdaff7d28 to dab04ebace1a4b36bb40e8f4f87804754b69760b
+  - 09ea0d5 2026-07-24T16:22:19+03:00 Update openshift/*
+  - 8dfb4f8 2026-07-24T05:27:15-04:00  pkg/operator: add KMS plugin sidecar revision readiness check
+  - 050afcf 2026-07-23T15:52:02+02:00 NO-JIRA: Automatic agentic rebase: Update library-go to d8f45c2
+  - df010b0 2026-07-23T12:17:46+05:30 Add KMS key ID identifier
+
+- cluster-network-operator embedded-component 4f6fb6be829a2f6ad3e0df4ab85ecb00ef028343 to 00e6cc59b92af5c8f73f9c3908ed3b0ef591bf63
+  - e538c9c 2026-07-23T15:10:03-04:00 Register PKI controller through AddToManager
+  - e7e9bf0 2026-07-23T14:57:58-04:00 Bound PKI informer cache sync with a timeout
+  - 60cedaf 2026-07-23T13:48:45-04:00 Use keyutil.ParsePrivateKeyPEM for private key decoding
+  - 262103b 2026-07-23T13:11:47-04:00 Enable configurable PKI for managed certificate rotation
+  - dfb8dd5 2026-07-23T15:40:27Z Revert "Merge pull request #2925 from OlivierCazade/day0"
+  - 17f08a7 2026-07-22T11:44:23-04:00 ovn-kubernetes: Move MNP from ConfigMap to CLI flags
+  - 79bbb49 2026-07-15T09:43:13Z Bump frr-k8s MAX_FDS from 1024 to 65536
+  - 9c178ed 2026-04-28T16:16:58+02:00 CORENET-6581: Add transport label to CUDN telemetry recording rule
+
+- kubernetes embedded-component 98b35193b2ac7a23a673325f5e9b830ecd5ba406 to 63ee93dac28329fd9d81e91b21ea8d8c43105d01
+  - 44a83e00e 2026-07-17T15:00:07+02:00 UPSTREAM: <drop>: hack/update-featuregates.sh
+  - 4da08ff19 2026-07-17T08:27:41+02:00 UPSTREAM: <carry>: Store SELinuxWarningController upgrade check as a ConfigMap
+  - 13ace3c70 2026-07-02T02:25:02-04:00 UPSTREAM: <carry>: upkeep cpu partitioning admission webhook
+
+- machine-config-operator embedded-component 067b924f19a64a209796d5be5a0a63665f53b1eb to 3b4a5c7d9fa127981c57efac6fa29bc76eac019d
+  - 08f5b4e1 2026-07-24T11:30:29Z Thread context through syncHandler instead of storing it in Controller
+  - c4fb4794 2026-07-24T11:30:29Z Propagate context to InspectStreamClass for shutdown cancellation
+  - 92bdeffb 2026-07-24T11:30:29Z Add unit tests for validateNoRuncOnRHEL10FromOSImageURL
+  - 3c6b0fcd 2026-07-24T11:30:29Z Inline runcBlockedError into its callers
+  - a0e361e2 2026-07-24T11:30:29Z Move validateNoRuncOnRHEL10FromOSImageStream out of generateRenderedMachineConfig
+  - cd031001 2026-07-24T11:30:29Z Decouple validateNoRuncOnRHEL10FromOSImageURL from Controller
+  - 46c64391 2026-07-24T11:30:29Z Rename runc validation functions for clarity
+  - ec249e54 2026-07-24T11:30:29Z TBD
+  - b5fe45d5 2026-07-24T08:59:10Z NO-ISSUE: extended tests, restore initial maxUnavailable when modified
+  - bd1f9660 2026-07-23T16:08:26+05:30 Add TC 88940: Apply password only if changes exist
+  - 173915e5 2026-07-23T09:54:18Z NO-ISSUE: add AWS marketplace polarion ID test
+  - 75e3bbca 2026-07-22T14:46:03-04:00 Surface MOSB build status on paused MCPs, added e2e tests to test the behavior, and refined non-paused pool reporting
+  - 9278288f 2026-07-22T15:13:16+02:00 CNTRLPLANE-3840: Remove ExternalTopologyMode guard from OSImageStream bootstrap
+  - 54982a74 2026-07-21T19:36:43+05:30 Add unit tests for osImageStream label skip logic in boot image controller
+  - b68a7440 2026-07-17T08:10:43Z MCO-2184: Adapt scale extended tests to support osstreams
+
+- service-ca-operator embedded-component 6391e070d2ab026324b032a6fa5fc7d6be0d2cb5 to e260be2b3710137012814ce9ca48f155f24f0b02
+  - 9ad2f83 2026-07-24T17:31:07-04:00 Bump github.com/openshift/build-machinery-go
+  - 11a6d83 2026-07-23T13:23:29+02:00 feat: inject centralized TLS into service-ca operand
+  - 843f71b 2026-07-22T14:39:22+02:00 chore: sync deps
+  - 195ba0b 2026-06-06T22:21:50Z Updating ose-service-ca-operator-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-service-ca-operator.yml
+
+- oc image-amd64 994613040335f72809854babcb80b9d11a4e98d5 to a88e785e90aa96ac96da93359bacf3ea5c174733
   - a88e785e 2026-07-23T20:40:27Z RFE-8595: must-gather: add client-side keep-alive to prevent accessTokenInactivityTimeout failures (#2288)
 
-- router image-arm64 0c4063da30da6091765e2576efc684d0f020918d to 682319a1bb432f0203951c33336d0f55947e1099
+- router image-amd64 f5b67ebd12089170bfc47da7745fe4efb1477eb7 to 682319a1bb432f0203951c33336d0f55947e1099
   - c15a20a 2026-07-25T20:02:34Z Revert "OCPBUGS-77056: Make external cert validation asynchronous (Resurrection)"
   - da1c969 2026-07-23T10:29:40-04:00 OCPBUGS-77056: Use a short, unique prefix for fake-haproxy test sockets
   - 6f2aacc 2026-07-23T10:29:40-04:00 OCPBUGS-77056: Update vendor to remove unused authorizationutil reference
@@ -16,24 +74,18 @@
   - 7b4b855 2026-07-23T10:29:40-04:00 Remove library-go replace directive and update vendor
   - 277913c 2026-07-23T10:29:40-04:00 OCPBUGS-77056: Retry on write conflicts without dropping writerlease
   - bc97dba 2026-07-23T10:29:40-04:00 OCPBUGS-77056: Asynchronous external certificate validation and Hybrid Informer secret monitoring
-  - 74b6915 2026-07-22T11:50:03-04:00 NE-2741: Align vendored openshift/api with the master branch version
-  - deb1d50 2026-07-22T11:21:18-04:00 NE-2741: Address PR comments on TLS curve preference parsing
-  - 7f33917 2026-07-22T11:21:18-04:00 Security: fail-closed on unsupported TLS curves and parse mixed delimiters
-  - da031dd 2026-07-22T11:21:18-04:00 Fix: shorten fake-haproxy socket path in tests to avoid length limits
-  - ef67e22 2026-07-22T11:21:18-04:00 NE-2741: Implement TLS Curves Support for Metrics Endpoints
   - 6ebff4e 2026-07-20T21:03:15-04:00 NE-2223: Bump HAProxy to 3.2.19 in the router image
   - 400eac8 2026-06-15T16:09:07-03:00 NO-JIRA: Add default coderabbit for the repo
 
-- ovn-kubernetes image-arm64 8e2e1542642847da592268a0ab94a207eb8d3605 to 88e9f0f146784e8525f6304a1f6f7c986eba2319
+- ovn-kubernetes image-amd64 8e2e1542642847da592268a0ab94a207eb8d3605 to 88e9f0f146784e8525f6304a1f6f7c986eba2319
   - 3f34530b 2026-07-12T10:36:43+03:00 Update OWNERS file
 
-- kubernetes image-arm64 0f7d1a1b66af90eece8d46f6f9dc7537bf16d978 to 63ee93dac28329fd9d81e91b21ea8d8c43105d01
+- kubernetes image-amd64 98b35193b2ac7a23a673325f5e9b830ecd5ba406 to 63ee93dac28329fd9d81e91b21ea8d8c43105d01
   - 44a83e00e 2026-07-17T15:00:07+02:00 UPSTREAM: <drop>: hack/update-featuregates.sh
   - 4da08ff19 2026-07-17T08:27:41+02:00 UPSTREAM: <carry>: Store SELinuxWarningController upgrade check as a ConfigMap
-  - d178a1dbb 2026-07-17T00:54:58+05:30 UPSTREAM: 140211: Promote regression-issue-74839 to 1.5
   - 13ace3c70 2026-07-02T02:25:02-04:00 UPSTREAM: <carry>: upkeep cpu partitioning admission webhook
 
-- service-ca-operator image-arm64 6391e070d2ab026324b032a6fa5fc7d6be0d2cb5 to e260be2b3710137012814ce9ca48f155f24f0b02
+- service-ca-operator image-amd64 6391e070d2ab026324b032a6fa5fc7d6be0d2cb5 to e260be2b3710137012814ce9ca48f155f24f0b02
   - 9ad2f83 2026-07-24T17:31:07-04:00 Bump github.com/openshift/build-machinery-go
   - 11a6d83 2026-07-23T13:23:29+02:00 feat: inject centralized TLS into service-ca operand
   - 843f71b 2026-07-22T14:39:22+02:00 chore: sync deps
