@@ -62,7 +62,7 @@ Verify Uncore-cache Feature Is Enabled
     ...    wait=5
     Pattern Should Appear In Log Output
     ...    ${cursor}
-    ...    kubelet I.*CPUManagerPolicyBetaOptions:true
+    ...    kubelet I.*CPUManagerPolicyBetaOptions":true
     ...    unit=microshift
     ...    wait=5
     Pattern Should Appear In Log Output
