@@ -343,8 +343,9 @@ gettool_ginkgo() {
     # shellcheck source=test/bin/common_versions.sh
     source "${SCRIPT_DIR}/../test/bin/common_versions.sh"
 
-    local -r repo_url="https://${GITHUB_TOKEN}@github.com/mffiedler/openshift-tests-private.git"
-    local -r repo_branch="fix-build-docker-api-and-kubernetes-dep"
+    local -r repo_url="https://${GITHUB_TOKEN}@github.com/openshift/openshift-tests-private.git"
+    local -r repo_branch="main"
+    local -r repo_pr="30086"
     local -r repo_commit=""
     local clone_dir="${WORK_DIR}/openshift-tests-private"
     
@@ -369,8 +370,14 @@ gettool_ginkgo() {
 
     pushd "${clone_dir}" &>/dev/null
 
-    # Checkout a valid commit to be sure ginkgo tests are working
-    if [[ -n "${repo_commit}" ]]; then
+    # Fetch PR head ref to test mffiedler's fix for OCPQE-32095
+    if [[ -n "${repo_pr}" ]]; then
+        if ! git fetch origin "pull/${repo_pr}/head:pr-${repo_pr}" || \
+           ! git checkout "pr-${repo_pr}"; then
+            echo "Error: Failed to fetch/checkout PR #${repo_pr}"
+            return 1
+        fi
+    elif [[ -n "${repo_commit}" ]]; then
         if ! (git checkout --quiet "${repo_commit}"); then
             echo "Error: Failed to checkout specific commit"
             return 1
