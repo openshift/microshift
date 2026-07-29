@@ -68,8 +68,8 @@ spec:
           echo "$(date -Iseconds) - starting ovn-northd"
           exec ovn-northd \
             --no-chdir "-vconsole:${OVN_LOG_LEVEL}" -vfile:off "-vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
-            --ovnnb-db "{{.OVN_NB_DB_LIST}}" \
-            --ovnsb-db "{{.OVN_SB_DB_LIST}}" \
+            --ovnnb-db "tcp:${K8S_NODE_IP}:{{.OVN_NB_PORT}}" \
+            --ovnsb-db "tcp:${K8S_NODE_IP}:{{.OVN_SB_PORT}}" \
             --pidfile /var/run/ovn/ovn-northd.pid &
 
           wait $!
@@ -141,6 +141,8 @@ spec:
             --db-nb-cluster-local-proto=tcp \
             --no-monitor"
 
+          rm -f /run/ovn/ovnnb_db.sock
+
           echo "$(date -Iseconds) - starting nbdb"
 
           exec /usr/share/ovn/scripts/ovn-ctl \
@@ -177,7 +179,7 @@ spec:
                 done
 
                 #configure northd_probe_interval
-                OVN_NB_CTL="ovn-nbctl --db "{{.OVN_NB_DB_LIST}}""
+                OVN_NB_CTL="ovn-nbctl --no-leader-only"
                 northd_probe_interval=${OVN_NORTHD_PROBE_INTERVAL:-10000}
                 echo "Setting northd probe interval to ${northd_probe_interval} ms"
                 retries=0
@@ -286,6 +288,8 @@ spec:
             --db-sb-cluster-local-proto=tcp \
             --no-monitor"
 
+          rm -f /run/ovn/ovnsb_db.sock
+
           echo "$(date -Iseconds) - starting sbdb "
           exec /usr/share/ovn/scripts/ovn-ctl \
             ${OVN_ARGS} \
@@ -353,6 +357,46 @@ spec:
           containerPort: {{.OVN_SB_PORT}}
         terminationMessagePolicy: FallbackToLogsOnError
 
+      # ovnkube cluster-manager: allocates subnets to nodes, handles cluster-wide IPAM
+      - name: ovnkube-cluster-manager
+        image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -xe
+          if [[ -f "/env/_master" ]]; then
+            set -o allexport
+            source "/env/_master"
+            set +o allexport
+          fi
+
+          echo "$(date -Iseconds) - starting ovnkube-cluster-manager, Node: ${K8S_NODE}"
+          exec /usr/bin/ovnkube \
+            --init-cluster-manager "${K8S_NODE}" \
+            --config-file=/run/ovnkube-config/ovnkube.conf \
+            --loglevel "${OVN_KUBE_LOG_LEVEL}" \
+            --enable-multicast
+        env:
+        - name: OVN_KUBE_LOG_LEVEL
+          value: "4"
+        - name: K8S_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+        - mountPath: /run/ovnkube-config/
+          name: ovnkube-config
+        - mountPath: {{.KubeconfigDir}}
+          name: kubeconfig
+        - mountPath: /env
+          name: env-overrides
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+
       # ovnkube master: convert kubernetes objects in to nbdb logical network components
       - name: ovnkube-master
         image: {{ .ReleaseImage.ovn_kubernetes_microshift }}
@@ -376,9 +420,7 @@ spec:
 
           echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-master - start ovnkube --init-master ${K8S_NODE}"
           exec /usr/bin/ovnkube \
-            --init-master "${K8S_NODE}" \
-            --nb-address "{{.OVN_NB_DB_LIST}}" \
-            --sb-address "{{.OVN_SB_DB_LIST}}" \
+            --init-ovnkube-controller "${K8S_NODE}" \
             --config-file=/run/ovnkube-config/ovnkube.conf \
             --loglevel "${OVN_KUBE_LOG_LEVEL}" \
             ${gateway_mode_flags} \
