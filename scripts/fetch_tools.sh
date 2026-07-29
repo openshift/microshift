@@ -343,9 +343,9 @@ gettool_ginkgo() {
     # shellcheck source=test/bin/common_versions.sh
     source "${SCRIPT_DIR}/../test/bin/common_versions.sh"
 
-    local -r repo_url="https://${GITHUB_TOKEN}@github.com/openshift/openshift-tests-private.git"
-    local -r repo_branch="${OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH}"
-    local -r repo_commit="${OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT}"
+    local -r repo_url="https://${GITHUB_TOKEN}@github.com/mffiedler/openshift-tests-private.git"
+    local -r repo_branch="fix-build-docker-api-and-kubernetes-dep"
+    local -r repo_commit=""
     local clone_dir="${WORK_DIR}/openshift-tests-private"
     
     local -r binary_path="${GINKGO_TEST_BINARY}"
@@ -362,7 +362,7 @@ gettool_ginkgo() {
     mkdir -p "$(dirname "${binary_path}")"
 
     # Clone repository with release branch preference
-    if ! git clone --depth 1000 --branch "${repo_branch}" "${repo_url}" "${clone_dir}" 2>/dev/null; then
+    if ! git clone --depth 1 --branch "${repo_branch}" "${repo_url}" "${clone_dir}" 2>/dev/null; then
         echo "Error: Failed to clone repository"
         return 1
     fi
@@ -370,17 +370,12 @@ gettool_ginkgo() {
     pushd "${clone_dir}" &>/dev/null
 
     # Checkout a valid commit to be sure ginkgo tests are working
-    if ! (git checkout --quiet "${repo_commit}"); then
-        echo "Error: Failed to checkout specific commit"
-        return 1
+    if [[ -n "${repo_commit}" ]]; then
+        if ! (git checkout --quiet "${repo_commit}"); then
+            echo "Error: Failed to checkout specific commit"
+            return 1
+        fi
     fi
-
-    # Workaround: pin origin to known-good commit to avoid cgroups/kubernetes
-    # type mismatch caused by openshift/origin bump(k8s) on Jul 24 2026.
-    # The Makefile runs 'go get -u github.com/openshift/origin@main' which
-    # pulls in incompatible dependency versions. Pin to last working commit.
-    # See: https://redhat.atlassian.net/browse/USHIFT-7427
-    sed -i 's|@main|@398edca0cfe4|g' Makefile
 
     # Build the binary
     make all
