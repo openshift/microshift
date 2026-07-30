@@ -1,8 +1,8 @@
 # Getting Started with MicroShift
 
-Refer to the [MicroShift product documentation](https://access.redhat.com/documentation/en-us/red_hat_build_of_microshift) for how to install MicroShift on a machine running RHEL and how to build a RHEL for Edge image embedding MicroShift. If you do not yet have a RHEL subscription, you can get a [no-cost Red Hat Developer subscription](https://developers.redhat.com/blog/2021/02/10/how-to-activate-your-no-cost-red-hat-enterprise-linux-subscription).
+Refer to the [MicroShift product documentation](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift) for how to install MicroShift on a machine running RHEL and how to build a RHEL for Edge image embedding MicroShift. If you do not yet have a RHEL subscription, you can get a [no-cost Red Hat Developer subscription](https://developers.redhat.com/blog/2021/02/10/how-to-activate-your-no-cost-red-hat-enterprise-linux-subscription).
 
-The remainder of this document describes an opinionated, non-production setup to facilitate experimentation with MicroShift in a virtual machine running the RHEL 9.4 operating system.
+The remainder of this document describes an opinionated, non-production setup to facilitate experimentation with MicroShift in a virtual machine running the RHEL 9.8 operating system.
 
 ## Prerequisites
 
@@ -16,11 +16,11 @@ Run the following command to install the necessary components for the [libvirt](
 sudo dnf install -y libvirt virt-manager virt-install virt-viewer libvirt-client qemu-kvm qemu-img
 ```
 
-Download the Red Hat Enterprise Linux 9.4 DVD ISO image for the `x86_64` or `aarch64` architectures from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site, scroll down to see the 9.4 option.
+Download the Red Hat Enterprise Linux 9.8 DVD ISO image for the `x86_64` or `aarch64` architectures from [Red Hat Developer](https://developers.redhat.com/products/rhel/download) site.
 
 Copy the ISO file to the `/var/lib/libvirt/images` directory.
 > Other architectures, versions or flavors of operating systems are not supported in this opinionated environment.
-> For this setup, only use the RHEL 9.4 DVD image for the `x86_64` or `aarch64` architectures.
+> For this setup, only use the RHEL 9.8 DVD image for the `x86_64` or `aarch64` architectures.
 
 Download the OpenShift pull secret from the https://console.redhat.com/openshift/downloads#tool-pull-secret page and save it into the `~/.pull-secret.json` file.
 
@@ -30,7 +30,7 @@ Run the following commands to initiate the creation process of the `microshift-s
 
 ```bash
 VMNAME=microshift-starter
-DVDISO="/var/lib/libvirt/images/rhel-9.4-$(uname -m)-dvd.iso"
+DVDISO="/var/lib/libvirt/images/rhel-9.8-$(uname -m)-dvd.iso"
 KICKSTART=https://raw.githubusercontent.com/openshift/microshift/main/docs/config/microshift-starter.ks
 
 sudo virt-install \
@@ -81,16 +81,17 @@ Register your RHEL machine and attach your subscriptions.
 sudo subscription-manager register --auto-attach
 ```
 
-Enable the MicroShift RPM repos and install MicroShift and the `oc` and `kubectl` clients.
+Enable the MicroShift RPM repos and install MicroShift. Set `USHIFT_VER` to the desired MicroShift minor version.
 
 ```bash
+USHIFT_VER=4.22
 sudo subscription-manager repos \
-    --enable rhocp-4.16-for-rhel-9-$(uname -m)-rpms \
+    --enable rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms \
     --enable fast-datapath-for-rhel-9-$(uname -m)-rpms
-sudo dnf install -y microshift openshift-clients
+sudo dnf install -y microshift
 ```
 
-Confgure the minimum required firewall rules.
+Configure the minimum required firewall rules.
 ```bash
 sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
 sudo firewall-cmd --permanent --zone=trusted --add-source=169.254.169.1
@@ -101,6 +102,7 @@ Configure `CRI-O` to use the pull secret.
 
 ```bash
 sudo cp ~redhat/.pull-secret.json /etc/crio/openshift-pull-secret
+sudo chmod 600 /etc/crio/openshift-pull-secret
 ```
 
 Start the MicroShift service.
