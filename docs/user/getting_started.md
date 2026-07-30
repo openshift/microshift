@@ -84,7 +84,7 @@ sudo subscription-manager register --auto-attach
 Enable the MicroShift RPM repos and install MicroShift. Set `USHIFT_VER` to the desired MicroShift minor version.
 
 ```bash
-USHIFT_VER=4.19
+USHIFT_VER=4.22
 sudo subscription-manager repos \
     --enable rhocp-${USHIFT_VER}-for-rhel-9-$(uname -m)-rpms \
     --enable fast-datapath-for-rhel-9-$(uname -m)-rpms
