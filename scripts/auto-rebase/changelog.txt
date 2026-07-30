@@ -1,9 +1,16 @@
-- cluster-ingress-operator embedded-component 489deaedf44ad6a74c33afd3a1dbca52a129f79f to 9aaf23a05fb87a8c177e1403c484725d557ad1c5
-  - 4e213f9 2026-07-21T12:44:10Z Add additional validation to AWS managed zone
-  - b803b1d 2026-07-21T12:44:10Z Address review comments on on-prem test
-  - d60536b 2026-07-21T12:44:10Z NE-2395: Fix e2e tests to work on platforms with unmanaged DNS
-  - 106bc24 2026-07-16T13:23:53-04:00 OCPBUGS-98968: Bump Istio version from v1.26.2 to v1.26.8
+- cluster-ingress-operator embedded-component 9aaf23a05fb87a8c177e1403c484725d557ad1c5 to 12a2b5974ae9cbb644b2827af3597a3c911d1d4c
+  - 113c6ca 2026-07-27T16:01:44Z E2E test for internal LB creation
+  - f0e8441 2026-07-22T19:54:48Z OCPBUGS-99484: Add e2e test for Gateway API infrastructure annotations
 
-- cluster-network-operator embedded-component 56c830ea4487e978a2697d065217b8851ed6cbd9 to 90fc24ad2c3d8100f309113c04351976e1f71078
-  - 2a23ae5 2026-07-20T08:42:01-04:00 Bump github.com/containernetworking/cni v0.8.0 -> v1.3.0
+- machine-config-operator embedded-component 4b444dec0a6048b49b11def88482e45b22a263f0 to 1f1efae7758fd6ec0d9e90cb9a893f51ff1079b8
+  - a87284ef 2026-07-24T11:02:15-04:00 Remove skopeo-install script
+  - 11883125 2026-07-24T11:02:14-04:00 Annotate MOSB with job UID when reusing existing build job
+  - 389017c6 2026-07-24T11:02:14-04:00 Handle transient NotFound errors in MOSB assertion polling
+  - 1726a0c4 2026-07-24T11:02:14-04:00 Fix MOSB ownership check in deleteMachineOSConfig
+  - ef5fbe6b 2026-07-24T11:02:14-04:00 Shard e2e-ocl test suite and apply stabilization fixes
+  - e0d9dd70 2026-07-24T18:22:30+05:30 OCPBUGS-99650: Delete stale auto-sizing MachineConfigs for non-default pools 4.20
+  - 77ae6045 2026-07-15T15:39:53-04:00 Skip rebuild when config unchanged, unless image was deleted
+  - 913c588c 2026-07-15T13:32:49-04:00 Remove overly-aggressive early return from reconcilePoolChange
+  - 464fb19e 2026-07-15T13:11:16-04:00 use tag URL for image existence
+  - f1a15683 2026-07-15T13:11:16-04:00 Handle missing firstOptIn annotation in reconciler
 
