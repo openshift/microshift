@@ -1,4 +1,0 @@
-- machine-config-operator embedded-component 60bbe3be66669898ce9124c75e997ee8ffa48cae to 9c5e8342612374f653853791f5fadab2db8bed9d
-  - c891064c 2026-06-29T11:48:18+00:00 OCPBUGS-59958: Updated Unit Test, added extra getconfig check
-  - d1540cc6 2026-06-29T11:48:18+00:00 OCPBUGS-59958: move cleanUpDuplicatedMC to after pool loop in syncNodeConfigHandler
-
