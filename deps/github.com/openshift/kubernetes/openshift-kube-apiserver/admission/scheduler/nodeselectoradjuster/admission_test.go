@@ -20,29 +20,52 @@ func TestAdmit(t *testing.T) {
 		expectedNodeSelector map[string]string
 	}{
 		{
-			name: "VPA operator pod: control-plane node selector is added",
+			name: "VPA operator pod with default node selector: control-plane node selector is added",
+			pod: makePod(
+				withNamespace(vpaOperatorNamespace),
+				withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}),
+				withNodeSelector(map[string]string{"kubernetes.io/os": "linux"}),
+			),
+			resource: coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: map[string]string{
+				controlPlaneRoleKey: "",
+				"kubernetes.io/os":  "linux",
+			},
+		},
+		{
+			name: "VPA operator pod with no node selector: not modified",
 			pod: makePod(
 				withNamespace(vpaOperatorNamespace),
 				withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}),
 			),
 			resource:             coreapi.Resource("pods").WithVersion("v1"),
-			expectedNodeSelector: map[string]string{controlPlaneRoleKey: ""},
+			expectedNodeSelector: nil,
 		},
 		{
-			name: "VPA operator pod: control-plane node selector added alongside existing selectors",
+			name: "VPA operator pod with non-default node selector: not modified",
 			pod: makePod(
 				withNamespace(vpaOperatorNamespace),
 				withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}),
 				withNodeSelector(map[string]string{"topology.kubernetes.io/zone": "us-east-1a"}),
 			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: map[string]string{"topology.kubernetes.io/zone": "us-east-1a"},
+		},
+		{
+			name: "VPA operator pod with extra node selectors: not modified",
+			pod: makePod(
+				withNamespace(vpaOperatorNamespace),
+				withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}),
+				withNodeSelector(map[string]string{"kubernetes.io/os": "linux", "topology.kubernetes.io/zone": "us-east-1a"}),
+			),
 			resource: coreapi.Resource("pods").WithVersion("v1"),
 			expectedNodeSelector: map[string]string{
-				controlPlaneRoleKey:           "",
+				"kubernetes.io/os":            "linux",
 				"topology.kubernetes.io/zone": "us-east-1a",
 			},
 		},
 		{
-			name: "VPA operator pod: control-plane node selector already present is left unchanged",
+			name: "VPA operator pod with control-plane selector already present: not modified",
 			pod: makePod(
 				withNamespace(vpaOperatorNamespace),
 				withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}),
@@ -50,6 +73,125 @@ func TestAdmit(t *testing.T) {
 			),
 			resource:             coreapi.Resource("pods").WithVersion("v1"),
 			expectedNodeSelector: map[string]string{controlPlaneRoleKey: ""},
+		},
+		{
+			name: "CRO operator pod with no node selector: control-plane node selector is added",
+			pod: makePod(
+				withNamespace(croOperatorNamespace),
+				withLabels(map[string]string{croOperatorLabelKey: croOperatorLabelValue}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: map[string]string{controlPlaneRoleKey: ""},
+		},
+		{
+			name: "CRO operator pod with existing node selector: not modified",
+			pod: makePod(
+				withNamespace(croOperatorNamespace),
+				withLabels(map[string]string{croOperatorLabelKey: croOperatorLabelValue}),
+				withNodeSelector(map[string]string{"kubernetes.io/os": "linux"}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: map[string]string{"kubernetes.io/os": "linux"},
+		},
+		{
+			name: "CRO operator pod in wrong namespace: not modified",
+			pod: makePod(
+				withNamespace("other-namespace"),
+				withLabels(map[string]string{croOperatorLabelKey: croOperatorLabelValue}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: nil,
+		},
+		{
+			name: "CRO operator label with wrong value: not modified",
+			pod: makePod(
+				withNamespace(croOperatorNamespace),
+				withLabels(map[string]string{croOperatorLabelKey: "false"}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: nil,
+		},
+		{
+			name: "CMA operator pod with master toleration: control-plane node selector is added",
+			pod: makePod(
+				withNamespace(cmaOperatorNamespace),
+				withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/master", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: map[string]string{controlPlaneRoleKey: ""},
+		},
+		{
+			name: "CMA operator pod with broad tolerate-all toleration: control-plane node selector is added",
+			pod: makePod(
+				withNamespace(cmaOperatorNamespace),
+				withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withTolerations([]coreapi.Toleration{
+					{Operator: coreapi.TolerationOpExists},
+				}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: map[string]string{controlPlaneRoleKey: ""},
+		},
+		{
+			name: "CMA operator pod without master toleration: not modified",
+			pod: makePod(
+				withNamespace(cmaOperatorNamespace),
+				withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: nil,
+		},
+		{
+			name: "CMA operator pod with wrong toleration key: not modified",
+			pod: makePod(
+				withNamespace(cmaOperatorNamespace),
+				withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/control-plane", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: nil,
+		},
+		{
+			name: "CMA operator pod with existing node selector: not modified",
+			pod: makePod(
+				withNamespace(cmaOperatorNamespace),
+				withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withNodeSelector(map[string]string{"kubernetes.io/os": "linux"}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/master", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: map[string]string{"kubernetes.io/os": "linux"},
+		},
+		{
+			name: "CMA operator pod in wrong namespace: not modified",
+			pod: makePod(
+				withNamespace("other-namespace"),
+				withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/master", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: nil,
+		},
+		{
+			name: "CMA operator label with wrong value: not modified",
+			pod: makePod(
+				withNamespace(cmaOperatorNamespace),
+				withLabels(map[string]string{cmaOperatorLabelKey: "wrong-operator"}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/master", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: nil,
 		},
 		{
 			name: "non-qualifying pod: not modified",
@@ -148,13 +290,102 @@ func TestRequiresNodeSelectorAdjustment(t *testing.T) {
 		expected bool
 	}{
 		{
-			name:     "VPA operator label in correct namespace: match",
-			pod:      makePod(withNamespace(vpaOperatorNamespace), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue})),
+			name:     "VPA operator with default node selector: match",
+			pod:      makePod(withNamespace(vpaOperatorNamespace), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}), withNodeSelector(map[string]string{"kubernetes.io/os": "linux"})),
 			expected: true,
 		},
 		{
-			name:     "VPA operator label in wrong namespace: no match",
-			pod:      makePod(withNamespace("other-namespace"), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue})),
+			name:     "VPA operator with no node selector: no match",
+			pod:      makePod(withNamespace(vpaOperatorNamespace), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue})),
+			expected: false,
+		},
+		{
+			name:     "VPA operator with non-default node selector: no match",
+			pod:      makePod(withNamespace(vpaOperatorNamespace), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}), withNodeSelector(map[string]string{"topology.kubernetes.io/zone": "us-east-1a"})),
+			expected: false,
+		},
+		{
+			name:     "VPA operator with extra node selectors: no match",
+			pod:      makePod(withNamespace(vpaOperatorNamespace), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}), withNodeSelector(map[string]string{"kubernetes.io/os": "linux", "extra": "value"})),
+			expected: false,
+		},
+		{
+			name:     "VPA operator in wrong namespace: no match",
+			pod:      makePod(withNamespace("other-namespace"), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}), withNodeSelector(map[string]string{"kubernetes.io/os": "linux"})),
+			expected: false,
+		},
+		{
+			name:     "CRO operator with no node selector: match",
+			pod:      makePod(withNamespace(croOperatorNamespace), withLabels(map[string]string{croOperatorLabelKey: croOperatorLabelValue})),
+			expected: true,
+		},
+		{
+			name:     "CRO operator with existing node selector: no match",
+			pod:      makePod(withNamespace(croOperatorNamespace), withLabels(map[string]string{croOperatorLabelKey: croOperatorLabelValue}), withNodeSelector(map[string]string{"kubernetes.io/os": "linux"})),
+			expected: false,
+		},
+		{
+			name:     "CRO operator in wrong namespace: no match",
+			pod:      makePod(withNamespace("other-namespace"), withLabels(map[string]string{croOperatorLabelKey: croOperatorLabelValue})),
+			expected: false,
+		},
+		{
+			name:     "CRO operator label with wrong value: no match",
+			pod:      makePod(withNamespace(croOperatorNamespace), withLabels(map[string]string{croOperatorLabelKey: "false"})),
+			expected: false,
+		},
+		{
+			name: "CMA operator with master toleration: match",
+			pod: makePod(withNamespace(cmaOperatorNamespace), withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/master", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				})),
+			expected: true,
+		},
+		{
+			name: "CMA operator with broad tolerate-all toleration: match",
+			pod: makePod(withNamespace(cmaOperatorNamespace), withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withTolerations([]coreapi.Toleration{
+					{Operator: coreapi.TolerationOpExists},
+				})),
+			expected: true,
+		},
+		{
+			name:     "CMA operator without master toleration: no match",
+			pod:      makePod(withNamespace(cmaOperatorNamespace), withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue})),
+			expected: false,
+		},
+		{
+			name: "CMA operator with wrong toleration key: no match",
+			pod: makePod(withNamespace(cmaOperatorNamespace), withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/control-plane", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				})),
+			expected: false,
+		},
+		{
+			name: "CMA operator with existing node selector: no match",
+			pod: makePod(withNamespace(cmaOperatorNamespace), withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withNodeSelector(map[string]string{"kubernetes.io/os": "linux"}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/master", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				})),
+			expected: false,
+		},
+		{
+			name: "CMA operator in wrong namespace: no match",
+			pod: makePod(withNamespace("other-namespace"), withLabels(map[string]string{cmaOperatorLabelKey: cmaOperatorLabelValue}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/master", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				})),
+			expected: false,
+		},
+		{
+			name: "CMA operator label with wrong value: no match",
+			pod: makePod(withNamespace(cmaOperatorNamespace), withLabels(map[string]string{cmaOperatorLabelKey: "wrong-operator"}),
+				withTolerations([]coreapi.Toleration{
+					{Key: "node-role.kubernetes.io/master", Effect: coreapi.TaintEffectNoSchedule, Operator: coreapi.TolerationOpExists},
+				})),
 			expected: false,
 		},
 		{
@@ -241,6 +472,12 @@ func withNamespace(ns string) func(*coreapi.Pod) {
 func withLabels(labels map[string]string) func(*coreapi.Pod) {
 	return func(p *coreapi.Pod) {
 		p.Labels = labels
+	}
+}
+
+func withTolerations(tolerations []coreapi.Toleration) func(*coreapi.Pod) {
+	return func(p *coreapi.Pod) {
+		p.Spec.Tolerations = tolerations
 	}
 }
 
