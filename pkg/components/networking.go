@@ -110,13 +110,11 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		return err
 	}
 
-	// Multinode only params: OVN_NB_DB_LIST, OVN_SB_DB_LIST, OVN_NB_PORT, OVN_SB_PORT
+	// Multinode only params: OVN_NB_PORT, OVN_SB_PORT
 	extraParams := assets.RenderParams{
 		"OVNConfig":      ovnConfig,
 		"KubeconfigPath": kubeconfigPath,
 		"KubeconfigDir":  filepath.Join(config.DataDir, "/resources/kubeadmin"),
-		"OVN_NB_DB_LIST": fmt.Sprintf("tcp:%s:%s", cfg.MultiNode.Controlplane, ovn.OVN_NB_PORT),
-		"OVN_SB_DB_LIST": fmt.Sprintf("tcp:%s:%s", cfg.MultiNode.Controlplane, ovn.OVN_SB_PORT),
 		"OVN_NB_PORT":    ovn.OVN_NB_PORT,
 		"OVN_SB_PORT":    ovn.OVN_SB_PORT,
 	}

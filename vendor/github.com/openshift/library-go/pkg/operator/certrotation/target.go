@@ -327,10 +327,10 @@ func (r *ClientRotation) CertificateType() pki.CertificateType {
 }
 
 func (r *ClientRotation) NewCertificate(signer *crypto.CA, validity time.Duration, keyGen crypto.KeyPairGenerator) (*crypto.TLSCertificateConfig, error) {
-	if keyGen != nil {
-		return signer.NewClientCertificate(r.UserInfo, keyGen, crypto.WithLifetime(validity))
+	if keyGen == nil {
+		return signer.MakeClientCertificateForDuration(r.UserInfo, validity)
 	}
-	return signer.MakeClientCertificateForDuration(r.UserInfo, validity)
+	return signer.NewClientCertificate(r.UserInfo, keyGen, crypto.WithLifetime(validity))
 }
 
 func (r *ClientRotation) NeedNewTargetCertKeyPair(currentCertSecret *corev1.Secret, signer *crypto.CA, caBundleCerts []*x509.Certificate, refresh time.Duration, refreshOnlyWhenExpired, exists bool) string {
@@ -356,14 +356,13 @@ func (r *ServingRotation) NewCertificate(signer *crypto.CA, validity time.Durati
 	if len(hostnames) == 0 {
 		return nil, fmt.Errorf("no hostnames set")
 	}
-	if keyGen != nil {
-		return signer.NewServerCertificate(
-			sets.New(hostnames...), keyGen,
-			crypto.WithLifetime(validity),
-			crypto.WithExtensions(r.CertificateExtensionFn...),
-		)
+	if keyGen == nil {
+		return signer.MakeServerCertForDuration(sets.New(hostnames...), validity, r.CertificateExtensionFn...)
 	}
-	return signer.MakeServerCertForDuration(sets.New(hostnames...), validity, r.CertificateExtensionFn...)
+	return signer.NewServerCertificate(sets.New(hostnames...), keyGen,
+		crypto.WithLifetime(validity),
+		crypto.WithExtensions(r.CertificateExtensionFn...),
+	)
 }
 
 func (r *ServingRotation) RecheckChannel() <-chan struct{} {
@@ -423,23 +422,25 @@ func (r *SignerRotation) CertificateType() pki.CertificateType {
 
 func (r *SignerRotation) NewCertificate(signer *crypto.CA, validity time.Duration, keyGen crypto.KeyPairGenerator) (*crypto.TLSCertificateConfig, error) {
 	signerName := fmt.Sprintf("%s_@%d", r.SignerName, time.Now().Unix())
-	if keyGen != nil {
-		return crypto.NewSigningCertificate(signerName, keyGen,
-			crypto.WithSigner(signer),
-			crypto.WithLifetime(validity),
-		)
+	if keyGen == nil {
+		return crypto.MakeCAConfigForDuration(signerName, validity, signer)
 	}
-	return crypto.MakeCAConfigForDuration(signerName, validity, signer)
+	return crypto.NewSigningCertificate(signerName, keyGen,
+		crypto.WithSigner(signer),
+		crypto.WithLifetime(validity),
+	)
 }
 
 // PeerRotation creates certificates used for both server and client authentication
 // (e.g., etcd peer certificates). It uses CertificateTypePeer for PKI profile
 // resolution, which selects the stronger of the serving and client key configurations.
 //
-// When keyGen is non-nil (ConfigurablePKI enabled), it calls NewPeerCertificate
-// which requires UserInfo for the client identity. When keyGen is nil (legacy),
-// it falls back to MakeServerCertForDuration with an extension function that
-// sets both ClientAuth and ServerAuth ExtKeyUsages.
+// UserInfo is always required. When keyGen is non-nil (ConfigurablePKI enabled),
+// NewPeerCertificate encodes UserInfo as the client identity in the certificate
+// subject. When keyGen is nil (legacy), UserInfo.Name must match the sorted first
+// hostname (used as CN by MakeServerCertForDuration), and the certificate falls
+// back to MakeServerCertForDuration with an extension function that sets both
+// ClientAuth and ServerAuth ExtKeyUsages.
 type PeerRotation struct {
 	Hostnames              ServingHostnameFunc
 	UserInfo               user.Info
@@ -456,24 +457,28 @@ func (r *PeerRotation) NewCertificate(signer *crypto.CA, validity time.Duration,
 	if len(hostnames) == 0 {
 		return nil, fmt.Errorf("no hostnames set")
 	}
-	if keyGen != nil {
-		if r.UserInfo == nil {
-			return nil, fmt.Errorf("PeerRotation requires UserInfo for configurable PKI certificates")
+	if r.UserInfo == nil {
+		return nil, fmt.Errorf("PeerRotation requires UserInfo")
+	}
+	if keyGen == nil {
+		// Legacy path: use server cert template with extension fn to add both ExtKeyUsages.
+		// MakeServerCertForDuration sorts hostnames and uses the first sorted value as CN.
+		sortedHostnames := sets.List(sets.New(hostnames...))
+		if cn := sortedHostnames[0]; r.UserInfo.GetName() != cn {
+			return nil, fmt.Errorf("PeerRotation legacy path uses sorted first hostname %q as CN; UserInfo.Name %q conflicts — set UserInfo.Name to match or enable ConfigurablePKI", cn, r.UserInfo.GetName())
 		}
-		return signer.NewPeerCertificate(
-			sets.New(hostnames...), r.UserInfo, keyGen,
-			crypto.WithLifetime(validity),
-			crypto.WithExtensions(r.CertificateExtensionFn...),
-		)
+		peerExtFn := func(cert *x509.Certificate) error {
+			cert.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth}
+			return nil
+		}
+		extensions := append(append([]crypto.CertificateExtensionFunc{}, r.CertificateExtensionFn...), peerExtFn)
+		return signer.MakeServerCertForDuration(sets.New(hostnames...), validity, extensions...)
 	}
-	// Legacy path: use server cert template with extension fn to add both ExtKeyUsages.
-	// The subject CN comes from the first hostname (preserves current behavior).
-	peerExtFn := func(cert *x509.Certificate) error {
-		cert.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth}
-		return nil
-	}
-	extensions := append(append([]crypto.CertificateExtensionFunc{}, r.CertificateExtensionFn...), peerExtFn)
-	return signer.MakeServerCertForDuration(sets.New(hostnames...), validity, extensions...)
+	return signer.NewPeerCertificate(
+		sets.New(hostnames...), r.UserInfo, keyGen,
+		crypto.WithLifetime(validity),
+		crypto.WithExtensions(r.CertificateExtensionFn...),
+	)
 }
 
 func (r *PeerRotation) RecheckChannel() <-chan struct{} {

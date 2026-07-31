@@ -40,7 +40,7 @@ func (c coordinates) LogValue() slog.Value {
 	return slog.GroupValue(slog.Attr{Key: "X", Value: slog.IntValue(c.x)}, slog.Attr{Key: "Y", Value: slog.IntValue(c.y)})
 }
 
-func ExampleNewLogger_Slog() {
+func ExampleNewLogger_slog() {
 	ts, _ := time.Parse(time.RFC3339, "2000-12-24T12:30:40Z")
 	internal.Pid = 123 // To get consistent output for each run.
 	config := textlogger.NewConfig(

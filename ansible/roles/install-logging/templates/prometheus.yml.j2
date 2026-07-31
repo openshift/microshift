@@ -1,50 +1,17 @@
 global:
-  scrape_interval:     5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
-  scrape_timeout:      5s
+  scrape_interval: {{ prometheus_scrape_interval }}
+  evaluation_interval: {{ prometheus_evaluation_interval }}
+  scrape_timeout: {{ prometheus_scrape_timeout }}
 
-  # Attach these labels to any time series or alerts when communicating with
-  # external systems (federation, remote storage, Alertmanager).
   external_labels:
-      monitor: 'example'
+    monitor: microshift-ci
 
-# Alertmanager configuration
-alerting:
-  alertmanagers:
-  - static_configs:
-    - targets: ['localhost:9093']
+rule_files: []
 
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
-rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
+scrape_config_files:
+  - scrape_configs.d/*.yml
 
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:{{ prometheus_port }}']
-
-  - job_name: node
-    static_configs:
-{% for host in groups['microshift'] %}
-      - targets: ['{{ host }}:9100']
-        labels:
-          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
-{% endfor %}
-
-  - job_name: process
-    static_configs:
-{% for host in groups['microshift'] %}
-      - targets: ['{{ host }}:9256']
-        labels:
-          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
-{% endfor %}
-
-  - job_name: crio
-    static_configs:
-{% for host in groups['microshift'] %}
-      - targets: ['{{ host }}:9537']
-        labels:
-          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
-{% endfor %}
+      - targets: ['localhost:{{ prometheus_container_port }}']

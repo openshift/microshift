@@ -1,0 +1,33 @@
+{% macro prometheus_target(address, port) -%}
+{% set address = address | string -%}
+{{ ('[' ~ address ~ ']') if ':' in address and not address.startswith('[') else address }}:{{ port }}
+{%- endmacro %}
+{% set microshift_hosts = groups.get('microshift', []) %}
+{% if microshift_hosts | length > 0 %}
+scrape_configs:
+  - job_name: node
+    static_configs:
+{% for host in microshift_hosts %}
+      - targets: ['{{ prometheus_target(hostvars[host].ansible_host | default(host), 9100) }}']
+        labels:
+          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
+{% endfor %}
+
+  - job_name: process
+    static_configs:
+{% for host in microshift_hosts %}
+      - targets: ['{{ prometheus_target(hostvars[host].ansible_host | default(host), 9256) }}']
+        labels:
+          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
+{% endfor %}
+
+  - job_name: crio
+    static_configs:
+{% for host in microshift_hosts %}
+      - targets: ['{{ prometheus_target(hostvars[host].ansible_host | default(host), 9537) }}']
+        labels:
+          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
+{% endfor %}
+{% else %}
+scrape_configs: []
+{% endif %}

@@ -126,7 +126,7 @@ func (c CertRotationController) Sync(ctx context.Context, syncCtx factory.SyncCo
 		return updateErr
 	}
 	if updated && syncErr != nil {
-		syncCtx.Recorder().Warningf("RotationError", syncErr.Error())
+		syncCtx.Recorder().Warningf("RotationError", "%s", syncErr.Error())
 	}
 
 	return syncErr

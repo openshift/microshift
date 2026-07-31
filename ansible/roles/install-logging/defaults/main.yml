@@ -1,19 +1,20 @@
 ---
 # install-logging default vars
 
-logging_packages:
-  - golang-github-prometheus
-  - grafana
-
-logging_services:
-  - prometheus
-  - grafana-server
-
-grafana_setup: false
-grafana_username: admin
-grafana_password: admin
-grafana_host_address: "192.168.1.100"
-grafana_port: 3000
-
+prometheus_image: quay.io/prometheus/prometheus:v3.13.1
+prometheus_container_name: microshift-prometheus
+prometheus_quadlet_name: microshift-prometheus
+prometheus_data_volume: microshift-prometheus-data
+prometheus_enable_linger: true
+prometheus_stop_timeout: 60
 prometheus_port: 9091
-prometheus_vars_file: /etc/default/prometheus
+prometheus_container_port: 9090
+prometheus_host_address: 0.0.0.0
+prometheus_exporter_scrape_config: "{{ prometheus_scrape_config_dir }}/exporters.yml"
+prometheus_auto_reload_interval: 30s
+
+prometheus_scrape_interval: 5s
+prometheus_evaluation_interval: 15s
+prometheus_scrape_timeout: 5s
+prometheus_retention_time: 7d
+prometheus_retention_size: ""

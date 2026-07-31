@@ -5,6 +5,7 @@ Resource            ../../resources/microshift-network.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/optional-config.resource
 Resource            ../../resources/oc.resource
+Resource            ../../resources/common.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -141,10 +142,3 @@ Verify Gateway Service Has External IP
     ...    oc get svc test-gateway-openshift-gateway-api -n ${namespace} -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     Should Not Be Empty    ${result}    Gateway service does not have an external IP assigned
     RETURN    ${result}
-
-Generate File From Template
-    [Documentation]    Generate file from template
-    [Arguments]    ${template_file}    ${out_file}
-    ${template}    OperatingSystem.Get File    ${template_file}
-    ${message}    Replace Variables    ${template}
-    OperatingSystem.Append To File    ${out_file}    ${message}

@@ -31,19 +31,25 @@ Host Metrics Are Exported
     [Documentation]    The opentelemetry-collector should be able to export host metrics.
 
     VAR    ${METRIC}    system_cpu_time_seconds_total    scope=TEST
-    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
-    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
 Kube Metrics Are Exported
     [Documentation]    The opentelemetry-collector should be able to export kube metrics.
 
     VAR    ${METRIC}    container_cpu_time_seconds_total    scope=TEST
-    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
-    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
     VAR    ${METRIC}    k8s_pod_cpu_time_seconds_total    scope=TEST
-    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
-    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
 Journald Logs Are Exported
     [Documentation]    The opentelemetry-collector should be able to export journald logs.
@@ -56,6 +62,36 @@ Kube Events Logs Are Exported
 
     Wait Until Keyword Succeeds    10x    5s
     ...    Check Loki Query    ${LOKI_HOST}    ${LOKI_PORT}    {service_name="kube_events"}
+
+KSM Metrics Are Exported Via Scrape Drop-In
+    [Documentation]    The prometheus receiver should scrape kube-state-metrics via the
+    ...    scrape.d drop-in and export kube_node_info to the prometheus exporter.
+
+    VAR    ${METRIC}    kube_node_info    scope=TEST
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
+
+Node Exporter Metrics Are Exported Via Scrape Drop-In
+    [Documentation]    The prometheus receiver should scrape node-exporter via the
+    ...    scrape.d drop-in and export node_cpu_seconds_total to the prometheus exporter.
+
+    VAR    ${METRIC}    node_cpu_seconds_total    scope=TEST
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
+
+Metrics Server Metrics Are Exported Via Scrape Drop-In
+    [Documentation]    The prometheus receiver should scrape metrics-server via the
+    ...    scrape.d drop-in and export metrics to the prometheus exporter.
+
+    VAR    ${METRIC}    metrics_server_kubelet_request_total    scope=TEST
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
+    Wait Until Keyword Succeeds    60s    5s
+    ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
 Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration
@@ -71,7 +107,11 @@ Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
     Setup Suite
-    Setup MicroShift With Optionals    003-microshift-observability
+    Setup MicroShift With Optionals
+    ...    003-microshift-observability
+    ...    080-microshift-metrics-server
+    ...    081-microshift-kube-state-metrics
+    ...    082-microshift-node-exporter
     ${ns}    Create Unique Namespace
     VAR    ${NAMESPACE}    ${ns}    scope=SUITE
     Configure Firewall And Observability

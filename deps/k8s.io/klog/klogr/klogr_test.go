@@ -69,22 +69,22 @@ func testOutput(t *testing.T, format string) {
 			expectedKlogOutput: `"test" logger="hello.world" akey="avalue"
 `,
 		},
-		"may print duplicate keys with the same value": {
+		"de-duplicate keys with the same value": {
 			klogr:         createLogger().V(0),
 			text:          "test",
 			keysAndValues: []interface{}{"akey", "avalue", "akey", "avalue"},
 			expectedOutput: `"msg"="test" "akey"="avalue"
 `,
-			expectedKlogOutput: `"test" akey="avalue" akey="avalue"
+			expectedKlogOutput: `"test" akey="avalue"
 `,
 		},
-		"may print duplicate keys when the values are passed to Info": {
+		"de-duplicate keys when the values are passed to Info": {
 			klogr:         createLogger().V(0),
 			text:          "test",
 			keysAndValues: []interface{}{"akey", "avalue", "akey", "avalue2"},
 			expectedOutput: `"msg"="test" "akey"="avalue2"
 `,
-			expectedKlogOutput: `"test" akey="avalue" akey="avalue2"
+			expectedKlogOutput: `"test" akey="avalue2"
 `,
 		},
 		"should only print the duplicate key that is passed to Info if one was passed to the logger": {

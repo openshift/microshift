@@ -1,6 +1,6 @@
 ---
 # add-kubelet-logging default vars
 
-prometheus_dir: /etc/prometheus
-prometheus_config: "{{ prometheus_dir }}/prometheus.yml"
-kubelet_auth_token_file: "{{ prometheus_dir }}/token"
+prometheus_kubelet_scrape_config: "{{ prometheus_scrape_config_dir }}/kubelet.yml"
+kubelet_auth_token_file: "{{ prometheus_config_dir }}/token"
+prometheus_container_token_path: /etc/prometheus/token

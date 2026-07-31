@@ -58,7 +58,6 @@
 
 - name: Set up logging node
   hosts: logging
-  become: yes
   vars_files:
   - vars/all.yml
   roles:
@@ -74,7 +73,6 @@
 
 - name: Add kubelet endpoint to prometheus
   hosts: logging
-  become: true
   gather_facts: false
   vars_files:
     - vars/all.yml

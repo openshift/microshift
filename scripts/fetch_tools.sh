@@ -375,6 +375,13 @@ gettool_ginkgo() {
         return 1
     fi
 
+    # Workaround: pin origin to known-good commit to avoid cgroups/kubernetes
+    # type mismatch caused by openshift/origin bump(k8s) on Jul 24 2026.
+    # The Makefile runs 'go get -u github.com/openshift/origin@main' which
+    # pulls in incompatible dependency versions. Pin to last working commit.
+    # See: https://redhat.atlassian.net/browse/USHIFT-7427
+    sed -i 's|@main|@398edca0cfe4|g' Makefile
+
     # Build the binary
     make all
 

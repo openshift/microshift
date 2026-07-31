@@ -149,3 +149,10 @@ Remove Files
         ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
         Should Be Equal As Integers    ${rc}    0
     END
+
+Generate File From Template
+    [Documentation]    Generate file from template
+    [Arguments]    ${template_file}    ${out_file}
+    ${template}=    OperatingSystem.Get File    ${template_file}
+    ${message}=    Replace Variables    ${template}
+    OperatingSystem.Create File    ${out_file}    ${message}

@@ -128,8 +128,7 @@ The following text files are created for each run:
 - `images.txt` — container image sizes (compressed and uncompressed)
 - `network.txt` — network transfer (RX/TX) via Prometheus when `prometheus_logging` is enabled
 
-If Prometheus was enabled, the performance metrics will be uploaded to the Ansible control node, where users can view all the captured performance data using the `http://<ansible-server-ip>:9091` URL. These metrics can be conveniently visualized in the Grafana dashboards accessible at the `http://<ansible-server-ip>:3000` site.
-> Use `admin:admin` credentials to log into the Grafana server.
+When Prometheus is enabled, it runs on the logging host in a Podman container managed by Quadlet. Captured metrics can be queried through the Prometheus web UI at `http://<logging-host-ip>:9091`.
 
 ## Configuration Overview
 

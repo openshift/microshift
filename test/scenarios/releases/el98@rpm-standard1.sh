@@ -13,36 +13,6 @@ export SKIP_GREENBOOT=true
 # did not want to spend the resources on a new VM.
 export TEST_RANDOMIZATION=none
 
-configure_rhocp_repo() {
-    local -r rhocp=$1
-    local -r major=$2
-    local -r minor=$3
-
-    # The repository may be empty if the beta mirror is not up yet
-    if [[ -z "${rhocp}" ]] ; then
-        return
-    fi
-
-    if [[ "${rhocp}" =~ ^[0-9]{1,2}$ ]]; then
-        run_command_on_vm host1 "sudo subscription-manager repos --enable rhocp-${major}.${rhocp}-for-rhel-9-\$(uname -m)-rpms"
-    elif [[ "${rhocp}" =~ ^http ]]; then
-        local -r ocp_repo_name="rhocp-${major}.${minor}-for-rhel-9-mirrorbeta-rpms"
-        local -r tmp_file=$(mktemp)
-
-        tee "${tmp_file}" >/dev/null <<EOF
-[${ocp_repo_name}]
-name=Beta rhocp RPMs for RHEL 9
-baseurl=${rhocp}
-enabled=1
-gpgcheck=0
-skip_if_unavailable=0
-EOF
-        copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-        run_command_on_vm host1 "sudo cp ${tmp_file} /etc/yum.repos.d/${ocp_repo_name}.repo"
-        rm -f "${tmp_file}"
-    fi
-}
-
 scenario_create_vms() {
     exit_if_brew_rpms_not_found
 
@@ -80,7 +50,7 @@ scenario_run_tests() {
     configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
     configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
     run_command_on_vm host1 "sudo subscription-manager release --set 9.8"
-    run_command_on_vm host1 "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
+    configure_fast_datapath_repo
 
     run_tests host1 \
         --exitonfailure \

@@ -1,0 +1,7 @@
+roles:
+  - name: ansible-role-rhel10-cis
+    src: https://github.com/RedHatOfficial/ansible-role-rhel10-cis
+    version: "0.1.80"
+collections:
+  - community.general
+  - ansible.posix

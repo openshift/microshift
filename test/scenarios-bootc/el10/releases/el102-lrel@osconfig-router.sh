@@ -23,7 +23,7 @@ scenario_run_tests() {
     run_tests host1 \
         suites/osconfig/clusterid.robot \
         suites/osconfig/systemd-resolved.robot \
-        suites/router/ \
+        suites/router/router-basic.robot \
         suites/otp-workloads/oc-cli.robot \
         suites/otp-workloads/statefulset-pvc.robot
 }

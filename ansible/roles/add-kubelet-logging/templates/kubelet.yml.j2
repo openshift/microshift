@@ -1,0 +1,36 @@
+{% macro prometheus_target(address, port) -%}
+{% set address = address | string -%}
+{{ ('[' ~ address ~ ']') if ':' in address and not address.startswith('[') else address }}:{{ port }}
+{%- endmacro %}
+{% set microshift_hosts = groups.get('microshift', []) %}
+{% if microshift_hosts | length > 0 %}
+scrape_configs:
+{% for host in microshift_hosts %}
+  - job_name: kubelet-{{ host }}
+    scheme: https
+    authorization:
+      credentials_file: "{{ prometheus_container_token_path }}"
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets:
+          - '{{ prometheus_target(hostvars[host].ansible_host | default(host), 10250) }}'
+        labels:
+          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
+
+  - job_name: kubelet-{{ host }}-cadvisor
+    scheme: https
+    authorization:
+      credentials_file: "{{ prometheus_container_token_path }}"
+    tls_config:
+      insecure_skip_verify: true
+    metrics_path: /metrics/cadvisor
+    static_configs:
+      - targets:
+          - '{{ prometheus_target(hostvars[host].ansible_host | default(host), 10250) }}'
+        labels:
+          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
+{% endfor %}
+{% else %}
+scrape_configs: []
+{% endif %}

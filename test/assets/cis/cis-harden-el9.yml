@@ -1,0 +1,13 @@
+---
+- name: Apply CIS Level 2 hardening
+  hosts: localhost
+  connection: local
+  become: true
+  roles:
+    - role: ansible-role-rhel9-cis
+      vars:
+        # MicroShift OVN networking requires IP forwarding
+        sysctl_net_ipv4_ip_forward: false
+        sysctl_net_ipv6_conf_all_forwarding: false
+        # CI requires passwordless sudo
+        sudo_remove_nopasswd: false

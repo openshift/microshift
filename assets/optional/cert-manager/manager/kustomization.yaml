@@ -4,6 +4,24 @@ resources:
   - manager.yaml
   - images.yaml
 
+patches:
+  - target:
+      kind: Deployment
+      name: controller-manager
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: controller-manager
+      spec:
+        template:
+          spec:
+            containers:
+            - name: cert-manager-operator
+              env:
+              - name: UNSUPPORTED_ADDON_FEATURES
+                value: TrustManager=true
+
 replacements:
   - source:
       kind: ConfigMap
@@ -55,6 +73,16 @@ replacements:
           name: controller-manager
         fieldPaths:
           - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_ISTIOCSR].value
+  - source:
+      kind: ConfigMap
+      name: cert-manager-images
+      fieldPath: data.cert-manager-trust-manager
+    targets:
+      - select:
+          kind: Deployment
+          name: controller-manager
+        fieldPaths:
+          - spec.template.spec.containers.[name=cert-manager-operator].env.[name=RELATED_IMAGE_CERT_MANAGER_TRUST_MANAGER].value
   - source:
       kind: ConfigMap
       name: cert-manager-images

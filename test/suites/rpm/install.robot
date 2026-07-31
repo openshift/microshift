@@ -58,8 +58,3 @@ Setup
 Teardown
     [Documentation]    Test suite teardown
     Logout MicroShift Host
-
-Install Third Party Packages With Warnings
-    [Documentation]    Install these separately to avoid having warnings
-    ...    show up in the warning check when installing MicroShift.
-    Command Should Work    dnf install -y NetworkManager-ovs containers-common

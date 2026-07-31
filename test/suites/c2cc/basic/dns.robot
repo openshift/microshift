@@ -9,7 +9,7 @@ Resource            ../../../resources/kubeconfig.resource
 Resource            ../../../resources/oc.resource
 Resource            ../../../resources/c2cc.resource
 
-Suite Setup         C2CC Suite Setup    deploy_workloads=${TRUE}
+Suite Setup         DNS Suite Setup
 Suite Teardown      C2CC Suite Teardown    cleanup_workloads=${TRUE}
 
 Test Tags           c2cc
@@ -45,3 +45,13 @@ Verify Remote Service Reachable Via DNS
     cluster-b    cluster-c
     cluster-c    cluster-a
     cluster-c    cluster-b
+
+
+*** Keywords ***
+DNS Suite Setup
+    [Documentation]    Set up clusters and wait for cross-cluster DNS to be healthy
+    ...    before running tests. A prior suite may have restarted MicroShift,
+    ...    and CoreDNS forward plugin needs time to re-establish upstreams.
+    C2CC Suite Setup    deploy_workloads=${TRUE}
+    Wait Until Keyword Succeeds    3 minutes    10s
+    ...    Verify Full C2CC DNS

@@ -68,8 +68,8 @@ spec:
           echo "$(date -Iseconds) - starting ovn-northd"
           exec ovn-northd \
             --no-chdir "-vconsole:${OVN_LOG_LEVEL}" -vfile:off "-vPATTERN:console:%D{%Y-%m-%dT%H:%M:%S.###Z}|%05N|%c%T|%p|%m" \
-            --ovnnb-db "{{.OVN_NB_DB_LIST}}" \
-            --ovnsb-db "{{.OVN_SB_DB_LIST}}" \
+            --ovnnb-db "tcp:${K8S_NODE_IP}:{{.OVN_NB_PORT}}" \
+            --ovnsb-db "tcp:${K8S_NODE_IP}:{{.OVN_SB_PORT}}" \
             --pidfile /var/run/ovn/ovn-northd.pid &
 
           wait $!
@@ -141,6 +141,8 @@ spec:
             --db-nb-cluster-local-proto=tcp \
             --no-monitor"
 
+          rm -f /run/ovn/ovnnb_db.sock
+
           echo "$(date -Iseconds) - starting nbdb"
 
           exec /usr/share/ovn/scripts/ovn-ctl \
@@ -177,7 +179,7 @@ spec:
                 done
 
                 #configure northd_probe_interval
-                OVN_NB_CTL="ovn-nbctl --db "{{.OVN_NB_DB_LIST}}""
+                OVN_NB_CTL="ovn-nbctl --no-leader-only"
                 northd_probe_interval=${OVN_NORTHD_PROBE_INTERVAL:-10000}
                 echo "Setting northd probe interval to ${northd_probe_interval} ms"
                 retries=0
@@ -285,6 +287,8 @@ spec:
             --db-sb-cluster-local-addr=$(bracketify ${K8S_NODE_IP}) \
             --db-sb-cluster-local-proto=tcp \
             --no-monitor"
+
+          rm -f /run/ovn/ovnsb_db.sock
 
           echo "$(date -Iseconds) - starting sbdb "
           exec /usr/share/ovn/scripts/ovn-ctl \

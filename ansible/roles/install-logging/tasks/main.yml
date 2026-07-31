@@ -1,78 +1,457 @@
 ---
 # install-logging tasks
 
-- name: RPM tasks
-  when: (ansible_facts.distribution == "CentOS") or (ansible_facts.distribution == "RedHat") or (ansible_facts.distribution == "Fedora")
+- name: Record rootless Prometheus user facts
+  ansible.builtin.set_fact:
+    prometheus_rootless: "{{ ansible_facts['user_uid'] | int != 0 }}"
+    prometheus_rootless_user: "{{ ansible_facts['user_id'] }}"
+    prometheus_rootless_home: "{{ ansible_facts['user_dir'] }}"
+    prometheus_user_runtime_dir: "/run/user/{{ ansible_facts['user_uid'] }}"
+    prometheus_systemd_environment: "{{ {'XDG_RUNTIME_DIR': '/run/user/' ~ ansible_facts['user_uid']} if (ansible_facts['user_uid'] | int != 0) else {} }}"
+    prometheus_systemd_unit: "{{ prometheus_quadlet_name }}.service"
+
+- name: Check existing managed Prometheus user unit
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - --user
+      - is-active
+      - "{{ prometheus_systemd_unit }}"
+  register: prometheus_existing_managed_user_unit
+  changed_when: false
+  failed_when: false
+  environment:
+    XDG_RUNTIME_DIR: "{{ prometheus_user_runtime_dir }}"
+  when: prometheus_rootless | bool
+
+- name: Check existing managed Prometheus system unit
+  ansible.builtin.command:
+    argv:
+      - systemctl
+      - is-active
+      - "{{ prometheus_systemd_unit }}"
+  register: prometheus_existing_managed_system_unit
+  changed_when: false
+  failed_when: false
+  when: not (prometheus_rootless | bool)
+
+- name: Record managed Prometheus unit status
+  ansible.builtin.set_fact:
+    prometheus_existing_managed_unit_rc: >-
+      {{
+        prometheus_existing_managed_user_unit.rc
+        if (prometheus_rootless | bool)
+        else prometheus_existing_managed_system_unit.rc
+      }}
+
+- name: Gather service facts for monitoring conflict detection
+  ansible.builtin.service_facts:
+
+- name: Detect active or enabled Prometheus services
+  ansible.builtin.set_fact:
+    prometheus_host_service_conflicts: >-
+      {{
+        (
+          ansible_facts.services | default({}) | dict2items
+          | selectattr('key', 'equalto', 'prometheus.service')
+          | selectattr('value.state', 'equalto', 'running')
+          | map(attribute='key')
+          | list
+        )
+        | union(
+          ansible_facts.services | default({}) | dict2items
+          | selectattr('key', 'equalto', 'prometheus.service')
+          | selectattr('value.status', 'defined')
+          | selectattr('value.status', 'match', '^enabled')
+          | map(attribute='key')
+          | list
+        )
+        | difference(
+          [prometheus_systemd_unit]
+          if (prometheus_existing_managed_unit_rc | int) == 0
+          else []
+        )
+      }}
+
+- name: Check Prometheus port listener
+  ansible.builtin.command: "ss -H -ltn sport = :{{ prometheus_port }}"
+  register: prometheus_port_check
+  changed_when: false
+  failed_when: false
+
+- name: Check for existing Prometheus processes
+  ansible.builtin.command:
+    argv:
+      - pgrep
+      - --exact
+      - prometheus
+  register: prometheus_process_check
+  changed_when: false
+  failed_when: false
+
+- name: Record host monitoring conflicts
+  ansible.builtin.set_fact:
+    prometheus_existing_monitoring_conflicts: >-
+      {{
+        prometheus_host_service_conflicts
+        + (
+            ['port:' ~ prometheus_port]
+            if prometheus_port_check.stdout | length > 0 and (prometheus_existing_managed_unit_rc | int) != 0
+            else []
+          )
+        + (
+            ['process:prometheus']
+            if prometheus_process_check.rc == 0 and (prometheus_existing_managed_unit_rc | int) != 0
+            else []
+          )
+      }}
+
+- name: Skip Prometheus deployment when existing monitoring is present
+  ansible.builtin.set_fact:
+    prometheus_container_managed: false
+    prometheus_skip_reason: "Existing monitoring detected: {{ prometheus_existing_monitoring_conflicts | join(', ') }}"
+  when: prometheus_existing_monitoring_conflicts | length > 0
+
+- name: Report skipped Prometheus deployment
+  ansible.builtin.debug:
+    msg: "{{ prometheus_skip_reason }}"
+  when: not (prometheus_container_managed | default(true) | bool)
+
+- name: Deploy Prometheus with quadlet
+  when: prometheus_container_managed | default(true) | bool
   block:
-    - name: Install prometheus & grafana
-      ansible.builtin.dnf:
-        name: "{{ logging_packages }}"
-        state: present
-        update_cache: true
-
-    - name: Check that the prometheus cli vars file exists
-      ansible.builtin.stat:
-        path: "{{ prometheus_vars_file }}"
-      register: prometheus_vars
-
-    - name: Set prometheus args to change listen port
-      ansible.builtin.replace:
-        path: "{{ prometheus_vars_file }}"
-        regexp: "ARGS=''"
-        replace: "ARGS='--web.listen-address=0.0.0.0:{{ prometheus_port }}'"
-      when: prometheus_vars.stat.exists
-
-- name: Copy prometheus config
-  ansible.builtin.template:
-    src: prometheus.yml.j2
-    dest: /etc/prometheus/prometheus.yml
-    mode: '0640'
-    backup: true
-
-- name: Start and enable prometheus & grafana service(s)
-  ansible.builtin.systemd:
-    name: "{{ item }}"
-    state: restarted
-    enabled: true
-  loop: "{{ logging_services }}"
-  when: item != 'grafana-server' or (grafana_setup | bool)
-
-- name: Configure Grafana dashboards and datasources
-  when: grafana_setup | bool
-  block:
-    - name: Get content of microshift grafana dashboard
+    - name: Record Prometheus path and service facts
       ansible.builtin.set_fact:
-        microshift_dashboard: "{{ lookup('ansible.builtin.file', 'microshift_perf.json') }}"
+        prometheus_config_dir: >-
+          {{ (prometheus_rootless_home ~ '/.config/microshift-prometheus')
+          if (prometheus_rootless | bool) else '/etc/microshift-prometheus' }}
+        prometheus_quadlet_dir: >-
+          {{ (prometheus_rootless_home ~ '/.config/containers/systemd')
+          if (prometheus_rootless | bool) else '/etc/containers/systemd' }}
+        prometheus_quadlet_file: >-
+          {{ ((prometheus_rootless_home ~ '/.config/containers/systemd')
+          if (prometheus_rootless | bool) else '/etc/containers/systemd')
+          }}/{{ prometheus_quadlet_name }}.container
+        prometheus_local_url: >-
+          http://{{ '127.0.0.1' if prometheus_host_address == '0.0.0.0'
+          else prometheus_host_address }}:{{ prometheus_port }}
+        prometheus_managed_container_name: "{{ prometheus_container_name }}"
+        prometheus_systemd_scope: "{{ 'user' if (prometheus_rootless | bool) else 'system' }}"
 
-    # The following URI commands fail without accessing some external network
-    - name: Wake up network access
-      ansible.builtin.command: curl github.com
+    - name: Record Prometheus scrape config directory
+      ansible.builtin.set_fact:
+        prometheus_scrape_config_dir: "{{ prometheus_config_dir }}/scrape_configs.d"
 
-    - name: Create prometheus datasource in grafana
-      ansible.builtin.uri:
-        url: http://{{ grafana_host_address | default(ansible_facts.default_ipv4.address) }}:{{ grafana_port }}/api/datasources
-        url_username: "{{ grafana_username }}"
-        url_password: "{{ grafana_password }}"
-        status_code: [200, 409]
-        force_basic_auth: true
-        method: POST
-        body_format: json
-        headers:
-          Accept: application/json
-          Content-Type: application/json
-        body: "{{ lookup('ansible.builtin.template', 'prometheus_datasource.json.j2') }}"
-      no_log: true
+    - name: Check rootless Prometheus user linger
+      ansible.builtin.command:
+        argv:
+          - loginctl
+          - show-user
+          - "{{ prometheus_rootless_user }}"
+          - --property=Linger
+          - --value
+      register: prometheus_linger_check
+      changed_when: false
+      failed_when: false
+      when:
+        - prometheus_rootless | bool
+        - prometheus_enable_linger | bool
 
-    - name: Create microshift perf dashboard in grafana
-      ansible.builtin.uri:
-        url: http://{{ grafana_host_address | default(ansible_facts.default_ipv4.address) }}:{{ grafana_port }}/api/dashboards/db
-        url_username: "{{ grafana_username }}"
-        url_password: "{{ grafana_password }}"
-        force_basic_auth: true
-        method: POST
-        body_format: json
-        headers:
-          Accept: application/json
-          Content-Type: application/json
-        body: "{{ lookup('ansible.builtin.template', 'grafana_dashboard.json.j2') }}"
-      no_log: true
+    - name: Enable linger for rootless Prometheus user
+      ansible.builtin.command:
+        argv:
+          - loginctl
+          - enable-linger
+          - "{{ prometheus_rootless_user }}"
+      become: true
+      changed_when: true
+      when:
+        - prometheus_rootless | bool
+        - prometheus_enable_linger | bool
+        - prometheus_linger_check.stdout | default('') != 'yes'
+
+    - name: Wait for user systemd runtime directory
+      ansible.builtin.wait_for:
+        path: "{{ prometheus_user_runtime_dir }}"
+        timeout: 30
+        msg: >-
+          User systemd is not available for {{ prometheus_rootless_user }}
+          because {{ prometheus_user_runtime_dir }} does not exist.
+      when: prometheus_rootless | bool
+
+    - name: Verify podman is available
+      ansible.builtin.command:
+        argv:
+          - podman
+          - --version
+      changed_when: false
+
+    - name: Check Prometheus image
+      ansible.builtin.command:
+        argv:
+          - podman
+          - image
+          - exists
+          - "{{ prometheus_image }}"
+      register: prometheus_image_check
+      changed_when: false
+      failed_when: false
+
+    - name: Pull Prometheus image
+      ansible.builtin.command:
+        argv:
+          - podman
+          - pull
+          - "{{ prometheus_image }}"
+      register: prometheus_image_pull
+      retries: 3
+      delay: 5
+      until: prometheus_image_pull.rc == 0
+      changed_when: true
+      when: prometheus_image_check.rc != 0
+
+    - name: Create Prometheus config and quadlet directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ prometheus_config_dir }}"
+        - "{{ prometheus_scrape_config_dir }}"
+        - "{{ prometheus_quadlet_dir }}"
+
+    - name: Check Prometheus data volume
+      ansible.builtin.command:
+        argv:
+          - podman
+          - volume
+          - exists
+          - "{{ prometheus_data_volume }}"
+      register: prometheus_data_volume_check
+      changed_when: false
+      failed_when: false
+
+    - name: Create Prometheus data volume
+      ansible.builtin.command:
+        argv:
+          - podman
+          - volume
+          - create
+          - "{{ prometheus_data_volume }}"
+      changed_when: true
+      when: prometheus_data_volume_check.rc != 0
+
+    # Validate every fragment; rollback is limited to files managed by this role.
+    - name: Write and validate Prometheus configuration
+      block:
+        - name: Write Prometheus exporter configuration
+          ansible.builtin.template:
+            src: exporters.yml.j2
+            dest: "{{ prometheus_exporter_scrape_config }}"
+            mode: '0644'
+            setype: container_file_t
+            backup: true
+          register: prometheus_exporter_config_template
+
+        - name: Write Prometheus configuration
+          ansible.builtin.template:
+            src: prometheus.yml.j2
+            dest: "{{ prometheus_config_dir }}/prometheus.yml"
+            mode: '0644'
+            setype: container_file_t
+            backup: true
+          register: prometheus_config_template
+
+        - name: Validate Prometheus configuration
+          ansible.builtin.command:
+            argv:
+              - podman
+              - run
+              - --rm
+              - --entrypoint
+              - /bin/promtool
+              - --volume
+              - "{{ prometheus_config_dir }}:/etc/prometheus:ro,z"
+              - "{{ prometheus_image }}"
+              - check
+              - config
+              - /etc/prometheus/prometheus.yml
+          changed_when: false
+
+      rescue:
+        - name: Restore previous Prometheus exporter configuration
+          ansible.builtin.copy:
+            src: "{{ prometheus_exporter_config_template.backup_file }}"
+            dest: "{{ prometheus_exporter_scrape_config }}"
+            remote_src: true
+            mode: '0644'
+            setype: container_file_t
+          when:
+            - prometheus_exporter_config_template is defined
+            - prometheus_exporter_config_template.backup_file is defined
+
+        - name: Remove invalid new Prometheus exporter configuration
+          ansible.builtin.file:
+            path: "{{ prometheus_exporter_scrape_config }}"
+            state: absent
+          when:
+            - prometheus_exporter_config_template is defined
+            - prometheus_exporter_config_template.changed | default(false)
+            - prometheus_exporter_config_template.backup_file is not defined
+
+        - name: Restore previous Prometheus configuration
+          ansible.builtin.copy:
+            src: "{{ prometheus_config_template.backup_file }}"
+            dest: "{{ prometheus_config_dir }}/prometheus.yml"
+            remote_src: true
+            mode: '0644'
+            setype: container_file_t
+          when:
+            - prometheus_config_template is defined
+            - prometheus_config_template.backup_file is defined
+
+        - name: Remove invalid new Prometheus configuration
+          ansible.builtin.file:
+            path: "{{ prometheus_config_dir }}/prometheus.yml"
+            state: absent
+          when:
+            - prometheus_config_template is defined
+            - prometheus_config_template.changed | default(false)
+            - prometheus_config_template.backup_file is not defined
+
+        - name: Report Prometheus configuration validation failure
+          ansible.builtin.fail:
+            msg: >-
+              {{ ansible_failed_result.stderr
+              | default(ansible_failed_result.stdout, true)
+              | default(ansible_failed_result.msg, true)
+              | default('Prometheus configuration could not be written or validated', true) }}
+
+    - name: Write Prometheus quadlet
+      ansible.builtin.template:
+        src: prometheus.container.j2
+        dest: "{{ prometheus_quadlet_file }}"
+        mode: '0644'
+      register: prometheus_quadlet_template
+
+    - name: Reset failed Prometheus user unit state
+      ansible.builtin.command:
+        argv:
+          - systemctl
+          - --user
+          - reset-failed
+          - "{{ prometheus_systemd_unit }}"
+      changed_when: false
+      failed_when: false
+      environment:
+        XDG_RUNTIME_DIR: "{{ prometheus_user_runtime_dir }}"
+      when: prometheus_rootless | bool
+
+    - name: Reset failed Prometheus system unit state
+      ansible.builtin.command:
+        argv:
+          - systemctl
+          - reset-failed
+          - "{{ prometheus_systemd_unit }}"
+      changed_when: false
+      failed_when: false
+      when: not (prometheus_rootless | bool)
+
+    # Quadlet derives boot persistence from [Install]; generated units are not enabled directly.
+    - name: Start Prometheus service
+      ansible.builtin.systemd:
+        name: "{{ prometheus_systemd_unit }}"
+        scope: "{{ prometheus_systemd_scope }}"
+        daemon_reload: true
+        state: >-
+          {{ (
+            prometheus_config_template.changed
+            or prometheus_exporter_config_template.changed
+            or prometheus_quadlet_template.changed
+          ) | ternary('restarted', 'started') }}
+      environment:
+        "{{ prometheus_systemd_environment }}"
+
+    - name: Verify Prometheus readiness
+      block:
+        - name: Wait for Prometheus readiness
+          ansible.builtin.uri:
+            url: "{{ prometheus_local_url }}/-/ready"
+            status_code: 200
+          register: prometheus_ready
+          retries: 12
+          delay: 5
+          until: prometheus_ready.status == 200
+
+      rescue:
+        - name: Collect Prometheus user service journal
+          ansible.builtin.command:
+            argv:
+              - journalctl
+              - --user
+              - --unit
+              - "{{ prometheus_systemd_unit }}"
+              - --lines
+              - "50"
+              - --no-pager
+          register: prometheus_user_journal
+          changed_when: false
+          failed_when: false
+          environment:
+            XDG_RUNTIME_DIR: "{{ prometheus_user_runtime_dir }}"
+          when: prometheus_rootless | bool
+
+        - name: Collect Prometheus system service journal
+          ansible.builtin.command:
+            argv:
+              - journalctl
+              - --unit
+              - "{{ prometheus_systemd_unit }}"
+              - --lines
+              - "50"
+              - --no-pager
+          register: prometheus_system_journal
+          changed_when: false
+          failed_when: false
+          when: not (prometheus_rootless | bool)
+
+        - name: Collect Prometheus container logs
+          ansible.builtin.command:
+            argv:
+              - podman
+              - logs
+              - --tail
+              - "50"
+              - "{{ prometheus_managed_container_name }}"
+          register: prometheus_container_logs
+          changed_when: false
+          failed_when: false
+
+        - name: Report Prometheus readiness failure
+          ansible.builtin.fail:
+            msg: |-
+              Prometheus did not become ready: {{ ansible_failed_result.msg | default('readiness check failed') }}
+
+              systemd journal:
+              {{
+                (
+                  prometheus_user_journal.stdout
+                  | default(prometheus_user_journal.stderr, true)
+                  | default('No user journal output', true)
+                )
+                if (prometheus_rootless | bool)
+                else (
+                  prometheus_system_journal.stdout
+                  | default(prometheus_system_journal.stderr, true)
+                  | default('No system journal output', true)
+                )
+              }}
+
+              container logs:
+              {{ prometheus_container_logs.stdout
+              | default(prometheus_container_logs.stderr, true)
+              | default('No container log output', true) }}
+
+    - name: Mark Prometheus as managed
+      ansible.builtin.set_fact:
+        prometheus_container_managed: true

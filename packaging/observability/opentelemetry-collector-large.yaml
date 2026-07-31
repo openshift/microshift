@@ -4,6 +4,7 @@
 # - Host's CPU, memory, disk, and network usage metrics
 # - System journals for selected MicroShift services and dependencies, priority < Info
 # - Metrics exposed by Pods that have "prometheus.io/scrape": "true" annotation
+# - Metrics from optional component scrape configs (scrape.d drop-ins)
 
 receivers:
   kubeletstats:
@@ -40,6 +41,8 @@ receivers:
     priority: info
   prometheus:
     config:
+      scrape_config_files:
+        - /etc/microshift/observability/scrape.d/*.yaml
       scrape_configs:
         - job_name: k8s
           scrape_interval: 10s
@@ -109,7 +112,7 @@ service:
       receivers: [ journald ]
       processors: [ resourcedetection/system ]
       exporters: [ otlp ]
-    metrics/pods:
+    metrics/scrape:
       receivers: [ prometheus ]
       processors: [ batch ]
       exporters: [ otlp ]

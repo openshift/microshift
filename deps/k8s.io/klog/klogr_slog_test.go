@@ -43,7 +43,7 @@ func (c coordinates) LogValue() slog.Value {
 	return slog.GroupValue(slog.Attr{Key: "X", Value: slog.IntValue(c.x)}, slog.Attr{Key: "Y", Value: slog.IntValue(c.y)})
 }
 
-func ExampleBackground_Slog() {
+func ExampleBackground_slog() {
 	// Temporarily reconfigure for output to stdout, with -v=4.
 	state := klog.CaptureState()
 	defer state.Restore()
