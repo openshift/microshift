@@ -1,0 +1,222 @@
+- cluster-network-operator embedded-component c1ea3224b639ac2ee98b4f4590a40474976aac5e to 0d5241f7846adf8707e647b3d32e7090a598c0e7
+  - f456214 2026-07-24T16:54:09Z Bump frr-k8s MAX_FDS from 1024 to 65536
+
+- etcd embedded-component d8d67b8ce849f816d6d23c904098336632e2348f to 6bd01267dc858aca6ff21632f95e98dc62ba33e7
+  - 2dfb18dc 2026-07-13T14:37:45-04:00 UPSTREAM: <drop>: update images
+  - 88b5ffdd 2026-07-06T13:06:45-04:00 UPSTREAM: <drop>: go mod tidy
+  - 93d682a6 2026-07-06T13:05:47-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - b0f9ef19 2026-07-01T13:34:00-07:00 version: bump up to 3.6.13
+  - 8221ae82 2026-07-01T14:06:33+01:00 Reject the client request if the client certificate has been revoked
+  - 907c3343 2026-06-12T14:39:32Z Update incorrect log message
+  - 380f8cf0 2026-06-09T08:13:09Z server/auth: accept bearer-prefixed auth tokens
+  - b590da44 2026-06-06T06:30:14Z Bump OpenTelemetry dependencies to v1.43.0
+  - 624550a1 2026-06-04T23:28:54Z build(deps): bump distroless/static-debian12 from `20bc6c0` to `9c346e4`
+  - 0fb05f87 2026-06-04T11:02:03Z Bump golang.org/x/crypto to v0.52.0
+  - b054801b 2026-06-03T07:40:11Z Update Go to 1.25.11
+  - 90b034a0 2026-06-01T13:47:35-07:00 version: bump up to 3.6.12
+  - 42339587 2026-05-29T15:11:13-04:00 Add V2Depr1WriteOnlySkipCheck to bypass the v2 data store check
+  - 576a6a00 2026-05-26T17:46:32+08:00 server: allow non-admin maintenance status
+  - e1468c8c 2026-05-22T15:42:28-07:00 client/pkg/fileutil: use os.Getuid() to skip TestIsDirWriteable as root
+  - 449e34b3 2026-05-20T14:33:22+08:00 etcdutl: validate data file path and return consistent errors instead of panic when given non-existent paths
+  - 49cd4a48 2026-05-11T21:49:07+08:00 bugfix: MemberUpdate implicitly and unexpectedly promotes a learner
+  - e7f96b08 2026-05-08T21:06:28+08:00 Bump Go to 1.25.10
+  - ec166e22 2026-05-01T11:50:30-07:00 version: bump up to 3.6.11
+  - 633de82d 2026-04-29T10:12:10+01:00 Fix the 'read via PrevKv' and 'Put with lease' in TXN bypass rbac check issue
+  - fbbd0a16 2026-04-29T10:07:23+01:00 Add an integration test to reproduce the issue of PutWithLease in a TXN bypass RBAC check
+  - 3fe57463 2026-04-29T10:05:53+01:00 Add an integration test case to reproduce the read via PrevKv bypass rbac check issue
+  - c387fa54 2026-04-28T21:46:03+01:00 Get all Put related auth check into a separate function 'checkPutAuth'
+  - 20e6f233 2026-04-28T21:45:58+01:00 move function CheckTxnAuth from package txn to apply
+  - 3c521c33 2026-04-26T21:16:39+01:00 Bump golang.org/x/image to v0.39.0 to resolve GO-2026-4962
+  - e989219f 2026-04-26T20:31:03+01:00 Fix the issue of not being able to adding new member when one existing member is down
+  - 9daef7ff 2026-04-26T20:26:51+01:00 Add an e2e test to reproduce the adding member failure when one member is down
+  - e25d4802 2026-04-08T14:59:10-04:00 *: bump go to 1.25.9
+  - eff7875e 2026-04-05T20:24:51+05:30 tests: Change max retries when removing a member from a cluster
+  - db8d13a5 2026-04-01T11:29:49-07:00 version: bump up to 3.6.10
+  - c99cf0c3 2026-03-31T08:50:34-04:00 etcdserver: allow non-admin to fetch member list and alarms
+  - f2173cd4 2026-03-27T16:12:46Z Bump golang.org/x/image to v0.38.0 to resolve GO-2026-4815
+  - e0f7af4d 2026-03-27T15:39:55Z Fix etcdctl endpoint command with option --cluster when auth is enabled
+  - 85651fa5 2026-03-20T11:04:03-07:00 version: bump up to 3.6.9
+  - 15263501 2026-03-19T17:36:13-04:00 tests/integration: fix flaky testcase
+  - f8998013 2026-03-19T13:26:23-07:00 dependency: Bump google.golang.org/grpc from v1.75.0 to 1.79.3
+  - 68551b32 2026-03-18T13:33:17-04:00 tests: update test for auth
+  - 7f73a57b 2026-03-18T12:25:41-04:00 server/etcdserver: guard unauthenticated endpoints with auth checks
+  - 3080527d 2026-03-18T12:09:02-04:00 server/etcdserver: enforce auth checks for nested txn ops
+  - fff31761 2026-03-08T12:54:43Z [release-3.6] devcontainer: remove devcontainer config
+  - cf9553d4 2026-03-06T15:20:21-08:00 Bump Go to 1.25.8
+  - 02bec62b 2026-03-06T20:10:13Z build(deps): bump distroless/static-debian12 from `3f2b64e` to `20bc6c0`
+  - d131ca7a 2026-03-06T10:00:50+01:00 Revert "Reuse events between sync loops"
+  - 00bd77f6 2026-03-06T12:06:23+05:30 Bump golang.org/x/net@ v0.51.0 fixes  GO-2026-4559
+  - 200dbea8 2026-03-03T10:17:41+01:00 Don't reuse same ReadIndex
+  - 928b3c6b 2026-03-02T18:17:37Z devcontainer: bump Go image to 1.25 for release-3.6
+  - 745da53a 2026-03-02T02:48:26+08:00 etcdctl: add license header
+  - 1d60990e 2026-03-02T02:47:54+08:00 etcdctl: add unit test for Argify
+  - 10068016 2026-03-02T02:47:02+08:00 etcdctl: fix slice bounds trimming single-quoted args
+  - 1f234c99 2026-03-01T08:21:54+08:00 [release-3.6] bump Go to 1.25.7
+  - 51d12afd 2026-02-27T13:28:22-08:00 Add defer-recover block to prevent panic when cc is nil
+  - a395a60f 2026-02-27T12:42:34-08:00 Bump golangci lint to v2
+  - a6e27ce8 2026-02-26T17:03:29Z Print the endpoint the grpc client connected to in unary interceptor
+  - fe194ee5 2026-02-26T15:56:32Z Fix unit test failure
+  - 179dcf87 2026-02-26T14:11:30Z Fix race berween read index and leader change causing a stale read
+  - d456631c 2026-02-24T01:01:42Z server/etcdmain: fix deadlock issue for grpcproxy
+  - e4522d80 2026-02-23T00:07:28+08:00 dependency: bump go.opentelemetry.io/otel/sdk from v1.34.0 to v1.40.0
+  - f8692e28 2026-02-18T19:00:20Z server/etcdserver/api/v3rpc: run metrics interceptors before handlers
+  - 4e814e20 2026-02-13T10:39:11-08:00 version: bump up to 3.6.8
+  - 2d3c79c3 2026-02-05T22:56:07-06:00 [release-3.6] Bump go version to 1.24.13
+  - bf783366 2026-02-03T09:55:46Z Remove the use of grpc-go's Metadata field
+  - ef879964 2026-01-30T10:13:09Z Bump go version to 1.24.11
+  - e8308218 2026-01-19T15:38:40Z Keep the --snapshot-count flag
+  - a8892448 2026-01-19T11:32:28Z Remove flag --max-snapshots in 3.8 rather than 3.7
+  - 81c32a40 2025-12-18T16:45:22-08:00 tools: explicitly require golang.org/x/tools/cmd/goimports
+  - f767aa25 2025-12-18T14:53:28-08:00 dependency: Bump golang.org/x/crypto from 0.42.0 to 0.45.0
+  - e838ef11 2025-12-18T03:39:29+08:00 version: bump up to 3.6.7
+  - 61af088e 2025-12-15T22:51:44-06:00 dependency: Bump golang.org/x/net from 0.38.0 to 0.45.0
+  - 97141e1f 2025-12-06T21:27:55+08:00 Bump go to 1.24.11
+  - 554dc70e 2025-11-17T17:51:06Z Print token fingerprint instead of the original tokens in log messages
+  - d2809cf0 2025-11-12T00:12:43-05:00 version: bump up to 3.6.6
+  - 145d927d 2025-11-07T15:41:12Z v3rpc: add and use getServerMetrics() with global metricsServerCached
+  - 2c0db321 2025-11-06T21:41:05-08:00 Bump from go1.24.9 to go1.24.10
+  - 523100b1 2025-11-06T19:19:48Z Fix the '--force-new-cluster' can't clean up learners issue
+  - 7d3fc029 2025-11-06T19:19:48Z Add an e2e test cases to reproduce the '--force-new-cluster' can't remove learner issue
+  - db6be4c1 2025-10-31T01:21:20Z tests: use WaitLeader() in memberPromoteWithAuth()
+  - 76ee0bc9 2025-10-31T01:21:20Z etcdserver: follow convention to extract auth token in cluster_util.go
+  - 5377bb9d 2025-10-31T01:21:20Z etcdserver: fix cannot promote with auth from follower
+  - e88e142c 2025-10-31T01:21:20Z test: add promote with auth e2e tests
+  - 1e023019 2025-10-15T11:31:08+08:00 Bump go to 1.24.9
+  - 4973fd42 2025-10-12T17:05:56+01:00 Fix endpoint status not retuning the correct storage quota
+  - ee85ed30 2025-10-01T15:39:50Z server/embed: Log EOF on DEBUG in TLS handshake
+  - 3bb44700 2025-09-23T17:47:02Z Reject watch request with -1 revision and make rangeEvents safe against negative revision
+
+- kubernetes embedded-component a3177b3b89764aeb87469936bf4fe8f708d88eb7 to 716965b5662de6df3485f68e7a1bef08cce8dcc1
+  - 099c83d18 2026-07-25T09:18:12Z UPSTREAM: <carry>: upkeep cpu partitioning admission webhook
+
+- machine-config-operator embedded-component 7d862ad8711335f953fe5a22286a9b516a09d4a1 to 0f69adf4303b705ff52c2b4c5fe05a52b27bf302
+  - c795a9ee 2026-07-24T12:37:10Z Add TC 88940: Apply password only if changes exist
+
+- ovn-kubernetes image-amd64 3fdca20426e61f0ae62daf23fee610e6546d0f01 to 62fa8c81ce6f31a71633828464054386fb5456a2
+  - 51047fae 2026-07-17T20:27:56+05:30 sync test annotations with upstream changes
+  - b05c351c 2026-07-17T20:27:53+05:30 Adapt OTE for E2E L3 CUDN multisubnet backward compatibility fixes
+  - 70a2009b 2026-07-17T10:23:14+02:00 e2e(kubevirt): deflake "with pre-copy fails" migration test
+  - fa8e140a 2026-07-16T15:33:44+02:00 Fix traffic leak in egress IP on secondary interface
+  - 8bce7389 2026-07-16T10:32:40+02:00 node: use libovsdb instead of ovs-vsctl exec in checkPorts
+  - 7b2e6eb5 2026-07-16T00:32:34+02:00 ci: cover dynamic UDN allocation on a no-overlay shared-gateway lane
+  - 1b7e0ec0 2026-07-16T00:32:34+02:00 e2e: adapt advertised network isolation tests to dynamic UDN allocation
+  - 156b75f9 2026-07-16T00:32:34+02:00 e2e: adapt CUDN advertisement tests to dynamic UDN allocation
+  - 501cc079 2026-07-16T00:32:34+02:00 e2e: cover RouteAdvertisements over a dynamically allocated CUDN
+  - 8df86599 2026-07-16T00:32:34+02:00 routeadvertisements: advertise dynamic UDNs only from active nodes
+  - 677d6113 2026-07-15T10:03:52-07:00 clustermanager: rename node allocation controller
+  - 1fcfb18f 2026-07-14T16:09:34-04:00 no-overlay: host -> pods on other nodes via mp0
+  - 4620cb6d 2026-07-14T10:29:15-07:00 licenses: refresh generated third-party licenses
+  - 8b0dd877 2026-07-14T10:29:15-07:00 cni: fold libovsdb and shell-out ConfigureOVS paths into one
+  - 0b276e27 2026-07-14T10:29:15-07:00 libovsdb/ops: consolidate ovs helper operations
+  - 49393a41 2026-07-14T16:52:06+01:00 docs: rename portSecurity to macSecurity in OKEP-3926
+  - 7229c04d 2026-07-14T20:27:41+05:30 node: skip configureGlobalForwarding tests in CI without root access
+  - 40bd24a5 2026-07-13T17:27:35+02:00 zone_interconnect: add unit test for stale IC route cleanup
+  - 3f34530b 2026-07-12T10:36:43+03:00 Update OWNERS file
+  - 60fcdaf5 2026-07-10T18:56:40+02:00 Use new IPv6 force_forwarding sysctl if available.
+  - 0e3a4e06 2026-07-10T18:56:40+02:00 Don't change FORWARD table default policy for IPv4
+  - 7795aba2 2026-07-10T18:56:40+02:00 Don't override FORWARD default policy when `disable-forwarding` is not set
+  - 92fc5160 2026-07-10T18:56:40+02:00 Update disable-gateway unit tests
+  - a90d60b6 2026-07-10T18:56:40+02:00 Clarify/simplify/fix "Disable Forwarding Config" docs
+  - bdfd82fb 2026-07-10T17:48:35+02:00 Redo the AllocateLoadBalancerNodePorts=false test cases
+  - dcaf6dba 2026-07-10T12:46:42+02:00 [perf] fix netpol selection for cudn-l2 job
+  - d447e853 2026-07-10T11:17:19+02:00 Support update of chassis-id without re-creating the node.
+  - 0c9edf05 2026-07-08T12:59:20-07:00 ovnkube.sh: unify gateway option loading from OVS external_ids
+  - 945f64d7 2026-07-08T10:33:19-07:00 test: Use proper TLS certificate validation in metrics server tests
+  - 98e204fe 2026-07-08T13:36:28+02:00 coderabbit: add pre-merge checks and custom validation rules
+  - e36fbadc 2026-07-07T20:23:30+02:00 Get pod from apiserver on retryable annotation patch failure
+  - 06f453b7 2026-07-07T08:13:37+02:00 e2e(kubevirt): replace echoserver with iperf3
+  - 853a72fa 2026-07-06T15:06:48-07:00 libovsdb/ops: document ovs-vsctl equivalents on read wrappers
+  - e3e40f10 2026-07-06T15:06:48-07:00 util, libovsdb/ops: migrate NicToBridge to libovsdb
+  - 497f470f 2026-07-06T15:06:48-07:00 test/e2e: pin docker while importing libovsdb
+  - c1c5603e 2026-07-06T15:06:48-07:00 util, node: migrate nicstobridge read paths to libovsdb
+  - 258eb623 2026-07-06T15:06:48-07:00 node/test: migrate DPU and gateway tests to libovsdb harness
+  - 1a64e7db 2026-07-06T15:06:48-07:00 cni, node: migrate ConfigureOVS and delRepPort to libovsdb
+  - 3785f7bd 2026-07-06T15:06:48-07:00 node: move ovsClient to BaseNodeNetworkController
+  - a58ead15 2026-07-06T15:06:47-07:00 libovsdb/ops: add GetOVSInterface and CreateOrUpdatePodPort
+  - ff6d3a79 2026-07-06T15:06:47-07:00 node, controllermanager: migrate stale-port cleanup to libovsdb
+  - 65e3926d 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate port-to-br shell-outs to libovsdb
+  - f1a554fd 2026-07-06T15:06:47-07:00 node: migrate br-exists and del-port br-int to libovsdb
+  - 1e4c92c6 2026-07-06T15:06:47-07:00 util, ovn-kube-util: migrate BridgeToNic to libovsdb
+  - 79cb19da 2026-07-06T15:06:47-07:00 libovsdb/ops: bridge-scope DeletePortWithInterfaces
+  - fdc69950 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate del-br shell-outs to libovsdb
+  - 25b05aa5 2026-07-06T20:15:26+02:00 Only create ACCEPT rules for bypassing our own DROP rules
+  - fe9bd9f8 2026-07-06T20:15:26+02:00 Simplify initLocalGateway iptables/nftables setup
+  - 7683207e 2026-07-03T10:03:37+02:00 e2e(kubevirt): drop fedora coreos image in favor of fedora
+  - d9d3e374 2026-07-02T18:14:51+02:00 area-merge: prevent bot comment feedback loop
+  - 635a3fd7 2026-07-02T15:50:39+01:00 docs: add "future work" section to OKEP-3926
+  - 69f3a5e7 2026-07-02T15:50:39+01:00 docs: simplify OKEP-3926 and add per-attachment future section
+  - 00e2aa81 2026-07-02T15:50:39+01:00 docs: add OKEP-3926 for disabling port security on secondary networks
+  - 4246d935 2026-07-02T17:56:19+08:00 docs: fix typo in OKEP 5193 CUDN spec
+  - e9ed7419 2026-07-01T15:50:28-07:00 OKEP-6227: Add DHCP IPAM support for localnet UDNs
+  - 78e42465 2026-07-01T10:34:35-04:00 config: make routing table ID start configurable
+  - b19a79d2 2026-06-30T10:59:13-04:00 Revert "Route DPU host no-overlay traffic through OVN"
+  - 6eac3a2e 2026-06-30T15:35:05+02:00 docs/e2e: clarify E2E backward compatibility requirements in OKEP template
+  - 585b72c2 2026-06-26T16:33:10+02:00 Allow networks to start while route advertisements settle
+
+- kubernetes image-amd64 a3177b3b89764aeb87469936bf4fe8f708d88eb7 to 716965b5662de6df3485f68e7a1bef08cce8dcc1
+  - 099c83d18 2026-07-25T09:18:12Z UPSTREAM: <carry>: upkeep cpu partitioning admission webhook
+
+- ovn-kubernetes image-arm64 3fdca20426e61f0ae62daf23fee610e6546d0f01 to 62fa8c81ce6f31a71633828464054386fb5456a2
+  - 51047fae 2026-07-17T20:27:56+05:30 sync test annotations with upstream changes
+  - b05c351c 2026-07-17T20:27:53+05:30 Adapt OTE for E2E L3 CUDN multisubnet backward compatibility fixes
+  - 70a2009b 2026-07-17T10:23:14+02:00 e2e(kubevirt): deflake "with pre-copy fails" migration test
+  - fa8e140a 2026-07-16T15:33:44+02:00 Fix traffic leak in egress IP on secondary interface
+  - 8bce7389 2026-07-16T10:32:40+02:00 node: use libovsdb instead of ovs-vsctl exec in checkPorts
+  - 7b2e6eb5 2026-07-16T00:32:34+02:00 ci: cover dynamic UDN allocation on a no-overlay shared-gateway lane
+  - 1b7e0ec0 2026-07-16T00:32:34+02:00 e2e: adapt advertised network isolation tests to dynamic UDN allocation
+  - 156b75f9 2026-07-16T00:32:34+02:00 e2e: adapt CUDN advertisement tests to dynamic UDN allocation
+  - 501cc079 2026-07-16T00:32:34+02:00 e2e: cover RouteAdvertisements over a dynamically allocated CUDN
+  - 8df86599 2026-07-16T00:32:34+02:00 routeadvertisements: advertise dynamic UDNs only from active nodes
+  - 677d6113 2026-07-15T10:03:52-07:00 clustermanager: rename node allocation controller
+  - 1fcfb18f 2026-07-14T16:09:34-04:00 no-overlay: host -> pods on other nodes via mp0
+  - 4620cb6d 2026-07-14T10:29:15-07:00 licenses: refresh generated third-party licenses
+  - 8b0dd877 2026-07-14T10:29:15-07:00 cni: fold libovsdb and shell-out ConfigureOVS paths into one
+  - 0b276e27 2026-07-14T10:29:15-07:00 libovsdb/ops: consolidate ovs helper operations
+  - 49393a41 2026-07-14T16:52:06+01:00 docs: rename portSecurity to macSecurity in OKEP-3926
+  - 7229c04d 2026-07-14T20:27:41+05:30 node: skip configureGlobalForwarding tests in CI without root access
+  - 40bd24a5 2026-07-13T17:27:35+02:00 zone_interconnect: add unit test for stale IC route cleanup
+  - 3f34530b 2026-07-12T10:36:43+03:00 Update OWNERS file
+  - 60fcdaf5 2026-07-10T18:56:40+02:00 Use new IPv6 force_forwarding sysctl if available.
+  - 0e3a4e06 2026-07-10T18:56:40+02:00 Don't change FORWARD table default policy for IPv4
+  - 7795aba2 2026-07-10T18:56:40+02:00 Don't override FORWARD default policy when `disable-forwarding` is not set
+  - 92fc5160 2026-07-10T18:56:40+02:00 Update disable-gateway unit tests
+  - a90d60b6 2026-07-10T18:56:40+02:00 Clarify/simplify/fix "Disable Forwarding Config" docs
+  - bdfd82fb 2026-07-10T17:48:35+02:00 Redo the AllocateLoadBalancerNodePorts=false test cases
+  - dcaf6dba 2026-07-10T12:46:42+02:00 [perf] fix netpol selection for cudn-l2 job
+  - d447e853 2026-07-10T11:17:19+02:00 Support update of chassis-id without re-creating the node.
+  - 0c9edf05 2026-07-08T12:59:20-07:00 ovnkube.sh: unify gateway option loading from OVS external_ids
+  - 945f64d7 2026-07-08T10:33:19-07:00 test: Use proper TLS certificate validation in metrics server tests
+  - 98e204fe 2026-07-08T13:36:28+02:00 coderabbit: add pre-merge checks and custom validation rules
+  - e36fbadc 2026-07-07T20:23:30+02:00 Get pod from apiserver on retryable annotation patch failure
+  - 06f453b7 2026-07-07T08:13:37+02:00 e2e(kubevirt): replace echoserver with iperf3
+  - 853a72fa 2026-07-06T15:06:48-07:00 libovsdb/ops: document ovs-vsctl equivalents on read wrappers
+  - e3e40f10 2026-07-06T15:06:48-07:00 util, libovsdb/ops: migrate NicToBridge to libovsdb
+  - 497f470f 2026-07-06T15:06:48-07:00 test/e2e: pin docker while importing libovsdb
+  - c1c5603e 2026-07-06T15:06:48-07:00 util, node: migrate nicstobridge read paths to libovsdb
+  - 258eb623 2026-07-06T15:06:48-07:00 node/test: migrate DPU and gateway tests to libovsdb harness
+  - 1a64e7db 2026-07-06T15:06:48-07:00 cni, node: migrate ConfigureOVS and delRepPort to libovsdb
+  - 3785f7bd 2026-07-06T15:06:48-07:00 node: move ovsClient to BaseNodeNetworkController
+  - a58ead15 2026-07-06T15:06:47-07:00 libovsdb/ops: add GetOVSInterface and CreateOrUpdatePodPort
+  - ff6d3a79 2026-07-06T15:06:47-07:00 node, controllermanager: migrate stale-port cleanup to libovsdb
+  - 65e3926d 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate port-to-br shell-outs to libovsdb
+  - f1a554fd 2026-07-06T15:06:47-07:00 node: migrate br-exists and del-port br-int to libovsdb
+  - 1e4c92c6 2026-07-06T15:06:47-07:00 util, ovn-kube-util: migrate BridgeToNic to libovsdb
+  - 79cb19da 2026-07-06T15:06:47-07:00 libovsdb/ops: bridge-scope DeletePortWithInterfaces
+  - fdc69950 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate del-br shell-outs to libovsdb
+  - 25b05aa5 2026-07-06T20:15:26+02:00 Only create ACCEPT rules for bypassing our own DROP rules
+  - fe9bd9f8 2026-07-06T20:15:26+02:00 Simplify initLocalGateway iptables/nftables setup
+  - 7683207e 2026-07-03T10:03:37+02:00 e2e(kubevirt): drop fedora coreos image in favor of fedora
+  - d9d3e374 2026-07-02T18:14:51+02:00 area-merge: prevent bot comment feedback loop
+  - 635a3fd7 2026-07-02T15:50:39+01:00 docs: add "future work" section to OKEP-3926
+  - 69f3a5e7 2026-07-02T15:50:39+01:00 docs: simplify OKEP-3926 and add per-attachment future section
+  - 00e2aa81 2026-07-02T15:50:39+01:00 docs: add OKEP-3926 for disabling port security on secondary networks
+  - 4246d935 2026-07-02T17:56:19+08:00 docs: fix typo in OKEP 5193 CUDN spec
+  - e9ed7419 2026-07-01T15:50:28-07:00 OKEP-6227: Add DHCP IPAM support for localnet UDNs
+  - 78e42465 2026-07-01T10:34:35-04:00 config: make routing table ID start configurable
+  - b19a79d2 2026-06-30T10:59:13-04:00 Revert "Route DPU host no-overlay traffic through OVN"
+  - 6eac3a2e 2026-06-30T15:35:05+02:00 docs/e2e: clarify E2E backward compatibility requirements in OKEP template
+  - 585b72c2 2026-06-26T16:33:10+02:00 Allow networks to start while route advertisements settle
+
+- kubernetes image-arm64 a3177b3b89764aeb87469936bf4fe8f708d88eb7 to 716965b5662de6df3485f68e7a1bef08cce8dcc1
+  - 099c83d18 2026-07-25T09:18:12Z UPSTREAM: <carry>: upkeep cpu partitioning admission webhook
+
