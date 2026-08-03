@@ -1,3 +1,64 @@
-- cluster-ingress-operator embedded-component a61dd582e6d93dd45dc75476dacb22907d5294a3 to 172349116c92d6b0d9cf56610be99de2115ae726
-  - 98f5ae0 2026-07-27T15:58:00Z E2E test for internal LB creation
+- cluster-network-operator embedded-component 72b5cba20082e859643ae3c4fc4e83ef2ae6fe20 to 83a7d5c233e26c9bb858c93f556dcbe9f653f032
+  - 8a46393 2026-07-24T16:53:27Z Bump frr-k8s MAX_FDS from 1024 to 65536
+
+- ovn-kubernetes image-arm64 9f20d9cb39b32feb1dc2d4b1b33e686c9a3d8d9b to 632e2e203b9f9c32b2bc9b5d6708d447d1221946
+  - 51047fae 2026-07-17T20:27:56+05:30 sync test annotations with upstream changes
+  - b05c351c 2026-07-17T20:27:53+05:30 Adapt OTE for E2E L3 CUDN multisubnet backward compatibility fixes
+  - 70a2009b 2026-07-17T10:23:14+02:00 e2e(kubevirt): deflake "with pre-copy fails" migration test
+  - fa8e140a 2026-07-16T15:33:44+02:00 Fix traffic leak in egress IP on secondary interface
+  - 8bce7389 2026-07-16T10:32:40+02:00 node: use libovsdb instead of ovs-vsctl exec in checkPorts
+  - 7b2e6eb5 2026-07-16T00:32:34+02:00 ci: cover dynamic UDN allocation on a no-overlay shared-gateway lane
+  - 1b7e0ec0 2026-07-16T00:32:34+02:00 e2e: adapt advertised network isolation tests to dynamic UDN allocation
+  - 156b75f9 2026-07-16T00:32:34+02:00 e2e: adapt CUDN advertisement tests to dynamic UDN allocation
+  - 501cc079 2026-07-16T00:32:34+02:00 e2e: cover RouteAdvertisements over a dynamically allocated CUDN
+  - 8df86599 2026-07-16T00:32:34+02:00 routeadvertisements: advertise dynamic UDNs only from active nodes
+  - 677d6113 2026-07-15T10:03:52-07:00 clustermanager: rename node allocation controller
+  - 1fcfb18f 2026-07-14T16:09:34-04:00 no-overlay: host -> pods on other nodes via mp0
+  - 4620cb6d 2026-07-14T10:29:15-07:00 licenses: refresh generated third-party licenses
+  - 8b0dd877 2026-07-14T10:29:15-07:00 cni: fold libovsdb and shell-out ConfigureOVS paths into one
+  - 0b276e27 2026-07-14T10:29:15-07:00 libovsdb/ops: consolidate ovs helper operations
+  - 49393a41 2026-07-14T16:52:06+01:00 docs: rename portSecurity to macSecurity in OKEP-3926
+  - 7229c04d 2026-07-14T20:27:41+05:30 node: skip configureGlobalForwarding tests in CI without root access
+  - 40bd24a5 2026-07-13T17:27:35+02:00 zone_interconnect: add unit test for stale IC route cleanup
+  - 3f34530b 2026-07-12T10:36:43+03:00 Update OWNERS file
+  - 60fcdaf5 2026-07-10T18:56:40+02:00 Use new IPv6 force_forwarding sysctl if available.
+  - 0e3a4e06 2026-07-10T18:56:40+02:00 Don't change FORWARD table default policy for IPv4
+  - 7795aba2 2026-07-10T18:56:40+02:00 Don't override FORWARD default policy when `disable-forwarding` is not set
+  - 92fc5160 2026-07-10T18:56:40+02:00 Update disable-gateway unit tests
+  - a90d60b6 2026-07-10T18:56:40+02:00 Clarify/simplify/fix "Disable Forwarding Config" docs
+  - bdfd82fb 2026-07-10T17:48:35+02:00 Redo the AllocateLoadBalancerNodePorts=false test cases
+  - dcaf6dba 2026-07-10T12:46:42+02:00 [perf] fix netpol selection for cudn-l2 job
+  - d447e853 2026-07-10T11:17:19+02:00 Support update of chassis-id without re-creating the node.
+  - 0c9edf05 2026-07-08T12:59:20-07:00 ovnkube.sh: unify gateway option loading from OVS external_ids
+  - 945f64d7 2026-07-08T10:33:19-07:00 test: Use proper TLS certificate validation in metrics server tests
+  - 98e204fe 2026-07-08T13:36:28+02:00 coderabbit: add pre-merge checks and custom validation rules
+  - e36fbadc 2026-07-07T20:23:30+02:00 Get pod from apiserver on retryable annotation patch failure
+  - 06f453b7 2026-07-07T08:13:37+02:00 e2e(kubevirt): replace echoserver with iperf3
+  - 853a72fa 2026-07-06T15:06:48-07:00 libovsdb/ops: document ovs-vsctl equivalents on read wrappers
+  - e3e40f10 2026-07-06T15:06:48-07:00 util, libovsdb/ops: migrate NicToBridge to libovsdb
+  - 497f470f 2026-07-06T15:06:48-07:00 test/e2e: pin docker while importing libovsdb
+  - c1c5603e 2026-07-06T15:06:48-07:00 util, node: migrate nicstobridge read paths to libovsdb
+  - 258eb623 2026-07-06T15:06:48-07:00 node/test: migrate DPU and gateway tests to libovsdb harness
+  - 1a64e7db 2026-07-06T15:06:48-07:00 cni, node: migrate ConfigureOVS and delRepPort to libovsdb
+  - 3785f7bd 2026-07-06T15:06:48-07:00 node: move ovsClient to BaseNodeNetworkController
+  - a58ead15 2026-07-06T15:06:47-07:00 libovsdb/ops: add GetOVSInterface and CreateOrUpdatePodPort
+  - ff6d3a79 2026-07-06T15:06:47-07:00 node, controllermanager: migrate stale-port cleanup to libovsdb
+  - 65e3926d 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate port-to-br shell-outs to libovsdb
+  - f1a554fd 2026-07-06T15:06:47-07:00 node: migrate br-exists and del-port br-int to libovsdb
+  - 1e4c92c6 2026-07-06T15:06:47-07:00 util, ovn-kube-util: migrate BridgeToNic to libovsdb
+  - 79cb19da 2026-07-06T15:06:47-07:00 libovsdb/ops: bridge-scope DeletePortWithInterfaces
+  - fdc69950 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate del-br shell-outs to libovsdb
+  - 25b05aa5 2026-07-06T20:15:26+02:00 Only create ACCEPT rules for bypassing our own DROP rules
+  - fe9bd9f8 2026-07-06T20:15:26+02:00 Simplify initLocalGateway iptables/nftables setup
+  - 7683207e 2026-07-03T10:03:37+02:00 e2e(kubevirt): drop fedora coreos image in favor of fedora
+  - d9d3e374 2026-07-02T18:14:51+02:00 area-merge: prevent bot comment feedback loop
+  - 635a3fd7 2026-07-02T15:50:39+01:00 docs: add "future work" section to OKEP-3926
+  - 69f3a5e7 2026-07-02T15:50:39+01:00 docs: simplify OKEP-3926 and add per-attachment future section
+  - 00e2aa81 2026-07-02T15:50:39+01:00 docs: add OKEP-3926 for disabling port security on secondary networks
+  - 4246d935 2026-07-02T17:56:19+08:00 docs: fix typo in OKEP 5193 CUDN spec
+  - e9ed7419 2026-07-01T15:50:28-07:00 OKEP-6227: Add DHCP IPAM support for localnet UDNs
+  - 78e42465 2026-07-01T10:34:35-04:00 config: make routing table ID start configurable
+  - b19a79d2 2026-06-30T10:59:13-04:00 Revert "Route DPU host no-overlay traffic through OVN"
+  - 6eac3a2e 2026-06-30T15:35:05+02:00 docs/e2e: clarify E2E backward compatibility requirements in OKEP template
+  - 585b72c2 2026-06-26T16:33:10+02:00 Allow networks to start while route advertisements settle
 
