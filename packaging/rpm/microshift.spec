@@ -79,16 +79,6 @@ Requires: cri-tools >= 1.36.0, cri-tools < 1.37.0
 # the missing package when it is not available.
 Recommends: containernetworking-plugins
 Requires: iptables
-# RHEL 10 moved iptables compat kernel modules (nft_compat, xt_CT) from
-# kernel-modules-core to kernel-modules-extra. These are needed by OVN-K
-# and kubelet until OVN-K completes its nftables migration (OCPBUGS-98161).
-# The dependency is unconditional because the RPM is built on el9 (where
-# %{rhel} is 9) but cross-installed on el10, so conditionals do not work.
-# Each variant is conditioned on its kernel-core so that installing MicroShift
-# on a kernel-rt system does not pull in the regular kernel (and vice-versa).
-# On RHEL 9 this is a no-op as the modules are already in kernel-modules-core.
-Requires: (kernel-modules-extra if kernel-core)
-Requires: (kernel-rt-modules-extra if kernel-rt-core)
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
 Requires: microshift-greenboot = %{version}
@@ -141,6 +131,13 @@ Requires: (openvswitch3.5 or openvswitch >= 3.5)
 Requires: NetworkManager
 Requires: NetworkManager-ovs
 Requires: jq
+# RHEL 10 moved iptables compat kernel modules (nft_compat, xt_CT) from
+# kernel-modules-core to kernel-modules-extra. These are needed by OVN-K
+# and kubelet until OVN-K completes its nftables migration (OCPBUGS-98161).
+# On RHEL 9 this is a no-op as the modules are already in kernel-modules-core.
+# Conditional guards prevent RT images from pulling in the regular kernel.
+Recommends: (kernel-modules-extra if kernel-core)
+Recommends: (kernel-rt-modules-extra if kernel-rt-core)
 
 %description networking
 The microshift-networking package provides the networking components necessary for the MicroShift default CNI driver.
