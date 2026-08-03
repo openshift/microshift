@@ -1,0 +1,6 @@
+- cluster-network-operator embedded-component 945b31bdb28f5654dfadba0169185c95588f46b0 to d0c6f75e06c861c7f2d5355dab0e7bd8a20de43c
+  - 8a3d8ba 2026-07-27T22:42:25-04:00 Bump github.com/containernetworking/cni v0.8.0 -> v1.3.0
+
+- ovn-kubernetes image-amd64 767a5511bc0e65c1c6982113c477b37df1d3e2be to 784dba42f89108d61da559252aaab66b7e4a7fd3
+  - e4bab0cd 2026-07-23T19:34:02+05:30 OCPBUGS-82825: Bump github.com/moby/spdystream to v0.5.1
+
