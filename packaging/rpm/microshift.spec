@@ -84,8 +84,11 @@ Requires: iptables
 # and kubelet until OVN-K completes its nftables migration (OCPBUGS-98161).
 # The dependency is unconditional because the RPM is built on el9 (where
 # %{rhel} is 9) but cross-installed on el10, so conditionals do not work.
+# Each variant is conditioned on its kernel-core so that installing MicroShift
+# on a kernel-rt system does not pull in the regular kernel (and vice-versa).
 # On RHEL 9 this is a no-op as the modules are already in kernel-modules-core.
-Requires: kernel-modules-extra
+Requires: (kernel-modules-extra if kernel-core)
+Requires: (kernel-rt-modules-extra if kernel-rt-core)
 Requires: microshift-selinux = %{version}
 Requires: microshift-networking = %{version}
 Requires: microshift-greenboot = %{version}
