@@ -130,15 +130,45 @@ Trust Manager Bundle With Cert Manager CA
     [Tags]    trust-manager
     [Setup]    Enable Trust Manager
 
-    Apply Template    ${CLUSTER_ISSUER_TMPL}
-    Oc Wait    -n ${NAMESPACE} clusterissuer ${ISSUER_NAME}
+    Setup Trust Bundle With Cert Manager CA
+
+    ${cm_data}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${NAMESPACE}
+    ...    ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    .data.ca-bundle\\.crt
+    Should Contain    ${cm_data}    BEGIN CERTIFICATE    msg=ConfigMap does not contain CA certificate data
+
+    [Teardown]    Run Keywords
+    ...    Cleanup Trust Bundle
+    ...    AND    Oc Delete    certificate/ca-certificate -n ${TRUST_MANAGER_NS} --ignore-not-found
+    ...    AND    Remove ClusterIssuer
+    ...    AND    Disable Trust Manager
+
+Trust Manager Bundle With Pebble ACME CA
+    [Documentation]    Verify trust-manager can distribute a Pebble ACME root CA via Bundle CR
+    [Tags]    trust-manager    acme
+    [Setup]    Run Keywords
+    ...    Enable Trust Manager
+    ...    AND    Setup Pebble Server    ${NAMESPACE}
+
+    ${DNS_NAME}=    Generate Random HostName
+    VAR    ${DNS_NAME}=    ${DNS_NAME}    scope=TEST
+    Setup DNS For Test    ${USHIFT_HOST}    ${DNS_NAME}
+
+    Apply Template    ${HTTP01_ISSUER_TMPL}
+    Oc Wait    -n ${NAMESPACE} issuer ${HTTP01_ISSUER_NAME}
     ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
 
-    Apply Template    ${CA_CERTIFICATE_TMPL}
-    Oc Wait    -n ${TRUST_MANAGER_NS} certificate ca-certificate
-    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
+    Apply Template    ${HTTP01_CERTIFICATE_TMPL}
+    Oc Wait    -n ${NAMESPACE} certificate ${HTTP01_CERT_NAME}    --for="condition=Ready" --timeout=300s
 
-    Apply Template    ${TRUST_BUNDLE_SECRET_TMPL}
+    ${pebble_ca}=    Fetch Pebble Root CA    ${NAMESPACE}
+    ${cert_file}=    Create Random Temp File    ${pebble_ca}
+    Oc Create    secret generic ca-source-secret -n ${TRUST_MANAGER_NS} --from-file=tls.crt=${cert_file}
+    Remove File    ${cert_file}
+
+    Apply Template    ${TRUST_BUNDLE_SRC_SECRET_TMPL}
     Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
     ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
 
@@ -147,7 +177,38 @@ Trust Manager Bundle With Cert Manager CA
     ...    ${NAMESPACE}
     ...    ${TRUST_MANAGER_BUNDLE_NAME}
     ...    .data.ca-bundle\\.crt
-    Should Contain    ${cm_data}    BEGIN CERTIFICATE    msg=ConfigMap does not contain CA certificate data
+    Should Contain    ${cm_data}    ${pebble_ca}    msg=ConfigMap does not contain Pebble CA certificate data
+
+    [Teardown]    Run Keywords
+    ...    Cleanup Trust Bundle
+    ...    AND    Oc Delete    secret ca-source-secret -n ${TRUST_MANAGER_NS} --ignore-not-found
+    ...    AND    Cleanup HTTP01 Resources
+    ...    AND    Cleanup DNS For Test    ${DNS_NAME}
+    ...    AND    Disable Trust Manager
+
+Trust Manager Survives MicroShift Restart
+    [Documentation]    Verify trust-manager Bundle CR and ConfigMap persist after MicroShift restart
+    [Tags]    trust-manager    restart
+    [Setup]    Enable Trust Manager
+
+    Setup Trust Bundle With Cert Manager CA
+    ${cm_data_before}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${NAMESPACE}
+    ...    ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    .data.ca-bundle\\.crt
+    Should Contain    ${cm_data_before}    BEGIN CERTIFICATE
+
+    Restart MicroShift
+    Wait For MicroShift Healthcheck Success
+    Wait For Trust Manager After Restart
+
+    ${cm_data_after}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${NAMESPACE}
+    ...    ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    .data.ca-bundle\\.crt
+    Should Be Equal    ${cm_data_before}    ${cm_data_after}    msg=ConfigMap data changed after restart
 
     [Teardown]    Run Keywords
     ...    Cleanup Trust Bundle
@@ -271,6 +332,7 @@ Cleanup HTTP01 Resources
     Oc Delete    issuer/${HTTP01_ISSUER_NAME} -n ${NAMESPACE} --ignore-not-found
     Oc Delete    deployment/pebble -n ${NAMESPACE} --ignore-not-found
     Oc Delete    service/pebble -n ${NAMESPACE} --ignore-not-found
+    Oc Delete    configmap/pebble -n ${NAMESPACE} --ignore-not-found
 
 Configure DNS For Domain
     [Documentation]    Configure DNS configmap in openshift-dns namespace and restart DNS pod
@@ -403,3 +465,53 @@ Cleanup Trust Bundle
     [Documentation]    Remove the test trust-manager Bundle CR and its target ConfigMap
     Oc Delete    bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
     Oc Delete    configmap ${TRUST_MANAGER_BUNDLE_NAME} -n ${NAMESPACE} --ignore-not-found
+
+Setup Trust Bundle With Cert Manager CA
+    [Documentation]    Create a self-signed CA via cert-manager and configure a trust Bundle
+    Apply Template    ${CLUSTER_ISSUER_TMPL}
+    Oc Wait    -n ${NAMESPACE} clusterissuer ${ISSUER_NAME}
+    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
+    Apply Template    ${CA_CERTIFICATE_TMPL}
+    Oc Wait    -n ${TRUST_MANAGER_NS} certificate ca-certificate
+    ...    --for="condition=Ready" --timeout=${DEFAULT_WAIT_TIMEOUT}
+    Apply Template    ${TRUST_BUNDLE_SECRET_TMPL}
+    Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+Wait For Trust Manager After Restart
+    [Documentation]    Wait for trust-manager components to be ready after a MicroShift restart
+    Wait Until Keyword Succeeds    30x    10s
+    ...    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
+    Wait Until Keyword Succeeds    30x    10s
+    ...    TrustManager CR Should Be Ready
+    Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+Fetch Pebble Root CA
+    [Documentation]    Fetch the root CA certificate from Pebble management API via port-forward
+    [Arguments]    ${namespace}
+    ${port_fwd}=    Process.Start Process
+    ...    oc    port-forward    deployment/pebble    15000:15000
+    ...    -n    ${namespace}    --kubeconfig    ${KUBECONFIG}
+    ...    stderr=STDOUT
+    Sleep    5s
+    ${running}=    Process.Is Process Running    ${port_fwd}
+    IF    not ${running}
+        ${fwd_result}=    Process.Wait For Process    ${port_fwd}
+        Fail    Port-forward failed to start: ${fwd_result.stdout}
+    END
+    TRY
+        ${pem}=    Wait Until Keyword Succeeds    10x    3s
+        ...    Pebble Root CA Should Be Available
+        RETURN    ${pem}
+    FINALLY
+        Process.Terminate Process    ${port_fwd}
+    END
+
+Pebble Root CA Should Be Available
+    [Documentation]    Check that the Pebble management API returns a valid CA certificate
+    ${result}=    Process.Run Process    curl    -skf    https://localhost:15000/roots/0
+    ...    stderr=STDOUT
+    Should Be Equal As Integers    ${result.rc}    0    msg=Failed to fetch Pebble root CA
+    Should Contain    ${result.stdout}    BEGIN CERTIFICATE    msg=Pebble root CA response missing certificate data
+    RETURN    ${result.stdout}
