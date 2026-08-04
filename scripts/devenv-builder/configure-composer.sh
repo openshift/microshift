@@ -152,7 +152,8 @@ EOF
 source /etc/os-release
 
 # shellcheck disable=SC2153
-enable_copr_repositories       "${VERSION_ID}"
+# Uncomment to install osbuild-composer from copr repositories
+# enable_copr_repositories       "${VERSION_ID}"
 install_and_configure_composer "${VERSION_ID}"
 check_umask_and_permissions
 
