@@ -1,7 +1,243 @@
-- oc image-arm64 994613040335f72809854babcb80b9d11a4e98d5 to a88e785e90aa96ac96da93359bacf3ea5c174733
-  - a88e785e 2026-07-23T20:40:27Z RFE-8595: must-gather: add client-side keep-alive to prevent accessTokenInactivityTimeout failures (#2288)
+- api embedded-component 581cfdf7198613bd325c185eb3eac672670da633 to 05ea89db4588a2f443a2402764a73f3529ab116b
+  - 716553af 2026-07-27T11:26:57-04:00 Promote AWS DualStack to Default
+  - bc8cebd3 2026-07-27T13:14:00+02:00 MON-4616: add support for dmmultipath collector
+  - 217ca8ce 2026-07-27T12:59:02+02:00 Remove NewOLMPreflightPermissionChecks FeatureGate
+  - 5c06b67f 2026-07-24T07:53:19-04:00 Added vSphere failure domain to vcenter ratcheting tests
+  - db1ed9c2 2026-07-24T07:53:13-04:00 Added vSphere failure domain to vcenter check
+  - ffbad1d3 2026-07-24T12:14:11+01:00 Check all hypershift variants when the featuregate is not platform specific
+  - bb7402c2 2026-07-23T11:59:36-03:00 Promote Multi HAProxy Versions feature to default
+  - f4a969be 2026-07-23T14:02:51+02:00 make update
+  - 62822773 2026-07-23T14:02:45+02:00 operator/v1: rename KMSPluginHealthReport fields and remove compatibility marker
+  - 3199351b 2026-07-22T14:28:51+02:00 machineconfiguration/v1: add BGPVIPPeersJSON to ControllerConfigSpec
+  - b0927431 2026-07-22T14:28:49+02:00 config/v1: add BGPBasedVIPManagement feature gate and VIPManagement field
+  - 5bd0b76d 2026-07-21T09:05:02-05:00 NodeUID in status to detect replaced node with same name
+  - 91ec72c6 2026-07-21T15:06:54+03:00 Align with latest beta API of Vault
+  - a1e80c1b 2026-07-09T10:56:50+02:00 Promote OLMLifecycleAndCompatibility feature gate to Default
 
-- router image-arm64 0c4063da30da6091765e2576efc684d0f020918d to 682319a1bb432f0203951c33336d0f55947e1099
+- cluster-csi-snapshot-controller-operator embedded-component ef7a4c8b7f5c5e6cba4486dcc37f50521e7bc655 to 35ec0224eb0e5219d5eae012fb703223a6f3e1f7
+  - ab3ec5d 2026-07-21T15:24:21+02:00 Bump all deps for 5.0.0
+  - 2267501 2026-07-09T14:20:58+02:00 Remove v1beta2 group snapshot API
+
+- cluster-dns-operator embedded-component 4b8ae49940eefc50fa48da5179e735dd6ccd42d9 to c0ed09e329e9001629518604a58205e3fbe8284a
+  - 1d4d1e8 2026-07-28T18:22:09+02:00 NE-2743: gate operator metrics TLS on tlsAdherence policy
+  - b2ee3f5 2026-06-23T15:35:36-04:00 OCPBUGS-86009: Add regression test for scale-up without rollout
+  - ee254fc 2026-05-28T14:02:33-04:00 OCPBUGS-86009: Fix dns operator reporting Progressing=True on scale up
+
+- cluster-ingress-operator embedded-component b4daff58712de418c51d765a8686069a5f47e764 to 2461c5ceeb1fe16a4c8cfc1d0f82fb9555cbf1d0
+  - af69f70f 2026-08-01T13:59:22Z Revert "Merge pull request #1513 from gcs278/listenerset-upgradeable"
+  - d89d9ac5 2026-07-31T17:00:00-03:00 Bump API to promote Multi HAProxy Versions feature
+  - 546c7b6f 2026-07-30T22:28:24-04:00 Move ListenerSet field index to ensureDependentControllers
+  - 7a481282 2026-07-30T22:28:24-04:00 Refactor to per-ListenerSet reconciliation with GaugeVec metric
+  - 901ca245 2026-07-30T22:28:24-04:00 Address review comments on listenerset-status controller
+  - 8105ed32 2026-07-30T22:28:24-04:00 Set Accepted=False on ListenerSets targeting OpenShift-managed Gateways
+  - e003edd7 2026-07-30T13:04:28-04:00 OCPBUGS-63219: Use status instead of old service for desired state during auto-delete
+  - 460e91cc 2026-07-30T13:04:28-04:00 OCPBUGS-63219: Improve NLB hairpin risk alert description
+  - 847c0fbf 2026-07-30T13:04:28-04:00 OCPBUGS-63219: Address code review feedback
+  - 8f942a63 2026-07-30T13:04:28-04:00 OCPBUGS-63219: Use isNewIngressController instead of !alreadyAdmitted for NLB protocol defaulting
+  - e5ca4df6 2026-07-30T13:04:28-04:00 OCPBUGS-63219: Add NLB hairpin risk alert for existing IngressControllers
+  - c0cf37d7 2026-07-30T13:04:28-04:00 OCPBUGS-63219: Add E2E tests for NLB protocol and LB type transition safety
+  - ed2c82e0 2026-07-30T09:22:59-04:00 Clean up ListenerSet ignored e2e test
+  - 5fc335e9 2026-07-30T08:32:37-04:00 Disable Istio CRL configmap creation
+  - 87efd8fc 2026-07-30T08:31:58-04:00 Bump GWAPI CRDs to v1.5.1 and Istio y-stream to 1.30
+  - 89626b79 2026-07-29T19:35:49-04:00 OCPBUGS-63219: Support NLB protocol for AWS
+  - be35bbce 2026-07-29T23:40:36+02:00 NE-2818: Gate operator metrics TLS on tlsAdherence
+  - 81aa343f 2026-07-29T23:40:36+02:00 NE-2742: Replace custom metrics server with controller-runtime built-in metrics and authentication
+  - de37a611 2026-07-29T23:37:11+02:00 NE-2742: Apply cluster TLS security profile to operator metrics and canary endpoints
+  - 7304d3c0 2026-07-29T18:11:31-03:00 NE-2796: check if Gateway infrastructure labels are replicated to pods
+  - 79e04dfe 2026-07-29T18:11:31-03:00 NE-2796: Set APIServer TLS on sail-library options
+  - 0ff67422 2026-07-29T17:34:17-03:00 Rename network policy in TestContainerLoggingMinLength
+  - 2ce2bfc6 2026-07-29T20:24:59Z Replace deprecated io/ioutil usage
+  - e5b605c2 2026-07-27T21:42:36-04:00 GCP: Set Universe Domain
+  - c781a1be 2026-07-27T21:42:30-04:00 go.mod/vendor: bump google API packages for universe domain support
+  - bdc58f56 2026-07-27T14:58:03-04:00 Don't publish duplicate DNS records
+  - 2e5310f5 2026-07-27T14:40:04+01:00 OCPBUGS-85680: Re-fetch infraConfig on every periodic loop iteration
+  - be257092 2026-07-27T09:44:30+01:00 OCPBUGS-86841: Add BackendTLSPolicy to Gateway API e2e CRD test coverage
+  - 56b39bf7 2026-07-25T22:58:36Z OCPBUGS-99775: Update TestHTTPHeaderBufferSize for HAProxy 3.2 response code change
+  - c1d235c5 2026-07-24T17:18:46-03:00 Add upgradeable logic for HAProxy version
+  - a5c99e25 2026-06-23T14:17:24+01:00 OCPBUGS-90616: Add GRPCRoute to Gateway API e2e CRD test coverage
+
+- cluster-kube-apiserver-operator embedded-component ea8a9c50203113ca43db98ca925ab7fcdaff7d28 to 1f677d8a71a5d43c17505349fc7c41c97b04fe8d
+  - 1840df0 2026-07-29T09:32:03+03:00 Update openshift/*
+  - e4c2c4d 2026-07-28T10:10:34+02:00 encryptionstatusprovider/provider: creates the provider from the operator client.
+  - 49d6404 2026-07-28T10:10:30+02:00 bump (*)
+  - 00f607c 2026-07-27T10:29:28+02:00 NO-JIRA: gofmt encryption_kms_2.go
+  - 16f12e5 2026-07-27T09:05:10+02:00 NO-JIRA: address preflight e2e review feedback
+  - d5e6d37 2026-07-27T09:05:10+02:00 NO-JIRA: add KMS preflight deploy e2e to encryption-kms-2
+  - 09ea0d5 2026-07-24T16:22:19+03:00 Update openshift/*
+  - 8dfb4f8 2026-07-24T05:27:15-04:00  pkg/operator: add KMS plugin sidecar revision readiness check
+  - 050afcf 2026-07-23T15:52:02+02:00 NO-JIRA: Automatic agentic rebase: Update library-go to d8f45c2
+  - df010b0 2026-07-23T12:17:46+05:30 Add KMS key ID identifier
+  - a400ab1 2026-02-09T11:18:33+01:00 chore: add permissions on endpointslice to Prometheus Role and use serviceDiscoveryRole: EndpointSlice in ServiceMonitors
+
+- cluster-network-operator embedded-component 4f6fb6be829a2f6ad3e0df4ab85ecb00ef028343 to 1dcce833f8682c68273f1c47c911baeeb1a741f6
+  - 471c79c 2026-07-29T19:07:13-04:00 Use TLS profile to render networking-console-plugin NGINX directives
+  - d654633 2026-07-29T19:07:13-04:00 Migrate check-endpoints to controller-runtime with TLS CLI args
+  - ad3dcdb 2026-07-24T10:20:52+02:00 vendor: bump github.com/openshift/api to latest master
+  - e538c9c 2026-07-23T15:10:03-04:00 Register PKI controller through AddToManager
+  - e7e9bf0 2026-07-23T14:57:58-04:00 Bound PKI informer cache sync with a timeout
+  - 60cedaf 2026-07-23T13:48:45-04:00 Use keyutil.ParsePrivateKeyPEM for private key decoding
+  - 262103b 2026-07-23T13:11:47-04:00 Enable configurable PKI for managed certificate rotation
+  - dfb8dd5 2026-07-23T15:40:27Z Revert "Merge pull request #2925 from OlivierCazade/day0"
+  - 17f08a7 2026-07-22T11:44:23-04:00 ovn-kubernetes: Move MNP from ConfigMap to CLI flags
+  - 9de83fa 2026-07-20T18:36:49+02:00 Fix 'kill: not a pid' error by checking PID file before use
+  - 40fd88f 2026-07-20T18:36:49+02:00 Remove /usr/libexec mount and avoid GLIBC compatibility issues
+  - a11c2e4 2026-07-20T18:36:49+02:00 Remove /usr/sbin host directory dependency from ovn-ipsec-host pod
+  - 3db668e 2026-07-20T18:36:39+02:00 Consume openvswitch-ipsec systemd service for OVN IPsec deployment
+  - 1117c8e 2026-07-17T11:37:37-04:00 Use TLS profile to render CLI args for network-check-source
+  - 6ad012f 2026-07-17T08:24:24-04:00 Use TLS profile to render CLI args for HyperShift ovnkube-control-plane
+  - 78a0e1a 2026-07-17T08:24:24-04:00 Use TLS profile to render CLI args for FRR components
+  - 6d2e543 2026-07-17T08:24:24-04:00 Use TLS profile to render CLI args for network-metrics kube-rbac-proxy
+  - 3e6eaf3 2026-07-17T08:24:24-04:00 Use TLS profile to render CLI args for kube-proxy's kube-rbac-proxy
+  - 46a985c 2026-07-17T08:24:24-04:00 Use TLS profile to render CLI args for kube-rbac-proxy in OVNK
+  - 6dd6533 2026-07-17T08:24:24-04:00 Use shared start-rbac-proxy function in ovnkube-control-plane
+  - c4a3db1 2026-07-17T08:24:24-04:00 Use TLS profile to render CLI args in the multus-admission-controller
+  - a211f70 2026-07-17T08:24:24-04:00 Use TLS profile to render CLI args in the node identity webhook
+  - c617131 2026-07-17T08:24:24-04:00 Add test utility functions for component rendering tests
+  - 42a8434 2026-07-17T08:24:24-04:00 Convert OpenSSL cipher names to IANA and filter TLS 1.3 ciphers
+  - 79bbb49 2026-07-15T09:43:13Z Bump frr-k8s MAX_FDS from 1024 to 65536
+  - 9c178ed 2026-04-28T16:16:58+02:00 CORENET-6581: Add transport label to CUDN telemetry recording rule
+
+- csi-external-snapshotter embedded-component b5e4b73f9a761ff8a59f31b982a63e1cdbb76ed8 to a019d1a9d9e1d26ffd0b2e0d911733180fa608b2
+  - b17468a 2026-07-29T11:10:15+02:00 UPSTREAM: 1460: Skip NotFound errors when deleting snapshot content objects
+
+- kubernetes embedded-component 98b35193b2ac7a23a673325f5e9b830ecd5ba406 to e63ab41237b34f2a457e76900f6162184420cf96
+  - 5e858e982 2026-07-28T13:51:08-04:00 UPSTREAM: <carry>: Re-enable kubectl kuberc commands e2e tests
+  - 8d27ef98f 2026-07-27T11:14:23+02:00 UPSTREAM: 137936: csi: update CSI sidecar images in test manifests
+  - c8aa52947 2026-07-24T13:25:07+02:00 UPSTREAM: 138768: move VolumeGroupSnapshot to V1
+  - 0f4503bbf 2026-07-22T11:54:16-04:00 UPSTREAM: <carry>: Update openshift-hack/rebase.sh, REBASE.openshift.md
+  - cc48cfba7 2026-07-20T21:23:37-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for standalone clusters (part 2)
+  - 44a83e00e 2026-07-17T15:00:07+02:00 UPSTREAM: <drop>: hack/update-featuregates.sh
+  - 4da08ff19 2026-07-17T08:27:41+02:00 UPSTREAM: <carry>: Store SELinuxWarningController upgrade check as a ConfigMap
+  - de396e993 2026-07-16T15:20:30-06:00 UPSTREAM: 140377: e2e: storage snapshot tests should read custom timeouts from manifest
+  - 13ace3c70 2026-07-02T02:25:02-04:00 UPSTREAM: <carry>: upkeep cpu partitioning admission webhook
+
+- machine-config-operator embedded-component 067b924f19a64a209796d5be5a0a63665f53b1eb to 215097bef12ac57636668b4732c6ccf288a48a9f
+  - c6eba28b 2026-08-01T21:29:39Z Revert "Merge pull request #6303 from isabella-janssen/disrutive-suite-stabilization"
+  - eccb06f8 2026-07-31T08:34:43-04:00 tests: make ImageModeStatusReporting MCP count test more resilient on SNO
+  - 44cb8f47 2026-07-31T10:13:32Z OCPBUGS-92811: test MCC proxy. Refactor TC 52373 proxy test.
+  - 6a9d4739 2026-07-30T18:21:21+05:30 Fix TC 43278 failing when release payload has no MCO commit info
+  - 131f0458 2026-07-30T17:12:38+05:30 Migrate 17 OCB test cases from openshift-tests-private
+  - 92a24cee 2026-07-30T14:30:20+05:30  Fix setArchitectureAndCheckStatus corrupting multi-label annotations
+  - 7ddac2a2 2026-07-29T15:54:20+02:00 MCO-2244: Update MCO dependencies to Kubernetes 1.36
+  - 58a9a52e 2026-07-29T10:59:57+02:00 MCO-2468: Cache backed OSImageStreams for PIS
+  - 6b9f78ba 2026-07-28T07:48:30+02:00 NO-ISSUE: Fix incorrect OSImageStreams log
+  - a5384d66 2026-07-27T19:53:32+02:00 Removed no more useful SkipTestIfWorkersCannotBeScaled(oc) function for scale-up test
+  - ce872407 2026-07-27T19:32:17+02:00 MCO-2470: Disable scale-up test support for AWS and vSphere
+  - 7ee7027a 2026-07-27T16:55:35+02:00 NO-ISSUE: Use context instead of discrete signal
+  - c316b995 2026-07-27T14:56:17+03:00 Add --collect back to systemd-run to prevent stale units
+  - 0cd0458e 2026-07-27T14:26:01+03:00 Bug: fix fencing_validator ocdebug fence dispatch race condition
+  - 08f5b4e1 2026-07-24T11:30:29Z Thread context through syncHandler instead of storing it in Controller
+  - c4fb4794 2026-07-24T11:30:29Z Propagate context to InspectStreamClass for shutdown cancellation
+  - 92bdeffb 2026-07-24T11:30:29Z Add unit tests for validateNoRuncOnRHEL10FromOSImageURL
+  - 3c6b0fcd 2026-07-24T11:30:29Z Inline runcBlockedError into its callers
+  - a0e361e2 2026-07-24T11:30:29Z Move validateNoRuncOnRHEL10FromOSImageStream out of generateRenderedMachineConfig
+  - cd031001 2026-07-24T11:30:29Z Decouple validateNoRuncOnRHEL10FromOSImageURL from Controller
+  - 46c64391 2026-07-24T11:30:29Z Rename runc validation functions for clarity
+  - ec249e54 2026-07-24T11:30:29Z TBD
+  - b5fe45d5 2026-07-24T08:59:10Z NO-ISSUE: extended tests, restore initial maxUnavailable when modified
+  - 00d8a31e 2026-07-24T09:55:57+02:00 vendor: bump github.com/openshift/api to latest master
+  - bd1f9660 2026-07-23T16:08:26+05:30 Add TC 88940: Apply password only if changes exist
+  - 173915e5 2026-07-23T09:54:18Z NO-ISSUE: add AWS marketplace polarion ID test
+  - 75e3bbca 2026-07-22T14:46:03-04:00 Surface MOSB build status on paused MCPs, added e2e tests to test the behavior, and refined non-paused pool reporting
+  - 9278288f 2026-07-22T15:13:16+02:00 CNTRLPLANE-3840: Remove ExternalTopologyMode guard from OSImageStream bootstrap
+  - 54982a74 2026-07-21T19:36:43+05:30 Add unit tests for osImageStream label skip logic in boot image controller
+  - 135e4398 2026-07-19T19:45:23-04:00 Add control-plane NoSchedule taint support alongside master taint
+  - b68a7440 2026-07-17T08:10:43Z MCO-2184: Adapt scale extended tests to support osstreams
+  - 7788a2e5 2026-07-09T22:27:07-04:00 OCPBUGS-98316: Fix SHA idempotency test in nmstate-configuration.sh
+  - a50480ed 2026-06-05T13:42:39-04:00 machine-config-daemon-firstboot: disable ostree fsync during bootstrap
+
+- operator-framework-olm embedded-component 56b3931de4636f7e0d212001f2074b9dddb45a8f to 76870171f4c192e96d450bcfb71dca508a264999
+  - 2050b037 2026-07-31T00:04:49Z :seedling: Bump github.com/prometheus/client_golang (#3882)
+  - 05e37129 2026-07-31T00:03:59Z :seedling: Bump the k8s-dependencies group with 8 updates (#3879)
+  - 9ac5c409 2026-07-31T00:03:36Z :seedling: Bump github.com/prometheus/common from 0.70.0 to 0.70.1 (#3880)
+  - abeffeb5 2026-07-31T00:03:18Z :seedling: Bump go.yaml.in/yaml/v3 from 3.0.4 to 3.0.5 (#3881)
+  - c6c6b0cf 2026-07-24T00:21:36Z Bump actions/setup-go from 6 to 7 (#506)
+  - 1f40a85d 2026-07-24T00:20:39Z Bump github.com/google/cel-go from 0.29.1 to 0.29.2 (#505)
+  - 3c189066 2026-07-24T00:20:22Z Bump github.com/google/cel-go from 0.28.1 to 0.29.1 (#504)
+  - 113c62ae 2026-07-24T00:20:04Z Bump golang.org/x/net from 0.54.0 to 0.55.0 (#503)
+  - 0e5f254d 2026-07-24T00:19:43Z Bump actions/cache from 5 to 6 (#502)
+  - 8e3576e0 2026-07-24T00:19:26Z pkg/manifests: fix dropped walk errors (#495)
+  - 59bced99 2026-07-24T00:19:10Z Bump actions/checkout from 6 to 7 (#501)
+  - e3d3ba94 2026-07-24T00:18:53Z Bump the k8s-dependencies group with 4 updates (#500)
+  - 136d055c 2026-07-24T00:18:37Z bump api to 0.45.0 (#2040)
+  - 46661c32 2026-07-24T00:18:19Z Bump github.com/moby/moby/client from v0.4.1 to v0.5.0 (#2039)
+  - 653c6c13 2026-07-24T00:18:02Z Reject cyclic substitutesFor chains instead of looping until OOM (#2038)
+  - 66852bce 2026-07-24T00:17:45Z Bump actions/setup-go from 6 to 7 (#2037)
+  - 4210cd0f 2026-07-24T00:17:29Z Bump github.com/docker/cli (#2036)
+  - faa7ac12 2026-07-24T00:17:12Z Bump google.golang.org/grpc from 1.82.0 to 1.82.1 (#2035)
+  - 2ee84a3a 2026-07-24T00:16:57Z Bump github.com/mattn/go-sqlite3 from 1.14.47 to 1.14.48 (#2033)
+  - 1f9ef03f 2026-07-24T00:16:38Z Bump oras.land/oras-go/v2 from 2.6.1 to 2.6.2 (#2032)
+  - 7bb36d4d 2026-07-24T00:16:12Z Bump github.com/containerd/containerd from 1.7.33 to 1.7.34 (#2031)
+  - c3c1a01e 2026-07-24T00:15:49Z Upgrade gopkg.in/yaml.v2 to go.yaml.in/yaml/v3 (#2023)
+  - ac622511 2026-07-24T00:15:27Z Bump go.podman.io/common from 0.68.0 to 0.68.1 (#2029)
+  - 108f9b21 2026-07-24T00:15:09Z Bump github.com/grpc-ecosystem/grpc-health-probe from 0.4.52 to 0.4.53 (#2030)
+  - aecb2cbc 2026-07-24T00:14:50Z Bump the golang-x-deps group with 4 updates (#2028)
+  - cf6a7040 2026-07-24T00:14:26Z Bump golang.org/x/text from 0.38.0 to 0.39.0 in the golang-x-deps group (#2027)
+  - 89a84c40 2026-07-24T00:14:08Z Bump google.golang.org/grpc from 1.81.1 to 1.82.0 (#2026)
+  - 5def95d3 2026-07-24T00:13:51Z Bump github.com/docker/cli (#2024)
+  - fd563d4f 2026-07-24T00:13:30Z empty cred check failed to fall back (#2020)
+  - 3be9d826 2026-07-24T00:13:13Z Bump github.com/onsi/gomega from 1.42.0 to 1.42.1 (#2022)
+  - a9705c4c 2026-07-24T00:12:56Z Bump github.com/joelanford/ignore from 0.1.1 to 0.1.2 (#2021)
+  - 94dc8f82 2026-07-24T00:12:38Z Bump github.com/onsi/ginkgo/v2 from 2.31.0 to 2.32.0 (#2019)
+  - 006c600c 2026-07-24T00:12:21Z Bump go.etcd.io/bbolt from 1.4.3 to 1.5.0 (#2018)
+  - 8b9e185b 2026-07-24T00:12:04Z Bump github.com/mattn/go-sqlite3 from 1.14.46 to 1.14.47 (#2017)
+  - 7dd24242 2026-07-24T00:11:46Z Bump github.com/docker/cli (#2016)
+  - e69eb2f5 2026-07-24T00:11:28Z Bump github.com/containerd/containerd from 1.7.32 to 1.7.33 (#2015)
+  - f4932e58 2026-07-24T00:11:05Z Bump actions/checkout from 6 to 7 (#2014)
+  - bad5f896 2026-07-24T00:10:47Z Bump github.com/mattn/go-sqlite3 from 1.14.45 to 1.14.46 (#2013)
+  - 64421e49 2026-07-24T00:10:26Z Bump github.com/onsi/ginkgo/v2 from 2.30.0 to 2.31.0 (#2012)
+  - bb561dd7 2026-07-24T00:10:11Z Bump github.com/onsi/gomega from 1.41.0 to 1.42.0 (#2011)
+  - 71d26236 2026-07-24T00:09:48Z Bump the k8s-dependencies group with 4 updates (#2010)
+  - 6e325976 2026-07-24T00:09:25Z Bump github.com/onsi/ginkgo/v2 from 2.29.0 to 2.30.0 (#2009)
+  - 31ebf518 2026-07-24T00:09:02Z chore: bump o-f deps (#3877)
+  - 2d8c7fe5 2026-07-24T00:08:38Z :seedling: Bump google.golang.org/grpc from 1.82.0 to 1.82.1 (#3875)
+  - f6bea1b4 2026-07-24T00:08:18Z :seedling: Bump github.com/go-logr/logr from 1.4.3 to 1.4.4 (#3874)
+  - 6909f0e9 2026-07-24T00:07:56Z Bump actions/setup-go from 6 to 7 (#3873)
+  - b995490f 2026-07-24T00:07:37Z :seedling: Bump github.com/prometheus/client_golang (#3872)
+  - 98c63a01 2026-07-24T00:06:58Z Migrate deprecated gopkg.in/yaml.v3 to go.yaml.in/yaml/v3 (#3865)
+  - bf01ccba 2026-07-24T00:06:37Z deploy/chart: add static NetworkPolicies for CatalogSource gRPC ingress and bundle unpack egress (#3863)
+  - 21730989 2026-07-24T00:06:12Z :seedling: Bump golang.org/x/net from 0.56.0 to 0.57.0 (#3868)
+  - d1efd56a 2026-07-24T00:05:36Z :seedling: Bump github.com/prometheus/common from 0.69.0 to 0.70.0 (#3869)
+  - 90eb2fa8 2026-07-24T00:05:02Z :seedling: Bump golang.org/x/sync from 0.21.0 to 0.22.0 (#3870)
+
+- service-ca-operator embedded-component 6391e070d2ab026324b032a6fa5fc7d6be0d2cb5 to 4c5aa6cf172006ca0ebc56c06fe0f2eebc23ec2d
+  - 9ad2f83 2026-07-24T17:31:07-04:00 Bump github.com/openshift/build-machinery-go
+  - 11a6d83 2026-07-23T13:23:29+02:00 feat: inject centralized TLS into service-ca operand
+  - 843f71b 2026-07-22T14:39:22+02:00 chore: sync deps
+  - 195ba0b 2026-06-06T22:21:50Z Updating ose-service-ca-operator-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-service-ca-operator.yml
+  - 2fc2708 2026-02-09T11:24:14+01:00 chore: add permissions on endpointslice to Prometheus Role and use serviceDiscoveryRole: EndpointSlice in ServiceMonitors
+
+- oc image-amd64 994613040335f72809854babcb80b9d11a4e98d5 to 86ceecf68afd2f20839edd7f0821766879b5572a
+  - 7884f37a 2026-07-31T19:05:40-04:00 Handle accept risks with different commands
+  - 68ed2c1a 2026-07-31T09:01:24-04:00 OCPBUGS-99757: Set oauth2 AuthStyle to AuthStyleInParams for OIDC token endpoint
+  - 51c19217 2026-07-27T09:55:07-04:00 OCPBUGS-99757: Include extra scopes in OIDC token cache key
+  - a88e785e 2026-07-23T20:40:27Z RFE-8595: must-gather: add client-side keep-alive to prevent accessTokenInactivityTimeout failures (#2288)
+  - 324c04c3 2026-07-22T19:10:46-04:00 Revert "TRT-2817: Revert "Merge pull request #2279 from nbottari9/1814-duplicate-warning""
+
+- csi-external-snapshotter image-amd64 b5e4b73f9a761ff8a59f31b982a63e1cdbb76ed8 to a019d1a9d9e1d26ffd0b2e0d911733180fa608b2
+  - b17468a 2026-07-29T11:10:15+02:00 UPSTREAM: 1460: Skip NotFound errors when deleting snapshot content objects
+
+- router image-amd64 f5b67ebd12089170bfc47da7745fe4efb1477eb7 to 6248720623dd7f49226e2333fcaf7cde3b9492a3
+  - 5c27a38 2026-07-29T15:24:08Z Revert "Merge pull request #825 from bentito/OCPBUGS-77056-async-sar-resurrect-v2"
+  - 64e3cbf 2026-07-28T14:19:34-04:00 OCPBUGS-77056: Check error returns in race condition tests
+  - 941eaf6 2026-07-27T12:43:29-04:00 OCPBUGS-77056: Update test comments to describe post-fix behavior
+  - fd296c1 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Reduce writerlease workers and fix gofmt
+  - e3418f0 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Fix race conditions causing x509 ECDSA verification failure
+  - 3926e45 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Add tests exposing race conditions in async external cert validation
+  - bff072d 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Use a short, unique prefix for fake-haproxy test sockets
+  - 34cbff2 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Update vendor to remove unused authorizationutil reference
+  - 1dcc235 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Refine secret deletion message for semantic consistency
+  - 2d4cf93 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Use t.Setenv for WatchListClient override in factory tests
+  - bc5619a 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Include standard SA groups in SubjectAccessReview specs
+  - cfc2726 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Fail-closed to ValidationFailed on secret deletion
+  - fff8566 2026-07-27T11:47:39-04:00 Addressing coderabbit PR comments
+  - 5a52884 2026-07-27T11:47:39-04:00 Addressed several refactor needs from PR comments
+  - 20fe05f 2026-07-27T11:47:39-04:00 address review comment: remove unnecessary lock from StatusAdmitter
+  - 463265d 2026-07-27T11:47:39-04:00 address review comment: use types.NamespacedName for informer key
+  - 25ccd95 2026-07-27T11:47:39-04:00 Remove library-go replace directive and update vendor
+  - 6c010a1 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Retry on write conflicts without dropping writerlease
+  - 8666c60 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Asynchronous external certificate validation and Hybrid Informer secret monitoring
+  - b701b2d 2026-07-27T15:37:57Z images/router/f5: Delete F5 router Dockerfile
   - c15a20a 2026-07-25T20:02:34Z Revert "OCPBUGS-77056: Make external cert validation asynchronous (Resurrection)"
   - da1c969 2026-07-23T10:29:40-04:00 OCPBUGS-77056: Use a short, unique prefix for fake-haproxy test sockets
   - 6f2aacc 2026-07-23T10:29:40-04:00 OCPBUGS-77056: Update vendor to remove unused authorizationutil reference
@@ -16,26 +252,187 @@
   - 7b4b855 2026-07-23T10:29:40-04:00 Remove library-go replace directive and update vendor
   - 277913c 2026-07-23T10:29:40-04:00 OCPBUGS-77056: Retry on write conflicts without dropping writerlease
   - bc97dba 2026-07-23T10:29:40-04:00 OCPBUGS-77056: Asynchronous external certificate validation and Hybrid Informer secret monitoring
-  - 74b6915 2026-07-22T11:50:03-04:00 NE-2741: Align vendored openshift/api with the master branch version
-  - deb1d50 2026-07-22T11:21:18-04:00 NE-2741: Address PR comments on TLS curve preference parsing
-  - 7f33917 2026-07-22T11:21:18-04:00 Security: fail-closed on unsupported TLS curves and parse mixed delimiters
-  - da031dd 2026-07-22T11:21:18-04:00 Fix: shorten fake-haproxy socket path in tests to avoid length limits
-  - ef67e22 2026-07-22T11:21:18-04:00 NE-2741: Implement TLS Curves Support for Metrics Endpoints
   - 6ebff4e 2026-07-20T21:03:15-04:00 NE-2223: Bump HAProxy to 3.2.19 in the router image
   - 400eac8 2026-06-15T16:09:07-03:00 NO-JIRA: Add default coderabbit for the repo
 
-- ovn-kubernetes image-arm64 8e2e1542642847da592268a0ab94a207eb8d3605 to 88e9f0f146784e8525f6304a1f6f7c986eba2319
+- ovn-kubernetes image-amd64 8e2e1542642847da592268a0ab94a207eb8d3605 to 4c92603d97181c0315e16fa9a1e2ad9f5d323344
+  - 51047fae 2026-07-17T20:27:56+05:30 sync test annotations with upstream changes
+  - b05c351c 2026-07-17T20:27:53+05:30 Adapt OTE for E2E L3 CUDN multisubnet backward compatibility fixes
+  - 70a2009b 2026-07-17T10:23:14+02:00 e2e(kubevirt): deflake "with pre-copy fails" migration test
+  - fa8e140a 2026-07-16T15:33:44+02:00 Fix traffic leak in egress IP on secondary interface
+  - 8bce7389 2026-07-16T10:32:40+02:00 node: use libovsdb instead of ovs-vsctl exec in checkPorts
+  - 7b2e6eb5 2026-07-16T00:32:34+02:00 ci: cover dynamic UDN allocation on a no-overlay shared-gateway lane
+  - 1b7e0ec0 2026-07-16T00:32:34+02:00 e2e: adapt advertised network isolation tests to dynamic UDN allocation
+  - 156b75f9 2026-07-16T00:32:34+02:00 e2e: adapt CUDN advertisement tests to dynamic UDN allocation
+  - 501cc079 2026-07-16T00:32:34+02:00 e2e: cover RouteAdvertisements over a dynamically allocated CUDN
+  - 8df86599 2026-07-16T00:32:34+02:00 routeadvertisements: advertise dynamic UDNs only from active nodes
+  - 677d6113 2026-07-15T10:03:52-07:00 clustermanager: rename node allocation controller
+  - 1fcfb18f 2026-07-14T16:09:34-04:00 no-overlay: host -> pods on other nodes via mp0
+  - 4620cb6d 2026-07-14T10:29:15-07:00 licenses: refresh generated third-party licenses
+  - 8b0dd877 2026-07-14T10:29:15-07:00 cni: fold libovsdb and shell-out ConfigureOVS paths into one
+  - 0b276e27 2026-07-14T10:29:15-07:00 libovsdb/ops: consolidate ovs helper operations
+  - 49393a41 2026-07-14T16:52:06+01:00 docs: rename portSecurity to macSecurity in OKEP-3926
+  - 7229c04d 2026-07-14T20:27:41+05:30 node: skip configureGlobalForwarding tests in CI without root access
+  - 40bd24a5 2026-07-13T17:27:35+02:00 zone_interconnect: add unit test for stale IC route cleanup
   - 3f34530b 2026-07-12T10:36:43+03:00 Update OWNERS file
+  - 60fcdaf5 2026-07-10T18:56:40+02:00 Use new IPv6 force_forwarding sysctl if available.
+  - 0e3a4e06 2026-07-10T18:56:40+02:00 Don't change FORWARD table default policy for IPv4
+  - 7795aba2 2026-07-10T18:56:40+02:00 Don't override FORWARD default policy when `disable-forwarding` is not set
+  - 92fc5160 2026-07-10T18:56:40+02:00 Update disable-gateway unit tests
+  - a90d60b6 2026-07-10T18:56:40+02:00 Clarify/simplify/fix "Disable Forwarding Config" docs
+  - bdfd82fb 2026-07-10T17:48:35+02:00 Redo the AllocateLoadBalancerNodePorts=false test cases
+  - dcaf6dba 2026-07-10T12:46:42+02:00 [perf] fix netpol selection for cudn-l2 job
+  - d447e853 2026-07-10T11:17:19+02:00 Support update of chassis-id without re-creating the node.
+  - 0c9edf05 2026-07-08T12:59:20-07:00 ovnkube.sh: unify gateway option loading from OVS external_ids
+  - 945f64d7 2026-07-08T10:33:19-07:00 test: Use proper TLS certificate validation in metrics server tests
+  - 98e204fe 2026-07-08T13:36:28+02:00 coderabbit: add pre-merge checks and custom validation rules
+  - e36fbadc 2026-07-07T20:23:30+02:00 Get pod from apiserver on retryable annotation patch failure
+  - 06f453b7 2026-07-07T08:13:37+02:00 e2e(kubevirt): replace echoserver with iperf3
+  - 853a72fa 2026-07-06T15:06:48-07:00 libovsdb/ops: document ovs-vsctl equivalents on read wrappers
+  - e3e40f10 2026-07-06T15:06:48-07:00 util, libovsdb/ops: migrate NicToBridge to libovsdb
+  - 497f470f 2026-07-06T15:06:48-07:00 test/e2e: pin docker while importing libovsdb
+  - c1c5603e 2026-07-06T15:06:48-07:00 util, node: migrate nicstobridge read paths to libovsdb
+  - 258eb623 2026-07-06T15:06:48-07:00 node/test: migrate DPU and gateway tests to libovsdb harness
+  - 1a64e7db 2026-07-06T15:06:48-07:00 cni, node: migrate ConfigureOVS and delRepPort to libovsdb
+  - 3785f7bd 2026-07-06T15:06:48-07:00 node: move ovsClient to BaseNodeNetworkController
+  - a58ead15 2026-07-06T15:06:47-07:00 libovsdb/ops: add GetOVSInterface and CreateOrUpdatePodPort
+  - ff6d3a79 2026-07-06T15:06:47-07:00 node, controllermanager: migrate stale-port cleanup to libovsdb
+  - 65e3926d 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate port-to-br shell-outs to libovsdb
+  - f1a554fd 2026-07-06T15:06:47-07:00 node: migrate br-exists and del-port br-int to libovsdb
+  - 1e4c92c6 2026-07-06T15:06:47-07:00 util, ovn-kube-util: migrate BridgeToNic to libovsdb
+  - 79cb19da 2026-07-06T15:06:47-07:00 libovsdb/ops: bridge-scope DeletePortWithInterfaces
+  - fdc69950 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate del-br shell-outs to libovsdb
+  - 25b05aa5 2026-07-06T20:15:26+02:00 Only create ACCEPT rules for bypassing our own DROP rules
+  - fe9bd9f8 2026-07-06T20:15:26+02:00 Simplify initLocalGateway iptables/nftables setup
+  - 7683207e 2026-07-03T10:03:37+02:00 e2e(kubevirt): drop fedora coreos image in favor of fedora
+  - d9d3e374 2026-07-02T18:14:51+02:00 area-merge: prevent bot comment feedback loop
+  - 635a3fd7 2026-07-02T15:50:39+01:00 docs: add "future work" section to OKEP-3926
+  - 69f3a5e7 2026-07-02T15:50:39+01:00 docs: simplify OKEP-3926 and add per-attachment future section
+  - 00e2aa81 2026-07-02T15:50:39+01:00 docs: add OKEP-3926 for disabling port security on secondary networks
+  - 4246d935 2026-07-02T17:56:19+08:00 docs: fix typo in OKEP 5193 CUDN spec
+  - e9ed7419 2026-07-01T15:50:28-07:00 OKEP-6227: Add DHCP IPAM support for localnet UDNs
+  - 78e42465 2026-07-01T10:34:35-04:00 config: make routing table ID start configurable
+  - b19a79d2 2026-06-30T10:59:13-04:00 Revert "Route DPU host no-overlay traffic through OVN"
+  - 6eac3a2e 2026-06-30T15:35:05+02:00 docs/e2e: clarify E2E backward compatibility requirements in OKEP template
+  - 585b72c2 2026-06-26T16:33:10+02:00 Allow networks to start while route advertisements settle
 
-- kubernetes image-arm64 0f7d1a1b66af90eece8d46f6f9dc7537bf16d978 to 63ee93dac28329fd9d81e91b21ea8d8c43105d01
+- kubernetes image-amd64 98b35193b2ac7a23a673325f5e9b830ecd5ba406 to e63ab41237b34f2a457e76900f6162184420cf96
+  - 5e858e982 2026-07-28T13:51:08-04:00 UPSTREAM: <carry>: Re-enable kubectl kuberc commands e2e tests
+  - 8d27ef98f 2026-07-27T11:14:23+02:00 UPSTREAM: 137936: csi: update CSI sidecar images in test manifests
+  - c8aa52947 2026-07-24T13:25:07+02:00 UPSTREAM: 138768: move VolumeGroupSnapshot to V1
+  - 0f4503bbf 2026-07-22T11:54:16-04:00 UPSTREAM: <carry>: Update openshift-hack/rebase.sh, REBASE.openshift.md
+  - cc48cfba7 2026-07-20T21:23:37-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for standalone clusters (part 2)
   - 44a83e00e 2026-07-17T15:00:07+02:00 UPSTREAM: <drop>: hack/update-featuregates.sh
   - 4da08ff19 2026-07-17T08:27:41+02:00 UPSTREAM: <carry>: Store SELinuxWarningController upgrade check as a ConfigMap
-  - d178a1dbb 2026-07-17T00:54:58+05:30 UPSTREAM: 140211: Promote regression-issue-74839 to 1.5
+  - de396e993 2026-07-16T15:20:30-06:00 UPSTREAM: 140377: e2e: storage snapshot tests should read custom timeouts from manifest
   - 13ace3c70 2026-07-02T02:25:02-04:00 UPSTREAM: <carry>: upkeep cpu partitioning admission webhook
 
-- service-ca-operator image-arm64 6391e070d2ab026324b032a6fa5fc7d6be0d2cb5 to e260be2b3710137012814ce9ca48f155f24f0b02
+- service-ca-operator image-amd64 6391e070d2ab026324b032a6fa5fc7d6be0d2cb5 to 4c5aa6cf172006ca0ebc56c06fe0f2eebc23ec2d
   - 9ad2f83 2026-07-24T17:31:07-04:00 Bump github.com/openshift/build-machinery-go
   - 11a6d83 2026-07-23T13:23:29+02:00 feat: inject centralized TLS into service-ca operand
   - 843f71b 2026-07-22T14:39:22+02:00 chore: sync deps
   - 195ba0b 2026-06-06T22:21:50Z Updating ose-service-ca-operator-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-service-ca-operator.yml
+  - 2fc2708 2026-02-09T11:24:14+01:00 chore: add permissions on endpointslice to Prometheus Role and use serviceDiscoveryRole: EndpointSlice in ServiceMonitors
+
+- oc image-arm64 a88e785e90aa96ac96da93359bacf3ea5c174733 to 86ceecf68afd2f20839edd7f0821766879b5572a
+  - 7884f37a 2026-07-31T19:05:40-04:00 Handle accept risks with different commands
+  - 68ed2c1a 2026-07-31T09:01:24-04:00 OCPBUGS-99757: Set oauth2 AuthStyle to AuthStyleInParams for OIDC token endpoint
+  - 51c19217 2026-07-27T09:55:07-04:00 OCPBUGS-99757: Include extra scopes in OIDC token cache key
+  - 324c04c3 2026-07-22T19:10:46-04:00 Revert "TRT-2817: Revert "Merge pull request #2279 from nbottari9/1814-duplicate-warning""
+
+- csi-external-snapshotter image-arm64 b5e4b73f9a761ff8a59f31b982a63e1cdbb76ed8 to a019d1a9d9e1d26ffd0b2e0d911733180fa608b2
+  - b17468a 2026-07-29T11:10:15+02:00 UPSTREAM: 1460: Skip NotFound errors when deleting snapshot content objects
+
+- router image-arm64 682319a1bb432f0203951c33336d0f55947e1099 to 6248720623dd7f49226e2333fcaf7cde3b9492a3
+  - 5c27a38 2026-07-29T15:24:08Z Revert "Merge pull request #825 from bentito/OCPBUGS-77056-async-sar-resurrect-v2"
+  - 64e3cbf 2026-07-28T14:19:34-04:00 OCPBUGS-77056: Check error returns in race condition tests
+  - 941eaf6 2026-07-27T12:43:29-04:00 OCPBUGS-77056: Update test comments to describe post-fix behavior
+  - fd296c1 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Reduce writerlease workers and fix gofmt
+  - e3418f0 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Fix race conditions causing x509 ECDSA verification failure
+  - 3926e45 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Add tests exposing race conditions in async external cert validation
+  - bff072d 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Use a short, unique prefix for fake-haproxy test sockets
+  - 34cbff2 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Update vendor to remove unused authorizationutil reference
+  - 1dcc235 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Refine secret deletion message for semantic consistency
+  - 2d4cf93 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Use t.Setenv for WatchListClient override in factory tests
+  - bc5619a 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Include standard SA groups in SubjectAccessReview specs
+  - cfc2726 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Fail-closed to ValidationFailed on secret deletion
+  - fff8566 2026-07-27T11:47:39-04:00 Addressing coderabbit PR comments
+  - 5a52884 2026-07-27T11:47:39-04:00 Addressed several refactor needs from PR comments
+  - 20fe05f 2026-07-27T11:47:39-04:00 address review comment: remove unnecessary lock from StatusAdmitter
+  - 463265d 2026-07-27T11:47:39-04:00 address review comment: use types.NamespacedName for informer key
+  - 25ccd95 2026-07-27T11:47:39-04:00 Remove library-go replace directive and update vendor
+  - 6c010a1 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Retry on write conflicts without dropping writerlease
+  - 8666c60 2026-07-27T11:47:39-04:00 OCPBUGS-77056: Asynchronous external certificate validation and Hybrid Informer secret monitoring
+  - b701b2d 2026-07-27T15:37:57Z images/router/f5: Delete F5 router Dockerfile
+
+- ovn-kubernetes image-arm64 88e9f0f146784e8525f6304a1f6f7c986eba2319 to 4c92603d97181c0315e16fa9a1e2ad9f5d323344
+  - 51047fae 2026-07-17T20:27:56+05:30 sync test annotations with upstream changes
+  - b05c351c 2026-07-17T20:27:53+05:30 Adapt OTE for E2E L3 CUDN multisubnet backward compatibility fixes
+  - 70a2009b 2026-07-17T10:23:14+02:00 e2e(kubevirt): deflake "with pre-copy fails" migration test
+  - fa8e140a 2026-07-16T15:33:44+02:00 Fix traffic leak in egress IP on secondary interface
+  - 8bce7389 2026-07-16T10:32:40+02:00 node: use libovsdb instead of ovs-vsctl exec in checkPorts
+  - 7b2e6eb5 2026-07-16T00:32:34+02:00 ci: cover dynamic UDN allocation on a no-overlay shared-gateway lane
+  - 1b7e0ec0 2026-07-16T00:32:34+02:00 e2e: adapt advertised network isolation tests to dynamic UDN allocation
+  - 156b75f9 2026-07-16T00:32:34+02:00 e2e: adapt CUDN advertisement tests to dynamic UDN allocation
+  - 501cc079 2026-07-16T00:32:34+02:00 e2e: cover RouteAdvertisements over a dynamically allocated CUDN
+  - 8df86599 2026-07-16T00:32:34+02:00 routeadvertisements: advertise dynamic UDNs only from active nodes
+  - 677d6113 2026-07-15T10:03:52-07:00 clustermanager: rename node allocation controller
+  - 1fcfb18f 2026-07-14T16:09:34-04:00 no-overlay: host -> pods on other nodes via mp0
+  - 4620cb6d 2026-07-14T10:29:15-07:00 licenses: refresh generated third-party licenses
+  - 8b0dd877 2026-07-14T10:29:15-07:00 cni: fold libovsdb and shell-out ConfigureOVS paths into one
+  - 0b276e27 2026-07-14T10:29:15-07:00 libovsdb/ops: consolidate ovs helper operations
+  - 49393a41 2026-07-14T16:52:06+01:00 docs: rename portSecurity to macSecurity in OKEP-3926
+  - 7229c04d 2026-07-14T20:27:41+05:30 node: skip configureGlobalForwarding tests in CI without root access
+  - 40bd24a5 2026-07-13T17:27:35+02:00 zone_interconnect: add unit test for stale IC route cleanup
+  - 60fcdaf5 2026-07-10T18:56:40+02:00 Use new IPv6 force_forwarding sysctl if available.
+  - 0e3a4e06 2026-07-10T18:56:40+02:00 Don't change FORWARD table default policy for IPv4
+  - 7795aba2 2026-07-10T18:56:40+02:00 Don't override FORWARD default policy when `disable-forwarding` is not set
+  - 92fc5160 2026-07-10T18:56:40+02:00 Update disable-gateway unit tests
+  - a90d60b6 2026-07-10T18:56:40+02:00 Clarify/simplify/fix "Disable Forwarding Config" docs
+  - bdfd82fb 2026-07-10T17:48:35+02:00 Redo the AllocateLoadBalancerNodePorts=false test cases
+  - dcaf6dba 2026-07-10T12:46:42+02:00 [perf] fix netpol selection for cudn-l2 job
+  - d447e853 2026-07-10T11:17:19+02:00 Support update of chassis-id without re-creating the node.
+  - 0c9edf05 2026-07-08T12:59:20-07:00 ovnkube.sh: unify gateway option loading from OVS external_ids
+  - 945f64d7 2026-07-08T10:33:19-07:00 test: Use proper TLS certificate validation in metrics server tests
+  - 98e204fe 2026-07-08T13:36:28+02:00 coderabbit: add pre-merge checks and custom validation rules
+  - e36fbadc 2026-07-07T20:23:30+02:00 Get pod from apiserver on retryable annotation patch failure
+  - 06f453b7 2026-07-07T08:13:37+02:00 e2e(kubevirt): replace echoserver with iperf3
+  - 853a72fa 2026-07-06T15:06:48-07:00 libovsdb/ops: document ovs-vsctl equivalents on read wrappers
+  - e3e40f10 2026-07-06T15:06:48-07:00 util, libovsdb/ops: migrate NicToBridge to libovsdb
+  - 497f470f 2026-07-06T15:06:48-07:00 test/e2e: pin docker while importing libovsdb
+  - c1c5603e 2026-07-06T15:06:48-07:00 util, node: migrate nicstobridge read paths to libovsdb
+  - 258eb623 2026-07-06T15:06:48-07:00 node/test: migrate DPU and gateway tests to libovsdb harness
+  - 1a64e7db 2026-07-06T15:06:48-07:00 cni, node: migrate ConfigureOVS and delRepPort to libovsdb
+  - 3785f7bd 2026-07-06T15:06:48-07:00 node: move ovsClient to BaseNodeNetworkController
+  - a58ead15 2026-07-06T15:06:47-07:00 libovsdb/ops: add GetOVSInterface and CreateOrUpdatePodPort
+  - ff6d3a79 2026-07-06T15:06:47-07:00 node, controllermanager: migrate stale-port cleanup to libovsdb
+  - 65e3926d 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate port-to-br shell-outs to libovsdb
+  - f1a554fd 2026-07-06T15:06:47-07:00 node: migrate br-exists and del-port br-int to libovsdb
+  - 1e4c92c6 2026-07-06T15:06:47-07:00 util, ovn-kube-util: migrate BridgeToNic to libovsdb
+  - 79cb19da 2026-07-06T15:06:47-07:00 libovsdb/ops: bridge-scope DeletePortWithInterfaces
+  - fdc69950 2026-07-06T15:06:47-07:00 node, libovsdb/ops: migrate del-br shell-outs to libovsdb
+  - 25b05aa5 2026-07-06T20:15:26+02:00 Only create ACCEPT rules for bypassing our own DROP rules
+  - fe9bd9f8 2026-07-06T20:15:26+02:00 Simplify initLocalGateway iptables/nftables setup
+  - 7683207e 2026-07-03T10:03:37+02:00 e2e(kubevirt): drop fedora coreos image in favor of fedora
+  - d9d3e374 2026-07-02T18:14:51+02:00 area-merge: prevent bot comment feedback loop
+  - 635a3fd7 2026-07-02T15:50:39+01:00 docs: add "future work" section to OKEP-3926
+  - 69f3a5e7 2026-07-02T15:50:39+01:00 docs: simplify OKEP-3926 and add per-attachment future section
+  - 00e2aa81 2026-07-02T15:50:39+01:00 docs: add OKEP-3926 for disabling port security on secondary networks
+  - 4246d935 2026-07-02T17:56:19+08:00 docs: fix typo in OKEP 5193 CUDN spec
+  - e9ed7419 2026-07-01T15:50:28-07:00 OKEP-6227: Add DHCP IPAM support for localnet UDNs
+  - 78e42465 2026-07-01T10:34:35-04:00 config: make routing table ID start configurable
+  - b19a79d2 2026-06-30T10:59:13-04:00 Revert "Route DPU host no-overlay traffic through OVN"
+  - 6eac3a2e 2026-06-30T15:35:05+02:00 docs/e2e: clarify E2E backward compatibility requirements in OKEP template
+  - 585b72c2 2026-06-26T16:33:10+02:00 Allow networks to start while route advertisements settle
+
+- kubernetes image-arm64 63ee93dac28329fd9d81e91b21ea8d8c43105d01 to e63ab41237b34f2a457e76900f6162184420cf96
+  - 5e858e982 2026-07-28T13:51:08-04:00 UPSTREAM: <carry>: Re-enable kubectl kuberc commands e2e tests
+  - 8d27ef98f 2026-07-27T11:14:23+02:00 UPSTREAM: 137936: csi: update CSI sidecar images in test manifests
+  - c8aa52947 2026-07-24T13:25:07+02:00 UPSTREAM: 138768: move VolumeGroupSnapshot to V1
+  - 0f4503bbf 2026-07-22T11:54:16-04:00 UPSTREAM: <carry>: Update openshift-hack/rebase.sh, REBASE.openshift.md
+  - cc48cfba7 2026-07-20T21:23:37-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for standalone clusters (part 2)
+  - de396e993 2026-07-16T15:20:30-06:00 UPSTREAM: 140377: e2e: storage snapshot tests should read custom timeouts from manifest
+
+- service-ca-operator image-arm64 e260be2b3710137012814ce9ca48f155f24f0b02 to 4c5aa6cf172006ca0ebc56c06fe0f2eebc23ec2d
+  - 2fc2708 2026-02-09T11:24:14+01:00 chore: add permissions on endpointslice to Prometheus Role and use serviceDiscoveryRole: EndpointSlice in ServiceMonitors
 
