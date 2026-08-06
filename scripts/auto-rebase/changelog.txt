@@ -1,6 +1,6 @@
-- cluster-network-operator embedded-component 90fc24ad2c3d8100f309113c04351976e1f71078 to 4fa59bf99729215d7eb5e91ad406898b4f87cf41
-  - b0da453 2026-07-24T16:52:45Z Bump frr-k8s MAX_FDS from 1024 to 65536
-
-- ovn-kubernetes image-amd64 e02cc75645fbc8981239e4144da1cd4dd98b1b17 to ff75cbd102b3f58445df4116ddcbe4d2ef2d254f
-  - e10ae628 2026-07-23T15:42:45+05:30 OCPBUGS-82872: Bump github.com/moby/spdystream to v0.5.1
+- ovn-kubernetes image-amd64 ff75cbd102b3f58445df4116ddcbe4d2ef2d254f to 25ccfc590108a9e734fb68b7991a5d0650af0640
+  - 53757642 2026-07-23T15:44:16+02:00 e2e(virt): Replace fake virt-launcher pod with proper VMI in UDPN test
+  - 1e16523e 2026-07-23T15:38:28+02:00 e2e(virt): Add test with three VMs same hostname
+  - 236032f5 2026-07-23T15:38:28+02:00 kubevirt: Support handling vm hostname field
+  - 2fadc6d3 2026-07-23T15:36:19+02:00 kubevirt: skip source LSP re-enable when source pod is not local
 
