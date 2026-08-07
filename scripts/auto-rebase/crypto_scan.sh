@@ -17,8 +17,10 @@ fi
 
 if [ -w /etc/subuid ] || [ ! -f /etc/subuid ]; then
     PODMAN_USER=$(whoami)
-    echo "${PODMAN_USER}:100000:65536" > /etc/subuid
-    echo "${PODMAN_USER}:100000:65536" > /etc/subgid
+    PODMAN_START_ID=$(( $(id -u) + 1 ))
+    PODMAN_COUNT=$(( 65536 - PODMAN_START_ID ))
+    echo "${PODMAN_USER}:${PODMAN_START_ID}:${PODMAN_COUNT}" > /etc/subuid
+    echo "${PODMAN_USER}:${PODMAN_START_ID}:${PODMAN_COUNT}" > /etc/subgid
 fi
 
 mkdir -p "${HOME}/.config/containers"
@@ -42,11 +44,6 @@ fi
 echo "Running crypto scanner against MicroShift source..."
 echo "Scanner image: ${SCANNER_IMAGE}"
 echo "Source directory: ${REPOROOT}"
-
-cat /proc/self/status | grep -i cap
-cat /proc/self/status | grep Seccomp
-unshare --user true 2>&1 && echo "unshare works" || echo "unshare BLOCKED"
-
 
 if ! podman pull "${SCANNER_IMAGE}"; then
   echo "WARNING: failed to pull scanner image, skipping CBOM generation" >&2
