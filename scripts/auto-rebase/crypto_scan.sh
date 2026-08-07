@@ -45,6 +45,12 @@ echo "Running crypto scanner against MicroShift source..."
 echo "Scanner image: ${SCANNER_IMAGE}"
 echo "Source directory: ${REPOROOT}"
 
+# bypass username creation to avoid newuidmap calls
+cat > "${HOME}/.config/containers/containers.conf" <<EOF
+[containers]
+userns = "host"
+EOF
+
 if ! podman pull "${SCANNER_IMAGE}"; then
   echo "WARNING: failed to pull scanner image, skipping CBOM generation" >&2
   exit 0
