@@ -6,6 +6,16 @@ set -o pipefail
 set -x
 
 
+# Generate CBOM (Cryptographic Bill of Materials)
+if [[ "${SKIP_CRYPTOSCAN:-}" != "true" ]]; then
+    ./scripts/auto-rebase/crypto_scan.sh
+    if [[ -n "$(git status -s cbom-microshift.json sbom-microshift-crypto.spdx.json)" ]]; then
+        echo "Updating CBOM"
+        git add cbom-microshift.json sbom-microshift-crypto.spdx.json
+        git commit -m "update cbom"
+    fi
+fi
+
 echo "Environment:"
 printenv
 
