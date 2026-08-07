@@ -45,11 +45,8 @@ echo "Running crypto scanner against MicroShift source..."
 echo "Scanner image: ${SCANNER_IMAGE}"
 echo "Source directory: ${REPOROOT}"
 
-# bypass username creation to avoid newuidmap calls
-cat > "${HOME}/.config/containers/containers.conf" <<EOF
-[containers]
-userns = "host"
-EOF
+echo "DEBUG: nsswitch subid=$(grep subid /etc/nsswitch.conf 2>/dev/null || echo 'not found')"
+cat /etc/subuid
 
 if ! podman pull "${SCANNER_IMAGE}"; then
   echo "WARNING: failed to pull scanner image, skipping CBOM generation" >&2
