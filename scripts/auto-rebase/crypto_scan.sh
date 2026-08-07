@@ -43,6 +43,11 @@ echo "Running crypto scanner against MicroShift source..."
 echo "Scanner image: ${SCANNER_IMAGE}"
 echo "Source directory: ${REPOROOT}"
 
+cat /proc/self/status | grep -i cap
+cat /proc/self/status | grep Seccomp
+unshare --user true 2>&1 && echo "unshare works" || echo "unshare BLOCKED"
+
+
 if ! podman pull "${SCANNER_IMAGE}"; then
   echo "WARNING: failed to pull scanner image, skipping CBOM generation" >&2
   exit 0
