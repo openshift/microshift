@@ -1,6 +1,7 @@
-- ovn-kubernetes image-amd64 ff75cbd102b3f58445df4116ddcbe4d2ef2d254f to 25ccfc590108a9e734fb68b7991a5d0650af0640
-  - 53757642 2026-07-23T15:44:16+02:00 e2e(virt): Replace fake virt-launcher pod with proper VMI in UDPN test
-  - 1e16523e 2026-07-23T15:38:28+02:00 e2e(virt): Add test with three VMs same hostname
-  - 236032f5 2026-07-23T15:38:28+02:00 kubevirt: Support handling vm hostname field
-  - 2fadc6d3 2026-07-23T15:36:19+02:00 kubevirt: skip source LSP re-enable when source pod is not local
+- cluster-ingress-operator embedded-component 12a2b5974ae9cbb644b2827af3597a3c911d1d4c to f86aaea4136dfea16e62290bd50ecdd1a8b22b3f
+  - 6ea1b8e 2026-07-22T16:40:30Z OCPBUGS-77457: Respect proxy configuration on gwapi provisioning
+
+- machine-config-operator embedded-component 1f1efae7758fd6ec0d9e90cb9a893f51ff1079b8 to 3cfcf6c812e9960a837be8a29a7a328e7ea758d3
+  - 1fdcfe98 2026-08-06T11:16:44-04:00 mcc: replace wildcard permissions with explicit verbs and resources in MCC ClusterRole & scope configmap access to target namespace via Role instead of ClusterRole
+  - 2196b04d 2026-08-06T04:42:40Z chore: update AMIs
 
