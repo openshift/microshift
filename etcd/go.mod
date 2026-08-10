@@ -145,11 +145,11 @@ require (
 
 replace (
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260424201627-4d4cc33d669d // from kubernetes
-	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20260722153822-64f8851a001f // from etcd
-	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.0.0-20260722153822-64f8851a001f // from etcd
-	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260722153822-64f8851a001f // from etcd
-	go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20260722153822-64f8851a001f // from etcd
-	go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20260722153822-64f8851a001f // from etcd
+	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20260806141214-3688f53af36d // from etcd
+	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.0.0-20260806141214-3688f53af36d // from etcd
+	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260806141214-3688f53af36d // from etcd
+	go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20260806141214-3688f53af36d // from etcd
+	go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20260806141214-3688f53af36d // from etcd
 )
 
 replace (
