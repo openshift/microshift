@@ -1331,6 +1331,19 @@ rebase_to() {
         echo "No changes to buildfiles."
     fi
 
+    # Generate CBOM (Cryptographic Bill of Materials)
+    if [[ "${SKIP_CRYPTOSCAN:-}" != "true" ]]; then
+        title "## Generating CBOM (Cryptographic Bill of Materials)"
+        ./scripts/auto-rebase/crypto_scan.sh
+        if [[ -n "$(git status -s cbom-microshift.json sbom-microshift-crypto.spdx.json)" ]]; then
+            echo "Updating CBOM"
+            git add cbom-microshift.json sbom-microshift-crypto.spdx.json
+            git commit -m "update cbom"
+        else
+            echo "No changes to CBOM."
+        fi        
+    fi
+
     title "# Removing staging directory"
     rm -rf "${STAGING_DIR}"
 }
