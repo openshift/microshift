@@ -218,7 +218,7 @@ sudo virt-install \
     --events on_reboot=restart \
     --location /var/lib/libvirt/images/rhel-9.6-$(uname -m)-boot.iso \
     --initrd-inject kickstart.ks \
-    --extra-args "inst.ks=file://kickstart.ks" \
+    --extra-args "inst.ks=file:/kickstart.ks" \
     --wait
 ```
 
@@ -336,7 +336,7 @@ sudo virt-install \
     --events on_reboot=restart \
     --location /var/lib/libvirt/images/${VMNAME}.iso \
     --initrd-inject kickstart.ks \
-    --extra-args "inst.ks=file://kickstart.ks" \
+    --extra-args "inst.ks=file:/kickstart.ks" \
     --wait
 ```
 
