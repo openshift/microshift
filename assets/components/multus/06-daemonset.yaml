@@ -61,7 +61,7 @@ spec:
             start=$(date +%s);
             while [ ! -f /host/etc/cni/net.d/10-ovn-kubernetes.conf ]; do
               now=$(date +%s);
-              if $(( now - start > 5 * 60 )); then
+              if [ "$((now - start))" -gt 300 ]; then
                 echo "$(date --iso-8601=seconds) Timed out waiting for /etc/cni/net.d/10-ovn-kubernetes.conf";
                 exit 1;
               fi;
