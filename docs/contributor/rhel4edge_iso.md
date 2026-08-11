@@ -73,7 +73,7 @@ Use `rhel/9/x86_64/edge` as the ostree ref in all `composer-cli compose start-os
 ### Disk Partitioning
 The [`microshift-edge.ks`](../config/microshift-edge.ks) file is configured to partition the main disk using `Logical Volume Manager` (LVM). Such partitioning is required for the data volume to be utilized by the MicroShift CSI driver and it allows for flexible file system customization if the disk space runs out.
 
-By default, the following partition layout is created and formatted with the `XFS` file system:
+By default, the following partition layout is created. The `/boot` and root partitions use the `XFS` file system:
 * EFI System Partition with FAT file system (600MB)
 * Boot partition is allocated on a 1GB volume
 * The rest of the disk is managed by the `LVM` in a single volume group named `rhel`
@@ -125,7 +125,7 @@ sudo virt-install \
     --events on_reboot=restart \
     --location "${ISOFILE}" \
     --initrd-inject "${HOME}/microshift-edge.ks" \
-    --extra-args "inst.ks=file://microshift-edge.ks" \
+    --extra-args "inst.ks=file:/microshift-edge.ks" \
     --noautoconsole \
     --wait
 ```
@@ -141,6 +141,7 @@ Log into the system using `redhat:redhat` credentials (as configured in [`micros
 ```bash
 mkdir ~/.kube
 sudo cat /var/lib/microshift/resources/kubeadmin/kubeconfig > ~/.kube/config
+chmod go-r ~/.kube/config
 ```
 
 Verify that MicroShift is up and running.
