@@ -1,7 +1,7 @@
 # Install MicroShift on RHEL for Edge
 To test MicroShift in a setup similar to the production environment, it is necessary to create a RHEL for Edge ISO installer with all the necessary components preloaded on the image.
 
-The official [Embedding in a RHEL for Edge image](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.22/html/embedding_in_a_rhel_for_edge_image/microshift-embed-in-rpm-ostree) documentation covers the full procedure for building an installer ISO from released MicroShift RPMs. This document describes a modified workflow for building from **locally compiled** RPMs, which is necessary when testing changes that have not been released.
+The official [Embedding in a RHEL for Edge image](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/embedding_in_a_rhel_for_edge_image/microshift-embed-in-rpm-ostree) documentation covers the full procedure for building an installer ISO from released MicroShift RPMs. This document describes a modified workflow for building from **locally compiled** RPMs, which is necessary when testing changes that have not been released.
 
 The procedures described in this document require the following setup:
 * A `physical hypervisor host` running RHEL with the [libvirt](https://libvirt.org/) virtualization platform and at least 50GB of free disk space
@@ -39,7 +39,7 @@ The RPMs are placed under `_output/rpmbuild/RPMS/`.
 
 ### Create a Local RPM Repository
 
-Create a local repository from the built RPMs so that `osbuild-composer` can resolve them as a package source. This replaces the released MicroShift RPMs that the [official procedure](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.22/html/embedding_in_a_rhel_for_edge_image/microshift-embed-in-rpm-ostree#adding-microshift-repos-image-builder_microshift-embed-in-rpm-ostree) obtains from CDN.
+Create a local repository from the built RPMs so that `osbuild-composer` can resolve them as a package source. This replaces the released MicroShift RPMs that the [official procedure](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/embedding_in_a_rhel_for_edge_image/microshift-embed-in-rpm-ostree#adding-microshift-repos-image-builder_microshift-embed-in-rpm-ostree) obtains from CDN.
 
 ```bash
 BUILDDIR=~/microshift/_output/image-builder
@@ -66,7 +66,7 @@ sudo composer-cli sources add /tmp/microshift-local.toml
 
 ### Build the Image
 
-With the local RPM source registered, follow the official documentation starting from [Adding MicroShift repositories to image builder](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.22/html/embedding_in_a_rhel_for_edge_image/microshift-embed-in-rpm-ostree#adding-microshift-repos-image-builder_microshift-embed-in-rpm-ostree) through [Download the ISO and prepare it for use](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.22/html/embedding_in_a_rhel_for_edge_image/microshift-embed-in-rpm-ostree#microshift-download-iso-prep-for-use_microshift-embed-in-rpm-ostree). The procedure is identical — `osbuild-composer` will resolve `microshift` packages from the local repository instead of CDN.
+With the local RPM source registered, follow the official documentation starting from [Adding MicroShift repositories to image builder](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/embedding_in_a_rhel_for_edge_image/microshift-embed-in-rpm-ostree#adding-microshift-repos-image-builder_microshift-embed-in-rpm-ostree) through [Download the ISO and prepare it for use](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/embedding_in_a_rhel_for_edge_image/microshift-embed-in-rpm-ostree#microshift-download-iso-prep-for-use_microshift-embed-in-rpm-ostree). The procedure is identical — `osbuild-composer` will resolve `microshift` packages from the local repository instead of CDN.
 
 Use `rhel/9/x86_64/edge` as the ostree ref in all `composer-cli compose start-ostree --ref` commands. This must match the ref in the [`microshift-edge.ks`](../config/microshift-edge.ks) kickstart.
 
