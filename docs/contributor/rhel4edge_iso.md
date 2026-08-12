@@ -47,6 +47,8 @@ mkdir -p "${BUILDDIR}/microshift-local"
 cp ~/microshift/_output/rpmbuild/RPMS/*/*.rpm "${BUILDDIR}/microshift-local/"
 createrepo "${BUILDDIR}/microshift-local"
 chmod -R a+rX "${BUILDDIR}/microshift-local"
+chmod a+rx "${HOME}" "${HOME}/microshift" \
+  "${HOME}/microshift/_output" "${HOME}/microshift/_output/image-builder"
 ```
 
 Register it with `osbuild-composer`:
@@ -131,6 +133,9 @@ sudo virt-install \
 ```
 
 Watch the OS console to see the progress of the installation, waiting until the machine is rebooted and the login prompt appears.
+```bash
+sudo virsh console "${VMNAME}"
+```
 
 Note that it may be more convenient to access the machine using SSH. Run the following command to get its IP address and use it to remotely connect to the system.
 ```bash
