@@ -105,7 +105,7 @@ Log into the `physical hypervisor host` using your user credentials. The remaind
 
 Start by copying the installer image and kickstart from the `development virtual machine` to the host file system. Replace `<dev-vm-ip>` with the IP address of your development VM (run `sudo virsh domifaddr <vm-name>` on the hypervisor to find it).
 ```bash
-scp microshift@<dev-vm-ip>:/home/microshift/microshift/_output/image-builder/microshift-installer.$(uname -m).iso ~/
+scp microshift@<dev-vm-ip>:/home/microshift/microshift/_output/image-builder/${BUILDID}-installer.iso ~/
 scp microshift@<dev-vm-ip>:/home/microshift/microshift/docs/config/microshift-edge.ks ~/
 ```
 
@@ -113,7 +113,7 @@ Run the following commands to create a virtual machine using the installer image
 ```bash
 VMNAME="microshift-edge"
 NETNAME="default"
-ISOFILE="${HOME}/microshift-installer.$(uname -m).iso"
+ISOFILE="${HOME}/${BUILDID}-installer.iso"
 
 sudo virt-install \
     --name "${VMNAME}" \

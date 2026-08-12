@@ -58,7 +58,7 @@ done
 # Work around bootupd not installing the EFI grub.cfg during ostree deployment.
 # Without these files the UEFI firmware loads grubx64.efi but GRUB drops to a
 # shell because it cannot find its configuration.
-if [ -d /boot/efi/EFI/redhat ] && [ -f /usr/lib/bootupd/grub2-static/grub-static-efi.cfg ]; then
+if [ -d /boot/efi/EFI/redhat ] && [ -f /usr/lib/bootupd/grub2-static/grub-static-efi.cfg ] && [ -f /boot/grub2/bootuuid.cfg ]; then
     cp /usr/lib/bootupd/grub2-static/grub-static-efi.cfg /boot/efi/EFI/redhat/grub.cfg
     cp /boot/grub2/bootuuid.cfg /boot/efi/EFI/redhat/bootuuid.cfg
 fi
