@@ -1325,6 +1325,59 @@ configure_fast_datapath_repo() {
     fi
 }
 
+# Configure a bare RHEL VM for RPM-based MicroShift testing.
+# Sets up firewall, RHSM, RPM repos, installs MicroShift from source-built
+# RPMs, and waits for all pods to be ready.
+#
+# Arguments:
+#   rhel_version -- e.g. "9.8" or "10.2"
+configure_rpm_scenario() {
+    local -r rhel_version="$1"
+
+    configure_vm_firewall host1
+    subscription_manager_register host1
+
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"       4 "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  4 "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1}"      4 "${PREVIOUS_MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" 4 "${PREVIOUS_MINOR_VERSION}"
+    run_command_on_vm host1 "sudo subscription-manager release --set ${rhel_version}"
+    configure_fast_datapath_repo
+
+    run_command_on_vm host1 "sudo dnf install -y NetworkManager-ovs containers-common"
+
+    local -r reponame=$(basename "${LOCAL_REPO}")
+    local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
+    local -r target_version=$(local_rpm_version)
+
+    local -r tmp_file=$(mktemp)
+    cat > "${tmp_file}" <<EOF
+[microshift-local]
+name=MicroShift Local Repository
+baseurl=${repo_url}
+enabled=1
+gpgcheck=0
+EOF
+    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
+    run_command_on_vm host1 "sudo cp '${tmp_file}' /etc/yum.repos.d/microshift-local.repo"
+    rm -f "${tmp_file}"
+
+    run_command_on_vm host1 "sudo dnf install -y --allowerasing 'microshift-${target_version}'"
+
+    # Wait for NetworkManager to reconnect after the RPM %post scriptlet restarts it.
+    local nm_status
+    nm_status=$(run_command_on_vm host1 "sudo nmcli -w 30 networking connectivity check")
+    echo "Post-install connectivity: ${nm_status}"
+    if [[ "${nm_status}" != *"full"* ]]; then
+        error "Network connectivity is '${nm_status}' after RPM install (expected 'full')"
+        exit 1
+    fi
+
+    run_command_on_vm host1 "sudo systemctl enable --now microshift.service"
+
+    run_command_on_vm host1 "sudo /usr/bin/microshift healthcheck --wait 300"
+}
+
 # Configure a MicroShift RPM mirror repository on host1. Used in upgrade
 # and presubmit scenarios to make a previous MicroShift release available
 # for installation before testing an upgrade to the current version.
