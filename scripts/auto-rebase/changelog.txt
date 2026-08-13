@@ -1,7 +1,0 @@
-- cluster-ingress-operator embedded-component 12a2b5974ae9cbb644b2827af3597a3c911d1d4c to f86aaea4136dfea16e62290bd50ecdd1a8b22b3f
-  - 6ea1b8e 2026-07-22T16:40:30Z OCPBUGS-77457: Respect proxy configuration on gwapi provisioning
-
-- machine-config-operator embedded-component 1f1efae7758fd6ec0d9e90cb9a893f51ff1079b8 to 3cfcf6c812e9960a837be8a29a7a328e7ea758d3
-  - 1fdcfe98 2026-08-06T11:16:44-04:00 mcc: replace wildcard permissions with explicit verbs and resources in MCC ClusterRole & scope configmap access to target namespace via Role instead of ClusterRole
-  - 2196b04d 2026-08-06T04:42:40Z chore: update AMIs
-
