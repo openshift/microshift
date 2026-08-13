@@ -1,3 +1,7 @@
-- machine-config-operator embedded-component 9c5e8342612374f653853791f5fadab2db8bed9d to 3706c1e3a2b8a8244c21f75d9abffebf2c69173c
-  - 87786668 2026-08-06T04:43:25+00:00 chore: update AMIs
+- machine-config-operator embedded-component 3706c1e3a2b8a8244c21f75d9abffebf2c69173c to 1a6905d980fd4c4f3869492b98cb696f09a46cff
+  - bbd80b30 2026-08-07T15:07:38+00:00 mcc: replace wildcard permissions with explicit verbs and resources in MCC ClusterRole & scope configmap access to target namespace via Role instead of ClusterRole
+
+- ovn-kubernetes image-amd64 784dba42f89108d61da559252aaab66b7e4a7fd3 to 6672a3cf649d5a6763386259588ad23d9fca2038
+  - d18e8e85 2026-06-04T17:37:52+02:00 remove forced V(5) logging during startup
+  - cc7f427b 2026-05-11T09:41:17+02:00 ANP: Skip redundant status updates to reduce API server load
 
