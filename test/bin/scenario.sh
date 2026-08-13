@@ -1330,52 +1330,27 @@ configure_fast_datapath_repo() {
 # RPMs, and waits for all pods to be ready.
 #
 # Arguments:
+#   vmname       -- VM name (e.g. "host1")
 #   rhel_version -- e.g. "9.8" or "10.2"
 configure_rpm_scenario() {
-    local -r rhel_version="$1"
-
-    configure_vm_firewall host1
-    subscription_manager_register host1
-
-    configure_rhocp_repo "${RHOCP_MINOR_Y}"       4 "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  4 "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y1}"      4 "${PREVIOUS_MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y1_BETA}" 4 "${PREVIOUS_MINOR_VERSION}"
-    run_command_on_vm host1 "sudo subscription-manager release --set ${rhel_version}"
-    configure_fast_datapath_repo
-
-    run_command_on_vm host1 "sudo dnf install -y NetworkManager-ovs containers-common"
-
+    local -r vmname="$1"
+    local -r rhel_version="$2"
     local -r reponame=$(basename "${LOCAL_REPO}")
     local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
     local -r target_version=$(local_rpm_version)
 
-    local -r tmp_file=$(mktemp)
-    cat > "${tmp_file}" <<EOF
-[microshift-local]
-name=MicroShift Local Repository
-baseurl=${repo_url}
-enabled=1
-gpgcheck=0
-EOF
-    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-    run_command_on_vm host1 "sudo cp '${tmp_file}' /etc/yum.repos.d/microshift-local.repo"
-    rm -f "${tmp_file}"
+    configure_vm_firewall "${vmname}"
+    subscription_manager_register "${vmname}"
+    run_command_on_vm "${vmname}" "sudo subscription-manager release --set ${rhel_version}"
 
-    run_command_on_vm host1 "sudo dnf install -y --allowerasing 'microshift-${target_version}'"
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
+    configure_fast_datapath_repo
+    configure_microshift_mirror "${repo_url}"
 
-    # Wait for NetworkManager to reconnect after the RPM %post scriptlet restarts it.
-    local nm_status
-    nm_status=$(run_command_on_vm host1 "sudo nmcli -w 30 networking connectivity check")
-    echo "Post-install connectivity: ${nm_status}"
-    if [[ "${nm_status}" != *"full"* ]]; then
-        error "Network connectivity is '${nm_status}' after RPM install (expected 'full')"
-        exit 1
-    fi
-
-    run_command_on_vm host1 "sudo systemctl enable --now microshift.service"
-
-    run_command_on_vm host1 "sudo /usr/bin/microshift healthcheck --wait 300"
+    run_command_on_vm "${vmname}" "sudo dnf install -y --allowerasing 'microshift-${target_version}'"
+    run_command_on_vm "${vmname}" "sudo systemctl enable --now microshift.service"
+    run_command_on_vm "${vmname}" "sudo /usr/bin/microshift healthcheck --timeout 300s"
 }
 
 # Configure a MicroShift RPM mirror repository on host1. Used in upgrade

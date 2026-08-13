@@ -1,0 +1,1 @@
+../../../scenarios-rpm/el10/presubmits/el102-src@standard1.sh
