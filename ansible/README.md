@@ -137,7 +137,7 @@ There are a few configuration files that can be configured before execution of t
 
 ### Variables
 
-Most of the following variables are defined in `vars/all.yml`. `rhel_target_version` is provided by the `setup-microshift-host` role defaults and can be set in `vars/all.yml` or passed directly with `-e`.
+Most of the following variables are defined in `vars/all.yml`. The source-build variables and `rhel_target_version` are provided by role defaults and can be set in `vars/all.yml` or passed directly with `-e`.
 
 | Variable Name  | Description | Default |
 | -------------- | ----------- | ------- |
@@ -151,12 +151,23 @@ Most of the following variables are defined in `vars/all.yml`. `rhel_target_vers
 | `prometheus_logging` | Set up logging and exporters on the nodes | `true` |
 | `install_microshift` | Install MicroShift (from packages or source) | `false` |
 | `build_microshift` | Build MicroShift from source instead of installing packages | `false` |
+| `microshift_source_dir` | Existing MicroShift Git worktree on the managed host to build instead of updating the default checkout | `""` |
+| `microshift_git_revision` | Git revision to check out when building MicroShift from source | `"release-<major.minor>"` |
+| `microshift_git_refspec` | Additional Git refspec to fetch when building MicroShift from source (e.g. `+refs/pull/123/head:refs/remotes/origin/pr-123`) | `""` |
 | `build_etcd_binary` | Build and deploy a separate etcd process | `false` |
 | `microshift_version` | MicroShift version to install (supports EC/RC prereleases) | `"4.20"` |
 | `enable_gpu` | Install NVIDIA GPU drivers and container toolkit for GPU workloads | `false` |
 | `deploy_gpu_test` | Deploy a test GPU workload to validate GPU functionality | `true` |
 | `run_workloads` | Run kube-burner performance workloads | `false` |
 | `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.8") | `undefined` |
+
+Source builds update the existing checkout in `microshift_dir` to `microshift_git_revision`. By default, the revision is the release branch derived from
+`microshift_version`; for example, both `4.21.0` and `latest-4.21` select `release-4.21`. Set it explicitly to build another branch, tag, or commit.
+A commit SHA may require `microshift_git_refspec` when the commit is not reachable from a branch or tag fetched by default. Checking out a SHA leaves the
+repository in detached HEAD state until a later branch-based run updates it.
+
+Set `microshift_source_dir` to build a complete Git worktree that is already present on the managed host. The caller is responsible for staging and
+updating the worktree, including its `.git` metadata. When set, the Git checkout task is skipped and the Git revision and refspec variables are ignored.
 
 ### Inventory Configuration
 

@@ -55,31 +55,27 @@
           - cri-tools
         state: present
 
-    - name: check if microshift dir exists
-      ansible.builtin.stat:
-        path: "{{ microshift_dir }}"
-      register: ms_dir
-
-    - name: clone microshift git repo
+    - name: ensure microshift git checkout
       ansible.builtin.git:
         repo: "{{ microshift_repo }}"
         dest: "{{ microshift_dir }}"
-        version: "{{ microshift_version }}"
-      when: not ms_dir.stat.exists
+        version: "{{ microshift_git_revision }}"
+        refspec: "{{ microshift_git_refspec | default(omit, true) }}"
+      when: not microshift_source_dir
 
     - name: make clean
       ansible.builtin.command: make clean
       args:
-        chdir: "{{ microshift_dir }}"
+        chdir: "{{ microshift_build_dir }}"
 
     - name: make rpm
       ansible.builtin.command: make rpm
       args:
-        chdir: "{{ microshift_dir }}"
+        chdir: "{{ microshift_build_dir }}"
 
     - name: find built RPMs
       ansible.builtin.find:
-        paths: "{{ microshift_dir }}"
+        paths: "{{ microshift_build_dir }}"
         patterns: '*.rpm'
         recurse: yes
       register: microshift_find
