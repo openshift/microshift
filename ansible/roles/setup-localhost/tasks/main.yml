@@ -22,7 +22,7 @@
   with_inventory_hostnames:
     - all
 
-- name:
+- name: Copy SSH key to MicroShift hosts
   ansible.builtin.command: sshpass -p {{ microshift_pass }} ssh-copy-id {{ ansible_user }}@{{ item }}
   with_inventory_hostnames:
     - microshift
