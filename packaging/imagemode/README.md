@@ -322,7 +322,7 @@ sudo virt-install \
     --location "/var/lib/libvirt/images/${VMNAME}.iso" \
     --osinfo detect=on \
     --initrd-inject kickstart.ks \
-    --extra-args "inst.ks=file://kickstart.ks" \
+    --extra-args "inst.ks=file:/kickstart.ks" \
     --wait
 ```
 
