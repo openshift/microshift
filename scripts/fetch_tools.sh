@@ -375,6 +375,10 @@ gettool_ginkgo() {
         return 1
     fi
 
+    # Download Go modules before building — the Makefile's patch-bindata
+    # target needs the origin module in the cache before go build runs.
+    go mod download
+
     # Build the binary
     make all
 
