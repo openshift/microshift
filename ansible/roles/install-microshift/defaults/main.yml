@@ -10,6 +10,16 @@ microshift_dir: "{{ ansible_facts.env.HOME }}/microshift"
 microshift_repo: https://github.com/openshift/microshift.git
 microshift_rpms: []
 microshift_version: 4.22.0
+# Optional existing MicroShift Git worktree to build instead of updating
+# microshift_dir from microshift_repo.
+microshift_source_dir: ""
+# Directory used by the source build tasks.
+microshift_build_dir: "{{ microshift_source_dir | default(microshift_dir, true) }}"
+# Git revision to check out when building MicroShift from source.
+microshift_git_revision: "release-{{ (microshift_version | regex_replace('^latest-', '')).split('.')[:2] | join('.') }}"
+# Optional additional Git refspec to fetch when building from source,
+# e.g. "+refs/pull/123/head:refs/remotes/origin/pr-123"
+microshift_git_refspec: ""
 
 du_dirs:
   - /
