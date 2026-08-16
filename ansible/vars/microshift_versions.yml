@@ -27,3 +27,6 @@ microshift_versions:
   "4.22":
     expected_pods: 6
     all_pods: 9
+  "5.0":
+    expected_pods: 6
+    all_pods: 9
