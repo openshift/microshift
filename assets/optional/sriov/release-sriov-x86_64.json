@@ -1,17 +1,17 @@
 {
   "release": {
-    "base": "4.20.0-202607171900"
+    "base": "4.20.0-202608040713"
   },
   "images": {
-    "metrics-exporter-image": "registry.redhat.io/openshift4/ose-sriov-network-metrics-exporter-rhel9@sha256:0f63c7ba3aca11bb60672d9a65b4dc275fe87fcece753e5198232a428e7c3257",
-    "metrics-exporter-kube-rbac-proxy-image": "registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9@sha256:61bc81ad1f2cb0f5e69583b43061c312c30bd0f5cd3c4005d5000c796eaa2429",
-    "network-resources-injector-image": "registry.redhat.io/openshift4/ose-sriov-dp-admission-controller-rhel9@sha256:2b653e893913c7d9fec3a95fb7bc56055ce0530993e44ce2e768b26f26680383",
-    "rdma-cni-image": "registry.redhat.io/openshift4/ose-sriov-rdma-cni-rhel9@sha256:1c9349f3ae515382a96fb5b3921aaa7fb4ded80ee3ba889ed4a0c67054077fb7",
-    "sriov-cni-image": "registry.redhat.io/openshift4/sriov-cni-rhel9@sha256:3271753f822f87cc8d6316dca3395b5c0c2e442f85018e08fd38b9118a48f22c",
-    "sriov-device-plugin-image": "registry.redhat.io/openshift4/ose-sriov-network-device-plugin-rhel9@sha256:7fea9d7749ab5c9fa3416a832f43641953edbdd53228948f9d5a51aa9012460b",
-    "sriov-infiniband-cni-image": "registry.redhat.io/openshift4/ose-sriov-infiniband-cni-rhel9@sha256:b22b99a1ada66fc7df460e9a008c37897f05e58758a418f4621a5358e4aa3677",
-    "sriov-network-config-daemon-image": "registry.redhat.io/openshift4/ose-sriov-network-config-daemon-rhel9@sha256:42567053ef707d75fdcb1982b8057c4f641665457c1e0734601384a2d9e661e2",
-    "sriov-network-operator": "registry.redhat.io/openshift4/ose-sriov-network-rhel9-operator@sha256:698a45b1d8fda40d37c64dd5cf2d7380a8ea57c02c4a7df4faa217744567b943",
-    "sriov-network-webhook-image": "registry.redhat.io/openshift4/ose-sriov-network-webhook-rhel9@sha256:5ddd012077ea5044ef76d72e51d422d4db67fc42dd6e08248cb8623385db922a"
+    "metrics-exporter-image": "registry.redhat.io/openshift4/ose-sriov-network-metrics-exporter-rhel9@sha256:c80ae2a02399ba8792fe2dac21451dc04198b69a4c99f8703f859fb94f072476",
+    "metrics-exporter-kube-rbac-proxy-image": "registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9@sha256:2b04d3076f278eb2cd40801ffe2b482b89f10c72f01e3b3100996559574dcc41",
+    "network-resources-injector-image": "registry.redhat.io/openshift4/ose-sriov-dp-admission-controller-rhel9@sha256:9b96bd73028248a343fabaeb2bb9deafda328212f3f9edafec01ba5b18a943eb",
+    "rdma-cni-image": "registry.redhat.io/openshift4/ose-sriov-rdma-cni-rhel9@sha256:e8f285115e9ffe7b1021280e62c1e70e14520e0128ac1f3ef58461c7ad8eecb7",
+    "sriov-cni-image": "registry.redhat.io/openshift4/sriov-cni-rhel9@sha256:5f781b809d00f30f42e8292c461042890a76026a311ddbfefb6d56377f3d388f",
+    "sriov-device-plugin-image": "registry.redhat.io/openshift4/ose-sriov-network-device-plugin-rhel9@sha256:8d5911f6ffca97c11cde2245d9d09bb15ad7b80443c0532769c3cc031a8a11ee",
+    "sriov-infiniband-cni-image": "registry.redhat.io/openshift4/ose-sriov-infiniband-cni-rhel9@sha256:c978c324cbc90b9efc6a0f8e27546dc336bf28781f341bcf31be494dd843365c",
+    "sriov-network-config-daemon-image": "registry.redhat.io/openshift4/ose-sriov-network-config-daemon-rhel9@sha256:5e6e98dd1aa764d64f14f38dd1c2004cf8095d06fe93643f1489ed2e1955ace9",
+    "sriov-network-operator": "registry.redhat.io/openshift4/ose-sriov-network-rhel9-operator@sha256:0ccdfc8519560734117ab3c591689f77fcd78a975ddf24eacae3a1f86dd245f8",
+    "sriov-network-webhook-image": "registry.redhat.io/openshift4/ose-sriov-network-webhook-rhel9@sha256:b93ff1beedecee963a4e1fa9e3533a887de6ad01d6c7f84779e234fb4d481bfe"
   }
 }
