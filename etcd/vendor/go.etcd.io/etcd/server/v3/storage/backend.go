@@ -23,6 +23,7 @@ import (
 
 	"go.etcd.io/etcd/server/v3/config"
 	"go.etcd.io/etcd/server/v3/etcdserver/api/snap"
+	"go.etcd.io/etcd/server/v3/features"
 	"go.etcd.io/etcd/server/v3/storage/backend"
 	"go.etcd.io/etcd/server/v3/storage/schema"
 	"go.etcd.io/raft/v3/raftpb"
@@ -52,6 +53,10 @@ func newBackend(cfg config.ServerConfig, hooks backend.Hooks) backend.Backend {
 	}
 	bcfg.Mlock = cfg.MemoryMlock
 	bcfg.Hooks = hooks
+	if cfg.ServerFeatureGate != nil {
+		bcfg.NonBlockingDefrag = cfg.ServerFeatureGate.Enabled(features.NonBlockingDefrag)
+	}
+	bcfg.DefragJournalMaxOps = cfg.DefragJournalMaxOps
 	return backend.New(bcfg)
 }
 
