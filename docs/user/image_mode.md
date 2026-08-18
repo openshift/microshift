@@ -16,7 +16,7 @@ image in a remote registry and use it for installing a new RHEL operating system
 for more information.
 
 The procedures described below require the following setup:
-* A `RHEL 9.6 host` with an active Red Hat subscription for building MicroShift `bootc`
+* A `RHEL 9.8 host` with an active Red Hat subscription for building MicroShift `bootc`
 images. For development purposes, you can use the [Red Hat Developer subscription](https://developers.redhat.com/products/rhel/download),
 which is free of charge.
 * A `hypervisor host` with a virtualization technology that supports RHEL. In
@@ -26,7 +26,7 @@ an example.
 
 ## Build MicroShift Bootc Image
 
-Log into the `RHEL 9.6 host` using the user credentials that have SUDO
+Log into the `RHEL 9.8 host` using the user credentials that have SUDO
 permissions configured.
 
 ### Build Image
@@ -75,8 +75,8 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
 
 > **Important:**<br>
 > If `dnf upgrade` command is used in the container image build procedure, it
-> may cause unintended operating system version upgrade (e.g. from `9.6` to
-> `9.6`). To prevent this from happening, use the following command instead.
+> may cause unintended operating system version upgrade (e.g. from `9.8` to
+> `9.8`). To prevent this from happening, use the following command instead.
 > ```
 > RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}"
 > ```
@@ -216,7 +216,7 @@ sudo virt-install \
     --disk path=/var/lib/libvirt/images/${VMNAME}.qcow2,size=20 \
     --network network=${NETNAME},model=virtio \
     --events on_reboot=restart \
-    --location /var/lib/libvirt/images/rhel-9.6-$(uname -m)-boot.iso \
+    --location /var/lib/libvirt/images/rhel-9.8-$(uname -m)-boot.iso \
     --initrd-inject kickstart.ks \
     --extra-args "inst.ks=file:/kickstart.ks" \
     --wait
@@ -238,7 +238,7 @@ containerized tool to create disk images from bootc images. You can use the tool
 to generate various image artifacts and deploy them in different environments,
 such as the edge, server, and clouds.
 
-Log into the `RHEL 9.6 host` using the user credentials that have SUDO
+Log into the `RHEL 9.8 host` using the user credentials that have SUDO
 permissions configured.
 
 ### Prepare Kickstart File
