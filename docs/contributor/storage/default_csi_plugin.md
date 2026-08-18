@@ -161,7 +161,7 @@ spec:
     - sh
     - -c
     - sleep 1d
-    image: nginxinc/nginx-unprivileged:latest
+    image: quay.io/microshift/busybox:1.36
     name: test-container
     securityContext:
       allowPrivilegeEscalation: false
@@ -250,7 +250,7 @@ spec:
     - sh
     - -c
     - sleep 1d
-    image: nginxinc/nginx-unprivileged:latest
+    image: quay.io/microshift/busybox:1.36
     name: test-container
     securityContext:
       allowPrivilegeEscalation: false
