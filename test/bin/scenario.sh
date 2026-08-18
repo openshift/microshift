@@ -1325,6 +1325,34 @@ configure_fast_datapath_repo() {
     fi
 }
 
+# Configure a bare RHEL VM for RPM-based MicroShift testing.
+# Sets up firewall, RHSM, RPM repos, installs MicroShift from source-built
+# RPMs, and waits for all pods to be ready.
+#
+# Arguments:
+#   vmname       -- VM name (e.g. "host1")
+#   rhel_version -- e.g. "9.8" or "10.2"
+configure_rpm_scenario() {
+    local -r vmname="$1"
+    local -r rhel_version="$2"
+    local -r reponame=$(basename "${LOCAL_REPO}")
+    local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
+    local -r target_version=$(local_rpm_version)
+
+    configure_vm_firewall "${vmname}"
+    subscription_manager_register "${vmname}"
+    run_command_on_vm "${vmname}" "sudo subscription-manager release --set ${rhel_version}"
+
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
+    configure_fast_datapath_repo
+    configure_microshift_mirror "${repo_url}"
+
+    run_command_on_vm "${vmname}" "sudo dnf install -y --allowerasing 'microshift-${target_version}'"
+    run_command_on_vm "${vmname}" "sudo systemctl enable --now microshift.service"
+    run_command_on_vm "${vmname}" "sudo /usr/bin/microshift healthcheck --timeout 300s"
+}
+
 # Configure a MicroShift RPM mirror repository on host1. Used in upgrade
 # and presubmit scenarios to make a previous MicroShift release available
 # for installation before testing an upgrade to the current version.
