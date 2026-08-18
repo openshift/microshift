@@ -27,7 +27,7 @@ VERSION_MAP = {
 
 # The version of Sonobuoy package used in CNCF tests.
 # See https://github.com/vmware-tanzu/sonobuoy/releases.
-CNCF_SONOBUOY_VERSION = "v0.57.3"
+CNCF_SONOBUOY_VERSION = "v0.57.5"
 
 # The version of systemd-logs image included in the sonobuoy release.
 CNCF_SYSTEMD_LOGS_VERSION = "v0.4"

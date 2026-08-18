@@ -152,13 +152,13 @@ export RHOCP_MINOR_Y1_BETA
 export RHOCP_MAJOR_Y2=4
 export RHOCP_MINOR_Y2=21
 
-export CNCF_SONOBUOY_VERSION=v0.57.3
+export CNCF_SONOBUOY_VERSION=v0.57.5
 
 # The version of systemd-logs image included in the sonobuoy release.
 export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 
 # The current version of the microshift-gitops package.
-export GITOPS_VERSION=1.19
+export GITOPS_VERSION=1.21
 
 # The brew release versions needed for release regression testing
 BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${MAJOR_VERSION}.${MINOR_VERSION}-zstream/${UNAME_M}/")"
