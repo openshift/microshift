@@ -6,19 +6,22 @@ use it for installing a new RHEL operating system.
 
 This document demonstrates how to run a `bootc` image using `podman`.
 
-> **NOTE**:<br>
+> **NOTE**:  
+>
 > Use the `podman` approach only for development purposes to benefit from
 > the fast turnaround times it allows. Do not use it for production use cases.
 
 The procedures described below require the following setup:
-* A `RHEL 9.6 host` with an active Red Hat subscription for building MicroShift `bootc`
+
+- A `RHEL 9.8 host` with an active Red Hat subscription for building MicroShift `bootc`
 images and running containers
-* A `remote registry` (e.g. `quay.io`) for storing and accessing `bootc` images
+- A `remote registry` (e.g. `quay.io`) for storing and accessing `bootc` images
+
+
 
 ## Run MicroShift Bootc Image
 
-Log into the `RHEL 9.6 host` using the user credentials that have SUDO
-permissions configured.
+Log into the `RHEL 9.8 host` using the user credentials that have `sudo` permissions configured.
 
 ### Configure CNI
 
@@ -32,10 +35,10 @@ kernel versions are different.
 
 ```bash
 $ find /lib/modules/$(uname -r) -name "openvswitch*"
-/lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch
-/lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch/openvswitch.ko.xz
+/lib/modules/5.14.0-687.34.1.el9_8.x86_64/kernel/net/openvswitch
+/lib/modules/5.14.0-687.34.1.el9_8.x86_64/kernel/net/openvswitch/openvswitch.ko.xz
 
-$ IMAGE_NAME=microshift-4.18-bootc
+$ IMAGE_NAME=microshift-4.22-bootc
 $ sudo podman inspect "${IMAGE_NAME}" | grep kernel-core
         "created_by": "kernel-core-5.14.0-427.26.1.el9_4.x86_64"
 ```
@@ -96,15 +99,18 @@ the next section.
 > sudo rm -f "${VGFILE}"
 > ```
 
+
+
 ### Run Container
 
 Run the following commands to start the MicroShift `bootc` image in an interactive
 terminal session.
 
 The host shares the following configuration with the container:
-* The `openvswitch` kernel module to be used by the Open vSwitch service
-* A pull secret file for downloading the required OpenShift container images
-* Host container storage for reusing available container images
+
+- The `openvswitch` kernel module to be used by the Open vSwitch service
+- A pull secret file for downloading the required OpenShift container images
+- Host container storage for reusing available container images
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
@@ -140,6 +146,8 @@ watch sudo oc get pods -A \
 ```
 
 > Run the `sudo shutdown now` command to stop the container.
+
+
 
 ## Appendix A: Multi-Architecture Image Build
 
@@ -178,7 +186,7 @@ the platform-specific `amd64` and `arm64` images to the remote registry as descr
 in the [Publish Image](#publish-image) section.
 
 > Cross-platform `podman` builds are not in the scope of this document. Log into
-> the RHEL 9.6 host running on the appropriate architecture to perform the container
+> the RHEL 9.8 host running on the appropriate architecture to perform the container
 > image builds and publish the platform-specific image to the remote registry.
 
 Finally, create a manifest containing the platform-specific image references
@@ -225,11 +233,12 @@ the manifest list.
 Refer to RHEL documentation for generic instructions on upgrading `rpm-ostree`
 systems to Image Mode. The upgrade process should be planned carefully considering
 the following guidelines:
-* Follow instructions in RHEL documentation for converting `rpm-ostree` blueprints to
-  Image Mode container files
-* Consider using [rpm-ostree compose container-encapsulate](https://coreos.github.io/rpm-ostree/container/#converting-ostree-commits-to-new-base-images)
-  to experiment with Image Mode based on the existing `ostree` commits
-* Invest in defining a proper container build pipeline for fully adopting Image Mode
+
+- Follow instructions in RHEL documentation for converting `rpm-ostree` blueprints to
+Image Mode container files
+- Consider using [rpm-ostree compose container-encapsulate](https://coreos.github.io/rpm-ostree/container/#converting-ostree-commits-to-new-base-images)
+to experiment with Image Mode based on the existing `ostree` commits
+- Invest in defining a proper container build pipeline for fully adopting Image Mode
 
 If reinstalling MicroShift devices from scratch is not an option, read the remainder
 of this section that outlines the upgrade details specific to MicroShift.
@@ -262,3 +271,5 @@ ExecStartPre=/bin/sh -c '/bin/getent group hugetlbfs >/dev/null || groupadd -r h
 ExecStartPre=/sbin/usermod -a -G hugetlbfs openvswitch
 ExecStartPre=/bin/chown -Rhv openvswitch. /etc/openvswitch
 EOF
+```
+

@@ -1,6 +1,6 @@
-FROM registry.redhat.io/rhel9-eus/rhel-9.6-bootc:9.6
+FROM registry.redhat.io/rhel9-eus/rhel-9.8-bootc:9.8
 
-ARG USHIFT_VER=4.18
+ARG USHIFT_VER=4.22
 # hadolint ignore=SC1091
 RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
     dnf config-manager \
@@ -24,7 +24,7 @@ RUN useradd -m -d /var/home/redhat -G wheel redhat && \
 RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
     firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \
     firewall-offline-cmd --zone=trusted --add-source=169.254.169.1 && \
-    firewall-offline-cmd --zone=trusted --add-source=fd01::/48
+    firewall-offline-cmd --zone=trusted --add-source=fd01::/48w
     # Application-specific firewall configuration
 RUN firewall-offline-cmd --zone=public --add-port=80/tcp && \
     firewall-offline-cmd --zone=public --add-port=443/tcp && \
