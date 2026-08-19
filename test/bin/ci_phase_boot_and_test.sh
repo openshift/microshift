@@ -84,9 +84,19 @@ else
     progress=""
 fi
 
+jobs_arg=""
+if [[ "${SCENARIO_SOURCES:-}" =~ .*releases.* ]]; then
+    # Release scenarios have grown (e.g. the router scenarios were split
+    # from 1 into 5) and no longer fit if every scenario's VMs stay up for
+    # the whole job. Shut down passed scenarios' VMs as they finish so the
+    # hypervisor only ever holds the still-running scenarios' VMs.
+    jobs_arg="-j 20"
+fi
+
 TEST_OK=true
 if ! parallel \
     ${progress} \
+    ${jobs_arg} \
     --results "${SCENARIO_INFO_DIR}/{/.}/boot_and_run.log" \
     --joblog "${BOOT_TEST_JOB_LOG}" \
     --delay 5 \
