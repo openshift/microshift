@@ -260,6 +260,7 @@ type EtcdServer struct {
 	kv         mvcc.WatchableKV
 	lessor     lease.Lessor
 	bemu       sync.RWMutex
+	defragMu   sync.Mutex
 	be         backend.Backend
 	beHooks    *serverstorage.BackendHooks
 	authStore  auth.AuthStore
@@ -975,8 +976,15 @@ func (s *EtcdServer) Cleanup() {
 }
 
 func (s *EtcdServer) Defragment() error {
-	s.bemu.Lock()
-	defer s.bemu.Unlock()
+	if s.FeatureEnabled(features.NonBlockingDefrag) {
+		s.defragMu.Lock()
+		defer s.defragMu.Unlock()
+		s.bemu.RLock()
+		defer s.bemu.RUnlock()
+	} else {
+		s.bemu.Lock()
+		defer s.bemu.Unlock()
+	}
 	return s.be.Defrag()
 }
 
