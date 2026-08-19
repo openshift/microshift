@@ -84,13 +84,27 @@ else
     progress=""
 fi
 
+jobs_arg=""
+scenario_action="create-and-run"
+if [[ "${SCENARIO_SOURCES:-}" =~ .*releases.* ]]; then
+    # Release scenarios have grown (e.g. the router scenarios were split
+    # from 1 into 5) and no longer fit if every scenario's VMs stay up for
+    # the whole job. Shut down passed scenarios' VMs as they finish so the
+    # hypervisor only ever holds the still-running scenarios' VMs.
+    export GREENBOOT_TIMEOUT=1200
+    jobs_arg="-j 20"
+    scenario_action="create-run-shutdown"
+fi
+
 TEST_OK=true
+# shellcheck disable=SC2086
 if ! parallel \
+    ${jobs_arg} \
     ${progress} \
     --results "${SCENARIO_INFO_DIR}/{/.}/boot_and_run.log" \
     --joblog "${BOOT_TEST_JOB_LOG}" \
     --delay 5 \
-    bash -x ./bin/scenario.sh create-and-run ::: "${SCENARIOS_TO_RUN}"/*.sh ; then
+    bash -x ./bin/scenario.sh "${scenario_action}" ::: "${SCENARIOS_TO_RUN}"/*.sh ; then
    TEST_OK=false
 fi
 
