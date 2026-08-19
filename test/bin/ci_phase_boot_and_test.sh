@@ -91,6 +91,7 @@ if [[ "${SCENARIO_SOURCES:-}" =~ .*releases.* ]]; then
     # from 1 into 5) and no longer fit if every scenario's VMs stay up for
     # the whole job. Shut down passed scenarios' VMs as they finish so the
     # hypervisor only ever holds the still-running scenarios' VMs.
+    export GREENBOOT_TIMEOUT=1200
     jobs_arg="-j 20"
     scenario_action="create-run-shutdown"
 fi
