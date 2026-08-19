@@ -1032,6 +1032,30 @@ remove_vm() {
     fi
 }
 
+# Power off all the VMs of the scenario without undefining them or
+# removing their storage. Frees the vCPUs and memory on the hypervisor
+# while keeping the domains and disks available for inspection.
+shutdown_scenario_vms() {
+    local vmdir
+    local vmname
+    local full_vmname
+    for vmdir in "${SCENARIO_INFO_DIR}/${SCENARIO}"/vms/*; do
+        if [ ! -d "${vmdir}" ]; then
+            continue
+        fi
+        vmname="$(basename "${vmdir}")"
+        full_vmname="$(full_vm_name "${vmname}")"
+        if sudo virsh dumpxml "${full_vmname}" >/dev/null; then
+            if ! sudo virsh dominfo "${full_vmname}" | grep '^State' | grep -q 'shut off'; then
+                sudo virsh destroy --graceful "${full_vmname}" || true
+            fi
+            if ! sudo virsh dominfo "${full_vmname}" | grep '^State' | grep -q 'shut off'; then
+                sudo virsh destroy "${full_vmname}" || true
+            fi
+        fi
+    done
+}
+
 # Configure the firewall in the VM based on the instructions in the documentation.
 configure_vm_firewall() {
     local -r vmname="$1"
@@ -1640,6 +1664,15 @@ case "${action}" in
     create-and-run)
         action_create "$@"
         action_run "$@"
+        ;;
+    create-run-shutdown)
+        action_create "$@"
+        action_run "$@"
+        rc=0
+        sos_report true || rc=1
+        trap "close_junit" EXIT
+        shutdown_scenario_vms || echo "WARNING: failed to shut down the VMs for ${SCENARIO}"
+        exit "${rc}"
         ;;
     *)
         error "Unknown instruction ${action}"
