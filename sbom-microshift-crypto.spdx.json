@@ -1,0 +1,672 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "MicroShift-CBOM",
+  "documentNamespace": "https://microshift.io/spdx/cbom",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-RootPackage",
+      "name": "microshift",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-AES",
+      "name": "AES",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"block-cipher\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"keygen\"]},\"oid\":\"2.16.840.1.101.3.4.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-AES-GCM",
+      "name": "AES-GCM",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"ae\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"mode\":\"gcm\",\"cryptoFunctions\":[\"encrypt\"]},\"oid\":\"2.16.840.1.101.3.4.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Blowfish",
+      "name": "Blowfish",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"block-cipher\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"encrypt\",\"keygen\"]}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-CSHAKE128",
+      "name": "CSHAKE128",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"xof\",\"parameterSetIdentifier\":\"128\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-CSHAKE256",
+      "name": "CSHAKE256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"xof\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-CSPRNG",
+      "name": "CSPRNG",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"drbg\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"other\"]}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ECDH-",
+      "name": "ECDH-",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"key-agree\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"other\"]},\"oid\":\"1.2.840.10045.2.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ECDSA",
+      "name": "ECDSA",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"signature\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"keygen\",\"verify\",\"sign\"]},\"oid\":\"1.2.840.10045.2.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ECDSA-P256",
+      "name": "ECDSA-P256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"signature\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"keygen\"]},\"oid\":\"1.2.840.10045.2.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ECDSA-P384",
+      "name": "ECDSA-P384",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"signature\",\"parameterSetIdentifier\":\"384\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"keygen\"]},\"oid\":\"1.2.840.10045.2.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ECDSA-P521",
+      "name": "ECDSA-P521",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"signature\",\"parameterSetIdentifier\":\"521\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"keygen\"]},\"oid\":\"1.2.840.10045.2.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Ed25519",
+      "name": "Ed25519",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"signature\",\"parameterSetIdentifier\":\"Ed25519\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"verify\",\"keygen\",\"sign\"]},\"oid\":\"1.3.101.112\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-HKDF-",
+      "name": "HKDF-",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"kdf\",\"parameterSetIdentifier\":\"HKDF-\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"keyderive\"]}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-HMAC",
+      "name": "HMAC",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"mac\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"verify\"]},\"oid\":\"1.2.840.113549.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-HMAC-",
+      "name": "HMAC-",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"mac\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"sign\"]},\"oid\":\"1.2.840.113549.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-HMAC-md5",
+      "name": "HMAC-md5",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"mac\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"sign\"]},\"oid\":\"1.2.840.113549.2.6\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-HMAC-sha1",
+      "name": "HMAC-sha1",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"mac\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"sign\"]},\"oid\":\"1.2.840.113549.2.7\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-HMAC-sha256",
+      "name": "HMAC-sha256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"mac\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"sign\"]},\"oid\":\"1.2.840.113549.2.9\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-HMAC-sha512",
+      "name": "HMAC-sha512",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"mac\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"sign\"]},\"oid\":\"1.2.840.113549.2.11\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-HSalsa20",
+      "name": "HSalsa20",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Keccak-256",
+      "name": "Keccak-256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-MD4",
+      "name": "MD4",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"128\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"1.2.840.113549.2.4\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-MD5",
+      "name": "MD5",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"128\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"1.2.840.113549.2.5\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-OTR",
+      "name": "OTR",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"signature\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"sign\",\"verify\",\"keygen\"]}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-PBKDF2---",
+      "name": "PBKDF2---",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"kdf\",\"parameterSetIdentifier\":\"-\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"keyderive\"]},\"oid\":\"1.2.840.113549.1.5.12\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-RSA",
+      "name": "RSA",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"pke\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"keygen\",\"verify\",\"sign\"]},\"oid\":\"1.2.840.113549.1.1.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-RSA-OAEP-sha1",
+      "name": "RSA-OAEP-sha1",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"pke\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"encrypt\",\"decrypt\"]},\"oid\":\"1.2.840.113549.1.1.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-RSA-OAEP-sha256",
+      "name": "RSA-OAEP-sha256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"pke\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"encrypt\",\"decrypt\"]},\"oid\":\"1.2.840.113549.1.1.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-RSA-PKCS1v15",
+      "name": "RSA-PKCS1v15",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"pke\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"encrypt\",\"decrypt\"]},\"oid\":\"1.2.840.113549.1.1.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-RSA-PKCS1v15-",
+      "name": "RSA-PKCS1v15-",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"signature\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"verify\",\"sign\"]},\"oid\":\"1.2.840.113549.1.1.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-RSA-PSS-",
+      "name": "RSA-PSS-",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"signature\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"verify\",\"sign\"]},\"oid\":\"1.2.840.113549.1.1.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-RSA-PSS-SHA256",
+      "name": "RSA-PSS-SHA256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"signature\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"verify\"]},\"oid\":\"1.2.840.113549.1.1.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-1",
+      "name": "SHA-1",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"160\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"1.3.14.3.2.26\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-224",
+      "name": "SHA-224",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"224\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2.4\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-256",
+      "name": "SHA-256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2.1\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-3-224",
+      "name": "SHA-3-224",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"224\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-3-256",
+      "name": "SHA-3-256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-3-384",
+      "name": "SHA-3-384",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"384\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-3-512",
+      "name": "SHA-3-512",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"512\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-384",
+      "name": "SHA-384",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"384\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-512",
+      "name": "SHA-512",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"512\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2.3\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHA-512-256",
+      "name": "SHA-512/256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"hash\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHAKE128",
+      "name": "SHAKE128",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"xof\",\"parameterSetIdentifier\":\"128\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2.11\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SHAKE256",
+      "name": "SHAKE256",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"xof\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"digest\"]},\"oid\":\"2.16.840.1.101.3.4.2.12\"}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Salsa20",
+      "name": "Salsa20",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"stream-cipher\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"encrypt\"]}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-XSalsa20-Poly1305",
+      "name": "XSalsa20-Poly1305",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"ae\",\"parameterSetIdentifier\":\"256\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"encrypt\",\"decrypt\"]}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-bcrypt",
+      "name": "bcrypt",
+      "comment": "{\"assetType\":\"algorithm\",\"algorithmProperties\":{\"primitive\":\"kdf\",\"executionEnvironment\":\"software-plain-ram\",\"implementationPlatform\":\"x86_64\",\"cryptoFunctions\":[\"verify\",\"keyderive\"]}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-private-key",
+      "name": "private-key",
+      "comment": "{\"assetType\":\"related-crypto-material\",\"relatedCryptoMaterialProperties\":{\"type\":\"private-key\"}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-public-key",
+      "name": "public-key",
+      "comment": "{\"assetType\":\"related-crypto-material\",\"relatedCryptoMaterialProperties\":{\"type\":\"public-key\"}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-signature",
+      "name": "signature",
+      "comment": "{\"assetType\":\"related-crypto-material\",\"relatedCryptoMaterialProperties\":{\"type\":\"signature\"}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Package-RootPackage",
+      "relationshipType": "DESCRIBES"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-AES",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-AES-GCM",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-Blowfish",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-CSHAKE128",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-CSHAKE256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-CSPRNG",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-ECDH-",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-ECDSA",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-ECDSA-P256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-ECDSA-P384",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-ECDSA-P521",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-Ed25519",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-HKDF-",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-HMAC",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-HMAC-",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-HMAC-md5",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-HMAC-sha1",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-HMAC-sha256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-HMAC-sha512",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-HSalsa20",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-Keccak-256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-MD4",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-MD5",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-OTR",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-PBKDF2---",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-RSA",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-RSA-OAEP-sha1",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-RSA-OAEP-sha256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-RSA-PKCS1v15",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-RSA-PKCS1v15-",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-RSA-PSS-",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-RSA-PSS-SHA256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-1",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-224",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-3-224",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-3-256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-3-384",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-3-512",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-384",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-512",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHA-512-256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHAKE128",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-SHAKE256",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-Salsa20",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-XSalsa20-Poly1305",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-bcrypt",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-private-key",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-public-key",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-signature",
+      "relationshipType": "CONTAINS"
+    }
+  ]
+}
