@@ -100,6 +100,9 @@ func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfi
 		sa = []string{
 			"components/service-ca/sa.yaml",
 		}
+		cms = []string{
+			"components/service-ca/controller-config.yaml",
+		}
 		secret     = "components/service-ca/signing-secret.yaml"
 		secretName = "signing-key"
 		cm         = "components/service-ca/signing-cabundle.yaml"
@@ -155,6 +158,10 @@ func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfi
 	}
 	if err := assets.ApplyConfigMapWithData(ctx, cm, cmData, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", cm, err)
+		return err
+	}
+	if err := assets.ApplyConfigMaps(ctx, cms, nil, nil, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply configMaps %v: %v", cms, err)
 		return err
 	}
 	extraParams := assets.RenderParams{
