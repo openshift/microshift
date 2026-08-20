@@ -1,0 +1,11 @@
+- machine-config-operator embedded-component a362b5965c47d38e15cfe32f69e66a525819e45c to f313997e0ba83edd79b1d0091e85d6e25c793274
+  - 4255295f 2026-08-10T09:12:03-04:00 mcc: replace wildcard permissions with explicit verbs and resources in MCC ClusterRole & scope configmap access to target namespace via Role instead of ClusterRole
+
+- router image-amd64 e5c059ea7a57d1ee5436b253cf214f144c9a7f27 to 347f03e9d6caaf6bf249bf1d2075965112eab228
+  - b2e4b66 2026-07-22T17:09:17+05:30 OCPBUGS-86726: Run go mod tidy and vendor for dependency update
+  - 584c0dc 2026-07-22T17:06:56+05:30 OCPBUGS-86726: Prevent SSRF via FQDN-typed EndpointSlices
+
+- router image-arm64 e5c059ea7a57d1ee5436b253cf214f144c9a7f27 to 347f03e9d6caaf6bf249bf1d2075965112eab228
+  - b2e4b66 2026-07-22T17:09:17+05:30 OCPBUGS-86726: Run go mod tidy and vendor for dependency update
+  - 584c0dc 2026-07-22T17:06:56+05:30 OCPBUGS-86726: Prevent SSRF via FQDN-typed EndpointSlices
+
