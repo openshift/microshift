@@ -1,0 +1,162 @@
+rebase.sh:
+[34m# Rebasing to registry.ci.openshift.org/ocp/release:4.19.0-0.nightly-2026-08-19-071214 and registry.ci.openshift.org/ocp-arm64/release-arm64:4.19.0-0.nightly-arm64-2026-07-29-231937[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release:4.19.0-0.nightly-2026-08-19-071214 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-arm64:4.19.0-0.nightly-arm64-2026-07-29-231937 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release:4.19.0-0.nightly-2026-08-19-071214 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release:4.19.0-0.nightly-2026-08-19-071214 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/api/.git/
+HEAD is now at 1ebdd7bb Merge pull request #2926 from openshift-cherrypick-robot/cherry-pick-2925-to-release-4.19
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-csi-snapshot-controller-operator/.git/
+HEAD is now at cf99de9 Merge pull request #229 from dfajmon/readOnlyFileSystem
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 6598130 Merge pull request #426 from khalid-lemghari/add-runbook-url-for-CoreDNSErrorsHigh
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at a3c5d8d Merge pull request #1476 from MrSanketkumar/CVE-2026-46579-4.19
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at 1b48403 Merge pull request #2118 from liouk/release-4.19-fix-oauth-metadata-type-none
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at 7c4e446 Merge pull request #893 from openshift-cherrypick-robot/cherry-pick-890-to-release-4.19
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at bf8cd78 Merge pull request #621 from ingvagabund/release-4.19
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at d0c6f75 Merge pull request #3094 from asood-rh/ocpbugs-99750-cve-fix-419
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+fatal: unable to access 'https://github.com/openshift/cluster-openshift-controller-manager-operator/': Could not resolve host: github.com
+==================================================
+rebase_ai_model_serving.sh:
+[34mRebasing AI Model Serving for MicroShift to registry.redhat.io/rhoai/odh-operator-bundle:v2.25[00m
+[34mFetching RHOAI CSV[00m
+[34mFetching RHOAI manifests[00m
+[34mUpdating last_rebase_ai_model_serving.sh[00m
+[34mCopying manifests from staging dir to assets/[00m
+2026-08-20 04:22:32,940     INFO       Not clearing dir optional/ai-model-serving/
+2026-08-20 04:22:32,940     WARNING    Ignoring optional/ai-model-serving/release-ai-model-serving-x86_64.json because Release info file
+2026-08-20 04:22:32,940     INFO       Not clearing dir optional/ai-model-serving/kserve/
+2026-08-20 04:22:32,940     WARNING    Ignoring optional/ai-model-serving/kserve/kustomization.yaml because MicroShift specific overrides
+2026-08-20 04:22:32,940     WARNING    Ignoring optional/ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml because MicroShift specific overrides
+2026-08-20 04:22:32,940     WARNING    Ignoring optional/ai-model-serving/kserve/namespace.yaml because MicroShift specific overrides
+2026-08-20 04:22:32,940     INFO       Clearing directory assets/optional/ai-model-serving/kserve/overlays/odh/
+2026-08-20 04:22:32,941     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/kustomization.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/kustomization.yaml
+2026-08-20 04:22:32,942     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/llm-svc-scc.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/llm-svc-scc.yaml
+2026-08-20 04:22:32,942     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/network-policies.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/network-policies.yaml
+2026-08-20 04:22:32,942     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/params.env <- _output/staging/rhoai/operator/kserve/overlays/odh/params.env
+2026-08-20 04:22:32,942     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/params.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/params.yaml
+2026-08-20 04:22:32,943     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/user-cluster-roles.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/user-cluster-roles.yaml
+2026-08-20 04:22:32,943     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/patch-inferenceservice-config.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/patch-inferenceservice-config.yaml
+2026-08-20 04:22:32,943     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/patch-set-resources-manager.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/patch-set-resources-manager.yaml
+2026-08-20 04:22:32,943     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/patch-webhook-svc-openshift-cert-injection.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/patch-webhook-svc-openshift-cert-injection.yaml
+2026-08-20 04:22:32,943     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/remove-cert-manager.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/remove-cert-manager.yaml
+2026-08-20 04:22:32,944     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/remove-clusterservingruntime.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/remove-clusterservingruntime.yaml
+2026-08-20 04:22:32,944     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/remove-local-model.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/remove-local-model.yaml
+2026-08-20 04:22:32,944     INFO       Clearing directory assets/optional/ai-model-serving/kserve/default/
+2026-08-20 04:22:32,945     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/cainjection_conversion_webhook.yaml <- _output/staging/rhoai/operator/kserve/default/cainjection_conversion_webhook.yaml
+2026-08-20 04:22:32,945     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml
+2026-08-20 04:22:32,946     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/inferencegraph_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/inferencegraph_validatingwebhook_cainjection_patch.yaml
+2026-08-20 04:22:32,946     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/isvc_mutatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/isvc_mutatingwebhook_cainjection_patch.yaml
+2026-08-20 04:22:32,946     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/isvc_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/isvc_validatingwebhook_cainjection_patch.yaml
+2026-08-20 04:22:32,946     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/kustomization.yaml <- _output/staging/rhoai/operator/kserve/default/kustomization.yaml
+2026-08-20 04:22:32,947     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/llmisvcconfig_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/llmisvcconfig_validatingwebhook_cainjection_patch.yaml
+2026-08-20 04:22:32,947     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/llmisvc_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/llmisvc_validatingwebhook_cainjection_patch.yaml
+2026-08-20 04:22:32,947     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/localmodelcache_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/localmodelcache_validatingwebhook_cainjection_patch.yaml
+2026-08-20 04:22:32,947     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/localmodel_manager_image_patch.yaml <- _output/staging/rhoai/operator/kserve/default/localmodel_manager_image_patch.yaml
+2026-08-20 04:22:32,947     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/localmodelnode_agent_image_patch.yaml <- _output/staging/rhoai/operator/kserve/default/localmodelnode_agent_image_patch.yaml
+2026-08-20 04:22:32,948     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_auth_proxy_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_auth_proxy_patch.yaml
+2026-08-20 04:22:32,948     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_image_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_image_patch.yaml
+2026-08-20 04:22:32,948     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_prometheus_metrics_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_prometheus_metrics_patch.yaml
+2026-08-20 04:22:32,948     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_resources_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_resources_patch.yaml
+2026-08-20 04:22:32,948     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/servingruntime_validationwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/servingruntime_validationwebhook_cainjection_patch.yaml
+2026-08-20 04:22:32,948     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/trainedmodel_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/trainedmodel_validatingwebhook_cainjection_patch.yaml
+2026-08-20 04:22:32,949     INFO       Clearing directory assets/optional/ai-model-serving/kserve/crd/
+2026-08-20 04:22:32,951     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/kustomization.yaml <- _output/staging/rhoai/operator/kserve/crd/kustomization.yaml
+2026-08-20 04:22:32,951     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/gateway-inference-extension/kustomization.yaml <- _output/staging/rhoai/operator/kserve/crd/external/gateway-inference-extension/kustomization.yaml
+2026-08-20 04:22:32,952     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/gateway-inference-extension/gateway-inference-extension.yaml <- _output/staging/rhoai/operator/kserve/crd/external/gateway-inference-extension/gateway-inference-extension.yaml
+2026-08-20 04:22:32,952     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/opendatahub-operator/kustomization.yaml <- _output/staging/rhoai/operator/kserve/crd/external/opendatahub-operator/kustomization.yaml
+2026-08-20 04:22:32,952     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/opendatahub-operator/datasciencecluster.opendatahub.io_datascienceclusters.yaml <- _output/staging/rhoai/operator/kserve/crd/external/opendatahub-operator/datasciencecluster.opendatahub.io_datascienceclusters.yaml
+2026-08-20 04:22:32,952     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/opendatahub-operator/dscinitialization.opendatahub.io_dscinitializations.yaml <- _output/staging/rhoai/operator/kserve/crd/external/opendatahub-operator/dscinitialization.opendatahub.io_dscinitializations.yaml
+2026-08-20 04:22:32,953     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/kustomization.yaml <- _output/staging/rhoai/operator/kserve/crd/full/kustomization.yaml
+2026-08-20 04:22:32,953     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_clusterservingruntimes.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_clusterservingruntimes.yaml
+2026-08-20 04:22:32,953     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_clusterstoragecontainers.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_clusterstoragecontainers.yaml
+2026-08-20 04:22:32,953     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_inferencegraphs.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_inferencegraphs.yaml
+2026-08-20 04:22:32,953     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_inferenceservices.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_inferenceservices.yaml
+2026-08-20 04:22:32,954     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_llminferenceserviceconfigs.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_llminferenceserviceconfigs.yaml
+2026-08-20 04:22:32,955     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_llminferenceservices.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_llminferenceservices.yaml
+2026-08-20 04:22:32,956     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_localmodelcaches.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_localmodelcaches.yaml
+2026-08-20 04:22:32,956     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_localmodelnodegroups.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_localmodelnodegroups.yaml
+2026-08-20 04:22:32,956     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_localmodelnodes.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_localmodelnodes.yaml
+2026-08-20 04:22:32,957     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_servingruntimes.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_servingruntimes.yaml
+2026-08-20 04:22:32,957     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_trainedmodels.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_trainedmodels.yaml
+2026-08-20 04:22:32,957     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/patches/protocol.yaml <- _output/staging/rhoai/operator/kserve/crd/patches/protocol.yaml
+2026-08-20 04:22:32,957     INFO       Clearing directory assets/optional/ai-model-serving/kserve/configmap/
+2026-08-20 04:22:32,958     DEBUG      Copying assets/optional/ai-model-serving/kserve/configmap/kustomization.yaml <- _output/staging/rhoai/operator/kserve/configmap/kustomization.yaml
+2026-08-20 04:22:32,958     DEBUG      Copying assets/optional/ai-model-serving/kserve/configmap/inferenceservice.yaml <- _output/staging/rhoai/operator/kserve/configmap/inferenceservice.yaml
+2026-08-20 04:22:32,958     INFO       Clearing directory assets/optional/ai-model-serving/kserve/rbac/
+2026-08-20 04:22:32,960     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/auth_proxy_role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/auth_proxy_role_binding.yaml
+2026-08-20 04:22:32,960     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/auth_proxy_role.yaml <- _output/staging/rhoai/operator/kserve/rbac/auth_proxy_role.yaml
+2026-08-20 04:22:32,961     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/auth_proxy_service.yaml <- _output/staging/rhoai/operator/kserve/rbac/auth_proxy_service.yaml
+2026-08-20 04:22:32,961     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/kustomization.yaml <- _output/staging/rhoai/operator/kserve/rbac/kustomization.yaml
+2026-08-20 04:22:32,961     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/leader_election_role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/leader_election_role_binding.yaml
+2026-08-20 04:22:32,961     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/leader_election_role.yaml <- _output/staging/rhoai/operator/kserve/rbac/leader_election_role.yaml
+2026-08-20 04:22:32,962     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/role_binding.yaml
+2026-08-20 04:22:32,962     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/role.yaml <- _output/staging/rhoai/operator/kserve/rbac/role.yaml
+2026-08-20 04:22:32,962     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/service_account.yaml <- _output/staging/rhoai/operator/kserve/rbac/service_account.yaml
+2026-08-20 04:22:32,962     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodel/role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodel/role_binding.yaml
+2026-08-20 04:22:32,963     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodel/role.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodel/role.yaml
+2026-08-20 04:22:32,963     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodel/service_account.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodel/service_account.yaml
+2026-08-20 04:22:32,963     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodelnode/role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodelnode/role_binding.yaml
+2026-08-20 04:22:32,963     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodelnode/role.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodelnode/role.yaml
+2026-08-20 04:22:32,964     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodelnode/service_account.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodelnode/service_account.yaml
+2026-08-20 04:22:32,964     INFO       Clearing directory assets/optional/ai-model-serving/kserve/manager/
+2026-08-20 04:22:32,964     DEBUG      Copying assets/optional/ai-model-serving/kserve/manager/kustomization.yaml <- _output/staging/rhoai/operator/kserve/manager/kustomization.yaml
+2026-08-20 04:22:32,965     DEBUG      Copying assets/optional/ai-model-serving/kserve/manager/manager.yaml <- _output/staging/rhoai/operator/kserve/manager/manager.yaml
+2026-08-20 04:22:32,965     DEBUG      Copying assets/optional/ai-model-serving/kserve/manager/service.yaml <- _output/staging/rhoai/operator/kserve/manager/service.yaml
+2026-08-20 04:22:32,965     INFO       Clearing directory assets/optional/ai-model-serving/kserve/webhook/
+2026-08-20 04:22:32,966     DEBUG      Copying assets/optional/ai-model-serving/kserve/webhook/kustomization.yaml <- _output/staging/rhoai/operator/kserve/webhook/kustomization.yaml
+2026-08-20 04:22:32,966     DEBUG      Copying assets/optional/ai-model-serving/kserve/webhook/manifests.yaml <- _output/staging/rhoai/operator/kserve/webhook/manifests.yaml
+2026-08-20 04:22:32,966     DEBUG      Copying assets/optional/ai-model-serving/kserve/webhook/service.yaml <- _output/staging/rhoai/operator/kserve/webhook/service.yaml
+2026-08-20 04:22:32,966     INFO       Clearing directory assets/optional/ai-model-serving/kserve/localmodels/
+2026-08-20 04:22:32,967     DEBUG      Copying assets/optional/ai-model-serving/kserve/localmodels/kustomization.yaml <- _output/staging/rhoai/operator/kserve/localmodels/kustomization.yaml
+2026-08-20 04:22:32,967     DEBUG      Copying assets/optional/ai-model-serving/kserve/localmodels/manager.yaml <- _output/staging/rhoai/operator/kserve/localmodels/manager.yaml
+2026-08-20 04:22:32,967     INFO       Clearing directory assets/optional/ai-model-serving/kserve/localmodelnodes/
+2026-08-20 04:22:32,968     DEBUG      Copying assets/optional/ai-model-serving/kserve/localmodelnodes/kustomization.yaml <- _output/staging/rhoai/operator/kserve/localmodelnodes/kustomization.yaml
+2026-08-20 04:22:32,968     DEBUG      Copying assets/optional/ai-model-serving/kserve/localmodelnodes/manager.yaml <- _output/staging/rhoai/operator/kserve/localmodelnodes/manager.yaml
+2026-08-20 04:22:32,968     INFO       Clearing directory assets/optional/ai-model-serving/kserve/llmisvc/
+2026-08-20 04:22:32,969     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-decode-template.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-decode-template.yaml
+2026-08-20 04:22:32,969     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-decode-worker-data-parallel.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-decode-worker-data-parallel.yaml
+2026-08-20 04:22:32,969     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-prefill-template.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-prefill-template.yaml
+2026-08-20 04:22:32,969     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-prefill-worker-data-parallel.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-prefill-worker-data-parallel.yaml
+2026-08-20 04:22:32,970     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-router-route.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-router-route.yaml
+2026-08-20 04:22:32,970     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-scheduler.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-scheduler.yaml
+2026-08-20 04:22:32,970     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-template.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-template.yaml
+2026-08-20 04:22:32,970     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-worker-data-parallel.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-worker-data-parallel.yaml
+2026-08-20 04:22:32,970     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/kustomization.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/kustomization.yaml
+2026-08-20 04:22:32,971     INFO       Clearing directory assets/optional/ai-model-serving/kserve/certmanager/
+2026-08-20 04:22:32,971     DEBUG      Copying assets/optional/ai-model-serving/kserve/certmanager/certificate.yaml <- _output/staging/rhoai/operator/kserve/certmanager/certificate.yaml
+2026-08-20 04:22:32,971     DEBUG      Copying assets/optional/ai-model-serving/kserve/certmanager/kustomization.yaml <- _output/staging/rhoai/operator/kserve/certmanager/kustomization.yaml
+2026-08-20 04:22:32,972     INFO       Clearing directory assets/optional/ai-model-serving/kserve/monitoring/llmisvc/
+2026-08-20 04:22:32,972     DEBUG      Copying assets/optional/ai-model-serving/kserve/monitoring/llmisvc/kustomization.yaml <- _output/staging/rhoai/operator/kserve/monitoring/llmisvc/kustomization.yaml
+2026-08-20 04:22:32,972     DEBUG      Copying assets/optional/ai-model-serving/kserve/monitoring/llmisvc/rbac.yaml <- _output/staging/rhoai/operator/kserve/monitoring/llmisvc/rbac.yaml
+2026-08-20 04:22:32,972     DEBUG      Copying assets/optional/ai-model-serving/kserve/monitoring/llmisvc/istio_gateway_monitor.yaml <- _output/staging/rhoai/operator/kserve/monitoring/llmisvc/istio_gateway_monitor.yaml
+2026-08-20 04:22:32,973     INFO       Clearing directory assets/optional/ai-model-serving/runtimes/
+2026-08-20 04:22:32,973     INFO       Restoring assets/optional/ai-model-serving/runtimes/kustomization.yaml
+2026-08-20 04:22:32,973     DEBUG      Executing 'git restore assets/optional/ai-model-serving/runtimes/kustomization.yaml'
+2026-08-20 04:22:33,215     WARNING    Ignoring optional/ai-model-serving/runtimes/kustomization.x86_64.yaml because Generated during rebase
+2026-08-20 04:22:33,216     DEBUG      Copying assets/optional/ai-model-serving/runtimes/caikit-standalone.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/caikit-standalone-template.yaml
+2026-08-20 04:22:33,216     DEBUG      Copying assets/optional/ai-model-serving/runtimes/caikit-tgis.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/caikit-tgis-template.yaml
+2026-08-20 04:22:33,216     DEBUG      Copying assets/optional/ai-model-serving/runtimes/hf-detector.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/hf-detector-template.yaml
+2026-08-20 04:22:33,216     DEBUG      Copying assets/optional/ai-model-serving/runtimes/ovms-kserve.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/ovms-kserve-template.yaml
+2026-08-20 04:22:33,216     DEBUG      Copying assets/optional/ai-model-serving/runtimes/vllm-cuda.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/vllm-cuda-template.yaml
+2026-08-20 04:22:33,217     DEBUG      Copying assets/optional/ai-model-serving/runtimes/vllm-gaudi.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/vllm-gaudi-template.yaml
+2026-08-20 04:22:33,217     DEBUG      Copying assets/optional/ai-model-serving/runtimes/vllm-rocm.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/vllm-rocm-template.yaml
+[34mInitializing release.json file[00m
+[34mDropping template containers from ServingRuntimes and changing them to ClusterServingRuntimes[00m
+[34mCreating ClusterServingRuntimes images kustomization[00m
+[34mNo changes to assets/ or last_rebase_ai_model_serving.sh[00m
+[34mRemoving staging directory[00m
