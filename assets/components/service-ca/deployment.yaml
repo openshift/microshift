@@ -29,6 +29,8 @@ spec:
           image: '{{ .ReleaseImage.service_ca_operator }}'
           imagePullPolicy: IfNotPresent
           command: ["service-ca-operator", "controller"]
+          args:
+            - -v=2
           ports:
             - containerPort: 8443
           securityContext:
@@ -45,8 +47,8 @@ spec:
               name: signing-key
             - mountPath: /var/run/configmaps/signing-cabundle
               name: signing-cabundle
-          args:
-            - -v=2
+            - mountPath: /var/run/configmaps/config
+              name: config
       volumes:
         - name: signing-key
           secret:
@@ -54,6 +56,9 @@ spec:
         - name: signing-cabundle
           configMap:
             name: '{{.CAConfigMap}}'
+        - name: config
+          configMap:
+            name: service-ca-controller-config
       nodeSelector:
         node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"
