@@ -1,235 +1,168 @@
-# Image Mode for MicroShift Users
+# Image Mode for MicroShift (from source)
 
-Image mode is a new approach to operating system deployment that lets users build,
+Image mode is an approach to operating system deployment that lets you build,
 deploy, and manage Red Hat Enterprise Linux as a bootable container (`bootc`)
-image. Such an image uses standard OCI/Docker containers as a transport and delivery
-format for base operating system updates. A `bootc` image includes a Linux kernel,
-which is used to boot.
+image. Such an image uses standard OCI/Docker containers as a transport and
+delivery format for base operating system updates. A `bootc` image includes a
+Linux kernel, which is used to boot.
 
 MicroShift build and deployment procedures can utilize bootable containers to
 benefit from this technology.
 
-This document demonstrates how to create a bootable container image, store this
-image in a remote registry and use it for installing a new RHEL operating system.
-
 > See [Image mode for Red Hat Enterprise Linux](https://developers.redhat.com/products/rhel-image-mode/overview)
-for more information.
+> for more information.
+
+> **Source of truth:**<br>
+> The [Installing with RHEL image mode](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-about-rhel-image-mode)
+> chapter of the Red Hat build of MicroShift documentation is the authoritative
+> reference for building, publishing, and installing image mode systems using
+> **released** MicroShift RPMs.
+>
+> This document does **not** duplicate that content. It supplements it for users
+> and contributors who need to deploy MicroShift built **from source** (i.e. from
+> this repository) rather than from the released `rhocp` repositories. Only the
+> image build differs; once you have a source-built image, the publish, Kickstart,
+> and virtual machine steps are identical and are linked below.
+
+> **Note:**<br>
+> The openshift-docs links in this document are pinned to version `4.19`. Use the
+> version selector on those pages to match the MicroShift release you are working
+> with.
 
 The procedures described below require the following setup:
-* A `RHEL 9.8 host` with an active Red Hat subscription for building MicroShift `bootc`
-images. For development purposes, you can use the [Red Hat Developer subscription](https://developers.redhat.com/products/rhel/download),
+* A `RHEL 9.8 host` with an active Red Hat subscription for building MicroShift
+`bootc` images. For development purposes, you can use the [Red Hat Developer subscription](https://developers.redhat.com/products/rhel/download),
 which is free of charge.
 * A `hypervisor host` with a virtualization technology that supports RHEL. In
 this documentation, [libvirt](https://libvirt.org/) virtualization is used as
 an example.
 * A `remote registry` (e.g. `quay.io`) for storing and accessing `bootc` images
 
-## Build MicroShift Bootc Image
+## Build a MicroShift bootc image from source
 
-Log into the `RHEL 9.8 host` using the user credentials that have SUDO
-permissions configured.
+Unlike the released flow documented in openshift-docs — which installs MicroShift
+from the `rhocp` and `fast-datapath` repositories — a source build installs the
+MicroShift RPMs that you compile from this repository into the `bootc` image.
 
-### Build Image
+Log into the `RHEL 9.8 host` using the user credentials that have `sudo`
+permissions configured, and clone this repository.
 
-Download the [Containerfile](../config/Containerfile.bootc-rhel9) using the following
-command and use it for subsequent image builds.
+### Build the MicroShift RPMs
 
-```bash
-URL=https://raw.githubusercontent.com/openshift/microshift/refs/heads/main/docs/config/Containerfile.bootc-rhel9
-
-curl -s -o Containerfile "${URL}"
-```
-
-> **Important:**<br>
-> When building a container image, podman uses host subscription information and
-> repositories inside the container. With only `BaseOS` and `AppStream` system
-> repositories enabled by default, we need to enable the `rhocp` and `fast-datapath`
-> repositories for installing MicroShift and its dependencies. These repositories
-> must be accessible in the host subscription, but not necessarily enabled on the host.
-
-Examine the `rhocp` and `fast-datapath` repositories that are available in the host
-subscription.
+Build the MicroShift RPMs from the current source tree by running the following
+command at the repository root:
 
 ```bash
-sudo subscription-manager repos --list | \
-    grep '^Repo ID:' | \
-    grep -E 'fast-datapath|rhocp-4.*-for-rhel' | sort
+make rpm
 ```
 
-Run the following image build command to create a local `bootc` image.
+> Use `make rpm-podman` to build the RPMs inside a container if the host is not
+> set up with the Go toolchain and build dependencies.
+
+The RPMs are written under `_output/rpmbuild/RPMS`:
+
+```bash
+$ find _output/rpmbuild/RPMS -name '*.rpm' | head
+_output/rpmbuild/RPMS/x86_64/microshift-5.0.0_0.nightly...el9.x86_64.rpm
+_output/rpmbuild/RPMS/x86_64/microshift-networking-5.0.0_0.nightly...el9.x86_64.rpm
+_output/rpmbuild/RPMS/noarch/microshift-release-info-5.0.0_0.nightly...el9.noarch.rpm
+...
+```
+
+> The version string encodes the source commit (for example
+> `5.0.0_0.nightly_..._<git-sha>`), so it differs from any released MicroShift
+> version. This is how you confirm the resulting image contains your source build
+> rather than a released RPM.
+
+### Create a local RPM repository
+
+Turn the built RPMs into a `dnf` repository so they can be consumed during the
+image build:
+
+```bash
+createrepo_c _output/rpmbuild/RPMS
+```
+
+This creates `_output/rpmbuild/RPMS/repodata`, indexing the RPMs in the `noarch`
+and `x86_64` subdirectories.
+
+### Build the bootc image
+
+Use the [Containerfile.bootc-source-rhel9](../config/Containerfile.bootc-source-rhel9)
+source build Containerfile from a clone of this repository.
+
+Unlike the released Containerfile, it:
+* copies the local RPM repository into the image and installs `microshift` from it
+* pulls the MicroShift runtime dependencies that are not part of base RHEL (cri-o,
+  cri-tools, openshift-clients and openvswitch) from the public OpenShift
+  dependencies mirror rather than from `rhocp`/`fast-datapath`, because the
+  matching versions for a pre-release source build are not yet available in those
+  subscription repositories
+
+> The dependencies mirror URL tracks the current development stream and is
+> architecture specific. See the comments in the Containerfile and the
+> `RHOCP_MINOR_Y_BETA` variable in
+> [test/bin/common_versions.sh](../../test/bin/common_versions.sh) for the
+> authoritative value, and override `DEPS_REPO_URL` with `--build-arg` when
+> building for another architecture.
 
 Note how secrets are used during the image build:
 * The podman `--authfile` argument is required to pull the base image from the
 `registry.redhat.io` registry
 * The build `USER_PASSWD` argument is used to set a password for the `redhat` user
 
+Run the following command, using `_output/rpmbuild/RPMS` as the build context so
+the local repository is available to the build:
+
 ```bash
 PULL_SECRET=~/.pull-secret.json
 USER_PASSWD="<your_redhat_user_password>"
-IMAGE_NAME=microshift-4.18-bootc
+IMAGE_NAME=microshift-source-bootc
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --build-arg USER_PASSWD="${USER_PASSWD}" \
-    -f Containerfile
+    -f docs/config/Containerfile.bootc-source-rhel9 \
+    _output/rpmbuild/RPMS
 ```
 
 > **Important:**<br>
-> If `dnf upgrade` command is used in the container image build procedure, it
-> may cause unintended operating system version upgrade (e.g. from `9.8` to
-> `9.8`). To prevent this from happening, use the following command instead.
-> ```
-> RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}"
-> ```
+> The `Containerfile` runs `dnf upgrade` pinned to the base image release version
+> (`dnf upgrade -y --releasever="${VERSION_ID}"`). Pinning `--releasever` prevents
+> an unintended minor version upgrade of the operating system (for example, from
+> `9.8` to a later RHEL `9.y`) that a plain `dnf upgrade` could otherwise perform,
+> keeping the image on the same RHEL version as its base.
 
-Verify that the local MicroShift 4.18 `bootc` image was created.
+Verify that the local MicroShift `bootc` image was created:
 
 ```bash
 $ sudo podman images "${IMAGE_NAME}"
-REPOSITORY                       TAG         IMAGE ID      CREATED        SIZE
-localhost/microshift-4.18-bootc  latest      193425283c00  2 minutes ago  2.31 GB
+REPOSITORY                          TAG     IMAGE ID      CREATED        SIZE
+localhost/microshift-source-bootc   latest  193425283c00  2 minutes ago  2.89 GB
 ```
 
-### Push Image to Registry
+> To run this image directly as a `podman` container for fast development
+> turnaround — the quickest way to exercise a source build without installing it
+> on a host — see [Image Mode for MicroShift Contributors](../contributor/image_mode.md).
 
-Run the following commands to log into a remote registry and push the image to
-a remote registry.
+## Deploy the source-built image
 
-> The image from the remote registry can be used for running the container on
-> another host, or when installing a new operating system with the `bootc`
-> image layer.
+Publishing the image to a registry, preparing a Kickstart file, and installing the
+image into a virtual machine are identical for a source-built image and a released
+image. Rather than duplicate those procedures, follow the openshift-docs
+instructions and substitute your source-built image reference wherever a MicroShift
+image is required:
 
-```bash
-REGISTRY_URL=<myreg>
-REGISTRY_IMG=<myorg>/<mypath>/"${IMAGE_NAME}"
+* [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-install-bootc-image) —
+  skip the "get a published image" step (you built the image locally above) and
+  push `localhost/microshift-source-bootc` to your remote registry.
+* [Running the bootc image in a virtual machine](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-install-running-bootc-image-vm) —
+  set the image reference used by the `ostreecontainer` Kickstart directive to your
+  source-built image (for example
+  `<myreg>/<myorg>/<mypath>/microshift-source-bootc`).
 
-sudo podman login "${REGISTRY_URL}"
-sudo podman push localhost/"${IMAGE_NAME}" "${REGISTRY_URL}/${REGISTRY_IMG}"
-```
-
-> Replace `<myreg>` with the URL to your remote registry, and `<myorg>/<mypath>`
-> with your organization name and path inside your remote registry.
-
-## Run MicroShift Bootc Virtual Machine
-
-Log into the `physical hypervisor host` using the user credentials that have
-SUDO permissions configured.
-
-### Prepare Kickstart File
-
-Set variables pointing to secret files that are included in `kickstart.ks` for
-gaining access to private container registries:
-* `AUTH_CONFIG` file contents are copied to `/etc/ostree/auth.json` at the
-pre-install stage to authenticate `<myreg>/<myorg>` registry access
-* `PULL_SECRET` file contents are copied to `/etc/crio/openshift-pull-secret`
-at the post-install stage to authenticate OpenShift registry access
-* `IMAGE_REF` variable contains the MicroShift bootc container image reference
-to be installed
-
-```bash
-AUTH_CONFIG=~/.registry-auth.json
-PULL_SECRET=~/.pull-secret.json
-IMAGE_REF="<myreg>/<myorg>/<mypath>/microshift-4.18-bootc"
-```
-
-> Replace `<myreg>` with the URL to your remote registry, and `<myorg>/<mypath>`
-> with your organization name and path inside your remote registry.
-
-> See the `containers-auth.json(5)` manual pages for more information on the
-> syntax of the `AUTH_CONFIG` registry authentication file.
-
-Run the following commands to create the `kickstart.ks` file to be used during
-the virtual machine installation.
-
-```bash
-cat > kickstart.ks <<EOFKS
-lang en_US.UTF-8
-keyboard us
-timezone UTC
-text
-reboot
-
-# Partition the disk with hardware-specific boot and swap partitions, adding an
-# LVM volume that contains a 10GB+ system root. The remainder of the volume will
-# be used by the CSI driver for storing data.
-zerombr
-clearpart --all --initlabel
-# Create boot and swap partitions as required by the current hardware platform
-reqpart --add-boot
-# Add an LVM volume group and allocate a system root logical volume
-part pv.01 --grow
-volgroup rhel pv.01
-logvol / --vgname=rhel --fstype=xfs --size=10240 --name=root
-
-# Lock root user account
-rootpw --lock
-
-# Configure network to use DHCP and activate on boot
-network --bootproto=dhcp --device=link --activate --onboot=on
-
-%pre-install --log=/dev/console --erroronfail
-
-# Create a 'bootc' image registry authentication file
-mkdir -p /etc/ostree
-cat > /etc/ostree/auth.json <<'EOF'
-$(cat "${AUTH_CONFIG}")
-EOF
-
-%end
-
-# Pull a 'bootc' image from a remote registry
-ostreecontainer --url "${IMAGE_REF}"
-
-%post --log=/dev/console --erroronfail
-
-# Create an OpenShift pull secret file
-cat > /etc/crio/openshift-pull-secret <<'EOF'
-$(cat "${PULL_SECRET}")
-EOF
-chmod 600 /etc/crio/openshift-pull-secret
-
-%end
-EOFKS
-```
-
-The kickstart file uses a special [ostreecontainer](https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html#ostreecontainer)
-directive to pull a `bootc` image from the remote registry and use it to install
-the RHEL operating system.
-
-### Create Virtual Machine
-
-Download a RHEL boot ISO image from https://developers.redhat.com/products/rhel/download.
-Copy the downloaded file to the `/var/lib/libvirt/images` directory.
-
-Run the following commands to create a RHEL virtual machine with 2 cores, 2GB of
-RAM and 20GB of storage. The command uses the kickstart file prepared in the
-previous step to pull a `bootc` image from the remote registry and use it to install
-the RHEL operating system.
-
-```bash
-VMNAME=microshift-4.18-bootc
-NETNAME=default
-
-sudo virt-install \
-    --name ${VMNAME} \
-    --vcpus 2 \
-    --memory 2048 \
-    --disk path=/var/lib/libvirt/images/${VMNAME}.qcow2,size=20 \
-    --network network=${NETNAME},model=virtio \
-    --events on_reboot=restart \
-    --location /var/lib/libvirt/images/rhel-9.8-$(uname -m)-boot.iso \
-    --initrd-inject kickstart.ks \
-    --extra-args "inst.ks=file:/kickstart.ks" \
-    --wait
-```
-
-Log into the virtual machine using the `redhat:<password>` credentials.
-Run the following command to verify that all the MicroShift pods are up and running
-without errors.
-
-```bash
-watch sudo oc get pods -A \
-    --kubeconfig /var/lib/microshift/resources/kubeadmin/kubeconfig
-```
+The remaining sections cover workflows that are **not** part of the openshift-docs
+image mode documentation: building a self-contained installation ISO with
+`bootc-image-builder`, and embedding container images for offline installation.
 
 ## Using Bootc Image Builder (BIB)
 
@@ -298,7 +231,7 @@ EOFKS
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
-IMAGE_NAME=microshift-4.18-bootc
+IMAGE_NAME=microshift-source-bootc
 
 mkdir ./output
 sudo podman run --authfile ${PULL_SECRET} --rm -it \
@@ -322,7 +255,7 @@ Run the following commands to copy the `./output/install.iso` file to the
 `/var/lib/libvirt/images` directory and create a virtual machine.
 
 ```bash
-VMNAME=microshift-4.18-bootc
+VMNAME=microshift-source-bootc
 NETNAME=default
 
 sudo cp -Z ./output/bootiso/install.iso /var/lib/libvirt/images/${VMNAME}.iso
@@ -375,7 +308,8 @@ curl -s -o Containerfile.embedded "${URL}"
 
 Run the following image build command to create a local `bootc` image with embedded
 container dependencies. It is using a base image built according to the instructions
-in the [Build Image](#build-image) section.
+in the [Build a MicroShift bootc image from source](#build-a-microshift-bootc-image-from-source)
+section.
 
 Note how secrets are used during the image build:
 * The podman `--authfile` argument is required to pull the base image from the
@@ -385,9 +319,9 @@ OpenShift container registries.
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
-BASE_IMAGE_NAME=microshift-4.18-bootc
+BASE_IMAGE_NAME=microshift-source-bootc
 BASE_IMAGE_TAG=latest
-IMAGE_NAME=microshift-4.18-bootc-embedded
+IMAGE_NAME=microshift-source-bootc-embedded
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --secret "id=pullsecret,src=${PULL_SECRET}" \
@@ -396,12 +330,12 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     -f Containerfile.embedded
 ```
 
-Verify that the local MicroShift 4.18 `bootc` image was created.
+Verify that the local MicroShift `bootc` image was created.
 
 ```bash
 $ sudo podman images "${IMAGE_NAME}"
-REPOSITORY                                TAG         IMAGE ID      CREATED             SIZE
-localhost/microshift-4.18-bootc-embedded  latest      6490d8f5752a  About a minute ago  3.75 GB
+REPOSITORY                                  TAG     IMAGE ID      CREATED             SIZE
+localhost/microshift-source-bootc-embedded  latest  6490d8f5752a  About a minute ago  3.75 GB
 ```
 
 ### Build Installation Image
@@ -409,7 +343,7 @@ localhost/microshift-4.18-bootc-embedded  latest      6490d8f5752a  About a minu
 Follow the instructions in [Create ISO Image Using BIB](#create-iso-image-using-bib)
 to build an ISO from the container image with embedded container dependencies.
 
-> Note: Make sure to set the `IMAGE_NAME` variable to `microshift-4.18-bootc-embedded`
+> Note: Make sure to set the `IMAGE_NAME` variable to `microshift-source-bootc-embedded`
 
 ### Prepare Kickstart File
 
@@ -420,7 +354,7 @@ gaining access to private container registries:
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
-IMAGE_NAME=microshift-4.18-bootc-embedded
+IMAGE_NAME=microshift-source-bootc-embedded
 ```
 
 Run the following command to create the `kickstart.ks` file to be used during
@@ -500,7 +434,7 @@ sudo virsh net-autostart "${VM_ISOLATED_NETWORK}"
 
 ### Create Virtual Machine
 
-Follow the instructions in [Create Virtual Machine](#create-virtual-machine-1)
+Follow the instructions in [Create Virtual Machine](#create-virtual-machine)
 to bootstrap a virtual machine from the ISO with embedded container dependencies.
 
 > Note: Make sure to set the `NETNAME` variable to the `VM_ISOLATED_NETWORK`
