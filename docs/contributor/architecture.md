@@ -163,11 +163,16 @@ Additional functionality is delivered as optional RPM subpackages:
 | `microshift-cert-manager` | `manifests.d/060-microshift-cert-manager` | Certificate Manager |
 | `microshift-sriov` | `manifests.d/070-microshift-sriov` | SR-IOV Network Operator |
 | `microshift-observability` | `manifests.d/003-microshift-observability` + systemd service | OpenTelemetry Collector |
+| `microshift-metrics-server` | `manifests.d/080-microshift-metrics-server` + observability `scrape.d` drop-in | metrics-server (Kubernetes Metrics API, `kubectl top`) |
+| `microshift-metrics-kube-state` | `manifests.d/081-microshift-kube-state-metrics` + observability `scrape.d` drop-in | kube-state-metrics (Kubernetes object-state metrics) |
+| `microshift-metrics-node-exporter` | `manifests.d/082-microshift-node-exporter` + observability `scrape.d` drop-in | Prometheus node-exporter (host hardware/OS metrics) |
 | `microshift-ai-model-serving` | `manifests.d/010-*-kserve`, `050-*-runtimes` | AI Model Serving (KServe) |
 | `microshift-multus` | config file in `/etc/microshift/config.d/` + CRI-O config | Multus CNI (enables via config, not manifests) |
 | `microshift-low-latency` | tuned profile | Baseline low-latency workload configuration |
 
 Most optional components also have a `-release-info` RPM containing container image references used by image builder blueprints.
+
+The optional metric-exporter RPMs (`microshift-metrics-node-exporter`, `microshift-metrics-kube-state`, `microshift-metrics-server`) integrate with `microshift-observability` via Prometheus scrape drop-ins in `/etc/microshift/observability/scrape.d/`. See [Observability: Scraping the Optional Metric Exporters](./observability_metric_exporters.md).
 
 ### Discovery Mechanism
 
