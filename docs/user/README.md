@@ -22,5 +22,5 @@ List of the documents in alphabetical file name order.
 - [How To Configure a Workload with Custom Security Context](./howto_pod_security.md)
 - [MicroShift Mitigation of System Configuration Changes](./howto_sysconf_watch.md)
 - [Running MicroShift Fully Offline](./howto_test_offline.md)
-- [Image Mode for MicroShift Users](./image_mode.md)
+- [Image Mode for MicroShift (from source)](./image_mode.md)
 - [Known Limitations](./known_limitations.md)
