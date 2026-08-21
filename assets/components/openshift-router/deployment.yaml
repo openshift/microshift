@@ -248,7 +248,7 @@ spec:
           startupProbe:
             failureThreshold: 120
             httpGet:
-              path: /healthz/ready
+              path: /healthz
               port: 1936
               scheme: HTTP
             periodSeconds: 1
