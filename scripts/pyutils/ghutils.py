@@ -2,6 +2,7 @@
 
 import os
 import logging
+import re
 import sys
 from pathlib import Path
 from github import GithubIntegration, Github
@@ -51,26 +52,32 @@ class GithubUtils:
 
     def is_branch_under_active_development(self, branch):
         """
-        Checks title of the issue #1239 in the openshift/microshift repository to check if
-        given branch is frozen and thus under active development is happening on main branch.
-
-        It returns True if given branch is on the list of frozen branches.
-        In such case the target (base) branch of newly created PR should be switched to main.
+        Searches open issues with the 'tide/merge-blocker' label for 'branch:<name>' tokens
+        to determine if a given branch is frozen. When frozen, active development happens on
+        main, so the target (base) branch of newly created PRs should be switched to main.
         """
         if self.dry_run:
             logging.info(f"[DRY RUN] Assuming branch {branch} is under active development")
             return True
 
-        issue = self.gh_repo.get_issue(number=1239)
-        title = issue.title
-        try:
-            branches_part = title.split('|', 1)[1].strip()
-            frozen_branches = [x.replace('branch:', '') for x in branches_part.split()]
-            if len(frozen_branches) == 0:
-                raise Exception(f"Unexpected amount of branch in the Issue 1239 title: {title}")
-            return branch in frozen_branches
-        except Exception as e:
-            raise RuntimeError(f"Failed to parse freeze issue title: {title} ({e})")
+        frozen_branches = self._get_frozen_branches()
+        return branch in frozen_branches
+
+    _FREEZE_ISSUE_AUTHOR = "openshift-ci"
+
+    def _get_frozen_branches(self):
+        """Collect all frozen branch names from open tide/merge-blocker issues created by the CI bot."""
+        frozen = set()
+        for issue in self.gh_repo.get_issues(state='open', labels=['tide/merge-blocker']):
+            if issue.user.login != self._FREEZE_ISSUE_AUTHOR:
+                logging.debug(f"Skipping issue #{issue.number} by {issue.user.login} (expected {self._FREEZE_ISSUE_AUTHOR})")
+                continue
+            branches = re.findall(r'branch:([\S]+)', issue.title)
+            logging.info(f"Freeze issue #{issue.number}: frozen branches {branches}")
+            frozen.update(branches)
+        if not frozen:
+            logging.info("No frozen branches found")
+        return frozen
 
     def create_pr(self, base_branch, branch_name, title, desc):
         """Create a Pull Request"""
