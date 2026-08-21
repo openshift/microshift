@@ -201,6 +201,12 @@ type ServerConfig struct {
 	// consider running defrag during bootstrap. Needs to be set to non-zero value to take effect.
 	BootstrapDefragThresholdMegabytes uint `json:"bootstrap-defrag-threshold-megabytes"`
 
+	// DefragJournalMaxOps sets the maximum number of write operations buffered
+	// in the non-blocking defrag journal before backpressure is applied. Only
+	// effective when NonBlockingDefrag feature gate is enabled. 0 means
+	// unlimited (no backpressure).
+	DefragJournalMaxOps int `json:"defrag-journal-max-ops"`
+
 	// MaxLearners sets a limit to the number of learner members that can exist in the cluster membership.
 	MaxLearners int `json:"max-learners"`
 
