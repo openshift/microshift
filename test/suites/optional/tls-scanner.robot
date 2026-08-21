@@ -13,6 +13,7 @@ Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/optional-config.resource
 Resource            ../../resources/oc.resource
+Resource            ../../resources/router.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -51,9 +52,11 @@ TLS Scanner Host Scan Completes And Produces Artifacts
     ...    Cleanup TLS Scanner Job
     ...    Ensure Cluster Reader Role Deleted
 
-Ingress Router TLS Curves supports ML-KEM Post Quantum Curves
-    [Documentation]    Verify TLS curve negotiation with openssl from inside the router pod.
-    Verify ML-KEM Post Quantum Curve Negotiation
+Ingress Router TLS Curves Are Correctly Configured
+    [Documentation]    Verify ROUTER_CURVES env var is set correctly based on FIPS mode.
+    ...    On FIPS: asserts only NIST curves (P-256:P-384:P-521).
+    ...    On non-FIPS: asserts ML-KEM post-quantum curve negotiation works.
+    Verify Router TLS Curves Configuration
 
 
 *** Keywords ***
@@ -142,22 +145,28 @@ Cleanup TLS Scanner Job
         Run Keyword And Ignore Error    Remove Directory    ${TLS_SCANNER_DIR}    recursive=True
     END
 
-Verify ML-KEM Post Quantum Curve Negotiation
+Verify Router TLS Curves Configuration
+    [Documentation]    Verify ROUTER_CURVES env var is correctly set on the router pod.
+    ...    Obtains FIPS status from /proc/sys/crypto/fips_enabled (same source
+    ...    the production code uses), then asserts the curves match that status.
+    ${is_fips}=    Is Host FIPS Enabled
+    IF    ${is_fips}
+        Log    FIPS mode enabled on host: expecting NIST-only curves
+        Router Pod Env Should Have Value    ROUTER_CURVES    P-256:P-384:P-521
+    ELSE
+        Log    Non-FIPS mode: expecting post-quantum curves and verifying negotiation
+        Router Pod Env Should Have Value    ROUTER_CURVES    X25519MLKEM768:X25519:P-256:P-384:P-521
+        Verify ML-KEM Curve Negotiation
+    END
+
+Verify ML-KEM Curve Negotiation
     [Documentation]    Verify X25519MLKEM768 post-quantum hybrid key exchange
-    ...    negotiates successfully via oc exec into the router pod, which
-    ...    has OpenSSL 3.5+ (the host OpenSSL may be too old for ML-KEM).
-    ...    Skipped on FIPS clusters where ML-KEM is not configured.
-    ${curves}=    Oc Get JsonPath    pod    openshift-ingress    ${EMPTY}
-    ...    .items[*].spec.containers[*].env[?(@.name=="ROUTER_CURVES")].value
-    Skip If    "X25519MLKEM768" not in """${curves}"""
-    ...    ROUTER_CURVES does not include X25519MLKEM768 (FIPS mode); skipping ML-KEM test
+    ...    negotiates successfully via oc exec into the router pod.
     ${router_ip}=    Oc Get JsonPath    svc    openshift-ingress    router-default
     ...    .spec.clusterIP
-    ${pod_name}=    Oc Get JsonPath    pod    openshift-ingress    ${EMPTY}
-    ...    .items[0].metadata.name
+    ${pod_name}=    Get Router Pod Name
     ${output}=    Oc Exec    ${pod_name}
     ...    echo Q | openssl s_client -connect ${router_ip}:443 -groups X25519MLKEM768 2>&1 || true
     ...    ns=openshift-ingress
     Should Contain    ${output}    X25519MLKEM768
-    ...    msg=ML-KEM post-quantum curve X25519MLKEM768 negotiation failed; openssl output: ${output}
-    Log    Post-quantum ML-KEM negotiation verified: OK
+    ...    msg=ML-KEM post-quantum curve negotiation failed; openssl output: ${output}

@@ -88,6 +88,20 @@ Delete Thin Storage Pool
     Log    ${stderr}
     Should Be Equal As Integers    0    ${rc}
 
+Is Host FIPS Enabled
+    [Documentation]    Returns true if FIPS mode is enabled on the host.
+    ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
+    ...    cat /proc/sys/crypto/fips_enabled
+    ...    sudo=False    return_rc=True    return_stdout=True    return_stderr=True
+    Should Be Equal As Integers    0    ${rc}    msg=Failed to read /proc/sys/crypto/fips_enabled
+    IF    '${stdout.strip()}' == '1'
+        RETURN    ${TRUE}
+    ELSE IF    '${stdout.strip()}' == '0'
+        RETURN    ${FALSE}
+    ELSE
+        Fail    Unexpected value in /proc/sys/crypto/fips_enabled: '${stdout.strip()}'
+    END
+
 Is System Bootc
     [Documentation]    Returns true if system is bootc-based.
 
