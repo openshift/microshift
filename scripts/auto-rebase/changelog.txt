@@ -1,0 +1,6 @@
+- cluster-network-operator embedded-component 880e60166a881fb00bbb0b15755517870997709b to 69b8dae17be7eae9345b86a378a356f0f323f44f
+  - fab434c 2026-08-05T17:29:33-04:00 Fix: whereabouts-token-watcher DaemonSet improvements
+  - 976e4b5 2026-06-29T17:07:49-04:00 Add release version annotation to whereabouts-controller and whereabouts-token-watcher
+  - d54a12c 2026-06-29T17:05:38-04:00 Manual feature backport of cert rotation for whereabouts
+  - 80685e5 2025-12-09T07:59:35+00:00 Re-disable metrics server
+
