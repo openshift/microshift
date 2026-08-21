@@ -39,8 +39,8 @@ cases with no extra wiring:
 - **Observability without metrics** — `scrape.d/` is empty; the receiver loads no configs
   and reports no error.
 - **Observability with a subset of exporters** — only the installed exporters are scraped.
-- **Exporters without observability** — the drop-in files exist on disk but are never read;
-  no side effects.
+- **Exporters without observability** — the drop-in files exist on disk but are never read,
+  so no scraping occurs (the exporter workload still deploys and serves its endpoint).
 
 ### Package ownership
 
@@ -85,5 +85,4 @@ Keep the collector presets, the drop-ins, and the RPM packaging in sync with the
 
 End-to-end behavior is exercised by `test/suites/optional/observability.robot`
 (USHIFT-7407), which enables the exporters alongside observability and asserts that
-kube-state-metrics and node-exporter series appear in the collector output and that
-metrics-server is scraped without `403` errors.
+kube-state-metrics, node-exporter, and metrics-server series appear in the collector output.
