@@ -109,16 +109,16 @@ export CURRENT_RELEASE_VERSION
 # For a release branch, the previous release repository should come from the
 # official 'rhocp' stream.# The previous release repository value should either
 # point to the OpenShift mirror URL or the 'rhocp' repository name.
-PREVIOUS_RELEASE_REPO="rhocp-4.22-for-rhel-9-${UNAME_M}-rpms"
-PREVIOUS_RELEASE_VERSION="$(get_vrel_from_rhsm "${PREVIOUS_RELEASE_REPO}")"
+PREVIOUS_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp/latest-4.22/el9/os"
+PREVIOUS_RELEASE_VERSION="$(get_vrel_from_beta "${PREVIOUS_RELEASE_REPO}")"
 export PREVIOUS_RELEASE_REPO
 export PREVIOUS_RELEASE_VERSION
 
 # The y-2 release repository value should either point to the OpenShift
 # mirror URL or the 'rhocp' repository name. It should always come from
 # the 'rhocp' stream.
-YMINUS2_RELEASE_REPO="rhocp-4.21-for-rhel-9-${UNAME_M}-rpms"
-YMINUS2_RELEASE_VERSION="$(get_vrel_from_rhsm "${YMINUS2_RELEASE_REPO}")"
+YMINUS2_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp/latest-4.21/el9/os"
+YMINUS2_RELEASE_VERSION="$(get_vrel_from_beta "${YMINUS2_RELEASE_REPO}")"
 export YMINUS2_RELEASE_REPO
 export YMINUS2_RELEASE_VERSION
 
@@ -138,8 +138,8 @@ export RHOCP_MINOR_Y_BETA
 # The 'rhocp_major_y1' and 'rhocp_minor_y1' variables should be the previous major
 # and minor version numbers, if the previous release is available through the
 # 'rhocp' stream, otherwise empty.
-RHOCP_MAJOR_Y1=4
-RHOCP_MINOR_Y1=22
+RHOCP_MAJOR_Y1=""
+RHOCP_MINOR_Y1=""
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. The mirror for previous release should always
 # be available.
@@ -152,13 +152,13 @@ export RHOCP_MINOR_Y1_BETA
 export RHOCP_MAJOR_Y2=4
 export RHOCP_MINOR_Y2=21
 
-export CNCF_SONOBUOY_VERSION=v0.57.3
+export CNCF_SONOBUOY_VERSION=v0.57.5
 
 # The version of systemd-logs image included in the sonobuoy release.
 export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 
 # The current version of the microshift-gitops package.
-export GITOPS_VERSION=1.19
+export GITOPS_VERSION=1.21
 
 # The brew release versions needed for release regression testing
 BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${MAJOR_VERSION}.${MINOR_VERSION}-zstream/${UNAME_M}/")"
