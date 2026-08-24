@@ -1,26 +1,17 @@
-- name: Create mirrors block
-  block:
-    - name: Check if microshift_version is valid for pre-release
-      ansible.builtin.uri:
-        url: "{{ item.repo_url }}"
-        method: GET
-        status_code: 200
-        timeout: 5
+- name: Install repository mirror
+  ansible.builtin.template:
+    src: ocpbeta.repo.j2
+    dest: "/etc/yum.repos.d/{{ item.repo_name }}.repo"
+    mode: '0644'
+  register: microshift_mirror_repo
 
-    - name: Install microshift mirror repo for pre-releases
-      ansible.builtin.template:
-        src: ocpbeta.repo.j2
-        dest: "/etc/yum.repos.d/{{ item.repo_name }}.repo"
-        mode: '0644'
-      register: microshift_mirror_repo
-
-    - name: Clean stale metadata for updated pre-release repo
-      ansible.builtin.command:
-        argv:
-          - dnf
-          - clean
-          - metadata
-          - "--disablerepo=*"
-          - "--enablerepo={{ item.repo_name }}"
-      changed_when: true
-      when: microshift_mirror_repo.changed
+- name: Clean stale metadata for updated repository
+  ansible.builtin.command:
+    argv:
+      - dnf
+      - clean
+      - metadata
+      - "--disablerepo=*"
+      - "--enablerepo={{ item.repo_name }}"
+  changed_when: true
+  when: microshift_mirror_repo.changed
