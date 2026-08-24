@@ -1,3 +1,4 @@
-- ovn-kubernetes image-amd64 40f95f00e99b9cb9f43f0988872d141a77e1a462 to c28f7669a9ef8e28a47163b1656c5647ea8a725c
-  - 8b1af490 2026-08-10T19:16:09+02:00 Fix traffic leak in egress IP on secondary interface
+- machine-config-operator embedded-component acca836821a48b58f669c64c8f8a29ca734d5ba3 to afed09939d80d86cafd38e9f733cc49ed16af092
+  - 51affbf9 2026-08-17T13:08:05Z vsphere: check secret before mutating template
+  - b6d9f8f3 2026-08-17T13:08:05Z vsphere: scope template lookup to folder
 
