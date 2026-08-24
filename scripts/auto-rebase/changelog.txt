@@ -1,0 +1,29 @@
+- machine-config-operator embedded-component a362b5965c47d38e15cfe32f69e66a525819e45c to f313997e0ba83edd79b1d0091e85d6e25c793274
+  - 4255295f 2026-08-10T09:12:03-04:00 mcc: replace wildcard permissions with explicit verbs and resources in MCC ClusterRole & scope configmap access to target namespace via Role instead of ClusterRole
+
+- oc image-amd64 6febe61977471b066f08d513424b226b82ee518f to 3da7a06927d28a77e2c772a62a19869e8b794db3
+  - a6e0ba00 2026-08-14T13:56:55+05:30 fix:correct sti-ruby path for unit tests
+  - 680fd9a7 2026-08-05T00:49:43+02:00 Fix for OCPBUGS-91365: CVE-2026-25681
+
+- router image-amd64 e5c059ea7a57d1ee5436b253cf214f144c9a7f27 to 347f03e9d6caaf6bf249bf1d2075965112eab228
+  - b2e4b66 2026-07-22T17:09:17+05:30 OCPBUGS-86726: Run go mod tidy and vendor for dependency update
+  - 584c0dc 2026-07-22T17:06:56+05:30 OCPBUGS-86726: Prevent SSRF via FQDN-typed EndpointSlices
+
+- ovn-kubernetes image-amd64 f8d50bf7fb4c0f4f74f9230a6b4bf2684bb6aae2 to 7b7fbcd222da0212fcf0446000fe4a95ea79347b
+  - e4bab0cd 2026-07-23T19:34:02+05:30 OCPBUGS-82825: Bump github.com/moby/spdystream to v0.5.1
+  - d18e8e85 2026-06-04T17:37:52+02:00 remove forced V(5) logging during startup
+  - cc7f427b 2026-05-11T09:41:17+02:00 ANP: Skip redundant status updates to reduce API server load
+
+- oc image-arm64 6febe61977471b066f08d513424b226b82ee518f to 3da7a06927d28a77e2c772a62a19869e8b794db3
+  - a6e0ba00 2026-08-14T13:56:55+05:30 fix:correct sti-ruby path for unit tests
+  - 680fd9a7 2026-08-05T00:49:43+02:00 Fix for OCPBUGS-91365: CVE-2026-25681
+
+- router image-arm64 e5c059ea7a57d1ee5436b253cf214f144c9a7f27 to 347f03e9d6caaf6bf249bf1d2075965112eab228
+  - b2e4b66 2026-07-22T17:09:17+05:30 OCPBUGS-86726: Run go mod tidy and vendor for dependency update
+  - 584c0dc 2026-07-22T17:06:56+05:30 OCPBUGS-86726: Prevent SSRF via FQDN-typed EndpointSlices
+
+- ovn-kubernetes image-arm64 f8d50bf7fb4c0f4f74f9230a6b4bf2684bb6aae2 to 7b7fbcd222da0212fcf0446000fe4a95ea79347b
+  - e4bab0cd 2026-07-23T19:34:02+05:30 OCPBUGS-82825: Bump github.com/moby/spdystream to v0.5.1
+  - d18e8e85 2026-06-04T17:37:52+02:00 remove forced V(5) logging during startup
+  - cc7f427b 2026-05-11T09:41:17+02:00 ANP: Skip redundant status updates to reduce API server load
+
