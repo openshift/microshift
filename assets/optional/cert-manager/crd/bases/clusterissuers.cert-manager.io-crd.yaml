@@ -6,9 +6,10 @@ metadata:
     helm.sh/resource-policy: keep
   labels:
     app: cert-manager
+    app.kubernetes.io/component: crds
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/version: v1.18.4
+    app.kubernetes.io/version: v1.20.3
   name: clusterissuers.cert-manager.io
 spec:
   group: cert-manager.io
@@ -24,10 +25,10 @@ spec:
   scope: Cluster
   versions:
     - additionalPrinterColumns:
-        - jsonPath: .status.conditions[?(@.type=="Ready")].status
+        - jsonPath: .status.conditions[?(@.type == "Ready")].status
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=="Ready")].message
+        - jsonPath: .status.conditions[?(@.type == "Ready")].message
           name: Status
           priority: 1
           type: string
@@ -397,6 +398,22 @@ spec:
                                       The TenantID of the Azure Service Principal used to authenticate with Azure DNS.
                                       If set, ClientID and ClientSecret must also be set.
                                     type: string
+                                  zoneType:
+                                    description: |-
+                                      ZoneType determines which type of Azure DNS zone to use.
+
+                                      Valid values are:
+                                        - AzurePublicZone  (default): Use a public Azure DNS zone.
+                                        - AzurePrivateZone: Use an Azure Private DNS zone.
+
+                                      If not specified, AzurePublicZone is used.
+
+                                      Support for Azure Private DNS zones is currently
+                                      experimental and may change in future releases.
+                                    enum:
+                                      - AzurePublicZone
+                                      - AzurePrivateZone
+                                    type: string
                                 required:
                                   - resourceGroupName
                                   - subscriptionID
@@ -520,8 +537,14 @@ spec:
                                     description: |-
                                       The IP address or hostname of an authoritative DNS server supporting
                                       RFC2136 in the form host:port. If the host is an IPv6 address it must be
-                                      enclosed in square brackets (e.g [2001:db8::1]) ; port is optional.
+                                      enclosed in square brackets (e.g [2001:db8::1]); port is optional.
                                       This field is required.
+                                    type: string
+                                  protocol:
+                                    description: Protocol to use for dynamic DNS update queries. Valid values are (case-sensitive) ``TCP`` and ``UDP``; ``UDP`` (default).
+                                    enum:
+                                      - TCP
+                                      - UDP
                                     type: string
                                   tsigAlgorithm:
                                     description: |-
@@ -564,8 +587,8 @@ spec:
                                     description: |-
                                       The AccessKeyID is used for authentication.
                                       Cannot be set when SecretAccessKeyID is set.
-                                      If neither the Access Key nor Key ID are set, we fall-back to using env
-                                      vars, shared credentials file or AWS Instance metadata,
+                                      If neither the Access Key nor Key ID are set, we fall back to using env
+                                      vars, shared credentials file, or AWS Instance metadata,
                                       see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials
                                     type: string
                                   accessKeyIDSecretRef:
@@ -573,8 +596,8 @@ spec:
                                       The SecretAccessKey is used for authentication. If set, pull the AWS
                                       access key ID from a key within a Kubernetes Secret.
                                       Cannot be set when AccessKeyID is set.
-                                      If neither the Access Key nor Key ID are set, we fall-back to using env
-                                      vars, shared credentials file or AWS Instance metadata,
+                                      If neither the Access Key nor Key ID are set, we fall back to using env
+                                      vars, shared credentials file, or AWS Instance metadata,
                                       see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials
                                     properties:
                                       key:
@@ -614,6 +637,7 @@ spec:
                                                 items:
                                                   type: string
                                                 type: array
+                                                x-kubernetes-list-type: atomic
                                               name:
                                                 description: Name of the ServiceAccount used to request a token.
                                                 type: string
@@ -662,8 +686,8 @@ spec:
                                   secretAccessKeySecretRef:
                                     description: |-
                                       The SecretAccessKey is used for authentication.
-                                      If neither the Access Key nor Key ID are set, we fall-back to using env
-                                      vars, shared credentials file or AWS Instance metadata,
+                                      If neither the Access Key nor Key ID are set, we fall back to using env
+                                      vars, shared credentials file, or AWS Instance metadata,
                                       see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials
                                     properties:
                                       key:
@@ -890,6 +914,7 @@ spec:
                                         - name
                                       type: object
                                     type: array
+                                    x-kubernetes-list-type: atomic
                                   podTemplate:
                                     description: |-
                                       Optional pod template used to configure the ACME challenge solver pods
@@ -1185,7 +1210,6 @@ spec:
                                                                 pod labels will be ignored. The default value is empty.
                                                                 The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                                 Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                               items:
                                                                 type: string
                                                               type: array
@@ -1200,7 +1224,6 @@ spec:
                                                                 pod labels will be ignored. The default value is empty.
                                                                 The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                                 Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                               items:
                                                                 type: string
                                                               type: array
@@ -1361,7 +1384,6 @@ spec:
                                                             pod labels will be ignored. The default value is empty.
                                                             The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                             Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                           items:
                                                             type: string
                                                           type: array
@@ -1376,7 +1398,6 @@ spec:
                                                             pod labels will be ignored. The default value is empty.
                                                             The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                             Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                           items:
                                                             type: string
                                                           type: array
@@ -1465,8 +1486,8 @@ spec:
                                                       most preferred is the one with the greatest sum of weights, i.e.
                                                       for each node that meets all of the scheduling requirements (resource
                                                       request, requiredDuringScheduling anti-affinity expressions, etc.),
-                                                      compute a sum by iterating through the elements of this field and adding
-                                                      "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+                                                      compute a sum by iterating through the elements of this field and subtracting
+                                                      "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
                                                       node(s) with the highest sum are the most preferred.
                                                     items:
                                                       description: The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
@@ -1530,7 +1551,6 @@ spec:
                                                                 pod labels will be ignored. The default value is empty.
                                                                 The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                                 Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                               items:
                                                                 type: string
                                                               type: array
@@ -1545,7 +1565,6 @@ spec:
                                                                 pod labels will be ignored. The default value is empty.
                                                                 The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                                 Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                               items:
                                                                 type: string
                                                               type: array
@@ -1706,7 +1725,6 @@ spec:
                                                             pod labels will be ignored. The default value is empty.
                                                             The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                             Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                           items:
                                                             type: string
                                                           type: array
@@ -1721,7 +1739,6 @@ spec:
                                                             pod labels will be ignored. The default value is empty.
                                                             The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                             Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                           items:
                                                             type: string
                                                           type: array
@@ -1819,6 +1836,9 @@ spec:
                                               type: object
                                               x-kubernetes-map-type: atomic
                                             type: array
+                                            x-kubernetes-list-map-keys:
+                                              - name
+                                            x-kubernetes-list-type: map
                                           nodeSelector:
                                             additionalProperties:
                                               type: string
@@ -1830,6 +1850,40 @@ spec:
                                           priorityClassName:
                                             description: If specified, the pod's priorityClassName.
                                             type: string
+                                          resources:
+                                            description: |-
+                                              If specified, the pod's resource requirements.
+                                              These values override the global resource configuration flags.
+                                              Note that when only specifying resource limits, ensure they are greater than or equal
+                                              to the corresponding global resource requests configured via controller flags
+                                              (--acme-http01-solver-resource-request-cpu, --acme-http01-solver-resource-request-memory).
+                                              Kubernetes will reject pod creation if limits are lower than requests, causing challenge failures.
+                                            properties:
+                                              limits:
+                                                additionalProperties:
+                                                  anyOf:
+                                                    - type: integer
+                                                    - type: string
+                                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                                  x-kubernetes-int-or-string: true
+                                                description: |-
+                                                  Limits describes the maximum amount of compute resources allowed.
+                                                  More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                                                type: object
+                                              requests:
+                                                additionalProperties:
+                                                  anyOf:
+                                                    - type: integer
+                                                    - type: string
+                                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                                  x-kubernetes-int-or-string: true
+                                                description: |-
+                                                  Requests describes the minimum amount of compute resources required.
+                                                  If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                                                  otherwise to the global values configured via controller flags. Requests cannot exceed Limits.
+                                                  More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                                                type: object
+                                            type: object
                                           securityContext:
                                             description: If specified, the pod's security context
                                             properties:
@@ -1945,6 +1999,7 @@ spec:
                                                   format: int64
                                                   type: integer
                                                 type: array
+                                                x-kubernetes-list-type: atomic
                                               sysctls:
                                                 description: |-
                                                   Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
@@ -1964,6 +2019,7 @@ spec:
                                                     - value
                                                   type: object
                                                 type: array
+                                                x-kubernetes-list-type: atomic
                                             type: object
                                           serviceAccountName:
                                             description: If specified, the pod's service account
@@ -1988,9 +2044,10 @@ spec:
                                                 operator:
                                                   description: |-
                                                     Operator represents a key's relationship to the value.
-                                                    Valid operators are Exists and Equal. Defaults to Equal.
+                                                    Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                                                     Exists is equivalent to wildcard for value, so that a pod can
                                                     tolerate all taints of a particular category.
+                                                    Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                                                   type: string
                                                 tolerationSeconds:
                                                   description: |-
@@ -2007,6 +2064,7 @@ spec:
                                                   type: string
                                               type: object
                                             type: array
+                                            x-kubernetes-list-type: atomic
                                         type: object
                                     type: object
                                   serviceType:
@@ -2364,7 +2422,6 @@ spec:
                                                                 pod labels will be ignored. The default value is empty.
                                                                 The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                                 Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                               items:
                                                                 type: string
                                                               type: array
@@ -2379,7 +2436,6 @@ spec:
                                                                 pod labels will be ignored. The default value is empty.
                                                                 The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                                 Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                               items:
                                                                 type: string
                                                               type: array
@@ -2540,7 +2596,6 @@ spec:
                                                             pod labels will be ignored. The default value is empty.
                                                             The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                             Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                           items:
                                                             type: string
                                                           type: array
@@ -2555,7 +2610,6 @@ spec:
                                                             pod labels will be ignored. The default value is empty.
                                                             The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                             Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                           items:
                                                             type: string
                                                           type: array
@@ -2644,8 +2698,8 @@ spec:
                                                       most preferred is the one with the greatest sum of weights, i.e.
                                                       for each node that meets all of the scheduling requirements (resource
                                                       request, requiredDuringScheduling anti-affinity expressions, etc.),
-                                                      compute a sum by iterating through the elements of this field and adding
-                                                      "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+                                                      compute a sum by iterating through the elements of this field and subtracting
+                                                      "weight" from the sum if the node has pods which matches the corresponding podAffinityTerm; the
                                                       node(s) with the highest sum are the most preferred.
                                                     items:
                                                       description: The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
@@ -2709,7 +2763,6 @@ spec:
                                                                 pod labels will be ignored. The default value is empty.
                                                                 The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                                 Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                               items:
                                                                 type: string
                                                               type: array
@@ -2724,7 +2777,6 @@ spec:
                                                                 pod labels will be ignored. The default value is empty.
                                                                 The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                                 Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                                This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                               items:
                                                                 type: string
                                                               type: array
@@ -2885,7 +2937,6 @@ spec:
                                                             pod labels will be ignored. The default value is empty.
                                                             The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                                             Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                           items:
                                                             type: string
                                                           type: array
@@ -2900,7 +2951,6 @@ spec:
                                                             pod labels will be ignored. The default value is empty.
                                                             The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                                             Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                                            This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                                           items:
                                                             type: string
                                                           type: array
@@ -2998,6 +3048,9 @@ spec:
                                               type: object
                                               x-kubernetes-map-type: atomic
                                             type: array
+                                            x-kubernetes-list-map-keys:
+                                              - name
+                                            x-kubernetes-list-type: map
                                           nodeSelector:
                                             additionalProperties:
                                               type: string
@@ -3009,6 +3062,40 @@ spec:
                                           priorityClassName:
                                             description: If specified, the pod's priorityClassName.
                                             type: string
+                                          resources:
+                                            description: |-
+                                              If specified, the pod's resource requirements.
+                                              These values override the global resource configuration flags.
+                                              Note that when only specifying resource limits, ensure they are greater than or equal
+                                              to the corresponding global resource requests configured via controller flags
+                                              (--acme-http01-solver-resource-request-cpu, --acme-http01-solver-resource-request-memory).
+                                              Kubernetes will reject pod creation if limits are lower than requests, causing challenge failures.
+                                            properties:
+                                              limits:
+                                                additionalProperties:
+                                                  anyOf:
+                                                    - type: integer
+                                                    - type: string
+                                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                                  x-kubernetes-int-or-string: true
+                                                description: |-
+                                                  Limits describes the maximum amount of compute resources allowed.
+                                                  More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                                                type: object
+                                              requests:
+                                                additionalProperties:
+                                                  anyOf:
+                                                    - type: integer
+                                                    - type: string
+                                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                                  x-kubernetes-int-or-string: true
+                                                description: |-
+                                                  Requests describes the minimum amount of compute resources required.
+                                                  If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                                                  otherwise to the global values configured via controller flags. Requests cannot exceed Limits.
+                                                  More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                                                type: object
+                                            type: object
                                           securityContext:
                                             description: If specified, the pod's security context
                                             properties:
@@ -3124,6 +3211,7 @@ spec:
                                                   format: int64
                                                   type: integer
                                                 type: array
+                                                x-kubernetes-list-type: atomic
                                               sysctls:
                                                 description: |-
                                                   Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
@@ -3143,6 +3231,7 @@ spec:
                                                     - value
                                                   type: object
                                                 type: array
+                                                x-kubernetes-list-type: atomic
                                             type: object
                                           serviceAccountName:
                                             description: If specified, the pod's service account
@@ -3167,9 +3256,10 @@ spec:
                                                 operator:
                                                   description: |-
                                                     Operator represents a key's relationship to the value.
-                                                    Valid operators are Exists and Equal. Defaults to Equal.
+                                                    Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                                                     Exists is equivalent to wildcard for value, so that a pod can
                                                     tolerate all taints of a particular category.
+                                                    Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                                                   type: string
                                                 tolerationSeconds:
                                                   description: |-
@@ -3186,6 +3276,7 @@ spec:
                                                   type: string
                                               type: object
                                             type: array
+                                            x-kubernetes-list-type: atomic
                                         type: object
                                     type: object
                                   serviceType:
@@ -3215,6 +3306,7 @@ spec:
                                 items:
                                   type: string
                                 type: array
+                                x-kubernetes-list-type: atomic
                               dnsZones:
                                 description: |-
                                   List of DNSZones that this solver will be used to solve.
@@ -3229,6 +3321,7 @@ spec:
                                 items:
                                   type: string
                                 type: array
+                                x-kubernetes-list-type: atomic
                               matchLabels:
                                 additionalProperties:
                                   type: string
@@ -3239,6 +3332,7 @@ spec:
                             type: object
                         type: object
                       type: array
+                      x-kubernetes-list-type: atomic
                   required:
                     - privateKeySecretRef
                     - server
@@ -3257,6 +3351,7 @@ spec:
                       items:
                         type: string
                       type: array
+                      x-kubernetes-list-type: atomic
                     issuingCertificateURLs:
                       description: |-
                         IssuingCertificateURLs is a list of URLs which this issuer should embed into certificates
@@ -3265,6 +3360,7 @@ spec:
                       items:
                         type: string
                       type: array
+                      x-kubernetes-list-type: atomic
                     ocspServers:
                       description: |-
                         The OCSP server list is an X.509 v3 extension that defines a list of
@@ -3275,6 +3371,7 @@ spec:
                       items:
                         type: string
                       type: array
+                      x-kubernetes-list-type: atomic
                     secretName:
                       description: |-
                         SecretName is the name of the secret used to sign Certificates issued
@@ -3296,6 +3393,7 @@ spec:
                       items:
                         type: string
                       type: array
+                      x-kubernetes-list-type: atomic
                   type: object
                 vault:
                   description: |-
@@ -3418,11 +3516,12 @@ spec:
                               properties:
                                 audiences:
                                   description: |-
-                                    TokenAudiences is an optional list of extra audiences to include in the token passed to Vault. The default token
-                                    consisting of the issuer's namespace and name is always included.
+                                    TokenAudiences is an optional list of extra audiences to include in the token passed to Vault.
+                                    The default audiences are always included in the token.
                                   items:
                                     type: string
                                   type: array
+                                  x-kubernetes-list-type: atomic
                                 name:
                                   description: Name of the ServiceAccount used to request a token.
                                   type: string
@@ -3546,16 +3645,16 @@ spec:
                   type: object
                 venafi:
                   description: |-
-                    Venafi configures this issuer to sign certificates using a Venafi TPP
-                    or Venafi Cloud policy zone.
+                    Venafi configures this issuer to sign certificates using a CyberArk Certificate Manager Self-Hosted
+                    or SaaS policy zone.
                   properties:
                     cloud:
                       description: |-
-                        Cloud specifies the Venafi cloud configuration settings.
-                        Only one of TPP or Cloud may be specified.
+                        Cloud specifies the CyberArk Certificate Manager SaaS configuration settings.
+                        Only one of CyberArk Certificate Manager may be specified.
                       properties:
                         apiTokenSecretRef:
-                          description: APITokenSecretRef is a secret key selector for the Venafi Cloud API token.
+                          description: APITokenSecretRef is a secret key selector for the CyberArk Certificate Manager SaaS API token.
                           properties:
                             key:
                               description: |-
@@ -3573,7 +3672,7 @@ spec:
                           type: object
                         url:
                           description: |-
-                            URL is the base URL for Venafi Cloud.
+                            URL is the base URL for CyberArk Certificate Manager SaaS.
                             Defaults to "https://api.venafi.cloud/".
                           type: string
                       required:
@@ -3581,13 +3680,13 @@ spec:
                       type: object
                     tpp:
                       description: |-
-                        TPP specifies Trust Protection Platform configuration settings.
-                        Only one of TPP or Cloud may be specified.
+                        TPP specifies CyberArk Certificate Manager Self-Hosted configuration settings.
+                        Only one of CyberArk Certificate Manager may be specified.
                       properties:
                         caBundle:
                           description: |-
                             Base64-encoded bundle of PEM CAs which will be used to validate the certificate
-                            chain presented by the TPP server. Only used if using HTTPS; ignored for HTTP.
+                            chain presented by the CyberArk Certificate Manager Self-Hosted server. Only used if using HTTPS; ignored for HTTP.
                             If undefined, the certificate bundle in the cert-manager controller container
                             is used to validate the chain.
                           format: byte
@@ -3595,7 +3694,7 @@ spec:
                         caBundleSecretRef:
                           description: |-
                             Reference to a Secret containing a base64-encoded bundle of PEM CAs
-                            which will be used to validate the certificate chain presented by the TPP server.
+                            which will be used to validate the certificate chain presented by the CyberArk Certificate Manager Self-Hosted server.
                             Only used if using HTTPS; ignored for HTTP. Mutually exclusive with CABundle.
                             If neither CABundle nor CABundleSecretRef is defined, the certificate bundle in
                             the cert-manager controller container is used to validate the TLS connection.
@@ -3616,7 +3715,7 @@ spec:
                           type: object
                         credentialsRef:
                           description: |-
-                            CredentialsRef is a reference to a Secret containing the Venafi TPP API credentials.
+                            CredentialsRef is a reference to a Secret containing the CyberArk Certificate Manager Self-Hosted API credentials.
                             The secret must contain the key 'access-token' for the Access Token Authentication,
                             or two keys, 'username' and 'password' for the API Keys Authentication.
                           properties:
@@ -3630,7 +3729,7 @@ spec:
                           type: object
                         url:
                           description: |-
-                            URL is the base URL for the vedsdk endpoint of the Venafi TPP instance,
+                            URL is the base URL for the vedsdk endpoint of the CyberArk Certificate Manager Self-Hosted instance,
                             for example: "https://tpp.example.com/vedsdk".
                           type: string
                       required:
@@ -3639,8 +3738,8 @@ spec:
                       type: object
                     zone:
                       description: |-
-                        Zone is the Venafi Policy Zone to use for this issuer.
-                        All requests made to the Venafi platform will be restricted by the named
+                        Zone is the Certificate Manager Policy Zone to use for this issuer.
+                        All requests made to the Certificate Manager platform will be restricted by the named
                         zone policy.
                         This field is required.
                       type: string
