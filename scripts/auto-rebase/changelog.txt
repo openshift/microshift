@@ -1,0 +1,8 @@
+- oc image-amd64 d76df14ea3d7ff9916ea576b6335cd3a220cd1bf to 7189593997f243911aeeb6e473e76d5ad0fd1e50
+  - ff914eaf 2026-08-18T07:32:02+00:00 fix:correct sti-ruby path for unit tests
+  - 8f46580e 2026-08-05T00:52:12+02:00 Fix for OCPBUGS-94526: CVE-2026-25681
+
+- oc image-arm64 d76df14ea3d7ff9916ea576b6335cd3a220cd1bf to 7189593997f243911aeeb6e473e76d5ad0fd1e50
+  - ff914eaf 2026-08-18T07:32:02+00:00 fix:correct sti-ruby path for unit tests
+  - 8f46580e 2026-08-05T00:52:12+02:00 Fix for OCPBUGS-94526: CVE-2026-25681
+
