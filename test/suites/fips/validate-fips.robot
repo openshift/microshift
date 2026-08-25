@@ -6,6 +6,7 @@ Resource            ../../resources/common.resource
 Resource            ../../resources/selinux.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/router.resource
 Library             Collections
 
 Suite Setup         Setup
@@ -42,6 +43,11 @@ Verify Node RPMs FIPS Compliant
 Verify Container Images FIPS Compliant
     [Documentation]    Performs a FIPS validation against the Released payload
     Check Container Images In Release Must Pass
+
+Verify Ingress Router TLS Curves Are FIPS Restricted
+    [Documentation]    Verify ROUTER_CURVES env var on the router pod contains
+    ...    only NIST-approved curves when running in FIPS mode.
+    Router Pod Env Should Have Value    ROUTER_CURVES    P-256:P-384:P-521
 
 
 *** Keywords ***
