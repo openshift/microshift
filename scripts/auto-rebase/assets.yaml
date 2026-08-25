@@ -93,6 +93,7 @@ assets:
     files:
       - file: clusterrole.yaml
       - file: clusterrolebinding.yaml
+      - file: controller-config.yaml
       - file: deployment.yaml
       - file: ns.yaml
       - file: role.yaml

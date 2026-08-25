@@ -104,6 +104,11 @@ func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfi
 		secretName = "signing-key"
 		cm         = "components/service-ca/signing-cabundle.yaml"
 		cmName     = "signing-cabundle"
+		// controllerConfig is a static GenericOperatorConfig the operand mounts as
+		// its --config. In full OCP the service-ca-operator creates it; MicroShift
+		// runs only the controller, so it must be applied here or the deployment's
+		// "config" volume fails to mount.
+		controllerConfig = "components/service-ca/controller-config.yaml"
 	)
 
 	serviceCADir := cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(config.DataDir))
@@ -155,6 +160,10 @@ func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfi
 	}
 	if err := assets.ApplyConfigMapWithData(ctx, cm, cmData, kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v: %v", cm, err)
+		return err
+	}
+	if err := assets.ApplyConfigMaps(ctx, []string{controllerConfig}, nil, nil, kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply configMap %v: %v", controllerConfig, err)
 		return err
 	}
 	extraParams := assets.RenderParams{
