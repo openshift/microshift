@@ -103,3 +103,49 @@ spec:
     - {}
   egress:
     - {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: olm-catalog-grpc-ingress
+  namespace: openshift-marketplace
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    capability.openshift.io/name: "OperatorLifecycleManager"
+    include.release.openshift.io/hypershift: "true"
+spec:
+  podSelector:
+    matchExpressions:
+      - key: olm.catalogSource
+        operator: Exists
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 50051
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bundle-unpack-egress
+  namespace: openshift-marketplace
+  annotations:
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    capability.openshift.io/name: "OperatorLifecycleManager"
+    include.release.openshift.io/hypershift: "true"
+spec:
+  podSelector:
+    matchExpressions:
+      - key: operatorframework.io/bundle-unpack-ref
+        operator: Exists
+      - key: olm.managed
+        operator: In
+        values:
+          - "true"
+  policyTypes:
+    - Egress
+  egress:
+    - {}
