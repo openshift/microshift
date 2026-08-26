@@ -20,5 +20,5 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_commit_not_found "${start_image}"
 
-    run_tests host1 suites/storage/
+    run_tests host1 suites/storage1/ suites/storage2/
 }
