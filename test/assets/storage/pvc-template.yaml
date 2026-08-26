@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${PVCNAME}
+spec:
+  accessModes:
+  - ${ACCESSMODE}
+  resources:
+    requests:
+      storage: ${PVCCAPACITY}
+  storageClassName: ${SCNAME}
+  volumeMode: ${VOLUMEMODE}
