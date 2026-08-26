@@ -14,6 +14,7 @@ List of the documents in alphabetical file name order, including sub-directories
 - [Quay Mirror Registry Setup for Testing](./howto_quay_mirror.md)
 - [Image Mode for MicroShift Contributors](./image_mode.md)
 - [Layered Product Testing with MicroShift](./layered_product_ci.md)
+- [Observability: Scraping the Optional Metric Exporters](./observability_metric_exporters.md)
 - [OpenShift CI for MicroShift](./openshift_ci.md)
 - [Install MicroShift on RHEL for Edge](./rhel4edge_iso.md)
 - [RPM Packages for Development and Testing](./rpm_packages.md)
