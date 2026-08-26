@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ${QUOTANAME}
+spec:
+  hard:
+    ${SCNAME}.storageclass.storage.k8s.io/requests.storage: ${HARDSTORAGE}
+    ${SCNAME}.storageclass.storage.k8s.io/persistentvolumeclaims: "${PVCLIMIT}"
