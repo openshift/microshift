@@ -14,7 +14,7 @@ can be conducted manually or integrated into the package CI/CD processes. See
 
 ## Build and Publish MicroShift Container Image
 
-Follow the openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-install-bootc-image)
+Follow the openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
 instructions to implement the MicroShift container image layer build procedure.
 
 > Prebuilt MicroShift bootc container images are not currently available for
@@ -87,12 +87,12 @@ RUN dnf install -y firewalld microshift && \
     dnf clean all
 ```
 
-Finally, follow the same openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-install-bootc-image)
+Finally, follow the same openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
 instructions to push the MicroShift images to a container registry.
 
 ## Build and Publish Layered Product Container Image
 
-Follow the openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-install-bootc-image)
+Follow the openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
 instructions to implement the Layered Product container image layer build procedure.
 
 Customize the `Containerfile` file according to the requirements of the layered
@@ -113,7 +113,7 @@ RUN dnf install -y microshift-gitops && \
 > The `FROM` statement should be updated to denote a valid reference to the base
 > MicroShift container image.
 
-Finally, follow the same openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-install-bootc-image)
+Finally, follow the same openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
 instructions to push the Layered Product images to a container registry.
 
 ## Run Layered Product Container Image

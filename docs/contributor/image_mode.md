@@ -189,7 +189,7 @@ localhost/microshift-source-bootc   linux-amd64  3f7e136fccb5  13 minutes ago  2
 
 Repeat the procedure on the other platform (i.e. `arm64`) and proceed by publishing
 the platform-specific `amd64` and `arm64` images to the remote registry as described
-in the openshift-docs [Publishing the bootc image to the remote registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-install-bootc-image)
+in the openshift-docs [Publishing the bootc image to the remote registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
 section.
 
 > Cross-platform `podman` builds are not in the scope of this document. Log into
