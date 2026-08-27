@@ -11,11 +11,11 @@ require (
 	github.com/spf13/cobra v1.10.2
 	go.etcd.io/etcd/api/v3 v3.6.13
 	go.etcd.io/etcd/server/v3 v3.6.8
-	k8s.io/apimachinery v1.36.2
-	k8s.io/cli-runtime v1.36.2
-	k8s.io/component-base v1.36.2
+	k8s.io/apimachinery v1.36.3
+	k8s.io/cli-runtime v1.36.3
+	k8s.io/component-base v1.36.3
 	k8s.io/klog/v2 v2.140.0
-	k8s.io/kubectl v1.36.2
+	k8s.io/kubectl v1.36.3
 	sigs.k8s.io/yaml v1.6.0
 )
 
@@ -119,7 +119,7 @@ require (
 	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
-	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/term v0.44.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
@@ -130,11 +130,11 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
-	k8s.io/api v1.36.2 // indirect
-	k8s.io/apiserver v1.36.2 // indirect
-	k8s.io/client-go v1.36.2 // indirect
+	k8s.io/api v1.36.3 // indirect
+	k8s.io/apiserver v1.36.3 // indirect
+	k8s.io/client-go v1.36.3 // indirect
 	k8s.io/kube-openapi v0.0.0-20260618221249-bc653b64f974 // indirect
-	k8s.io/kubelet v1.36.2 // indirect
+	k8s.io/kubelet v1.36.3 // indirect
 	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/kustomize/api v0.21.1 // indirect
@@ -145,11 +145,11 @@ require (
 
 replace (
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260424201627-4d4cc33d669d // from kubernetes
-	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20260722153822-64f8851a001f // from etcd
-	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.0.0-20260722153822-64f8851a001f // from etcd
-	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260722153822-64f8851a001f // from etcd
-	go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20260722153822-64f8851a001f // from etcd
-	go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20260722153822-64f8851a001f // from etcd
+	go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20260810103824-609b11ed8fc4 // from etcd
+	go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.0.0-20260810103824-609b11ed8fc4 // from etcd
+	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260810103824-609b11ed8fc4 // from etcd
+	go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20260810103824-609b11ed8fc4 // from etcd
+	go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20260810103824-609b11ed8fc4 // from etcd
 )
 
 replace (
