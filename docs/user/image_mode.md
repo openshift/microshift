@@ -13,7 +13,7 @@ benefit from this technology.
 > for more information.
 
 > **Source of truth:**<br>
-> The [Installing with RHEL image mode](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-about-rhel-image-mode)
+> The [Installing with RHEL image mode](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-about-rhel-image-mode)
 > chapter of the Red Hat build of MicroShift documentation is the authoritative
 > reference for building, publishing, and installing image mode systems using
 > **released** MicroShift RPMs.
@@ -152,10 +152,10 @@ image. Rather than duplicate those procedures, follow the openshift-docs
 instructions and substitute your source-built image reference wherever a MicroShift
 image is required:
 
-* [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-install-bootc-image) —
+* [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image) —
   skip the "get a published image" step (you built the image locally above) and
   push `localhost/microshift-source-bootc` to your remote registry.
-* [Running the bootc image in a virtual machine](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/4.19/html/installing_with_rhel_image_mode/microshift-install-running-bootc-image-vm) —
+* [Running the bootc image in a virtual machine](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-running-bootc-image-vm) —
   set the image reference used by the `ostreecontainer` Kickstart directive to your
   source-built image (for example
   `<myreg>/<myorg>/<mypath>/microshift-source-bootc`).
