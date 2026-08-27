@@ -63,7 +63,7 @@ class GithubUtils:
         frozen_branches = self._get_frozen_branches()
         return branch in frozen_branches
 
-    _FREEZE_ISSUE_AUTHOR = "openshift-ci"
+    _FREEZE_ISSUE_AUTHOR = "openshift-ci[bot]"
 
     def _get_frozen_branches(self):
         """Collect all frozen branch names from open tide/merge-blocker issues created by the CI bot."""
