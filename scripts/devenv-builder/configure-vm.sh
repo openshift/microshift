@@ -288,7 +288,8 @@ if ${BUILD_AND_RUN}; then
         "${DNF_RETRY}" "install" \
             "microshift microshift-release-info \
             --repofrompath=microshift-local,${HOME}/microshift/_output/rpmbuild \
-            --setopt=microshift-local.gpgcheck=0"
+            --setopt=microshift-local.gpgcheck=0 \
+	    --setopt=microshift-local.priority=1"
     fi
 fi
 
