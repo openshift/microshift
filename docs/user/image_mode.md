@@ -13,7 +13,7 @@ benefit from this technology.
 > for more information.
 
 > **Source of truth:**<br>
-> The [Installing with RHEL image mode](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-about-rhel-image-mode)
+> The [Installing with image mode for RHEL](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html-single/installing_with_image_mode_for_rhel/index)
 > chapter of the Red Hat build of MicroShift documentation is the authoritative
 > reference for building, publishing, and installing image mode systems using
 > **released** MicroShift RPMs.
@@ -25,9 +25,9 @@ benefit from this technology.
 > and virtual machine steps are identical and are linked below.
 
 > **Note:**<br>
-> The openshift-docs links in this document are pinned to version `4.19`. Use the
-> version selector on those pages to match the MicroShift release you are working
-> with.
+> The openshift-docs links in this document point to the `latest` version of the
+> documentation. Use the version selector on those pages to match the MicroShift
+> release you are working with.
 
 The procedures described below require the following setup:
 * A `RHEL 9.8 host` with an active Red Hat subscription for building MicroShift
@@ -155,7 +155,7 @@ image is required:
 * [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image) —
   skip the "get a published image" step (you built the image locally above) and
   push `localhost/microshift-source-bootc` to your remote registry.
-* [Running the bootc image in a virtual machine](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-running-bootc-image-vm) —
+* [Running the bootc image in a virtual machine](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-running-bootc-image-in-vm) —
   set the image reference used by the `ostreecontainer` Kickstart directive to your
   source-built image (for example
   `<myreg>/<myorg>/<mypath>/microshift-source-bootc`).
@@ -171,7 +171,7 @@ containerized tool to create disk images from bootc images. You can use the tool
 to generate various image artifacts and deploy them in different environments,
 such as the edge, server, and clouds.
 
-Log into the `RHEL 9.8 host` using the user credentials that have SUDO
+Log into the `RHEL 9.8 host` using the user credentials that have `sudo`
 permissions configured.
 
 ### Prepare Kickstart File
@@ -251,7 +251,7 @@ sudo podman run --authfile ${PULL_SECRET} --rm -it \
 
 ### Create Virtual Machine
 
-Run the following commands to copy the `./output/install.iso` file to the
+Run the following commands to copy the `./output/bootiso/install.iso` file to the
 `/var/lib/libvirt/images` directory and create a virtual machine.
 
 ```bash
@@ -294,17 +294,11 @@ external dependencies on startup.
 
 ### Build Container Image
 
-Download the [Containerfile.embedded](../config/Containerfile.bootc-embedded-rhel9) using
-the following command and use it for subsequent image builds.
+Use the [Containerfile.bootc-embedded-rhel9](../config/Containerfile.bootc-embedded-rhel9)
+Containerfile from a clone of this repository for the embedded image build.
 
-```bash
-URL=https://raw.githubusercontent.com/openshift/microshift/refs/heads/main/docs/config/Containerfile.bootc-embedded-rhel9
-
-curl -s -o Containerfile.embedded "${URL}"
-```
-
-> Review comments in the `Containerfile.embedded` file to understand how container
-> dependencies are embedded during the `bootc` image build.
+> Review the comments in the `Containerfile.bootc-embedded-rhel9` file to understand
+> how container dependencies are embedded during the `bootc` image build.
 
 Run the following image build command to create a local `bootc` image with embedded
 container dependencies. It is using a base image built according to the instructions
@@ -327,7 +321,8 @@ sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --secret "id=pullsecret,src=${PULL_SECRET}" \
     --build-arg USHIFT_BASE_IMAGE_NAME="${BASE_IMAGE_NAME}" \
     --build-arg USHIFT_BASE_IMAGE_TAG="${BASE_IMAGE_TAG}" \
-    -f Containerfile.embedded
+    -f docs/config/Containerfile.bootc-embedded-rhel9 \
+    .
 ```
 
 Verify that the local MicroShift `bootc` image was created.
