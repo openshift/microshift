@@ -1,4 +1,0 @@
-- machine-config-operator embedded-component acca836821a48b58f669c64c8f8a29ca734d5ba3 to afed09939d80d86cafd38e9f733cc49ed16af092
-  - 51affbf9 2026-08-17T13:08:05Z vsphere: check secret before mutating template
-  - b6d9f8f3 2026-08-17T13:08:05Z vsphere: scope template lookup to folder
-
