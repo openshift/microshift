@@ -337,10 +337,15 @@ function build_and_install_microshift_rpms() {
         "${DNF_RETRY}" "localinstall" "$(find ~/microshift/_output/rpmbuild/RPMS -type f -name "*.rpm" $(printf ' -not -name *%s* ' ${SKIPPED_RPMS}))"
     else
         createrepo "${HOME}/microshift/_output/rpmbuild"
+        # Set the highest priority on the local repository to ensure that the
+        # locally built RPMs are preferred over any RPMs published in product
+        # repositories (e.g. rhocp-4.y), whose release versions may sort higher
+        # than the locally built nightly versions.
         "${DNF_RETRY}" "install" \
             "microshift microshift-release-info \
             --repofrompath=microshift-local,${HOME}/microshift/_output/rpmbuild \
-            --setopt=microshift-local.gpgcheck=0"
+            --setopt=microshift-local.gpgcheck=0 \
+            --setopt=microshift-local.priority=1"
     fi
 }
 
