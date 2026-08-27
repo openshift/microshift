@@ -25,7 +25,6 @@ COPY . /tmp/microshift-local
 # Configure the local source RPM repository, then install MicroShift built from
 # source. Its dependencies are resolved from the base RHEL repositories (via the
 # host subscription) and from the OpenShift dependencies repository above.
-# hadolint ignore=SC1091,DL3059
 RUN cat > /etc/yum.repos.d/microshift-local.repo <<'EOF'
 [microshift-local]
 name=MicroShift RPMs built from source
@@ -34,6 +33,7 @@ enabled=1
 gpgcheck=0
 EOF
 
+# hadolint ignore=SC1091,DL3059
 RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
     dnf install -y \
         --repofrompath="openshift-deps,${DEPS_REPO_URL}" \
