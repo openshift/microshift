@@ -291,6 +291,11 @@ type batchTxBuffered struct {
 	batchTx
 	buf                     txWriteBuffer
 	pendingDeleteOperations int
+	// defragJournal captures write operations during the non-blocking
+	// defrag copy phase. Accessed atomically because LockInsideApply
+	// reads it before acquiring the batchTx mutex (for backpressure),
+	// while defragPrepare/defragReplayAndSwap set it under the mutex.
+	defragJournal atomic.Pointer[defragJournal]
 }
 
 func newBatchTxBuffered(backend *backend) *batchTxBuffered {
@@ -303,6 +308,15 @@ func newBatchTxBuffered(backend *backend) *batchTxBuffered {
 	}
 	tx.Commit()
 	return tx
+}
+
+func (t *batchTxBuffered) LockInsideApply() {
+	if t.backend.nonBlockingDefrag {
+		if j := t.defragJournal.Load(); j != nil {
+			j.waitForSpace()
+		}
+	}
+	t.batchTx.LockInsideApply()
 }
 
 func (t *batchTxBuffered) Unlock() {
@@ -385,22 +399,51 @@ func (t *batchTxBuffered) unsafeCommit(stop bool) {
 	}
 }
 
+func (t *batchTxBuffered) UnsafeCreateBucket(bucket Bucket) {
+	if t.backend.nonBlockingDefrag {
+		if j := t.defragJournal.Load(); j != nil {
+			j.appendCreateBucket(bucket.Name())
+		}
+	}
+	t.batchTx.UnsafeCreateBucket(bucket)
+}
+
 func (t *batchTxBuffered) UnsafePut(bucket Bucket, key []byte, value []byte) {
+	if t.backend.nonBlockingDefrag {
+		if j := t.defragJournal.Load(); j != nil {
+			j.appendPut(bucket.Name(), key, value, false)
+		}
+	}
 	t.batchTx.UnsafePut(bucket, key, value)
 	t.buf.put(bucket, key, value)
 }
 
 func (t *batchTxBuffered) UnsafeSeqPut(bucket Bucket, key []byte, value []byte) {
+	if t.backend.nonBlockingDefrag {
+		if j := t.defragJournal.Load(); j != nil {
+			j.appendPut(bucket.Name(), key, value, true)
+		}
+	}
 	t.batchTx.UnsafeSeqPut(bucket, key, value)
 	t.buf.putSeq(bucket, key, value)
 }
 
 func (t *batchTxBuffered) UnsafeDelete(bucketType Bucket, key []byte) {
+	if t.backend.nonBlockingDefrag {
+		if j := t.defragJournal.Load(); j != nil {
+			j.appendDelete(bucketType.Name(), key)
+		}
+	}
 	t.batchTx.UnsafeDelete(bucketType, key)
 	t.pendingDeleteOperations++
 }
 
 func (t *batchTxBuffered) UnsafeDeleteBucket(bucket Bucket) {
+	if t.backend.nonBlockingDefrag {
+		if j := t.defragJournal.Load(); j != nil {
+			j.appendDeleteBucket(bucket.Name())
+		}
+	}
 	t.batchTx.UnsafeDeleteBucket(bucket)
 	t.pendingDeleteOperations++
 }
