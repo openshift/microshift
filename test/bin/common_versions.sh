@@ -71,11 +71,11 @@ get_vrel_from_rpm() {
 # The current release version (e.g. '4.17') affects
 # the definition of previous and fake next versions.
 export MAJOR_VERSION=5
-export MINOR_VERSION=0
-export PREVIOUS_MAJOR_VERSION=4
-export PREVIOUS_MINOR_VERSION=22
+export MINOR_VERSION=1
+export PREVIOUS_MAJOR_VERSION=5
+export PREVIOUS_MINOR_VERSION=0
 export YMINUS2_MAJOR_VERSION=4
-export YMINUS2_MINOR_VERSION=21
+export YMINUS2_MINOR_VERSION=22
 # Handle cross-major version boundary (e.g. 4.22 -> 5.0)
 declare -A LAST_MINOR_FOR_MAJOR=([4]=22)
 if [[ -n "${LAST_MINOR_FOR_MAJOR[${MAJOR_VERSION}]:-}" && \
@@ -93,8 +93,8 @@ fi
 #
 # For a release branch, the current release repository should come from the
 # official 'rhocp' stream.
-CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/microshift/ocp-dev-preview/latest-5.0/el9/os"
-CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
+CURRENT_RELEASE_REPO=""
+CURRENT_RELEASE_VERSION=""
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
 
@@ -109,7 +109,7 @@ export CURRENT_RELEASE_VERSION
 # For a release branch, the previous release repository should come from the
 # official 'rhocp' stream.# The previous release repository value should either
 # point to the OpenShift mirror URL or the 'rhocp' repository name.
-PREVIOUS_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp/latest-4.22/el9/os"
+PREVIOUS_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/microshift/ocp-dev-preview/latest-5.0/el9/os"
 PREVIOUS_RELEASE_VERSION="$(get_vrel_from_beta "${PREVIOUS_RELEASE_REPO}")"
 export PREVIOUS_RELEASE_REPO
 export PREVIOUS_RELEASE_VERSION
@@ -117,8 +117,8 @@ export PREVIOUS_RELEASE_VERSION
 # The y-2 release repository value should either point to the OpenShift
 # mirror URL or the 'rhocp' repository name. It should always come from
 # the 'rhocp' stream.
-YMINUS2_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp/latest-4.21/el9/os"
-YMINUS2_RELEASE_VERSION="$(get_vrel_from_beta "${YMINUS2_RELEASE_REPO}")"
+YMINUS2_RELEASE_REPO="rhocp-4.22-for-rhel-9-${UNAME_M}-rpms"
+YMINUS2_RELEASE_VERSION="$(get_vrel_from_rhsm "${YMINUS2_RELEASE_REPO}")"
 export YMINUS2_RELEASE_REPO
 export YMINUS2_RELEASE_VERSION
 
@@ -130,7 +130,7 @@ RHOCP_MINOR_Y=""
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. If the mirror for current minor is not
 # available yet, it should point to an older release.
-RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/dependencies/rpms/5.0-el9-beta"
+RHOCP_MINOR_Y_BETA="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/dependencies/rpms/5.1-el9-beta"
 export RHOCP_MAJOR_Y
 export RHOCP_MINOR_Y
 export RHOCP_MINOR_Y_BETA
@@ -143,14 +143,14 @@ RHOCP_MINOR_Y1=""
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. The mirror for previous release should always
 # be available.
-RHOCP_MINOR_Y1_BETA="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/dependencies/rpms/4.22-el9-beta"
+RHOCP_MINOR_Y1_BETA="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/dependencies/rpms/5.0-el9-beta"
 export RHOCP_MAJOR_Y1
 export RHOCP_MINOR_Y1
 export RHOCP_MINOR_Y1_BETA
 
 # The 'rhocp_major_y2' and 'rhocp_minor_y2' should always be the y-2 version numbers.
 export RHOCP_MAJOR_Y2=4
-export RHOCP_MINOR_Y2=21
+export RHOCP_MINOR_Y2=22
 
 export CNCF_SONOBUOY_VERSION=v0.57.5
 

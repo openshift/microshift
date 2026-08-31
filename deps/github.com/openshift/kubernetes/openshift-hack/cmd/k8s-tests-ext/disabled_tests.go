@@ -163,9 +163,6 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 			// https://issues.redhat.com/browse/OCPBUGS-45275
 			"[sig-network] Connectivity Pod Lifecycle should be able to connect to other Pod from a terminating Pod",
 
-			// https://issues.redhat.com/browse/OCPBUGS-63132
-			"[sig-node] [Serial] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-3",
-
 			// https://issues.redhat.com/browse/OCPBUGS-99058
 			"[sig-node] [DRA] [FeatureGate:DRAExtendedResource] [Beta] [Feature:DynamicResourceAllocation] must run pods with extended resource on dra nodes and device plugin nodes [Serial] [KubeletMinVersion:1.35]",
 		},
@@ -176,9 +173,6 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 
 			// https://issues.redhat.com/browse/OCPBUGS-61378
 			"[sig-network] Conntrack should be able to cleanup conntrack entries when UDP service target port changes for a NodePort service",
-
-			// https://redhat.atlassian.net/browse/OCPBUGS-85262
-			"[sig-cli] kubectl kuberc commands",
 
 			// https://redhat.atlassian.net/browse/OCPBUGS-64847
 			"[sig-node] [Serial] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-2",
