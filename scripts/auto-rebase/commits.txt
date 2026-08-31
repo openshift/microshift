@@ -17,7 +17,7 @@ https://github.com/openshift/openshift-controller-manager embedded-component 5b3
 https://github.com/openshift/operator-framework-olm embedded-component c606498ade273e9392d6b10713a1e926c09095b0
 https://github.com/openshift/route-controller-manager embedded-component 6068e2c71fc1efb67324a91f48c1470c647f1344
 https://github.com/openshift/service-ca-operator embedded-component 4dfa6916f984d0fd7188380edc88b250738f07f7
-https://github.com/openshift/oc image-amd64 522f35afa3a67d73547d93936dedca524783c811
+https://github.com/openshift/oc image-amd64 a2c805b5894a8a1a6bcb16e7023203e3f01952b4
 https://github.com/openshift/coredns image-amd64 4f64931403bf747b78bccb40ad877b08da534e23
 https://github.com/openshift/csi-external-snapshotter image-amd64 8a319b5b9df2d4f596b4619f73cf5a65eab031c1
 https://github.com/openshift/router image-amd64 f0d97a0ddaccf153648fee10067bdd146aa00c77
