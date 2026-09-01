@@ -152,7 +152,7 @@ export RHOCP_MINOR_Y1_BETA
 export RHOCP_MAJOR_Y2=4
 export RHOCP_MINOR_Y2=22
 
-export CNCF_SONOBUOY_VERSION=v0.57.3
+export CNCF_SONOBUOY_VERSION=v0.57.5
 
 # The version of systemd-logs image included in the sonobuoy release.
 export CNCF_SYSTEMD_LOGS_VERSION=v0.4
