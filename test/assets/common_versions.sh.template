@@ -166,7 +166,9 @@ BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{PREVIOUS_M
 BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{YMINUS2_MAJOR_VERSION}}.${{YMINUS2_MINOR_VERSION}}-zstream/{ARCH}/")"
 BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{MAJOR_VERSION}}.${{MINOR_VERSION}}-rc/{ARCH}/")"
 BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{MAJOR_VERSION}}.${{MINOR_VERSION}}-ec/{ARCH}/")"
-BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{MAJOR_VERSION}}.${{MINOR_VERSION}}-nightly/{ARCH}/")"
+# Temporary disable while we decide what to do with nightly brew RPMs
+#BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${{BREW_RPM_SOURCE}}/${{MAJOR_VERSION}}.${{MINOR_VERSION}}-nightly/{ARCH}/")"
+BREW_NIGHTLY_RELEASE_VERSION=""
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION

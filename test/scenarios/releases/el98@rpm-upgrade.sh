@@ -59,6 +59,7 @@ scenario_run_tests() {
         --exitonfailure \
         --variable "SOURCE_REPO_URL:${repo_url}" \
         --variable "TARGET_VERSION:${BREW_LREL_RELEASE_VERSION}" \
+        --variable "PREVIOUS_MAJOR_VERSION:${PREVIOUS_MAJOR_VERSION}" \
         --variable "PREVIOUS_MINOR_VERSION:${PREVIOUS_MINOR_VERSION}" \
         suites/rpm/upgrade-successful.robot
 }

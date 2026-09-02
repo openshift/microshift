@@ -109,7 +109,7 @@ export CURRENT_RELEASE_VERSION
 # For a release branch, the previous release repository should come from the
 # official 'rhocp' stream.# The previous release repository value should either
 # point to the OpenShift mirror URL or the 'rhocp' repository name.
-PREVIOUS_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/microshift/ocp-dev-preview/latest-5.0/el9/os"
+PREVIOUS_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/microshift/ocp/latest-5.0/el9/os"
 PREVIOUS_RELEASE_VERSION="$(get_vrel_from_beta "${PREVIOUS_RELEASE_REPO}")"
 export PREVIOUS_RELEASE_REPO
 export PREVIOUS_RELEASE_VERSION
@@ -166,7 +166,9 @@ BREW_Y1_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${PREVIOUS_MAJO
 BREW_Y2_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${YMINUS2_MAJOR_VERSION}.${YMINUS2_MINOR_VERSION}-zstream/${UNAME_M}/")"
 BREW_RC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${MAJOR_VERSION}.${MINOR_VERSION}-rc/${UNAME_M}/")"
 BREW_EC_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${MAJOR_VERSION}.${MINOR_VERSION}-ec/${UNAME_M}/")"
-BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${MAJOR_VERSION}.${MINOR_VERSION}-nightly/${UNAME_M}/")"
+# Temporary disable while we decide what to do with nightly brew RPMs
+#BREW_NIGHTLY_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${MAJOR_VERSION}.${MINOR_VERSION}-nightly/${UNAME_M}/")"
+BREW_NIGHTLY_RELEASE_VERSION=""
 export BREW_Y0_RELEASE_VERSION
 export BREW_Y1_RELEASE_VERSION
 export BREW_Y2_RELEASE_VERSION
