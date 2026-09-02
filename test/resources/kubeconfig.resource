@@ -94,4 +94,4 @@ Create Random Namespace
 Remove Namespace
     [Documentation]    Removes the given namespace.
     [Arguments]    ${ns}
-    Run With Kubeconfig    oc delete namespace ${ns}
+    Run With Kubeconfig    oc delete namespace ${ns} --wait=false
