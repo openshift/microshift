@@ -93,7 +93,7 @@ fi
 #
 # For a release branch, the current release repository should come from the
 # official 'rhocp' stream.
-CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/microshift/ocp-dev-preview/latest-5.0/el9/os"
+CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/microshift/ocp/latest-5.0/el9/os"
 CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
@@ -158,7 +158,7 @@ export CNCF_SONOBUOY_VERSION=v0.57.3
 export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 
 # The current version of the microshift-gitops package.
-export GITOPS_VERSION=1.19
+export GITOPS_VERSION=1.21
 
 # The brew release versions needed for release regression testing
 BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/${MAJOR_VERSION}.${MINOR_VERSION}-zstream/${UNAME_M}/")"
