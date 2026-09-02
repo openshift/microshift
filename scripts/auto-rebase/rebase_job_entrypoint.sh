@@ -88,6 +88,10 @@ SRIOV_RELEASE=${sriov_release} \
 OPM_RELEASE=${opm_release} \
 ./scripts/auto-rebase/rebase.py
 
+# Monitoring images (metrics-server, kube-state-metrics, node-exporter) are
+# part of the OCP release payload and must be rebased with every nightly.
+./scripts/auto-rebase/rebase_cluster_monitoring_operator.sh to "${PULLSPEC_RELEASE_AMD64}" "${PULLSPEC_RELEASE_ARM64}"
+
 # LVMS is not tracked in the OCP release image. Instead, rely on the
 # latest z-stream for a given X.Y version. Only the X.Y needs manual
 # updating between releases.
