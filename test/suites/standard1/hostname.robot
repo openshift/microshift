@@ -13,7 +13,7 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${NEW_HOSTNAME}     microshift.local
+${NEW_HOSTNAME}     microshift-test.example
 ${OLD_HOSTNAME}     ${EMPTY}
 
 
@@ -29,7 +29,7 @@ Verify Local Host Name
     Should Contain    ${hostname}    standard
 
 Verify Local Host Name Resolution
-    [Documentation]    Verify correct host name resolution through mDNS
+    [Documentation]    Verify MicroShift restarts correctly after a hostname change
     [Setup]    Configure New Hostname
 
     Named Deployment Should Be Available    router-default    timeout=${DEFAULT_WAIT_TIMEOUT}    ns=openshift-ingress
