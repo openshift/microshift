@@ -4,6 +4,7 @@ Documentation       Tests for case-insensitive log level parsing
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/systemd.resource
 Library             ../../resources/journalctl.py
 
 Suite Setup         Setup
@@ -29,10 +30,12 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig
+    Disable Journal Rate Limiting
 
 Teardown
     [Documentation]    Test suite teardown
     Remove Drop In MicroShift Config    10-loglevel
+    Enable Journal Rate Limiting
     Restart MicroShift
     Logout MicroShift Host
     Remove Kubeconfig
