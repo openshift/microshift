@@ -55,6 +55,7 @@ scenario_run_tests() {
         --exitonfailure \
         --variable "SOURCE_REPO_URL:${source_repo_url}" \
         --variable "TARGET_VERSION:${target_version}" \
+        --variable "PREVIOUS_MAJOR_VERSION:${PREVIOUS_MAJOR_VERSION}" \
         --variable "PREVIOUS_MINOR_VERSION:${PREVIOUS_MINOR_VERSION}" \
         suites/rpm/install.robot \
         suites/rpm/remove.robot \

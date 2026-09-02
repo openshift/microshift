@@ -47,11 +47,12 @@ Upgrade From Previous Version
     # know some of our older RPMs generate warnings. We care more
     # about warnings on the new RPM.
     Install MicroShift RPM Packages From System Repo
-    ...    4.${PREVIOUS_MINOR_VERSION}.*
+    ...    ${PREVIOUS_MAJOR_VERSION}.${PREVIOUS_MINOR_VERSION}.*
     ...    check_warnings=False
     # Verify the package version is as expected
     ${version}=    MicroShift Version
     Log    MicroShift init version: ${version}
+    Should Be Equal As Integers    ${version.major}    ${PREVIOUS_MAJOR_VERSION}
     Should Be Equal As Integers    ${version.minor}    ${PREVIOUS_MINOR_VERSION}
     # Start the service and wait until initialized
     Start MicroShift
