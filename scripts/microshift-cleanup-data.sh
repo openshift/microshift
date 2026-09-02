@@ -107,6 +107,11 @@ function clean_processes() {
         for pname in conmon pause ovn-controller ovn-northd ; do
             pkill -9 --exact ${pname} || true
         done
+        # OVS must be restarted to clear stale flow state left by the
+        # stopped ovsdb-server, otherwise OVN cannot reinitialize on
+        # the next MicroShift start.
+        echo Restarting openvswitch service
+        systemctl restart openvswitch.service 2>/dev/null || true
     fi
 }
 
