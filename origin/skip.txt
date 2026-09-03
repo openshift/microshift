@@ -216,3 +216,4 @@
 "[sig-node] ContainerTerminationMetrics Validation should report terminated_containers_total metric"
 "[sig-api-machinery] health handlers should contain necessary checks [Suite:openshift/conformance/parallel] [Suite:k8s]"
 "[sig-api-machinery] health handlers should contain necessary checks"
+"[OTP][Jira:OCPCLOUD][sig-cluster-lifecycle] Cluster_Infrastructure CAPI IPAM should have IPAM CRDs installed"
