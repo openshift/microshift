@@ -1,6 +1,6 @@
-# {{- if env.Getenv "BREW_VERSION" "" -}}
+# {{- if env.Getenv "BREW_Y2_RELEASE_VERSION" "" -}}
 # Note: This comment makes templating add a new line before the code
-FROM localhost/rhel102-test-agent:latest
+FROM localhost/rhel98-test-agent:latest
 
 # Build arguments
 ARG USHIFT_RPM_REPO_NAME=microshift-brew
@@ -10,18 +10,23 @@ ARG USHIFT_RPM_REPO_PATH=/tmp/$USHIFT_RPM_REPO_NAME
 COPY ./rpm-repos/$USHIFT_RPM_REPO_NAME $USHIFT_RPM_REPO_PATH
 
 # Copy repository configuration
-COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-rhocp-y.repo \
+COPY ./bootc-images/$USHIFT_RPM_REPO_NAME.repo ./bootc-images/microshift-fast-datapath-rhel9.repo ./bootc-images/microshift-rhocp-y2.repo \
     /etc/yum.repos.d/
 
 # Print repository configuration contents.
 # Install MicroShift, test agent and cleanup.
-# OpenSSL is added as a temporary workaround. Systemd-resolved will bump systemd to a newer
-# version that requires openssl 3.4 or higher, but package is kept at 3.2.2. By installing
-# it we force an upgrade so that everything works.
 RUN dnf repoinfo --enabled && \
-    dnf install -y firewalld systemd-resolved openssl \
+    dnf install -y firewalld systemd-resolved \
         {{ range (env.Getenv "MICROSHIFT_MANDATORY_RPMS" | strings.Split " ") -}}
-        "{{ . }}-{{ env.Getenv "BREW_VERSION" }}" \
+        "{{ . }}-{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}" \
+        {{ end -}}
+        {{ range (env.Getenv "MICROSHIFT_Y2_OPTIONAL_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}" \
+        {{ end -}}
+        {{ if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) -}}
+        {{ range (env.Getenv "MICROSHIFT_Y2_X86_64_RPMS" | strings.Split " ") -}}
+        "{{ . }}-{{ env.Getenv "BREW_Y2_RELEASE_VERSION" }}" \
+        {{ end -}}
         {{ end -}}
         && \
     systemctl enable microshift microshift-test-agent && \
