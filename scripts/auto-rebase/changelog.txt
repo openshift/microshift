@@ -1,28 +1,15 @@
-- api embedded-component 9fda5179a7f76209e548ccc46d16767ed1e0bddb to 2c17c596bd4b2f7f0431fd44a0611b440429d672
-  - 8a92347c 2026-08-24T16:26:21Z Fix development_start parsing for Sippy date-only format
-  - f6f1649c 2026-07-23T15:24:50-04:00 Promote FeatureGateVSphereMixedNodeEnv to GA
+- api embedded-component 2c17c596bd4b2f7f0431fd44a0611b440429d672 to 160d28ee4bcb759daf12a47066e7026a4c5806ab
+  - eb17e6c9 2026-08-24T17:22:02-04:00 OCPBUGS-113639: move empty CRIOCredentialProviderConfig CR to run-level 0000_10
 
-- cluster-network-operator embedded-component 6a5fcccf86374942a57dac208d9435eb6b3d7150 to fe422f7670aa55e037c2180f1b7f2dc4e3d34cde
-  - b1775c9 2026-08-21T15:06:51+02:00 apply: add unit tests for PrePatchAnnotation and replace fakeRESTMapper
-  - d59aba6 2026-08-21T15:06:51+02:00 frr-k8s: fix strategy switch to Recreate on SNO upgrades
-  - a5752d9 2026-08-21T15:06:29+02:00 frr-k8s: use Recreate strategy for statuscleaner deployment
-  - cedf0d7 2026-08-21T15:05:41+02:00 Add test utility functions for component rendering tests
+- cluster-csi-snapshot-controller-operator embedded-component 4847d2e09adb887610a0e18061bbf508e17f6ee3 to e9b3b21fbc322cb410a58b5f147ac76893d851ea
+  - 8ce5ddd 2026-08-19T18:07:53-05:00 OCPBUGS-101892: bump golang.org/x/net to v0.53.0 CVE-2026-33814 (GO-2026-4918): infinite loop in HTTP/2 transport when given a malformed SETTINGS_MAX_FRAME_SIZE frame. Reachable via operator.RunOperator -> events.GetControllerReferenceForCurrentPod -> http2.Transport.RoundTrip/NewClientConn. go.mod's go directive stays at 1.25.0 (no toolchain bump needed on this branch). vendor/ regenerated via go mod tidy + go mod vendor to keep it consistent with go.sum, matching what OpenShift CI's verify-deps job independently re-checks. Verified with govulncheck before/after: GO-2026-4918 no longer reported (4 -> 3 findings, exactly the expected one removed; the other 3 are unrelated CVEs out of scope for this ticket). go build/go vet ./... clean. go test ./... run as a control: the e2e suite (test/e2e) fails identically on the unmodified code (requires a real in-cluster Kubernetes config not available here), confirming it is pre-existing/environmental, not caused by this bump.
 
-- machine-config-operator embedded-component 9027c94cde45f82a2421b49fca261e9e20ce6310 to 68e5c4026c0571ea6ea351b06fc7f78dc9b72803
-  - 010fc4c6 2026-08-27T07:14:53Z Revert TNF GNS
-  - 6ab1640b 2026-08-26T15:55:28-04:00 test: use Image struct for Azure fake boot image
-  - bbd87097 2026-08-26T15:52:55-04:00 bootimage: fix Confidential Cluster skip
-  - 70a69955 2026-08-26T16:34:38Z OCPBUGS-64623: Use kubernetes scheme in drain controller event recorder
-  - 9eeb5d26 2026-08-21T14:40:27Z OCPBUGS-98258: Fix upstreams for CoreDNS pods on Cloud platforms
-  - 037760e3 2026-08-18T10:54:20-04:00 go mod tidy; go mod vendor
-  - def551c7 2026-08-18T10:53:21-04:00 AGENT-1571: Update api and client-go dependency after 4.22 feature promotion
+- operator-framework-olm embedded-component ce8d9807f909efffb32fafad30f1bc9ad958cfc6 to 5359e60525288af86885e14d89e3210878f87274
+  - a605ef4a 2026-08-31T11:13:07+05:30 OCPBUGS-101995: Bump golang.org/x/net to v0.53.0 to address CVE-2026-33814
 
-- operator-framework-olm embedded-component de6260e53055e10e216ec668d692a35554ab0585 to ce8d9807f909efffb32fafad30f1bc9ad958cfc6
-  - 482781df 2026-08-18T14:26:21+05:30 CVE-2026-53488: bump containerd to v1.7.33
+- oc image-amd64 7ec2e14b74e700fec86dc0936a61f6c12b79d083 to 96ed0f43f0b5adf771ce3bd4fbc86809e93139f8
+  - 7cc6c9b5 2026-08-27T22:35:09Z Fix windows builds of oc rpm
 
-- router image-amd64 b2665a2999cec36350ccf2614b43941753027773 to b70b28c0380056950793382f42b9b2eaf9330945
-  - de013ca 2026-08-18T22:13:53+05:30 OCPBUGS-101956: Bump golang.org/x/net from v0.48.0 to v0.53.0
-
-- router image-arm64 b2665a2999cec36350ccf2614b43941753027773 to b70b28c0380056950793382f42b9b2eaf9330945
-  - de013ca 2026-08-18T22:13:53+05:30 OCPBUGS-101956: Bump golang.org/x/net from v0.48.0 to v0.53.0
+- oc image-arm64 7ec2e14b74e700fec86dc0936a61f6c12b79d083 to 96ed0f43f0b5adf771ce3bd4fbc86809e93139f8
+  - 7cc6c9b5 2026-08-27T22:35:09Z Fix windows builds of oc rpm
 
