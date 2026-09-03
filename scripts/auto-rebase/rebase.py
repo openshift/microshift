@@ -542,6 +542,12 @@ def main():
     pull_req = try_get_pr(gh_repo, org, base_branch, rebase_branch_name)
     if pull_req is None:
         pull_req = create_pr(gh_repo, base_branch, rebase_branch_name, pr_title, desc)
+        # The pipeline controller only reacts to issue_comment events, so
+        # '/pipeline auto' must be posted as its own comment - it is ignored
+        # when placed in the PR body/description. It adds the 'pipeline-auto'
+        # label, which persists across pushes, so it only needs posting once
+        # when the PR is created.
+        post_comment(pull_req, "/pipeline auto")
     else:
         update_pr(pull_req, pr_title, desc)
         comment = f"Rebase job updated the branch\n{desc}"
