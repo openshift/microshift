@@ -116,6 +116,12 @@ elif [[ "${SCENARIO_SOURCES}" =~ .*releases.* ]]; then
     # hypervisor only ever holds the still-running scenarios' VMs.
     jobs_arg="-j 20"
     scenario_action="create-run-shutdown"
+    # Release scenarios run upgrade paths with LVMS workloads followed by
+    # full standard suites, which need more time than the default 30m robot
+    # timeout and 600s greenboot healthcheck — especially under I/O
+    # contention when many VMs boot and pull images in parallel.
+    export GREENBOOT_TIMEOUT=1200
+    export TEST_EXECUTION_TIMEOUT=60m
 fi
 
 TEST_OK=true
