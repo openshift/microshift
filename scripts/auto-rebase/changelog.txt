@@ -1,0 +1,9 @@
+- cluster-network-operator embedded-component e39d57bde3ff15efdd63cc8567e91b2c2c2d45b3 to 907dc8b385a37ba34798eb104c489ba1dc7aeef9
+  - 5baae22 2026-08-26T14:15:58+02:00 apply: add unit tests for PrePatchAnnotation and replace fakeRESTMapper
+  - 3bc5f1a 2026-08-26T14:04:20+02:00 frr-k8s: fix strategy switch to Recreate on SNO upgrades
+  - 18810af 2026-08-26T14:04:12+02:00 frr-k8s: use Recreate strategy for statuscleaner deployment
+  - defacb2 2026-08-26T13:48:11+02:00 Add test utility functions for component rendering tests
+
+- machine-config-operator embedded-component afed09939d80d86cafd38e9f733cc49ed16af092 to 0db0e697092e7d4f44f0331d03ce68cd1fbd63d1
+  - b6f4f667 2026-08-26T16:33:05Z OCPBUGS-64623: Use kubernetes scheme in drain controller event recorder
+
