@@ -85,7 +85,7 @@ GDP Test Setup
     Enable Serialsim
     Copy Script To Host
     Wait Until Device Is Allocatable
-    Command Should Work    crictl pull registry.access.redhat.com/ubi9/ubi:9.6
+    Command Should Work    crictl pull registry.access.redhat.com/ubi9/ubi:9.8
     Start Script On Host
 
 GDP Test Teardown
