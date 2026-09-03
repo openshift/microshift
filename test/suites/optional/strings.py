@@ -67,7 +67,7 @@ metadata:
 spec:
   containers:
   - name: serialdevice-app-container
-    image: registry.access.redhat.com/ubi9/ubi:9.6
+    image: registry.access.redhat.com/ubi9/ubi:9.8
     command: ["sleep", "infinity"]
     resources:
       limits:
