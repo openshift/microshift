@@ -1,3 +1,0 @@
-- oc image-amd64 522f35afa3a67d73547d93936dedca524783c811 to a2c805b5894a8a1a6bcb16e7023203e3f01952b4
-  - 04d89408 2026-08-11T18:41:13+02:00 Fix for OCPBUGS-88243: CVE-2026-39821 (using fork from sustaining)
-
