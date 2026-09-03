@@ -211,7 +211,6 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
     /label tide/merge-method-squash
     /label backport-risk-assessed
     /label jira/valid-bug
-    /pipeline auto
     """)
     base = template.format(**locals())
     return (base if rebase_script_succeded
@@ -380,6 +379,12 @@ def main():
     pull_req = gh.get_existing_pr_for_a_branch(adjusted_base_branch, rebase_branch_name)
     if pull_req is None:
         pull_req = gh.create_pr(adjusted_base_branch, rebase_branch_name, pr_title, desc)
+        # The pipeline controller only reacts to issue_comment events, so
+        # '/pipeline auto' must be posted as its own comment - it is ignored
+        # when placed in the PR body/description. It adds the 'pipeline-auto'
+        # label, which persists across pushes, so it only needs posting once
+        # when the PR is created.
+        gh.post_comment(pull_req, "/pipeline auto")
     else:
         gh.update_pr(pull_req, pr_title, desc)
         comment = f"Rebase job updated the branch\n{desc}"
