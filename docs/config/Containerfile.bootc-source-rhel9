@@ -1,0 +1,83 @@
+FROM registry.redhat.io/rhel9-eus/rhel-9.8-bootc:9.8
+
+# URL of the OpenShift "dependencies" repository that provides the MicroShift
+# runtime dependencies which are NOT part of base RHEL: cri-o, cri-tools,
+# openshift-clients and openvswitch. The version of these packages must match
+# the MicroShift source being built.
+#
+# The default below tracks the current pre-release development stream. For the
+# authoritative value matching the current source tree, see the
+# RHOCP_MINOR_Y_BETA variable in test/bin/common_versions.sh. When building a
+# MicroShift version that is already released through the 'rhocp' stream, replace
+# this repository with the matching 'rhocp-<ver>-for-rhel-9-$(uname -m)-rpms' and
+# 'fast-datapath-for-rhel-9-$(uname -m)-rpms' repositories from your Red Hat
+# subscription instead (see docs/config/Containerfile.bootc-rhel9).
+#
+# NOTE: the URL is architecture specific. Override it with '--build-arg' when
+# building for aarch64 (replace 'x86_64' with 'aarch64').
+ARG DEPS_REPO_URL=https://mirror.openshift.com/pub/openshift-v5/x86_64/dependencies/rpms/5.0-el9-beta
+
+# Copy the locally built MicroShift RPM repository (the RPMs produced by
+# 'make rpm' together with the 'repodata' created by 'createrepo_c') into the
+# image. The build context must be the directory that contains them.
+COPY . /tmp/microshift-local
+
+# Configure the local source RPM repository, then install MicroShift built from
+# source. Its dependencies are resolved from the base RHEL repositories (via the
+# host subscription) and from the OpenShift dependencies repository above.
+RUN cat > /etc/yum.repos.d/microshift-local.repo <<'EOF'
+[microshift-local]
+name=MicroShift RPMs built from source
+baseurl=file:///tmp/microshift-local
+enabled=1
+gpgcheck=0
+EOF
+
+# hadolint ignore=SC1091,DL3059
+RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
+    dnf install -y \
+        --repofrompath="openshift-deps,${DEPS_REPO_URL}" \
+        --setopt=openshift-deps.gpgcheck=0 \
+        firewalld jq microshift microshift-release-info && \
+    systemctl enable microshift && \
+    rm -f /etc/yum.repos.d/microshift-local.repo && \
+    rm -rf /tmp/microshift-local && \
+    dnf clean all
+
+# Create a default 'redhat' user with the specified password.
+# Add it to the 'wheel' group to allow for running sudo commands.
+ARG USER_PASSWD
+RUN if [ -z "${USER_PASSWD}" ] ; then \
+        echo USER_PASSWD is a mandatory build argument && exit 1 ; \
+    fi
+# hadolint ignore=DL4006
+RUN useradd -m -d /var/home/redhat -G wheel redhat && \
+    echo "redhat:${USER_PASSWD}" | chpasswd
+
+# Mandatory firewall configuration
+RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \
+    firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16 && \
+    firewall-offline-cmd --zone=trusted --add-source=169.254.169.1 && \
+    firewall-offline-cmd --zone=trusted --add-source=fd01::/48
+    # Application-specific firewall configuration
+RUN firewall-offline-cmd --zone=public --add-port=80/tcp && \
+    firewall-offline-cmd --zone=public --add-port=443/tcp && \
+    firewall-offline-cmd --zone=public --add-port=30000-32767/tcp && \
+    firewall-offline-cmd --zone=public --add-port=30000-32767/udp
+
+# Create a systemd unit to recursively make the root filesystem subtree
+# shared as required by OVN images
+RUN cat > /usr/lib/systemd/system/microshift-make-rshared.service <<'EOF'
+[Unit]
+Description=Make root filesystem shared
+Before=microshift.service
+ConditionVirtualization=container
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mount --make-rshared /
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# hadolint ignore=DL3059
+RUN systemctl enable microshift-make-rshared.service

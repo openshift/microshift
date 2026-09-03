@@ -14,8 +14,8 @@ can be conducted manually or integrated into the package CI/CD processes. See
 
 ## Build and Publish MicroShift Container Image
 
-Follow the instructions in the [Build Image](./image_mode.md#build-image) section
-to implement the MicroShift container image layer build procedure.
+Follow the openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
+instructions to implement the MicroShift container image layer build procedure.
 
 > Prebuilt MicroShift bootc container images are not currently available for
 > download.
@@ -23,13 +23,13 @@ to implement the MicroShift container image layer build procedure.
 Customize the `Containerfile` file according to the requirements of the layered
 product to be tested. A typical customization would be to select a custom version
 of MicroShift, which may also include pre-released ones that are published at
-[OpenShift Mirror](mirror.openshift.com).
+[OpenShift Mirror](https://mirror.openshift.com).
 
 > For a given MicroShift `4.y` version, it is always recommended to use the
 > production builds of MicroShift RPMs as soon as they are available at the
 > `rhocp-4.y-for-rhel-9-$(uname -m)-rpms` repository.
 > Otherwise, use pre-released engineering or release candidate packages from
-> [OpenShift Mirror](mirror.openshift.com).
+> [OpenShift Mirror](https://mirror.openshift.com).
 
 **Example: MicroShift 4.17 Engineering Candidate Packages (fragment)**
 
@@ -87,13 +87,13 @@ RUN dnf install -y firewalld microshift && \
     dnf clean all
 ```
 
-Finally, follow the instructions in the [Publish Image](./image_mode.md#publish-image)
-section to push the MicroShift images to a container registry.
+Finally, follow the same openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
+instructions to push the MicroShift images to a container registry.
 
 ## Build and Publish Layered Product Container Image
 
-Follow the instructions in the [Build Image](./image_mode.md#build-image) section
-to implement the Layered Product container image layer build procedure.
+Follow the openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
+instructions to implement the Layered Product container image layer build procedure.
 
 Customize the `Containerfile` file according to the requirements of the layered
 product to be tested. A typical customization would be to select a custom version
@@ -113,8 +113,8 @@ RUN dnf install -y microshift-gitops && \
 > The `FROM` statement should be updated to denote a valid reference to the base
 > MicroShift container image.
 
-Finally, follow the instructions in the [Publish Image](./image_mode.md#publish-image)
-section to push the Layered Product images to a container registry.
+Finally, follow the same openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
+instructions to push the Layered Product images to a container registry.
 
 ## Run Layered Product Container Image
 

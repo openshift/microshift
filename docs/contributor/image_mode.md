@@ -1,24 +1,28 @@
 # Image Mode for MicroShift Contributors
 
-Follow the instructions in [Image Mode for MicroShift Users](../user/image_mode.md)
-to create a bootable container image, store this image in a remote registry and
-use it for installing a new RHEL operating system.
+Follow the instructions in [Image Mode for MicroShift (from source)](../user/image_mode.md)
+to build a `bootc` image containing MicroShift built from source.
 
-This document demonstrates how to run a `bootc` image using `podman`.
+This document demonstrates how to run that `bootc` image directly using `podman`,
+which is the fastest way to exercise a source build without installing it on a
+host.
 
-> **NOTE**:<br>
+> **NOTE**:  
+>
 > Use the `podman` approach only for development purposes to benefit from
 > the fast turnaround times it allows. Do not use it for production use cases.
 
 The procedures described below require the following setup:
-* A `RHEL 9.6 host` with an active Red Hat subscription for building MicroShift `bootc`
+
+- A `RHEL 9.8 host` with an active Red Hat subscription for building MicroShift `bootc`
 images and running containers
-* A `remote registry` (e.g. `quay.io`) for storing and accessing `bootc` images
+- A `remote registry` (e.g. `quay.io`) for storing and accessing `bootc` images
+
+
 
 ## Run MicroShift Bootc Image
 
-Log into the `RHEL 9.6 host` using the user credentials that have SUDO
-permissions configured.
+Log into the `RHEL 9.8 host` using the user credentials that have `sudo` permissions configured.
 
 ### Configure CNI
 
@@ -32,12 +36,12 @@ kernel versions are different.
 
 ```bash
 $ find /lib/modules/$(uname -r) -name "openvswitch*"
-/lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch
-/lib/modules/6.9.9-200.fc40.x86_64/kernel/net/openvswitch/openvswitch.ko.xz
+/lib/modules/5.14.0-687.34.1.el9_8.x86_64/kernel/net/openvswitch
+/lib/modules/5.14.0-687.34.1.el9_8.x86_64/kernel/net/openvswitch/openvswitch.ko.xz
 
-$ IMAGE_NAME=microshift-4.18-bootc
+$ IMAGE_NAME=microshift-source-bootc
 $ sudo podman inspect "${IMAGE_NAME}" | grep kernel-core
-        "created_by": "kernel-core-5.14.0-427.26.1.el9_4.x86_64"
+        "created_by": "kernel-core-5.14.0-687.39.1.el9_8.x86_64"
 ```
 
 When a `bootc` image is started as a container, it uses the host kernel, which is
@@ -96,19 +100,22 @@ the next section.
 > sudo rm -f "${VGFILE}"
 > ```
 
+
+
 ### Run Container
 
 Run the following commands to start the MicroShift `bootc` image in an interactive
 terminal session.
 
 The host shares the following configuration with the container:
-* The `openvswitch` kernel module to be used by the Open vSwitch service
-* A pull secret file for downloading the required OpenShift container images
-* Host container storage for reusing available container images
+
+- The `openvswitch` kernel module to be used by the Open vSwitch service
+- A pull secret file for downloading the required OpenShift container images
+- Host container storage for reusing available container images
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
-IMAGE_NAME=microshift-4.18-bootc
+IMAGE_NAME=microshift-source-bootc
 
 sudo modprobe openvswitch
 sudo podman run --rm -it --privileged \
@@ -141,6 +148,8 @@ watch sudo oc get pods -A \
 
 > Run the `sudo shutdown now` command to stop the container.
 
+
+
 ## Appendix A: Multi-Architecture Image Build
 
 It is often convenient to build multi-architecture container images and store
@@ -148,37 +157,43 @@ them under the same registry URL using manifest lists.
 
 > See [podman-manifest](https://docs.podman.io/en/latest/markdown/podman-manifest.1.html) for more information.
 
-The [Build Image](#build-image) procedure needs to be adjusted in the following
-manner to create multi-architecture images.
+The [Build a MicroShift bootc image from source](../user/image_mode.md#build-a-microshift-bootc-image-from-source)
+procedure needs to be adjusted in the following manner to create
+multi-architecture images.
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
 USER_PASSWD="<your_redhat_user_password>"
 IMAGE_ARCH=amd64 # Use amd64 or arm64 depending on the current platform
 IMAGE_PLATFORM="linux/${IMAGE_ARCH}"
-IMAGE_NAME="microshift-4.18-bootc:linux-${IMAGE_ARCH}"
+IMAGE_NAME="microshift-source-bootc:linux-${IMAGE_ARCH}"
 
+# The MicroShift RPMs must have been built for ${IMAGE_ARCH} and published to the
+# local repository first. The OpenShift dependencies repository is architecture
+# specific, so override DEPS_REPO_URL for arm64 (replace 'x86_64' with 'aarch64').
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --platform "${IMAGE_PLATFORM}" \
     --build-arg USER_PASSWD="${USER_PASSWD}" \
-    -f Containerfile
+    -f docs/config/Containerfile.bootc-source-rhel9 \
+    _output/rpmbuild/RPMS
 ```
 
-Verify that the local MicroShift 4.18 `bootc` image was created for the specified
+Verify that the local MicroShift `bootc` image was created for the specified
 platform.
 
 ```bash
 $ sudo podman images "${IMAGE_NAME}"
-REPOSITORY                       TAG          IMAGE ID      CREATED         SIZE
-localhost/microshift-4.18-bootc  linux-amd64  3f7e136fccb5  13 minutes ago  2.19 GB
+REPOSITORY                          TAG          IMAGE ID      CREATED         SIZE
+localhost/microshift-source-bootc   linux-amd64  3f7e136fccb5  13 minutes ago  2.89 GB
 ```
 
 Repeat the procedure on the other platform (i.e. `arm64`) and proceed by publishing
 the platform-specific `amd64` and `arm64` images to the remote registry as described
-in the [Publish Image](#publish-image) section.
+in the openshift-docs [Installing and publishing a bootc image to a registry](https://docs.redhat.com/en/documentation/red_hat_build_of_microshift/latest/html/installing_with_image_mode_for_rhel/microshift-install-bootc-image)
+section.
 
 > Cross-platform `podman` builds are not in the scope of this document. Log into
-> the RHEL 9.6 host running on the appropriate architecture to perform the container
+> the RHEL 9.8 host running on the appropriate architecture to perform the container
 > image builds and publish the platform-specific image to the remote registry.
 
 Finally, create a manifest containing the platform-specific image references
@@ -190,7 +205,7 @@ and publish it to the remote registry.
 ```bash
 REGISTRY_URL=quay.io
 REGISTRY_ORG=myorg/mypath
-BASE_NAME=microshift-4.18-bootc
+BASE_NAME=microshift-source-bootc
 MANIFEST_NAME="${BASE_NAME}:latest"
 
 sudo podman manifest create -a "localhost/${MANIFEST_NAME}" \
@@ -216,7 +231,7 @@ $ sudo podman manifest inspect \
 ```
 
 It is now possible to access images using the manifest name with the `latest` tag
-(e.g. `quay.io/myorg/mypath/microshift-4.18-bootc:latest`). The image for the
+(e.g. `quay.io/myorg/mypath/microshift-source-bootc:latest`). The image for the
 current platform will automatically be pulled from the registry if it is part of
 the manifest list.
 
@@ -225,11 +240,12 @@ the manifest list.
 Refer to RHEL documentation for generic instructions on upgrading `rpm-ostree`
 systems to Image Mode. The upgrade process should be planned carefully considering
 the following guidelines:
-* Follow instructions in RHEL documentation for converting `rpm-ostree` blueprints to
-  Image Mode container files
-* Consider using [rpm-ostree compose container-encapsulate](https://coreos.github.io/rpm-ostree/container/#converting-ostree-commits-to-new-base-images)
-  to experiment with Image Mode based on the existing `ostree` commits
-* Invest in defining a proper container build pipeline for fully adopting Image Mode
+
+- Follow instructions in RHEL documentation for converting `rpm-ostree` blueprints to
+Image Mode container files
+- Consider using [rpm-ostree compose container-encapsulate](https://coreos.github.io/rpm-ostree/container/#converting-ostree-commits-to-new-base-images)
+to experiment with Image Mode based on the existing `ostree` commits
+- Invest in defining a proper container build pipeline for fully adopting Image Mode
 
 If reinstalling MicroShift devices from scratch is not an option, read the remainder
 of this section that outlines the upgrade details specific to MicroShift.
@@ -262,3 +278,5 @@ ExecStartPre=/bin/sh -c '/bin/getent group hugetlbfs >/dev/null || groupadd -r h
 ExecStartPre=/sbin/usermod -a -G hugetlbfs openvswitch
 ExecStartPre=/bin/chown -Rhv openvswitch. /etc/openvswitch
 EOF
+```
+
