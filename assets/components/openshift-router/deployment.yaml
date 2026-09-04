@@ -27,7 +27,7 @@ spec:
           volumeMounts:
             - mountPath: /mnt/config
               name: haproxy-config
-          image: '{{ .ReleaseImage.haproxy_router }}'
+          image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
         - name: haproxy
           imagePullPolicy: IfNotPresent
           restartPolicy: Always
@@ -85,7 +85,7 @@ spec:
               name: rsyslog-socket
               readOnly: false
             {{- end }}
-          image: '{{ .ReleaseImage.haproxy_router }}'
+          image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
       containers:
         - name: router
           imagePullPolicy: IfNotPresent
@@ -285,7 +285,7 @@ spec:
               name: rsyslog-socket
               readOnly: false
             {{- end }}
-          image: '{{ .ReleaseImage.haproxy_router }}'
+          image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
           ports:
             - name: http
               containerPort: 80
@@ -302,7 +302,7 @@ spec:
         - name: logs
           imagePullPolicy: IfNotPresent
           terminationMessagePolicy: FallbackToLogsOnError
-          image: '{{ .ReleaseImage.haproxy_router }}'
+          image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
           imagePullPolicy: IfNotPresent
           command:
             - /sbin/rsyslogd

@@ -1,8 +1,8 @@
 diff --git a/assets/components/openshift-router/deployment.yaml b/assets/components/openshift-router/deployment.yaml
-index b88af94..59aca8c 100644
+index 15fa33a879..362d00f44f 100644
 --- a/assets/components/openshift-router/deployment.yaml
 +++ b/assets/components/openshift-router/deployment.yaml
-@@ -157,6 +157,14 @@ spec:
+@@ -161,6 +161,14 @@ spec:
                value: '{{ .RouterCompressionMime }}'
              - name: ROUTER_ENABLE_EXTERNAL_CERTIFICATE
                value: "true"
@@ -17,7 +17,7 @@ index b88af94..59aca8c 100644
            livenessProbe:
              failureThreshold: 3
              httpGet:
-@@ -201,6 +209,11 @@ spec:
+@@ -205,6 +213,11 @@ spec:
              - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
                name: kube-api-access
                readOnly: true
@@ -26,10 +26,10 @@ index b88af94..59aca8c 100644
 +              name: '{{ .ClientCAMapName}}'
 +              readOnly: true
 +            {{- end }}
-           image: '{{ .ReleaseImage.haproxy_router }}'
+           image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
            ports:
              - name: http
-@@ -254,6 +267,16 @@ spec:
+@@ -258,6 +271,16 @@ spec:
                      - path: namespace
                        fieldRef:
                          fieldPath: metadata.namespace

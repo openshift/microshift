@@ -794,9 +794,9 @@ EOF
     yq -i '.spec.selector = {"matchLabels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.metadata += {"labels": {"ingresscontroller.operator.openshift.io/deployment-ingresscontroller": "default"}}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.metadata.annotations += {"openshift.io/required-scc": "restricted"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.initContainers[0].image = "{{ .ReleaseImage.haproxy_router }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.initContainers[1].image = "{{ .ReleaseImage.haproxy_router }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
-    yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.haproxy_router }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.initContainers[0].image = "{{ .ReleaseImage.haproxy_router_haproxy32 }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.initContainers[1].image = "{{ .ReleaseImage.haproxy_router_haproxy32 }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
+    yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.haproxy_router_haproxy32 }}"' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "ROUTER_HAPROXY_ADMIN_UNIX_SOCKET", "value": "/var/lib/haproxy/run/admin.sock"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "STATS_PORT", "value": "1936"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
     yq -i '.spec.template.spec.containers[0].env += {"name": "RELOAD_INTERVAL", "value": "5s"}' "${REPOROOT}"/assets/components/openshift-router/deployment.yaml
@@ -886,8 +886,12 @@ EOF
         if git apply --check "${patch_file}" 2> /dev/null; then
             git apply "${patch_file}"
             echo "${patch_file} - Patch applied"
+        elif git apply --reverse --check "${patch_file}" 2> /dev/null; then
+            echo "${patch_file} - Patch was already applied"
         else
-            echo "Patch was already applied"
+            echo "ERROR: ${patch_file} - context drifted, patch neither applies nor is already applied." >&2
+            echo "       Regenerate it against the freshly rebased manifest (see comment above)." >&2
+            exit 1
         fi
     done
     popd
