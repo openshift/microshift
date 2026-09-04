@@ -194,7 +194,7 @@ github.com/munnerz/goautoneg
 # github.com/oklog/run v1.2.0
 ## explicit; go 1.20
 github.com/oklog/run
-# github.com/openshift/api v0.0.0-20260715165912-72066cc9718b
+# github.com/openshift/api v0.0.0-20260901194050-81278704edb0
 ## explicit; go 1.26.0
 github.com/openshift/api/config/v1
 github.com/openshift/api/operator/v1
