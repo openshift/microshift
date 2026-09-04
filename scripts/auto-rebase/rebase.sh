@@ -886,8 +886,12 @@ EOF
         if git apply --check "${patch_file}" 2> /dev/null; then
             git apply "${patch_file}"
             echo "${patch_file} - Patch applied"
+        elif git apply --reverse --check "${patch_file}" 2> /dev/null; then
+            echo "${patch_file} - Patch was already applied"
         else
-            echo "Patch was already applied"
+            echo "ERROR: ${patch_file} - context drifted, patch neither applies nor is already applied." >&2
+            echo "       Regenerate it against the freshly rebased manifest (see comment above)." >&2
+            exit 1
         fi
     done
     popd
