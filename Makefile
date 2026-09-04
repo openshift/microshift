@@ -178,6 +178,13 @@ verify-py:
 verify-rf:
 	./scripts/verify/verify-rf.sh
 
+.PHONY: verify-ansible
+verify-ansible:
+	./scripts/verify/verify-ansible.sh
+
+.PHONY: lint-ansible
+lint-ansible: verify-ansible
+
 # Container check is not run in any default verify target as it uses the podman
 # command, which does not work in the containerized verify CI job.
 # Container verification is performed as part of the image build procedure.

@@ -1,0 +1,12 @@
+---
+collections:
+  - name: ansible.posix
+    version: 2.2.2
+  - name: community.general
+    version: 13.2.0
+  - name: community.library_inventory_filtering_v1
+    version: 1.1.5
+  - name: community.libvirt
+    version: 2.3.0
+  - name: kubernetes.core
+    version: 6.5.0

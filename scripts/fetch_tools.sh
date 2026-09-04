@@ -90,6 +90,24 @@ gettool_shellcheck() {
     _install "${url}" "${checksum}" "${filename}" "${filename}"
 }
 
+gettool_uv() {
+    local ver="0.12.3"
+    declare -A checksums=(
+        ["x86_64"]="600cf9a742aca00d292673b16b5acffaa7b8c269a364ad0c2e79498dcb1fe101"
+        ["aarch64"]="bb66cb52e7b1823aed1183630d8d8e5c958840d584a4c55ec10a4cfc168dcca2")
+
+    declare -A arch_map=(
+        ["x86_64"]="x86_64"
+        ["aarch64"]="aarch64")
+
+    local arch="${arch_map[${ARCH}]}"
+    local checksum="${checksums[${ARCH}]}"
+    local filename="uv-${ver}"
+    local url="https://github.com/astral-sh/uv/releases/download/${ver}/uv-${arch}-unknown-linux-gnu.tar.gz"
+
+    _install "${url}" "${checksum}" "${filename}" "uv"
+}
+
 gettool_kuttl() {
     local ver="0.15.0"
     declare -A checksums=(
