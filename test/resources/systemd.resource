@@ -91,7 +91,10 @@ Disable Journal Rate Limiting
     ...    sets RateLimitBurst=0, then restarting the journal service.
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    printf '[Journal]\nRateLimitBurst=0\n' > /etc/systemd/journald.conf.d/disable-ratelimit.conf && systemctl restart systemd-journald
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+    ...    sudo=True
+    ...    return_stdout=True
+    ...    return_stderr=True
+    ...    return_rc=True
     Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
 
@@ -100,6 +103,9 @@ Enable Journal Rate Limiting
     ...    drop-in created by Disable Journal Rate Limiting.
     ${stdout}    ${stderr}    ${rc}=    Execute Command
     ...    rm -f /etc/systemd/journald.conf.d/disable-ratelimit.conf && systemctl restart systemd-journald
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+    ...    sudo=True
+    ...    return_stdout=True
+    ...    return_stderr=True
+    ...    return_rc=True
     Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
