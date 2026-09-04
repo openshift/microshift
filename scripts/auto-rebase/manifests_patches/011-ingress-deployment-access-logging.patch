@@ -1,5 +1,5 @@
 diff --git a/assets/components/openshift-router/deployment.yaml b/assets/components/openshift-router/deployment.yaml
-index d615ed0..f4f8f9a 100644
+index 362d00f44f..22bf56d338 100644
 --- a/assets/components/openshift-router/deployment.yaml
 +++ b/assets/components/openshift-router/deployment.yaml
 @@ -75,6 +75,16 @@ spec:
@@ -19,7 +19,7 @@ index d615ed0..f4f8f9a 100644
            image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
        containers:
          - name: router
-@@ -165,6 +175,53 @@ spec:
+@@ -169,6 +179,53 @@ spec:
              - name: ROUTER_MUTUAL_TLS_AUTH_FILTER
                value: '{{ .ClientAuthFilter }}'
              {{- end }}
@@ -73,7 +73,7 @@ index d615ed0..f4f8f9a 100644
            livenessProbe:
              failureThreshold: 3
              httpGet:
-@@ -214,6 +271,16 @@ spec:
+@@ -218,6 +275,16 @@ spec:
                name: '{{ .ClientCAMapName}}'
                readOnly: true
              {{- end }}
@@ -90,7 +90,7 @@ index d615ed0..f4f8f9a 100644
            image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
            ports:
              - name: http
-@@ -227,6 +294,29 @@ spec:
+@@ -231,6 +298,29 @@ spec:
                protocol: TCP
            args:
              - -v=4
@@ -120,7 +120,7 @@ index d615ed0..f4f8f9a 100644
        tolerations:
          # Ensure the pod isn't deleted during serial NoExecuteTaintManager tests.
          # Remember that NoExecute uses Delete, not Evict, because removing the pod
-@@ -277,6 +367,19 @@ spec:
+@@ -281,6 +371,19 @@ spec:
              name: '{{ .ClientCAMapName }}'
              optional: false
          {{- end }}
