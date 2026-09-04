@@ -169,6 +169,12 @@ repository in detached HEAD state until a later branch-based run updates it.
 Set `microshift_source_dir` to build a complete Git worktree that is already present on the managed host. The caller is responsible for staging and
 updating the worktree, including its `.git` metadata. When set, the Git checkout task is skipped and the Git revision and refspec variables are ignored.
 
+When repository management is enabled, source builds provision runtime dependencies from the stream's OpenShift repository when it is available. If
+that repository is unavailable, or
+`microshift_version` identifies a prerelease, dependencies are provided by the `dependencies/rpms/<major.minor>-el9-beta` mirror instead. Package-based
+repository selection is unchanged. Repository probes verify that `cri-o` is present; installation of the built RPMs enforces version compatibility.
+If the OpenShift repository becomes usable on a later run, the corresponding fallback mirror is removed.
+
 ### Inventory Configuration
 
 The inventory configuration file is located at `inventory/inventory`.

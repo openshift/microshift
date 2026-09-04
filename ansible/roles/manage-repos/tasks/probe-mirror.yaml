@@ -1,0 +1,22 @@
+- name: Check repository mirror is available
+  ansible.builtin.uri:
+    url: "{{ item.repo_url }}"
+    method: GET
+    status_code: 200
+    timeout: 5
+
+- name: Check repository mirror provides required package
+  ansible.builtin.command:
+    argv:
+      - dnf
+      - --refresh
+      - repository-packages
+      - --showduplicates
+      - "--disablerepo=*"
+      - --repofrompath
+      - "microshift-dependency-probe,{{ item.repo_url }}"
+      - microshift-dependency-probe
+      - info
+      - "{{ repository_probe_package }}"
+  changed_when: false
+  when: (repository_probe_package | default('') | length) > 0
