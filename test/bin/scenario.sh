@@ -1335,9 +1335,19 @@ configure_fast_datapath_repo() {
 configure_rpm_scenario() {
     local -r vmname="$1"
     local -r rhel_version="$2"
-    local -r reponame=$(basename "${LOCAL_REPO}")
+
+    if [[ -z "${LOCAL_REPO}" ]]; then
+        echo "ERROR: LOCAL_REPO is not set" >&2
+        return 1
+    fi
+
+    local reponame
+    reponame=$(basename "${LOCAL_REPO}")
+    local -r reponame
     local -r repo_url="${WEB_SERVER_URL}/rpm-repos/${reponame}"
-    local -r target_version=$(local_rpm_version)
+    local target_version
+    target_version=$(local_rpm_version)
+    local -r target_version
 
     configure_vm_firewall "${vmname}"
     subscription_manager_register "${vmname}"
