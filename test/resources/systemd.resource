@@ -90,7 +90,7 @@ Disable Journal Rate Limiting
     [Documentation]    Disable journald rate limiting by writing a drop-in that
     ...    sets RateLimitBurst=0, then restarting the journal service.
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    printf '[Journal]\nRateLimitBurst=0\n' > /etc/systemd/journald.conf.d/disable-ratelimit.conf && systemctl restart systemd-journald
+    ...    bash -c "printf '[Journal]\nRateLimitBurst=0\n' > /etc/systemd/journald.conf.d/disable-ratelimit.conf && systemctl restart systemd-journald"
     ...    sudo=True
     ...    return_stdout=True
     ...    return_stderr=True
@@ -102,7 +102,7 @@ Enable Journal Rate Limiting
     [Documentation]    Re-enable default journald rate limiting by removing the
     ...    drop-in created by Disable Journal Rate Limiting.
     ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    rm -f /etc/systemd/journald.conf.d/disable-ratelimit.conf && systemctl restart systemd-journald
+    ...    bash -c "rm -f /etc/systemd/journald.conf.d/disable-ratelimit.conf && systemctl restart systemd-journald"
     ...    sudo=True
     ...    return_stdout=True
     ...    return_stderr=True
