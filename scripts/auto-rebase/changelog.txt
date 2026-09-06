@@ -1,9 +1,0 @@
-- api embedded-component 187a9f96f273e64c03e3afad816ded6b15ae766f to 31af9f93e31ecd483504b3302d78f67c5a077a9e
-  - 2604afac 2026-08-28T19:14:45Z payload-command: add CRD-before-CR ordering regression test
-  - ce997b3a 2026-08-28T19:14:45Z OCPBUGS-99266: move empty CRIOCredentialProviderConfig CR to run-level 0000_10
-
-- machine-config-operator embedded-component 6965d4912c4b2ca6d8cd0736b63582116d7f2a8e to 0e883dbc97bd0c1f97f1b10d9bc66ac3881c8151
-  - 0c6700fe 2026-08-31T13:19:51Z fix: adjust fencing validator to match MAC-address based credential secrets
-  - cf40ccf1 2026-08-27T16:30:03Z OCPBUGS-112043: Preserve proxy environment vars
-  - ad929f96 2026-08-27T12:01:44Z controller: modify MachineOSBuild event and condition update functionality to more clearly handle pod failures with reties
-
