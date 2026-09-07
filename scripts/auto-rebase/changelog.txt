@@ -1,3 +1,22 @@
-- machine-config-operator embedded-component db84d8368ef78e50f3bc0961dcf2b27a7975e053 to a94e123109ee46a66552dca42a0dd6a2ef03e29b
-  - 7b390201 2026-08-26T16:33:52Z OCPBUGS-64623: Use kubernetes scheme in drain controller event recorder
+- cluster-csi-snapshot-controller-operator embedded-component 8c1ebc60a2014ab925cbad6ef255e06ea0bd72b4 to eb43a7a80d1b314eb8bbe63b6b73de91ba8cc7aa
+  - 10812f0 2026-08-31T22:42:46-05:00 OCPBUGS-104057: CVE-2026-33814 - replace golang.org/x/net with openshift-sustaining fork
+
+- kubernetes embedded-component 7ffd39de9bbb8e3edca8ee7530cf1dab522fbce2 to 93afd702239e69df4bf4b7e66140455ab8282acd
+  - cf89602a0 2026-06-04T13:30:23Z UPSTREAM: 138981: Cache selinux conflicts
+  - 1b7b4200e 2026-06-04T13:30:23Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
+  - 379d13715 2026-06-04T13:30:23Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
+
+- machine-config-operator embedded-component a94e123109ee46a66552dca42a0dd6a2ef03e29b to f08b4678edfbce0d57e8d7dc779bf6aae131f0e8
+  - 25a52d38 2026-09-02T16:59:49Z chore: update AMIs
+  - a18ff695 2026-08-20T20:25:48Z OCPBUGS-98316: Fix SHA idempotency test in nmstate-configuration.sh
+
+- kubernetes image-amd64 7ffd39de9bbb8e3edca8ee7530cf1dab522fbce2 to 93afd702239e69df4bf4b7e66140455ab8282acd
+  - cf89602a0 2026-06-04T13:30:23Z UPSTREAM: 138981: Cache selinux conflicts
+  - 1b7b4200e 2026-06-04T13:30:23Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
+  - 379d13715 2026-06-04T13:30:23Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
+
+- kubernetes image-arm64 7ffd39de9bbb8e3edca8ee7530cf1dab522fbce2 to 93afd702239e69df4bf4b7e66140455ab8282acd
+  - cf89602a0 2026-06-04T13:30:23Z UPSTREAM: 138981: Cache selinux conflicts
+  - 1b7b4200e 2026-06-04T13:30:23Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
+  - 379d13715 2026-06-04T13:30:23Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
 
