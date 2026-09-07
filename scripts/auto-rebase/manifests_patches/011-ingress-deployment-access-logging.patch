@@ -87,7 +87,7 @@ index 362d00f44f..22bf56d338 100644
 +              name: rsyslog-socket
 +              readOnly: false
 +            {{- end }}
-           image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
+           image: '{{ .ReleaseImage.haproxy_router }}'
            ports:
              - name: http
 @@ -231,6 +298,29 @@ spec:
@@ -98,7 +98,7 @@ index 362d00f44f..22bf56d338 100644
 +        - name: logs
 +          imagePullPolicy: IfNotPresent
 +          terminationMessagePolicy: FallbackToLogsOnError
-+          image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
++          image: '{{ .ReleaseImage.haproxy_router }}'
 +          imagePullPolicy: IfNotPresent
 +          command:
 +            - /sbin/rsyslogd

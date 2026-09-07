@@ -26,7 +26,7 @@ index 15fa33a879..362d00f44f 100644
 +              name: '{{ .ClientCAMapName}}'
 +              readOnly: true
 +            {{- end }}
-           image: '{{ .ReleaseImage.haproxy_router_haproxy32 }}'
+           image: '{{ .ReleaseImage.haproxy_router }}'
            ports:
              - name: http
 @@ -258,6 +271,16 @@ spec:
