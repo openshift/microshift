@@ -1,15 +1,3 @@
-- api embedded-component 2c17c596bd4b2f7f0431fd44a0611b440429d672 to 160d28ee4bcb759daf12a47066e7026a4c5806ab
-  - eb17e6c9 2026-08-24T17:22:02-04:00 OCPBUGS-113639: move empty CRIOCredentialProviderConfig CR to run-level 0000_10
-
-- cluster-csi-snapshot-controller-operator embedded-component 4847d2e09adb887610a0e18061bbf508e17f6ee3 to e9b3b21fbc322cb410a58b5f147ac76893d851ea
-  - 8ce5ddd 2026-08-19T18:07:53-05:00 OCPBUGS-101892: bump golang.org/x/net to v0.53.0 CVE-2026-33814 (GO-2026-4918): infinite loop in HTTP/2 transport when given a malformed SETTINGS_MAX_FRAME_SIZE frame. Reachable via operator.RunOperator -> events.GetControllerReferenceForCurrentPod -> http2.Transport.RoundTrip/NewClientConn. go.mod's go directive stays at 1.25.0 (no toolchain bump needed on this branch). vendor/ regenerated via go mod tidy + go mod vendor to keep it consistent with go.sum, matching what OpenShift CI's verify-deps job independently re-checks. Verified with govulncheck before/after: GO-2026-4918 no longer reported (4 -> 3 findings, exactly the expected one removed; the other 3 are unrelated CVEs out of scope for this ticket). go build/go vet ./... clean. go test ./... run as a control: the e2e suite (test/e2e) fails identically on the unmodified code (requires a real in-cluster Kubernetes config not available here), confirming it is pre-existing/environmental, not caused by this bump.
-
-- operator-framework-olm embedded-component ce8d9807f909efffb32fafad30f1bc9ad958cfc6 to 5359e60525288af86885e14d89e3210878f87274
-  - a605ef4a 2026-08-31T11:13:07+05:30 OCPBUGS-101995: Bump golang.org/x/net to v0.53.0 to address CVE-2026-33814
-
-- oc image-amd64 7ec2e14b74e700fec86dc0936a61f6c12b79d083 to 96ed0f43f0b5adf771ce3bd4fbc86809e93139f8
-  - 7cc6c9b5 2026-08-27T22:35:09Z Fix windows builds of oc rpm
-
-- oc image-arm64 7ec2e14b74e700fec86dc0936a61f6c12b79d083 to 96ed0f43f0b5adf771ce3bd4fbc86809e93139f8
-  - 7cc6c9b5 2026-08-27T22:35:09Z Fix windows builds of oc rpm
+- kubernetes image-arm64 05744abbe07157bc72508fd1872e46e9c38fbfe7 to 19365a06f558a5c5dc7f5654fa99a8318e4a77f4
+  - 059143d00 2026-08-31T22:09:49-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for HCP clusters (part 2)
 
