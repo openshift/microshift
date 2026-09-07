@@ -56,7 +56,11 @@ type Config struct {
 	Ingress   IngressConfig `json:"ingress"`
 	Storage   Storage       `json:"storage"`
 	Telemetry Telemetry     `json:"telemetry"`
-	// Settings specified in this section are transferred as-is into the Kubelet config.
+	// Settings specified in this section are transferred as-is into the Kubelet config,
+	// except imageCredentialProviderConfigPath and imageCredentialProviderBinDir, which
+	// enable the kubelet image credential provider and are applied as kubelet startup
+	// flags. Both must be set together, be absolute paths, and be owned by root and not
+	// writable by group or others, including parent directories and contents.
 	// +kubebuilder:validation:Schemaless
 	Kubelet map[string]any `json:"kubelet"`
 
@@ -66,6 +70,12 @@ type Config struct {
 
 	// Internal-only fields
 	userSettings *Config `json:"-"` // the values read from the config file
+
+	// Read from the Kubelet map during updateComputedValues(). These are kubelet
+	// flags, not KubeletConfiguration fields. After validation they hold the
+	// canonical (symlink-resolved) paths.
+	KubeletImageCredentialProviderConfigPath string `json:"-"`
+	KubeletImageCredentialProviderBinDir     string `json:"-"`
 
 	MultiNode MultiNodeConfig `json:"-"` // the value read from commond line
 
@@ -587,6 +597,10 @@ func (c *Config) updateComputedValues() error {
 	c.C2CC.stripEmptyRemoteClusters()
 	c.C2CC.resolveRoutingDefaults()
 
+	if err := c.readKubeletCredentialProviderKeys(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -744,6 +758,9 @@ func (c *Config) validate() error {
 		if err := c.C2CC.validate(c); err != nil {
 			return fmt.Errorf("error validating clusterToCluster: %w", err)
 		}
+	}
+	if err := c.validateKubeletCredentialProvider(); err != nil {
+		return err
 	}
 	return nil
 }
