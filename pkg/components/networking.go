@@ -61,17 +61,12 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 	)
 
 	if cfg.MultiNode.Enabled {
-		if cfg.BootstrapKubeConfigExists() {
-			// Worker node: only the node DaemonSet; the primary runs the SBDB.
-			apps = []string{
-				"components/ovn/multi-node/node/daemonset.yaml",
-			}
-		} else {
-			// Primary node: full master (sbdb/nbdb/northd) + node DaemonSets.
-			apps = []string{
-				"components/ovn/multi-node/master/daemonset.yaml",
-				"components/ovn/multi-node/node/daemonset.yaml",
-			}
+		// node DaemonSet runs on every multinode member (primary and workers).
+		apps = []string{"components/ovn/multi-node/node/daemonset.yaml"}
+		if !cfg.BootstrapKubeConfigExists() {
+			// Primary node only: also deploy the OVN database stack (sbdb/nbdb/northd).
+			// Workers connect to the primary's databases via the ovnkube.conf [OvnNorth]/[OvnSouth] stanzas.
+			apps = append([]string{"components/ovn/multi-node/master/daemonset.yaml"}, apps...)
 		}
 	}
 
