@@ -110,6 +110,16 @@ World Writable Bin Directory Prevents Start
     ...    AND    Remove Credential Provider Config
     ...    AND    Restart MicroShift
 
+Extended ACL On Bin Directory Prevents Start
+    [Documentation]    MicroShift refuses to start when the bin directory carries an extended POSIX
+    ...    ACL, which can grant write access the mode bits do not show.
+    [Setup]    Run Keywords    Command Should Work    setfacl -m u:nobody:rwx ${CP_BIN_DIR}
+    ...    AND    Apply Invalid Credential Provider Config    ${CP_VALID}
+    Pattern Should Appear In Log Output    ${CURSOR}    must not have an extended ACL
+    [Teardown]    Run Keywords    Command Should Work    setfacl -b ${CP_BIN_DIR}
+    ...    AND    Remove Credential Provider Config
+    ...    AND    Restart MicroShift
+
 Missing Provider Binary Prevents Start
     [Documentation]    MicroShift fails to start when a provider names a binary absent from the bin directory.
     ...    Validation fails before kubelet is configured, so the "configured" line must not appear.

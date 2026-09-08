@@ -10,24 +10,34 @@ import (
 	"strings"
 	"syscall"
 
-	kubeletconfigv1 "k8s.io/kubelet/config/v1"
-	kubeletconfigv1alpha1 "k8s.io/kubelet/config/v1alpha1"
-	kubeletconfigv1beta1 "k8s.io/kubelet/config/v1beta1"
-	"sigs.k8s.io/yaml"
+	"golang.org/x/sys/unix"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	kubeletconfig "k8s.io/kubernetes/pkg/kubelet/apis/config"
+	kubeletconfigv1 "k8s.io/kubernetes/pkg/kubelet/apis/config/v1"
+	kubeletconfigv1alpha1 "k8s.io/kubernetes/pkg/kubelet/apis/config/v1alpha1"
+	kubeletconfigv1beta1 "k8s.io/kubernetes/pkg/kubelet/apis/config/v1beta1"
 )
 
-// acceptedCredentialProviderConfigAPIVersions mirrors the CredentialProviderConfig
-// apiVersions the vendored kubelet registers and accepts when it decodes the
-// provider configuration (see decode() in
-// vendor/k8s.io/kubernetes/pkg/credentialprovider/plugin/config.go, which accepts
-// any version registered in its scheme for group kubelet.config.k8s.io). Deriving
-// the set from the vendored SchemeGroupVersions keeps this structural check from
-// drifting from the kubelet built into the same binary.
-var acceptedCredentialProviderConfigAPIVersions = map[string]struct{}{
-	kubeletconfigv1.SchemeGroupVersion.String():       {},
-	kubeletconfigv1beta1.SchemeGroupVersion.String():  {},
-	kubeletconfigv1alpha1.SchemeGroupVersion.String(): {},
-}
+// credentialProviderCodecs is the same strict decoder the vendored kubelet uses
+// to read the credential provider configuration: see the scheme setup in
+// vendor/k8s.io/kubernetes/pkg/credentialprovider/plugin/plugin.go (lines
+// 69-70, 135-138) and decode() in the sibling config.go. Strict decoding
+// rejects unknown fields, and all three API versions kubelet accepts
+// (v1alpha1, v1beta1, v1 of kubelet.config.k8s.io) are registered together with
+// the internal type and its conversions. Building the decoder from the same
+// vendored packages keeps this structural check from diverging from the kubelet
+// compiled into the same binary; a lenient decoder would let a typo'd field
+// through to the os.Exit at registration.
+var credentialProviderCodecs = func() serializer.CodecFactory {
+	s := runtime.NewScheme()
+	utilruntime.Must(kubeletconfig.AddToScheme(s))
+	utilruntime.Must(kubeletconfigv1alpha1.AddToScheme(s))
+	utilruntime.Must(kubeletconfigv1beta1.AddToScheme(s))
+	utilruntime.Must(kubeletconfigv1.AddToScheme(s))
+	return serializer.NewCodecFactory(s, serializer.EnableStrict)
+}()
 
 // isNotExistErr reports whether err means the path cannot exist. It covers both
 // a plain "no such file or directory" and ENOTDIR, which EvalSymlinks returns
@@ -64,6 +74,23 @@ var statForTrust = func(path string) (uid uint32, mode os.FileMode, err error) {
 		return 0, 0, fmt.Errorf("unable to determine ownership of %q", path)
 	}
 	return st.Uid, fi.Mode(), nil
+}
+
+// aclForTrust reports whether path carries an extended POSIX access ACL. Mode
+// bits do not reveal ACL write grants (for example `setfacl -m u:x:rwx dir`
+// leaves the mode at 0755), so the trusted-path rule rejects any component that
+// carries one. It is a package-level variable so tests can simulate ACLs without
+// setfacl or root. A filesystem that stores no ACL for the object (ENODATA) or
+// does not support ACLs (ENOTSUP) reports false.
+var aclForTrust = func(path string) (bool, error) {
+	sz, err := unix.Lgetxattr(path, "system.posix_acl_access", nil)
+	if err != nil {
+		if errors.Is(err, unix.ENODATA) || errors.Is(err, unix.ENOTSUP) {
+			return false, nil
+		}
+		return false, err
+	}
+	return sz > 0, nil
 }
 
 // readKubeletCredentialProviderKeys copies the two credential-provider keys from
@@ -282,6 +309,22 @@ func validateTrustedChain(canonical string) error {
 		if uid != 0 || mode&0o022 != 0 {
 			return fmt.Errorf("%q must be owned by root and not writable by group or others", component)
 		}
+		if err := checkNoExtendedACL(component); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// checkNoExtendedACL rejects a path that carries an extended POSIX ACL, which can
+// grant write access that the mode bits do not show.
+func checkNoExtendedACL(path string) error {
+	hasACL, err := aclForTrust(path)
+	if err != nil {
+		return err
+	}
+	if hasACL {
+		return fmt.Errorf("%q must not have an extended ACL", path)
 	}
 	return nil
 }
@@ -330,8 +373,13 @@ func validateCredentialProviderStructure(configKey, canonicalConfigPath, canonic
 
 // collectCredentialProviderConfigFiles returns the configuration files kubelet
 // would read for canonicalConfigPath. A regular file yields itself; a directory
-// yields its regular entries (symlinks resolved) whose extension is .json,
-// .yaml or .yml, sorted lexicographically. An empty directory is an error.
+// yields its entries whose extension is .json, .yaml or .yml, sorted
+// lexicographically. Directory entries are skipped (kubelet checks
+// !entry.IsDir()). Kubelet does not resolve symlinks and reads whatever remains
+// with os.ReadFile, so a dangling symlink or a non-regular entry with a
+// matching extension is an error here rather than a skip: kubelet would fail on
+// (or block on, for a FIFO) it and reach os.Exit. An empty directory is an
+// error.
 func collectCredentialProviderConfigFiles(canonicalConfigPath string) ([]string, error) {
 	fi, err := os.Stat(canonicalConfigPath)
 	if err != nil {
@@ -353,11 +401,15 @@ func collectCredentialProviderConfigFiles(canonicalConfigPath string) ([]string,
 		default:
 			continue
 		}
-		resolved, err := filepath.EvalSymlinks(filepath.Join(canonicalConfigPath, entry.Name()))
+		entryPath := filepath.Join(canonicalConfigPath, entry.Name())
+		resolved, err := filepath.EvalSymlinks(entryPath)
 		if err != nil {
+			// Kubelet does not resolve symlinks: it includes any matching entry
+			// in configFiles and later os.ReadFile fails, reaching os.Exit. A
+			// dangling symlink with a matching extension is therefore an error
+			// here, not a skip.
 			if isNotExistErr(err) {
-				// A dangling symlink is not a configuration file kubelet reads.
-				continue
+				return nil, fmt.Errorf("configuration file %q does not exist (dangling symlink)", entryPath)
 			}
 			return nil, err
 		}
@@ -365,8 +417,15 @@ func collectCredentialProviderConfigFiles(canonicalConfigPath string) ([]string,
 		if err != nil {
 			return nil, err
 		}
-		if !info.Mode().IsRegular() {
+		if info.IsDir() {
+			// Kubelet skips directories (it checks !entry.IsDir()); a directory
+			// named e.g. foo.yaml is ignored by both.
 			continue
+		}
+		if !info.Mode().IsRegular() {
+			// Kubelet would os.ReadFile a non-regular entry (e.g. a FIFO named
+			// x.yaml) and block or fail at registration; reject it here.
+			return nil, fmt.Errorf("configuration file %q is not a regular file", resolved)
 		}
 		files = append(files, resolved)
 	}
@@ -378,26 +437,37 @@ func collectCredentialProviderConfigFiles(canonicalConfigPath string) ([]string,
 	return files, nil
 }
 
-// decodeCredentialProviderNames decodes a single configuration file as a
-// CredentialProviderConfig using the vendored k8s.io/kubelet/config/v1 types and
-// returns the declared provider names. Decoding with the vendored types keeps the
-// check aligned with the kubelet in the same build. It does not validate provider
-// contents beyond apiVersion, kind, and the presence of at least one provider.
+// decodeCredentialProviderNames decodes a single configuration file the same way
+// kubelet does (strict, via credentialProviderCodecs) and returns the declared
+// provider names. Decoding with the vendored kubelet packages keeps the check
+// aligned with the kubelet in the same build: unknown fields are rejected and all
+// three accepted API versions convert to the internal type. It does not replicate
+// kubelet's semantic validation beyond kind, group, and the presence of at least
+// one provider.
 func decodeCredentialProviderNames(file string) ([]string, error) {
 	data, err := os.ReadFile(file)
 	if err != nil {
+		// A non-root reader (typically `microshift show-config` against a 0600
+		// file) cannot read the file; say so rather than reporting it invalid.
+		if errors.Is(err, syscall.EACCES) {
+			return nil, fmt.Errorf("cannot read %q: permission denied (run as root)", file)
+		}
 		return nil, fmt.Errorf("unable to read file %q: %w", file, err)
 	}
 
-	var cfg kubeletconfigv1.CredentialProviderConfig
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
+	obj, gvk, err := credentialProviderCodecs.UniversalDecoder().Decode(data, nil, nil)
+	if err != nil {
 		return nil, fmt.Errorf("file %q is not a valid CredentialProviderConfig: %w", file, err)
 	}
-	if cfg.Kind != "CredentialProviderConfig" {
-		return nil, fmt.Errorf("file %q is not a valid CredentialProviderConfig: unexpected kind %q", file, cfg.Kind)
+	if gvk.Kind != "CredentialProviderConfig" {
+		return nil, fmt.Errorf("file %q is not a valid CredentialProviderConfig: unexpected kind %q", file, gvk.Kind)
 	}
-	if _, ok := acceptedCredentialProviderConfigAPIVersions[cfg.APIVersion]; !ok {
-		return nil, fmt.Errorf("file %q is not a valid CredentialProviderConfig: unsupported apiVersion %q", file, cfg.APIVersion)
+	if gvk.Group != kubeletconfig.GroupName {
+		return nil, fmt.Errorf("file %q is not a valid CredentialProviderConfig: unexpected group %q", file, gvk.Group)
+	}
+	cfg, ok := obj.(*kubeletconfig.CredentialProviderConfig)
+	if !ok {
+		return nil, fmt.Errorf("file %q is not a valid CredentialProviderConfig: unexpected type %T", file, obj)
 	}
 	if len(cfg.Providers) == 0 {
 		return nil, fmt.Errorf("file %q declares no providers", file)
