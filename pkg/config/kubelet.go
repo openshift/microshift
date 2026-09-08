@@ -10,7 +10,6 @@ import (
 	"strings"
 	"syscall"
 
-	"golang.org/x/sys/unix"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -74,23 +73,6 @@ var statForTrust = func(path string) (uid uint32, mode os.FileMode, err error) {
 		return 0, 0, fmt.Errorf("unable to determine ownership of %q", path)
 	}
 	return st.Uid, fi.Mode(), nil
-}
-
-// aclForTrust reports whether path carries an extended POSIX access ACL. Mode
-// bits do not reveal ACL write grants (for example `setfacl -m u:x:rwx dir`
-// leaves the mode at 0755), so the trusted-path rule rejects any component that
-// carries one. It is a package-level variable so tests can simulate ACLs without
-// setfacl or root. A filesystem that stores no ACL for the object (ENODATA) or
-// does not support ACLs (ENOTSUP) reports false.
-var aclForTrust = func(path string) (bool, error) {
-	sz, err := unix.Lgetxattr(path, "system.posix_acl_access", nil)
-	if err != nil {
-		if errors.Is(err, unix.ENODATA) || errors.Is(err, unix.ENOTSUP) {
-			return false, nil
-		}
-		return false, err
-	}
-	return sz > 0, nil
 }
 
 // readKubeletCredentialProviderKeys copies the two credential-provider keys from
@@ -309,22 +291,6 @@ func validateTrustedChain(canonical string) error {
 		if uid != 0 || mode&0o022 != 0 {
 			return fmt.Errorf("%q must be owned by root and not writable by group or others", component)
 		}
-		if err := checkNoExtendedACL(component); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// checkNoExtendedACL rejects a path that carries an extended POSIX ACL, which can
-// grant write access that the mode bits do not show.
-func checkNoExtendedACL(path string) error {
-	hasACL, err := aclForTrust(path)
-	if err != nil {
-		return err
-	}
-	if hasACL {
-		return fmt.Errorf("%q must not have an extended ACL", path)
 	}
 	return nil
 }
@@ -447,11 +413,6 @@ func collectCredentialProviderConfigFiles(canonicalConfigPath string) ([]string,
 func decodeCredentialProviderNames(file string) ([]string, error) {
 	data, err := os.ReadFile(file)
 	if err != nil {
-		// A non-root reader (typically `microshift show-config` against a 0600
-		// file) cannot read the file; say so rather than reporting it invalid.
-		if errors.Is(err, syscall.EACCES) {
-			return nil, fmt.Errorf("cannot read %q: permission denied (run as root)", file)
-		}
 		return nil, fmt.Errorf("unable to read file %q: %w", file, err)
 	}
 

@@ -45,18 +45,6 @@ func withStatMock(t *testing.T, overrides map[string]fakeStat) {
 	t.Cleanup(func() { statForTrust = orig })
 }
 
-// withACLMock installs an aclForTrust that reports the given canonical paths as
-// carrying an extended ACL and every other path as carrying none, so ACL
-// rejection can be exercised without setfacl or root.
-func withACLMock(t *testing.T, withACL map[string]bool) {
-	t.Helper()
-	orig := aclForTrust
-	aclForTrust = func(path string) (bool, error) {
-		return withACL[path], nil
-	}
-	t.Cleanup(func() { aclForTrust = orig })
-}
-
 func TestReadKubeletCredentialProviderKeys(t *testing.T) {
 	ttests := []struct {
 		name        string
@@ -540,76 +528,6 @@ func TestValidateKubeletCredentialProviderTrustedPath(t *testing.T) {
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "must be owned by root")
 	})
-
-	t.Run("extended ACL on the bin dir is rejected", func(t *testing.T) {
-		dir := t.TempDir()
-		cfgFile := mkConfigFile(t, dir, "cp.yaml", "ecr-credential-provider")
-		binDir := mkDir(t, dir, "bin")
-		mkExecProvider(t, binDir, "ecr-credential-provider")
-		canonicalBin, _ := filepath.EvalSymlinks(binDir)
-		withStatMock(t, nil)
-		withACLMock(t, map[string]bool{canonicalBin: true})
-		c := &Config{
-			KubeletImageCredentialProviderConfigPath: cfgFile,
-			KubeletImageCredentialProviderBinDir:     binDir,
-		}
-		err := c.validateKubeletCredentialProvider()
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), canonicalBin)
-		assert.Contains(t, err.Error(), "must not have an extended ACL")
-	})
-
-	t.Run("extended ACL on a bin-dir entry is rejected", func(t *testing.T) {
-		dir := t.TempDir()
-		cfgFile := mkConfigFile(t, dir, "cp.yaml", "ecr-credential-provider")
-		binDir := mkDir(t, dir, "bin")
-		mkExecProvider(t, binDir, "ecr-credential-provider")
-		entry := filepath.Join(binDir, "ecr-credential-provider")
-		canonicalEntry, _ := filepath.EvalSymlinks(entry)
-		withStatMock(t, nil)
-		withACLMock(t, map[string]bool{canonicalEntry: true})
-		c := &Config{
-			KubeletImageCredentialProviderConfigPath: cfgFile,
-			KubeletImageCredentialProviderBinDir:     binDir,
-		}
-		err := c.validateKubeletCredentialProvider()
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), canonicalEntry)
-		assert.Contains(t, err.Error(), "must not have an extended ACL")
-	})
-
-	t.Run("extended ACL on an ancestor is rejected", func(t *testing.T) {
-		dir := t.TempDir()
-		cfgFile := mkConfigFile(t, dir, "cp.yaml", "ecr-credential-provider")
-		binDir := mkDir(t, dir, "bin")
-		mkExecProvider(t, binDir, "ecr-credential-provider")
-		canonicalBin, _ := filepath.EvalSymlinks(binDir)
-		ancestor := filepath.Dir(canonicalBin)
-		withStatMock(t, nil)
-		withACLMock(t, map[string]bool{ancestor: true})
-		c := &Config{
-			KubeletImageCredentialProviderConfigPath: cfgFile,
-			KubeletImageCredentialProviderBinDir:     binDir,
-		}
-		err := c.validateKubeletCredentialProvider()
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), ancestor)
-		assert.Contains(t, err.Error(), "must not have an extended ACL")
-	})
-
-	t.Run("no extended ACL passes", func(t *testing.T) {
-		dir := t.TempDir()
-		cfgFile := mkConfigFile(t, dir, "cp.yaml", "ecr-credential-provider")
-		binDir := mkDir(t, dir, "bin")
-		mkExecProvider(t, binDir, "ecr-credential-provider")
-		withStatMock(t, nil)
-		withACLMock(t, map[string]bool{})
-		c := &Config{
-			KubeletImageCredentialProviderConfigPath: cfgFile,
-			KubeletImageCredentialProviderBinDir:     binDir,
-		}
-		assert.NoError(t, c.validateKubeletCredentialProvider())
-	})
 }
 
 func TestValidateKubeletCredentialProviderStructure(t *testing.T) {
@@ -838,26 +756,6 @@ func TestValidateKubeletCredentialProviderStructure(t *testing.T) {
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), cfgFile)
 		assert.Contains(t, err.Error(), "is not a valid CredentialProviderConfig")
-	})
-
-	t.Run("unreadable file reports run-as-root", func(t *testing.T) {
-		if os.Geteuid() == 0 {
-			t.Skip("root can read a 0000 file; this path cannot be reproduced as root")
-		}
-		dir := t.TempDir()
-		cfgFile := filepath.Join(dir, "cp.yaml")
-		require.NoError(t, os.WriteFile(cfgFile,
-			[]byte(credentialProviderConfigYAML("ecr-credential-provider")), 0o000))
-		binDir := mkDir(t, dir, "bin")
-		mkExecProvider(t, binDir, "ecr-credential-provider")
-		withStatMock(t, nil)
-		c := &Config{
-			KubeletImageCredentialProviderConfigPath: cfgFile,
-			KubeletImageCredentialProviderBinDir:     binDir,
-		}
-		err := c.validateKubeletCredentialProvider()
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "permission denied (run as root)")
 	})
 
 	t.Run("world-writable bin dir wins over unresolvable provider", func(t *testing.T) {
