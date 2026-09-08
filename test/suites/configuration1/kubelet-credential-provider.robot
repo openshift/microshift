@@ -19,6 +19,7 @@ ${CP_CONFIGURED_LOG}            Kubelet image credential provider configured
 ${CP_BIN_DIR}                   /usr/libexec/microshift/credential-providers
 ${CP_MOCK_PROVIDER}             ${CP_BIN_DIR}/mock-credential-provider
 ${CP_CONFIG_FILE}               /etc/microshift/credential-providers.yaml
+${CP_CONFIG_DIR}                /etc/microshift/credential-providers.d
 ${KUBELET_GENERATED_CONFIG}     /var/lib/microshift/resources/kubelet/config/config.yaml
 ${CP_VALID}                     SEPARATOR=\n
 ...                             ---
@@ -43,6 +44,20 @@ ${CP_PROVIDER_CONFIG}           SEPARATOR=\n
 ...                             \ \ \ \ \ \ - "registry.example.invalid"
 ...                             \ \ \ \ defaultCacheDuration: "1m"
 ...                             \ \ \ \ apiVersion: credentialprovider.kubelet.k8s.io/v1
+${CP_BAD_PROVIDER_CONFIG}       SEPARATOR=\n
+...                             apiVersion: kubelet.config.k8s.io/v1
+...                             kind: CredentialProviderConfig
+...                             providers:
+...                             \ \ - name: no-such-provider
+...                             \ \ \ \ matchImages:
+...                             \ \ \ \ \ \ - "registry.example.invalid"
+...                             \ \ \ \ defaultCacheDuration: "1m"
+...                             \ \ \ \ apiVersion: credentialprovider.kubelet.k8s.io/v1
+${CP_EMPTY_DIR_CONFIG}          SEPARATOR=\n
+...                             ---
+...                             kubelet:
+...                             \ \ imageCredentialProviderConfigPath: ${CP_CONFIG_DIR}
+...                             \ \ imageCredentialProviderBinDir: ${CP_BIN_DIR}
 ${CP_MOCK_SCRIPT}               SEPARATOR=\n
 ...                             \#!/bin/bash
 ...                             \# Mock kubelet image credential provider: returns static credentials.
@@ -92,6 +107,27 @@ World Writable Bin Directory Prevents Start
     ...    AND    Apply Invalid Credential Provider Config    ${CP_VALID}
     Pattern Should Appear In Log Output    ${CURSOR}    must be owned by root and not writable by group or others
     [Teardown]    Run Keywords    Command Should Work    chmod o-w ${CP_BIN_DIR}
+    ...    AND    Remove Credential Provider Config
+    ...    AND    Restart MicroShift
+
+Missing Provider Binary Prevents Start
+    [Documentation]    MicroShift fails to start when a provider names a binary absent from the bin directory.
+    ...    Validation fails before kubelet is configured, so the "configured" line must not appear.
+    [Setup]    Run Keywords    Upload String To File    ${CP_BAD_PROVIDER_CONFIG}    ${CP_CONFIG_FILE}
+    ...    AND    Apply Invalid Credential Provider Config    ${CP_VALID}
+    Pattern Should Appear In Log Output    ${CURSOR}    no executable at
+    Pattern Should Appear In Log Output    ${CURSOR}    no-such-provider
+    Pattern Should Not Appear In Log Output    ${CURSOR}    ${CP_CONFIGURED_LOG}
+    [Teardown]    Run Keywords    Upload String To File    ${CP_PROVIDER_CONFIG}    ${CP_CONFIG_FILE}
+    ...    AND    Remove Credential Provider Config
+    ...    AND    Restart MicroShift
+
+Empty Configuration Directory Prevents Start
+    [Documentation]    MicroShift fails to start when the configuration directory holds no config files
+    [Setup]    Run Keywords    Command Should Work    install -d -o root -g root -m 0755 ${CP_CONFIG_DIR}
+    ...    AND    Apply Invalid Credential Provider Config    ${CP_EMPTY_DIR_CONFIG}
+    Pattern Should Appear In Log Output    ${CURSOR}    contains no .json, .yaml, or .yml
+    [Teardown]    Run Keywords    Command Should Work    rm -rf ${CP_CONFIG_DIR}
     ...    AND    Remove Credential Provider Config
     ...    AND    Restart MicroShift
 

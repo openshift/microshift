@@ -4,10 +4,30 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"slices"
+	"strings"
 	"syscall"
+
+	kubeletconfigv1 "k8s.io/kubelet/config/v1"
+	kubeletconfigv1alpha1 "k8s.io/kubelet/config/v1alpha1"
+	kubeletconfigv1beta1 "k8s.io/kubelet/config/v1beta1"
+	"sigs.k8s.io/yaml"
 )
+
+// acceptedCredentialProviderConfigAPIVersions mirrors the CredentialProviderConfig
+// apiVersions the vendored kubelet registers and accepts when it decodes the
+// provider configuration (see decode() in
+// vendor/k8s.io/kubernetes/pkg/credentialprovider/plugin/config.go, which accepts
+// any version registered in its scheme for group kubelet.config.k8s.io). Deriving
+// the set from the vendored SchemeGroupVersions keeps this structural check from
+// drifting from the kubelet built into the same binary.
+var acceptedCredentialProviderConfigAPIVersions = map[string]struct{}{
+	kubeletconfigv1.SchemeGroupVersion.String():       {},
+	kubeletconfigv1beta1.SchemeGroupVersion.String():  {},
+	kubeletconfigv1alpha1.SchemeGroupVersion.String(): {},
+}
 
 // isNotExistErr reports whether err means the path cannot exist. It covers both
 // a plain "no such file or directory" and ENOTDIR, which EvalSymlinks returns
@@ -161,6 +181,18 @@ func (c *Config) validateKubeletCredentialProvider() error {
 			kubeletImageCredentialProviderConfigPathKey, kubeletImageCredentialProviderBinDirKey, canonical[0])
 	}
 
+	// Structural pre-validation of the provider configuration, on the canonical
+	// paths. Upstream kubelet calls os.Exit(1) when provider registration fails,
+	// which in MicroShift terminates the whole process after other components are
+	// up. These checks turn the three structural conditions that reach that exit
+	// (empty config directory, undecodable config, unresolvable provider name)
+	// into ordinary fail-fast configuration errors. configPath (the configured
+	// value) is used only for the error prefix; the filesystem work uses the
+	// canonical paths.
+	if err := validateCredentialProviderStructure(configPath, canonical[0], canonical[1]); err != nil {
+		return err
+	}
+
 	// Store canonical paths only once both keys have passed validation.
 	for i, p := range paths {
 		*p.dst = canonical[i]
@@ -252,6 +284,130 @@ func validateTrustedChain(canonical string) error {
 		}
 	}
 	return nil
+}
+
+// validateCredentialProviderStructure verifies the structural conditions that
+// would otherwise make kubelet call os.Exit(1) at provider registration: a
+// configuration directory with no configuration files, a file that does not
+// decode as a CredentialProviderConfig, a file that declares no providers, and a
+// provider name that does not resolve to an executable in the bin directory. It
+// does not replicate kubelet's semantic validation. configKey is the configured
+// value, used only in messages; canonicalConfigPath and canonicalBinDir are the
+// symlink-resolved paths the checks operate on.
+func validateCredentialProviderStructure(configKey, canonicalConfigPath, canonicalBinDir string) error {
+	prefix := func(err error) error {
+		return fmt.Errorf("error validating kubelet.%s (%q): %w",
+			kubeletImageCredentialProviderConfigPathKey, configKey, err)
+	}
+
+	files, err := collectCredentialProviderConfigFiles(canonicalConfigPath)
+	if err != nil {
+		return prefix(err)
+	}
+
+	for _, file := range files {
+		names, err := decodeCredentialProviderNames(file)
+		if err != nil {
+			return prefix(err)
+		}
+		for _, name := range names {
+			// Kubelet joins the bin dir and the provider name directly; a name
+			// containing a separator would escape the bin dir, so reject it.
+			if strings.Contains(name, "/") {
+				return prefix(fmt.Errorf("provider name %q must not contain \"/\"", name))
+			}
+			// Report the joined path, never exec.LookPath's return value: on
+			// error LookPath returns an empty string, which is the upstream
+			// defect that prints "plugin binary executable  did not exist".
+			joined := filepath.Join(canonicalBinDir, name)
+			if _, err := exec.LookPath(joined); err != nil {
+				return prefix(fmt.Errorf("provider %q has no executable at %q", name, joined))
+			}
+		}
+	}
+	return nil
+}
+
+// collectCredentialProviderConfigFiles returns the configuration files kubelet
+// would read for canonicalConfigPath. A regular file yields itself; a directory
+// yields its regular entries (symlinks resolved) whose extension is .json,
+// .yaml or .yml, sorted lexicographically. An empty directory is an error.
+func collectCredentialProviderConfigFiles(canonicalConfigPath string) ([]string, error) {
+	fi, err := os.Stat(canonicalConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	if !fi.IsDir() {
+		return []string{canonicalConfigPath}, nil
+	}
+
+	entries, err := os.ReadDir(canonicalConfigPath)
+	if err != nil {
+		return nil, err
+	}
+
+	var files []string
+	for _, entry := range entries {
+		switch filepath.Ext(entry.Name()) {
+		case ".json", ".yaml", ".yml":
+		default:
+			continue
+		}
+		resolved, err := filepath.EvalSymlinks(filepath.Join(canonicalConfigPath, entry.Name()))
+		if err != nil {
+			if isNotExistErr(err) {
+				// A dangling symlink is not a configuration file kubelet reads.
+				continue
+			}
+			return nil, err
+		}
+		info, err := os.Lstat(resolved)
+		if err != nil {
+			return nil, err
+		}
+		if !info.Mode().IsRegular() {
+			continue
+		}
+		files = append(files, resolved)
+	}
+	slices.Sort(files)
+
+	if len(files) == 0 {
+		return nil, fmt.Errorf("directory contains no .json, .yaml, or .yml configuration files")
+	}
+	return files, nil
+}
+
+// decodeCredentialProviderNames decodes a single configuration file as a
+// CredentialProviderConfig using the vendored k8s.io/kubelet/config/v1 types and
+// returns the declared provider names. Decoding with the vendored types keeps the
+// check aligned with the kubelet in the same build. It does not validate provider
+// contents beyond apiVersion, kind, and the presence of at least one provider.
+func decodeCredentialProviderNames(file string) ([]string, error) {
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read file %q: %w", file, err)
+	}
+
+	var cfg kubeletconfigv1.CredentialProviderConfig
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, fmt.Errorf("file %q is not a valid CredentialProviderConfig: %w", file, err)
+	}
+	if cfg.Kind != "CredentialProviderConfig" {
+		return nil, fmt.Errorf("file %q is not a valid CredentialProviderConfig: unexpected kind %q", file, cfg.Kind)
+	}
+	if _, ok := acceptedCredentialProviderConfigAPIVersions[cfg.APIVersion]; !ok {
+		return nil, fmt.Errorf("file %q is not a valid CredentialProviderConfig: unsupported apiVersion %q", file, cfg.APIVersion)
+	}
+	if len(cfg.Providers) == 0 {
+		return nil, fmt.Errorf("file %q declares no providers", file)
+	}
+
+	names := make([]string, 0, len(cfg.Providers))
+	for _, p := range cfg.Providers {
+		names = append(names, p.Name)
+	}
+	return names, nil
 }
 
 // trustedPathComponents returns every path component of abs, ordered from the
