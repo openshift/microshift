@@ -27,7 +27,7 @@ Mixed Ingress And Egress NetworkPolicy
     ...    Covers QE test 60331.
     [Setup]    Setup Mixed Policy Test
 
-    ${hello_pod_ns1}=    Set Variable    hello-microshift
+    VAR    ${hello_pod_ns1}=    hello-microshift
     ${hello_pod_ip_ns2}=    Get Pod IP    hello-microshift    ${NS_MIXED_2}
 
     Wait Until Keyword Succeeds    5x    5s
@@ -69,7 +69,7 @@ Hairpin Traffic Through Service With NetworkPolicy
 
     [Teardown]    Teardown Hairpin Test
 
-PodSelector Allow To And Allow From
+PodSelector Allow To And Allow From    # robocop: off=too-long-test-case
     [Documentation]    Verify that podSelector-based NetworkPolicies (allow-from-red,
     ...    allow-to-blue, default-deny-ingress) work together. Tests 6 connectivity
     ...    scenarios across 2 namespaces with labeled pods:
@@ -130,8 +130,8 @@ Setup Mixed Policy Test
     [Documentation]    Create 2 namespaces, deploy pods with labels, apply egress and ingress policies.
     ${ns1}=    Create Random Namespace
     ${ns2}=    Create Random Namespace
-    Set Suite Variable    ${NS_MIXED_1}    ${ns1}
-    Set Suite Variable    ${NS_MIXED_2}    ${ns2}
+    VAR    ${NS_MIXED_1}=    ${ns1}    scope=SUITE
+    VAR    ${NS_MIXED_2}=    ${ns2}    scope=SUITE
 
     Create Hello MicroShift Pod    ns=${ns1}
     Create Hello MicroShift Pod    ns=${ns2}
@@ -161,12 +161,12 @@ Teardown Hairpin Test
     Run With Kubeconfig    oc delete service test-service -n ${NAMESPACE}    allow_fail=True
     Run With Kubeconfig    oc delete pod hello-pod1 hello-pod2 -n ${NAMESPACE} --grace-period=0    allow_fail=True
 
-Setup PodSelector Test
+Setup PodSelector Test    # robocop: off=too-many-calls-in-keyword
     [Documentation]    Create 2 namespaces with labeled pods and apply NetworkPolicies.
     ${ns1}=    Create Random Namespace
     ${ns2}=    Create Random Namespace
-    Set Suite Variable    ${NS_SEL_1}    ${ns1}
-    Set Suite Variable    ${NS_SEL_2}    ${ns2}
+    VAR    ${NS_SEL_1}=    ${ns1}    scope=SUITE
+    VAR    ${NS_SEL_2}=    ${ns2}    scope=SUITE
 
     # ns1: pod-red (type=red), pod-blue (type=blue), pod-plain (no type label), pod-plain-src (curl source)
     Create Labeled Pod    pod-red    ${ns1}    labels=name=pod-red,type=red

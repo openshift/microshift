@@ -124,7 +124,10 @@ Teardown LB Traffic Policy Test
 
 Create LB Service With Policies
     [Documentation]    Create a LoadBalancer service with configurable traffic policies.
-    [Arguments]    ${name}    ${externalTrafficPolicy}=${EMPTY}    ${internalTrafficPolicy}=${EMPTY}    ${selector}=hello-pod
+    [Arguments]    ${name}
+    ...    ${externalTrafficPolicy}=${EMPTY}
+    ...    ${internalTrafficPolicy}=${EMPTY}
+    ...    ${selector}=hello-pod
     Run With Kubeconfig
     ...    oc create service loadbalancer ${name} --tcp=${LB_SVC_PORT}:8080 -n ${NAMESPACE}
     Run With Kubeconfig
@@ -167,7 +170,9 @@ Setup Idling Test
 Teardown Idling Test
     [Documentation]    Clean up idling test resources.
     Run With Kubeconfig    oc delete -f ${SVC_ASSETS}/service-clusterip.yaml -n ${NAMESPACE}    allow_fail=True
-    Run With Kubeconfig    oc delete -f ${SVC_ASSETS}/deployment-hello-2-replicas.yaml -n ${NAMESPACE}    allow_fail=True
+    Run With Kubeconfig
+    ...    oc delete -f ${SVC_ASSETS}/deployment-hello-2-replicas.yaml -n ${NAMESPACE}
+    ...    allow_fail=True
 
 Deployment Should Have Zero Replicas
     [Documentation]    Assert that a deployment has scaled to zero.

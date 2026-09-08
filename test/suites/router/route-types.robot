@@ -139,7 +139,7 @@ Reencrypt Route Via Ingress With Destination CA
     ...    AND
     ...    Teardown Web Server Signed
 
-Router As LoadBalancer Service
+Router As LoadBalancer Service    # robocop: off=too-long-test-case
     [Documentation]    Verify that the router is exposed as a LoadBalancer service and that
     ...    all 4 route types (HTTP, edge, passthrough, reencrypt) are accessible via
     ...    the LoadBalancer IP.

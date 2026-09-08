@@ -15,8 +15,10 @@ Create Labeled Pod
     ...    Uses 'oc run' to create the pod inline with a simple HTTP server on port 8080.
     [Arguments]    ${name}    ${ns}    ${labels}=${EMPTY}    ${port}=8080
     ${label_arg}=    Set Variable If    '${labels}' != '${EMPTY}'    --labels=${labels}    ${EMPTY}
+    # robocop: off=line-too-long
     Run With Kubeconfig
     ...    oc run ${name} -n ${ns} ${label_arg} --image=quay.io/microshift/busybox:1.36 --command -- /bin/sh -c "while true; do echo -ne 'HTTP/1.0 200 OK\\r\\nContent-Length: 16\\r\\n\\r\\nHello MicroShift' | nc -l -p ${port}; done"
+    # robocop: on=line-too-long
     Labeled Pod Should Be Ready    name\=${name}    ns=${ns}
 
 Get Pod IP
@@ -112,7 +114,8 @@ Curl Route Should Succeed
     [Arguments]    ${hostname}    ${ip}    ${port}    ${scheme}=https
     ${result}=    Run Process
     ...    curl -k -s -o /dev/null -w "%{http_code}" --max-time 10 --resolve ${hostname}:${port}:${ip} ${scheme}://${hostname}:${port}/
-    ...    shell=True    timeout=15s
+    ...    shell=True
+    ...    timeout=15s
     Log Many    stdout: ${result.stdout}    stderr: ${result.stderr}    rc: ${result.rc}
     Should Be Equal As Integers    ${result.rc}    0
     ...    msg=curl failed with rc=${result.rc}: ${result.stderr}
