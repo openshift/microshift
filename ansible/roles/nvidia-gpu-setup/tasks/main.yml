@@ -26,7 +26,7 @@
       ansible.builtin.get_url:
         url: "{{ cuda_repo_url }}"
         dest: /etc/yum.repos.d/cuda-rhel{{ rhel_version }}.repo
-        mode: '0644'
+        mode: "0644"
 
     - name: Check latest available NVIDIA driver version
       when: nvidia_driver_version in ["latest", "latest-dkms", "open-dkms"]
@@ -75,7 +75,7 @@
       ansible.builtin.dnf:
         name: "libnvidia-nscq-{{ nvidia_driver_version }}"
         state: present
-      when: 
+      when:
         - "'dkms' not in nvidia_driver_version"
         - "'open' not in nvidia_driver_version"
 
@@ -86,7 +86,7 @@
           blacklist nouveau
           options nouveau modeset=0
         dest: /etc/modprobe.d/nouveau-blacklist.conf
-        mode: '0644'
+        mode: "0644"
       register: nouveau_blacklist
 
     - name: Rebuild initramfs
@@ -106,7 +106,7 @@
       ansible.builtin.get_url:
         url: "{{ container_toolkit_repo_url }}"
         dest: /etc/yum.repos.d/libnvidia-container.repo
-        mode: '0644'
+        mode: "0644"
 
     - name: Install NVIDIA Container Toolkit packages
       ansible.builtin.dnf:
@@ -140,7 +140,7 @@
 
           allow container_t xserver_misc_device_t:chr_file map;
         dest: "{{ selinux_temp_dir.path }}/nvidia-container-microshift.te"
-        mode: '0644'
+        mode: "0644"
       register: selinux_policy_file
 
     - name: Compile SELinux policy module
@@ -163,7 +163,7 @@
       ansible.builtin.file:
         path: /var/run/cdi
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Generate CDI specification for NVIDIA GPUs
       ansible.builtin.command: nvidia-ctk cdi generate --output=/var/run/cdi/nvidia.yaml
@@ -180,15 +180,15 @@
         - name: Set CDI mode in nvidia-container-runtime config
           ansible.builtin.lineinfile:
             path: /etc/nvidia-container-runtime/config.toml
-            regexp: '^mode = '
+            regexp: "^mode = "
             line: 'mode = "cdi"'
             state: present
-            backup: yes
-        
+            backup: true
+
         - name: Set runtimes in nvidia-container-runtime config
           ansible.builtin.lineinfile:
             path: /etc/nvidia-container-runtime/config.toml
-            regexp: '^runtimes = '
+            regexp: "^runtimes = "
             line: 'runtimes = ["crun", "docker-runc", "runc"]'
             state: present
 
@@ -198,13 +198,13 @@
       ansible.builtin.file:
         path: "{{ device_plugin_manifest_dir }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Download NVIDIA Device Plugin manifest
       ansible.builtin.get_url:
         url: "{{ device_plugin_manifest_url }}"
         dest: "{{ device_plugin_manifest_file }}"
-        mode: '0644'
+        mode: "0644"
 
     - name: Get latest NVIDIA Device Plugin version
       ansible.builtin.uri:
@@ -218,7 +218,7 @@
 
     - name: Display detected versions
       ansible.builtin.debug:
-        msg: 
+        msg:
           - "Latest Device Plugin version: {{ latest_release.json.tag_name | default('unknown') }}"
           - "Updating manifest to use this version..."
       when: latest_release.json.tag_name is defined
@@ -226,7 +226,7 @@
     - name: Update Device Plugin manifest with latest version
       ansible.builtin.replace:
         path: "{{ device_plugin_manifest_file }}"
-        regexp: 'image: nvcr.io/nvidia/k8s-device-plugin:v[0-9]+\.[0-9]+\.[0-9]+'
+        regexp: "image: nvcr.io/nvidia/k8s-device-plugin:v[0-9]+\\.[0-9]+\\.[0-9]+"
         replace: "image: nvcr.io/nvidia/k8s-device-plugin:{{ latest_release.json.tag_name }}"
       when: latest_release.json.tag_name is defined
 
@@ -239,7 +239,7 @@
           resources:
             - nvidia-device-plugin.yml
         dest: "{{ device_plugin_manifest_dir }}/kustomization.yaml"
-        mode: '0644'
+        mode: "0644"
 
     - name: Restart CRI-O to apply NVIDIA configuration
       ansible.builtin.systemd:
@@ -368,10 +368,10 @@
   always:
     - name: Ensure no orphaned NVIDIA temp files remain
       ansible.builtin.find:
-        paths: 
+        paths:
           - /tmp
           - /var/tmp
-        patterns: 
+        patterns:
           - "nvidia-*.te"
           - "nvidia-*.mod"
           - "nvidia-*.pp"

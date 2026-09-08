@@ -1,8 +1,9 @@
+---
 - name: Install repository mirror
   ansible.builtin.template:
     src: ocpbeta.repo.j2
     dest: "/etc/yum.repos.d/{{ item.repo_name }}.repo"
-    mode: '0644'
+    mode: "0644"
   register: microshift_mirror_repo
 
 - name: Clean stale metadata for updated repository

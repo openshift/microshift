@@ -1,6 +1,5 @@
 ---
-
-- name: reboot machine
-  reboot:
+- name: Reboot machine
+  listen: reboot machine
+  ansible.builtin.reboot:
     reboot_timeout: 600
-
