@@ -1,9 +1,0 @@
-- cluster-network-operator embedded-component 0813f5cf408bcd19d4123cb7a9531772a7957b0c to 769a2ade112bd4b775ef007024559fe83a592ede
-  - 0ac3f7e 2026-08-17T11:51:30Z Allow per-node OVN encap IP override via env-overrides
-
-- machine-config-operator embedded-component 0e883dbc97bd0c1f97f1b10d9bc66ac3881c8151 to 56e40012677752f23a6736afae2ed082934fba37
-  - af86b338 2026-09-02T18:42:47Z fix(test): increase TC-74751 Eventually timeout for vSphere OVA upload
-  - d6807838 2026-09-02T17:02:56Z chore: update AMIs
-  - 651af62d 2026-09-02T15:19:22Z bootimage: skip vsphere fd-unmatched machinesets
-  - aefb6996 2026-08-31T15:11:00Z OCPBUGS-69681: limit ContainerRuntimeConfig status condition to 3
-
