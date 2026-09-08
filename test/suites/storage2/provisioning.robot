@@ -23,20 +23,11 @@ OCP-59668 Default SC XFS Dynamic Provision RW Exec Scale
     [Documentation]    Verify default StorageClass provisions xfs volumes that support
     ...    read/write, exec, and data persistence across scale-down/up.
     [Setup]    Test Case Setup
-    ${pvc}=    Set Variable    pvc-59668
-    ${dep}=    Set Variable    dep-59668
+    VAR    ${pvc}=    pvc-59668
+    VAR    ${dep}=    dep-59668
 
     # Verify default SC configuration
-    ${is_default}=    Oc Get JsonPath    sc    ${EMPTY}    ${SC_NAME}
-    ...    .metadata.annotations.storageclass\\.kubernetes\\.io/is-default-class
-    Should Be Equal    ${is_default}    true
-    ${reclaim}=    Oc Get JsonPath    sc    ${EMPTY}    ${SC_NAME}    .reclaimPolicy
-    Should Be Equal    ${reclaim}    Delete
-    ${binding}=    Oc Get JsonPath    sc    ${EMPTY}    ${SC_NAME}    .volumeBindingMode
-    Should Be Equal    ${binding}    WaitForFirstConsumer
-    ${fstype}=    Oc Get JsonPath    sc    ${EMPTY}    ${SC_NAME}
-    ...    .parameters.csi\\.storage\\.k8s\\.io/fstype
-    Should Be Equal    ${fstype}    xfs
+    Default StorageClass Should Be XFS    ${SC_NAME}
 
     # Create PVC and deployment
     Create PVC    ${pvc}    ${SC_NAME}    1Gi
@@ -69,9 +60,9 @@ OCP-59668 Default SC XFS Dynamic Provision RW Exec Scale
 OCP-59655 WaitForFirstConsumer Binding Mode
     [Documentation]    Verify PVC stays Pending with WaitForFirstConsumer until a consumer pod is created.
     [Setup]    Test Case Setup
-    ${sc}=    Set Variable    sc-59655
-    ${pvc}=    Set Variable    pvc-59655
-    ${dep}=    Set Variable    dep-59655
+    VAR    ${sc}=    sc-59655
+    VAR    ${pvc}=    pvc-59655
+    VAR    ${dep}=    dep-59655
 
     Create StorageClass    ${sc}    binding_mode=WaitForFirstConsumer
     Create PVC    ${pvc}    ${sc}    1Gi
@@ -92,9 +83,9 @@ OCP-59655 WaitForFirstConsumer Binding Mode
 OCP-59657 Immediate Binding Mode
     [Documentation]    Verify PVC binds immediately with Immediate volumeBindingMode.
     [Setup]    Test Case Setup
-    ${sc}=    Set Variable    sc-59657
-    ${pvc}=    Set Variable    pvc-59657
-    ${dep}=    Set Variable    dep-59657
+    VAR    ${sc}=    sc-59657
+    VAR    ${pvc}=    pvc-59657
+    VAR    ${dep}=    dep-59657
 
     Create StorageClass    ${sc}    binding_mode=Immediate
     Create PVC    ${pvc}    ${sc}    1Gi
@@ -112,8 +103,8 @@ OCP-59657 Immediate Binding Mode
 OCP-59658 Block VolumeMode PVC
     [Documentation]    Verify a PVC with Block volumeMode creates a matching PV.
     [Setup]    Test Case Setup
-    ${sc}=    Set Variable    sc-59658
-    ${pvc}=    Set Variable    pvc-59658
+    VAR    ${sc}=    sc-59658
+    VAR    ${pvc}=    pvc-59658
 
     Create StorageClass    ${sc}    binding_mode=Immediate
     Create PVC    ${pvc}    ${sc}    1Gi    volume_mode=Block
@@ -130,8 +121,8 @@ OCP-59658 Block VolumeMode PVC
 OCP-59659 Filesystem VolumeMode PVC
     [Documentation]    Verify a PVC with Filesystem volumeMode creates a matching PV.
     [Setup]    Test Case Setup
-    ${sc}=    Set Variable    sc-59659
-    ${pvc}=    Set Variable    pvc-59659
+    VAR    ${sc}=    sc-59659
+    VAR    ${pvc}=    pvc-59659
 
     Create StorageClass    ${sc}    binding_mode=Immediate
     Create PVC    ${pvc}    ${sc}    1Gi    volume_mode=Filesystem
@@ -149,8 +140,8 @@ OCP-59660 Online Volume Resize
     [Documentation]    Verify PVC can be resized online while a pod is consuming it.
     [Tags]    serial
     [Setup]    Test Case Setup
-    ${pvc}=    Set Variable    pvc-59660
-    ${dep}=    Set Variable    dep-59660
+    VAR    ${pvc}=    pvc-59660
+    VAR    ${dep}=    dep-59660
 
     Create PVC    ${pvc}    ${SC_NAME}    1Gi
     Create Deployment    ${dep}    ${pvc}    mount_path=${MOUNT_PATH}
@@ -172,7 +163,7 @@ OCP-59660 Online Volume Resize
 OCP-59661 StatefulSet Volumes RW And Exec
     [Documentation]    Verify StatefulSet with 3 replicas provisions PVCs that support RW and exec.
     [Setup]    Test Case Setup
-    ${sts}=    Set Variable    sts-59661
+    VAR    ${sts}=    sts-59661
 
     Create StatefulSet    ${sts}    ${SC_NAME}    1Gi    replicas=3    mount_path=${MOUNT_PATH}
     Wait For StatefulSet Ready    ${sts}    3    timeout=120s
@@ -186,10 +177,10 @@ OCP-59661 StatefulSet Volumes RW And Exec
 OCP-59662 Pod Mounts Multiple PVCs
     [Documentation]    Verify a deployment can mount multiple PVCs at different paths.
     [Setup]    Test Case Setup
-    ${sc}=    Set Variable    sc-59662
-    ${pvc1}=    Set Variable    pvc1-59662
-    ${pvc2}=    Set Variable    pvc2-59662
-    ${dep}=    Set Variable    dep-59662
+    VAR    ${sc}=    sc-59662
+    VAR    ${pvc1}=    pvc1-59662
+    VAR    ${pvc2}=    pvc2-59662
+    VAR    ${dep}=    dep-59662
     ${xfs_params}=    Catenate    SEPARATOR=\n
     ...    parameters:
     ...    ${SPACE}${SPACE}csi.storage.k8s.io/fstype: xfs
@@ -219,11 +210,11 @@ OCP-59662 Pod Mounts Multiple PVCs
 OCP-59663 StorageClass Scoped Resource Quota
     [Documentation]    Verify StorageClass-scoped ResourceQuota limits PVC count and storage.
     [Setup]    Test Case Setup
-    ${sc}=    Set Variable    sc-59663
-    ${pvc1}=    Set Variable    pvc1-59663
-    ${pvc2}=    Set Variable    pvc2-59663
-    ${pvc3}=    Set Variable    pvc3-59663
-    ${quota}=    Set Variable    quota-59663
+    VAR    ${sc}=    sc-59663
+    VAR    ${pvc1}=    pvc1-59663
+    VAR    ${pvc2}=    pvc2-59663
+    VAR    ${pvc3}=    pvc3-59663
+    VAR    ${quota}=    quota-59663
 
     Create StorageClass    ${sc}    binding_mode=WaitForFirstConsumer
     Create StorageClass ResourceQuota    ${quota}    ${sc}    6Gi    2
@@ -253,10 +244,10 @@ OCP-59663 StorageClass Scoped Resource Quota
 OCP-59664 Namespace Storage PVC Quota
     [Documentation]    Verify namespace-level ResourceQuota limits PVC count and storage.
     [Setup]    Test Case Setup
-    ${pvc1}=    Set Variable    pvc1-59664
-    ${pvc2}=    Set Variable    pvc2-59664
-    ${pvc3}=    Set Variable    pvc3-59664
-    ${quota}=    Set Variable    quota-59664
+    VAR    ${pvc1}=    pvc1-59664
+    VAR    ${pvc2}=    pvc2-59664
+    VAR    ${pvc3}=    pvc3-59664
+    VAR    ${quota}=    quota-59664
 
     Create Namespace ResourceQuota    ${quota}    6Gi    2
 
@@ -282,7 +273,7 @@ OCP-59664 Namespace Storage PVC Quota
 OCP-59665 Delete Unconsumed PVC
     [Documentation]    Verify a PVC not consumed by a pod can be deleted successfully.
     [Setup]    Test Case Setup
-    ${pvc}=    Set Variable    pvc-59665
+    VAR    ${pvc}=    pvc-59665
 
     Create PVC    ${pvc}    ${SC_NAME}    1Gi
 
@@ -301,9 +292,9 @@ OCP-59666 Delete Active PVC Protection
     [Documentation]    Verify deleting a PVC in active use by a pod postpones deletion
     ...    and new pods consuming such PVC get FailedScheduling.
     [Setup]    Test Case Setup
-    ${pvc}=    Set Variable    pvc-59666
-    ${dep}=    Set Variable    dep-59666
-    ${dep2}=    Set Variable    dep2-59666
+    VAR    ${pvc}=    pvc-59666
+    VAR    ${dep}=    dep-59666
+    VAR    ${dep2}=    dep2-59666
 
     Create PVC    ${pvc}    ${SC_NAME}    1Gi
     Create Deployment    ${dep}    ${pvc}    mount_path=${MOUNT_PATH}
@@ -339,32 +330,24 @@ OCP-59667 Single Default SC And PVC Without SC Name
     [Documentation]    Verify cluster has exactly one default SC and PVCs without
     ...    specifying storageclass use the default SC.
     [Setup]    Test Case Setup
-    ${pvc}=    Set Variable    pvc-59667
-    ${pvc2}=    Set Variable    pvc2-59667
-    ${dep}=    Set Variable    dep-59667
-    ${dep2}=    Set Variable    dep2-59667
-    ${sc}=    Set Variable    sc-59667
+    VAR    ${pvc}=    pvc-59667
+    VAR    ${pvc2}=    pvc2-59667
+    VAR    ${dep}=    dep-59667
+    VAR    ${dep2}=    dep2-59667
+    VAR    ${sc}=    sc-59667
 
     # Verify exactly one default SC
-    ${default_sc}=    Run With Kubeconfig
-    ...    oc get sc -o jsonpath='{.items[?(@.metadata.annotations.storageclass\\.kubernetes\\.io/is-default-class=="true")].metadata.name}'
-    @{sc_list}=    Split String    ${default_sc}
-    ${sc_count}=    Get Length    ${sc_list}
-    Should Be Equal As Integers    ${sc_count}    1
+    ${default_sc}=    Cluster Should Have One Default StorageClass
 
     # Create PVC without specifying SC
     Create PVC Without StorageClass    ${pvc}    1Gi
     Create Deployment    ${dep}    ${pvc}    mount_path=${MOUNT_PATH}
     Named Deployment Should Be Available    ${dep}
 
-    ${pod}=    Get Deployment Pod Name    ${dep}
-    Volume Should Be RW    ${pod}    ${MOUNT_PATH}
-    Volume Should Have Exec Right    ${pod}    ${MOUNT_PATH}
+    Deployment Volume Should Be RW And Exec    ${dep}    ${MOUNT_PATH}
 
     # Verify the PV got the default SC
-    ${pv}=    Get PV Name From PVC    ${pvc}
-    ${pv_sc}=    Oc Get JsonPath    pv    ${EMPTY}    ${pv}    .spec.storageClassName
-    Should Be Equal    ${pv_sc}    ${default_sc}
+    PV StorageClass Should Be    ${pvc}    ${default_sc}
 
     # Delete first dep and PVC
     Oc Delete    deployment/${dep} -n ${NAMESPACE}
@@ -379,17 +362,15 @@ OCP-59667 Single Default SC And PVC Without SC Name
     Create Deployment    ${dep2}    ${pvc2}    mount_path=${MOUNT_PATH}
     Named Deployment Should Be Available    ${dep2}
 
-    ${pv2}=    Get PV Name From PVC    ${pvc2}
-    ${pv2_sc}=    Oc Get JsonPath    pv    ${EMPTY}    ${pv2}    .spec.storageClassName
-    Should Be Equal    ${pv2_sc}    ${sc}
+    PV StorageClass Should Be    ${pvc2}    ${sc}
 
     [Teardown]    Teardown OCP 59667    ${dep2}    ${pvc2}    ${sc}
 
 OCP-59669 Pod With SELinux SecurityContext
     [Documentation]    Verify pod with SELinux securityContext labels the mounted volume correctly.
     [Setup]    Test Case Setup
-    ${pvc}=    Set Variable    pvc-59669
-    ${pod}=    Set Variable    pod-59669
+    VAR    ${pvc}=    pvc-59669
+    VAR    ${pod}=    pod-59669
 
     Create PVC    ${pvc}    ${SC_NAME}    1Gi
     Create Pod With SELinux Context    ${pod}    ${pvc}    mount_path=${MOUNT_PATH}
@@ -412,11 +393,7 @@ OCP-59670 Change Default SC To Non Default
     [Setup]    Test Case Setup
 
     # Verify exactly one default SC
-    ${default_sc}=    Run With Kubeconfig
-    ...    oc get sc -o jsonpath='{.items[?(@.metadata.annotations.storageclass\\.kubernetes\\.io/is-default-class=="true")].metadata.name}'
-    @{sc_list}=    Split String    ${default_sc}
-    ${sc_count}=    Get Length    ${sc_list}
-    Should Be Equal As Integers    ${sc_count}    1
+    ${default_sc}=    Cluster Should Have One Default StorageClass
 
     # Set default SC to non-default
     Set StorageClass As Non Default    ${default_sc}
@@ -426,8 +403,8 @@ OCP-59670 Change Default SC To Non Default
 OCP-59671 PV Reclaim Policy Retain
     [Documentation]    Verify changing PV reclaim policy to Retain keeps PV after PVC deletion.
     [Setup]    Test Case Setup
-    ${pvc}=    Set Variable    pvc-59671
-    ${dep}=    Set Variable    dep-59671
+    VAR    ${pvc}=    pvc-59671
+    VAR    ${dep}=    dep-59671
 
     Create PVC    ${pvc}    ${SC_NAME}    1Gi
     Create Deployment    ${dep}    ${pvc}    mount_path=${MOUNT_PATH}
@@ -457,13 +434,13 @@ OCP-59671 PV Reclaim Policy Retain
 OCP-64231 Generic Ephemeral Volume
     [Documentation]    Verify pod with generic ephemeral volume auto-creates and auto-deletes PVC/PV.
     [Setup]    Test Case Setup
-    ${pod}=    Set Variable    pod-64231
+    VAR    ${pod}=    pod-64231
 
     Create Pod With Ephemeral Volume    ${pod}    ${SC_NAME}    1Gi    mount_path=${MOUNT_PATH}
     Named Pod Should Be Ready    ${pod}
 
     # Verify PVC auto-created with naming convention: {pod}-inline-volume
-    ${pvc_name}=    Set Variable    ${pod}-inline-volume
+    VAR    ${pvc_name}=    ${pod}-inline-volume
     ${actual_pvc}=    Run With Kubeconfig
     ...    oc get pvc -n ${NAMESPACE} -l workloadName\=${pod} -o jsonpath='{.items[0].metadata.name}'
     Should Be Equal    ${actual_pvc}    ${pvc_name}
@@ -493,63 +470,42 @@ OCP-64231 Generic Ephemeral Volume
 OCP-68580 Oc Set Volume Operations
     [Documentation]    Verify oc set volume commands for add, overwrite, and remove operations.
     [Setup]    Test Case Setup
-    ${pvc1}=    Set Variable    pvc1-68580
-    ${pvc2}=    Set Variable    pvc2-68580
-    ${dep}=    Set Variable    dep-68580
+    VAR    ${pvc1}=    pvc1-68580
+    VAR    ${pvc2}=    pvc2-68580
+    VAR    ${dep}=    dep-68580
     VAR    ${NEW_PVC}=    ${EMPTY}    scope=TEST
 
-    # Create PVC1 and deployment with PVC1
-    Create PVC    ${pvc1}    ${SC_NAME}    1Gi
-    Create Deployment    ${dep}    ${pvc1}    mount_path=${MOUNT_PATH}
-    Named Deployment Should Be Available    ${dep}
-
-    # Create PVC2
+    # Create PVC1, deployment with PVC1, and PVC2
+    Create Deployment With PVC    ${dep}    ${pvc1}    ${SC_NAME}    mount_path=${MOUNT_PATH}
     Create PVC    ${pvc2}    ${SC_NAME}    1Gi
 
-    # Verify oc set volume --all lists PVC1
-    ${result}=    Run With Kubeconfig
-    ...    oc set volume deployment --all -n ${NAMESPACE}
-    Should Contain    ${result}    ${dep}
-    Should Contain    ${result}    ${pvc1}
+    # Verify oc set volume --all lists the deployment and PVC1
+    Oc Set Volume List Should Contain    ${dep}    ${pvc1}
 
-    # Overwrite with PVC2
-    ${result}=    Run With Kubeconfig
-    ...    oc set volumes deployment ${dep} --add --name\=local -t pvc --claim-name\=${pvc2} --overwrite -n ${NAMESPACE}
-    Should Contain    ${result}    volume updated
-    Named Deployment Should Be Available    ${dep}    timeout=120s
-    ${pod}=    Get Deployment Pod Name    ${dep}
-    Volume Should Be RW    ${pod}    ${MOUNT_PATH}
-    Oc Delete    pvc/${pvc1} -n ${NAMESPACE}    # PVC1 no longer used
+    # Overwrite with PVC2, verify RW, drop the now-unused PVC1
+    Oc Set Volume On Deployment Should Succeed
+    ...    ${dep}    --add --name\=local -t pvc --claim-name\=${pvc2} --overwrite
+    Deployment Volume Should Be RW    ${dep}    ${MOUNT_PATH}
+    Oc Delete    pvc/${pvc1} -n ${NAMESPACE}
 
-    # Overwrite by creating a new volume with --claim-size
-    ${result}=    Run With Kubeconfig
-    ...    oc set volumes deployment ${dep} --add --name\=local -t pvc --claim-size\=2Gi --overwrite -n ${NAMESPACE}
-    Should Contain    ${result}    volume updated
-    Named Deployment Should Be Available    ${dep}    timeout=120s
+    # Overwrite with a new dynamically-sized PVC, verify it differs from PVC2
+    Oc Set Volume On Deployment Should Succeed
+    ...    ${dep}    --add --name\=local -t pvc --claim-size\=2Gi --overwrite
+    ${NEW_PVC}=    Get Deployment PVC Name    ${dep}
+    Should Not Be Equal    ${NEW_PVC}    ${pvc2}
+    Deployment Volume Should Be RW    ${dep}    ${MOUNT_PATH}
+    Oc Delete    pvc/${pvc2} -n ${NAMESPACE}
 
-    # Verify the new PVC is not PVC2
-    ${new_pvc}=    Run With Kubeconfig
-    ...    oc get deployment ${dep} -n ${NAMESPACE} -o jsonpath='{.spec.template.spec.volumes[0].persistentVolumeClaim.claimName}'
-    Should Not Be Equal    ${new_pvc}    ${pvc2}
-    ${pod2}=    Get Deployment Pod Name    ${dep}
-    Volume Should Be RW    ${pod2}    ${MOUNT_PATH}
-    Oc Delete    pvc/${pvc2} -n ${NAMESPACE}    # PVC2 no longer used
-
-    # Change mount path
-    ${result}=    Run With Kubeconfig
-    ...    oc set volumes deployment ${dep} --add --name\=local -m /data/storage --overwrite -n ${NAMESPACE}
-    Should Contain    ${result}    volume updated
-    Named Deployment Should Be Available    ${dep}    timeout=120s
+    # Change mount path, verify data persists
+    Oc Set Volume On Deployment Should Succeed
+    ...    ${dep}    --add --name\=local -m /data/storage --overwrite
     Deployment Volume Should Contain Data    ${dep}    /data/storage
 
     # Remove volume
-    ${result}=    Run With Kubeconfig
-    ...    oc set volumes deployment ${dep} --remove --name\=local -n ${NAMESPACE}
-    Should Contain    ${result}    volume updated
-    Named Deployment Should Be Available    ${dep}    timeout=120s
+    Oc Set Volume On Deployment Should Succeed    ${dep}    --remove --name\=local
     Deployment Volume Should Not Contain Data    ${dep}    /data/storage
 
-    [Teardown]    Teardown OCP 68580    ${dep}    ${new_pvc}
+    [Teardown]    Teardown OCP 68580    ${dep}    ${NEW_PVC}
 
 
 *** Keywords ***
@@ -629,3 +585,38 @@ Pod Should Have Event
     [Arguments]    ${pod_name}    ${reason}
     ${output}=    Run With Kubeconfig    oc describe pod ${pod_name} -n ${NAMESPACE}
     Should Contain    ${output}    ${reason}
+
+Default StorageClass Should Be XFS
+    [Documentation]    Verify the default StorageClass uses Delete reclaim, WaitForFirstConsumer binding, and xfs.
+    [Arguments]    ${sc_name}
+    ${is_default}=    Oc Get JsonPath    sc    ${EMPTY}    ${sc_name}
+    ...    .metadata.annotations.storageclass\\.kubernetes\\.io/is-default-class
+    Should Be Equal    ${is_default}    true
+    ${reclaim}=    Oc Get JsonPath    sc    ${EMPTY}    ${sc_name}    .reclaimPolicy
+    Should Be Equal    ${reclaim}    Delete
+    ${binding}=    Oc Get JsonPath    sc    ${EMPTY}    ${sc_name}    .volumeBindingMode
+    Should Be Equal    ${binding}    WaitForFirstConsumer
+    ${fstype}=    Oc Get JsonPath    sc    ${EMPTY}    ${sc_name}
+    ...    .parameters.csi\\.storage\\.k8s\\.io/fstype
+    Should Be Equal    ${fstype}    xfs
+
+Oc Set Volume List Should Contain
+    [Documentation]    Verify 'oc set volume --all' lists the deployment and its PVC.
+    [Arguments]    ${dep}    ${pvc}
+    ${result}=    Run With Kubeconfig    oc set volume deployment --all -n ${NAMESPACE}
+    Should Contain    ${result}    ${dep}
+    Should Contain    ${result}    ${pvc}
+
+Oc Set Volume On Deployment Should Succeed
+    [Documentation]    Run 'oc set volumes' with the given args and wait for the deployment rollout.
+    [Arguments]    ${dep}    ${args}
+    ${result}=    Run With Kubeconfig    oc set volumes deployment ${dep} ${args} -n ${NAMESPACE}
+    Should Contain    ${result}    volume updated
+    Named Deployment Should Be Available    ${dep}    timeout=120s
+
+Get Deployment PVC Name
+    [Documentation]    Return the PVC claim name referenced by a deployment's first volume.
+    [Arguments]    ${dep}
+    ${name}=    Run With Kubeconfig
+    ...    oc get deployment ${dep} -n ${NAMESPACE} -o jsonpath='{.spec.template.spec.volumes[0].persistentVolumeClaim.claimName}'
+    RETURN    ${name}

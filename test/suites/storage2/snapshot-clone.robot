@@ -2,8 +2,8 @@
 Documentation       Snapshot restore, snapshot content lifecycle, and PVC clone tests.
 ...                 Migrated from openshift-tests-private OCP-64839, 64840, 64842, 64843, 64856, 64857, 64858.
 
-Library             SSHLibrary
 Library             String
+Library             SSHLibrary
 Library             ../../resources/DataFormats.py
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/common.resource
@@ -189,7 +189,7 @@ Test Suite Setup
     Upload Lvmd Config    ${config}
     Oc Apply    -f ${STORAGE_CLASS}
     Restart Microshift
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success
 
 Test Suite Teardown
     [Documentation]    Restore LVMD config, remove thin pool, restart MicroShift.
@@ -197,7 +197,7 @@ Test Suite Teardown
     Restore Lvmd Config
     Delete Thin Storage Pool
     Restart Microshift
-    Restart Greenboot And Wait For Success
+    Wait For MicroShift Healthcheck Success
     Teardown Suite
 
 Test Case Setup

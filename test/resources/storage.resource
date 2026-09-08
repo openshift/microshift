@@ -36,44 +36,39 @@ ${RQ_SC_TPL}                assets/storage/resourcequota-storageclass-template.y
 *** Keywords ***
 Create PVC
     [Documentation]    Create a PersistentVolumeClaim with the given parameters.
-    [Arguments]    ${name}    ${sc}    ${capacity}    ${ns}=${NAMESPACE}
-    ...    ${volume_mode}=Filesystem    ${access_mode}=ReadWriteOnce
+    [Arguments]    ${name}    ${sc}    ${capacity}    ${ns}=${NAMESPACE}    ${volume_mode}=Filesystem
     ${file}=    Render Template    ${PVC_TPL}
     ...    PVCNAME=${name}    SCNAME=${sc}    PVCCAPACITY=${capacity}
-    ...    VOLUMEMODE=${volume_mode}    ACCESSMODE=${access_mode}
+    ...    VOLUMEMODE=${volume_mode}    ACCESSMODE=ReadWriteOnce
     Apply Rendered Template    ${file}    -n ${ns}
 
 Create PVC Without StorageClass
     [Documentation]    Create a PVC without specifying a storageClassName.
-    [Arguments]    ${name}    ${capacity}    ${ns}=${NAMESPACE}
-    ...    ${volume_mode}=Filesystem    ${access_mode}=ReadWriteOnce
+    [Arguments]    ${name}    ${capacity}    ${ns}=${NAMESPACE}    ${volume_mode}=Filesystem
     ${file}=    Render Template    ${PVC_NO_SC_TPL}
     ...    PVCNAME=${name}    PVCCAPACITY=${capacity}
-    ...    VOLUMEMODE=${volume_mode}    ACCESSMODE=${access_mode}
+    ...    VOLUMEMODE=${volume_mode}    ACCESSMODE=ReadWriteOnce
     Apply Rendered Template    ${file}    -n ${ns}
 
 Create PVC From Snapshot
     [Documentation]    Create a PVC that restores from a VolumeSnapshot dataSource.
-    [Arguments]    ${name}    ${sc}    ${capacity}    ${snapshot_name}    ${ns}=${NAMESPACE}
-    ...    ${volume_mode}=Filesystem
+    [Arguments]    ${name}    ${sc}    ${capacity}    ${snapshot_name}    ${volume_mode}=Filesystem
     ${file}=    Render Template    ${PVC_SNAPSHOT_TPL}
     ...    PVCNAME=${name}    SCNAME=${sc}    PVCCAPACITY=${capacity}
     ...    SNAPSHOTNAME=${snapshot_name}    VOLUMEMODE=${volume_mode}
-    Apply Rendered Template    ${file}    -n ${ns}
+    Apply Rendered Template    ${file}    -n ${NAMESPACE}
 
 Create PVC From Clone
     [Documentation]    Create a PVC cloned from another PVC.
-    [Arguments]    ${name}    ${sc}    ${capacity}    ${source_pvc}    ${ns}=${NAMESPACE}
-    ...    ${volume_mode}=Filesystem
+    [Arguments]    ${name}    ${sc}    ${capacity}    ${source_pvc}    ${volume_mode}=Filesystem
     ${file}=    Render Template    ${PVC_CLONE_TPL}
     ...    PVCNAME=${name}    SCNAME=${sc}    PVCCAPACITY=${capacity}
     ...    SOURCEPVC=${source_pvc}    VOLUMEMODE=${volume_mode}
-    Apply Rendered Template    ${file}    -n ${ns}
+    Apply Rendered Template    ${file}    -n ${NAMESPACE}
 
 Create Deployment
     [Documentation]    Create a Deployment with a PVC-backed volume mount.
-    [Arguments]    ${name}    ${pvc_name}    ${ns}=${NAMESPACE}
-    ...    ${mount_path}=${DEFAULT_MOUNT_PATH}    ${replicas}=1
+    [Arguments]    ${name}    ${pvc_name}    ${ns}=${NAMESPACE}    ${mount_path}=${DEFAULT_MOUNT_PATH}    ${replicas}=1
     ${file}=    Render Template    ${DEPLOYMENT_TPL}
     ...    DNAME=${name}    PVCNAME=${pvc_name}    MOUNTPATH=${mount_path}
     ...    REPLICAS=${replicas}    IMAGE=${HELLO_IMAGE}
@@ -88,8 +83,7 @@ Create Deployment Without Volume
 
 Create Pod
     [Documentation]    Create a Pod with a PVC-backed filesystem volume mount.
-    [Arguments]    ${name}    ${pvc_name}    ${ns}=${NAMESPACE}
-    ...    ${mount_path}=${DEFAULT_MOUNT_PATH}
+    [Arguments]    ${name}    ${pvc_name}    ${ns}=${NAMESPACE}    ${mount_path}=${DEFAULT_MOUNT_PATH}
     ${file}=    Render Template    ${POD_TPL}
     ...    PODNAME=${name}    PVCNAME=${pvc_name}    MOUNTPATH=${mount_path}
     ...    IMAGE=${HELLO_IMAGE}
@@ -97,8 +91,7 @@ Create Pod
 
 Create Pod With Block Volume
     [Documentation]    Create a Pod with a PVC-backed raw block volume device.
-    [Arguments]    ${name}    ${pvc_name}    ${ns}=${NAMESPACE}
-    ...    ${device_path}=/dev/dblock
+    [Arguments]    ${name}    ${pvc_name}    ${ns}=${NAMESPACE}    ${device_path}=/dev/dblock
     ${file}=    Render Template    ${POD_BLOCK_TPL}
     ...    PODNAME=${name}    PVCNAME=${pvc_name}    DEVICEPATH=${device_path}
     ...    IMAGE=${HELLO_IMAGE}
@@ -106,8 +99,11 @@ Create Pod With Block Volume
 
 Create Pod With SELinux Context
     [Documentation]    Create a Pod with SELinux securityContext and a PVC-backed volume.
-    [Arguments]    ${name}    ${pvc_name}    ${ns}=${NAMESPACE}
-    ...    ${mount_path}=${DEFAULT_MOUNT_PATH}    ${selinux_level}=s0:c345,c789
+    [Arguments]    ${name}
+    ...    ${pvc_name}
+    ...    ${ns}=${NAMESPACE}
+    ...    ${mount_path}=${DEFAULT_MOUNT_PATH}
+    ...    ${selinux_level}=s0:c345,c789
     ${file}=    Render Template    ${POD_SELINUX_TPL}
     ...    PODNAME=${name}    PVCNAME=${pvc_name}    MOUNTPATH=${mount_path}
     ...    SELINUXLEVEL=${selinux_level}    IMAGE=${HELLO_IMAGE}
@@ -115,8 +111,7 @@ Create Pod With SELinux Context
 
 Create Pod With Ephemeral Volume
     [Documentation]    Create a Pod with a generic ephemeral volume.
-    [Arguments]    ${name}    ${sc}    ${capacity}    ${ns}=${NAMESPACE}
-    ...    ${mount_path}=${DEFAULT_MOUNT_PATH}
+    [Arguments]    ${name}    ${sc}    ${capacity}    ${ns}=${NAMESPACE}    ${mount_path}=${DEFAULT_MOUNT_PATH}
     ${file}=    Render Template    ${POD_EPHEMERAL_TPL}
     ...    PODNAME=${name}    SCNAME=${sc}    PVCCAPACITY=${capacity}
     ...    MOUNTPATH=${mount_path}    IMAGE=${HELLO_IMAGE}
@@ -124,12 +119,14 @@ Create Pod With Ephemeral Volume
 
 Create StorageClass
     [Documentation]    Create a StorageClass with the given parameters.
-    [Arguments]    ${name}    ${provisioner}=${TOPOLVM_PROVISIONER}
-    ...    ${binding_mode}=WaitForFirstConsumer    ${reclaim_policy}=Delete
-    ...    ${parameters}=${EMPTY}    ${allow_expansion}=true
+    [Arguments]    ${name}
+    ...    ${provisioner}=${TOPOLVM_PROVISIONER}
+    ...    ${binding_mode}=WaitForFirstConsumer
+    ...    ${reclaim_policy}=Delete
+    ...    ${parameters}=${EMPTY}
     ${file}=    Render Template    ${SC_TPL}
     ...    SCNAME=${name}    PROVISIONER=${provisioner}    BINDINGMODE=${binding_mode}
-    ...    RECLAIMPOLICY=${reclaim_policy}    ALLOWEXPANSION=${allow_expansion}
+    ...    RECLAIMPOLICY=${reclaim_policy}    ALLOWEXPANSION=true
     IF    "${parameters}" != "${EMPTY}"
         ${content}=    OperatingSystem.Get File    ${file}
         ${content}=    Catenate    SEPARATOR=\n    ${content}    ${parameters}
@@ -143,12 +140,11 @@ Create StorageClass
 
 Create StatefulSet
     [Documentation]    Create a StatefulSet with volumeClaimTemplates.
-    [Arguments]    ${name}    ${sc}    ${capacity}    ${ns}=${NAMESPACE}
-    ...    ${replicas}=3    ${mount_path}=${DEFAULT_MOUNT_PATH}
+    [Arguments]    ${name}    ${sc}    ${capacity}    ${replicas}=3    ${mount_path}=${DEFAULT_MOUNT_PATH}
     ${file}=    Render Template    ${STS_TPL}
     ...    STSNAME=${name}    SCNAME=${sc}    PVCCAPACITY=${capacity}
     ...    REPLICAS=${replicas}    MOUNTPATH=${mount_path}    IMAGE=${HELLO_IMAGE}
-    Apply Rendered Template    ${file}    -n ${ns}
+    Apply Rendered Template    ${file}    -n ${NAMESPACE}
 
 Create VolumeSnapshot
     [Documentation]    Create a VolumeSnapshot from a PVC.
@@ -190,8 +186,7 @@ Apply Rendered Template
 
 PVC Create Should Fail
     [Documentation]    Attempt to create a PVC and expect it to fail. Returns the error output.
-    [Arguments]    ${name}    ${sc}    ${capacity}    ${ns}=${NAMESPACE}
-    ...    ${volume_mode}=Filesystem
+    [Arguments]    ${name}    ${sc}    ${capacity}    ${ns}=${NAMESPACE}    ${volume_mode}=Filesystem
     ${file}=    Render Template    ${PVC_TPL}
     ...    PVCNAME=${name}    SCNAME=${sc}    PVCCAPACITY=${capacity}
     ...    VOLUMEMODE=${volume_mode}    ACCESSMODE=ReadWriteOnce
@@ -376,7 +371,7 @@ StatefulSet Volume Should Be RW
     [Documentation]    Check RW on each pod in a StatefulSet.
     [Arguments]    ${sts_name}    ${replicas}    ${mount_path}=${DEFAULT_MOUNT_PATH}    ${ns}=${NAMESPACE}
     FOR    ${i}    IN RANGE    ${replicas}
-        ${pod}=    Set Variable    ${sts_name}-${i}
+        VAR    ${pod}=    ${sts_name}-${i}
         Volume Should Be RW    ${pod}    ${mount_path}    ${ns}
     END
 
@@ -384,7 +379,7 @@ StatefulSet Volume Should Have Exec Right
     [Documentation]    Check exec right on each pod in a StatefulSet.
     [Arguments]    ${sts_name}    ${replicas}    ${mount_path}=${DEFAULT_MOUNT_PATH}    ${ns}=${NAMESPACE}
     FOR    ${i}    IN RANGE    ${replicas}
-        ${pod}=    Set Variable    ${sts_name}-${i}
+        VAR    ${pod}=    ${sts_name}-${i}
         Volume Should Have Exec Right    ${pod}    ${mount_path}    ${ns}
     END
 
@@ -432,9 +427,37 @@ Delete LogicalVolume
     [Arguments]    ${name}
     Run With Kubeconfig    oc delete logicalvolume ${name}    allow_fail=True
 
-No Topolvm LogicalVolumes Should Exist
-    [Documentation]    Verify no topolvm LogicalVolume CRs remain in the cluster.
-    ${output}=    Run With Kubeconfig
-    ...    oc get logicalvolumes -o jsonpath='{.items[*].metadata.name}'
-    ...    allow_fail=True
-    Should Be Empty    ${output}
+Deployment Volume Should Be RW
+    [Documentation]    Verify the deployment's pod volume supports read/write.
+    [Arguments]    ${dep_name}    ${mount_path}=${DEFAULT_MOUNT_PATH}    ${ns}=${NAMESPACE}
+    ${pod}=    Get Deployment Pod Name    ${dep_name}    ${ns}
+    Volume Should Be RW    ${pod}    ${mount_path}    ${ns}
+
+Deployment Volume Should Be RW And Exec
+    [Documentation]    Verify the deployment's pod volume supports read/write and executables.
+    [Arguments]    ${dep_name}    ${mount_path}=${DEFAULT_MOUNT_PATH}    ${ns}=${NAMESPACE}
+    ${pod}=    Get Deployment Pod Name    ${dep_name}    ${ns}
+    Volume Should Be RW    ${pod}    ${mount_path}    ${ns}
+    Volume Should Have Exec Right    ${pod}    ${mount_path}    ${ns}
+
+Create Deployment With PVC
+    [Documentation]    Create a PVC and a deployment that mounts it, then wait for rollout.
+    [Arguments]    ${dep}    ${pvc}    ${sc}    ${capacity}=1Gi    ${mount_path}=${DEFAULT_MOUNT_PATH}
+    Create PVC    ${pvc}    ${sc}    ${capacity}
+    Create Deployment    ${dep}    ${pvc}    mount_path=${mount_path}
+    Named Deployment Should Be Available    ${dep}
+
+PV StorageClass Should Be
+    [Documentation]    Verify the PV bound to a PVC has the expected storageClassName.
+    [Arguments]    ${pvc_name}    ${expected}    ${ns}=${NAMESPACE}
+    ${pv}=    Get PV Name From PVC    ${pvc_name}    ${ns}
+    ${pv_sc}=    Oc Get JsonPath    pv    ${EMPTY}    ${pv}    .spec.storageClassName
+    Should Be Equal    ${pv_sc}    ${expected}
+
+Cluster Should Have One Default StorageClass
+    [Documentation]    Verify exactly one StorageClass is marked default and return its name.
+    ${default_sc}=    Run With Kubeconfig
+    ...    oc get sc -o jsonpath='{.items[?(@.metadata.annotations.storageclass\\.kubernetes\\.io/is-default-class=="true")].metadata.name}'
+    @{sc_list}=    Split String    ${default_sc}
+    Length Should Be    ${sc_list}    1
+    RETURN    ${default_sc}
