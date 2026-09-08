@@ -55,13 +55,16 @@ spec:
           # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes
           echo "$(date -Iseconds) - starting ovn-controller, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
 
-          # Wait for the SBDB unix socket to appear. The sbdb container
-          # removes stale sockets and creates fresh ones on startup.
-          # Connecting to a stale socket would cause ovn-controller to
-          # cache a raft commit index higher than the fresh SBDB's.
-          echo "Waiting for SBDB socket..."
-          while [ ! -S /run/ovn/ovnsb_db.sock ]; do sleep 1; done
-          echo "SBDB socket ready"
+          # Wait for SBDB connectivity before starting ovn-controller.
+          # Primary node: local unix socket appears from the sbdb container.
+          # Worker node: no local sbdb runs; ovnkube-node sets ovn-remote
+          # in OVS external_ids once it connects to the primary's TCP SBDB.
+          echo "Waiting for SBDB..."
+          until [ -S /run/ovn/ovnsb_db.sock ] || \
+                ovs-vsctl --timeout=5 get Open_vSwitch . external_ids:ovn-remote 2>/dev/null | grep -q "tcp:"; do
+            sleep 1
+          done
+          echo "SBDB ready"
 
           exec ovn-controller unix:/var/run/openvswitch/db.sock -vfile:off \
             --no-chdir --pidfile=/var/run/ovn/ovn-controller.pid \

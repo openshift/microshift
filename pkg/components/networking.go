@@ -61,9 +61,17 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 	)
 
 	if cfg.MultiNode.Enabled {
-		apps = []string{
-			"components/ovn/multi-node/master/daemonset.yaml",
-			"components/ovn/multi-node/node/daemonset.yaml",
+		if cfg.BootstrapKubeConfigExists() {
+			// Worker node: only the node DaemonSet; the primary runs the SBDB.
+			apps = []string{
+				"components/ovn/multi-node/node/daemonset.yaml",
+			}
+		} else {
+			// Primary node: full master (sbdb/nbdb/northd) + node DaemonSets.
+			apps = []string{
+				"components/ovn/multi-node/master/daemonset.yaml",
+				"components/ovn/multi-node/node/daemonset.yaml",
+			}
 		}
 	}
 
@@ -110,13 +118,14 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		return err
 	}
 
-	// Multinode only params: OVN_NB_PORT, OVN_SB_PORT
+	// Multinode only params: OVN_NB_PORT, OVN_SB_PORT, MultiNodeEnabled
 	extraParams := assets.RenderParams{
-		"OVNConfig":      ovnConfig,
-		"KubeconfigPath": kubeconfigPath,
-		"KubeconfigDir":  filepath.Join(config.DataDir, "/resources/kubeadmin"),
-		"OVN_NB_PORT":    ovn.OVN_NB_PORT,
-		"OVN_SB_PORT":    ovn.OVN_SB_PORT,
+		"OVNConfig":        ovnConfig,
+		"KubeconfigPath":   kubeconfigPath,
+		"KubeconfigDir":    filepath.Join(config.DataDir, "/resources/kubeadmin"),
+		"OVN_NB_PORT":      ovn.OVN_NB_PORT,
+		"OVN_SB_PORT":      ovn.OVN_SB_PORT,
+		"MultiNodeEnabled": cfg.MultiNode.Enabled,
 	}
 	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply configMap %v %v", cm, err)
