@@ -78,7 +78,7 @@ PodSelector Allow To And Allow From
     ...    - pod-plain -> pod-plain: DENIED (default-deny, no matching allow)
     ...    - ns2/pod-plain -> ns1/pod-plain: DENIED (cross-namespace, no allow)
     ...    - ns2/pod-plain -> ns1/pod-blue: ALLOWED (allow-to-blue allows all ingress)
-    ...    - ns2/pod-plain -> ns1/pod-plain: DENIED
+    ...    - ns2/pod-plain -> ns1/pod-red: DENIED
     ...    Covers QE test 60426.
     [Setup]    Setup PodSelector Test
 

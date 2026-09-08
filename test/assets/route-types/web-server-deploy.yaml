@@ -17,6 +17,7 @@ items:
         labels:
           name: web-server-deploy
       spec:
+        automountServiceAccountToken: false
         containers:
         - name: nginx
           image: quay.io/microshift/hello-world:latest
