@@ -472,7 +472,7 @@ spec:
           privileged: true
         terminationMessagePolicy: FallbackToLogsOnError
       nodeSelector:
-        node-role.kubernetes.io/master: ""
+        node.microshift.io/role: primary
         kubernetes.io/os: "linux"
       volumes:
       # for checking ovs-configuration service
