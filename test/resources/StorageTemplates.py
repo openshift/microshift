@@ -13,7 +13,7 @@ class StorageTemplates:
             content = f.read()
         for key, value in substitutions.items():
             content = content.replace(f"${{{key}}}", str(value))
-        unreplaced = re.findall(r"\$\{[A-Z_]+\}", content)
+        unreplaced = re.findall(r"\$\{[A-Z_][A-Z0-9_]*\}", content)
         if unreplaced:
             raise ValueError(
                 f"Unreplaced placeholders in {template_path}: {', '.join(unreplaced)}"
