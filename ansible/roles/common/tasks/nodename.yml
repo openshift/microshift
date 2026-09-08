@@ -14,7 +14,7 @@
 # to ansible_facts.hostname even when an override is configured.
 
 - name: Resolve kubernetes nodename
-  become: yes
+  become: true
   block:
     - name: Find microshift config drop-ins
       ansible.builtin.find:
@@ -55,6 +55,4 @@
 
 - name: Set kubernetes_nodename fact
   ansible.builtin.set_fact:
-    kubernetes_nodename: "{{ ((_microshift_hostname_override | length > 0)
-                              | ternary(_microshift_hostname_override, ansible_facts.hostname))
-                              | lower }}"
+    kubernetes_nodename: "{{ ((_microshift_hostname_override | length > 0) | ternary(_microshift_hostname_override, ansible_facts.hostname)) | lower }}"

@@ -8,23 +8,20 @@ exclude_paths:
 
 # Existing roles use hyphenated names throughout the repository. Keep that
 # convention out of scope for this lint cleanup.
+# Shared task files also publish variables consumed across roles, so enforcing
+# role-specific prefixes would require behavioral variable renames.
 skip_list:
   - role-name
+  - var-naming[no-role-prefix]
 
 # These rule families are promoted to fatal errors as the follow-up cleanup
 # changes land. New findings in a warned family remain warnings until then.
 warn_list:
   - command-instead-of-module
-  - fqcn
   - ignore-errors
-  - jinja
-  - key-order
   - latest
-  - name
   - no-changed-when
   - no-handler
   - package-latest
   - risky-file-permissions
   - risky-shell-pipe
-  - var-naming
-  - yaml

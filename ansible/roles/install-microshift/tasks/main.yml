@@ -1,61 +1,64 @@
 ---
 # install-microshift tasks
 
-- name: check if microshift is installed
+- name: Check if microshift is installed
   ansible.builtin.command: rpm -q microshift
   register: microshift_installed
   ignore_errors: true
   changed_when: false
 
-- name: cleanup and uninstall existing microshift
+- name: Cleanup and uninstall existing microshift
+  when: microshift_installed.rc == 0
   block:
-    - name: stop microshift service
-      become: yes
+    - name: Stop microshift service
+      become: true
       ansible.builtin.systemd:
         name: microshift
         state: stopped
       ignore_errors: true
 
-    - name: find microshift cleanup script
+    - name: Find microshift cleanup script
       ansible.builtin.find:
         paths: /usr/bin
         patterns:
-          - '.*microshift.*cleanup.*'
-          - '.*cleanup.*microshift.*'
-        use_regex: yes
+          - ".*microshift.*cleanup.*"
+          - ".*cleanup.*microshift.*"
+        use_regex: true
       register: find_cleanup
 
-    - name: cleanup microshift data
-      become: yes
+    - name: Cleanup microshift data
+      become: true
       ansible.builtin.shell: echo 1 | {{ find_cleanup.files[0].path }} --all
       when: find_cleanup.files | length > 0
 
-    - name: uninstall microshift packages and dependencies
-      become: yes
+    - name: Uninstall microshift packages and dependencies
+      become: true
       ansible.builtin.dnf:
         name:
           - microshift*
-        autoremove: yes
+        autoremove: true
         state: absent
-  when: microshift_installed.rc == 0
 
-- name: record initial disk space
+- name: Record initial disk space
   vars:
     filename: disk0.txt
-  include_tasks: roles/common/tasks/disk.yml
+  ansible.builtin.include_tasks: roles/common/tasks/disk.yml
   loop: "{{ du_dirs }}"
 
-- name: build & install microshift RPMs on RHEL
+- name: Build & install microshift RPMs on RHEL
+  when:
+    - ansible_facts.distribution == "RedHat"
+    - build_microshift | bool
   block:
-    - name: install cri-o
-      become: yes
+    - name: Install cri-o
+      become: true
       ansible.builtin.dnf:
         name:
           - cri-o
           - cri-tools
         state: present
 
-    - name: ensure microshift git checkout
+    - name: Ensure microshift git checkout
       ansible.builtin.git:
         repo: "{{ microshift_repo }}"
         dest: "{{ microshift_dir }}"
@@ -63,116 +66,117 @@
         refspec: "{{ microshift_git_refspec | default(omit, true) }}"
       when: not microshift_source_dir
 
-    - name: make clean
+    - name: Make clean
       ansible.builtin.command: make clean
       args:
         chdir: "{{ microshift_build_dir }}"
 
-    - name: make rpm
+    - name: Make rpm
       ansible.builtin.command: make rpm
       args:
         chdir: "{{ microshift_build_dir }}"
 
-    - name: find built RPMs
+    - name: Find built RPMs
       ansible.builtin.find:
         paths: "{{ microshift_build_dir }}"
-        patterns: '*.rpm'
-        recurse: yes
+        patterns: "*.rpm"
+        recurse: true
       register: microshift_find
 
-    - name: make list of built RPM paths
+    - name: Make list of built RPM paths
       ansible.builtin.set_fact:
-        microshift_rpms: "{{ microshift_rpms + [ item.path ] }}"
+        microshift_rpms: "{{ microshift_rpms + [item.path] }}"
       with_items: "{{ microshift_find.files }}"
 
-    - name: install microshift RPMs
-      become: yes
+    - name: Install microshift RPMs
+      become: true
       ansible.builtin.dnf:
         name: "{{ microshift_rpms }}"
         state: present
-        disable_gpg_check: yes
-  when:
-    - ansible_facts.distribution == "RedHat"
-    - build_microshift | bool
+        disable_gpg_check: true
 
-- name: install microshift package on RHEL
-  block:
-    - name: install microshift package
-      become: yes
-      ansible.builtin.dnf:
-        name: microshift
-        state: present
-        disable_gpg_check: yes
+- name: Install microshift package on RHEL
   when:
     - ansible_facts.distribution == "RedHat"
     - not (build_microshift | bool)
-
-- name: build & install etcd
   block:
-    - name: clone etcd git repo
+    - name: Install microshift package
+      become: true
+      ansible.builtin.dnf:
+        name: microshift
+        state: present
+        disable_gpg_check: true
+      register: microshift_package_install
+      until: microshift_package_install is succeeded
+      retries: 2
+      delay: 10
+
+- name: Build & install etcd
+  when:
+    - build_etcd_binary | bool
+    - not (build_microshift | bool)
+  block:
+    - name: Clone etcd git repo
       ansible.builtin.git:
         repo: "{{ etcd_repo }}"
         dest: "{{ etcd_dir }}"
 
-    - name: make etcd binary
+    - name: Make etcd binary
       ansible.builtin.command: make
       args:
         chdir: "{{ etcd_dir }}"
 
-    - name: install etcd binary
-      become: yes
+    - name: Install etcd binary
+      become: true
       ansible.builtin.copy:
         src: "{{ etcd_dir }}/bin/etcd"
         dest: "/usr/bin/etcd"
-        remote_src: yes
-        mode: '0755'
+        remote_src: true
+        mode: "0755"
 
-    - name: copy etcd systemd unit to node
-      become: yes
+    - name: Copy etcd systemd unit to node
+      become: true
       ansible.builtin.copy:
         src: etcd.service
         dest: /usr/lib/systemd/system/etcd.service
         owner: root
         group: root
-        mode: '0664'
+        mode: "0664"
 
-    - name: start etcd service
-      become: yes
+    - name: Start etcd service
+      become: true
       ansible.builtin.systemd:
-        daemon_reload: yes
+        daemon_reload: true
         state: started
         name: etcd
-  when:
-    - build_etcd_binary | bool
-    - not (build_microshift | bool)
 
-- name: check if pull-secret is present
+- name: Check if pull-secret is present
   ansible.builtin.stat:
     path: /etc/crio/openshift-pull-secret
   register: pull_secret
 
-- name: copy pull-secret to node
-  become: yes
+- name: Copy pull-secret to node
+  become: true
   ansible.builtin.copy:
     src: pull-secret.txt
     dest: /etc/crio/openshift-pull-secret
     owner: root
     group: root
-    mode: '0600'
+    mode: "0600"
   no_log: true
   when: not pull_secret.stat.exists
 
-- name: check if crio metrics config is present
+- name: Check if crio metrics config is present
   ansible.builtin.stat:
     path: "{{ crio_metrics_path }}"
   register: crio_metrics
 
-- name: enable crio metrics
-  become: yes
+- name: Enable crio metrics
+  become: true
   ansible.builtin.copy:
     src: "{{ crio_metrics_conf }}"
     dest: "{{ crio_metrics_path }}"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   when: not crio_metrics.stat.exists

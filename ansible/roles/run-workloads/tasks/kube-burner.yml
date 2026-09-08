@@ -1,7 +1,7 @@
 ---
 # kube-burner tasks
 
-- name: "run kube-burner workload {{ kube_burner_workload.name }} with QPS={{ kube_burner_workload.qps }}"
+- name: "Run kube-burner workload {{ kube_burner_workload.name ~ ' QPS=' ~ kube_burner_workload.qps }}"
   ansible.builtin.command:
     cmd: ./run.sh
     chdir: "{{ e2e_path }}/workloads/kube-burner"
@@ -12,23 +12,25 @@
     QPS: "{{ kube_burner_workload.qps }}"
     WORKLOAD: "{{ kube_burner_workload.name }}"
 
-- name: "log workload execution details"
+- name: "Log workload execution details"
   ansible.builtin.debug:
     msg: "Completed {{ kube_burner_workload.name }} with QPS={{ kube_burner_workload.qps }}, BURST={{ kube_burner_workload.burst }}"
 
-- ansible.builtin.pause:
+- name: Pause before deleting workload namespaces
+  ansible.builtin.pause:
     seconds: "{{ pre_delete_pause_duration }}"
 
-- name: cleanup previous workload namespace
+- name: Cleanup previous workload namespace
   kubernetes.core.k8s:
     api_version: v1
     kind: Namespace
     state: absent
-    label_selectors: "{{ delete_label_selectors }}" 
+    label_selectors: "{{ delete_label_selectors }}"
     delete_options:
       gracePeriodSeconds: "{{ delete_grace_period }}"
     wait: true
     wait_timeout: "{{ delete_wait_timeout }}"
 
-- ansible.builtin.pause:
+- name: Pause after running workload
+  ansible.builtin.pause:
     seconds: "{{ post_run_pause_duration }}"

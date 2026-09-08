@@ -2,14 +2,14 @@
 # setup-localhost tasks
 #
 
-- name: cleanup existing known_hosts entries
+- name: Cleanup existing known_hosts entries
   ansible.builtin.lineinfile:
     path: ~/.ssh/known_hosts
     state: absent
     regexp: "{{ item }}"
   loop: "{{ known_hosts }}"
 
-- name: wait 300 seconds for port 22 to become open and contain "OpenSSH"
+- name: Wait 300 seconds for port 22 to become open and contain "OpenSSH"
   ansible.builtin.wait_for:
     port: 22
     host: "{{ item }}"
@@ -17,7 +17,7 @@
   with_inventory_hostnames:
     - all
 
-- name: write the new ssh fingerprint to known hosts
+- name: Write the new ssh fingerprint to known hosts
   ansible.builtin.shell: "ssh-keyscan {{ item }} >> ~/.ssh/known_hosts"
   with_inventory_hostnames:
     - all
@@ -27,18 +27,18 @@
   with_inventory_hostnames:
     - microshift
 
-- name: check if python packages are installed via pip
+- name: Check if python packages are installed via pip
   ansible.builtin.command: "pip3 show {{ item.pip }}"
   register: pip_check
   ignore_errors: true
   changed_when: false
   loop: "{{ local_packages }}"
 
-- name: build list of packages not installed via pip
+- name: Build list of packages not installed via pip
   ansible.builtin.set_fact:
     packages_to_install: "{{ pip_check.results | selectattr('rc', 'ne', 0) | map(attribute='item.rpm') | list }}"
 
-- name: install local ansible prereq packages
+- name: Install local ansible prereq packages
   ansible.builtin.dnf:
     name: "{{ packages_to_install }}"
     state: present
@@ -46,4 +46,4 @@
   when:
     - packages_to_install | length > 0
     - (ansible_facts.distribution == "CentOS") or (ansible_facts.distribution == "RedHat") or (ansible_facts.distribution == "Fedora")
-  become: yes
+  become: true

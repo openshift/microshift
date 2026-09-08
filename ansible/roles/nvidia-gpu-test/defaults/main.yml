@@ -15,8 +15,8 @@ cuda_base_image: "nvcr.io/nvidia/cuda:12.8.1-base-ubi9"
 cuda_sample_image: "nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda12.5.0-ubi8"
 
 # Cleanup settings
-gpu_test_cleanup: true  # Set to false to keep test resources for debugging
+gpu_test_cleanup: true # Set to false to keep test resources for debugging
 
 # Logging settings
-gpu_test_save_logs: true  # Save test logs to files
-gpu_test_logs_dir: "./gpu-test-logs"  # Directory to save test logs
+gpu_test_save_logs: true # Save test logs to files
+gpu_test_logs_dir: "./gpu-test-logs" # Directory to save test logs

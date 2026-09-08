@@ -8,11 +8,11 @@
 
 - name: Create vm and set up localhost
   hosts: localhost
-  become: no
+  become: false
   vars:
     ansible_connection: local
   vars_files:
-  - vars/all.yml
+    - vars/all.yml
   roles:
     - role: create-vm
       when: (create_devenv | bool)
@@ -20,7 +20,7 @@
 
 - name: Entitle host and manage repos
   hosts: microshift
-  become: yes
+  become: true
   vars_files:
     - vars/all.yml
   roles:
@@ -29,7 +29,7 @@
 
 - name: Install packages, configure services & firewall
   hosts: microshift
-  become: yes
+  become: true
   vars_files:
     - vars/all.yml
   roles:
@@ -53,13 +53,13 @@
   vars_files:
     - vars/all.yml
   tasks:
-    - name: resolve kubernetes nodename
-      include_tasks: roles/common/tasks/nodename.yml
+    - name: Resolve kubernetes nodename
+      ansible.builtin.include_tasks: roles/common/tasks/nodename.yml
 
 - name: Set up logging node
   hosts: logging
   vars_files:
-  - vars/all.yml
+    - vars/all.yml
   roles:
     - role: install-logging
       when: (prometheus_logging | bool)
@@ -89,7 +89,7 @@
 
 - name: Setup NVIDIA GPU support
   hosts: microshift
-  become: yes
+  become: true
   vars_files:
     - vars/all.yml
   roles:
@@ -105,7 +105,7 @@
 
 - name: Deploy GPU test workload
   hosts: microshift
-  become: yes
+  become: true
   vars_files:
     - vars/all.yml
   roles:
@@ -114,7 +114,7 @@
 
 - name: Run performance workloads
   hosts: localhost
-  become: no
+  become: false
   vars:
     ansible_connection: local
   vars_files:

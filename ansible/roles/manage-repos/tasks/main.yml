@@ -2,210 +2,210 @@
 # manage-repos tasks
 
 - name: RHEL tasks
+  when: ansible_facts.distribution == "RedHat"
   block:
-  - name: subscription-manager tasks
-    block:
-      - name: Check if we have subscription-manager installed
-        ansible.builtin.command: which subscription-manager
-        register: sm_present
-        ignore_errors: true
+    - name: Subscription-manager tasks
+      when: manage_subscription | bool
+      block:
+        - name: Check if we have subscription-manager installed
+          ansible.builtin.command: which subscription-manager
+          register: sm_present
+          ignore_errors: true
 
-      - name: Install subscription-manager
-        ansible.builtin.dnf:
-          name:
-          - subscription-manager
-        when: sm_present.rc != 0
+        - name: Install subscription-manager
+          ansible.builtin.dnf:
+            name:
+              - subscription-manager
+          when: sm_present.rc != 0
 
-      - name: Register host with subscription manager
-        community.general.redhat_subscription:
-          state: present
-          username: "{{ rhel_username }}"
-          password: "{{ rhel_password }}"
-        no_log: true
+        - name: Register host with subscription manager
+          community.general.redhat_subscription:
+            state: present
+            username: "{{ rhel_username }}"
+            password: "{{ rhel_password }}"
+          no_log: true
 
-      - name: Enable repo management from subscription-manager
-        ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
-    when: manage_subscription | bool
+        - name: Enable repo management from subscription-manager
+          ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
 
-  - name: Slurp redhat-release
-    ansible.builtin.slurp:
-      src: /etc/redhat-release
-    register: redhat_release_slurp
+    - name: Slurp redhat-release
+      ansible.builtin.slurp:
+        src: /etc/redhat-release
+      register: redhat_release_slurp
 
-  - name: Set beta release of RHEL
-    ansible.builtin.set_fact:
-      rhel_beta: beta-
-    when: "'Beta' in (redhat_release_slurp['content'] | b64decode)"
+    - name: Set beta release of RHEL
+      ansible.builtin.set_fact:
+        rhel_beta: beta-
+      when: "'Beta' in (redhat_release_slurp['content'] | b64decode)"
 
-  - name: Set microshift_prerelease if microshift_version is a prerelease
-    ansible.builtin.set_fact:
-      microshift_prerelease: "{{ 'rc' in microshift_version or 'ec' in microshift_version or 'latest' in microshift_version }}"
+    - name: Set microshift_prerelease if microshift_version is a prerelease
+      ansible.builtin.set_fact:
+        microshift_prerelease: "{{ 'rc' in microshift_version or 'ec' in microshift_version or 'latest' in microshift_version }}"
 
-  - name: Enable required RHEL package repos for microshift
-    community.general.rhsm_repository:
-      name: "{{ rhel_base_repos }}"
+    - name: Enable required RHEL package repos for microshift
+      community.general.rhsm_repository:
+        name: "{{ rhel_base_repos }}"
 
-  - name: Provision dependency repos for source builds
-    when: build_microshift | bool
-    block:
-      - name: Enable OpenShift repo for source-build dependencies
-        community.general.rhsm_repository:
-          name: "{{ rhel_ocp_repos }}"
-        register: microshift_source_rhsm_repo
-        when: not (microshift_prerelease | bool)
+    - name: Provision dependency repos for source builds
+      when: build_microshift | bool
+      block:
+        - name: Enable OpenShift repo for source-build dependencies
+          community.general.rhsm_repository:
+            name: "{{ rhel_ocp_repos }}"
+          register: microshift_source_rhsm_repo
+          when: not (microshift_prerelease | bool)
 
-      - name: Check OpenShift repo provides source-build dependencies
+        - name: Check OpenShift repo provides source-build dependencies
         # This matches scripts/get-latest-rhocp-repo.sh: repository routing
         # checks package presence, while RPM installation enforces compatibility.
-        ansible.builtin.command:
-          argv:
-            - dnf
-            - --refresh
-            - repository-packages
-            - --showduplicates
-            - "--disablerepo=*"
-            - "--enablerepo={{ item }}"
-            - "{{ item }}"
-            - info
-            - cri-o
-        loop: "{{ rhel_ocp_repos }}"
-        register: microshift_source_rhsm_probe
-        changed_when: false
-        when: not (microshift_prerelease | bool)
-    rescue:
-      - name: Disable unusable OpenShift repo for source-build dependencies
-        community.general.rhsm_repository:
-          name: "{{ rhel_ocp_repos }}"
-          state: disabled
-        when:
-          - microshift_source_rhsm_repo is defined
-          - not ((microshift_source_rhsm_repo.failed | default(false)) | bool)
+          ansible.builtin.command:
+            argv:
+              - dnf
+              - --refresh
+              - repository-packages
+              - --showduplicates
+              - "--disablerepo=*"
+              - "--enablerepo={{ item }}"
+              - "{{ item }}"
+              - info
+              - cri-o
+          loop: "{{ rhel_ocp_repos }}"
+          register: microshift_source_rhsm_probe
+          changed_when: false
+          when: not (microshift_prerelease | bool)
+      rescue:
+        - name: Disable unusable OpenShift repo for source-build dependencies
+          community.general.rhsm_repository:
+            name: "{{ rhel_ocp_repos }}"
+            state: disabled
+          when:
+            - microshift_source_rhsm_repo is defined
+            - not ((microshift_source_rhsm_repo.failed | default(false)) | bool)
 
-      - name: Check fallback dependency mirror for source builds
-        block:
-          - name: Probe fallback dependency mirror for source builds
-            ansible.builtin.include_tasks: probe-mirror.yaml
-            loop: "{{ microshift_deps_repos }}"
-            loop_control:
-              label: "{{ item.repo_name }}"
-            vars:
-              repository_probe_package: cri-o
-        rescue:
-          - name: Report unavailable source-build dependency repositories
-            ansible.builtin.fail:
-              msg: >-
-                Neither the entitled OpenShift repositories
-                ({{ rhel_ocp_repos | join(', ') }}) nor the dependency mirrors
-                ({{ microshift_deps_repos | map(attribute='repo_url') | join(', ') }})
-                provide cri-o for MicroShift {{ ocp_version }}.
+        - name: Check fallback dependency mirror for source builds
+          block:
+            - name: Probe fallback dependency mirror for source builds
+              ansible.builtin.include_tasks: probe-mirror.yaml
+              loop: "{{ microshift_deps_repos }}"
+              loop_control:
+                label: "{{ item.repo_name }}"
+              vars:
+                repository_probe_package: cri-o
+          rescue:
+            - name: Report unavailable source-build dependency repositories
+              ansible.builtin.fail:
+                msg: >-
+                  Neither the entitled OpenShift repositories
+                  ({{ rhel_ocp_repos | join(', ') }}) nor the dependency mirrors
+                  ({{ microshift_deps_repos | map(attribute='repo_url') | join(', ') }})
+                  provide cri-o for MicroShift {{ ocp_version }}.
 
-      - name: Install fallback dependency mirror for source builds
-        ansible.builtin.include_tasks: create-mirrors.yaml
-        loop: "{{ microshift_deps_repos }}"
-        loop_control:
-          label: "{{ item.repo_name }}"
+        - name: Install fallback dependency mirror for source builds
+          ansible.builtin.include_tasks: create-mirrors.yaml
+          loop: "{{ microshift_deps_repos }}"
+          loop_control:
+            label: "{{ item.repo_name }}"
 
-  - name: Remove fallback dependency mirrors after OpenShift repo recovers
-    ansible.builtin.file:
-      path: "/etc/yum.repos.d/{{ item.repo_name }}.repo"
-      state: absent
-    loop: "{{ microshift_deps_repos }}"
-    loop_control:
-      label: "{{ item.repo_name }}"
-    register: microshift_removed_fallback_repos
-    when:
-      - build_microshift | bool
-      - not (microshift_prerelease | bool)
-      - microshift_source_rhsm_probe is defined
-      - not ((microshift_source_rhsm_probe.failed | default(true)) | bool)
+    - name: Remove fallback dependency mirrors after OpenShift repo recovers
+      ansible.builtin.file:
+        path: "/etc/yum.repos.d/{{ item.repo_name }}.repo"
+        state: absent
+      loop: "{{ microshift_deps_repos }}"
+      loop_control:
+        label: "{{ item.repo_name }}"
+      register: microshift_removed_fallback_repos
+      when:
+        - build_microshift | bool
+        - not (microshift_prerelease | bool)
+        - microshift_source_rhsm_probe is defined
+        - not ((microshift_source_rhsm_probe.failed | default(true)) | bool)
 
-  - name: Clean metadata after removing fallback dependency mirrors
-    ansible.builtin.command:
-      argv:
-        - dnf
-        - clean
-        - metadata
-    changed_when: true
-    when:
-      - build_microshift | bool
-      - not (microshift_prerelease | bool)
-      - microshift_source_rhsm_probe is defined
-      - not ((microshift_source_rhsm_probe.failed | default(true)) | bool)
-      - microshift_removed_fallback_repos is defined
-      - (microshift_removed_fallback_repos.changed | default(false)) | bool
+    - name: Clean metadata after removing fallback dependency mirrors
+      ansible.builtin.command:
+        argv:
+          - dnf
+          - clean
+          - metadata
+      changed_when: true
+      when:
+        - build_microshift | bool
+        - not (microshift_prerelease | bool)
+        - microshift_source_rhsm_probe is defined
+        - not ((microshift_source_rhsm_probe.failed | default(true)) | bool)
+        - microshift_removed_fallback_repos is defined
+        - (microshift_removed_fallback_repos.changed | default(false)) | bool
 
-  - name: Check dependency mirror for prerelease source builds
-    when:
-      - build_microshift | bool
-      - microshift_prerelease | bool
-    block:
-      - name: Probe dependency mirror for prerelease source builds
-        ansible.builtin.include_tasks: probe-mirror.yaml
-        loop: "{{ microshift_deps_repos }}"
-        loop_control:
-          label: "{{ item.repo_name }}"
-        vars:
-          repository_probe_package: cri-o
-    rescue:
-      - name: Report unavailable prerelease dependency mirrors
-        ansible.builtin.fail:
-          msg: >-
-            The dependency mirrors
-            ({{ microshift_deps_repos | map(attribute='repo_url') | join(', ') }})
-            do not provide cri-o for MicroShift {{ ocp_version }}.
+    - name: Check dependency mirror for prerelease source builds
+      when:
+        - build_microshift | bool
+        - microshift_prerelease | bool
+      block:
+        - name: Probe dependency mirror for prerelease source builds
+          ansible.builtin.include_tasks: probe-mirror.yaml
+          loop: "{{ microshift_deps_repos }}"
+          loop_control:
+            label: "{{ item.repo_name }}"
+          vars:
+            repository_probe_package: cri-o
+      rescue:
+        - name: Report unavailable prerelease dependency mirrors
+          ansible.builtin.fail:
+            msg: >-
+              The dependency mirrors
+              ({{ microshift_deps_repos | map(attribute='repo_url') | join(', ') }})
+              do not provide cri-o for MicroShift {{ ocp_version }}.
 
-  - name: Create dependency mirror for prerelease source builds
-    ansible.builtin.include_tasks: create-mirrors.yaml
-    loop: "{{ microshift_deps_repos }}"
-    loop_control:
-      label: "{{ item.repo_name }}"
-    when:
-      - build_microshift | bool
-      - microshift_prerelease | bool
+    - name: Create dependency mirror for prerelease source builds
+      ansible.builtin.include_tasks: create-mirrors.yaml
+      loop: "{{ microshift_deps_repos }}"
+      loop_control:
+        label: "{{ item.repo_name }}"
+      when:
+        - build_microshift | bool
+        - microshift_prerelease | bool
 
-  - name: Check microshift prerelease mirrors
-    ansible.builtin.include_tasks: probe-mirror.yaml
-    loop: "{{ repo_list }}"
-    loop_control:
-      label: "{{ item.repo_name }}"
-    when:
-      - microshift_prerelease | bool
-      - not (build_microshift | bool)
+    - name: Check microshift prerelease mirrors
+      ansible.builtin.include_tasks: probe-mirror.yaml
+      loop: "{{ repo_list }}"
+      loop_control:
+        label: "{{ item.repo_name }}"
+      when:
+        - microshift_prerelease | bool
+        - not (build_microshift | bool)
 
-  - name: Create microshift prerelease mirrors
-    ansible.builtin.include_tasks: create-mirrors.yaml
-    loop: "{{ repo_list }}"
-    loop_control:
-      label: "{{ item.repo_name }}"
-    when:
-      - microshift_prerelease | bool
-      - not (build_microshift | bool)
+    - name: Create microshift prerelease mirrors
+      ansible.builtin.include_tasks: create-mirrors.yaml
+      loop: "{{ repo_list }}"
+      loop_control:
+        label: "{{ item.repo_name }}"
+      when:
+        - microshift_prerelease | bool
+        - not (build_microshift | bool)
 
-  - name: Enable OpenShift repo for released microshift
-    community.general.rhsm_repository:
-      name: "{{ rhel_ocp_repos }}"
-    when:
-      - not (microshift_prerelease | bool)
-      - not (build_microshift | bool)
+    - name: Enable OpenShift repo for released microshift
+      community.general.rhsm_repository:
+        name: "{{ rhel_ocp_repos }}"
+      when:
+        - not (microshift_prerelease | bool)
+        - not (build_microshift | bool)
 
-  - name: Install EPEL repo
-    ansible.builtin.dnf:
-      name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_facts.distribution_major_version }}.noarch.rpm"
-      disablerepo: "*"
-      disable_gpg_check: true
-      state: present
-  when: ansible_facts.distribution == "RedHat"
+    - name: Install EPEL repo
+      ansible.builtin.dnf:
+        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_facts.distribution_major_version }}.noarch.rpm"
+        disablerepo: "*"
+        disable_gpg_check: true
+        state: present
 
 - name: Gather the package facts
   ansible.builtin.package_facts:
     manager: auto
 
-- name: pbench-agent is installed
+- name: Pbench-agent is installed
   ansible.builtin.set_fact:
     pbench_installed: true
   when: "'pbench-agent' in ansible_facts.packages"
 
-- name: pbench-agent is not installed
+- name: Pbench-agent is not installed
   ansible.builtin.set_fact:
     pbench_installed: false
   when: "'pbench-agent' not in ansible_facts.packages"

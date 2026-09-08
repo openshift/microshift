@@ -1,3 +1,4 @@
+---
 - name: Check repository mirror is available
   ansible.builtin.uri:
     url: "{{ item.repo_url }}"
