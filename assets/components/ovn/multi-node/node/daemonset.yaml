@@ -56,15 +56,48 @@ spec:
           echo "$(date -Iseconds) - starting ovn-controller, Node: ${K8S_NODE} IP: ${K8S_NODE_IP}"
 
           # Wait for SBDB connectivity before starting ovn-controller.
-          # Primary node: local unix socket appears from the sbdb container.
-          # Worker node: no local sbdb runs; ovnkube-node sets ovn-remote
-          # in OVS external_ids once it connects to the primary's TCP SBDB.
+          # Primary node: ovn-remote is unix:/var/run/ovn/ovnsb_db.sock and the
+          #   socket is served by the sbdb container in ovnkube-master.
+          # Worker node: ovnkube-node starts a socat relay that serves the local
+          #   unix socket and forwards connections to the primary's TCP SBDB.
+          # Avoid treating a stale unix socket (left from a previous run) as
+          # ready: for unix: remotes, verify the socket accepts connections.
           echo "Waiting for SBDB..."
-          until [ -S /run/ovn/ovnsb_db.sock ] || \
-                ovs-vsctl --timeout=5 get Open_vSwitch . external_ids:ovn-remote 2>/dev/null | grep -q "tcp:"; do
+          until
+            OVN_REMOTE=$(ovs-vsctl --timeout=5 get Open_vSwitch . external_ids:ovn-remote 2>/dev/null | tr -d '"')
+            if [[ "${OVN_REMOTE}" =~ ^tcp: ]]; then
+              true   # TCP remote set by startup script — ready immediately
+            elif [[ "${OVN_REMOTE}" =~ ^unix: ]]; then
+              # Accept unix: only when something is actually listening on the socket
+              socat -t2 /dev/null "UNIX-CONNECT:${OVN_REMOTE#unix:}" 2>/dev/null
+            else
+              false
+            fi
+          do
             sleep 1
           done
-          echo "SBDB ready"
+          echo "SBDB ready (ovn-remote=${OVN_REMOTE})"
+
+          # If a previous ovn-controller instance is still running (possible
+          # because it shares the host PID namespace), kill it so the new
+          # invocation does not abort with "already running".  Leave the pid
+          # file in place so the concurrent ovnkube-node container can always
+          # open it — ovn-controller will overwrite the file after the old
+          # process has exited.
+          if [ -f /var/run/ovn/ovn-controller.pid ]; then
+            OLD_PID=$(cat /var/run/ovn/ovn-controller.pid)
+            if kill -0 "${OLD_PID}" 2>/dev/null; then
+              echo "Killing stale ovn-controller process ${OLD_PID}"
+              kill "${OLD_PID}" 2>/dev/null || true
+              # Wait for the process to exit (up to 5 s)
+              for _ in $(seq 1 10); do
+                kill -0 "${OLD_PID}" 2>/dev/null || break
+                sleep 0.5
+              done
+            fi
+          fi
+          # Remove stale .ctl sockets that belong to the dead process.
+          rm -f /var/run/ovn/ovn-controller.*.ctl
 
           exec ovn-controller unix:/var/run/openvswitch/db.sock -vfile:off \
             --no-chdir --pidfile=/var/run/ovn/ovn-controller.pid \
@@ -149,19 +182,64 @@ spec:
             # the functionality depends on ip_forwarding being enabled
           fi
 
-          # On worker nodes the [OvnSouth] address= in ovnkube.conf points to
-          # the primary's SBDB over TCP. Set the required OVS external_ids
-          # directly from the mounted configmap so ovn-controller can connect
-          # to the correct endpoint and register the chassis with encap data,
-          # regardless of how the ovnkube binary parses the ini config file.
+          # The configmap's [OvnNorth]/[OvnSouth] address= fields point to the
+          # primary node's NB/SB TCP ports.  They are used differently:
+          #
+          # Primary node (SB_ADDR host == own IP):
+          #   The nbdb/sbdb containers in ovnkube-master serve local unix
+          #   sockets on this host.  Only set encap OVS external_ids; do NOT
+          #   touch the sockets or start relays.
+          #
+          # Worker node (SB_ADDR host != own IP):
+          #   No local nbdb/sbdb containers run.  The ovnkube binary cannot
+          #   parse the address= fields (upstream config format mismatch) and
+          #   falls back to the stale local unix sockets, blocking startup.
+          #   Fix: start socat relays that serve the local unix sockets and
+          #   forward connections to the primary's TCP ports; also set
+          #   ovn-remote in OVS so ovn-controller uses TCP directly.
+          NB_ADDR=$(awk 'BEGIN{f=0} /^\[OvnNorth\]/{f=1} f && /^address=/{print substr($0,9); exit}' \
+              /run/ovnkube-config/ovnkube.conf 2>/dev/null)
           SB_ADDR=$(awk 'BEGIN{f=0} /^\[OvnSouth\]/{f=1} f && /^address=/{print substr($0,9); exit}' \
               /run/ovnkube-config/ovnkube.conf 2>/dev/null)
           if [[ "${SB_ADDR}" =~ ^tcp: ]]; then
-              echo "$(date -Iseconds) - setting ovn-remote=${SB_ADDR} encap-ip=${K8S_NODE_IP}"
+              # Always set encap type and IP so ovn-controller can register the chassis
               ovs-vsctl --timeout=5 set Open_vSwitch . \
-                  "external_ids:ovn-remote=${SB_ADDR}" \
                   "external_ids:ovn-encap-type=geneve" \
                   "external_ids:ovn-encap-ip=${K8S_NODE_IP}" || true
+
+              # Worker detection: SB address points to a DIFFERENT host than ours
+              if [[ "${SB_ADDR}" != *"${K8S_NODE_IP}"* ]]; then
+                  echo "$(date -Iseconds) - worker node: setting up OVN socket relays to primary"
+
+                  # Remove stale socket files from any previous run.
+                  # Any socat processes from a prior container instance are
+                  # already gone — CRI-O kills them via the cgroup on stop.
+                  rm -f /run/ovn/ovnnb_db.sock /run/ovn/ovnsb_db.sock
+
+                  # Start socat relays: local unix socket → primary TCP port.
+                  # These background processes survive the exec and are killed
+                  # when the container stops (cgroup boundary).
+                  NB_HOST_PORT="${NB_ADDR#tcp:}"
+                  SB_HOST_PORT="${SB_ADDR#tcp:}"
+                  socat UNIX-LISTEN:/run/ovn/ovnnb_db.sock,fork,reuseaddr \
+                      TCP:${NB_HOST_PORT} &
+                  socat UNIX-LISTEN:/run/ovn/ovnsb_db.sock,fork,reuseaddr \
+                      TCP:${SB_HOST_PORT} &
+                  echo "$(date -Iseconds) - NB relay → ${NB_HOST_PORT}, SB relay → ${SB_HOST_PORT}"
+
+                  # Set ovn-remote so ovn-controller reaches the primary SBDB
+                  # over TCP directly (the socat relay also works, but TCP is simpler)
+                  ovs-vsctl --timeout=5 set Open_vSwitch . \
+                      "external_ids:ovn-remote=${SB_ADDR}" || true
+
+                  # Export OVN_SB_DB/OVN_NB_DB so that ovn-sbctl/ovn-nbctl
+                  # subprocess calls inside the ovnkube binary also use TCP.
+                  export OVN_SB_DB="${SB_ADDR}"
+                  export OVN_NB_DB="${NB_ADDR}"
+                  echo "$(date -Iseconds) - setting ovn-remote=${SB_ADDR} encap-ip=${K8S_NODE_IP}"
+              else
+                  echo "$(date -Iseconds) - primary node: setting encap-ip=${K8S_NODE_IP}"
+              fi
           fi
 
           echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-node - start ovnkube --init-node ${K8S_NODE}"
