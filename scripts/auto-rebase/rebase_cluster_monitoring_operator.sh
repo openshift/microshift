@@ -329,6 +329,17 @@ EOF
          fi)
 }
 
+commit_cluster_monitoring_operator_changes() {
+    title "## Committing changes to cluster-monitoring-operator assets"
+    (cd "${REPOROOT}" && \
+         if test -n "$(git status -s ./assets)"; then \
+             git add ./assets && \
+             git commit -m "update cluster-monitoring-operator manifests and images"; \
+         else \
+             echo "No changes in cluster-monitoring-operator assets."; \
+         fi)
+}
+
 rebase_cluster_monitoring_operator_to() {
     local release_image_amd64="$1"
     local release_image_arm64="$2"
@@ -338,6 +349,7 @@ rebase_cluster_monitoring_operator_to() {
     update_kube_state_metrics_manifests
     update_node_exporter_manifests
     update_cluster_monitoring_operator_images
+    commit_cluster_monitoring_operator_changes
     update_last_rebase "${release_image_amd64}" "${release_image_arm64}"
 }
 
