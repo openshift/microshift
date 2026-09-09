@@ -145,7 +145,77 @@ func ProvisionMetricsServerCerts(ctx context.Context, cfg *config.Config) error 
 		return fmt.Errorf("applying kubelet serving CA configmap: %w", err)
 	}
 
+	if err := ensureMetricsServerServingCert(ctx, clientset, certsDir); err != nil {
+		return fmt.Errorf("ensuring metrics-server serving cert: %w", err)
+	}
+
 	klog.Infof("Provisioned metrics-server kubelet client cert and CA bundle")
+	return nil
+}
+
+// ensureMetricsServerServingCert makes sure the metrics-server serving cert
+// secret ("metrics-server-tls") exists. In normal operation the service-ca
+// operator generates it from the serving-cert annotation on the metrics-server
+// Service. However, if that secret is lost (e.g. after a data cleanup / restart
+// storm) the operator does not always regenerate it, leaving metrics-server
+// stuck ContainerCreating and the metrics.k8s.io APIService unavailable
+// (USHIFT-7500). As a safety net, mint the serving cert from MicroShift's
+// service-CA when the secret is missing.
+//
+// The secret is only created when absent so we do not fight the operator in the
+// normal case: both sign with the same service-CA, so whichever cert is present
+// is valid against the service-CA bundle the operator injects into the
+// APIService.
+func ensureMetricsServerServingCert(ctx context.Context, clientset kubernetes.Interface, certsDir string) error {
+	const servingSecretName = "metrics-server-tls"
+
+	_, err := clientset.CoreV1().Secrets(metricsNamespace).Get(ctx, servingSecretName, metav1.GetOptions{})
+	if err == nil {
+		klog.V(2).Infof("Secret %s/%s already exists, leaving it to the service-ca operator", metricsNamespace, servingSecretName)
+		return nil
+	}
+	if !apierrors.IsNotFound(err) {
+		return fmt.Errorf("getting secret %s/%s: %w", metricsNamespace, servingSecretName, err)
+	}
+
+	servingDir := cryptomaterial.MetricsServerServingCertDir(certsDir)
+	certPEM, err := os.ReadFile(cryptomaterial.ServingCertPath(servingDir))
+	if err != nil {
+		return err
+	}
+	keyPEM, err := os.ReadFile(cryptomaterial.ServingKeyPath(servingDir))
+	if err != nil {
+		return err
+	}
+
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      servingSecretName,
+			Namespace: metricsNamespace,
+			Annotations: map[string]string{
+				"openshift.io/owning-component": "metrics-server",
+			},
+		},
+		Type: corev1.SecretTypeTLS,
+		Data: map[string][]byte{
+			"tls.crt": certPEM,
+			"tls.key": keyPEM,
+		},
+	}
+
+	err = wait.PollUntilContextTimeout(ctx, 2*time.Second, 1*time.Minute, true, func(ctx context.Context) (bool, error) {
+		_, createErr := clientset.CoreV1().Secrets(metricsNamespace).Create(ctx, secret, metav1.CreateOptions{})
+		if createErr != nil && !apierrors.IsAlreadyExists(createErr) {
+			klog.Errorf("creating metrics-server serving cert secret: %v", createErr)
+			return false, nil
+		}
+		return true, nil
+	})
+	if err != nil {
+		return fmt.Errorf("creating metrics-server serving cert secret: %w", err)
+	}
+
+	klog.Infof("Provisioned metrics-server serving cert secret %s/%s (service-ca operator secret was missing)", metricsNamespace, servingSecretName)
 	return nil
 }
 

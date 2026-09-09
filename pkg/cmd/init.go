@@ -247,6 +247,21 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 					"route-controller-manager.openshift-route-controller-manager.svc.cluster.local",
 				},
 			},
+			// Serving cert for metrics-server. Normally the service-ca operator
+			// generates the "metrics-server-tls" secret from the serving-cert
+			// annotation on the Service, but if that secret is lost it is not
+			// always regenerated (USHIFT-7500). Minting it from the same
+			// service-CA lets MicroShift recreate the secret as a safety net.
+			&certchains.ServingCertificateSigningRequestInfo{
+				CSRMeta: certchains.CSRMeta{
+					Name:     "metrics-server-serving",
+					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+				},
+				Hostnames: []string{
+					"metrics-server.openshift-monitoring.svc",
+					"metrics-server.openshift-monitoring.svc.cluster.local",
+				},
+			},
 		),
 
 		certchains.NewCertificateSigner(
