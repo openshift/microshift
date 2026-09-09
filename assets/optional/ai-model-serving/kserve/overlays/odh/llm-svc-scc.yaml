@@ -2,7 +2,14 @@ kind: SecurityContextConstraints
 apiVersion: security.openshift.io/v1
 metadata:
   name: openshift-ai-llminferenceservice-scc
-priority: 10
+# priority is intentionally null. OCP SCC admission evaluates the union of the
+# pod's ServiceAccount and the identity that submits the pod create, then selects
+# the highest-priority SCC available to either. A positive priority makes this SCC
+# auto-win over restricted-v2 for any pod created by a broadly-privileged requestor
+# (e.g. a GitOps controller), hijacking unrelated workloads. With null priority
+# this SCC is only selected when a pod actually requires the extra capabilities it
+# grants; otherwise OCP falls back to a more restrictive SCC.
+priority: null
 allowHostDirVolumePlugin: false
 allowHostIPC: false
 allowHostNetwork: false
@@ -46,7 +53,15 @@ kind: SecurityContextConstraints
 apiVersion: security.openshift.io/v1
 metadata:
   name: openshift-ai-llminferenceservice-multi-node-scc
-priority: 11
+# priority is intentionally null. OCP SCC admission evaluates the union of the
+# pod's ServiceAccount and the identity that submits the pod create, then selects
+# the highest-priority SCC available to either. A positive priority makes this SCC
+# auto-win over restricted-v2 for any pod created by a broadly-privileged requestor
+# (e.g. a GitOps controller), hijacking unrelated workloads. With null priority
+# this SCC is only selected when a pod actually requires the extra capabilities it
+# grants (e.g. hostPath for multi-node); otherwise OCP falls back to a more
+# restrictive SCC.
+priority: null
 allowHostDirVolumePlugin: true
 allowHostIPC: false
 allowHostNetwork: false
