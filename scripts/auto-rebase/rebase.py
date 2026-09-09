@@ -360,11 +360,13 @@ def main():
     else:
         logging.warning("Rebase script failed - everything will be committed")
         with open('rebase.log', mode='w', encoding='utf-8') as writer:
-            output = ("rebase.sh:\n" +
-                      f"{rebase_result.output}" +
-                      "==================================================\n" +
-                      "rebase_ai_model_serving.sh:\n" +
-                      f"{ai_rebase_result.output}")
+            separator = "==================================================\n"
+            output = (
+                "rebase.sh:\n" + f"{rebase_result.output}" + separator +
+                "rebase_ai_model_serving.sh:\n" + f"{ai_rebase_result.output}" + separator +
+                "rebase_sriov.sh:\n" + f"{sriov_rebase_result.output}" + separator +
+                "rebase_cert_manager.sh:\n" + f"{cert_manager_rebase_result.output}" + separator +
+                "rebase_cluster_monitoring_operator.sh:\n" + f"{monitoring_rebase_result.output}")
             writer.write(output)
         if g.git_repo.active_branch.name == base_branch:
             # rebase.sh didn't reach the step that would create a branch
@@ -391,8 +393,8 @@ def main():
         g.push(rebase_branch_name, base_branch, gh.gh_repo)
 
     prow_job_url = try_create_prow_job_url()
-    pr_title = create_pr_title(rebase_branch_name, rebase_result.success)
-    desc = generate_pr_description(get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebase_result.success)
+    pr_title = create_pr_title(rebase_branch_name, rebases_succeeded)
+    desc = generate_pr_description(get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebases_succeeded)
 
     comment = ""
     pull_req = gh.get_existing_pr_for_a_branch(adjusted_base_branch, rebase_branch_name)
