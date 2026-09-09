@@ -277,13 +277,6 @@ Get PV Name From PVC
     Should Not Be Empty    ${pv}
     RETURN    ${pv}
 
-Get Pod Node Name
-    [Documentation]    Return the node name where a pod is scheduled.
-    [Arguments]    ${pod}    ${ns}=${NAMESPACE}
-    ${node}=    Oc Get JsonPath    pod    ${ns}    ${pod}    .spec.nodeName
-    Should Not Be Empty    ${node}
-    RETURN    ${node}
-
 Get Deployment Pod Name
     [Documentation]    Return the first pod name from a deployment.
     [Arguments]    ${dep_name}    ${ns}=${NAMESPACE}
@@ -340,13 +333,13 @@ Resource Should Not Exist Cluster Scoped
 
 Check Volume Mount On Node
     [Documentation]    Verify a volume is mounted on the MicroShift host with expected content.
-    [Arguments]    ${vol_name}    ${node_name}    ${expected}
+    [Arguments]    ${vol_name}    ${expected}
     ${output}=    Command Should Work    mount | grep ${vol_name}
     Should Contain    ${output}    ${expected}
 
 Check Volume Not Mounted On Node
     [Documentation]    Verify a volume is NOT mounted on the MicroShift host.
-    [Arguments]    ${vol_name}    ${node_name}
+    [Arguments]    ${vol_name}
     ${stdout}    ${stderr}    ${rc}=    SSHLibrary.Execute Command
     ...    mount | grep ${vol_name}
     ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True

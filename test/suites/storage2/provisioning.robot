@@ -42,12 +42,11 @@ OCP-59668 Default SC XFS Dynamic Provision RW Exec Scale
 
     # Verify volume mount on node
     ${pv}=    Get PV Name From PVC    ${pvc}
-    ${node}=    Get Pod Node Name    ${pod}
-    Check Volume Mount On Node    ${pv}    ${node}    xfs
+    Check Volume Mount On Node    ${pv}    xfs
 
     # Scale down and verify unmount
     Scale Deployment And Wait    ${dep}    0
-    Check Volume Not Mounted On Node    ${pv}    ${node}
+    Check Volume Not Mounted On Node    ${pv}
 
     # Scale up and verify data persists
     Scale Deployment And Wait    ${dep}    1
