@@ -107,6 +107,14 @@ function clean_processes() {
         for pname in conmon pause ovn-controller ovn-northd ; do
             pkill -9 --exact ${pname} || true
         done
+        # Remove OVN-related entries from OVS external_ids so that a subsequent
+        # MicroShift start picks up the correct SBDB address rather than a stale
+        # unix socket or TCP endpoint from the previous run.
+        for key in ovn-remote ovn-encap-type ovn-encap-ip ovn-bridge-mappings \
+                   ovn-monitor-all ovn-openflow-probe-interval ovn-remote-probe-interval ; do
+            val=$(ovs-vsctl --if-exists get Open_vSwitch . "external_ids:${key}" 2>/dev/null | tr -d '"')
+            [ -n "${val}" ] && ovs-vsctl remove Open_vSwitch . external_ids "${key}" "${val}" 2>/dev/null || true
+        done
     fi
 }
 
