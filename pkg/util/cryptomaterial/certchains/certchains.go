@@ -110,7 +110,9 @@ func WhenToRotateAtEarliest(cs *CertificateChains) ([]string, time.Time, error) 
 		rotationDate time.Time
 	)
 
-	err := cs.WalkChains(nil, func(currentPath []string, c x509.Certificate) error {
+	for _, entry := range cs.Inventory() {
+		currentPath := entry.Path
+		c := entry.Certificate
 		const month = 30 * time.Hour * 24
 
 		rotateAt := c.NotAfter.Add(-4 * month)
@@ -122,16 +124,14 @@ func WhenToRotateAtEarliest(cs *CertificateChains) ([]string, time.Time, error) 
 		if rotationDate.IsZero() {
 			rotationDate = rotateAt
 			certPath = currentPath
-			return nil
+			continue
 		}
 
 		if rotateAt.Before(rotationDate) {
 			rotationDate = rotateAt
 			certPath = currentPath
 		}
+	}
 
-		return nil
-	})
-
-	return certPath, rotationDate, err
+	return certPath, rotationDate, nil
 }

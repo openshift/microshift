@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"crypto/x509"
 	"fmt"
 	"net"
 	"net/url"
@@ -590,7 +589,9 @@ func initKubeconfigs(
 // bundle that need to be regenerated
 func certsToRegenerate(cs *certchains.CertificateChains) ([][]string, error) {
 	regenCerts := [][]string{}
-	err := cs.WalkChains(nil, func(certPath []string, c x509.Certificate) error {
+	for _, entry := range cs.Inventory() {
+		certPath := entry.Path
+		c := entry.Certificate
 		if now := time.Now(); now.Before(c.NotBefore) || now.After(c.NotAfter) {
 			regenCerts = append(regenCerts, certPath)
 		}
@@ -605,18 +606,16 @@ func certsToRegenerate(cs *certchains.CertificateChains) ([][]string, error) {
 			if timeLeft < until {
 				regenCerts = append(regenCerts, certPath)
 			}
-			return nil
+			continue
 		}
 
 		// long lived certs
 		if timeLeft < 18*month {
 			regenCerts = append(regenCerts, certPath)
 		}
+	}
 
-		return nil
-	})
-
-	return regenCerts, err
+	return regenCerts, nil
 }
 
 func cleanupStaleKubeconfigs(cfg *config.Config, path string) error {
