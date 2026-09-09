@@ -45,18 +45,14 @@ func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 	// we cannot just remove the certs dir and regenerate all the certificates
 	// because there are some long-lived certs and CAs that shouldn't be swapped
 	// - for example system:admin client certs, KAS serving CAs
-	regenCerts, err := certsToRegenerate(certChains)
-	if err != nil {
-		return nil, err
-	}
-
+	regenCerts := certsToRegenerate(certChains)
 	for _, c := range regenCerts {
 		if err := certChains.Regenerate(c...); err != nil {
 			return nil, err
 		}
 	}
 
-	return certChains, err
+	return certChains, nil
 }
 
 func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
@@ -587,7 +583,7 @@ func initKubeconfigs(
 
 // certsToRegenerate returns paths to certificates in the given certificate chains
 // bundle that need to be regenerated
-func certsToRegenerate(cs *certchains.CertificateChains) ([][]string, error) {
+func certsToRegenerate(cs *certchains.CertificateChains) [][]string {
 	regenCerts := [][]string{}
 	for _, entry := range cs.Inventory() {
 		certPath := entry.Path
@@ -615,7 +611,7 @@ func certsToRegenerate(cs *certchains.CertificateChains) ([][]string, error) {
 		}
 	}
 
-	return regenCerts, nil
+	return regenCerts
 }
 
 func cleanupStaleKubeconfigs(cfg *config.Config, path string) error {

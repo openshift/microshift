@@ -38,8 +38,9 @@ func (i CertificateInventory) ByRole(role CertificateRole) CertificateInventory 
 // Inventory returns a deterministic snapshot of all certificates managed by
 // the chain. Signers are listed before their sub-CAs and leaf certificates.
 func (cs *CertificateChains) Inventory() CertificateInventory {
-	entries := make(CertificateInventory, 0)
-	for _, signerName := range cs.GetSignerNames() {
+	signerNames := cs.GetSignerNames()
+	entries := make(CertificateInventory, 0, len(signerNames))
+	for _, signerName := range signerNames {
 		signer := cs.GetSigner(signerName)
 		entries = append(entries, signer.inventory([]string{signerName})...)
 	}
@@ -47,11 +48,12 @@ func (cs *CertificateChains) Inventory() CertificateInventory {
 }
 
 func (s *CertificateSigner) inventory(path []string) CertificateInventory {
-	entries := CertificateInventory{{
+	entries := make(CertificateInventory, 0, 1+len(s.subCAs)+len(s.signedCertificates))
+	entries = append(entries, CertificateInventoryEntry{
 		Path:        append([]string(nil), path...),
 		Role:        CertificateRoleCA,
 		Certificate: *s.signerConfig.Config.Certs[0],
-	}}
+	})
 
 	for _, subCAName := range s.GetSubCANames() {
 		subCAPath := append(append([]string(nil), path...), subCAName)
