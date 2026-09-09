@@ -109,7 +109,9 @@ function clean_processes() {
         for key in ovn-remote ovn-encap-type ovn-encap-ip ovn-bridge-mappings \
                    ovn-monitor-all ovn-openflow-probe-interval ovn-remote-probe-interval ; do
             val=$(ovs-vsctl --if-exists get Open_vSwitch . "external_ids:${key}" 2>/dev/null | tr -d '"') || true
-            [ -n "${val}" ] && ovs-vsctl remove Open_vSwitch . external_ids "${key}" "${val}" 2>/dev/null || true
+            if [ -n "${val}" ]; then
+                ovs-vsctl remove Open_vSwitch . external_ids "${key}" "${val}" 2>/dev/null || true
+            fi
         done
         echo Killing conmon, pause and OVN processes
         systemctl stop --now ovsdb-server.service 2>/dev/null || true
