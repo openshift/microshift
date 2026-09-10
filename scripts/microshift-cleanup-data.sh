@@ -102,6 +102,17 @@ function clean_processes() {
     fi
 
     if ${FULL_CLEAN} || ${OVN_CLEAN} ; then
+        # Remove OVN-related entries from OVS external_ids BEFORE stopping ovsdb-server
+        # so that ovs-vsctl can still reach the socket. This ensures a subsequent
+        # MicroShift start picks up the correct SBDB address rather than a stale
+        # unix socket or TCP endpoint from the previous run.
+        for key in ovn-remote ovn-encap-type ovn-encap-ip ovn-bridge-mappings \
+                   ovn-monitor-all ovn-openflow-probe-interval ovn-remote-probe-interval ; do
+            val=$(ovs-vsctl --if-exists get Open_vSwitch . "external_ids:${key}" 2>/dev/null | tr -d '"') || true
+            if [ -n "${val}" ]; then
+                ovs-vsctl remove Open_vSwitch . external_ids "${key}" "${val}" 2>/dev/null || true
+            fi
+        done
         echo Killing conmon, pause and OVN processes
         systemctl stop --now ovsdb-server.service 2>/dev/null || true
         for pname in conmon pause ovn-controller ovn-northd ; do
