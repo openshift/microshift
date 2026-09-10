@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "2.25.10"
+    "base": "2.25.11"
   },
   "images": {
     "ray-tls-generator-image": "registry.redhat.io/ubi9/ubi-minimal:latest",
