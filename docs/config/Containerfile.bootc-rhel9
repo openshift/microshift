@@ -1,6 +1,6 @@
-FROM registry.redhat.io/rhel9-eus/rhel-9.6-bootc:9.6
+FROM registry.redhat.io/rhel9-eus/rhel-9.8-bootc:9.8
 
-ARG USHIFT_VER=4.18
+ARG USHIFT_VER=4.22
 # hadolint ignore=SC1091
 RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
     dnf config-manager \
