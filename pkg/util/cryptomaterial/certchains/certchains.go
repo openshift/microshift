@@ -74,7 +74,7 @@ func WhenToRotateAtEarliest(cs *CertificateChains) ([]string, time.Time, error) 
 		if !cryptomaterial.IsCertShortLived(&c) {
 			rotateAt = c.NotAfter.Add(-12 * month)
 		}
-		klog.Errorf("%v rotate at: %s", currentPath, rotateAt.String())
+		klog.Warningf("%v rotate at: %s", currentPath, rotateAt.String())
 
 		if rotationDate.IsZero() {
 			rotationDate = rotateAt
