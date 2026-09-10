@@ -46,13 +46,14 @@ RUN . /etc/os-release && dnf upgrade -y --releasever="${VERSION_ID}" && \
 
 # Create a default 'redhat' user with the specified password.
 # Add it to the 'wheel' group to allow for running sudo commands.
-ARG USER_PASSWD
-RUN if [ -z "${USER_PASSWD}" ] ; then \
-        echo USER_PASSWD is a mandatory build argument && exit 1 ; \
-    fi
+# The password is passed via a build secret to avoid exposing it in image metadata.
 # hadolint ignore=DL4006
-RUN useradd -m -d /var/home/redhat -G wheel redhat && \
-    echo "redhat:${USER_PASSWD}" | chpasswd
+RUN --mount=type=secret,id=user_passwd \
+    if [ ! -f /run/secrets/user_passwd ]; then \
+        echo "user_passwd secret is required" && exit 1; \
+    fi && \
+    useradd -m -d /var/home/redhat -G wheel redhat && \
+    echo "redhat:$(cat /run/secrets/user_passwd)" | chpasswd
 
 # Mandatory firewall configuration
 RUN firewall-offline-cmd --zone=public --add-port=22/tcp && \

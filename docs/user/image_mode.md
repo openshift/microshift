@@ -109,7 +109,8 @@ Unlike the released Containerfile, it:
 Note how secrets are used during the image build:
 * The podman `--authfile` argument is required to pull the base image from the
 `registry.redhat.io` registry
-* The build `USER_PASSWD` argument is used to set a password for the `redhat` user
+* The build secret `user_passwd` is used to set a password for the `redhat` user
+without exposing it in image metadata
 
 Run the following command, using `_output/rpmbuild/RPMS` as the build context so
 the local repository is available to the build:
@@ -120,7 +121,7 @@ USER_PASSWD="<your_redhat_user_password>"
 IMAGE_NAME=microshift-source-bootc
 
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
-    --build-arg USER_PASSWD="${USER_PASSWD}" \
+    --secret id=user_passwd,env=USER_PASSWD \
     -f docs/config/Containerfile.bootc-source-rhel9 \
     _output/rpmbuild/RPMS
 ```
