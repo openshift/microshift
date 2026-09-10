@@ -1,0 +1,29 @@
+- cluster-ingress-operator embedded-component 5bf72fcc4534d9ba2c4d65d29cdb8b01c83cf550 to 48b8f79897294e8701c22af8dcdddcb78fa30ff0
+  - 37e7d31e 2026-09-01T13:27:57-04:00 Update the logging and add a descriptive comment
+  - bea6ae70 2026-09-01T17:37:11+02:00 OCPBUGS-92835: add grace period to Available condition for deployment blips
+  - 022ab829 2026-08-26T18:38:38-03:00 vendor files required for tests
+  - 6daaab20 2026-08-26T18:38:38-03:00 WAF-3: Implement extension provider capability for WAF
+  - 1ad981ce 2026-08-14T12:48:03-04:00 Update the unit tests
+  - 5edaf15a 2026-08-13T20:03:58-04:00 Add two unit tests for malformed CIDRs
+  - 58cc99fc 2026-08-13T19:11:45-04:00 OCPBUGS-109582: Normalize malformed CIDRs to avoid upgrade disruptions
+  - d896afa8 2026-08-10T15:48:35+02:00 Fix gofmt formatting in controller_test.go
+  - 99e8741a 2026-07-31T16:29:50+02:00 OCPBUGS-62627: Suppress cluster operator Progressing during infrastructure-driven ingress unavailability
+
+- cluster-kube-apiserver-operator embedded-component 2caf92bdc42acc1d71c2c1e6152b7da31b66919c to 7e0eee0325ab855d09906ba31c2ae2040bb1a7b1
+  - e9a1777 2026-09-04T11:43:10+02:00 bump (*)
+
+- cluster-network-operator embedded-component 50609c5ab373ed5c1db508e9819afd10ea5512ec to c44c178f408a77a9d2460bae64620d2bd3200ff7
+  - d25b490 2026-09-04T10:19:02+02:00 Add AGENTS.md, point CodeRabbit knowledge base at it
+  - 84a98ca 2026-08-31T12:24:13-07:00 Add status.vrfName and shortNames to UDN/CUDN CRDs
+
+- etcd embedded-component 609b11ed8fc404fb95572d7c87e3243a1206cdb7 to 24fb7ef2afe9c4e4ca179f70b101d8ac2a0daeab
+  - 33b1c411 2026-09-02T20:30:20-07:00 DOWNSTREAM: <carry>: CNTRLPLANE-3724: add agentic context docs for the openshift/etcd fork
+
+- machine-config-operator embedded-component 11fd0ff5069fa923efab9312a3cdb65e8b94fb43 to 95ada475a7d0c0928d9d3cbfbe37196196a337d8
+  - 8940415e 2026-09-04T11:48:16Z NO-ISSUE: check mosb failed message in test 85980
+  - 1129129d 2026-09-04T09:45:39+02:00 OCPBUGS-120711: Fix vsphere network absolute paths
+  - 2c4e2bc3 2026-09-03T13:12:07-04:00 operator: retry on conflict in syncMachineConfigNodes
+  - 8fdff133 2026-09-03T16:07:31Z OCPBUGS-116490: remove nft chains before checking the ignition config
+  - b8eee7e1 2026-09-02T15:22:15+05:30 OCPBUGS-109657: Assert errors in TestGetPrimaryPoolForNode
+  - b764fb26 2026-08-31T14:01:28-04:00 mcs: replace wildcard permissions with explicit verbs
+
