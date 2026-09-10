@@ -20,14 +20,24 @@ func TestAdmit(t *testing.T) {
 		expectedNodeSelector map[string]string
 	}{
 		{
-			name: "VPA operator pod with master node selector: selector is removed",
+			name: "VPA operator pod with default node selectors (os + master): master selector is removed",
+			pod: makePod(
+				withNamespace(vpaOperatorNamespace),
+				withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}),
+				withNodeSelector(map[string]string{"kubernetes.io/os": "linux", masterRoleKey: ""}),
+			),
+			resource:             coreapi.Resource("pods").WithVersion("v1"),
+			expectedNodeSelector: map[string]string{"kubernetes.io/os": "linux"},
+		},
+		{
+			name: "VPA operator pod with only master node selector: not modified",
 			pod: makePod(
 				withNamespace(vpaOperatorNamespace),
 				withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}),
 				withNodeSelector(map[string]string{masterRoleKey: ""}),
 			),
 			resource:             coreapi.Resource("pods").WithVersion("v1"),
-			expectedNodeSelector: map[string]string{},
+			expectedNodeSelector: map[string]string{masterRoleKey: ""},
 		},
 		{
 			name: "VPA operator pod with no node selector: not modified",
@@ -49,7 +59,7 @@ func TestAdmit(t *testing.T) {
 			expectedNodeSelector: map[string]string{"topology.kubernetes.io/zone": "us-east-1a"},
 		},
 		{
-			name: "VPA operator pod with extra node selectors including master: not modified",
+			name: "VPA operator pod with custom node selectors including master: not modified",
 			pod: makePod(
 				withNamespace(vpaOperatorNamespace),
 				withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}),
@@ -158,9 +168,14 @@ func TestRequiresNodeSelectorAdjustment(t *testing.T) {
 		expected bool
 	}{
 		{
-			name:     "VPA operator with master node selector: match",
-			pod:      makePod(withNamespace(vpaOperatorNamespace), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}), withNodeSelector(map[string]string{masterRoleKey: ""})),
+			name:     "VPA operator with default node selectors (os + master): match",
+			pod:      makePod(withNamespace(vpaOperatorNamespace), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}), withNodeSelector(map[string]string{"kubernetes.io/os": "linux", masterRoleKey: ""})),
 			expected: true,
+		},
+		{
+			name:     "VPA operator with only master node selector: no match",
+			pod:      makePod(withNamespace(vpaOperatorNamespace), withLabels(map[string]string{vpaOperatorLabelKey: vpaOperatorLabelValue}), withNodeSelector(map[string]string{masterRoleKey: ""})),
+			expected: false,
 		},
 		{
 			name:     "VPA operator with no node selector: no match",
