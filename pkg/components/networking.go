@@ -61,9 +61,12 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 	)
 
 	if cfg.MultiNode.Enabled {
-		apps = []string{
-			"components/ovn/multi-node/master/daemonset.yaml",
-			"components/ovn/multi-node/node/daemonset.yaml",
+		// node DaemonSet runs on every multinode member (primary and workers).
+		apps = []string{"components/ovn/multi-node/node/daemonset.yaml"}
+		if !cfg.BootstrapKubeConfigExists() {
+			// Primary node only: also deploy the OVN database stack (sbdb/nbdb/northd).
+			// Workers connect to the primary's databases via the ovnkube.conf [OvnNorth]/[OvnSouth] stanzas.
+			apps = append([]string{"components/ovn/multi-node/master/daemonset.yaml"}, apps...)
 		}
 	}
 
@@ -110,17 +113,24 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		return err
 	}
 
-	// Multinode only params: OVN_NB_PORT, OVN_SB_PORT
+	// Multinode only params: OVN_NB_PORT, OVN_SB_PORT, MultiNodeEnabled
 	extraParams := assets.RenderParams{
-		"OVNConfig":      ovnConfig,
-		"KubeconfigPath": kubeconfigPath,
-		"KubeconfigDir":  filepath.Join(config.DataDir, "/resources/kubeadmin"),
-		"OVN_NB_PORT":    ovn.OVN_NB_PORT,
-		"OVN_SB_PORT":    ovn.OVN_SB_PORT,
+		"OVNConfig":        ovnConfig,
+		"KubeconfigPath":   kubeconfigPath,
+		"KubeconfigDir":    filepath.Join(config.DataDir, "/resources/kubeadmin"),
+		"OVN_NB_PORT":      ovn.OVN_NB_PORT,
+		"OVN_SB_PORT":      ovn.OVN_SB_PORT,
+		"MultiNodeEnabled": cfg.MultiNode.Enabled,
 	}
-	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
-		klog.Warningf("Failed to apply configMap %v %v", cm, err)
-		return err
+	// In multinode mode the configmap contains [OvnNorth]/[OvnSouth] stanzas
+	// with the primary's IP. Only the primary may write it; a worker applying
+	// the configmap would overwrite the primary IP with its own, breaking SBDB
+	// connectivity for every node that reads the configmap afterwards.
+	if !cfg.MultiNode.Enabled || !cfg.BootstrapKubeConfigExists() {
+		if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+			klog.Warningf("Failed to apply configMap %v %v", cm, err)
+			return err
+		}
 	}
 	if err := assets.ApplyDaemonSets(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v %v", apps, err)
