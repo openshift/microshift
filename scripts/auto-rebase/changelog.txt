@@ -1,3 +1,12 @@
-- machine-config-operator embedded-component 0db0e697092e7d4f44f0331d03ce68cd1fbd63d1 to 9bc526090b3b087f1d9eaaea86901a3f95c2c997
-  - 134a8466 2026-09-02T17:00:35Z chore: update AMIs
+- kubernetes embedded-component 2df3632e823a813f64218dfc6f5c2e70d28ecdf0 to 4012064c4f97c60a48b036469d20df3bcb2ac328
+  - fe035f535 2026-09-02T19:34:49Z UPSTREAM: 138981: Cache selinux conflicts
+  - ccbe36ecc 2026-09-02T19:34:49Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
+  - e1738f129 2026-09-02T19:34:48Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
+  - e441f4674 2026-08-11T15:28:28Z UPSTREAM: <carry>: OCPBUGS-105592: backport kubernetes/conformance umbrella suite
+
+- kubernetes image-amd64 2df3632e823a813f64218dfc6f5c2e70d28ecdf0 to 4012064c4f97c60a48b036469d20df3bcb2ac328
+  - fe035f535 2026-09-02T19:34:49Z UPSTREAM: 138981: Cache selinux conflicts
+  - ccbe36ecc 2026-09-02T19:34:49Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
+  - e1738f129 2026-09-02T19:34:48Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
+  - e441f4674 2026-08-11T15:28:28Z UPSTREAM: <carry>: OCPBUGS-105592: backport kubernetes/conformance umbrella suite
 
