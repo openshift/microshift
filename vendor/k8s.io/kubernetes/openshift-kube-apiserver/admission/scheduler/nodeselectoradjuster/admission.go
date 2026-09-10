@@ -96,11 +96,14 @@ func (p *nodeSelectorAdjuster) ValidateInitialization() error {
 // opts it in to node placement and lives in a namespace where that
 // label is expected. Control-plane-adjacent Day 2 operators can be added here.
 func requiresNodeSelectorAdjustment(pod *coreapi.Pod) bool {
-	// For VPA, we only want to update if the sole node selector is the
-	// master role key, which is the default from the 4.x VPA operator manifests.
+	// Only adjust when the node selector matches the exact default set from
+	// the 4.x VPA operator manifests. A cluster admin who customises the
+	// selector should not have their intent overridden.
 	if pod.Labels[vpaOperatorLabelKey] == vpaOperatorLabelValue &&
-		pod.Namespace == vpaOperatorNamespace && len(pod.Spec.NodeSelector) == 1 {
-		if _, found := pod.Spec.NodeSelector[masterRoleKey]; found {
+		pod.Namespace == vpaOperatorNamespace && len(pod.Spec.NodeSelector) == 2 {
+		_, hasMaster := pod.Spec.NodeSelector[masterRoleKey]
+		osVal, hasOS := pod.Spec.NodeSelector["kubernetes.io/os"]
+		if hasMaster && hasOS && osVal == "linux" {
 			return true
 		}
 	}
