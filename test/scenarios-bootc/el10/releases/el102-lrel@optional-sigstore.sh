@@ -2,15 +2,6 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-# Each optional suite restarts MicroShift with its own kustomizePaths config,
-# adding ~10 minutes of restart overhead to the total execution time.
-# shellcheck disable=SC2034  # used elsewhere
-TEST_EXECUTION_TIMEOUT=60m
-
-# shellcheck disable=SC2034  # used elsewhere
-# Increase greenboot timeout for optional packages (more services to start)
-GREENBOOT_TIMEOUT=1200
-
 # Enable container signature verification for current release images,
 # including the optional components.
 # These are ec / rc / z-stream, thus must all to be signed.
