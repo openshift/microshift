@@ -1,3 +1,37 @@
-- kubernetes image-arm64 05744abbe07157bc72508fd1872e46e9c38fbfe7 to 19365a06f558a5c5dc7f5654fa99a8318e4a77f4
+- api embedded-component 160d28ee4bcb759daf12a47066e7026a4c5806ab to 42fb550ea02a47ab1de1ee81d798706cb74035a1
+  - 7b09db07 2026-09-02T13:56:13-04:00 Tech preview feature gate file upgrades
+  - 92bc982f 2026-09-02T13:46:48-04:00 Move GCD to TechPreview
+  - 19c023c7 2026-09-02T13:22:47-04:00 Dev Preview updates to yaml files.
+  - 757f038d 2026-09-02T13:16:46-04:00 CORS-4435: GCP Sovereign Cloud Feature Gate
+  - 019fbdc1 2026-09-02T13:04:33-04:00 - Remove universeDomain from DevPreviewNoUpgrade CRDs — the first cherry-pick commit already added it to CustomNoUpgrade and DevPreviewNoUpgrade, but this second commit is adjusting the generated manifests. The diff removes universeDomain from several DevPreview CRDs and the AzureClusterHostedDNSInstall featuregated manifest, and trims down the GCPSovereignCloudInstall featuregated manifests. - Deletes SelfManagedHA-* payload CRDs — these don't exist in release-4.22.
+  - 520fea14 2026-09-02T13:00:05-04:00 Address review comments: improve docs and test coverage
+  - 8bd5b5c8 2026-09-02T12:54:03-04:00 CORS-4417: Add UniverseDomain field to GCPPlatformStatus
+
+- cluster-kube-apiserver-operator embedded-component 9c413cd4dc8c3876cc40ee85c207bf9b143f106f to a2ba9c6a2d1ed76ea98a40885cf9a824eb9b9071
+  - 906e0be 2026-09-03T14:35:06+02:00 Use 10min inertia for GuardControllerDegraded
+  - 84d38af 2026-09-03T14:33:03+02:00 Add 10-minute degraded inertia for StaticPodsDegraded
+  - a430728 2026-09-03T14:32:56+02:00 Add 10-minute degraded inertia for NodeControllerDegraded
+
+- cluster-kube-controller-manager-operator embedded-component 95150ed5dbf11370b4a06e6959c77efa13768561 to c5c678b3e04a64214ae62f5ad6d873c8899ac363
+  - 88be954 2026-09-02T15:21:30+02:00 Use 10min inertia for GuardControllerDegraded
+  - ad4e48a 2026-09-02T14:56:58+02:00 Add 10-minute degraded inertia for StaticPodsDegraded
+  - 6d2b464 2026-09-02T14:56:45+02:00 Add 10-minute degraded inertia for NodeControllerDegraded
+
+- cluster-kube-scheduler-operator embedded-component 51ea59abd057d0cef56b29b8a74efc28411d5427 to da4bf66b8f6d057ab1562b6640261d8fe9ded28f
+  - 37456f4 2026-09-03T14:23:20+02:00 Use 10min inertia for GuardControllerDegraded
+  - 6878bd1 2026-09-03T14:21:20+02:00 Add 10-minute degraded inertia for StaticPodsDegraded
+  - f5be8fe 2026-09-03T14:21:13+02:00 Add 10-minute degraded inertia for NodeControllerDegraded
+
+- kubernetes embedded-component 05744abbe07157bc72508fd1872e46e9c38fbfe7 to 19365a06f558a5c5dc7f5654fa99a8318e4a77f4
+  - 059143d00 2026-08-31T22:09:49-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for HCP clusters (part 2)
+
+- machine-config-operator embedded-component 68e5c4026c0571ea6ea351b06fc7f78dc9b72803 to 90b269666abb8df37c46bf49d9b54dcf2604447c
+  - 206fb079 2026-09-08T13:00:28Z OCPBUGS-120711: Fix vsphere network absolute paths
+  - 2629e4cc 2026-09-03T11:18:34-04:00 bootimage: skip vsphere fd-unmatched machinesets
+  - ecf4b31b 2026-09-03T09:29:31Z fix(test): increase TC-74751 Eventually timeout for vSphere OVA upload
+  - b7b4fa0b 2026-09-02T17:02:10Z chore: update AMIs
+  - ac6d66e0 2026-09-01T15:22:16-04:00 controller: update message for MachineOSBuildFailed condition
+
+- kubernetes image-amd64 05744abbe07157bc72508fd1872e46e9c38fbfe7 to 19365a06f558a5c5dc7f5654fa99a8318e4a77f4
   - 059143d00 2026-08-31T22:09:49-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for HCP clusters (part 2)
 
