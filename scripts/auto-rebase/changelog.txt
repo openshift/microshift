@@ -1,22 +1,9 @@
-- cluster-csi-snapshot-controller-operator embedded-component 8c1ebc60a2014ab925cbad6ef255e06ea0bd72b4 to eb43a7a80d1b314eb8bbe63b6b73de91ba8cc7aa
-  - 10812f0 2026-08-31T22:42:46-05:00 OCPBUGS-104057: CVE-2026-33814 - replace golang.org/x/net with openshift-sustaining fork
+- operator-framework-olm embedded-component 149d553b2057320d761c4d1913098a66787dd09a to dea74354157f010d1c2705f87c88b3724843e90d
+  - 63307408 2026-08-18T14:59:10+05:30 CVE-2026-53488: bump containerd to v1.7.33
 
-- kubernetes embedded-component 7ffd39de9bbb8e3edca8ee7530cf1dab522fbce2 to 93afd702239e69df4bf4b7e66140455ab8282acd
-  - cf89602a0 2026-06-04T13:30:23Z UPSTREAM: 138981: Cache selinux conflicts
-  - 1b7b4200e 2026-06-04T13:30:23Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
-  - 379d13715 2026-06-04T13:30:23Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
+- oc image-amd64 4717c66ce35180eea2efcd759aeec77bdc611375 to d0bf7cc5959bf8408912e5276f2ea9e269ede24d
+  - 6d3d3faa 2026-08-31T12:07:28+05:30 Replace golang.org/x/net with sustaining fork for CVE-2026-33814 because upstream fix (x/net v0.53.0) requires go 1.25.0
 
-- machine-config-operator embedded-component a94e123109ee46a66552dca42a0dd6a2ef03e29b to f08b4678edfbce0d57e8d7dc779bf6aae131f0e8
-  - 25a52d38 2026-09-02T16:59:49Z chore: update AMIs
-  - a18ff695 2026-08-20T20:25:48Z OCPBUGS-98316: Fix SHA idempotency test in nmstate-configuration.sh
-
-- kubernetes image-amd64 7ffd39de9bbb8e3edca8ee7530cf1dab522fbce2 to 93afd702239e69df4bf4b7e66140455ab8282acd
-  - cf89602a0 2026-06-04T13:30:23Z UPSTREAM: 138981: Cache selinux conflicts
-  - 1b7b4200e 2026-06-04T13:30:23Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
-  - 379d13715 2026-06-04T13:30:23Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
-
-- kubernetes image-arm64 7ffd39de9bbb8e3edca8ee7530cf1dab522fbce2 to 93afd702239e69df4bf4b7e66140455ab8282acd
-  - cf89602a0 2026-06-04T13:30:23Z UPSTREAM: 138981: Cache selinux conflicts
-  - 1b7b4200e 2026-06-04T13:30:23Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
-  - 379d13715 2026-06-04T13:30:23Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
+- oc image-arm64 4717c66ce35180eea2efcd759aeec77bdc611375 to d0bf7cc5959bf8408912e5276f2ea9e269ede24d
+  - 6d3d3faa 2026-08-31T12:07:28+05:30 Replace golang.org/x/net with sustaining fork for CVE-2026-33814 because upstream fix (x/net v0.53.0) requires go 1.25.0
 

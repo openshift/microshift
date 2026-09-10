@@ -14,10 +14,10 @@ https://github.com/openshift/kubernetes embedded-component 93afd702239e69df4bf4b
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component ce5ff17e9a81ce754567e6dd5053d13409c251e9
 https://github.com/openshift/machine-config-operator embedded-component f08b4678edfbce0d57e8d7dc779bf6aae131f0e8
 https://github.com/openshift/openshift-controller-manager embedded-component 438d52e79d691e016d66eabfe9a53c84229db40c
-https://github.com/openshift/operator-framework-olm embedded-component 149d553b2057320d761c4d1913098a66787dd09a
+https://github.com/openshift/operator-framework-olm embedded-component dea74354157f010d1c2705f87c88b3724843e90d
 https://github.com/openshift/route-controller-manager embedded-component 166a3e96f8151d9e789b3951ae75b03cdede5081
 https://github.com/openshift/service-ca-operator embedded-component e9622ba18c86bf24aceab0c19fdcb87339c14f44
-https://github.com/openshift/oc image-amd64 4717c66ce35180eea2efcd759aeec77bdc611375
+https://github.com/openshift/oc image-amd64 d0bf7cc5959bf8408912e5276f2ea9e269ede24d
 https://github.com/openshift/coredns image-amd64 7486e9e4330c1e41d9a91e4673b7f2782efc112c
 https://github.com/openshift/csi-external-snapshotter image-amd64 2c14afc50a30de62cb00cc8263b061383cfbd3b5
 https://github.com/openshift/router image-amd64 22531cf0bb2435e73437be73c244913de4844812
@@ -25,7 +25,7 @@ https://github.com/openshift/kube-rbac-proxy image-amd64 cd636680e06a55395c26570
 https://github.com/openshift/ovn-kubernetes image-amd64 e2e61dbe576da162f711394c89068b8067f72343
 https://github.com/openshift/kubernetes image-amd64 93afd702239e69df4bf4b7e66140455ab8282acd
 https://github.com/openshift/service-ca-operator image-amd64 e9622ba18c86bf24aceab0c19fdcb87339c14f44
-https://github.com/openshift/oc image-arm64 4717c66ce35180eea2efcd759aeec77bdc611375
+https://github.com/openshift/oc image-arm64 d0bf7cc5959bf8408912e5276f2ea9e269ede24d
 https://github.com/openshift/coredns image-arm64 7486e9e4330c1e41d9a91e4673b7f2782efc112c
 https://github.com/openshift/csi-external-snapshotter image-arm64 2c14afc50a30de62cb00cc8263b061383cfbd3b5
 https://github.com/openshift/router image-arm64 22531cf0bb2435e73437be73c244913de4844812
