@@ -34,7 +34,7 @@ func run() int {
 	terminationLock := flag.String("termination-touch-file", "", "Touch this file on SIGTERM and delete on termination")
 	processOverlapDetectionFile := flag.String("process-overlap-detection-file", "", "This file is present when the kube-apiserver initialization timed out while waiting for kubelet to terminate old process")
 	kubeconfigPath := flag.String("kubeconfig", "", "Optional kubeconfig used to create events")
-	gracefulTerminatioPeriod := flag.Duration("graceful-termination-duration", 105*time.Second, "The duration of the graceful termination period, e.g. 105s")
+	gracefulTerminationPeriod := flag.Duration("graceful-termination-duration", 0, "The duration of the graceful termination period. (required and provided by the operator)")
 
 	klog.InitFlags(nil)
 	flag.Set("v", "9")
@@ -48,6 +48,12 @@ func run() int {
 
 	if len(args) == 0 {
 		fmt.Println("Missing command line")
+		return 1
+	}
+
+	// The operator must always set this explicitly; a silent default would mask operator bugs with wrong termination timings.
+	if *gracefulTerminationPeriod <= 0 {
+		fmt.Println("error: --graceful-termination-duration is required and must be > 0")
 		return 1
 	}
 
@@ -166,10 +172,10 @@ func run() int {
 
 		var deleteLockOnce sync.Once
 
-		if *gracefulTerminatioPeriod > 2*time.Second {
+		if *gracefulTerminationPeriod > 2*time.Second {
 			go func() {
 				<-termCh
-				<-time.After(*gracefulTerminatioPeriod - 2*time.Second)
+				<-time.After(*gracefulTerminationPeriod - 2*time.Second)
 
 				deleteLockOnce.Do(func() {
 					klog.Infof("Graceful termination time nearly passed and kube-apiserver has still not terminated. Deleting termination lock file %q to avoid a false positive.", *terminationLock)
@@ -177,7 +183,7 @@ func run() int {
 						klog.Errorf("Termination lock file deletion failed: %v", err)
 					}
 
-					if err := eventf(client.CoreV1().Events(ref.Namespace), *ref, corev1.EventTypeWarning, "GracefulTerminationTimeout", "kube-apiserver did not terminate within %s", *gracefulTerminatioPeriod); err != nil {
+					if err := eventf(client.CoreV1().Events(ref.Namespace), *ref, corev1.EventTypeWarning, "GracefulTerminationTimeout", "kube-apiserver did not terminate within %s", *gracefulTerminationPeriod); err != nil {
 						klog.Error(err)
 					}
 				})
