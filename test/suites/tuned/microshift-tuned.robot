@@ -69,6 +69,7 @@ MicroShift-Tuned Requires Config To Function
 Setup
     [Documentation]    Setup test for the test suite
     Login MicroShift Host
+    Wait Until Greenboot Health Check Exited
     # We don't need MicroShift service when testing microshift-tuned.service
     Stop MicroShift
     Disable MicroShift
