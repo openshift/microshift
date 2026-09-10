@@ -13,7 +13,7 @@ Test Tags           restart    slow
 
 
 *** Variables ***
-${CURSOR}                   ${EMPTY}    # Journal cursor for the current boot; set by Boot And Scan Journal
+${CURSOR}                   ${EMPTY}    # Journal cursor for the current service startup; set by Service Startup And Scan Journal
 
 # Known-benign "forbidden" log lines to ignore during the log scan.
 # On a fresh/clean start the cert-manager operator creates the cainjector,
@@ -29,18 +29,18 @@ ${CURSOR}                   ${EMPTY}    # Journal cursor for the current boot; s
 
 *** Test Cases ***
 Log Scan
-    [Documentation]    Scan the journal of a clean first boot and then of a
-    ...    restart. Both boots are checked, but the "forbidden" check runs only
-    ...    on the restart: a clean first boot logs a benign "forbidden" while
-    ...    components initialize (see ${FORBIDDEN_EXCEPTIONS}), whereas a restart
-    ...    must be free of it.
+    [Documentation]    Scan the journal of a clean first service startup and then
+    ...    of a restart. Both service startups are checked, but the "forbidden"
+    ...    check runs only on the restart: a clean first service startup logs a
+    ...    benign "forbidden" while components initialize (see
+    ...    ${FORBIDDEN_EXCEPTIONS}), whereas a restart must be free of it.
     Cleanup MicroShift    --all    --keep-images
     Enable MicroShift
 
-    # Clean first boot: skip the forbidden check.
-    Boot And Scan Journal    check_forbidden=False
+    # Clean first service startup: skip the forbidden check.
+    Service Startup And Scan Journal    check_forbidden=False
     # Restart: forbidden messages must not reappear.
-    Boot And Scan Journal
+    Service Startup And Scan Journal
 
 
 *** Keywords ***
@@ -57,10 +57,10 @@ Teardown
     Logout MicroShift Host
     Remove Kubeconfig
 
-Boot And Scan Journal
+Service Startup And Scan Journal
     [Documentation]    Record the journal cursor, start MicroShift, wait until it
-    ...    is initialized, stop it, and scan this boot's journal for wanted and
-    ...    unwanted messages.
+    ...    is initialized, stop it, and scan this service startup's journal for
+    ...    wanted and unwanted messages.
     [Arguments]    ${check_forbidden}=True
     ${cursor}=    Get Journal Cursor
     VAR    ${CURSOR}=    ${cursor}    scope=SUITE
@@ -70,11 +70,11 @@ Boot And Scan Journal
     Wait For MicroShift Healthcheck Success
     Stop MicroShift
 
-    Scan Boot Journal    check_forbidden=${check_forbidden}
+    Scan Service Startup Journal    check_forbidden=${check_forbidden}
 
-Scan Boot Journal
-    [Documentation]    Assert this boot's journal contains the expected readiness
-    ...    messages and none of the unwanted ones.
+Scan Service Startup Journal
+    [Documentation]    Assert this service startup's journal contains the expected
+    ...    readiness messages and none of the unwanted ones.
     [Arguments]    ${check_forbidden}=True
     IF    ${check_forbidden}    Should Not Find Forbidden
     Should Not Find Cannot Patch Resource
