@@ -176,7 +176,7 @@ DEPS_ARCH=$([ "${IMAGE_ARCH}" = "arm64" ] && echo aarch64 || echo x86_64)
 DEPS_REPO_URL="https://mirror.openshift.com/pub/openshift-v5/${DEPS_ARCH}/dependencies/rpms/5.0-el9-beta"
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --platform "${IMAGE_PLATFORM}" \
-    --build-arg USER_PASSWD="${USER_PASSWD}" \
+    --secret id=user_passwd,env=USER_PASSWD \
     --build-arg DEPS_REPO_URL="${DEPS_REPO_URL}" \
     -f docs/config/Containerfile.bootc-source-rhel9 \
     _output/rpmbuild/RPMS
