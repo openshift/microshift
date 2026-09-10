@@ -139,6 +139,23 @@ def run_rebase_cert_manager_sh(release):
     return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
 
 
+def run_rebase_cluster_monitoring_operator_sh(release_amd64, release_arm64):
+    """Run the 'rebase_cluster_monitoring_operator.sh' script with the given release versions and return the script's output."""
+    script_dir = os.path.abspath(os.path.dirname(__file__))
+    args = [f"{script_dir}/rebase_cluster_monitoring_operator.sh", "to", release_amd64, release_arm64]
+    logging.info(f"Running: '{' '.join(args)}'")
+    start = timer()
+    result = subprocess.run(
+        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False)
+    logging.info(f"Return code: {result.returncode}. Output:\n" +
+                 "==================================================\n" +
+                 f"{result.stdout}" +
+                 "==================================================\n")
+    end = timer() - start
+    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
+    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
+
+
 def make_sure_rebase_script_created_new_commits_or_exit(git_repo, base_branch):
     """Exit the script if the 'rebase.sh' script did not create any new commits."""
     if git_repo.active_branch.commit == git_repo.branches[base_branch].commit:
@@ -327,8 +344,10 @@ def main():
     ai_rebase_result = run_rebase_ai_model_serving_sh(rhoai_release)
     sriov_rebase_result = run_rebase_sriov_sh(sriov_release)
     cert_manager_rebase_result = run_rebase_cert_manager_sh(opm_version)
+    monitoring_rebase_result = run_rebase_cluster_monitoring_operator_sh(release_amd, release_arm)
 
-    rebases_succeeded = all([rebase_result.success, ai_rebase_result.success, sriov_rebase_result.success, cert_manager_rebase_result.success])
+    rebases_succeeded = all([rebase_result.success, ai_rebase_result.success, sriov_rebase_result.success,
+                             cert_manager_rebase_result.success, monitoring_rebase_result.success])
 
     if rebases_succeeded:
         # TODO How can we inform team that rebase job ran successfully just there was nothing new?
@@ -341,11 +360,13 @@ def main():
     else:
         logging.warning("Rebase script failed - everything will be committed")
         with open('rebase.log', mode='w', encoding='utf-8') as writer:
-            output = ("rebase.sh:\n" +
-                      f"{rebase_result.output}" +
-                      "==================================================\n" +
-                      "rebase_ai_model_serving.sh:\n" +
-                      f"{ai_rebase_result.output}")
+            separator = "==================================================\n"
+            output = (
+                "rebase.sh:\n" + f"{rebase_result.output}" + separator +
+                "rebase_ai_model_serving.sh:\n" + f"{ai_rebase_result.output}" + separator +
+                "rebase_sriov.sh:\n" + f"{sriov_rebase_result.output}" + separator +
+                "rebase_cert_manager.sh:\n" + f"{cert_manager_rebase_result.output}" + separator +
+                "rebase_cluster_monitoring_operator.sh:\n" + f"{monitoring_rebase_result.output}")
             writer.write(output)
         if g.git_repo.active_branch.name == base_branch:
             # rebase.sh didn't reach the step that would create a branch
@@ -372,8 +393,8 @@ def main():
         g.push(rebase_branch_name, base_branch, gh.gh_repo)
 
     prow_job_url = try_create_prow_job_url()
-    pr_title = create_pr_title(rebase_branch_name, rebase_result.success)
-    desc = generate_pr_description(get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebase_result.success)
+    pr_title = create_pr_title(rebase_branch_name, rebases_succeeded)
+    desc = generate_pr_description(get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebases_succeeded)
 
     comment = ""
     pull_req = gh.get_existing_pr_for_a_branch(adjusted_base_branch, rebase_branch_name)
