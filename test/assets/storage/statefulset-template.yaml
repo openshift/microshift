@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ${STSNAME}
+spec:
+  replicas: ${REPLICAS}
+  selector:
+    matchLabels:
+      app: ${STSNAME}
+  template:
+    metadata:
+      labels:
+        app: ${STSNAME}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: ${STSNAME}
+        image: ${IMAGE}
+        volumeMounts:
+        - name: data
+          mountPath: ${MOUNTPATH}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      storageClassName: ${SCNAME}
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: ${PVCCAPACITY}
