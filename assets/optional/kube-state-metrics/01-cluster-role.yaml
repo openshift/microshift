@@ -97,7 +97,11 @@ rules:
 - apiGroups:
   - admissionregistration.k8s.io
   resources:
+  - mutatingadmissionpolicies
+  - mutatingadmissionpolicybindings
   - mutatingwebhookconfigurations
+  - validatingadmissionpolicies
+  - validatingadmissionpolicybindings
   - validatingwebhookconfigurations
   verbs:
   - list

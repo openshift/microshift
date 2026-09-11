@@ -84,7 +84,7 @@ spec:
             - --upstream=http://127.0.0.1:8081/
             - --tls-cert-file=/etc/tls/private/tls.crt
             - --tls-private-key-file=/etc/tls/private/tls.key
-            - --client-ca-file=/etc/tls/client/client-ca.crt
+            - --client-ca-file=/etc/tls/client-ca/ca.crt
             - --config-file=/etc/kube-rbac-policy/config.yaml
           image: "quay.io/openshift/kube-rbac-proxy"
           name: kube-rbac-proxy-main
@@ -110,8 +110,8 @@ spec:
             - mountPath: /etc/kube-rbac-policy
               name: kube-state-metrics-kube-rbac-proxy-config
               readOnly: true
-            - mountPath: /etc/tls/client
-              name: metrics-client-ca
+            - mountPath: /etc/tls/client-ca/ca.crt
+              name: admin-kubeconfig-signer-ca
               readOnly: true
         - args:
             - --secure-listen-address=:9443
@@ -119,7 +119,7 @@ spec:
             - --upstream=http://127.0.0.1:8082/
             - --tls-cert-file=/etc/tls/private/tls.crt
             - --tls-private-key-file=/etc/tls/private/tls.key
-            - --client-ca-file=/etc/tls/client/client-ca.crt
+            - --client-ca-file=/etc/tls/client-ca/ca.crt
             - --config-file=/etc/kube-rbac-policy/config.yaml
           image: "quay.io/openshift/kube-rbac-proxy"
           name: kube-rbac-proxy-self
@@ -145,8 +145,8 @@ spec:
             - mountPath: /etc/kube-rbac-policy
               name: kube-state-metrics-kube-rbac-proxy-config
               readOnly: true
-            - mountPath: /etc/tls/client
-              name: metrics-client-ca
+            - mountPath: /etc/tls/client-ca/ca.crt
+              name: admin-kubeconfig-signer-ca
               readOnly: true
       nodeSelector:
         kubernetes.io/os: linux
@@ -166,6 +166,7 @@ spec:
         - configMap:
             name: kube-state-metrics-custom-resource-state-configmap
           name: kube-state-metrics-custom-resource-state-configmap
-        - configMap:
-            name: metrics-client-ca
-          name: metrics-client-ca
+        - hostPath:
+            path: /var/lib/microshift/certs/admin-kubeconfig-signer/ca.crt
+            type: File
+          name: admin-kubeconfig-signer-ca
