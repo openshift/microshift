@@ -90,6 +90,8 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 	kubeletFlags.NodeLabels["node.openshift.io/os_id"] = osID
 	kubeletFlags.NodeLabels["node.kubernetes.io/instance-type"] = "rhde"
 
+	setImageCredentialProviderFlags(kubeletFlags, cfg)
+
 	kubeletConfig, err := loadConfigFile(filepath.Join(config.DataDir, "/resources/kubelet/config/config.yaml"))
 
 	if err != nil {
@@ -98,6 +100,25 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 
 	s.kubeconfig = kubeletConfig
 	s.kubeletflags = kubeletFlags
+}
+
+// setImageCredentialProviderFlags copies the (already validated and
+// canonicalized) image credential provider paths onto the kubelet flags. When
+// the feature is not configured the flags are left at their defaults.
+func setImageCredentialProviderFlags(kubeletFlags *kubeletoptions.KubeletFlags, cfg *config.Config) {
+	if cfg.KubeletImageCredentialProviderConfigPath == "" {
+		return
+	}
+
+	kubeletFlags.ImageCredentialProviderConfigPath = cfg.KubeletImageCredentialProviderConfigPath
+	kubeletFlags.ImageCredentialProviderBinDir = cfg.KubeletImageCredentialProviderBinDir
+
+	// The paths logged here are the canonical (symlink-resolved) ones handed to
+	// kubelet. The values the user configured are available from
+	// `microshift show-config`, so they are not duplicated in the journal.
+	klog.InfoS("Kubelet image credential provider configured",
+		"configPath", cfg.KubeletImageCredentialProviderConfigPath,
+		"binDir", cfg.KubeletImageCredentialProviderBinDir)
 }
 
 func (s *KubeletServer) writeConfig(cfg *config.Config) error {
@@ -136,8 +157,11 @@ func (s *KubeletServer) generateConfig(cfg *config.Config) ([]byte, error) {
 	}
 
 	userProvidedConfig := ""
-	if cfg.Kubelet != nil {
-		b, err := yaml.Marshal(cfg.Kubelet)
+	// The MicroShift-owned keys (image credential provider paths) are applied as
+	// kubelet startup flags, not KubeletConfiguration fields, so they must be
+	// filtered out of the generated config here.
+	if passthrough := cfg.KubeletPassthrough(); len(passthrough) > 0 {
+		b, err := yaml.Marshal(passthrough)
 		if err != nil {
 			return nil, fmt.Errorf("failed to re-marshal user provided kubelet config: %w", err)
 		}
