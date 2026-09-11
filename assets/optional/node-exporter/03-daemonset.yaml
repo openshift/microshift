@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: cluster-monitoring-operator
     app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: openshift-monitoring
-    app.kubernetes.io/version: 1.11.1
+    app.kubernetes.io/version: 1.12.1
   name: node-exporter
   namespace: openshift-monitoring
 spec:
@@ -27,7 +27,7 @@ spec:
         app.kubernetes.io/managed-by: cluster-monitoring-operator
         app.kubernetes.io/name: node-exporter
         app.kubernetes.io/part-of: openshift-monitoring
-        app.kubernetes.io/version: 1.11.1
+        app.kubernetes.io/version: 1.12.1
     spec:
       automountServiceAccountToken: true
       containers:
@@ -66,7 +66,8 @@ spec:
             requests:
               cpu: 8m
               memory: 32Mi
-          securityContext: {}
+          securityContext:
+            readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /host/sys
@@ -90,7 +91,7 @@ spec:
             - --upstream=http://127.0.0.1:9101/
             - --tls-cert-file=/etc/tls/private/tls.crt
             - --tls-private-key-file=/etc/tls/private/tls.key
-            - --client-ca-file=/etc/tls/client/client-ca.crt
+            - --client-ca-file=/etc/tls/client-ca/ca.crt
             - --config-file=/etc/kube-rbac-policy/config.yaml
           env:
             - name: IP
@@ -126,8 +127,8 @@ spec:
             - mountPath: /etc/kube-rbac-policy
               name: node-exporter-kube-rbac-proxy-config
               readOnly: true
-            - mountPath: /etc/tls/client
-              name: metrics-client-ca
+            - mountPath: /etc/tls/client-ca/ca.crt
+              name: admin-kubeconfig-signer-ca
               readOnly: true
       hostNetwork: true
       hostPID: true
@@ -147,6 +148,7 @@ spec:
               memory: 1Mi
           securityContext:
             privileged: true
+            readOnlyRootFilesystem: true
             runAsUser: 0
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
@@ -189,9 +191,10 @@ spec:
                 path: config.yaml
             name: node-exporter-accelerators-collector-config
           name: node-exporter-accelerators-collector-config
-        - configMap:
-            name: metrics-client-ca
-          name: metrics-client-ca
+        - hostPath:
+            path: /var/lib/microshift/certs/admin-kubeconfig-signer/ca.crt
+            type: File
+          name: admin-kubeconfig-signer-ca
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 10%
