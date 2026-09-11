@@ -3,61 +3,61 @@
 
 # Include shared microshift version configuration
 - name: Include shared microshift version configuration
-  include_vars:
+  ansible.builtin.include_vars:
     file: "{{ playbook_dir }}/vars/microshift_versions.yml"
 
-- name: initialize results directory
-  include_tasks: roles/common/tasks/results-dir.yml
+- name: Initialize results directory
+  ansible.builtin.include_tasks: roles/common/tasks/results-dir.yml
 
-- block:
-  - name: find microshift cleanup script
-    ansible.builtin.find:
-      paths: /usr/bin
-      patterns:
-        - '.*microshift.*cleanup.*'
-        - '.*cleanup.*microshift.*'
-      use_regex: yes
-    register: find_cleanup
-
-  - name: set microshift_cleanup_bin variable
-    set_fact:
-      microshift_cleanup_bin: "{{ find_cleanup.files[0].path if find_cleanup.files }}"
-
-  - name: cleanup microshift data
-    become: true
-    ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
+- name: Clean up MicroShift data when requested
   when: cleanup_microshift | default('false') | bool
+  block:
+    - name: Find microshift cleanup script
+      ansible.builtin.find:
+        paths: /usr/bin
+        patterns:
+          - ".*microshift.*cleanup.*"
+          - ".*cleanup.*microshift.*"
+        use_regex: true
+      register: find_cleanup
 
-- block:
-  - name: reboot machine
-    become: true
-    ansible.builtin.reboot:
-      reboot_timeout: 600
-  
-  - name: Pause for 60 seconds for steady state post reboot
-    ansible.builtin.pause:
-      seconds: 60
+    - name: Set microshift_cleanup_bin variable
+      ansible.builtin.set_fact:
+        microshift_cleanup_bin: "{{ find_cleanup.files[0].path if find_cleanup.files }}"
+
+    - name: Cleanup microshift data
+      become: true
+      ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
+- name: Reboot when requested
   when: reboot | default('false') | bool
+  block:
+    - name: Reboot machine
+      become: true
+      ansible.builtin.reboot:
+        reboot_timeout: 600
 
+    - name: Pause for 60 seconds for steady state post reboot
+      ansible.builtin.pause:
+        seconds: 60
 - name: Normalize microshift version for pod counts
-  set_fact:
+  ansible.builtin.set_fact:
     microshift_version_clean: "{{ microshift_version | regex_replace('^latest-', '') }}"
 
 - name: Extract major version for pod counts
-  set_fact:
+  ansible.builtin.set_fact:
     microshift_major_version: "{{ microshift_version_clean.split('.')[:2] | join('.') }}"
 
 - name: Validate that version exists in config
-  fail:
+  ansible.builtin.fail:
     msg: "Error: MicroShift version {{ microshift_major_version }} not found in microshift_versions dictionary. Please update vars/microshift_versions.yml."
   when: microshift_major_version not in microshift_versions
 
 - name: Set expected pod counts
-  set_fact:
+  ansible.builtin.set_fact:
     expected_pods: "{{ microshift_versions[microshift_major_version].expected_pods }}"
     all_pods: "{{ microshift_versions[microshift_major_version].all_pods }}"
 
-- name: run the microshift boot script
+- name: Run the microshift boot script
   ansible.builtin.script:
     cmd: >
       ready.sh
@@ -65,11 +65,11 @@
       {{ all_pods }}
   register: script_output
 
-- name: display script output
+- name: Display script output
   ansible.builtin.debug:
     var: script_output.stdout
 
-- name: save microshift boot info to local file
+- name: Save microshift boot info to local file
   ansible.builtin.copy:
     content: "{{ script_output.stdout }}"
     dest: "{{ results_dir }}/{{ boot_output_filename | default('boot_quick.txt') }}"

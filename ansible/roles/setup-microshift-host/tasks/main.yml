@@ -1,60 +1,60 @@
 ---
 # setup-microshift-host tasks
 
-- name: install firewalld & packages
+- name: Install firewalld & packages
   ansible.builtin.dnf:
     name: "{{ install_packages }}"
     state: present
     update_cache: true
 
-- name: determine system architecture
+- name: Determine system architecture
   ansible.builtin.set_fact:
     go_arch: amd64
   when: ansible_facts['architecture'] == "x86_64"
 
-- name: create target directory for go version
+- name: Create target directory for go version
   ansible.builtin.file:
     path: "{{ go_install_dir }}"
     state: directory
 
-- name: download & extract newer version of golang
+- name: Download & extract newer version of golang
   ansible.builtin.unarchive:
     src: https://go.dev/dl/go{{ go_version }}.linux-{{ go_arch }}.tar.gz
     dest: "{{ go_install_dir }}"
-    remote_src: yes
+    remote_src: true
     extra_opts:
       - "--strip-components=1"
 
-- name: create symbolic links
+- name: Create symbolic links
   ansible.builtin.file:
     src: "{{ go_install_dir }}/bin/{{ item }}"
     dest: "/usr/local/bin/{{ item }}"
     state: link
   with_items: "{{ go_files }}"
 
-- name: unmask firewalld if masked
+- name: Unmask firewalld if masked
   ansible.builtin.systemd:
     name: firewalld
-    masked: no
+    masked: false
 
-- name: start and enable firewalld
+- name: Start and enable firewalld
   ansible.builtin.systemd:
     name: firewalld
     state: started
-    enabled: yes
+    enabled: true
 
-- name: check if rhel vg exists
+- name: Check if rhel vg exists
   ansible.builtin.command: vgdisplay -s {{ vg_name }}
   register: rhel_vg_present
   ignore_errors: true
 
-- name: check if lvm disk exists
+- name: Check if lvm disk exists
   ansible.builtin.stat:
     path: "{{ lvm_disk }}"
   register: lvm_disk_stat
   when: rhel_vg_present.rc != 0
 
-- name: create a volume group on top of secondary disk for topolvm
+- name: Create a volume group on top of secondary disk for topolvm
   community.general.lvg:
     vg: "{{ vg_name }}"
     pvs: "{{ lvm_disk }}"
@@ -62,7 +62,7 @@
     - rhel_vg_present.rc != 0
     - lvm_disk_stat.stat.exists
 
-- name: notify about missing lvm disk
+- name: Notify about missing lvm disk
   ansible.builtin.debug:
     msg: "LVM disk {{ lvm_disk }} not found, skipping TopoLVM volume group creation"
   when:
@@ -77,25 +77,25 @@
   failed_when: false
 
 - name: Configure TopoLVM storage
-  include_tasks: storage.yml
+  ansible.builtin.include_tasks: storage.yml
   when:
     - vg_name != default_vg_name
     - vg_exists.rc == 0
 
-- name: pin RHEL version to prevent upgrading beyond supported release
+- name: Pin RHEL version to prevent upgrading beyond supported release
   become: true
   ansible.builtin.copy:
     content: "{{ rhel_target_version }}"
     dest: /etc/dnf/vars/releasever
-    mode: '0644'
+    mode: "0644"
   when: rhel_target_version is defined
 
-- name: upgrade all packages
+- name: Upgrade all packages
   ansible.builtin.dnf:
     name: "*"
     state: latest
     nobest: true
   notify: reboot machine
 
-- name: flush handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers

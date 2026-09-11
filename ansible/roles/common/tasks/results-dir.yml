@@ -3,42 +3,42 @@
 # Creates: results/{{ microshift_version }}/{{ timestamp }}/
 # Updates: results/{{ microshift_version }}/latest -> {{ timestamp }}/
 
-- name: set results base directory
+- name: Set results base directory
   ansible.builtin.set_fact:
     results_base_dir: "{{ results_base_dir | default(playbook_dir + '/results') }}"
   when: results_base_dir is not defined
 
-- name: set results timestamp
+- name: Set results timestamp
   ansible.builtin.set_fact:
     results_timestamp: "{{ results_timestamp | default(lookup('pipe', 'date +%Y-%m-%d_%H-%M-%S')) }}"
   when: results_timestamp is not defined
 
-- name: set results directory with version
+- name: Set results directory with version
   ansible.builtin.set_fact:
     results_dir: "{{ results_base_dir }}/{{ microshift_version }}/{{ results_timestamp }}"
   when: results_dir is not defined
 
-- name: ensure results directory exists on localhost
+- name: Ensure results directory exists on localhost
   ansible.builtin.file:
     path: "{{ results_dir }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   delegate_to: localhost
 
-- name: update latest symlink
+- name: Update latest symlink
   ansible.builtin.file:
     src: "{{ results_dir | basename }}"
     dest: "{{ results_dir | dirname }}/latest"
     state: link
-    force: yes
+    force: true
   delegate_to: localhost
   when: results_latest_src is not defined
 
-- name: set results latest source
+- name: Set results latest source
   ansible.builtin.set_fact:
     results_latest_src: "{{ results_dir }}"
   when: results_latest_src is not defined
 
-- name: display results directory
+- name: Display results directory
   ansible.builtin.debug:
     msg: "Results will be saved to: {{ results_dir }}"

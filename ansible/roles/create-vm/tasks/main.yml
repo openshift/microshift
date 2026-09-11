@@ -1,37 +1,42 @@
 ---
 # create-vm tasks
 
-- name: list all VMs
+- name: List all VMs
   community.libvirt.virt:
     command: list_vms
   register: all_vms
 
-- name: destroy target VM if present
+- name: Destroy target VM if present
   community.libvirt.virt:
     name: "{{ vm_name }}"
     state: destroyed
   when: vm_name in (all_vms.list_vms | default([]))
 
-- name: undefine target VM if present
+- name: Undefine target VM if present
   community.libvirt.virt:
     name: "{{ vm_name }}"
     command: undefine
   when: vm_name in (all_vms.list_vms | default([]))
 
-- name: find create-vm.sh
+- name: Find create-vm.sh
   ansible.builtin.find:
     paths: "{{ playbook_dir | dirname }}"
     patterns: "create-vm.sh"
     file_type: file
-    recurse: yes
+    recurse: true
   register: sh_search_result
 
-- set_fact:
+- name: Set create-vm script candidates
+  ansible.builtin.set_fact:
     script_path: '{{ sh_search_result.files | selectattr("path", "search", "devenv") }}'
 
-- set_fact:
+- name: Set create-vm script path
+  ansible.builtin.set_fact:
     create_vm_path: "{{ script_path[0].path }}"
 
-- name: run create-vm shell script
-  ansible.builtin.script: 
-    cmd: "{{ create_vm_path }} {{ vm_name }} {{ vm_disk_dir }} {{ iso_file }} {{ num_cpu }} {{ ram_size }} {{ disk_size }} {{ swap_size }} {{ data_volume_size }}"
+- name: Run create-vm shell script
+  ansible.builtin.script:
+    cmd: >-
+      {{ create_vm_path }} {{ vm_name }} {{ vm_disk_dir }} {{ iso_file }}
+      {{ num_cpu }} {{ ram_size }} {{ disk_size }} {{ swap_size }}
+      {{ data_volume_size }}

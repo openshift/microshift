@@ -19,12 +19,12 @@
   when: not kubeconfig_directory_check.stat.exists
 
 - name: Fetch remote kubeconfig to a host-specific file (always overwrites)
-  become: yes
+  become: true
   ansible.builtin.fetch:
     src: "{{ kubeconfig_remote_file }}"
     dest: "{{ kubeconfig_dest_file }}"
-    flat: yes
-    force: yes
+    flat: true
+    force: true
 
 - name: Check if a default kubeconfig file exists on local machine
   ansible.builtin.stat:
@@ -37,7 +37,7 @@
     src: "{{ kubeconfig_dest_file }}"
     dest: "{{ kubeconfig_local_file }}"
     state: link
-    force: yes
+    force: true
   delegate_to: localhost
   when: not kubeconfig_local_file_check.stat.exists or (kubeconfig_local_file_check.stat.islnk | default(false))
 
@@ -70,7 +70,7 @@
         msg: |
           Failed to connect to MicroShift cluster!
           Error: {{ oc_test.stderr | default('Unknown error') }}
-          
+
           Please check:
           1. Port 6443 is accessible from this host (firewall/iptables rules)
           2. MicroShift service is running on the remote host

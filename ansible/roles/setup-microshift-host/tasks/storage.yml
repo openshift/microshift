@@ -9,7 +9,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Deploy lvmd.yaml configuration
   ansible.builtin.template:
@@ -17,7 +17,7 @@
     dest: /etc/microshift/lvmd.yaml
     owner: root
     group: root
-    mode: '0644'
-    backup: yes
+    mode: "0644"
+    backup: true
   vars:
     topolvm_vg: "{{ vg_name }}"

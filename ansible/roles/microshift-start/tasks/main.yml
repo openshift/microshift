@@ -1,150 +1,151 @@
 ---
 # microshift-start tasks
 
-- name: resolve kubernetes nodename
-  include_tasks: roles/common/tasks/nodename.yml
+- name: Resolve kubernetes nodename
+  ansible.builtin.include_tasks: roles/common/tasks/nodename.yml
 
-- name: check if microshift has run
+- name: Check if microshift has run
   ansible.builtin.shell: systemctl show -p ActiveEnterTimestampMonotonic microshift | awk -F"=" '{print $2}'
   register: microshift_active
   ignore_errors: true
 
-- block:
-  - name: find microshift cleanup script
-    ansible.builtin.find:
-      paths: /usr/bin
-      patterns:
-        - '.*microshift.*cleanup.*'
-        - '.*cleanup.*microshift.*'
-      use_regex: yes
-    register: find_cleanup
-
-  - name: set microshift_cleanup_bin variable
-    set_fact:
-      microshift_cleanup_bin: "{{ find_cleanup.files[0].path if find_cleanup.files }}"
-
-  - name: cleanup microshift data
-    become: yes
-    ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
+- name: Clean up existing MicroShift data
   when:
     - cleanup_microshift | default('true') | bool
     - microshift_active.stdout | int != 0
+  block:
+    - name: Find microshift cleanup script
+      ansible.builtin.find:
+        paths: /usr/bin
+        patterns:
+          - ".*microshift.*cleanup.*"
+          - ".*cleanup.*microshift.*"
+        use_regex: true
+      register: find_cleanup
 
-- name: disable microshift service
-  become: yes
+    - name: Set microshift_cleanup_bin variable
+      ansible.builtin.set_fact:
+        microshift_cleanup_bin: "{{ find_cleanup.files[0].path if find_cleanup.files }}"
+
+    - name: Cleanup microshift data
+      become: true
+      ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
+
+- name: Disable microshift service
+  become: true
   ansible.builtin.systemd:
     name: microshift
     state: stopped
-    enabled: no
+    enabled: false
 
-- name: create .kube home dir
+- name: Create .kube home dir
   ansible.builtin.file:
     path: ~/.kube/
     state: directory
 
-- name: reboot machine
-  become: yes
+- name: Reboot machine
+  become: true
   ansible.builtin.reboot:
     reboot_timeout: 600
 
-- name: initialize results directory
-  include_tasks: roles/common/tasks/results-dir.yml
+- name: Initialize results directory
+  ansible.builtin.include_tasks: roles/common/tasks/results-dir.yml
 
-- name: record post-install disk utilization
+- name: Record post-install disk utilization
   vars:
     filename: disk1.txt
-  include_tasks: roles/common/tasks/disk.yml
+  ansible.builtin.include_tasks: roles/common/tasks/disk.yml
   loop: "{{ du_dirs }}"
 
 - name: Pause for 60 seconds for steady state post reboot
   ansible.builtin.pause:
     seconds: 60
 
-- name: pbench recording start
-  become: yes
-  block:
-  - name: source pbench-agent & register-tool-set
-    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
-
-  - name: set new pidstat interval
-    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool --name=pidstat -- --interval={{ sample_interval }}
-
-  - name: start pbench-user-benchmark recording
-    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-user-benchmark --config=microshift -- sleep {{ pbench_record_duration }}
-    async: "{{ pbench_record_duration|int * 2 }}"
-    poll: 0
-    register: pbench_user_benchmark_result
-
-  - name: Pause for 60 seconds to gather steady state for pbench tool recording
-    ansible.builtin.pause:
-      seconds: 60
+- name: Pbench recording start
+  become: true
   when: install_pbench | bool
   environment:
     PBENCH_TOOL_DATA_SINK: localhost:8081
+  block:
+    - name: Source pbench-agent & register-tool-set
+      ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
 
-- name: record network measurement start epoch
+    - name: Set new pidstat interval
+      ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool --name=pidstat -- --interval={{ sample_interval }}
+
+    - name: Start pbench-user-benchmark recording
+      ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-user-benchmark --config=microshift -- sleep {{ pbench_record_duration }}
+      async: "{{ pbench_record_duration | int * 2 }}"
+      poll: 0
+      register: pbench_user_benchmark_result
+
+    - name: Pause for 60 seconds to gather steady state for pbench tool recording
+      ansible.builtin.pause:
+        seconds: 60
+
+- name: Record network measurement start epoch
   ansible.builtin.command: date +%s
   register: network_start_epoch
 
-- name: measure microshift service boot time
-  include_tasks: roles/common/tasks/boot.yml
+- name: Measure microshift service boot time
+  ansible.builtin.include_tasks: roles/common/tasks/boot.yml
   vars:
     boot_output_filename: "boot0.txt"
     cleanup_microshift: false
     reboot: false
 
-- name: create service account task(s)
-  include_tasks: roles/create-service-account/tasks/main.yml
+- name: Create service account task(s)
+  ansible.builtin.include_tasks: roles/create-service-account/tasks/main.yml
 
-- name: finish pbench capture
-  become: yes
-  block:
-  - name: check on pbench-user-benchmark status
-    ansible.builtin.async_status:
-      jid: "{{ pbench_user_benchmark_result.ansible_job_id }}"
-    register: job_result
-    until: job_result.finished
-    retries: 240
-    delay: 15
-
-  - name: source pbench-agent & move results
-    ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-move-results
-    ignore_errors: yes
+- name: Finish pbench capture
+  become: true
   when: install_pbench | bool
   environment:
     PBENCH_USER: microshift
+  block:
+    - name: Check on pbench-user-benchmark status
+      ansible.builtin.async_status:
+        jid: "{{ pbench_user_benchmark_result.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 240
+      delay: 15
 
-- name: record fully running disk utilization
+    - name: Source pbench-agent & move results
+      ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-move-results
+      ignore_errors: true
+
+- name: Record fully running disk utilization
   vars:
     filename: disk2.txt
-  include_tasks: roles/common/tasks/disk.yml
+  ansible.builtin.include_tasks: roles/common/tasks/disk.yml
   loop: "{{ du_dirs }}"
 
-- name: capture container image sizes
+- name: Capture container image sizes
   block:
-    - name: copy crio-df script to remote host
-      become: yes
+    - name: Copy crio-df script to remote host
+      become: true
       ansible.builtin.copy:
         src: roles/common/tasks/files/crio-df.py
         dest: /tmp/crio-df.py
-        mode: '0755'
+        mode: "0755"
 
-    - name: run crio-df script
-      become: yes
+    - name: Run crio-df script
+      become: true
       ansible.builtin.command: python3 /tmp/crio-df.py -v
       register: crio_df
 
-    - name: save container image sizes to results
+    - name: Save container image sizes to results
       ansible.builtin.copy:
         content: "{{ crio_df.stdout }}"
         dest: "{{ results_dir }}/images.txt"
       delegate_to: localhost
 
-- name: record network measurement end epoch
+- name: Record network measurement end epoch
   ansible.builtin.command: date +%s
   register: network_end_epoch
 
-- name: resolve prometheus network query settings
+- name: Resolve prometheus network query settings
   ansible.builtin.set_fact:
     prom_network_endpoint: >-
       {{
@@ -166,9 +167,10 @@
     prom_network_instance: "{{ kubernetes_nodename }}"
   when: prometheus_logging | bool
 
-- name: query prometheus for network transfer
+- name: Query prometheus for network transfer
+  when: prometheus_logging | bool
   block:
-    - name: run prometheus network query
+    - name: Run prometheus network query
       ansible.builtin.command: >
         python3 roles/common/tasks/files/prom-network-query.py
         --prometheus {{ prom_network_endpoint }}
@@ -179,9 +181,8 @@
       register: prom_network
       delegate_to: localhost
 
-    - name: save network data to results
+    - name: Save network data to results
       ansible.builtin.copy:
         content: "{{ prom_network.stdout }}"
         dest: "{{ results_dir }}/network.txt"
       delegate_to: localhost
-  when: prometheus_logging | bool
