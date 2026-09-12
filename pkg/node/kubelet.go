@@ -89,6 +89,9 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/worker"] = ""
 	kubeletFlags.NodeLabels["node.openshift.io/os_id"] = osID
 	kubeletFlags.NodeLabels["node.kubernetes.io/instance-type"] = "rhde"
+	if !cfg.BootstrapKubeConfigExists() {
+		kubeletFlags.NodeLabels["node.microshift.io/role"] = "primary"
+	}
 
 	kubeletConfig, err := loadConfigFile(filepath.Join(config.DataDir, "/resources/kubelet/config/config.yaml"))
 
