@@ -34,3 +34,11 @@ data:
     election-lease-duration=137
     election-renew-deadline=107
     election-retry-period=26
+{{- if .MultiNodeEnabled}}
+
+    [OvnNorth]
+    address=tcp:{{.NodeIP}}:{{.OVN_NB_PORT}}
+
+    [OvnSouth]
+    address=tcp:{{.NodeIP}}:{{.OVN_SB_PORT}}
+{{- end}}
