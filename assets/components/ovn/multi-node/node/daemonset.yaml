@@ -146,6 +146,21 @@ spec:
             # the functionality depends on ip_forwarding being enabled
           fi
 
+          # On worker nodes, ovnkube cannot parse [OvnNorth]/[OvnSouth] address= from
+          # the config file (upstream config format mismatch).  Export OVN_NB_DB and
+          # OVN_SB_DB so ovnkube connects to the primary's databases over TCP, and set
+          # the geneve encap external_ids so ovn-controller can register the chassis.
+          NB_ADDR=$(awk 'BEGIN{f=0} /^\[OvnNorth\]/{f=1} f && /^address=/{print substr($0,9); exit}' \
+              /run/ovnkube-config/ovnkube.conf 2>/dev/null)
+          SB_ADDR=$(awk 'BEGIN{f=0} /^\[OvnSouth\]/{f=1} f && /^address=/{print substr($0,9); exit}' \
+              /run/ovnkube-config/ovnkube.conf 2>/dev/null)
+          if [[ "${SB_ADDR}" =~ ^tcp: ]] && [[ "${SB_ADDR}" != *"${K8S_NODE_IP}"* ]]; then
+              export OVN_NB_DB="${NB_ADDR}" OVN_SB_DB="${SB_ADDR}"
+              ovs-vsctl --timeout=5 set Open_vSwitch . \
+                  "external_ids:ovn-encap-type=geneve" \
+                  "external_ids:ovn-encap-ip=${K8S_NODE_IP}" || true
+          fi
+
           echo "I$(date "+%m%d %H:%M:%S.%N") - ovnkube-node - start ovnkube --init-node ${K8S_NODE}"
           exec /usr/bin/ovnkube \
             --init-node "${K8S_NODE}" \
