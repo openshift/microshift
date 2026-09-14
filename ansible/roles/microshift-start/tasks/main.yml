@@ -94,7 +94,8 @@
     reboot: false
 
 - name: create service account task(s)
-  include_tasks: roles/create-service-account/tasks/main.yml
+  ansible.builtin.include_role:
+    name: create-service-account
 
 - name: finish pbench capture
   become: yes
