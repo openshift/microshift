@@ -31,10 +31,9 @@ import (
 
 func Test_certsToRegenerate(t *testing.T) {
 	tests := []struct {
-		name    string
-		chains  *certchains.CertificateChains
-		want    [][]string
-		wantErr bool
+		name   string
+		chains *certchains.CertificateChains
+		want   [][]string
 	}{
 		{
 			name:   "empty chains",
@@ -118,11 +117,7 @@ func Test_certsToRegenerate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := certsToRegenerate(tt.chains)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("certsToRegenerate() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got := certsToRegenerate(tt.chains)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("certsToRegenerate() = %v, want %v", got, tt.want)
 			}
