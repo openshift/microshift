@@ -106,6 +106,7 @@ Deploy MicroShift With LVMS By Default
     [Setup]    Deploy Storage Config    ${LVMS_DEFAULT}
     LVMS Is Deployed
     CSI Snapshot Controller Is Deployed
+    CSI Volume Group Snapshot Support Is Enabled
     [Teardown]    Remove Storage Drop In Config
 
 Deploy MicroShift Without LVMS
@@ -218,6 +219,18 @@ CSI Snapshot Controller Is Deployed
     [Documentation]    Wait for CSI snapshot controller to be deployed
     [Arguments]    ${timeout}=5m
     Named Deployment Should Be Available    csi-snapshot-controller    kube-system    ${timeout}
+
+CSI Volume Group Snapshot Support Is Enabled
+    [Documentation]    Verify the group snapshot APIs and controller feature gate are enabled
+    Run With Kubeconfig    oc get crd volumegroupsnapshotclasses.groupsnapshot.storage.k8s.io
+    Run With Kubeconfig    oc get crd volumegroupsnapshotcontents.groupsnapshot.storage.k8s.io
+    Run With Kubeconfig    oc get crd volumegroupsnapshots.groupsnapshot.storage.k8s.io
+    ${args}=    Oc Get JsonPath
+    ...    deployment
+    ...    kube-system
+    ...    csi-snapshot-controller
+    ...    .spec.template.spec.containers[0].args
+    Should Contain    ${args}    --feature-gates=CSIVolumeGroupSnapshot=true
 
 Check HTTP Proxy Env In Bootc Image
     [Documentation]    Check that the HTTP proxy environment variables are not defined

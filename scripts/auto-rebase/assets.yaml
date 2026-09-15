@@ -108,6 +108,9 @@ assets:
     files:
     - file: csi_controller_deployment.yaml
     - file: serviceaccount.yaml
+    - file: volumegroupsnapshotclasses.yaml
+    - file: volumegroupsnapshotcontents.yaml
+    - file: volumegroupsnapshots.yaml
     - file: volumesnapshotclasses.yaml
     - file: volumesnapshotcontents.yaml
     - file: volumesnapshots.yaml
