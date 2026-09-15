@@ -1,13 +1,13 @@
 {
   "release": {
-    "base": "1.18.1"
+    "base": "1.20.0"
   },
   "images": {
-    "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:22f4e686a81fc809e70e3f73206ec221f8081e842243f173308dc1fbc7f02a3e",
-    "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:95f5dfa4331fcfb96357ed28f4d7f0fd00d9419d9252e3cff3962aec6cedbeb9",
-    "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:3258027c0fb9426c9ee3567f6dc0d02b85cb661c23300b230f5b1400b43bac25",
-    "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:f1b903ff69100fa938d6bdf4d730d35158eec905351344a246e30ef14c847222",
-    "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:f1b903ff69100fa938d6bdf4d730d35158eec905351344a246e30ef14c847222",
-    "cert-manager-controller": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:f1b903ff69100fa938d6bdf4d730d35158eec905351344a246e30ef14c847222"
+    "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:4772792109e65d30e0a1838f1d4db6708bf34664440e62fa9f4ffc834b235802",
+    "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:a0805907ffdb84f69313cc5d9673ba080737ed9150e9fdff6bcba1c8a34ca2f1",
+    "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:c7eb92be1e699143736b0b78f79b4e49ef2621c08f7df13519a65ad79aaa641e",
+    "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:7392848d7fbd47b77d03869e60fcd86f849bb342f89d5426dbddb31af5a53b70",
+    "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:7392848d7fbd47b77d03869e60fcd86f849bb342f89d5426dbddb31af5a53b70",
+    "cert-manager-controller": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:7392848d7fbd47b77d03869e60fcd86f849bb342f89d5426dbddb31af5a53b70"
   }
 }
