@@ -52,6 +52,9 @@ spec:
           args:
             - --v=2
             - --leader-election=false
+            - -kube-api-qps=30
+            - -kube-api-burst=60
+            - --feature-gates=CSIVolumeGroupSnapshot=true
           imagePullPolicy: IfNotPresent
           resources:
             requests:
