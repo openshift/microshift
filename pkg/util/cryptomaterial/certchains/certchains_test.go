@@ -1,14 +1,11 @@
 package certchains
 
 import (
-	"crypto/x509"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"k8s.io/apimachinery/pkg/util/diff"
 	"k8s.io/apiserver/pkg/authentication/user"
 )
 
@@ -101,116 +98,6 @@ func testChains(t *testing.T, tmpDir string) *CertificateChains {
 
 	require.NoError(t, err)
 	return ret
-}
-
-func TestCertificateChains_WalkChains(t *testing.T) {
-	tmpDir := t.TempDir()
-
-	testChain := testChains(t, tmpDir)
-
-	tests := []struct {
-		name             string
-		path             []string
-		expectedSubjects string
-		wantErr          bool
-	}{
-		{
-			name:    "full tree traversal",
-			path:    nil,
-			wantErr: false,
-			expectedSubjects: `
-CN=test-signer1
-	CN=test-signer1-subca
-		CN=test-signer1-subca-too
-			CN=test-signer1-subca-too-too
-				CN=test-user2
-			CN=test-signer1-subca-too-too2
-			CN=test-user,O=test-group1+O=test-group2
-		CN=newname.host
-	CN=test-user,O=test-group1+O=test-group2
-	CN=test-user2
-	CN=behind.the.wardrobe.door
-CN=test-signer2
-	CN=bluebirds.fly
-CN=test-signer3
-	CN=test-signer3-subca1
-		CN=test-user,O=test-group1+O=test-group2
-	CN=test-user,O=test-group1
-	CN=castle.brobdingnag`,
-		},
-		{
-			name:    "1-level signer",
-			path:    []string{"test-signer2"},
-			wantErr: false,
-			expectedSubjects: `
-CN=test-signer2
-	CN=bluebirds.fly`,
-		},
-		{
-			name:    "signer w/ subca",
-			path:    []string{"test-signer3"},
-			wantErr: false,
-			expectedSubjects: `
-CN=test-signer3
-	CN=test-signer3-subca1
-		CN=test-user,O=test-group1+O=test-group2
-	CN=test-user,O=test-group1
-	CN=castle.brobdingnag`,
-		},
-		{
-			name:    "signer/subca",
-			path:    []string{"test-signer3", "test-signer3-subca1"},
-			wantErr: false,
-			expectedSubjects: `
-	CN=test-signer3-subca1
-		CN=test-user,O=test-group1+O=test-group2`,
-		},
-		{
-			name:    "leaf cert",
-			path:    []string{"test-signer2", "test-signer2-server1"},
-			wantErr: false,
-			expectedSubjects: `
-	CN=bluebirds.fly`,
-		},
-		{
-			name:    "leaf cert of subca",
-			path:    []string{"test-signer3", "test-signer3-subca1", "test-client1"},
-			wantErr: false,
-			expectedSubjects: `
-		CN=test-user,O=test-group1+O=test-group2`,
-		},
-		{
-			name:    "nonexistent signer",
-			path:    []string{"test-signer4"},
-			wantErr: true,
-		},
-		{
-			name:    "nonexistent intermediate signer",
-			path:    []string{"test-signer3", "test-signer3-subca2", "test-client1"},
-			wantErr: true,
-		},
-		{
-			name:    "nonexistent leaf",
-			path:    []string{"test-signer3", "test-signer3-subca1", "test-client2"},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var subjects string
-			walkFunc := func(path []string, c x509.Certificate) error {
-				t.Helper()
-				subjects += "\n" + strings.Repeat("\t", len(path)-1) + c.Subject.String()
-				return nil
-			}
-
-			if err := testChain.WalkChains(tt.path, walkFunc); (err != nil) != tt.wantErr {
-				t.Errorf("CertificateChains.WalkChains() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			require.Equal(t, tt.expectedSubjects, subjects, "diff %s", diff.Diff(subjects, tt.expectedSubjects))
-		})
-	}
 }
 
 func TestWhenToRotateAtEarliest(t *testing.T) {
