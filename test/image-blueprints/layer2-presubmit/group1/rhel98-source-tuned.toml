@@ -30,6 +30,15 @@ version = "2.27.0-2.1.20270724git0eb28ac3.el9fdp"
 name = "tuned-profiles-cpu-partitioning"
 version = "2.27.0-2.1.20270724git0eb28ac3.el9fdp"
 
+{{- if and (env.Getenv "UNAME_M" "") (eq "x86_64" .Env.UNAME_M) }}
+# On x86_64 kernel-rt pulls tuned-profiles-realtime, which requires an exact
+# matching tuned version. Pin it too, otherwise it resolves to 2.28.0 and
+# conflicts with the tuned 2.27.0 pin above, failing the compose depsolve.
+[[packages]]
+name = "tuned-profiles-realtime"
+version = "2.27.0-2.1.20270724git0eb28ac3.el9fdp"
+{{- end }}
+
 [[packages]]
 name = "microshift-test-agent"
 version = "*"
