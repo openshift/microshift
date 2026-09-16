@@ -15,6 +15,21 @@ version = "{{ env.Getenv "SOURCE_VERSION" }}"
 name = "microshift-low-latency"
 version = "{{ .Env.SOURCE_VERSION }}"
 
+# TEMPORARY WORKAROUND (revert when the tuned bug is fixed):
+# tuned 2.28.0-1.el9fdp regressed the [bootloader] plugin so that
+# microshift-baseline kernel args are no longer persisted to the ostree
+# bootloader (tuned-adm returns 0 but /proc/cmdline is unchanged after
+# reboot), which fails the low-latency Profile suite across presubmits.
+# Pin to the last-known-good 2.27.0 build until the tuned team ships a fix.
+# Tracking: RHEL-261119 (tuned), related RHEL-170825 / RHEL-210923.
+[[packages]]
+name = "tuned"
+version = "2.27.0-2.1.20270724git0eb28ac3.el9fdp"
+
+[[packages]]
+name = "tuned-profiles-cpu-partitioning"
+version = "2.27.0-2.1.20270724git0eb28ac3.el9fdp"
+
 [[packages]]
 name = "microshift-test-agent"
 version = "*"
