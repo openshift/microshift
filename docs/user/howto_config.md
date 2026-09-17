@@ -551,6 +551,54 @@ those volumes must then be manually deleted by the user. Once the MicroShift con
 supported values, the user may restart MicroShift. They should see that MicroShift does not redeploy the disabled
 components after restart.
 
+## Kubelet Image Credential Provider
+
+The `kubelet` section is normally passed through as-is into the kubelet
+configuration. Two keys are the exception: `imageCredentialProviderConfigPath`
+and `imageCredentialProviderBinDir` are consumed by MicroShift and applied as
+kubelet startup flags. They enable the kubelet
+[image credential provider](https://kubernetes.io/docs/tasks/administer-cluster/kubelet-credential-provider/),
+which lets kubelet obtain registry credentials from an external provider
+binary at image pull time instead of relying on static credentials in CRI-O.
+This is intended for token-based registries such as Amazon ECR, whose
+credentials expire after a short time.
+
+```yaml
+kubelet:
+  imageCredentialProviderConfigPath: /etc/microshift/credential-providers.yaml
+  imageCredentialProviderBinDir: /usr/libexec/microshift/credential-providers
+```
+
+`imageCredentialProviderConfigPath` is the path to a kubelet
+`CredentialProviderConfig` file, or to a directory of such files.
+`imageCredentialProviderBinDir` is the directory containing the provider
+binaries named by that configuration. MicroShift does not ship any provider
+binary; obtain the one for your registry (for example `ecr-credential-provider`
+from the upstream `kubernetes/cloud-provider-aws` project) and install it
+yourself. On image-based systems the binary must be included in every OS image
+build, since `/usr` is replaced on each update.
+
+Place the bin directory under `/usr/libexec` or `/usr/local/bin`, which carry
+the `bin_t` SELinux label that the confined kubelet (`kubelet_t`) is permitted
+to execute. A bin directory under `/etc/microshift` (labeled
+`kubernetes_file_t`) or `/opt` (labeled `usr_t`) passes MicroShift's path
+validation but is denied execution under SELinux enforcing: the provider never
+runs, the image pull fails, and the only trace is an AVC denial in the audit
+log (`ausearch -m AVC -ts recent`). MicroShift does not validate SELinux
+labels, so this is a placement rule you must follow.
+
+Both keys must be set together and must be absolute paths. Because the
+provider binary runs with kubelet's privileges, MicroShift refuses to start
+unless both paths, all of their parent directories, and every file inside a
+directory are owned by root and not writable by group or others. Symbolic
+links are resolved and the resolved path is checked and passed to kubelet.
+When the keys are omitted, kubelet starts without a credential provider, as
+before.
+
+Changing either key or the provider configuration file requires a MicroShift
+restart. On startup with a valid configuration, the journal contains
+`Kubelet image credential provider configured` with the paths in use.
+
 ## Drop-in configuration directory
 
 In addition to the existing `/etc/microshift/config.yaml` configuration file there is a `/etc/microshift/config.d` configuration directory where you can place fragments of configuration.

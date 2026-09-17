@@ -664,7 +664,11 @@ ingress:
 
         # If unset, the default timeout is 1h
         tunnelTimeout: 1h
-# Settings specified in this section are transferred as-is into the Kubelet config.
+# Settings specified in this section are transferred as-is into the Kubelet config,
+# except imageCredentialProviderConfigPath and imageCredentialProviderBinDir, which
+# enable the kubelet image credential provider and are applied as kubelet startup
+# flags. Both must be set together, be absolute paths, and be owned by root and not
+# writable by group or others, including parent directories and contents.
 kubelet:
 manifests:
     # The locations on the filesystem to scan for kustomization
