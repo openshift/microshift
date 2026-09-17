@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"sync/atomic"
+	"syscall"
 	"testing"
 	"time"
 
@@ -56,6 +57,118 @@ func TestMetricsServerServingCertReady(t *testing.T) {
 				t.Errorf("metricsServerServingCertReady() = %t, want %t", got, tt.ready)
 			}
 		})
+	}
+}
+
+func TestIsTransientKubernetesAPIError(t *testing.T) {
+	tests := []struct {
+		name      string
+		err       error
+		transient bool
+	}{
+		{
+			name:      "service unavailable",
+			err:       apierrors.NewServiceUnavailable("service unavailable"),
+			transient: true,
+		},
+		{
+			name:      "connection refused",
+			err:       syscall.ECONNREFUSED,
+			transient: true,
+		},
+		{
+			name:      "unexpected server response",
+			err:       apierrors.NewGenericServerResponse(502, "get", schema.GroupResource{Resource: "services"}, metricsServerServiceName, "bad gateway", 0, true),
+			transient: true,
+		},
+		{
+			name:      "unauthorized",
+			err:       apierrors.NewUnauthorized("unauthorized"),
+			transient: false,
+		},
+		{
+			name:      "forbidden",
+			err:       apierrors.NewForbidden(schema.GroupResource{Resource: "services"}, metricsServerServiceName, errors.New("forbidden")),
+			transient: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isTransientKubernetesAPIError(tt.err); got != tt.transient {
+				t.Errorf("isTransientKubernetesAPIError() = %t, want %t", got, tt.transient)
+			}
+		})
+	}
+}
+
+func TestWaitForServiceCAControllerRetriesTransientReadError(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newServiceCADeployment())
+	var gets atomic.Int32
+	clientset.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		if gets.Add(1) == 1 {
+			return true, nil, apierrors.NewServiceUnavailable("service unavailable")
+		}
+		return false, nil, nil
+	})
+
+	if err := waitForServiceCAController(context.Background(), clientset, testMetricsServerServingCertRetryBackoff()); err != nil {
+		t.Fatalf("waiting for service-ca controller: %v", err)
+	}
+	if got := gets.Load(); got != 2 {
+		t.Errorf("deployment gets = %d, want 2 after one transient error", got)
+	}
+}
+
+func TestWaitForServiceCAControllerReturnsUnauthorizedError(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newServiceCADeployment())
+	var gets atomic.Int32
+	clientset.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		gets.Add(1)
+		return true, nil, apierrors.NewUnauthorized("unauthorized")
+	})
+
+	err := waitForServiceCAController(context.Background(), clientset, testMetricsServerServingCertRetryBackoff())
+	if !apierrors.IsUnauthorized(err) {
+		t.Fatalf("waiting for service-ca controller = %v, want unauthorized error", err)
+	}
+	if got := gets.Load(); got != 1 {
+		t.Errorf("deployment gets = %d, want 1 for terminal error", got)
+	}
+}
+
+func TestWaitForMetricsServerServiceRetriesTransientReadError(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newMetricsServerService())
+	var gets atomic.Int32
+	clientset.PrependReactor("get", "services", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		if gets.Add(1) == 1 {
+			return true, nil, apierrors.NewServiceUnavailable("service unavailable")
+		}
+		return false, nil, nil
+	})
+
+	if err := waitForMetricsServerService(context.Background(), clientset, testMetricsServerServingCertRetryBackoff()); err != nil {
+		t.Fatalf("waiting for metrics-server Service: %v", err)
+	}
+	if got := gets.Load(); got != 2 {
+		t.Errorf("service gets = %d, want 2 after one transient error", got)
+	}
+}
+
+func TestWaitForMetricsServerServiceReturnsForbiddenError(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newMetricsServerService())
+	var gets atomic.Int32
+	clientset.PrependReactor("get", "services", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		gets.Add(1)
+		return true, nil, apierrors.NewForbidden(schema.GroupResource{Resource: "services"}, metricsServerServiceName, errors.New("forbidden"))
+	})
+
+	err := waitForMetricsServerService(context.Background(), clientset, testMetricsServerServingCertRetryBackoff())
+	if !apierrors.IsForbidden(err) {
+		t.Fatalf("waiting for metrics-server Service = %v, want forbidden error", err)
+	}
+	if got := gets.Load(); got != 1 {
+		t.Errorf("service gets = %d, want 1 for terminal error", got)
 	}
 }
 
@@ -152,11 +265,56 @@ func TestTriggerMetricsServerServingCertReconciliationRetriesConflict(t *testing
 		return false, nil, nil
 	})
 
-	if err := triggerMetricsServerServingCertReconciliation(context.Background(), clientset); err != nil {
+	if err := triggerMetricsServerServingCertReconciliation(context.Background(), clientset, testMetricsServerServingCertRetryBackoff()); err != nil {
 		t.Fatalf("triggering service-ca reconciliation: %v", err)
 	}
 	if got := updates.Load(); got != 2 {
 		t.Errorf("service updates = %d, want 2 after one conflict", got)
+	}
+}
+
+func TestTriggerMetricsServerServingCertReconciliationRetriesTransientReadAndUpdateErrors(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newMetricsServerService())
+	var gets atomic.Int32
+	var updates atomic.Int32
+	clientset.PrependReactor("get", "services", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		if gets.Add(1) == 1 {
+			return true, nil, apierrors.NewServiceUnavailable("service unavailable")
+		}
+		return false, nil, nil
+	})
+	clientset.PrependReactor("update", "services", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		if updates.Add(1) == 1 {
+			return true, nil, apierrors.NewInternalError(errors.New("internal error"))
+		}
+		return false, nil, nil
+	})
+
+	if err := triggerMetricsServerServingCertReconciliation(context.Background(), clientset, testMetricsServerServingCertRetryBackoff()); err != nil {
+		t.Fatalf("triggering service-ca reconciliation: %v", err)
+	}
+	if got := gets.Load(); got != 3 {
+		t.Errorf("service gets = %d, want 3 after one transient get and update error", got)
+	}
+	if got := updates.Load(); got != 2 {
+		t.Errorf("service updates = %d, want 2 after one transient update error", got)
+	}
+}
+
+func TestTriggerMetricsServerServingCertReconciliationReturnsForbiddenUpdateError(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newMetricsServerService())
+	var updates atomic.Int32
+	clientset.PrependReactor("update", "services", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		updates.Add(1)
+		return true, nil, apierrors.NewForbidden(schema.GroupResource{Resource: "services"}, metricsServerServiceName, errors.New("forbidden"))
+	})
+
+	err := triggerMetricsServerServingCertReconciliation(context.Background(), clientset, testMetricsServerServingCertRetryBackoff())
+	if !apierrors.IsForbidden(err) {
+		t.Fatalf("triggering service-ca reconciliation = %v, want forbidden error", err)
+	}
+	if got := updates.Load(); got != 1 {
+		t.Errorf("service updates = %d, want 1 for terminal error", got)
 	}
 }
 
@@ -167,6 +325,10 @@ func testMetricsServerServingCertWaitOptions() metricsServerServingCertWaitOptio
 		controllerRetryBackoff: wait.Backoff{Steps: 1},
 		serviceRetryBackoff:    wait.Backoff{Steps: 1},
 	}
+}
+
+func testMetricsServerServingCertRetryBackoff() wait.Backoff {
+	return wait.Backoff{Steps: 3, Duration: time.Millisecond, Factor: 1}
 }
 
 func newServiceCADeployment() *appsv1.Deployment {
