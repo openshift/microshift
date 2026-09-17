@@ -1,37 +1,32 @@
-- api embedded-component 160d28ee4bcb759daf12a47066e7026a4c5806ab to 42fb550ea02a47ab1de1ee81d798706cb74035a1
-  - 7b09db07 2026-09-02T13:56:13-04:00 Tech preview feature gate file upgrades
-  - 92bc982f 2026-09-02T13:46:48-04:00 Move GCD to TechPreview
-  - 19c023c7 2026-09-02T13:22:47-04:00 Dev Preview updates to yaml files.
-  - 757f038d 2026-09-02T13:16:46-04:00 CORS-4435: GCP Sovereign Cloud Feature Gate
-  - 019fbdc1 2026-09-02T13:04:33-04:00 - Remove universeDomain from DevPreviewNoUpgrade CRDs — the first cherry-pick commit already added it to CustomNoUpgrade and DevPreviewNoUpgrade, but this second commit is adjusting the generated manifests. The diff removes universeDomain from several DevPreview CRDs and the AzureClusterHostedDNSInstall featuregated manifest, and trims down the GCPSovereignCloudInstall featuregated manifests. - Deletes SelfManagedHA-* payload CRDs — these don't exist in release-4.22.
-  - 520fea14 2026-09-02T13:00:05-04:00 Address review comments: improve docs and test coverage
-  - 8bd5b5c8 2026-09-02T12:54:03-04:00 CORS-4417: Add UniverseDomain field to GCPPlatformStatus
+- cluster-ingress-operator embedded-component 656d475a0bc76b31b8e387abd9e19458531cc4a3 to ab5f68632a64486c295c84301600f630c6693976
+  - feb77cf 2026-08-26T13:14:55-04:00 vendor:  updated google auth apis
+  - cc12883 2026-08-26T13:14:55-04:00 go.mod: bump google api to v0.199.0
+  - 864e8fb 2026-08-26T13:14:55-04:00 GCP: Set Universe Domain
 
-- cluster-kube-apiserver-operator embedded-component 9c413cd4dc8c3876cc40ee85c207bf9b143f106f to a2ba9c6a2d1ed76ea98a40885cf9a824eb9b9071
-  - 906e0be 2026-09-03T14:35:06+02:00 Use 10min inertia for GuardControllerDegraded
-  - 84d38af 2026-09-03T14:33:03+02:00 Add 10-minute degraded inertia for StaticPodsDegraded
-  - a430728 2026-09-03T14:32:56+02:00 Add 10-minute degraded inertia for NodeControllerDegraded
+- cluster-kube-apiserver-operator embedded-component a2ba9c6a2d1ed76ea98a40885cf9a824eb9b9071 to 6269fbc7b6ae116ff8e7e22cd24ca047fab18e1f
+  - 8def64b 2026-03-17T06:13:45Z Updating ose-cluster-kube-apiserver-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/0daf002c3db04b759c8f818f28800c1531cf2f79/images/ose-cluster-kube-apiserver-operator.yml
 
-- cluster-kube-controller-manager-operator embedded-component 95150ed5dbf11370b4a06e6959c77efa13768561 to c5c678b3e04a64214ae62f5ad6d873c8899ac363
-  - 88be954 2026-09-02T15:21:30+02:00 Use 10min inertia for GuardControllerDegraded
-  - ad4e48a 2026-09-02T14:56:58+02:00 Add 10-minute degraded inertia for StaticPodsDegraded
-  - 6d2b464 2026-09-02T14:56:45+02:00 Add 10-minute degraded inertia for NodeControllerDegraded
+- cluster-kube-controller-manager-operator embedded-component c5c678b3e04a64214ae62f5ad6d873c8899ac363 to 99a72b4e43a0e019a15a53739873f2f868c05dd7
+  - 9c807e1 2026-03-03T16:52:38Z Updating ose-cluster-kube-controller-manager-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/56cb39ad358cdec1db7c84ea1919fe8849c2550b/images/ose-cluster-kube-controller-manager-operator.yml
 
-- cluster-kube-scheduler-operator embedded-component 51ea59abd057d0cef56b29b8a74efc28411d5427 to da4bf66b8f6d057ab1562b6640261d8fe9ded28f
-  - 37456f4 2026-09-03T14:23:20+02:00 Use 10min inertia for GuardControllerDegraded
-  - 6878bd1 2026-09-03T14:21:20+02:00 Add 10-minute degraded inertia for StaticPodsDegraded
-  - f5be8fe 2026-09-03T14:21:13+02:00 Add 10-minute degraded inertia for NodeControllerDegraded
+- machine-config-operator embedded-component 90b269666abb8df37c46bf49d9b54dcf2604447c to f3334a057822a0f01ba82e15243c6ced44899a30
+  - c2572ef1 2026-09-11T08:49:48Z OCPBUGS-69681: limit ContainerRuntimeConfig status condition to 3
 
-- kubernetes embedded-component 05744abbe07157bc72508fd1872e46e9c38fbfe7 to 19365a06f558a5c5dc7f5654fa99a8318e4a77f4
-  - 059143d00 2026-08-31T22:09:49-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for HCP clusters (part 2)
+- service-ca-operator embedded-component 9fff46a576033685f66fbb1121eb0a2f134a29be to de05110fb2993491ff7f40455deb2f70cb95423b
+  - fa94a82 2026-09-10T22:23:53Z OCPBUGS-114426: Update build-machinery-go vendor dependency
 
-- machine-config-operator embedded-component 68e5c4026c0571ea6ea351b06fc7f78dc9b72803 to 90b269666abb8df37c46bf49d9b54dcf2604447c
-  - 206fb079 2026-09-08T13:00:28Z OCPBUGS-120711: Fix vsphere network absolute paths
-  - 2629e4cc 2026-09-03T11:18:34-04:00 bootimage: skip vsphere fd-unmatched machinesets
-  - ecf4b31b 2026-09-03T09:29:31Z fix(test): increase TC-74751 Eventually timeout for vSphere OVA upload
-  - b7b4fa0b 2026-09-02T17:02:10Z chore: update AMIs
-  - ac6d66e0 2026-09-01T15:22:16-04:00 controller: update message for MachineOSBuildFailed condition
+- oc image-amd64 96ed0f43f0b5adf771ce3bd4fbc86809e93139f8 to aea5a82b408a8b83dd7d6f8b8ee9a83585dc87fd
+  - 4ec6cbb6 2026-09-10T22:24:35Z OCPBUGS-114426: Update build-machinery-go vendor dependency
 
-- kubernetes image-amd64 05744abbe07157bc72508fd1872e46e9c38fbfe7 to 19365a06f558a5c5dc7f5654fa99a8318e4a77f4
-  - 059143d00 2026-08-31T22:09:49-06:00 UPSTREAM: <carry>: Add NodeSelectorAdjuster admission plugin for HCP clusters (part 2)
+- service-ca-operator image-amd64 9fff46a576033685f66fbb1121eb0a2f134a29be to de05110fb2993491ff7f40455deb2f70cb95423b
+  - fa94a82 2026-09-10T22:23:53Z OCPBUGS-114426: Update build-machinery-go vendor dependency
+
+- oc image-arm64 96ed0f43f0b5adf771ce3bd4fbc86809e93139f8 to aea5a82b408a8b83dd7d6f8b8ee9a83585dc87fd
+  - 4ec6cbb6 2026-09-10T22:24:35Z OCPBUGS-114426: Update build-machinery-go vendor dependency
+
+- kubernetes image-arm64 19365a06f558a5c5dc7f5654fa99a8318e4a77f4 to 160626b4fccad02c2aacc0b30eb4d660bb9d4e66
+  - 877bf2726 2026-09-06T18:34:43+05:30 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
+
+- service-ca-operator image-arm64 9fff46a576033685f66fbb1121eb0a2f134a29be to de05110fb2993491ff7f40455deb2f70cb95423b
+  - fa94a82 2026-09-10T22:23:53Z OCPBUGS-114426: Update build-machinery-go vendor dependency
 
