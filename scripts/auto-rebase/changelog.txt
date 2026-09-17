@@ -1,9 +1,19 @@
-- operator-framework-olm embedded-component 149d553b2057320d761c4d1913098a66787dd09a to dea74354157f010d1c2705f87c88b3724843e90d
-  - 63307408 2026-08-18T14:59:10+05:30 CVE-2026-53488: bump containerd to v1.7.33
+- cluster-ingress-operator embedded-component e45a96d194a3eea3178c1fe046a9b68220254173 to f30c6160c94034639739df5ce940d60d1d7c028a
+  - dbd34ee 2026-07-17T11:48:56-04:00 OCPBUGS-90505: Guard subscriptionCache creation with OLM capability check
+  - fbcea1a 2026-07-17T11:48:56-04:00 OCPBUGS-90505: Guard OLM watches with capability check in gatewayclass controller
+  - 3694790 2026-07-17T11:48:47-04:00 Address review comments
+  - c691d8d 2026-07-17T11:48:47-04:00 extend subscription unittest to contain expected subscription
+  - a27db4a 2026-07-17T11:48:43-04:00 Address review comments and make pkg name a constant
+  - bd299a4 2026-07-17T11:47:43-04:00 Add unit tests for the new subscription conflict management logic
+  - dbe97ed 2026-07-17T11:47:43-04:00 fix the logic to verify if package is installed
+  - 5f54675 2026-07-17T11:47:43-04:00 Add status conditions to OSSM subscription takeover
+  - 8660867 2026-07-17T11:47:36-04:00 Address comments
+  - c861f51 2026-07-17T11:46:51-04:00 Add every ossm subscription to state and to related objects
+  - 3782e81 2026-07-17T11:45:13-04:00 NE-2224: Do not take over OSSM subscription
 
-- oc image-amd64 4717c66ce35180eea2efcd759aeec77bdc611375 to d0bf7cc5959bf8408912e5276f2ea9e269ede24d
-  - 6d3d3faa 2026-08-31T12:07:28+05:30 Replace golang.org/x/net with sustaining fork for CVE-2026-33814 because upstream fix (x/net v0.53.0) requires go 1.25.0
+- machine-config-operator embedded-component f08b4678edfbce0d57e8d7dc779bf6aae131f0e8 to 0c32560860e39c44babcc69692782c63119fb331
+  - cc417faf 2026-09-03T13:17:53Z controller: update message for MachineOSBuildFailed condition
 
-- oc image-arm64 4717c66ce35180eea2efcd759aeec77bdc611375 to d0bf7cc5959bf8408912e5276f2ea9e269ede24d
-  - 6d3d3faa 2026-08-31T12:07:28+05:30 Replace golang.org/x/net with sustaining fork for CVE-2026-33814 because upstream fix (x/net v0.53.0) requires go 1.25.0
+- operator-framework-olm embedded-component dea74354157f010d1c2705f87c88b3724843e90d to e0c18696b033d125090f0af6205ec5cd39eaf9de
+  - 4c147292 2026-08-31T12:19:49+05:30 OCPBUGS-104152: CVE-2026-33814: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.50.0-sec.3
 
