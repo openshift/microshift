@@ -919,7 +919,7 @@ EOF
     local target="${REPOROOT}/assets/components/csi-snapshot-controller/csi_controller_deployment.yaml"
     yq -i '.metadata.namespace = "kube-system"' $target
     yq -i '.spec.template.spec.containers[0].image = "{{ .ReleaseImage.csi_snapshot_controller }}"' $target
-    yq -i '.spec.template.spec.containers[0].args = [ "--v=2", "--leader-election=false"]' $target
+    yq -i '.spec.template.spec.containers[0].args = [ "--v=2", "--leader-election=false", "-kube-api-qps=30", "-kube-api-burst=60", "--feature-gates=CSIVolumeGroupSnapshot=true"]' $target
     yq -i 'del(.spec.template.spec.priorityClassName) | del(.spec.template.spec.containers[0].securityContext.seccompProfile)' $target
     yq -i 'with(.spec.template.spec.containers[0].securityContext; .runAsUser = 65534)' $target
 
