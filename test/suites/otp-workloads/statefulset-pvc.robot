@@ -13,8 +13,8 @@ Suite Teardown      Teardown Suite
 
 *** Variables ***
 ${STATEFULSET_YAML}     ./assets/otp-workloads/statefulset-pvc.yaml
+${STATEFULSET_NAME}     hello-statefulset
 ${PVC_NAME}             www-hello-statefulset-0
-${POD_NAME}             hello-statefulset-0
 
 
 *** Test Cases ***
@@ -24,7 +24,8 @@ Custom Label For PVC In StatefulSets
     ...    OCP-28018
     [Setup]    Create StatefulSet Resources
 
-    Named Pod Should Be Ready    ${POD_NAME}    ns=${NAMESPACE}    timeout=5m
+    Command Should Work
+    ...    microshift healthcheck --namespace ${NAMESPACE} --statefulsets ${STATEFULSET_NAME} --timeout 5m
     Wait Until Keyword Succeeds    60s    5s
     ...    PVC Should Have Label    ${PVC_NAME}    ${NAMESPACE}    app    hello-pod
 

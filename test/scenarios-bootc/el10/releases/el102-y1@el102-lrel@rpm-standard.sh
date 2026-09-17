@@ -13,8 +13,6 @@ export SKIP_GREENBOOT=true
 # did not want to spend the resources on a new VM.
 export TEST_RANDOMIZATION=none
 
-export TEST_EXECUTION_TIMEOUT=60m
-
 scenario_create_vms() {
     exit_if_brew_rpms_not_found
 

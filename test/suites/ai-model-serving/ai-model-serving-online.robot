@@ -48,7 +48,10 @@ Deploy OpenVINO Serving Runtime
     ...    /usr/lib/microshift/manifests.d/050-microshift-ai-model-serving-runtimes/ovms-kserve.yaml
     ...    ${OVMS_KSERVE_MANIFEST}
     Local Command Should Work    sed -i "s,image: ovms-image,image: ${ovms_image}," "${OVMS_KSERVE_MANIFEST}"
-    Oc Apply    -n ${NAMESPACE} -f ${OVMS_KSERVE_MANIFEST}
+    # Retry until the kserve validating webhook has endpoints; a bare apply
+    # fails if the webhook pod is not serving yet.
+    Wait Until Keyword Succeeds    15x    2s
+    ...    Oc Apply    -n ${NAMESPACE} -f ${OVMS_KSERVE_MANIFEST}
 
 Deploy OpenVINO Resnet Model
     [Documentation]    Deploys InferenceService object to create Deployment and Service to serve the model.

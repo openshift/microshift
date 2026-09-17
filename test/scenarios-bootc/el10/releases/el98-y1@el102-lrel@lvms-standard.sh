@@ -6,9 +6,6 @@
 # ensure MicroShift is upgraded before running validation tests
 export TEST_RANDOMIZATION=none
 
-# Add extra timeout because it runs both standard1 and standard2 suites.
-export TEST_EXECUTION_TIMEOUT=60m
-
 start_image="rhel98-bootc-brew-y1-with-optional"
 dest_image="rhel102-bootc-brew-lrel-optional"
 

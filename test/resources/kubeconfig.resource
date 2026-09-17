@@ -92,6 +92,21 @@ Create Random Namespace
     RETURN    test-${rand}
 
 Remove Namespace
-    [Documentation]    Removes the given namespace.
+    [Documentation]    Removes the given namespace and waits until it is actually
+    ...    gone so a subsequent test can safely reuse the name. The delete
+    ...    tolerates failure (allow_fail) so a slow deletion killed at the Run
+    ...    With Kubeconfig process timeout under load does not fail the teardown.
     [Arguments]    ${ns}
-    Run With Kubeconfig    oc delete namespace ${ns}
+    Run With Kubeconfig    oc delete namespace ${ns}    allow_fail=True
+    Wait Until Keyword Succeeds    5m    5s    Namespace Should Not Exist    ${ns}
+
+Namespace Should Not Exist
+    [Documentation]    Fails unless the namespace is reported NotFound, so that a
+    ...    transient API error (which also exits non-zero) is not mistaken for a
+    ...    successful deletion.
+    [Arguments]    ${ns}
+    ${stdout}    ${rc}=    Run With Kubeconfig    oc get namespace ${ns}
+    ...    allow_fail=True    return_rc=True
+    Should Not Be Equal As Integers    ${rc}    0    Namespace ${ns} still exists
+    Should Contain    ${stdout}    NotFound
+    ...    msg=oc get namespace ${ns} failed for a reason other than NotFound: ${stdout}
