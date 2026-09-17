@@ -17,13 +17,22 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/util/retry"
 	"k8s.io/klog/v2"
 	"k8s.io/utils/clock"
 )
 
 const (
-	metricsServerManifestPath = "/usr/lib/microshift/manifests.d/080-microshift-metrics-server"
-	metricsNamespace          = "openshift-monitoring"
+	metricsServerManifestPath    = "/usr/lib/microshift/manifests.d/080-microshift-metrics-server"
+	metricsNamespace             = "openshift-monitoring"
+	metricsServerServiceName     = "metrics-server"
+	metricsServerTLSResourceName = "metrics-server-tls"
+
+	// metricsServerServingCertRecoveryAnnotation changes whenever the serving
+	// certificate needs recovery. The service-ca controller watches Service
+	// updates, so this requeues certificate generation while the expected Secret
+	// is absent or incomplete.
+	metricsServerServingCertRecoveryAnnotation = "microshift.openshift.io/service-ca-reconcile-at"
 )
 
 var metricsServerEventRecorder events.Recorder = events.NewLoggingEventRecorder("microshift-metrics-server", clock.RealClock{})
@@ -46,6 +55,55 @@ func waitForNamespace(ctx context.Context, clientset kubernetes.Interface, names
 			return false, nil
 		}
 		klog.V(2).Infof("Waiting for namespace %s to be created by kustomize", namespace)
+		return false, nil
+	})
+}
+
+func metricsServerServingCertReady(secret *corev1.Secret) bool {
+	return secret != nil && len(secret.Data[corev1.TLSCertKey]) > 0 && len(secret.Data[corev1.TLSPrivateKeyKey]) > 0
+}
+
+func triggerMetricsServerServingCertReconciliation(ctx context.Context, clientset kubernetes.Interface) error {
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		service, err := clientset.CoreV1().Services(metricsNamespace).Get(ctx, metricsServerServiceName, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+
+		annotations := service.GetAnnotations()
+		if annotations == nil {
+			annotations = map[string]string{}
+		}
+		annotations[metricsServerServingCertRecoveryAnnotation] = time.Now().UTC().Format(time.RFC3339Nano)
+		service.SetAnnotations(annotations)
+
+		_, err = clientset.CoreV1().Services(metricsNamespace).Update(ctx, service, metav1.UpdateOptions{})
+		return err
+	})
+}
+
+// waitForMetricsServerServingCert waits for service-ca to restore the serving
+// certificate used by metrics-server. While the Service remains present and
+// the Secret is absent or incomplete, force a Service update to make service-ca
+// re-evaluate its serving-cert annotation.
+func waitForMetricsServerServingCert(ctx context.Context, clientset kubernetes.Interface) error {
+	return wait.PollUntilContextTimeout(ctx, 2*time.Second, 5*time.Minute, true, func(ctx context.Context) (bool, error) {
+		secret, err := clientset.CoreV1().Secrets(metricsNamespace).Get(ctx, metricsServerTLSResourceName, metav1.GetOptions{})
+		if err == nil && metricsServerServingCertReady(secret) {
+			return true, nil
+		}
+		if err != nil && !apierrors.IsNotFound(err) {
+			klog.Errorf("getting metrics-server serving cert secret: %v", err)
+		}
+
+		if err := triggerMetricsServerServingCertReconciliation(ctx, clientset); err != nil {
+			if !apierrors.IsNotFound(err) {
+				klog.Errorf("triggering metrics-server serving cert reconciliation: %v", err)
+			}
+			return false, nil
+		}
+
+		klog.V(2).Info("Waiting for service-ca to restore the metrics-server serving certificate")
 		return false, nil
 	})
 }
@@ -74,6 +132,9 @@ func ProvisionMetricsServerCerts(ctx context.Context, cfg *config.Config) error 
 
 	if err := waitForNamespace(ctx, clientset, metricsNamespace); err != nil {
 		return fmt.Errorf("waiting for namespace %s: %w", metricsNamespace, err)
+	}
+	if err := waitForMetricsServerServingCert(ctx, clientset); err != nil {
+		return fmt.Errorf("waiting for metrics-server serving cert: %w", err)
 	}
 
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
