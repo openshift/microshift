@@ -28,7 +28,7 @@ require_kernel_argument() {
     local -r cmdline=$2
 
     if [[ " ${cmdline} " != *" ${argument} "* ]]; then
-        fail "missing kernel argument '${argument}' in /proc/cmdline; reapply microshift-baseline and reboot. Current command line: ${cmdline}"
+        fail "missing or invalid kernel argument '${argument}' in /proc/cmdline; reapply microshift-baseline and reboot."
     fi
 }
 
@@ -115,12 +115,15 @@ if [[ "${active_profile}" != "Current active profile: microshift-baseline" ]]; t
     fail "active TuneD profile is '${active_profile}', expected microshift-baseline; rerun setup/022-enable-profile.sh and reboot."
 fi
 
+set +x
 cmdline=$(</proc/cmdline)
 require_kernel_argument nohz=on "${cmdline}"
 require_kernel_argument "nohz_full=${isolated_cores}" "${cmdline}"
 require_kernel_argument "rcu_nocbs=${isolated_cores}" "${cmdline}"
 require_kernel_argument "hugepagesz=${hugepages_size}" "${cmdline}"
 require_kernel_argument "hugepages=${hugepages}" "${cmdline}"
+unset cmdline
+set -x
 
 check_cpu_list_state "${isolated_cores}" 1
 check_cpu_list_state "${offline_cpu_set}" 0
