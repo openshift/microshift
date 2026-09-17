@@ -89,7 +89,7 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 	kubeletFlags.NodeLabels["node-role.kubernetes.io/worker"] = ""
 	kubeletFlags.NodeLabels["node.openshift.io/os_id"] = osID
 	kubeletFlags.NodeLabels["node.kubernetes.io/instance-type"] = "rhde"
-	if !cfg.BootstrapKubeConfigExists() {
+	if cfg.MultiNode.Enabled && !cfg.BootstrapKubeConfigExists() {
 		kubeletFlags.NodeLabels["node.microshift.io/role"] = "primary"
 	}
 
