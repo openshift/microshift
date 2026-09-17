@@ -95,7 +95,7 @@ offline_cpu_set=$(get_tuned_variable offline_cpu_set)
 if ! kernel_rt_versions=$(rpm -q --queryformat '%{version}-%{release}.%{arch}\n' kernel-rt); then
     fail "kernel-rt is not installed; rerun setup/021-install-kernel-rt.sh."
 fi
-expected_kernel="$(printf '%s\n' "${kernel_rt_versions}" | sort | tail -n 1)+rt"
+expected_kernel="$(printf '%s\n' "${kernel_rt_versions}" | sort -V | tail -n 1)+rt"
 running_kernel=$(uname -r)
 if [[ "${running_kernel}" != "${expected_kernel}" ]]; then
     fail "running kernel '${running_kernel}' does not match selected kernel-rt '${expected_kernel}'; reboot into the RT kernel."
