@@ -59,8 +59,10 @@ Metrics Server Reports Node Metrics
     Should Match Regexp    ${out}    \\d+m
 
 Metrics Server Recovers After Restart Storm
-    [Documentation]    Service-ca must restore the metrics-server serving Secret after
-    ...    MicroShift is interrupted repeatedly during startup.
+    [Documentation]    Service-ca must recreate the deleted metrics-server serving Secret
+    ...    after MicroShift is interrupted repeatedly during startup. The retry ceiling
+    ...    makes the pre-fix failure deterministic without creating a certificate here.
+    ${old_uid}=    Simulate Metrics Server Serving Certificate Retry Ceiling
     FOR    ${attempt}    IN RANGE    ${RESTART_ATTEMPTS}
         Stop MicroShift
         Start MicroShift Without Waiting For Systemd Readiness
@@ -68,9 +70,10 @@ Metrics Server Recovers After Restart Storm
         Restart MicroShift
     END
     Wait Until Keyword Succeeds    5m    5s
-    ...    Metrics Server Serving Certificate Secret Should Be Available
+    ...    Metrics Server Serving Certificate Secret Should Be Recreated    ${old_uid}
     Named Deployment Should Be Available    metrics-server    ns=${METRICS_NS}
     Metrics Server API Should Be Available
+    [Teardown]    Clear Metrics Server Serving Certificate Failure State
 
 
 *** Keywords ***
@@ -106,14 +109,56 @@ Cleanup Metrics Client Certs
     [Documentation]    Remove temporary client cert files from the remote host.
     Command Should Work    rm -f ${CLIENT_CERT} ${CLIENT_KEY} ${SERVICE_CA}
 
-Metrics Server Serving Certificate Secret Should Be Available
-    [Documentation]    Verify service-ca has restored the TLS data mounted by metrics-server.
+Simulate Metrics Server Serving Certificate Retry Ceiling
+    [Documentation]    Delete the service-ca-managed Secret after setting the controller's
+    ...    documented retry ceiling. The test never writes certificate data itself.
+    ${old_uid}=    Run With Kubeconfig
+    ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.metadata.uid}'
+    Should Not Be Empty    ${old_uid}
+    Run With Kubeconfig
+    ...    oc annotate service metrics-server -n ${METRICS_NS} --overwrite service.beta.openshift.io/serving-cert-generation-error-num=10
+    Run With Kubeconfig
+    ...    oc annotate service metrics-server -n ${METRICS_NS} --overwrite service.alpha.openshift.io/serving-cert-generation-error-num=10
+    ${retry_count}=    Run With Kubeconfig
+    ...    oc get service metrics-server -n ${METRICS_NS} -o jsonpath\\='{.metadata.annotations.service\\.beta\\.openshift\\.io/serving-cert-generation-error-num}'
+    Should Be Equal As Integers    ${retry_count}    10
+    Run With Kubeconfig    oc delete secret metrics-server-tls -n ${METRICS_NS}
+    Metrics Server Serving Certificate Secret Should Be Absent
+    RETURN    ${old_uid}
+
+Metrics Server Serving Certificate Secret Should Be Absent
+    [Documentation]    Prove the service-ca serving Secret was deleted before recovery.
+    ${output}    ${rc}=    Run With Kubeconfig
+    ...    oc get secret metrics-server-tls -n ${METRICS_NS}
+    ...    allow_fail=${TRUE}
+    ...    return_rc=${TRUE}
+    Should Not Be Equal As Integers    ${rc}    0
+
+Metrics Server Serving Certificate Secret Should Be Recreated
+    [Documentation]    Verify service-ca recreated a new TLS Secret with its ownership annotation.
+    [Arguments]    ${old_uid}
+    ${new_uid}=    Run With Kubeconfig
+    ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.metadata.uid}'
+    Should Not Be Empty    ${new_uid}
+    Should Not Be Equal    ${new_uid}    ${old_uid}
     ${certificate}=    Run With Kubeconfig
     ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.data.tls\\.crt}'
     Should Not Be Empty    ${certificate}
     ${private_key}=    Run With Kubeconfig
     ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.data.tls\\.key}'
     Should Not Be Empty    ${private_key}
+    ${owner}=    Run With Kubeconfig
+    ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.metadata.annotations.service\\.beta\\.openshift\\.io/service-name}'
+    Should Be Equal    ${owner}    metrics-server
+
+Clear Metrics Server Serving Certificate Failure State
+    [Documentation]    Leave the service-ca retry bookkeeping clear if the test fails.
+    Run With Kubeconfig
+    ...    oc annotate service metrics-server -n ${METRICS_NS} service.beta.openshift.io/serving-cert-generation-error- service.beta.openshift.io/serving-cert-generation-error-num-
+    ...    allow_fail=${TRUE}
+    Run With Kubeconfig
+    ...    oc annotate service metrics-server -n ${METRICS_NS} service.alpha.openshift.io/serving-cert-generation-error- service.alpha.openshift.io/serving-cert-generation-error-num-
+    ...    allow_fail=${TRUE}
 
 Metrics Server API Should Be Available
     [Documentation]    Wait until the aggregated metrics API can route to metrics-server.
