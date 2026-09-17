@@ -7,16 +7,18 @@ Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/optional-config.resource
+Resource            ../../resources/microshift-process.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
 
 
 *** Variables ***
-${METRICS_NS}       openshift-monitoring
-${CLIENT_CERT}      /tmp/metrics-test-client.crt
-${CLIENT_KEY}       /tmp/metrics-test-client.key
-${SERVICE_CA}       /tmp/metrics-test-service-ca.crt
+${METRICS_NS}           openshift-monitoring
+${CLIENT_CERT}          /tmp/metrics-test-client.crt
+${CLIENT_KEY}           /tmp/metrics-test-client.key
+${SERVICE_CA}           /tmp/metrics-test-service-ca.crt
+${RESTART_ATTEMPTS}     3
 
 
 *** Test Cases ***
@@ -56,6 +58,20 @@ Metrics Server Reports Node Metrics
     ${out}=    Run With Kubeconfig    oc adm top nodes --no-headers
     Should Match Regexp    ${out}    \\d+m
 
+Metrics Server Recovers After Restart Storm
+    [Documentation]    Service-ca must restore the metrics-server serving Secret after
+    ...    MicroShift is interrupted repeatedly during startup.
+    FOR    ${attempt}    IN RANGE    ${RESTART_ATTEMPTS}
+        Stop MicroShift
+        Start MicroShift Without Waiting For Systemd Readiness
+        Sleep    1s
+        Restart MicroShift
+    END
+    Wait Until Keyword Succeeds    5m    5s
+    ...    Metrics Server Serving Certificate Secret Should Be Available
+    Named Deployment Should Be Available    metrics-server    ns=${METRICS_NS}
+    Metrics Server API Should Be Available
+
 
 *** Keywords ***
 Setup
@@ -89,6 +105,19 @@ Extract Metrics Client Certs
 Cleanup Metrics Client Certs
     [Documentation]    Remove temporary client cert files from the remote host.
     Command Should Work    rm -f ${CLIENT_CERT} ${CLIENT_KEY} ${SERVICE_CA}
+
+Metrics Server Serving Certificate Secret Should Be Available
+    [Documentation]    Verify service-ca has restored the TLS data mounted by metrics-server.
+    ${certificate}=    Run With Kubeconfig
+    ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.data.tls\\.crt}'
+    Should Not Be Empty    ${certificate}
+    ${private_key}=    Run With Kubeconfig
+    ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.data.tls\\.key}'
+    Should Not Be Empty    ${private_key}
+
+Metrics Server API Should Be Available
+    [Documentation]    Wait until the aggregated metrics API can route to metrics-server.
+    Oc Wait    apiservice v1beta1.metrics.k8s.io    --for=condition=Available --timeout\\=120s
 
 Metrics Endpoint Should Contain
     [Documentation]    Scrape kube-state-metrics on the given port and assert the
