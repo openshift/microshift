@@ -141,12 +141,10 @@ Metrics Server Serving Certificate Secret Should Be Recreated
     ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.metadata.uid}'
     Should Not Be Empty    ${new_uid}
     Should Not Be Equal    ${new_uid}    ${old_uid}
-    ${certificate}=    Run With Kubeconfig
-    ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.data.tls\\.crt}'
-    Should Not Be Empty    ${certificate}
-    ${private_key}=    Run With Kubeconfig
-    ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.data.tls\\.key}'
-    Should Not Be Empty    ${private_key}
+    Run With Kubeconfig
+    ...    test "$(oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.data.tls\\.crt}' | base64 -d | wc -c)" -gt 0
+    Run With Kubeconfig
+    ...    test "$(oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.data.tls\\.key}' | base64 -d | wc -c)" -gt 0
     ${owner}=    Run With Kubeconfig
     ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.metadata.annotations.service\\.beta\\.openshift\\.io/service-name}'
     Should Be Equal    ${owner}    metrics-server
