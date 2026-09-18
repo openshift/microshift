@@ -34,7 +34,22 @@ sudo dnf --assumeno downgrade "${TUNED_PACKAGES[@]}" 2>&1 | tee "${preflight_out
 preflight_status=${PIPESTATUS[0]}
 set -e
 
-if ! grep -Eq 'Operation aborted|Nothing to do' "${preflight_output}"; then
+if grep -Eqi '(^|[[:space:]])(Error|Problem):|No match for argument|No matches found|No matching [Pp]ackages|protected package|read-only|read only|permission denied|conflicting requests|dependency conflict|nothing provides|cannot install the best candidate|unable to resolve transaction' "${preflight_output}"; then
+    echo "ERROR: TuneD downgrade preflight reported a blocking DNF diagnostic; refusing to continue." >&2
+    exit 1
+fi
+if grep -Eq '^[[:space:]]*Nothing to do\.?[[:space:]]*$' "${preflight_output}"; then
+    :
+# DNF --assumeno refuses a resolved transaction with this exact summary and
+# terminal message; other uses of "Operation aborted." are blocking failures.
+elif [[ "${preflight_status}" -ne 0 ]] && awk '
+    /^[[:space:]]*Transaction Summary[[:space:]]*$/ { transaction_summary = 1 }
+    transaction_summary && /^[[:space:]]*Downgrade[[:space:]]+/ { downgrade = 1 }
+    downgrade && /^[[:space:]]*Operation aborted\.[[:space:]]*$/ { refusal_line = NR }
+    END { exit !(transaction_summary && downgrade && refusal_line == NR) }
+' "${preflight_output}"; then
+    :
+else
     echo "ERROR: TuneD downgrade preflight failed (dnf exit status ${preflight_status})." >&2
     exit 1
 fi
