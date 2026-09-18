@@ -11,21 +11,21 @@ sudo grubby --set-default="/boot/vmlinuz-$(rpm -q --queryformat '%{version}-%{re
 # transaction synchronized; the profile packages require the matching tuned NVR.
 readonly TUNED_NVR="2.27.0-2.1.20270724git0eb28ac3.el9fdp"
 readonly -a TUNED_PACKAGES=(
-    "tuned-${TUNED_NVR}"
-    "tuned-profiles-cpu-partitioning-${TUNED_NVR}"
-    "tuned-profiles-realtime-${TUNED_NVR}"
+    "tuned-${TUNED_NVR}.noarch"
+    "tuned-profiles-cpu-partitioning-${TUNED_NVR}.noarch"
+    "tuned-profiles-realtime-${TUNED_NVR}.noarch"
 )
 
 # Check that every exact NVR is retained in the currently enabled repositories.
 for package in "${TUNED_PACKAGES[@]}"; do
-    if ! sudo dnf -q repoquery --available --qf '%{name}-%{version}-%{release}.%{arch}' "${package}.noarch" | grep -Fxq "${package}.noarch"; then
-        echo "ERROR: required TuneD package ${package}.noarch is unavailable in the enabled repositories." >&2
+    if ! sudo dnf -q repoquery --available --qf '%{name}-%{version}-%{release}.%{arch}' "${package}" | grep -Fxq "${package}"; then
+        echo "ERROR: required TuneD package ${package} is unavailable in the enabled repositories." >&2
         exit 1
     fi
 done
 
-# Resolve the exact downgrade before changing the host. DNF only erases packages
-# when explicitly given --allowerasing, which this transaction deliberately omits.
+# Resolve the exact downgrade before changing the host. This transaction
+# deliberately does not authorize replacing installed packages by erasing them.
 preflight_output=$(mktemp)
 trap 'rm -f "${preflight_output}"' EXIT
 
