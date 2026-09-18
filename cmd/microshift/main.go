@@ -41,6 +41,7 @@ func newCommand() *cobra.Command {
 	cmd.AddCommand(cmds.NewBackupCommand())
 	cmd.AddCommand(cmds.NewRestoreCommand())
 	cmd.AddCommand(cmds.NewHealthcheckCommand())
+	cmd.AddCommand(cmds.NewCertsCommand(ioStreams))
 	cmd.AddCommand(cmds.NewAddNodeCommand())
 	cmd.AddCommand(cmds.NewC2CCProbeCommand())
 	return cmd
