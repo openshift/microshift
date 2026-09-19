@@ -1009,7 +1009,7 @@
       }
     },
     "kubelet": {
-      "description": "Settings specified in this section are transferred as-is into the Kubelet config."
+      "description": "Settings specified in this section are transferred as-is into the Kubelet config,\nexcept imageCredentialProviderConfigPath and imageCredentialProviderBinDir, which\nenable the kubelet image credential provider and are applied as kubelet startup\nflags. Both must be set together, be absolute paths, and be owned by root and not\nwritable by group or others, including parent directories and contents."
     },
     "manifests": {
       "type": "object",
