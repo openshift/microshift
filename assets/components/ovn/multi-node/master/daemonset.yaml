@@ -141,6 +141,19 @@ spec:
             --db-nb-cluster-local-proto=tcp \
             --no-monitor"
 
+          # On worker nodes the configmap contains [OvnNorth] address= pointing to
+          # the primary.  Join the primary's NBDB RAFT cluster so this node gets a
+          # local unix socket connected to the shared database.
+          NB_ADDR=$(awk 'BEGIN{f=0} /^\[OvnNorth\]/{f=1} f && /^address=/{print substr($0,9); exit}' \
+              /run/ovnkube-config/ovnkube.conf 2>/dev/null)
+          if [[ "${NB_ADDR}" =~ ^tcp: ]] && [[ "${NB_ADDR}" != *"${K8S_NODE_IP}"* ]]; then
+              PRIMARY_IP="${NB_ADDR#tcp:}"; PRIMARY_IP="${PRIMARY_IP%%:*}"
+              OVN_ARGS="${OVN_ARGS} \
+                --db-nb-cluster-remote-addr=$(bracketify ${PRIMARY_IP}) \
+                --db-nb-cluster-remote-port=9643 \
+                --db-nb-cluster-remote-proto=tcp"
+          fi
+
           rm -f /run/ovn/ovnnb_db.sock
 
           echo "$(date -Iseconds) - starting nbdb"
@@ -234,6 +247,8 @@ spec:
           name: run-openvswitch
         - mountPath: /run/ovn/
           name: run-ovn
+        - mountPath: /run/ovnkube-config/
+          name: ovnkube-config
         - mountPath: /env
           name: env-overrides
         resources:
@@ -287,6 +302,19 @@ spec:
             --db-sb-cluster-local-addr=$(bracketify ${K8S_NODE_IP}) \
             --db-sb-cluster-local-proto=tcp \
             --no-monitor"
+
+          # On worker nodes the configmap contains [OvnSouth] address= pointing to
+          # the primary.  Join the primary's SBDB RAFT cluster so this node gets a
+          # local unix socket connected to the shared database.
+          SB_ADDR=$(awk 'BEGIN{f=0} /^\[OvnSouth\]/{f=1} f && /^address=/{print substr($0,9); exit}' \
+              /run/ovnkube-config/ovnkube.conf 2>/dev/null)
+          if [[ "${SB_ADDR}" =~ ^tcp: ]] && [[ "${SB_ADDR}" != *"${K8S_NODE_IP}"* ]]; then
+              PRIMARY_IP="${SB_ADDR#tcp:}"; PRIMARY_IP="${PRIMARY_IP%%:*}"
+              OVN_ARGS="${OVN_ARGS} \
+                --db-sb-cluster-remote-addr=$(bracketify ${PRIMARY_IP}) \
+                --db-sb-cluster-remote-port=9644 \
+                --db-sb-cluster-remote-proto=tcp"
+          fi
 
           rm -f /run/ovn/ovnsb_db.sock
 
@@ -345,6 +373,8 @@ spec:
           name: run-openvswitch
         - mountPath: /run/ovn/
           name: run-ovn
+        - mountPath: /run/ovnkube-config/
+          name: ovnkube-config
         - mountPath: /env
           name: env-overrides
         resources:
@@ -369,6 +399,16 @@ spec:
             set -o allexport
             source "/env/_master"
             set +o allexport
+          fi
+
+          # cluster-manager handles cluster-wide IPAM — only the primary should run it.
+          # Worker nodes run sbdb/nbdb as RAFT followers; the primary wins the NBDB
+          # leader election and handles all cluster-manager work.
+          SB_ADDR=$(awk 'BEGIN{f=0} /^\[OvnSouth\]/{f=1} f && /^address=/{print substr($0,9); exit}' \
+              /run/ovnkube-config/ovnkube.conf 2>/dev/null)
+          if [[ "${SB_ADDR}" =~ ^tcp: ]] && [[ "${SB_ADDR}" != *"${K8S_NODE_IP}"* ]]; then
+              echo "$(date -Iseconds) - worker node: cluster-manager is primary-only, idling"
+              exec sleep infinity
           fi
 
           echo "$(date -Iseconds) - starting ovnkube-cluster-manager, Node: ${K8S_NODE}"
@@ -409,6 +449,15 @@ spec:
             set -o allexport
             source "/env/_master"
             set +o allexport
+          fi
+
+          # ovnkube-master handles per-node network setup — only the primary should
+          # run the controller role; workers' local NBDB/SBDB are RAFT followers.
+          SB_ADDR=$(awk 'BEGIN{f=0} /^\[OvnSouth\]/{f=1} f && /^address=/{print substr($0,9); exit}' \
+              /run/ovnkube-config/ovnkube.conf 2>/dev/null)
+          if [[ "${SB_ADDR}" =~ ^tcp: ]] && [[ "${SB_ADDR}" != *"${K8S_NODE_IP}"* ]]; then
+              echo "$(date -Iseconds) - worker node: ovnkube-master is primary-only, idling"
+              exec sleep infinity
           fi
 
           # K8S_NODE_IP triggers reconcilation of this daemon when node IP changes

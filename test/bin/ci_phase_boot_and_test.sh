@@ -22,9 +22,12 @@ prepare_scenario_sources() {
     rm -rf "${SCENARIOS_TO_RUN}"
     mkdir -p "${SCENARIOS_TO_RUN}"
     cp "${SCENARIO_SOURCES}"/*.sh "${SCENARIOS_TO_RUN}"/
-    if ${EXCLUDE_CNCF_CONFORMANCE}; then
-        find "${SCENARIOS_TO_RUN}" -name "*cncf-conformance.sh" -delete
-    fi
+    # TODO: Temporarily disabled so that the CNCF conformance scenario runs
+    # unconditionally while the multinode OVN SBDB fix (PR #7344) is validated
+    # in CI. Revert once the job is confirmed green.
+    # if ${EXCLUDE_CNCF_CONFORMANCE}; then
+    #     find "${SCENARIOS_TO_RUN}" -name "*cncf-conformance.sh" -delete
+    # fi
 }
 
 # Log output automatically
