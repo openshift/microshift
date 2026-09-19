@@ -66,6 +66,7 @@ cp -a "${REPOROOT}/etcd/cmd" "${SCAN_DIR}/etcd-cmd"
 cp -a "${REPOROOT}/etcd/vendor" "${SCAN_DIR}/etcd-deps"
 
 if ! podman run --rm \
+  -e LC_ALL=C.UTF-8 \
   -v "${SCAN_DIR}:/workspace:z" \
   "${SCANNER_IMAGE}" \
   /workspace > "${CBOM_OUTPUT}"; then
