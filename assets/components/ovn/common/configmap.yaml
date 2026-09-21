@@ -36,9 +36,9 @@ data:
     election-retry-period=26
 {{- if .MultiNodeEnabled}}
 
-    [OvnNorth]
+    [ovnnorth]
     address=tcp:{{.NodeIP}}:{{.OVN_NB_PORT}}
 
-    [OvnSouth]
+    [ovnsouth]
     address=tcp:{{.NodeIP}}:{{.OVN_SB_PORT}}
 {{- end}}
