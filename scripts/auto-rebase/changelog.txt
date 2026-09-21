@@ -1,8 +1,0 @@
-- oc image-amd64 6f88b5846ab96ac1808c20038646d4dd669395cb to 33afbae38573e7a0944ab0d00c8acee6b321c196
-  - 2d006d4a 2026-08-18T12:47:36+00:00 fix:correct sti-ruby path for unit tests
-  - 8075f605 2026-08-05T00:54:17+02:00 Fix for OCPBUGS-91552: CVE-2026-25681
-
-- oc image-arm64 6f88b5846ab96ac1808c20038646d4dd669395cb to 33afbae38573e7a0944ab0d00c8acee6b321c196
-  - 2d006d4a 2026-08-18T12:47:36+00:00 fix:correct sti-ruby path for unit tests
-  - 8075f605 2026-08-05T00:54:17+02:00 Fix for OCPBUGS-91552: CVE-2026-25681
-
