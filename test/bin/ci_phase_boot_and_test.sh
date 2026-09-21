@@ -96,6 +96,7 @@ if [[ "${SCENARIO_SOURCES}" =~ c2cc ]]; then
 
     # Power off passed VMs so the job limit is an actual cap on running VMs.
     scenario_action="create-run-shutdown"
+    export TEST_EXECUTION_TIMEOUT=45m
 
     # Each arch runs one RHEL version to halve the scenario count.
     # The assignment rotates per commit so both combos get coverage:
