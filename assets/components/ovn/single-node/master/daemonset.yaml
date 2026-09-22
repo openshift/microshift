@@ -347,6 +347,14 @@ spec:
         - -c
         - |
           set -xe
+          # Remove any CNI conf left over from a previous container instance that
+          # exited without running preStop (crash/OOM/reboot). ovnkube writes the
+          # file only if it is absent, so a stale copy would satisfy the startup
+          # and readiness probes before this instance finishes init. This runs on
+          # every container start (unlike preStop or an initContainer, which do
+          # not), and the startupProbe initialDelaySeconds keeps the probe from
+          # racing this removal.
+          rm -f /etc/cni/net.d/10-ovn-kubernetes.conf
           if [[ -f "/env/_master" ]]; then
             set -o allexport
             source "/env/_master"
@@ -397,6 +405,18 @@ spec:
           preStop:
             exec:
               command: ["rm","-f","/etc/cni/net.d/10-ovn-kubernetes.conf"]
+        # The CNI conf file is written only once node init completes, so its
+        # presence is a reliable "started" signal. Bound a wedged init to ~180s
+        # while tolerating slow starts.
+        startupProbe:
+          exec:
+            command: ["test", "-f", "/etc/cni/net.d/10-ovn-kubernetes.conf"]
+          # Give the container's startup rm time to clear a stale conf before the
+          # first probe, so a leftover file cannot prematurely satisfy it.
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 36
         readinessProbe:
           exec:
             command: ["test", "-f", "/etc/cni/net.d/10-ovn-kubernetes.conf"]
