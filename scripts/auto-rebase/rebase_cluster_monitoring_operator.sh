@@ -202,14 +202,14 @@ update_kube_state_metrics_manifests() {
     yq -i '(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "kube-state-metrics-tls")).readOnly = true' "$ksm_deploy"
     yq -i '(.spec.template.spec.containers[2].volumeMounts[] | select(.name == "kube-state-metrics-tls")).readOnly = true' "$ksm_deploy"
 
-    yq -i '(.spec.template.spec.containers[1].args[] | select(test("--client-ca-file="))) |= "--client-ca-file=/etc/tls/client-ca/ca.crt"' "$ksm_deploy"
-    yq -i '(.spec.template.spec.containers[2].args[] | select(test("--client-ca-file="))) |= "--client-ca-file=/etc/tls/client-ca/ca.crt"' "$ksm_deploy"
-    yq -i 'del(.spec.template.spec.volumes[] | select(.name == "metrics-client-ca"))' "$ksm_deploy"
-    yq -i '.spec.template.spec.volumes += [{"hostPath": {"path": "/var/lib/microshift/certs/admin-kubeconfig-signer/ca.crt", "type": "File"}, "name": "admin-kubeconfig-signer-ca"}]' "$ksm_deploy"
-    yq -i 'del(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "metrics-client-ca"))' "$ksm_deploy"
-    yq -i 'del(.spec.template.spec.containers[2].volumeMounts[] | select(.name == "metrics-client-ca"))' "$ksm_deploy"
-    yq -i '.spec.template.spec.containers[1].volumeMounts += [{"mountPath": "/etc/tls/client-ca/ca.crt", "name": "admin-kubeconfig-signer-ca", "readOnly": true}]' "$ksm_deploy"
-    yq -i '.spec.template.spec.containers[2].volumeMounts += [{"mountPath": "/etc/tls/client-ca/ca.crt", "name": "admin-kubeconfig-signer-ca", "readOnly": true}]' "$ksm_deploy"
+    yq -i '(.spec.template.spec.containers[1].args[] | select(test("--client-ca-file="))) |= "--client-ca-file=/etc/tls/client/client-ca.crt"' "$ksm_deploy"
+    yq -i '(.spec.template.spec.containers[2].args[] | select(test("--client-ca-file="))) |= "--client-ca-file=/etc/tls/client/client-ca.crt"' "$ksm_deploy"
+    yq -i 'del(.spec.template.spec.volumes[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ksm_deploy"
+    yq -i '.spec.template.spec.volumes += [{"configMap": {"name": "metrics-client-ca"}, "name": "metrics-client-ca"}]' "$ksm_deploy"
+    yq -i 'del(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ksm_deploy"
+    yq -i 'del(.spec.template.spec.containers[2].volumeMounts[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[1].volumeMounts += [{"mountPath": "/etc/tls/client", "name": "metrics-client-ca", "readOnly": true}]' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[2].volumeMounts += [{"mountPath": "/etc/tls/client", "name": "metrics-client-ca", "readOnly": true}]' "$ksm_deploy"
 
     local ksm_secret="${REPOROOT}/assets/optional/kube-state-metrics/02-kube-rbac-proxy-secret.yaml"
     sed -i '/"user":/,/"name":/d' "$ksm_secret"
@@ -228,11 +228,11 @@ update_node_exporter_manifests() {
 
     yq -i '(.spec.template.spec.containers[1].args[] | select(test("--secure-listen-address="))) |= "--secure-listen-address=0.0.0.0:9100"' "$ne_ds"
 
-    yq -i '(.spec.template.spec.containers[1].args[] | select(test("--client-ca-file="))) |= "--client-ca-file=/etc/tls/client-ca/ca.crt"' "$ne_ds"
-    yq -i 'del(.spec.template.spec.volumes[] | select(.name == "metrics-client-ca"))' "$ne_ds"
-    yq -i '.spec.template.spec.volumes += [{"hostPath": {"path": "/var/lib/microshift/certs/admin-kubeconfig-signer/ca.crt", "type": "File"}, "name": "admin-kubeconfig-signer-ca"}]' "$ne_ds"
-    yq -i 'del(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "metrics-client-ca"))' "$ne_ds"
-    yq -i '.spec.template.spec.containers[1].volumeMounts += [{"mountPath": "/etc/tls/client-ca/ca.crt", "name": "admin-kubeconfig-signer-ca", "readOnly": true}]' "$ne_ds"
+    yq -i '(.spec.template.spec.containers[1].args[] | select(test("--client-ca-file="))) |= "--client-ca-file=/etc/tls/client/client-ca.crt"' "$ne_ds"
+    yq -i 'del(.spec.template.spec.volumes[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ne_ds"
+    yq -i '.spec.template.spec.volumes += [{"configMap": {"name": "metrics-client-ca"}, "name": "metrics-client-ca"}]' "$ne_ds"
+    yq -i 'del(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ne_ds"
+    yq -i '.spec.template.spec.containers[1].volumeMounts += [{"mountPath": "/etc/tls/client", "name": "metrics-client-ca", "readOnly": true}]' "$ne_ds"
 
     yq -i '(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "node-exporter-tls")).readOnly = true' "$ne_ds"
 
