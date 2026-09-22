@@ -103,6 +103,12 @@ type Controller struct {
 	metricsCreated    bool
 	metricsCreateOnce sync.Once
 	metricsCreateLock sync.RWMutex
+
+	// flaggedUnmanagedRoutes is the set of route metrics flagged as unmanaged.
+	// This set is used to clear the metric when the route is removed from the
+	// apiserver.
+	flaggedUnmanagedRoutes     sets.Set[routeMetricLabels]
+	flaggedUnmanagedRoutesLock sync.Mutex
 }
 
 // expectations track an upcoming change to a named resource related
@@ -111,6 +117,13 @@ type Controller struct {
 type expectations struct {
 	lock   sync.Mutex
 	expect map[queueKey]sets.String
+}
+
+// routeMetricLabels defines the route metric labels as a comparable type
+type routeMetricLabels struct {
+	name      string
+	namespace string
+	host      string
 }
 
 // newExpectations returns a tracking object for upcoming events
@@ -194,6 +207,8 @@ func NewController(eventsClient kv1core.EventsGetter, routeClient routeclient.Ro
 		secretLister:       secrets.Lister(),
 		routeLister:        routes.Lister(),
 		serviceLister:      services.Lister(),
+
+		flaggedUnmanagedRoutes: sets.New[routeMetricLabels](),
 
 		syncs: []cache.InformerSynced{
 			ingresses.Informer().HasSynced,
@@ -387,7 +402,7 @@ func (c *Controller) sync(key queueKey) error {
 
 	ingress, err := c.ingressLister.Ingresses(key.namespace).Get(key.name)
 	if kerrors.IsNotFound(err) {
-		c.ResetIngressMetrics(key.namespace, key.name)
+		c.resetIngressMetrics(key.namespace, key.name)
 		return nil
 	}
 	if err != nil {
