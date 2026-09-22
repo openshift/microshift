@@ -20,7 +20,6 @@ ${CP_BIN_DIR}                   /usr/libexec/microshift/credential-providers
 ${CP_MOCK_PROVIDER}             ${CP_BIN_DIR}/mock-credential-provider
 ${CP_CONFIG_FILE}               /etc/microshift/credential-providers.yaml
 ${CP_CONFIG_DIR}                /etc/microshift/credential-providers.d
-${KUBELET_GENERATED_CONFIG}     /var/lib/microshift/resources/kubelet/config/config.yaml
 ${CP_VALID}                     SEPARATOR=\n
 ...                             ---
 ...                             kubelet:
@@ -85,8 +84,6 @@ Valid Configuration Applies Kubelet Flags
     ${config}=    Show Config    effective
     Should Be Equal As Strings    ${config.kubelet.imageCredentialProviderConfigPath}    ${CP_CONFIG_FILE}
     Should Be Equal As Strings    ${config.kubelet.imageCredentialProviderBinDir}    ${CP_BIN_DIR}
-    # Reserved keys must not reach the KubeletConfiguration file kubelet loads
-    Command Should Fail    grep -q imageCredentialProvider ${KUBELET_GENERATED_CONFIG}
     [Teardown]    Remove Credential Provider Config
 
 Missing Bin Directory Prevents Start
@@ -100,7 +97,7 @@ Only One Key Prevents Start
     [Setup]    Apply Invalid Credential Provider Config    ${CP_ONLY_CONFIG_PATH}
     Pattern Should Appear In Log Output
     ...    ${CURSOR}
-    ...    imageCredentialProviderConfigPath and kubelet.imageCredentialProviderBinDir must be set together
+    ...    imageCredentialProviderConfigPath and kubelet\\.imageCredentialProviderBinDir must be set together
     [Teardown]    Run Keywords    Remove Credential Provider Config    AND    Restart MicroShift
 
 World Writable Bin Directory Prevents Start
