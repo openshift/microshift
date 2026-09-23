@@ -21,7 +21,15 @@ source "${SCRIPTDIR}/scenario_container.sh"
 DEFAULT_BOOT_BLUEPRINT="rhel-9.6"
 LVM_SYSROOT_SIZE="15360"
 PULL_SECRET="${PULL_SECRET:-${HOME}/.pull-secret.json}"
+XTRACE_ENABLED=false
+case "$-" in
+    *x*) XTRACE_ENABLED=true ;;
+esac
+set +x
 PULL_SECRET_CONTENT="$(jq -c . "${PULL_SECRET}")"
+if "${XTRACE_ENABLED}"; then
+    set -x
+fi
 VM_BOOT_TIMEOUT=1200 # Overall total boot times are around 15m
 VM_GREENBOOT_TIMEOUT=1800 # Greenboot readiness may take up to 15-30m depending on the load
 SKIP_SOS=${SKIP_SOS:-false}  # may be overridden in global settings file
@@ -444,7 +452,6 @@ prepare_kickstart() {
             -e "s|REPLACE_RPM_SERVER_URL|${WEB_SERVER_URL}/rpm-repos|g" \
             -e "s|REPLACE_MINOR_VERSION|${MINOR_VERSION}|g" \
             -e "s|REPLACE_BOOT_COMMIT_REF|${boot_commit_ref}|g" \
-            -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \
             -e "s|REPLACE_HOST_NAME|${vm_hostname}|g" \
             -e "s|REPLACE_IPV6_ONLY|${ipv6_opt}|g" \
             -e "s|REPLACE_REDHAT_AUTHORIZED_KEYS|${REDHAT_AUTHORIZED_KEYS}|g" \
@@ -455,6 +462,14 @@ prepare_kickstart() {
             -e "s|REPLACE_IMAGE_SIGSTORE_ENABLED|${IMAGE_SIGSTORE_ENABLED}|g" \
             -e "s|REPLACE_GREENBOOT_TIMEOUT|${GREENBOOT_TIMEOUT}|g" \
             "${ifile}" > "${output_file}"
+
+	set +x
+        sed -i \
+            -e "s|REPLACE_PULL_SECRET|${PULL_SECRET_CONTENT}|g" \
+	    "${output_file}"
+	if "${XTRACE_ENABLED}"; then
+	    set -x
+	fi
     done
     record_junit "${vmname}" "prepare_kickstart" "OK"
 }
