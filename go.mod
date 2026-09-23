@@ -8,7 +8,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/miekg/dns v1.1.63 // microshift
 	github.com/openshift/api v0.0.0-20260715165912-72066cc9718b
-	github.com/openshift/build-machinery-go v0.0.0-20260629141115-154a2b810491
+	github.com/openshift/build-machinery-go v0.0.0-20260902143904-520f675c892b
 	github.com/openshift/client-go v0.0.0-20260715172546-dac61734e0ec
 	github.com/openshift/library-go v0.0.0-20260720185249-0595e37fe20f
 	github.com/ovn-kubernetes/libovsdb v0.8.2-0.20260302130604-c07ce22366ac
@@ -35,7 +35,7 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
 	github.com/openshift/cluster-policy-controller v0.0.0-20260902120314-c9e9a3482609
-	github.com/openshift/route-controller-manager v0.0.0-20260722172158-59697cf7af45
+	github.com/openshift/route-controller-manager v0.0.0-20260909174728-a158fff7ce38
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/common v0.67.5
 	github.com/prometheus/prometheus v0.302.1
@@ -241,7 +241,7 @@ replace (
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260424201627-4d4cc33d669d // from kubernetes
 	k8s.io/klog/v2 => ./deps/k8s.io/klog // deps clone github.com/kubernetes/klog from kubernetes
 	k8s.io/kubernetes => ./deps/github.com/openshift/kubernetes // deps copy
-	sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260304192652-72835e43c775 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
+	sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260913130130-fb49e56122b6 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
 )
 
 replace (
