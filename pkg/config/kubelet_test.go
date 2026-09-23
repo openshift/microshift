@@ -215,6 +215,58 @@ func credentialProviderConfigYAMLAt(apiVersion string, names ...string) string {
 	return b.String()
 }
 
+// cpProvider builds one provider block for buildCredentialProviderConfig. A nil
+// pointer field is omitted from the YAML (so a test can exercise a missing
+// required field); a non-nil pointer is emitted verbatim. name is always emitted
+// (it may be empty). extra holds additional indented YAML lines, e.g. a
+// tokenAttributes block.
+type cpProvider struct {
+	name                 string
+	matchImages          *string // YAML value, e.g. `["*.example.com"]`
+	defaultCacheDuration *string // e.g. `"12h"`
+	apiVersion           *string // e.g. credentialprovider.kubelet.k8s.io/v1
+	extra                string
+}
+
+// strptr returns a pointer to s, for setting cpProvider fields inline.
+func strptr(s string) *string { return &s }
+
+// validCPProvider returns a cpProvider with every required field set to a valid
+// value, so a test can override or clear exactly one field.
+func validCPProvider(name string) cpProvider {
+	return cpProvider{
+		name:                 name,
+		matchImages:          strptr(`["*.dkr.ecr.*.amazonaws.com"]`),
+		defaultCacheDuration: strptr(`"12h"`),
+		apiVersion:           strptr("credentialprovider.kubelet.k8s.io/v1"),
+	}
+}
+
+// buildCredentialProviderConfig renders a CredentialProviderConfig with the
+// given providers, omitting any provider field left nil. The config apiVersion is
+// always the sole supported value; a provider's own exec apiVersion is set via
+// cpProvider.apiVersion.
+func buildCredentialProviderConfig(providers ...cpProvider) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "apiVersion: %s\n", "kubelet.config.k8s.io/v1")
+	b.WriteString("kind: CredentialProviderConfig\n")
+	b.WriteString("providers:\n")
+	for _, p := range providers {
+		fmt.Fprintf(&b, "- name: %q\n", p.name)
+		if p.matchImages != nil {
+			fmt.Fprintf(&b, "  matchImages: %s\n", *p.matchImages)
+		}
+		if p.defaultCacheDuration != nil {
+			fmt.Fprintf(&b, "  defaultCacheDuration: %s\n", *p.defaultCacheDuration)
+		}
+		if p.apiVersion != nil {
+			fmt.Fprintf(&b, "  apiVersion: %s\n", *p.apiVersion)
+		}
+		b.WriteString(p.extra)
+	}
+	return b.String()
+}
+
 // mkConfigFile writes a structurally valid config file naming the given
 // providers and returns its path.
 func mkConfigFile(t *testing.T, dir, name string, providers ...string) string {
@@ -491,20 +543,91 @@ func TestValidateKubeletCredentialProviderTrustedPath(t *testing.T) {
 		assert.Contains(t, err.Error(), "must be owned by root")
 	})
 
-	t.Run("world-writable contained entry", func(t *testing.T) {
+	t.Run("unrelated non-root entry in the config dir is ignored", func(t *testing.T) {
+		// kubelet reads only .json/.yaml/.yml files, so a non-root, world-writable
+		// README next to a compliant config must not block startup.
 		dir := t.TempDir()
-		cfgFile := mkFile(t, dir, "cp.yaml", 0o644)
+		cfgDir := mkDir(t, dir, "cp.d")
+		mkConfigFile(t, cfgDir, "10-ecr.yaml", "ecr-credential-provider")
+		readme := mkFile(t, cfgDir, "README", 0o644)
+		canonicalReadme, _ := filepath.EvalSymlinks(readme)
 		binDir := mkDir(t, dir, "bin")
-		plugin := mkFile(t, binDir, "ecr-credential-provider", 0o755)
-		canonicalPlugin, _ := filepath.EvalSymlinks(plugin)
-		own, _ := newOwnership(map[string]fakeStat{canonicalPlugin: {uid: 0, mode: 0o757}})
+		mkExecProvider(t, binDir, "ecr-credential-provider")
+		// The override would fail the trusted-path rule if README were ever checked.
+		own, _ := newOwnership(map[string]fakeStat{canonicalReadme: {uid: 1000, mode: 0o777}})
+		c := &Config{
+			kubeletImageCredentialProviderConfigPathRaw: cfgDir,
+			kubeletImageCredentialProviderBinDirRaw:     binDir,
+		}
+		assert.NoError(t, c.validateKubeletCredentialProviderWith(own))
+	})
+
+	t.Run("non-root config file in the config dir is rejected naming the file", func(t *testing.T) {
+		dir := t.TempDir()
+		cfgDir := mkDir(t, dir, "cp.d")
+		cfgFile := mkConfigFile(t, cfgDir, "10-ecr.yaml", "ecr-credential-provider")
+		canonicalFile, _ := filepath.EvalSymlinks(cfgFile)
+		binDir := mkDir(t, dir, "bin")
+		mkExecProvider(t, binDir, "ecr-credential-provider")
+		own, _ := newOwnership(map[string]fakeStat{canonicalFile: {uid: 1000, mode: 0o644}})
+		c := &Config{
+			kubeletImageCredentialProviderConfigPathRaw: cfgDir,
+			kubeletImageCredentialProviderBinDirRaw:     binDir,
+		}
+		err := c.validateKubeletCredentialProviderWith(own)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), canonicalFile)
+		assert.Contains(t, err.Error(), "must be owned by root")
+	})
+
+	t.Run("writable subdirectory in the config dir is ignored", func(t *testing.T) {
+		// A subdirectory is not a file kubelet reads, so its ownership is irrelevant.
+		dir := t.TempDir()
+		cfgDir := mkDir(t, dir, "cp.d")
+		mkConfigFile(t, cfgDir, "10-ecr.yaml", "ecr-credential-provider")
+		sub := mkDir(t, cfgDir, "old")
+		canonicalSub, _ := filepath.EvalSymlinks(sub)
+		binDir := mkDir(t, dir, "bin")
+		mkExecProvider(t, binDir, "ecr-credential-provider")
+		own, _ := newOwnership(map[string]fakeStat{canonicalSub: {uid: 1000, mode: 0o777}})
+		c := &Config{
+			kubeletImageCredentialProviderConfigPathRaw: cfgDir,
+			kubeletImageCredentialProviderBinDirRaw:     binDir,
+		}
+		assert.NoError(t, c.validateKubeletCredentialProviderWith(own))
+	})
+
+	t.Run("unrelated non-root entry in the bin dir is ignored", func(t *testing.T) {
+		// kubelet only executes the declared provider binaries, so an unrelated
+		// helper.sh in the bin dir must not block startup.
+		dir := t.TempDir()
+		cfgFile := mkConfigFile(t, dir, "cp.yaml", "ecr-credential-provider")
+		binDir := mkDir(t, dir, "bin")
+		mkExecProvider(t, binDir, "ecr-credential-provider")
+		helper := mkFile(t, binDir, "helper.sh", 0o755)
+		canonicalHelper, _ := filepath.EvalSymlinks(helper)
+		own, _ := newOwnership(map[string]fakeStat{canonicalHelper: {uid: 1000, mode: 0o777}})
+		c := &Config{
+			kubeletImageCredentialProviderConfigPathRaw: cfgFile,
+			kubeletImageCredentialProviderBinDirRaw:     binDir,
+		}
+		assert.NoError(t, c.validateKubeletCredentialProviderWith(own))
+	})
+
+	t.Run("non-root declared provider binary is rejected naming it", func(t *testing.T) {
+		dir := t.TempDir()
+		cfgFile := mkConfigFile(t, dir, "cp.yaml", "ecr-credential-provider")
+		binDir := mkDir(t, dir, "bin")
+		mkExecProvider(t, binDir, "ecr-credential-provider")
+		canonicalBinary, _ := filepath.EvalSymlinks(filepath.Join(binDir, "ecr-credential-provider"))
+		own, _ := newOwnership(map[string]fakeStat{canonicalBinary: {uid: 1000, mode: 0o755}})
 		c := &Config{
 			kubeletImageCredentialProviderConfigPathRaw: cfgFile,
 			kubeletImageCredentialProviderBinDirRaw:     binDir,
 		}
 		err := c.validateKubeletCredentialProviderWith(own)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), canonicalPlugin)
+		assert.Contains(t, err.Error(), canonicalBinary)
 		assert.Contains(t, err.Error(), "must be owned by root")
 	})
 
@@ -539,16 +662,18 @@ func TestValidateKubeletCredentialProviderTrustedPath(t *testing.T) {
 		assert.Equal(t, wantBin, gotBin)
 	})
 
-	t.Run("symlinked bin-dir entry is checked at its target including ancestors", func(t *testing.T) {
+	t.Run("declared provider binary symlinked under an unsafe ancestor is rejected naming the ancestor", func(t *testing.T) {
 		dir := t.TempDir()
-		cfgFile := mkFile(t, dir, "cp.yaml", 0o644)
+		cfgFile := mkConfigFile(t, dir, "cp.yaml", "plugin")
 		binDir := mkDir(t, dir, "bin")
-		// The real plugin lives outside binDir, under an unsafe ancestor.
+		// The declared provider binary is a symlink whose target lives outside binDir,
+		// under a group-writable ancestor. Resolving it and walking the target's
+		// ancestors must catch the unsafe directory.
 		unsafeParent := mkDir(t, dir, "unsafe")
 		realPlugin := mkFile(t, unsafeParent, "plugin", 0o755)
 		require.NoError(t, os.Symlink(realPlugin, filepath.Join(binDir, "plugin")))
 		canonicalParent, _ := filepath.EvalSymlinks(unsafeParent)
-		own, _ := newOwnership(map[string]fakeStat{canonicalParent: {uid: 0, mode: 0o777}})
+		own, _ := newOwnership(map[string]fakeStat{canonicalParent: {uid: 0, mode: 0o775}})
 		c := &Config{
 			kubeletImageCredentialProviderConfigPathRaw: cfgFile,
 			kubeletImageCredentialProviderBinDirRaw:     binDir,
@@ -746,7 +871,10 @@ func TestValidateKubeletCredentialProviderStructure(t *testing.T) {
 		}
 		err := c.validateKubeletCredentialProviderWith(own)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), `provider name "sub/provider" must not contain "/"`)
+		// The "/" rule now comes from the semantic mirror, so the message reads like
+		// kubelet's, with the offending provider named by field path.
+		assert.Contains(t, err.Error(), `providers[0].name`)
+		assert.Contains(t, err.Error(), "provider name cannot contain '/'")
 	})
 
 	t.Run("duplicate provider across two files is rejected", func(t *testing.T) {
@@ -782,7 +910,11 @@ func TestValidateKubeletCredentialProviderStructure(t *testing.T) {
 		}
 		err := c.validateKubeletCredentialProviderWith(own)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), `provider "dup" is declared more than once`)
+		// A within-file duplicate is caught by the per-file semantic mirror
+		// (field.Duplicate), mirroring kubelet; the cross-file case (below) keeps the
+		// MicroShift message that names both source files.
+		assert.Contains(t, err.Error(), `providers[1].name`)
+		assert.Contains(t, err.Error(), `Duplicate value: "dup"`)
 	})
 
 	t.Run("valid single file and executable provider passes", func(t *testing.T) {
@@ -978,5 +1110,189 @@ func TestValidateKubeletCredentialProviderStructure(t *testing.T) {
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), fifo)
 		assert.Contains(t, err.Error(), "is not a regular file")
+	})
+}
+
+func TestValidateKubeletCredentialProviderSemantics(t *testing.T) {
+	// runSingleFile writes cfgYAML to one config file, installs an executable in the
+	// bin dir for each name in binNames, and runs full validation. Semantic
+	// validation runs before the provider-binary check, so a semantic-failure case
+	// needs no bin names.
+	runSingleFile := func(t *testing.T, cfgYAML string, binNames ...string) error {
+		t.Helper()
+		dir := t.TempDir()
+		cfgFile := filepath.Join(dir, "cp.yaml")
+		require.NoError(t, os.WriteFile(cfgFile, []byte(cfgYAML), 0o644))
+		binDir := mkDir(t, dir, "bin")
+		for _, n := range binNames {
+			mkExecProvider(t, binDir, n)
+		}
+		own, _ := newOwnership(nil)
+		c := &Config{
+			kubeletImageCredentialProviderConfigPathRaw: cfgFile,
+			kubeletImageCredentialProviderBinDirRaw:     binDir,
+		}
+		return c.validateKubeletCredentialProviderWith(own)
+	}
+
+	t.Run("missing provider apiVersion", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		p.apiVersion = nil
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].apiVersion: Required value")
+	})
+
+	t.Run("unsupported provider apiVersion lists the supported versions", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		p.apiVersion = strptr("credentialprovider.kubelet.k8s.io/v2")
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].apiVersion")
+		assert.Contains(t, err.Error(), "Unsupported value")
+		assert.Contains(t, err.Error(), "credentialprovider.kubelet.k8s.io/v1")
+		assert.Contains(t, err.Error(), "credentialprovider.kubelet.k8s.io/v1beta1")
+		assert.Contains(t, err.Error(), "credentialprovider.kubelet.k8s.io/v1alpha1")
+	})
+
+	t.Run("missing matchImages", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		p.matchImages = nil
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].matchImages: Required value")
+	})
+
+	t.Run("invalid matchImages entry", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		// "[::1" is an unterminated IPv6 host, which ParseSchemelessURL rejects.
+		p.matchImages = strptr(`["[::1"]`)
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].matchImages")
+		assert.Contains(t, err.Error(), "match image is invalid")
+	})
+
+	t.Run("missing defaultCacheDuration", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		p.defaultCacheDuration = nil
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].defaultCacheDuration: Required value")
+	})
+
+	t.Run("negative defaultCacheDuration", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		p.defaultCacheDuration = strptr(`"-1h"`)
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].defaultCacheDuration")
+		assert.Contains(t, err.Error(), "must be greater than or equal to 0")
+	})
+
+	t.Run("empty provider name", func(t *testing.T) {
+		p := validCPProvider("")
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].name")
+		assert.Contains(t, err.Error(), "provider name is required")
+	})
+
+	t.Run("provider name with a space", func(t *testing.T) {
+		p := validCPProvider("ecr provider")
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "provider name cannot contain spaces")
+	})
+
+	t.Run("provider name is a single dot", func(t *testing.T) {
+		p := validCPProvider(".")
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "provider name cannot be '.'")
+	})
+
+	t.Run("provider name is a double dot", func(t *testing.T) {
+		p := validCPProvider("..")
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "provider name cannot be '..'")
+	})
+
+	t.Run("tokenAttributes without serviceAccountTokenAudience", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		p.extra = "  tokenAttributes:\n    requireServiceAccount: true\n    cacheType: Token\n"
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].tokenAttributes.serviceAccountTokenAudience: Required value")
+	})
+
+	t.Run("tokenAttributes on a non-v1 provider apiVersion is forbidden", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		p.apiVersion = strptr("credentialprovider.kubelet.k8s.io/v1beta1")
+		p.extra = "  tokenAttributes:\n    serviceAccountTokenAudience: aud\n    requireServiceAccount: true\n    cacheType: Token\n"
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].tokenAttributes")
+		assert.Contains(t, err.Error(), "only supported for credentialprovider.kubelet.k8s.io/v1 API version")
+	})
+
+	t.Run("tokenAttributes without cacheType", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		p.extra = "  tokenAttributes:\n    serviceAccountTokenAudience: aud\n    requireServiceAccount: true\n"
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].tokenAttributes.cacheType: Required value")
+	})
+
+	t.Run("tokenAttributes with an unsupported cacheType", func(t *testing.T) {
+		p := validCPProvider("ecr")
+		p.extra = "  tokenAttributes:\n    serviceAccountTokenAudience: aud\n    requireServiceAccount: true\n    cacheType: Bogus\n"
+		err := runSingleFile(t, buildCredentialProviderConfig(p))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].tokenAttributes.cacheType")
+		assert.Contains(t, err.Error(), "Unsupported value")
+	})
+
+	t.Run("multi-file directory names the file with the semantic error", func(t *testing.T) {
+		dir := t.TempDir()
+		cfgDir := mkDir(t, dir, "cp.d")
+		// a.yaml is valid; b.yaml (read second, lexicographically) omits matchImages.
+		require.NoError(t, os.WriteFile(filepath.Join(cfgDir, "a.yaml"),
+			[]byte(buildCredentialProviderConfig(validCPProvider("provider-a"))), 0o644))
+		bad := validCPProvider("provider-b")
+		bad.matchImages = nil
+		require.NoError(t, os.WriteFile(filepath.Join(cfgDir, "b.yaml"),
+			[]byte(buildCredentialProviderConfig(bad)), 0o644))
+		binDir := mkDir(t, dir, "bin")
+		mkExecProvider(t, binDir, "provider-a")
+		mkExecProvider(t, binDir, "provider-b")
+		own, _ := newOwnership(nil)
+		c := &Config{
+			kubeletImageCredentialProviderConfigPathRaw: cfgDir,
+			kubeletImageCredentialProviderBinDirRaw:     binDir,
+		}
+		err := c.validateKubeletCredentialProviderWith(own)
+		require.Error(t, err)
+		canonicalB, _ := filepath.EvalSymlinks(filepath.Join(cfgDir, "b.yaml"))
+		assert.Contains(t, err.Error(), canonicalB)
+		assert.Contains(t, err.Error(), "providers[0].matchImages: Required value")
+	})
+
+	t.Run("fully valid config passes", func(t *testing.T) {
+		err := runSingleFile(t, buildCredentialProviderConfig(validCPProvider("ecr-credential-provider")),
+			"ecr-credential-provider")
+		assert.NoError(t, err)
+	})
+
+	t.Run("provider with only a name fails validation before reaching kubelet", func(t *testing.T) {
+		// Example from PR review: a v1 CredentialProviderConfig whose provider declares
+		// only name. Previously this passed MicroShift's structural check and then made
+		// kubelet os.Exit(1); it must now be rejected up front.
+		err := runSingleFile(t, buildCredentialProviderConfig(cpProvider{name: "ecr"}))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "providers[0].apiVersion: Required value")
+		assert.Contains(t, err.Error(), "providers[0].matchImages: Required value")
+		assert.Contains(t, err.Error(), "providers[0].defaultCacheDuration: Required value")
 	})
 }

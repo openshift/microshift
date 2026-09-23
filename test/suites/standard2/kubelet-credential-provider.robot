@@ -52,6 +52,13 @@ ${CP_BAD_PROVIDER_CONFIG}       SEPARATOR=\n
 ...                             \ \ \ \ \ \ - "registry.example.invalid"
 ...                             \ \ \ \ defaultCacheDuration: "1m"
 ...                             \ \ \ \ apiVersion: credentialprovider.kubelet.k8s.io/v1
+${CP_NO_MATCH_IMAGES_CONFIG}    SEPARATOR=\n
+...                             apiVersion: kubelet.config.k8s.io/v1
+...                             kind: CredentialProviderConfig
+...                             providers:
+...                             \ \ - name: mock-credential-provider
+...                             \ \ \ \ defaultCacheDuration: "1m"
+...                             \ \ \ \ apiVersion: credentialprovider.kubelet.k8s.io/v1
 ${CP_EMPTY_DIR_CONFIG}          SEPARATOR=\n
 ...                             ---
 ...                             kubelet:
@@ -120,6 +127,17 @@ Missing Provider Binary Prevents Start
     ...    ${CURSOR}
     ...    imageCredentialProviderBinDir.*provider .+no-such-provider.+ .*has no executable at .*/no-such-provider
     Pattern Should Not Appear In Log Output    ${CURSOR}    ${CP_CONFIGURED_LOG}
+    [Teardown]    Run Keywords    Upload String To File    ${CP_PROVIDER_CONFIG}    ${CP_CONFIG_FILE}
+    ...    AND    Remove Credential Provider Config
+    ...    AND    Restart MicroShift
+
+Semantically Invalid Provider Config Prevents Start
+    [Documentation]    MicroShift fails to start when a provider declares no matchImages
+    [Setup]    Run Keywords    Upload String To File    ${CP_NO_MATCH_IMAGES_CONFIG}    ${CP_CONFIG_FILE}
+    ...    AND    Apply Invalid Credential Provider Config    ${CP_VALID}
+    Pattern Should Appear In Log Output
+    ...    ${CURSOR}
+    ...    error validating kubelet\\.imageCredentialProviderConfigPath.*providers\\[0\\]\\.matchImages: Required value
     [Teardown]    Run Keywords    Upload String To File    ${CP_PROVIDER_CONFIG}    ${CP_CONFIG_FILE}
     ...    AND    Remove Credential Provider Config
     ...    AND    Restart MicroShift

@@ -589,11 +589,20 @@ labels, so this is a placement rule you must follow.
 
 Both keys must be set together and must be absolute paths. Because the
 provider binary runs with kubelet's privileges, MicroShift refuses to start
-unless both paths, all of their parent directories, and every file inside a
-directory are owned by root and not writable by group or others. Symbolic
-links are resolved and the resolved path is checked and passed to kubelet.
-When the keys are omitted, kubelet starts without a credential provider, as
-before.
+unless both paths and all of their parent directories are owned by root and
+not writable by group or others. The same ownership and permission rule is
+applied to the entries kubelet actually consumes: the `.json`, `.yaml` and
+`.yml` files in a configuration directory, and the declared provider binaries
+in the bin directory. Unrelated entries (a README, an editor swap file, a
+subdirectory, or a helper script that no provider names) are ignored, the way
+kubelet ignores them. Symbolic links are resolved and the resolved path is
+checked and passed to kubelet.
+
+MicroShift also pre-validates the provider configuration the way kubelet does —
+required fields, `apiVersion`, `matchImages`, `defaultCacheDuration` and
+`tokenAttributes` — and refuses to start on an invalid configuration with a
+clear error, rather than letting kubelet fail after startup. When the keys are
+omitted, kubelet starts without a credential provider, as before.
 
 Changing either key or the provider configuration file requires a MicroShift
 restart. On startup with a valid configuration, the journal contains

@@ -14,10 +14,34 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/apimachinery/pkg/util/validation"
+	"k8s.io/apimachinery/pkg/util/validation/field"
+	credentialproviderv1 "k8s.io/kubelet/pkg/apis/credentialprovider/v1"
+	credentialproviderv1alpha1 "k8s.io/kubelet/pkg/apis/credentialprovider/v1alpha1"
+	credentialproviderv1beta1 "k8s.io/kubelet/pkg/apis/credentialprovider/v1beta1"
+	"k8s.io/kubernetes/pkg/credentialprovider"
 	kubeletconfig "k8s.io/kubernetes/pkg/kubelet/apis/config"
 	kubeletconfigv1 "k8s.io/kubernetes/pkg/kubelet/apis/config/v1"
 	kubeletconfigv1alpha1 "k8s.io/kubernetes/pkg/kubelet/apis/config/v1alpha1"
 	kubeletconfigv1beta1 "k8s.io/kubernetes/pkg/kubelet/apis/config/v1beta1"
+)
+
+// credentialProviderAPIVersions is the set of provider exec API versions kubelet
+// accepts, mirroring the apiVersions map built in
+// vendor/k8s.io/kubernetes/pkg/credentialprovider/plugin/plugin.go from the same
+// three packages. Re-check against upstream on every kubernetes rebase.
+var credentialProviderAPIVersions = sets.New[string](
+	credentialproviderv1alpha1.SchemeGroupVersion.String(),
+	credentialproviderv1beta1.SchemeGroupVersion.String(),
+	credentialproviderv1.SchemeGroupVersion.String(),
+)
+
+// validCredentialProviderCacheTypes mirrors validCacheTypes in
+// vendor/k8s.io/kubernetes/pkg/credentialprovider/plugin/config.go.
+var validCredentialProviderCacheTypes = sets.New[string](
+	string(kubeletconfig.ServiceAccountServiceAccountTokenCacheType),
+	string(kubeletconfig.TokenServiceAccountTokenCacheType),
 )
 
 // credentialProviderCodec returns the same strict decoder the vendored kubelet
@@ -263,7 +287,7 @@ func (c *Config) validateKubeletCredentialProviderWith(ownership ownershipFn) er
 	// up. These checks turn the structural conditions that reach that exit into
 	// ordinary fail-fast configuration errors. The configured values are used only
 	// for the error prefixes; the filesystem work uses the canonical paths.
-	if err := validateCredentialProviderStructure(configPath, binDir, canonical[0], canonical[1]); err != nil {
+	if err := validateCredentialProviderStructure(configPath, binDir, canonical[0], canonical[1], checker); err != nil {
 		return err
 	}
 
@@ -308,26 +332,63 @@ func validateCredentialProviderPath(path string, kind credentialPathKind, checke
 		return "", err
 	}
 
-	// If the final object is a directory, every entry it contains must also
-	// satisfy the trusted-path rule.
+	// If the final object is a directory, apply the trusted-path rule only to the
+	// entries kubelet will actually consume.
 	if isDir {
-		if err := validateDirEntries(canonical, checker); err != nil {
-			return "", err
+		switch kind {
+		case credentialProviderConfigKind:
+			// kubelet's readCredentialProviderConfig reads only the .json/.yaml/.yml
+			// files in the directory; every other entry (a README, a .bak, an editor
+			// swap file, a subdirectory) is ignored. Check exactly those files, so an
+			// unrelated non-root entry does not block startup when kubelet would never
+			// read it.
+			if err := validateConfigDirEntries(canonical, checker); err != nil {
+				return "", err
+			}
+		case credentialProviderBinDirKind:
+			// kubelet only executes filepath.Join(binDir, provider.Name) for the
+			// declared providers, so the bin dir's entries are not walked here. The
+			// trusted-path rule is applied to each declared provider binary in
+			// validateCredentialProviderStructure; unrelated files in the bin dir are
+			// ignored, matching kubelet. The bin dir itself is still verified above,
+			// which is what prevents an unprivileged user from dropping a file named
+			// after a provider.
 		}
 	}
 
 	return canonical, nil
 }
 
-// validateDirEntries applies the trusted-path rule to every entry in dir.
-// Symlinked entries are resolved and the full rule, including the target's
-// ancestors, is applied to the target.
-func validateDirEntries(dir string, checker *trustChecker) error {
+// isCredentialProviderConfigEntry reports whether entry is one kubelet's
+// readCredentialProviderConfig would read from a configuration directory: a
+// non-directory whose extension is .json, .yaml or .yml. DirEntry.IsDir() is
+// false for a symlink, matching kubelet, so a symlink named x.yaml is a config
+// entry (and is caught downstream if it does not resolve to a regular file).
+func isCredentialProviderConfigEntry(entry os.DirEntry) bool {
+	if entry.IsDir() {
+		return false
+	}
+	switch filepath.Ext(entry.Name()) {
+	case ".json", ".yaml", ".yml":
+		return true
+	default:
+		return false
+	}
+}
+
+// validateConfigDirEntries applies the trusted-path rule to the configuration
+// files in dir that kubelet would read, ignoring every other entry. Symlinked
+// entries are resolved and the full rule, including the target's ancestors, is
+// applied to the target.
+func validateConfigDirEntries(dir string, checker *trustChecker) error {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return err
 	}
 	for _, entry := range entries {
+		if !isCredentialProviderConfigEntry(entry) {
+			continue
+		}
 		entryPath := filepath.Join(dir, entry.Name())
 		resolved, err := filepath.EvalSymlinks(entryPath)
 		if err != nil {
@@ -343,15 +404,18 @@ func validateDirEntries(dir string, checker *trustChecker) error {
 	return nil
 }
 
-// validateCredentialProviderStructure verifies the structural conditions that
-// would otherwise make kubelet call os.Exit(1) at provider registration: a
-// configuration directory with no configuration files, a file that does not
-// decode as a CredentialProviderConfig, a file that declares no providers, a
-// provider name declared more than once, and a provider name that does not
-// resolve to an executable in the bin directory. It does not replicate kubelet's
-// semantic validation. configKey and binDirKey are the configured values, used
-// only in messages; the checks operate on the symlink-resolved paths.
-func validateCredentialProviderStructure(configKey, binDirKey, canonicalConfigPath, canonicalBinDir string) error {
+// validateCredentialProviderStructure verifies the structural and semantic
+// conditions that would otherwise make kubelet call os.Exit(1) at provider
+// registration: a configuration directory with no configuration files, a file
+// that does not decode as a CredentialProviderConfig, a file that declares no
+// providers, a provider that fails kubelet's semantic validation (see
+// validateCredentialProviderSemantics), a provider name declared more than once
+// across files, and a provider name that does not resolve to an executable in the
+// bin directory. configKey and binDirKey are the configured values, used only in
+// messages; the checks operate on the symlink-resolved paths. checker applies the
+// trusted-path rule to each declared provider binary (the only bin-dir entries
+// kubelet consumes).
+func validateCredentialProviderStructure(configKey, binDirKey, canonicalConfigPath, canonicalBinDir string, checker *trustChecker) error {
 	configPrefix := func(err error) error {
 		return fmt.Errorf("error validating kubelet.%s (%q): %w",
 			kubeletImageCredentialProviderConfigPathKey, configKey, err)
@@ -367,26 +431,31 @@ func validateCredentialProviderStructure(configKey, binDirKey, canonicalConfigPa
 	}
 
 	// Record the file each provider name was first declared in, both to reject
-	// duplicates across all files (kubelet rejects these in its semantic
-	// validation, which exits) and to name the source file in the missing-binary
-	// error. Duplicate detection is pure string comparison, so it cannot drift
-	// from kubelet.
+	// duplicates across all files and to name the source file in the missing-binary
+	// error. Cross-file duplicate detection is pure string comparison at the merged
+	// level, so it cannot drift from kubelet; within-file duplicates are caught by
+	// the semantic validation below.
 	declaredIn := make(map[string]string)
 	for _, file := range files {
-		names, err := decodeCredentialProviderNames(file)
+		cfg, err := decodeCredentialProviderConfig(file)
 		if err != nil {
 			return configPrefix(err)
 		}
-		for _, name := range names {
-			// Kubelet joins the bin dir and the provider name directly; a name
-			// containing a separator would escape the bin dir, so reject it.
-			if strings.Contains(name, "/") {
-				return configPrefix(fmt.Errorf("provider name %q must not contain \"/\"", name))
+		// Semantic validation mirrors kubelet's own, run per file so its field-path
+		// messages read like kubelet's. Kubelet validates the merged provider list;
+		// validating per file gives the same coverage with a message that can name
+		// the offending file when the config path is a directory.
+		if err := validateCredentialProviderSemantics(cfg.Providers); err != nil {
+			if len(files) > 1 {
+				return configPrefix(fmt.Errorf("file %q: %w", file, err))
 			}
-			if first, ok := declaredIn[name]; ok {
-				return configPrefix(fmt.Errorf("provider %q is declared more than once (in %q and %q)", name, first, file))
+			return configPrefix(err)
+		}
+		for _, p := range cfg.Providers {
+			if first, ok := declaredIn[p.Name]; ok {
+				return configPrefix(fmt.Errorf("provider %q is declared more than once (in %q and %q)", p.Name, first, file))
 			}
-			declaredIn[name] = file
+			declaredIn[p.Name] = file
 		}
 	}
 
@@ -397,17 +466,180 @@ func validateCredentialProviderStructure(configKey, binDirKey, canonicalConfigPa
 	}
 	slices.Sort(names)
 	for _, name := range names {
-		// Report the joined path. filepath.Join(binDir, name) is exactly what
-		// kubelet passes to exec.LookPath at registration; a missing or
-		// non-executable binary is what MicroShift is standing in for here, so the
-		// error is attributed to the bin dir, whose contents need fixing.
+		// filepath.Join(binDir, name) is exactly what kubelet passes to
+		// exec.LookPath at registration; a missing or non-executable binary is what
+		// MicroShift is standing in for here, so the error is attributed to the bin
+		// dir, whose contents need fixing.
 		joined := filepath.Join(canonicalBinDir, name)
-		info, err := os.Stat(joined)
+		resolved, err := filepath.EvalSymlinks(joined)
+		if err != nil {
+			return binDirPrefix(fmt.Errorf("provider %q (declared in %q) has no executable at %q", name, declaredIn[name], joined))
+		}
+		info, err := os.Lstat(resolved)
 		if err != nil || !info.Mode().IsRegular() || info.Mode()&0o111 == 0 {
 			return binDirPrefix(fmt.Errorf("provider %q (declared in %q) has no executable at %q", name, declaredIn[name], joined))
 		}
+		// The provider binary runs with kubelet's privileges, so the resolved binary
+		// (and, for a symlinked binary, its target's ancestors) must satisfy the
+		// trusted-path rule. Ancestors already verified when the bin dir was checked
+		// are memoized and skipped.
+		if err := checker.checkChain(resolved); err != nil {
+			return binDirPrefix(err)
+		}
 	}
 	return nil
+}
+
+// validateCredentialProviderSemantics mirrors validateCredentialProviderConfig in
+// vendor/k8s.io/kubernetes/pkg/credentialprovider/plugin/config.go, which is
+// unexported. Re-check against upstream on every kubernetes rebase. The structure
+// and rule order are kept identical to upstream so a diff is trivial; the only
+// deliberate deviations are:
+//   - field paths use providers[i] (Index) so a message names the offending
+//     provider; upstream uses the bare "providers" path.
+//   - the KubeletServiceAccountTokenForCredentialProviders feature-gate check is
+//     not mirrored (see the tokenAttributes block below).
+func validateCredentialProviderSemantics(providers []kubeletconfig.CredentialProvider) error {
+	allErrs := field.ErrorList{}
+
+	if len(providers) == 0 {
+		allErrs = append(allErrs, field.Required(field.NewPath("providers"), "at least 1 item in plugins is required"))
+	}
+
+	seenProviderNames := sets.New[string]()
+	for i := range providers {
+		provider := providers[i]
+		fieldPath := field.NewPath("providers").Index(i)
+
+		// Upstream has no explicit empty-name rule, but filepath.Join(binDir, "")
+		// is the bin dir itself and registration then fails; report it clearly.
+		if len(provider.Name) == 0 {
+			allErrs = append(allErrs, field.Required(fieldPath.Child("name"), "provider name is required"))
+		}
+
+		if strings.Contains(provider.Name, "/") {
+			allErrs = append(allErrs, field.Invalid(fieldPath.Child("name"), provider.Name, "provider name cannot contain '/'"))
+		}
+
+		if strings.Contains(provider.Name, " ") {
+			allErrs = append(allErrs, field.Invalid(fieldPath.Child("name"), provider.Name, "provider name cannot contain spaces"))
+		}
+
+		if provider.Name == "." {
+			allErrs = append(allErrs, field.Invalid(fieldPath.Child("name"), provider.Name, "provider name cannot be '.'"))
+		}
+
+		if provider.Name == ".." {
+			allErrs = append(allErrs, field.Invalid(fieldPath.Child("name"), provider.Name, "provider name cannot be '..'"))
+		}
+
+		if seenProviderNames.Has(provider.Name) {
+			allErrs = append(allErrs, field.Duplicate(fieldPath.Child("name"), provider.Name))
+		}
+		seenProviderNames.Insert(provider.Name)
+
+		if provider.APIVersion == "" {
+			allErrs = append(allErrs, field.Required(fieldPath.Child("apiVersion"), ""))
+		} else if !credentialProviderAPIVersions.Has(provider.APIVersion) {
+			allErrs = append(allErrs, field.NotSupported(fieldPath.Child("apiVersion"), provider.APIVersion, sets.List(credentialProviderAPIVersions)))
+		}
+
+		if len(provider.MatchImages) == 0 {
+			allErrs = append(allErrs, field.Required(fieldPath.Child("matchImages"), "at least 1 item in matchImages is required"))
+		}
+
+		for _, matchImage := range provider.MatchImages {
+			if _, err := credentialprovider.ParseSchemelessURL(matchImage); err != nil {
+				allErrs = append(allErrs, field.Invalid(fieldPath.Child("matchImages"), matchImage, fmt.Sprintf("match image is invalid: %s", err.Error())))
+			}
+		}
+
+		if provider.DefaultCacheDuration == nil {
+			allErrs = append(allErrs, field.Required(fieldPath.Child("defaultCacheDuration"), ""))
+		}
+
+		if provider.DefaultCacheDuration != nil && provider.DefaultCacheDuration.Duration < 0 {
+			allErrs = append(allErrs, field.Invalid(fieldPath.Child("defaultCacheDuration"), provider.DefaultCacheDuration, "must be greater than or equal to 0"))
+		}
+
+		allErrs = append(allErrs, validateCredentialProviderTokenAttributes(fieldPath, provider)...)
+	}
+
+	return allErrs.ToAggregate()
+}
+
+// validateCredentialProviderTokenAttributes mirrors the tokenAttributes block of
+// validateCredentialProviderConfig. It is factored out of
+// validateCredentialProviderSemantics only to keep that function within the
+// project's cyclomatic-complexity limit; the rules and their order are unchanged
+// from upstream. A nil provider.TokenAttributes yields no errors.
+func validateCredentialProviderTokenAttributes(fieldPath *field.Path, provider kubeletconfig.CredentialProvider) field.ErrorList {
+	if provider.TokenAttributes == nil {
+		return nil
+	}
+
+	allErrs := field.ErrorList{}
+	fldPath := fieldPath.Child("tokenAttributes")
+	// Upstream also forbids tokenAttributes when the
+	// KubeletServiceAccountTokenForCredentialProviders feature gate is
+	// disabled. That gate is Beta/on by default in the vendored kubelet, and
+	// its effective value at registration comes from the kubelet passthrough
+	// (kubelet.featureGates), which this validation cannot see. The gate check
+	// is therefore deliberately not mirrored; it is the one documented residual.
+	if len(provider.TokenAttributes.ServiceAccountTokenAudience) == 0 {
+		allErrs = append(allErrs, field.Required(fldPath.Child("serviceAccountTokenAudience"), ""))
+	}
+	if provider.TokenAttributes.RequireServiceAccount == nil {
+		allErrs = append(allErrs, field.Required(fldPath.Child("requireServiceAccount"), ""))
+	}
+	if provider.APIVersion != credentialproviderv1.SchemeGroupVersion.String() {
+		allErrs = append(allErrs, field.Forbidden(fldPath, fmt.Sprintf("tokenAttributes is only supported for %s API version", credentialproviderv1.SchemeGroupVersion.String())))
+	}
+
+	if provider.TokenAttributes.RequireServiceAccount != nil && !*provider.TokenAttributes.RequireServiceAccount && len(provider.TokenAttributes.RequiredServiceAccountAnnotationKeys) > 0 {
+		allErrs = append(allErrs, field.Forbidden(fldPath.Child("requiredServiceAccountAnnotationKeys"), "requireServiceAccount cannot be false when requiredServiceAccountAnnotationKeys is set"))
+	}
+
+	allErrs = append(allErrs, validateCredentialProviderAnnotationKeys(fldPath.Child("requiredServiceAccountAnnotationKeys"), provider.TokenAttributes.RequiredServiceAccountAnnotationKeys)...)
+	allErrs = append(allErrs, validateCredentialProviderAnnotationKeys(fldPath.Child("optionalServiceAccountAnnotationKeys"), provider.TokenAttributes.OptionalServiceAccountAnnotationKeys)...)
+
+	requiredServiceAccountAnnotationKeys := sets.New[string](provider.TokenAttributes.RequiredServiceAccountAnnotationKeys...)
+	optionalServiceAccountAnnotationKeys := sets.New[string](provider.TokenAttributes.OptionalServiceAccountAnnotationKeys...)
+	duplicateAnnotationKeys := requiredServiceAccountAnnotationKeys.Intersection(optionalServiceAccountAnnotationKeys)
+	if duplicateAnnotationKeys.Len() > 0 {
+		allErrs = append(allErrs, field.Invalid(fldPath, sets.List(duplicateAnnotationKeys), "annotation keys cannot be both required and optional"))
+	}
+
+	switch {
+	case len(provider.TokenAttributes.CacheType) == 0:
+		allErrs = append(allErrs, field.Required(fldPath.Child("cacheType"), fmt.Sprintf("cacheType is required to be set when tokenAttributes is specified. Supported values are: %s", strings.Join(sets.List(validCredentialProviderCacheTypes), ", "))))
+	case validCredentialProviderCacheTypes.Has(string(provider.TokenAttributes.CacheType)):
+		// ok
+	default:
+		allErrs = append(allErrs, field.NotSupported(fldPath.Child("cacheType"), provider.TokenAttributes.CacheType, sets.List(validCredentialProviderCacheTypes)))
+	}
+
+	return allErrs
+}
+
+// validateCredentialProviderAnnotationKeys mirrors validateServiceAccountAnnotationKeys
+// in vendor/k8s.io/kubernetes/pkg/credentialprovider/plugin/config.go.
+func validateCredentialProviderAnnotationKeys(fldPath *field.Path, keys []string) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	seenAnnotationKeys := sets.New[string]()
+	for _, k := range keys {
+		// The rule is QualifiedName except that case doesn't matter, so convert to
+		// lowercase before checking.
+		for _, msg := range validation.IsQualifiedName(strings.ToLower(k)) {
+			allErrs = append(allErrs, field.Invalid(fldPath, k, msg))
+		}
+		if seenAnnotationKeys.Has(k) {
+			allErrs = append(allErrs, field.Duplicate(fldPath, k))
+		}
+		seenAnnotationKeys.Insert(k)
+	}
+	return allErrs
 }
 
 // collectCredentialProviderConfigFiles returns the configuration files kubelet
@@ -435,16 +667,13 @@ func collectCredentialProviderConfigFiles(canonicalConfigPath string) ([]string,
 
 	var files []string
 	for _, entry := range entries {
-		switch filepath.Ext(entry.Name()) {
-		case ".json", ".yaml", ".yml":
-		default:
-			continue
-		}
-		// Skip only a real directory, matching kubelet's DirEntry.IsDir() check.
-		// DirEntry.IsDir() is false for a symlink, so a symlink named foo.yaml
-		// pointing at a directory is NOT skipped here; it is caught below as a
-		// non-regular file, the way kubelet would fail os.ReadFile on it.
-		if entry.IsDir() {
+		// isCredentialProviderConfigEntry applies the same .json/.yaml/.yml +
+		// DirEntry.IsDir() filter kubelet uses, so this loop and the trusted-path
+		// walk in validateConfigDirEntries cannot disagree about which entries
+		// kubelet consumes. A real directory named foo.yaml is skipped; a symlink
+		// named foo.yaml is not (IsDir() is false for a symlink) and is caught below
+		// as a non-regular file, the way kubelet would fail os.ReadFile on it.
+		if !isCredentialProviderConfigEntry(entry) {
 			continue
 		}
 		entryPath := filepath.Join(canonicalConfigPath, entry.Name())
@@ -478,14 +707,14 @@ func collectCredentialProviderConfigFiles(canonicalConfigPath string) ([]string,
 	return files, nil
 }
 
-// decodeCredentialProviderNames decodes a single configuration file the same way
-// kubelet does (strict, via credentialProviderCodec) and returns the declared
-// provider names. Decoding with the vendored kubelet packages keeps the check
-// aligned with the kubelet in the same build: unknown fields are rejected and all
-// three accepted API versions convert to the internal type. It does not replicate
-// kubelet's semantic validation beyond kind, group, and the presence of at least
-// one provider.
-func decodeCredentialProviderNames(file string) ([]string, error) {
+// decodeCredentialProviderConfig decodes a single configuration file the same way
+// kubelet does (strict, via credentialProviderCodec) and returns the internal
+// CredentialProviderConfig. Decoding with the vendored kubelet packages keeps the
+// check aligned with the kubelet in the same build: unknown fields are rejected
+// and all three accepted API versions convert to the internal type. It checks
+// kind, group, type, and the presence of at least one provider; the field-level
+// semantic rules are applied by validateCredentialProviderSemantics.
+func decodeCredentialProviderConfig(file string) (*kubeletconfig.CredentialProviderConfig, error) {
 	data, err := os.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read file %q: %w", file, err)
@@ -508,12 +737,7 @@ func decodeCredentialProviderNames(file string) ([]string, error) {
 	if len(cfg.Providers) == 0 {
 		return nil, fmt.Errorf("file %q declares no providers", file)
 	}
-
-	names := make([]string, 0, len(cfg.Providers))
-	for _, p := range cfg.Providers {
-		names = append(names, p.Name)
-	}
-	return names, nil
+	return cfg, nil
 }
 
 // trustedPathComponents returns every path component of abs, ordered from the

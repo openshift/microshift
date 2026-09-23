@@ -60,7 +60,9 @@ type Config struct {
 	// except imageCredentialProviderConfigPath and imageCredentialProviderBinDir, which
 	// enable the kubelet image credential provider and are applied as kubelet startup
 	// flags. Both must be set together, be absolute paths, and be owned by root and not
-	// writable by group or others, including parent directories and contents.
+	// writable by group or others, along with their parent directories, the provider
+	// configuration files kubelet reads, and the declared provider binaries. The
+	// provider configuration is also validated the way kubelet validates it.
 	// +kubebuilder:validation:Schemaless
 	Kubelet map[string]any `json:"kubelet"`
 
