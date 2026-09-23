@@ -14,7 +14,7 @@ scenario_create_vms() {
     exit_if_image_not_found "${dest_image}"
 
     LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template "${start_image}"
-    launch_vm rhel98-bootc --vm_vcpus 4
+    launch_vm rhel98-bootc --vm_disksize 30 --vm_vcpus 4
 }
 
 scenario_remove_vms() {
