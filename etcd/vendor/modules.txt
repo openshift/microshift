@@ -198,7 +198,7 @@ github.com/oklog/run
 ## explicit; go 1.26.0
 github.com/openshift/api/config/v1
 github.com/openshift/api/operator/v1
-# github.com/openshift/build-machinery-go v0.0.0-20260629141115-154a2b810491
+# github.com/openshift/build-machinery-go v0.0.0-20260902143904-520f675c892b
 ## explicit; go 1.22.0
 github.com/openshift/build-machinery-go
 github.com/openshift/build-machinery-go/make
