@@ -1,29 +1,127 @@
-- cluster-ingress-operator embedded-component 656d475a0bc76b31b8e387abd9e19458531cc4a3 to ab5f68632a64486c295c84301600f630c6693976
-  - feb77cf 2026-08-26T13:14:55-04:00 vendor:  updated google auth apis
-  - cc12883 2026-08-26T13:14:55-04:00 go.mod: bump google api to v0.199.0
-  - 864e8fb 2026-08-26T13:14:55-04:00 GCP: Set Universe Domain
+- api embedded-component 42fb550ea02a47ab1de1ee81d798706cb74035a1 to 231177cd43bccd49bad2bfb4c3cd4cc8153288fb
+  - b02757d9 2026-09-12T09:09:58-04:00 Promote GCD to GA in 4.22
+  - ec9c1da1 2026-09-11T08:54:30-04:00 updates after rebase
+  - 9d240da1 2026-09-11T08:34:11-04:00 Added vSphere failure domain to vcenter ratcheting tests
+  - 449c74cd 2026-09-11T08:34:11-04:00 Added vSphere failure domain to vcenter check
+  - 024dc52a 2026-09-11T08:34:11-04:00 Revert "TRT-2701: Revert "SPLAT-2793: Promoted VSphereMultiVCenterDay2 feature gate to TP""
+  - 2eb26047 2026-09-11T08:34:11-04:00 Updated vcenter logic to make sure no server switching occurs
+  - f48e4b50 2026-09-11T08:34:10-04:00 Added some ratcheting tests to cover change in min size of vCenters
+  - b78cc536 2026-09-11T08:34:10-04:00 Modified parent logic to not check size, but only changes in existence, and other review suggestions.
+  - ceb27ed3 2026-09-11T08:34:10-04:00 Added vSphere Day 2 tests
+  - bfa87f59 2026-09-11T08:34:10-04:00 Added vSphere Day 2 logic to CRDs
 
-- cluster-kube-apiserver-operator embedded-component a2ba9c6a2d1ed76ea98a40885cf9a824eb9b9071 to 6269fbc7b6ae116ff8e7e22cd24ca047fab18e1f
-  - 8def64b 2026-03-17T06:13:45Z Updating ose-cluster-kube-apiserver-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/0daf002c3db04b759c8f818f28800c1531cf2f79/images/ose-cluster-kube-apiserver-operator.yml
+- cluster-kube-apiserver-operator embedded-component 6269fbc7b6ae116ff8e7e22cd24ca047fab18e1f to a18571de7438badd6206ba84f40a17160f524e94
+  - 9a5d7a8 2026-09-13T15:48:36Z OCPBUGS-123142: Update build-machinery-go vendor dependency
+  - 59914e1 2026-09-03T19:34:12Z [release-4.22] OCPBUGS-101906: Bump golang.org/x/net to v0.53.0 to address CVE-2026-33814
 
-- cluster-kube-controller-manager-operator embedded-component c5c678b3e04a64214ae62f5ad6d873c8899ac363 to 99a72b4e43a0e019a15a53739873f2f868c05dd7
-  - 9c807e1 2026-03-03T16:52:38Z Updating ose-cluster-kube-controller-manager-operator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/56cb39ad358cdec1db7c84ea1919fe8849c2550b/images/ose-cluster-kube-controller-manager-operator.yml
+- cluster-kube-controller-manager-operator embedded-component 99a72b4e43a0e019a15a53739873f2f868c05dd7 to b0509dae420643b9432921a158b3d219da3abd03
+  - 7c95445 2026-09-13T15:46:51Z OCPBUGS-123142: Update build-machinery-go vendor dependency
 
-- machine-config-operator embedded-component 90b269666abb8df37c46bf49d9b54dcf2604447c to f3334a057822a0f01ba82e15243c6ced44899a30
-  - c2572ef1 2026-09-11T08:49:48Z OCPBUGS-69681: limit ContainerRuntimeConfig status condition to 3
+- cluster-kube-scheduler-operator embedded-component da4bf66b8f6d057ab1562b6640261d8fe9ded28f to 497c7928d45d88396c5c1e204592811427cc256b
+  - b8e222d 2026-09-13T15:47:25Z OCPBUGS-123142: Update build-machinery-go vendor dependency
 
-- service-ca-operator embedded-component 9fff46a576033685f66fbb1121eb0a2f134a29be to de05110fb2993491ff7f40455deb2f70cb95423b
-  - fa94a82 2026-09-10T22:23:53Z OCPBUGS-114426: Update build-machinery-go vendor dependency
+- cluster-network-operator embedded-component fe422f7670aa55e037c2180f1b7f2dc4e3d34cde to 6d4ef087a25c346e76149f5bef614387e86857cb
+  - 88f6a1a 2026-07-17T18:55:55+02:00 OCPBUGS-62144: Restart pods when rendering egressIP settings
 
-- oc image-amd64 96ed0f43f0b5adf771ce3bd4fbc86809e93139f8 to aea5a82b408a8b83dd7d6f8b8ee9a83585dc87fd
-  - 4ec6cbb6 2026-09-10T22:24:35Z OCPBUGS-114426: Update build-machinery-go vendor dependency
+- kubernetes embedded-component 19365a06f558a5c5dc7f5654fa99a8318e4a77f4 to 9858a610ffeeca53f0ba04e92c634665c67237f5
+  - bcbbe3292 2026-09-14T15:28:21-04:00 UPSTREAM: <drop>: update builder image to golang 1.26
+  - 30188092b 2026-09-14T15:28:21-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 637721dc2 2026-09-14T15:28:05-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 877bf2726 2026-09-06T18:34:43+05:30 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
+  - 1c2e10a40 2026-08-20T15:16:14Z Release commit for Kubernetes v1.35.8
+  - b5d9d08dc 2026-08-06T11:31:30-04:00 Update golang.org/x deps
+  - e5d59a4b6 2026-07-24T16:35:17-07:00 Bump to go 1.26.5
+  - 28e0796fb 2026-07-22T18:03:27Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.7
+  - 96cb9ab42 2026-07-22T17:51:54Z Release commit for Kubernetes v1.35.7
+  - a4bbdac8b 2026-07-16T12:52:03Z Fix case where preemptor may be stuck in unschedulable queue
+  - 68bd31918 2026-07-15T13:04:57+07:00 Bump images and versions to golang 1.25.12 and update distroless-iptables
+  - 36793dffd 2026-07-14T17:41:36Z Fix linter warnings
+  - d1bb523c4 2026-07-14T17:41:36Z Fix ObjectVal ConvertToNative for structpb and refine mutation tests
+  - ff899e0c5 2026-07-08T22:26:31+08:00 stop logging missing optional container annotations
+  - 2165452d2 2026-06-30T14:07:56-07:00 Fix vet error
+  - 8b1184f81 2026-06-24T12:00:44-04:00 Make utf8 replacement char test pass on Go 1.27
+  - 64f72b7ec 2026-06-23T13:49:20-04:00 Restore string JSON encoding of cri-api KeyValue
+  - cfad4b5bc 2026-06-22T13:26:15+01:00 kubeadm: treat already promoted learner as successful
+  - 463e90875 2026-06-17T11:48:12+02:00 kubeadm: use KubernetesAPICallTimeout for mandatory kubeadm-config fetch
+  - 4c8948174 2026-06-12T00:43:07-07:00 Update google.golang.org/protobuf to v1.36.12-0.20260120151049-f2248ac996af
+  - 923d2d96a 2026-06-11T18:16:45Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.6
+  - dd8437498 2026-06-11T14:03:21+05:30 Fix job controller reporting active=0 during pod creation backoff
+  - bf604dc07 2026-05-11T16:29:53-05:00 test/compatibility_lifecycle: resolve feature names from variables
+  - 799beb916 2026-04-21T10:31:02+08:00 kubeadm: skip promote call when etcd member is already a voting member
 
-- service-ca-operator image-amd64 9fff46a576033685f66fbb1121eb0a2f134a29be to de05110fb2993491ff7f40455deb2f70cb95423b
-  - fa94a82 2026-09-10T22:23:53Z OCPBUGS-114426: Update build-machinery-go vendor dependency
+- kubernetes-kube-storage-version-migrator embedded-component 72835e43c7754356645e41031f3a99926b4d42e6 to 5f86c7d2bace76cacd57770e2de0e1525cd4be15
+  - 7fe47df 2026-09-13T14:45:33Z UPSTREAM: <carry>: OCPBUGS-114428: Update build-machinery-go vendor dependency
+  - dbab209 2026-03-02T14:37:20Z UPSTREAM: <carry>: Updating ose-kube-storage-version-migrator-container image to be consistent with ART for 4.22 Reconciling with https://github.com/openshift/ocp-build-data/tree/11e0241a3082aa2746b5fcab35d046e2bd4264e2/images/ose-kube-storage-version-migrator.yml
 
-- oc image-arm64 96ed0f43f0b5adf771ce3bd4fbc86809e93139f8 to aea5a82b408a8b83dd7d6f8b8ee9a83585dc87fd
-  - 4ec6cbb6 2026-09-10T22:24:35Z OCPBUGS-114426: Update build-machinery-go vendor dependency
+- machine-config-operator embedded-component f3334a057822a0f01ba82e15243c6ced44899a30 to a3c8701d3046f06c0769aa3c47f155e9cdfea6bd
+  - 45dbee86 2026-09-21T18:03:11Z controller: update helper determining if a new MOSB is needed to handle case when a successful MOSB is reassigned a new image
+  - a9b4789b 2026-09-21T17:09:41Z Fix IsBootImageUpdateSupported to include vSphere and Azure platforms
+  - 8d7ac6d5 2026-09-21T10:52:03-04:00 vendor: openshift/api bump
+  - 74312347 2026-09-21T10:50:39-04:00 go.mod: bump openshift/api
+  - 2f9711b4 2026-09-21T10:50:04-04:00 templates/gcp: drop GCD health-check ranges in openshift-gcp-routes
+  - 6991708c 2026-09-18T15:46:30Z improve JSON unmarshalling for secret decoding
+  - a232eb4f 2026-09-18T11:01:13+02:00 OCPBUGS-126637: Mount /etc/container in mosb
+  - 7a4c9625 2026-09-17T10:05:13Z OCPBUGS-122237: [TNF] Add infinite retry on untaint systemd unit
+  - 90107d1b 2026-09-16T23:04:54Z mcs: replace wildcard permissions with explicit verbs
+  - a92d5baa 2026-09-11T23:48:47Z updateLayeredOS deploy-from-self when skopeo < 1.22.2
+  - 7912e750 2026-09-09T16:45:11Z operator: retry on conflict in syncMachineConfigNodes
+  - b4b7388b 2026-09-07T17:15:24+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
 
-- service-ca-operator image-arm64 9fff46a576033685f66fbb1121eb0a2f134a29be to de05110fb2993491ff7f40455deb2f70cb95423b
-  - fa94a82 2026-09-10T22:23:53Z OCPBUGS-114426: Update build-machinery-go vendor dependency
+- oc image-amd64 aea5a82b408a8b83dd7d6f8b8ee9a83585dc87fd to d0f23b14fbf35493e5b713e25ecf662ec239e76c
+  - 4124994e 2026-09-16T19:48:09Z Fix go vet warning in process.go
+
+- kubernetes image-amd64 19365a06f558a5c5dc7f5654fa99a8318e4a77f4 to 9858a610ffeeca53f0ba04e92c634665c67237f5
+  - bcbbe3292 2026-09-14T15:28:21-04:00 UPSTREAM: <drop>: update builder image to golang 1.26
+  - 30188092b 2026-09-14T15:28:21-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 637721dc2 2026-09-14T15:28:05-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 877bf2726 2026-09-06T18:34:43+05:30 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
+  - 1c2e10a40 2026-08-20T15:16:14Z Release commit for Kubernetes v1.35.8
+  - b5d9d08dc 2026-08-06T11:31:30-04:00 Update golang.org/x deps
+  - e5d59a4b6 2026-07-24T16:35:17-07:00 Bump to go 1.26.5
+  - 28e0796fb 2026-07-22T18:03:27Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.7
+  - 96cb9ab42 2026-07-22T17:51:54Z Release commit for Kubernetes v1.35.7
+  - a4bbdac8b 2026-07-16T12:52:03Z Fix case where preemptor may be stuck in unschedulable queue
+  - 68bd31918 2026-07-15T13:04:57+07:00 Bump images and versions to golang 1.25.12 and update distroless-iptables
+  - 36793dffd 2026-07-14T17:41:36Z Fix linter warnings
+  - d1bb523c4 2026-07-14T17:41:36Z Fix ObjectVal ConvertToNative for structpb and refine mutation tests
+  - ff899e0c5 2026-07-08T22:26:31+08:00 stop logging missing optional container annotations
+  - 2165452d2 2026-06-30T14:07:56-07:00 Fix vet error
+  - 8b1184f81 2026-06-24T12:00:44-04:00 Make utf8 replacement char test pass on Go 1.27
+  - 64f72b7ec 2026-06-23T13:49:20-04:00 Restore string JSON encoding of cri-api KeyValue
+  - cfad4b5bc 2026-06-22T13:26:15+01:00 kubeadm: treat already promoted learner as successful
+  - 463e90875 2026-06-17T11:48:12+02:00 kubeadm: use KubernetesAPICallTimeout for mandatory kubeadm-config fetch
+  - 4c8948174 2026-06-12T00:43:07-07:00 Update google.golang.org/protobuf to v1.36.12-0.20260120151049-f2248ac996af
+  - 923d2d96a 2026-06-11T18:16:45Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.6
+  - dd8437498 2026-06-11T14:03:21+05:30 Fix job controller reporting active=0 during pod creation backoff
+  - bf604dc07 2026-05-11T16:29:53-05:00 test/compatibility_lifecycle: resolve feature names from variables
+  - 799beb916 2026-04-21T10:31:02+08:00 kubeadm: skip promote call when etcd member is already a voting member
+
+- oc image-arm64 aea5a82b408a8b83dd7d6f8b8ee9a83585dc87fd to d0f23b14fbf35493e5b713e25ecf662ec239e76c
+  - 4124994e 2026-09-16T19:48:09Z Fix go vet warning in process.go
+
+- kubernetes image-arm64 19365a06f558a5c5dc7f5654fa99a8318e4a77f4 to 9858a610ffeeca53f0ba04e92c634665c67237f5
+  - bcbbe3292 2026-09-14T15:28:21-04:00 UPSTREAM: <drop>: update builder image to golang 1.26
+  - 30188092b 2026-09-14T15:28:21-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 637721dc2 2026-09-14T15:28:05-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 877bf2726 2026-09-06T18:34:43+05:30 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
+  - 1c2e10a40 2026-08-20T15:16:14Z Release commit for Kubernetes v1.35.8
+  - b5d9d08dc 2026-08-06T11:31:30-04:00 Update golang.org/x deps
+  - e5d59a4b6 2026-07-24T16:35:17-07:00 Bump to go 1.26.5
+  - 28e0796fb 2026-07-22T18:03:27Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.7
+  - 96cb9ab42 2026-07-22T17:51:54Z Release commit for Kubernetes v1.35.7
+  - a4bbdac8b 2026-07-16T12:52:03Z Fix case where preemptor may be stuck in unschedulable queue
+  - 68bd31918 2026-07-15T13:04:57+07:00 Bump images and versions to golang 1.25.12 and update distroless-iptables
+  - 36793dffd 2026-07-14T17:41:36Z Fix linter warnings
+  - d1bb523c4 2026-07-14T17:41:36Z Fix ObjectVal ConvertToNative for structpb and refine mutation tests
+  - ff899e0c5 2026-07-08T22:26:31+08:00 stop logging missing optional container annotations
+  - 2165452d2 2026-06-30T14:07:56-07:00 Fix vet error
+  - 8b1184f81 2026-06-24T12:00:44-04:00 Make utf8 replacement char test pass on Go 1.27
+  - 64f72b7ec 2026-06-23T13:49:20-04:00 Restore string JSON encoding of cri-api KeyValue
+  - cfad4b5bc 2026-06-22T13:26:15+01:00 kubeadm: treat already promoted learner as successful
+  - 463e90875 2026-06-17T11:48:12+02:00 kubeadm: use KubernetesAPICallTimeout for mandatory kubeadm-config fetch
+  - 4c8948174 2026-06-12T00:43:07-07:00 Update google.golang.org/protobuf to v1.36.12-0.20260120151049-f2248ac996af
+  - 923d2d96a 2026-06-11T18:16:45Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.6
+  - dd8437498 2026-06-11T14:03:21+05:30 Fix job controller reporting active=0 during pod creation backoff
+  - bf604dc07 2026-05-11T16:29:53-05:00 test/compatibility_lifecycle: resolve feature names from variables
+  - 799beb916 2026-04-21T10:31:02+08:00 kubeadm: skip promote call when etcd member is already a voting member
 
