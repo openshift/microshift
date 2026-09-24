@@ -47,7 +47,7 @@ echo "Source directory: ${REPOROOT}"
 
 if ! podman pull "${SCANNER_IMAGE}"; then
   echo "WARNING: failed to pull scanner image, skipping CBOM generation" >&2
-  exit 0
+  exit 1
 fi
 
 # The scanner skips directories named "vendor/" by default.
@@ -66,11 +66,12 @@ cp -a "${REPOROOT}/etcd/cmd" "${SCAN_DIR}/etcd-cmd"
 cp -a "${REPOROOT}/etcd/vendor" "${SCAN_DIR}/etcd-deps"
 
 if ! podman run --rm \
+  -e LC_ALL=C.UTF-8 \
   -v "${SCAN_DIR}:/workspace:z" \
   "${SCANNER_IMAGE}" \
   /workspace > "${CBOM_OUTPUT}"; then
   echo "WARNING: crypto scan failed, skipping CBOM generation" >&2
-  exit 0
+  exit 1
 fi
 
 echo "CBOM generated: "
@@ -115,7 +116,7 @@ if ! jq '{
   )
 }' "${CBOM_OUTPUT}" > "${SPDX_OUTPUT}"; then
   echo "WARNING: SPDX conversion failed" >&2
-  exit 0
+  exit 1
 fi
 
 echo "SPDX generated: "
