@@ -1,0 +1,12 @@
+- cluster-ingress-operator embedded-component fa958db6ac41da40aa032efa02cd4bb7365e59b9 to fdaf5248a73ea29dbfd104fa4583e0461f6ad03a
+  - c9ca2e5 2026-08-31T21:55:25+05:30 OCPBUGS-103414: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- machine-config-operator embedded-component f313997e0ba83edd79b1d0091e85d6e25c793274 to 8df98a1e751a0a9d60970fa3d6109ce7d6f1183c
+  - 83e3f4f0 2026-09-14T08:24:34+02:00 OCPBUGS-122250: Add missing verb in MCC RBAC
+
+- operator-framework-olm embedded-component f3a32b076b409a9be12ca8082ef758f4ddffd41e to b3573251315be79aa5bbe6a1cb0b5606b5371835
+  - bc575487 2026-08-31T13:16:06+05:30 OCPBUGS-103497: CVE-2026-33814: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3
+
+- kube-rbac-proxy image-amd64 5a14ea9d338b2582c7c2a8f89f351a0c30f56371 to f72b2ec69dc82611820dff33470c73cc0254415e
+  - f93bd23 2024-09-03T22:36:19+00:00 Updating kube-rbac-proxy-container image to be consistent with ART for 4.18 Reconciling with https://github.com/openshift/ocp-build-data/tree/827ab4ccce9cbbcf82c9dbaf6398b61d6cff8d7a/images/kube-rbac-proxy.yml
+
