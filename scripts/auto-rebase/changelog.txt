@@ -1,29 +1,40 @@
-- cluster-kube-apiserver-operator embedded-component 440392249bc58324156ba813b797728e9a81fa3c to b8c26db7c7c7e49476235ec83b2e81ef0996e242
-  - 4b021f3 2026-09-11T16:11:55Z OCPBUGS-114428: Update build-machinery-go vendor dependency
+- cluster-network-operator embedded-component d7a55c9a073db7e954d3dd484e9d400dc5b5b3ac to 3b484353063fe95156373f7cf51c5ba13f501256
+  - ba3caa6 2026-09-03T13:11:47-03:00 Adds rendering of enable-multi-network-policy in ovnkube-node
 
-- cluster-kube-controller-manager-operator embedded-component 7be80f36a759d713170588c44fcd5b45970382d5 to 1ee372e7019b41fbcb4c64323142c4a06bf266d0
-  - 0fedaa9 2026-09-11T16:18:27Z OCPBUGS-122387: Update build-machinery-go vendor dependency
-  - a8b375f 2026-08-18T06:29:39Z Updating ose-cluster-kube-controller-manager-operator-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/ab3769c912df87c39f1bb9109164abd058bc1b52/images/ose-cluster-kube-controller-manager-operator.yml
+- kubernetes embedded-component b376ee7b841bed5a51cb9520b37d87931c48a821 to 45178365c1a52e2e1b5af4fa6bacfee5bafdd637
+  - bb39ed79c 2026-09-16T11:34:46-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 138dca85e 2026-09-16T11:34:33-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - bb826b1d4 2026-08-20T03:06:27Z Release commit for Kubernetes v1.36.4
+  - 80ea0382d 2026-08-07T12:05:10Z Make sure gated pods are flushed with the same frequency as non-gated
+  - b8fe55419 2026-08-06T11:40:31-04:00 Update golang.org/x deps
+  - 1c4484e07 2026-07-28T19:23:03Z Always set UpdatePodResources when a starting container is resized
+  - 1eaf46caf 2026-07-28T13:59:36-05:00 client-go: restore FakeCustomStore conformance to cache.Store
+  - d03cc591d 2026-07-27T11:09:46+03:00 kubelet/dra: reset devices before processing response
+  - 9353e673e 2026-07-22T18:20:19Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.3
+  - a3f52dbe6 2026-07-20T07:27:48Z Unset WasFlushedFromUnschedulable for gated pods
+  - 45492be98 2026-07-18T17:41:27+08:00 DRA: key the structured allocator counter caches by PoolID
+  - c9ffbca92 2026-07-17T13:40:27Z Fix case where preemptor may be stuck in unschedulable queue
+  - cfb62a41f 2026-05-18T20:29:56Z Clarify multi-attach events
 
-- cluster-kube-scheduler-operator embedded-component 7b737a3f68ff52ebff3c9f541edbca357dde7111 to e0d271fceb3727138177e017f860a8ff79738bb3
-  - a346b0f 2026-09-11T16:47:12Z OCPBUGS-122387: Update build-machinery-go vendor dependency
+- kubernetes-kube-storage-version-migrator embedded-component 72835e43c7754356645e41031f3a99926b4d42e6 to 05d6b0c4537954b2b115c793646fb598756bb303
+  - fd3a0de 2026-09-13T13:02:43Z UPSTREAM: <carry>: OCPBUGS-114428: Update build-machinery-go vendor dependency
+  - 82322a6 2026-06-05T22:56:26Z UPSTREAM: <carry>: Updating ose-kube-storage-version-migrator-container image to be consistent with ART for 5.0 Reconciling with https://github.com/openshift-eng/ocp-build-data/tree/7691ed4dc0b6585b358f9e73fb736ace9a48a286/images/ose-kube-storage-version-migrator.yml
 
-- cluster-network-operator embedded-component 1b9a053663d46a789d8c500314cdfae3f879c060 to d7a55c9a073db7e954d3dd484e9d400dc5b5b3ac
-  - 77d0804 2026-08-22T02:42:55+05:30 CVE-2026-41178: bump go.opentelemetry.io/otel to v1.44.0
+- machine-config-operator embedded-component 966718a5dab28fc1594d233a1293f2edc56620c9 to 1f4f3e726943feb8f982f9826689781f3154dd82
+  - 0e8e5c60 2026-09-17T14:27:44-04:00 vendor: openshift/api
+  - ff0564f4 2026-09-17T14:26:59-04:00 go.mod: bump openshift/api
+  - eeacb231 2026-09-17T14:26:07-04:00 templates/gcp: drop GCD health-check ranges in openshift-gcp-routes
+  - eb33745d 2026-09-17T09:58:50Z OCPBUGS-122237: [TNF] Add infinite retry on untaint systemd unit
+  - 03d3bb45 2026-09-16T06:28:36Z OCPBUGS-121353: Pass missing proxy vars to bootstrap MCC
+  - e3a01f4a 2026-09-16T01:17:30Z controller: update helper determining if a new MOSB is needed to handle case when a successful MOSB is reassigned a new image
+  - faca6bdc 2026-09-11T19:57:12Z OCBPUGS-105283: Mount /etc/container in mosb
+  - 6e8cdb02 2026-09-11T08:16:46Z Fix IsBootImageUpdateSupported to include vSphere and Azure platforms
+  - 0e6ce40f 2026-09-10T14:20:32+02:00 OCPBUGS-122217: Dump compact cache to CM for persistence
+  - f04733ea 2026-09-09T09:59:09-05:00 Fix CVE-2026-15792: Upgrade BuildKit to v0.31.2 and gRPC to v1.82.1
+  - 9ad8a9f2 2026-09-08T16:43:39Z mcs: replace wildcard permissions with explicit verbs
+  - 0fab1e1a 2026-09-02T13:15:33Z OCPNODE-4526: Strengthen store path validation
 
-- kubernetes embedded-component 306002d4cb7d5621b4b9d1871d1d029682f8f824 to b376ee7b841bed5a51cb9520b37d87931c48a821
-  - b9c17c8f6 2026-09-07T09:09:13+01:00 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
-
-- machine-config-operator embedded-component 3400a9c1429cce50d3a097f11e1a770e028e30d4 to 966718a5dab28fc1594d233a1293f2edc56620c9
-  - 8d3cc3ff 2026-09-11T10:05:18Z updateLayeredOS deploy-from-self when skopeo < 1.22.2
-  - 8422372e 2026-09-08T08:28:52Z OCPBUGS-116490: remove nft chains before checking the ignition config
-  - c74b862a 2026-09-07T16:20:11Z operator: retry on conflict in syncMachineConfigNodes
-  - 84ae2810 2026-08-27T18:04:39Z crio: drop container restore support
-
-- kubernetes image-amd64 306002d4cb7d5621b4b9d1871d1d029682f8f824 to b376ee7b841bed5a51cb9520b37d87931c48a821
-  - b9c17c8f6 2026-09-07T09:09:13+01:00 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
-
-- ovn-kubernetes image-arm64 7b4de5ed3bd4381e3a17cdfddbe14be1432b9860 to 3ce12184bf66e8be8abe365f81ffdfa7dbb4dd76
+- ovn-kubernetes image-amd64 7b4de5ed3bd4381e3a17cdfddbe14be1432b9860 to 3ce12184bf66e8be8abe365f81ffdfa7dbb4dd76
   - c53c330c 2026-09-11T17:29:47+05:30 Remove legacy moveACLsToNamespacedPortGroups function
   - 17c44bdf 2026-09-11T17:29:47+05:30 Handle GetActiveNetworkForNamespace NotFound across callers
   - 085cd7f9 2026-09-11T17:29:45+05:30 Handle GetPrimaryNADForNamespace NotFound across callers
@@ -40,6 +51,36 @@
   - 89a5de3c 2026-09-11T17:27:54+05:30 ovn: treat missing node zone as unknown
   - 484e4c73 2026-09-11T17:27:53+05:30 ovn: remove legacy default zone configuration
 
-- kubernetes image-arm64 306002d4cb7d5621b4b9d1871d1d029682f8f824 to b376ee7b841bed5a51cb9520b37d87931c48a821
-  - b9c17c8f6 2026-09-07T09:09:13+01:00 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
+- kubernetes image-amd64 b376ee7b841bed5a51cb9520b37d87931c48a821 to 45178365c1a52e2e1b5af4fa6bacfee5bafdd637
+  - bb39ed79c 2026-09-16T11:34:46-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 138dca85e 2026-09-16T11:34:33-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - bb826b1d4 2026-08-20T03:06:27Z Release commit for Kubernetes v1.36.4
+  - 80ea0382d 2026-08-07T12:05:10Z Make sure gated pods are flushed with the same frequency as non-gated
+  - b8fe55419 2026-08-06T11:40:31-04:00 Update golang.org/x deps
+  - 1c4484e07 2026-07-28T19:23:03Z Always set UpdatePodResources when a starting container is resized
+  - 1eaf46caf 2026-07-28T13:59:36-05:00 client-go: restore FakeCustomStore conformance to cache.Store
+  - d03cc591d 2026-07-27T11:09:46+03:00 kubelet/dra: reset devices before processing response
+  - 9353e673e 2026-07-22T18:20:19Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.3
+  - a3f52dbe6 2026-07-20T07:27:48Z Unset WasFlushedFromUnschedulable for gated pods
+  - 45492be98 2026-07-18T17:41:27+08:00 DRA: key the structured allocator counter caches by PoolID
+  - c9ffbca92 2026-07-17T13:40:27Z Fix case where preemptor may be stuck in unschedulable queue
+  - cfb62a41f 2026-05-18T20:29:56Z Clarify multi-attach events
+
+- ovn-kubernetes image-arm64 3ce12184bf66e8be8abe365f81ffdfa7dbb4dd76 to 69562fb7062b12b271c3b7393680594fbfe0c9f7
+  - 662a5d2a 2026-09-21T17:15:30+02:00 e2e: exclude machine network subnets from UDN/BGP allocators
+
+- kubernetes image-arm64 b376ee7b841bed5a51cb9520b37d87931c48a821 to 45178365c1a52e2e1b5af4fa6bacfee5bafdd637
+  - bb39ed79c 2026-09-16T11:34:46-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 138dca85e 2026-09-16T11:34:33-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - bb826b1d4 2026-08-20T03:06:27Z Release commit for Kubernetes v1.36.4
+  - 80ea0382d 2026-08-07T12:05:10Z Make sure gated pods are flushed with the same frequency as non-gated
+  - b8fe55419 2026-08-06T11:40:31-04:00 Update golang.org/x deps
+  - 1c4484e07 2026-07-28T19:23:03Z Always set UpdatePodResources when a starting container is resized
+  - 1eaf46caf 2026-07-28T13:59:36-05:00 client-go: restore FakeCustomStore conformance to cache.Store
+  - d03cc591d 2026-07-27T11:09:46+03:00 kubelet/dra: reset devices before processing response
+  - 9353e673e 2026-07-22T18:20:19Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.3
+  - a3f52dbe6 2026-07-20T07:27:48Z Unset WasFlushedFromUnschedulable for gated pods
+  - 45492be98 2026-07-18T17:41:27+08:00 DRA: key the structured allocator counter caches by PoolID
+  - c9ffbca92 2026-07-17T13:40:27Z Fix case where preemptor may be stuck in unschedulable queue
+  - cfb62a41f 2026-05-18T20:29:56Z Clarify multi-attach events
 
