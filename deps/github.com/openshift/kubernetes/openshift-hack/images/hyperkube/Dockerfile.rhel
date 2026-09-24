@@ -1,4 +1,4 @@
-FROM registry.ci.openshift.org/ocp/builder:rhel-9-golang-1.25-openshift-4.22 AS builder
+FROM registry.ci.openshift.org/ocp/builder:rhel-9-golang-1.26-openshift-4.22 AS builder
 ARG TAGS=""
 WORKDIR /go/src/k8s.io/kubernetes
 COPY . .
@@ -15,4 +15,4 @@ COPY --from=builder /tmp/build/* /usr/bin/
 LABEL io.k8s.display-name="OpenShift Kubernetes Server Commands" \
       io.k8s.description="OpenShift is a platform for developing, building, and deploying containerized applications." \
       io.openshift.tags="openshift,hyperkube" \
-      io.openshift.build.versions="kubernetes=1.35.6"
+      io.openshift.build.versions="kubernetes=1.35.8"
