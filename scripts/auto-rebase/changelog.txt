@@ -1,3 +1,55 @@
-- oc image-amd64 1367d50cf3740bc3a6a68ba6c74f6ad5e3ef7cb7 to ef515cfbef680d4040becc4a180afb7a195270a4
+- kubernetes embedded-component 4012064c4f97c60a48b036469d20df3bcb2ac328 to 8008e652cb56e8fb34e76d0736973b3e99816fb0
+  - d3516fd78 2026-09-17T04:07:07Z UPSTREAM: <carry>: Fix ClusterIsIPv6() detection for dual-stack v6-primary clusters
+
+- kubernetes image-amd64 4012064c4f97c60a48b036469d20df3bcb2ac328 to 8008e652cb56e8fb34e76d0736973b3e99816fb0
+  - d3516fd78 2026-09-17T04:07:07Z UPSTREAM: <carry>: Fix ClusterIsIPv6() detection for dual-stack v6-primary clusters
+
+- oc image-arm64 02b0b2d9994a35535b710dd51ac604ed47b29bc9 to ef515cfbef680d4040becc4a180afb7a195270a4
   - 1b648c69 2026-08-26T19:33:24+05:30 Replace golang.org/x/net with sustaining fork for CVE-2026-33814 because upstream fix (x/net v0.53.0) requires go 1.25.0
+  - 988c8d9b 2026-08-05T00:30:12+02:00 Fix for OCPBUGS-91324: CVE-2026-25681
+
+- csi-external-snapshotter image-arm64 433cf89b4e4d1b437a8a446ece28b217ccf9bd06 to d123f362cc13d9b14459af7b9e91eb2a9361d3cd
+  - 770bc48 2026-06-25T10:23:18Z UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
+
+- router image-arm64 40c34581a02ca043d454034e376771c12d2e995c to 0fec034e28f1f44ed75dcc1ab96f7135fd9beb49
+  - 5c17d61 2026-07-22T16:48:57+05:30 OCPBUGS-86728: Run go mod tidy and vendor for dependency update
+  - d953807 2026-07-22T16:39:29+05:30 OCPBUGS-86728: Prevent SSRF via FQDN-typed EndpointSlices
+
+- ovn-kubernetes image-arm64 e02cc75645fbc8981239e4144da1cd4dd98b1b17 to c28f7669a9ef8e28a47163b1656c5647ea8a725c
+  - fc34e5f8 2026-08-11T13:05:44Z Add static kernel neighbor entries for UDN masquerade IPs
+  - a2c4495e 2026-08-11T13:05:43Z e2e: verify NO_FLOOD, priority-12, and priority-11 ARP/NDP flows for CUDNs
+  - 01987628 2026-08-11T13:05:43Z Fix ARP/NDP storm and FDB learning for CUDN GRs on breth0
+  - 53506961 2026-08-11T10:50:03Z e2e: fix cross-UDN same-node nodeport test expectations per gateway mode
+  - de6a30ef 2026-08-11T10:50:02Z Fix Layer2 UDN same-node nodeport: use correct transit router port prefix
+  - d6c1fae0 2026-08-11T10:50:02Z Fix UDN masquerade ARP storm on external network
+  - c6dd422b 2026-08-11T10:50:02Z Refactor deleteStaleMasqueradeRouteAndMACBinding to use router-scoped ops
+  - 89408a52 2026-08-11T10:50:01Z Add upgrade migration for switch-based drop ACL to port group
+  - 8e6def54 2026-08-11T10:50:01Z Move advertised network drop ACL from switches to port group
+  - f53263e7 2026-08-11T10:50:01Z Centralize router-to-switch and switch-to-router port naming into NetInfo
+  - afe3129c 2026-08-11T10:50:01Z Add PortGroupAdvertisedNetwork type and create PG in ConfigureAdvertisedNetworkIsolation
+  - 276a0630 2026-08-11T10:50:01Z Add EnsureAddressSetOps to AddressSetFactory interface
+  - 5b7b4976 2026-08-11T10:50:00Z Refactor: extract advertised network isolation init and cleanup helpers
+  - 755ff248 2026-08-10T14:23:57-04:00 node: harden OVS cleanup state handling
+  - bfe5b76e 2026-08-10T14:03:59-04:00 node/managementport: migrate root-row sites to libovsdb
+  - 0999e5f0 2026-08-10T14:03:59-04:00 node/bridgeconfig: add UDN test coverage for libovsdb migration
+  - 7c7f7abd 2026-08-10T14:03:59-04:00 node/bridgeconfig: migrate bridgedGatewayNodeSetup to libovsdb
+  - d6df8bc1 2026-08-10T14:03:59-04:00 node: migrate CleanupClusterNode chain to libovsdb
+  - 8b1af490 2026-08-10T19:16:09+02:00 Fix traffic leak in egress IP on secondary interface
+  - 702a058b 2026-08-10T09:18:43-04:00 libovsdb/ops: add RemoveOpenvSwitchExternalIDs
+  - 5eb1b7f6 2026-08-10T09:18:40-04:00 node: migrate ovn-encap-ip update to libovsdb
+  - 8d8c6fef 2026-08-10T09:18:28-04:00 libovsdb/ops: Add UpdateOpenvSwitchExternalIDs
+  - 0ea3e06e 2026-08-03T15:29:39+05:30 zone_interconnect: add unit test for stale IC route cleanup
+  - 85eee6e2 2026-08-03T13:41:55+05:30 [FYI] prevent duplicate logical_router_static_route
+  - 53757642 2026-07-23T15:44:16+02:00 e2e(virt): Replace fake virt-launcher pod with proper VMI in UDPN test
+  - 1e16523e 2026-07-23T15:38:28+02:00 e2e(virt): Add test with three VMs same hostname
+  - 236032f5 2026-07-23T15:38:28+02:00 kubevirt: Support handling vm hostname field
+  - 2fadc6d3 2026-07-23T15:36:19+02:00 kubevirt: skip source LSP re-enable when source pod is not local
+  - e10ae628 2026-07-23T15:42:45+05:30 OCPBUGS-82872: Bump github.com/moby/spdystream to v0.5.1
+
+- kubernetes image-arm64 2df3632e823a813f64218dfc6f5c2e70d28ecdf0 to 8008e652cb56e8fb34e76d0736973b3e99816fb0
+  - d3516fd78 2026-09-17T04:07:07Z UPSTREAM: <carry>: Fix ClusterIsIPv6() detection for dual-stack v6-primary clusters
+  - fe035f535 2026-09-02T19:34:49Z UPSTREAM: 138981: Cache selinux conflicts
+  - ccbe36ecc 2026-09-02T19:34:49Z UPSTREAM: 137226: controller/selinuxwarning/cache: Add reverse index
+  - e1738f129 2026-09-02T19:34:48Z UPSTREAM: 137224: controller/selinuxwarning: Pre-parse SELinux label
+  - e441f4674 2026-08-11T15:28:28Z UPSTREAM: <carry>: OCPBUGS-105592: backport kubernetes/conformance umbrella suite
 
