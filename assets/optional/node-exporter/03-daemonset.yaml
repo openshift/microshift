@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: cluster-monitoring-operator
     app.kubernetes.io/name: node-exporter
     app.kubernetes.io/part-of: openshift-monitoring
-    app.kubernetes.io/version: 1.11.1
+    app.kubernetes.io/version: 1.12.1
   name: node-exporter
   namespace: openshift-monitoring
 spec:
@@ -27,7 +27,7 @@ spec:
         app.kubernetes.io/managed-by: cluster-monitoring-operator
         app.kubernetes.io/name: node-exporter
         app.kubernetes.io/part-of: openshift-monitoring
-        app.kubernetes.io/version: 1.11.1
+        app.kubernetes.io/version: 1.12.1
     spec:
       automountServiceAccountToken: true
       containers:
@@ -66,7 +66,8 @@ spec:
             requests:
               cpu: 8m
               memory: 32Mi
-          securityContext: {}
+          securityContext:
+            readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /host/sys
@@ -147,6 +148,7 @@ spec:
               memory: 1Mi
           securityContext:
             privileged: true
+            readOnlyRootFilesystem: true
             runAsUser: 0
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:

@@ -6,7 +6,7 @@ replace github.com/openshift/microshift => ../
 
 require (
 	github.com/openshift/api v0.0.0-20260901194050-81278704edb0
-	github.com/openshift/build-machinery-go v0.0.0-20260629141115-154a2b810491
+	github.com/openshift/build-machinery-go v0.0.0-20260902143904-520f675c892b
 	github.com/openshift/microshift v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.2
 	go.etcd.io/etcd/api/v3 v3.6.13
