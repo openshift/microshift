@@ -19,6 +19,7 @@ type SignerInfo interface {
 type CertificateSignerBuilder interface {
 	SignerInfo
 
+	WithService(service string) CertificateSignerBuilder
 	WithSignerConfig(config *crypto.CA) CertificateSignerBuilder
 	WithSubCAs(subCAsInfo ...CertificateSignerBuilder) CertificateSignerBuilder
 	WithClientCertificates(signInfos ...*ClientCertificateSigningRequestInfo) CertificateSignerBuilder
@@ -30,6 +31,7 @@ type CertificateSignerBuilder interface {
 
 type certificateSigner struct {
 	signerName     string
+	service        string
 	signerDir      string
 	signerValidity time.Duration
 
@@ -55,6 +57,14 @@ func NewCertificateSigner(signerName, signerDir string, validity time.Duration) 
 func (s *certificateSigner) Name() string            { return s.signerName }
 func (s *certificateSigner) Directory() string       { return s.signerDir }
 func (s *certificateSigner) Validity() time.Duration { return s.signerValidity }
+
+// WithService records the service or function that owns the signer.
+//
+//nolint:ireturn
+func (s *certificateSigner) WithService(service string) CertificateSignerBuilder {
+	s.service = service
+	return s
+}
 
 // WithSignerConfig uses the provided configuration in `config` to sign its
 // direct certificates.
@@ -116,6 +126,7 @@ func (s *certificateSigner) Complete() (*CertificateSigner, error) {
 
 	signerCompleted := &CertificateSigner{
 		signerName:     s.signerName,
+		service:        s.service,
 		signerDir:      s.signerDir,
 		signerValidity: s.signerValidity,
 		signerConfig:   signerConfig,
