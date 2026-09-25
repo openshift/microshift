@@ -29,13 +29,6 @@ func addEnvironmentSelectors(specs et.ExtensionTestSpecs) {
 		et.NameContainsAll("NetworkPolicy", "named port"),
 	}).Exclude(et.NetworkEquals("OVNKubernetes")).AddLabel("[Skipped:Network/OVNKubernetes]")
 
-	// SELinux tests marked with [Feature:SELinuxMountReadWriteOncePodOnly] require SELinuxMount
-	// feature gate **disabled**.
-	// REBASE NOTE: this will intentionally fail to compile when the feature gate is removed upstream.
-	// Just remove this check + notify the OCP storage team.
-	specs.Select(et.NameContains("[Feature:SELinuxMountReadWriteOncePodOnly]")).
-		Exclude(et.FeatureGateEnabled(string(features.SELinuxMount)))
-
 	// DynamicResourceAllocation is only enabled in Technology Preview clusters as of 1.34 rebase,
 	// see https://issues.redhat.com/browse/OCPBUGS-61381 for context
 	specs.Select(et.NameContains("[FeatureGate:DynamicResourceAllocation]")).
