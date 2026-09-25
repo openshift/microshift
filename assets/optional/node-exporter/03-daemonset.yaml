@@ -136,10 +136,10 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - '[[ ! -d /node_exporter/collectors/init ]] || find /node_exporter/collectors/init -perm /111 -type f -exec {} \;'
+            - '[[ ! -d /node_exporter/collectors/init ]] || find /node_exporter/collectors/init -perm /111 -type f -exec sh -c ''for script; do "$script" || exit $?; done'' sh {} +'
           env:
             - name: TMPDIR
-              value: /tmp
+              value: /var/node_exporter/textfile
           image: "quay.io/openshift/node-exporter"
           name: init-textfile
           resources:
