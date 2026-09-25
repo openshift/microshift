@@ -211,6 +211,16 @@ sos_report() {
 sos_report_for_vm() {
     local -r vmdir="${1}"
     local -r vmname="${2}"
+
+    # Wait for SSH to become available before attempting artifact collection.
+    # The VM may be rebooting (e.g. after a low-latency/RT kernel switch),
+    # causing SSH connection refused errors and silent loss of diagnostics.
+    local -r vm_ip=$(get_vm_property "${vmname}" ip)
+    wait_for_ssh "${vm_ip}" || {
+        echo "WARNING: SSH not available, skipping SOS collection for ${vmname}"
+        return
+    }
+
     # Some scenarios do not start with MicroShift installed, so we
     # can't rely on the wrapper being there or working if it
     # is. Copy the script to the host, just in case, along with a
