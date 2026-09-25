@@ -126,7 +126,7 @@ func runAddNode(ctx context.Context, opts *AddNodeOptions) error {
 	}
 	klog.Info("Etcd certificates generated successfully")
 
-	clusterMembers, err := getClusterNodes(ctx, client)
+	clusterMembers, err := waitForClusterNodes(ctx, client)
 	if err != nil {
 		return fmt.Errorf("failed to get cluster information: %w", err)
 	}
@@ -372,6 +372,26 @@ func generateEtcdCertificates(cfg *config.Config) error {
 
 	klog.Info("All etcd certificates generated successfully with proper signatures and SAN entries")
 	return nil
+}
+
+func waitForClusterNodes(ctx context.Context, client kubernetes.Interface) ([]string, error) {
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+	for {
+		members, err := getClusterNodes(ctx, client)
+		if err != nil {
+			return nil, err
+		}
+		if len(members) > 0 {
+			return members, nil
+		}
+		klog.Info("No Ready cluster nodes found yet, waiting for primary node to become Ready...")
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("timed out waiting for primary node to become Ready")
+		case <-ticker.C:
+		}
+	}
 }
 
 func getClusterNodes(ctx context.Context, client kubernetes.Interface) ([]string, error) {
