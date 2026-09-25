@@ -1,0 +1,15 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: egress-ns-label
+spec:
+  podSelector:
+    matchLabels:
+      name: hello-microshift
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          team: openshift
+  policyTypes:
+  - Egress
