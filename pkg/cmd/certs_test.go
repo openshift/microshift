@@ -52,7 +52,7 @@ func TestCertStatusOutput(t *testing.T) {
 	require.NoError(t, err)
 
 	var jsonOutput bytes.Buffer
-	require.NoError(t, writeCertificateStatusJSON(&jsonOutput, status))
+	require.NoError(t, writeCertificateObject(&jsonOutput, &status, certificateOutputJSON))
 	require.JSONEq(t, `{
 		"apiVersion":"microshift.openshift.io/v1alpha1",
 		"kind":"CertificateStatusList",
@@ -72,7 +72,7 @@ func TestCertStatusOutput(t *testing.T) {
 	}`, jsonOutput.String())
 
 	var yamlOutput bytes.Buffer
-	require.NoError(t, writeCertificateStatusYAML(&yamlOutput, status))
+	require.NoError(t, writeCertificateObject(&yamlOutput, &status, certificateOutputYAML))
 	yamlAsJSON, err := yaml.YAMLToJSONStrict(yamlOutput.Bytes())
 	require.NoError(t, err)
 	require.JSONEq(t, jsonOutput.String(), string(yamlAsJSON))
@@ -141,9 +141,8 @@ func TestCertStatusStructuredOutputFlags(t *testing.T) {
 					return certchains.CertificateInventory{}, nil
 				},
 			}
-			command := newCertsStatusCommand(options)
-			command.SetArgs(args)
-			require.NoError(t, command.Execute())
+			command := newCertsCommand(options, func() error { return nil })
+			require.Equal(t, 0, RunCertsCommand(command, append([]string{"status"}, args...)))
 			require.Empty(t, stderr.String())
 			var status certificatesv1alpha1.CertificateStatusList
 			if options.output == certificateOutputJSON {
@@ -164,8 +163,8 @@ func TestCertStatusOutputWriteFailure(t *testing.T) {
 	wantErr := errors.New("output unavailable")
 	status, err := newCertificateStatusList(nil, nil, time.Now())
 	require.NoError(t, err)
-	require.ErrorIs(t, writeCertificateStatusJSON(failingCertificateWriter{wantErr}, status), wantErr)
-	require.ErrorIs(t, writeCertificateStatusYAML(failingCertificateWriter{wantErr}, status), wantErr)
+	require.ErrorIs(t, writeCertificateObject(failingCertificateWriter{wantErr}, &status, certificateOutputJSON), wantErr)
+	require.ErrorIs(t, writeCertificateObject(failingCertificateWriter{wantErr}, &status, certificateOutputYAML), wantErr)
 }
 
 type failingCertificateWriter struct {
@@ -178,7 +177,7 @@ func (w failingCertificateWriter) Write(_ []byte) (int, error) {
 
 func TestCertsCommandRequiresPrivileges(t *testing.T) {
 	wantErr := errors.New("privileges required")
-	command := newCertsCommand(genericclioptions.IOStreams{}, func() error { return wantErr })
+	command := newCertsCommand(&certStatusOptions{}, func() error { return wantErr })
 	command.SetArgs([]string{"status"})
 	require.ErrorIs(t, command.Execute(), wantErr)
 

@@ -14,8 +14,21 @@ import (
 
 func main() {
 	command := newCommand()
-	code := cli.Run(command)
+	code := runCommand(command, os.Args[1:])
 	os.Exit(code)
+}
+
+func runCommand(command *cobra.Command, args []string) int {
+	// Certificate commands own their JSON/YAML error output. Keep the existing
+	// logging and diagnostic behavior for every other command.
+	selected, _, _ := command.Find(args)
+	for current := selected; current != nil; current = current.Parent() {
+		if current.Name() == "certs" {
+			return cmds.RunCertsCommand(command, args)
+		}
+	}
+	command.SetArgs(args)
+	return cli.Run(command)
 }
 
 func newCommand() *cobra.Command {

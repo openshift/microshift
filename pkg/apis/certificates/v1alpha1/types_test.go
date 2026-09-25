@@ -54,8 +54,10 @@ func TestCertificateRenewalResultRoundTrip(t *testing.T) {
 	} {
 		t.Run(string(tt.status), func(t *testing.T) {
 			result := certificatesv1alpha1.CertificateRenewalResult{
-				APIVersion:  certificatesv1alpha1.APIVersion,
-				Kind:        certificatesv1alpha1.CertificateRenewalResultKind,
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: certificatesv1alpha1.APIVersion,
+					Kind:       certificatesv1alpha1.CertificateRenewalResultKind,
+				},
 				GeneratedAt: now,
 				Mode:        certificatesv1alpha1.RenewalModeCA,
 				Status:      tt.status,

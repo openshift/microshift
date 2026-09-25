@@ -1,6 +1,9 @@
 package v1alpha1
 
-import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+)
 
 const (
 	APIVersion                   = "microshift.openshift.io/v1alpha1"
@@ -40,13 +43,9 @@ const (
 )
 
 // CertificateStatusList reports the state of all managed certificates.
+// +kubebuilder:object:root=true
 type CertificateStatusList struct {
-
-	// +kubebuilder:validation:Enum="microshift.openshift.io/v1alpha1"
-	APIVersion string `json:"apiVersion"`
-
-	// +kubebuilder:validation:Enum=CertificateStatusList
-	Kind string `json:"kind"`
+	metav1.TypeMeta `json:",inline"`
 
 	// GeneratedAt is the time used to calculate zones and remaining validity.
 	GeneratedAt metav1.Time             `json:"generatedAt"`
@@ -111,13 +110,10 @@ const (
 // Failed operations return an Error document instead.
 // +kubebuilder:validation:XValidation:rule="self.status == 'validated' ? self.dryRun : !self.dryRun",message="validated results require dryRun=true; completed results require dryRun=false"
 // +kubebuilder:validation:XValidation:rule="self.items.all(item, item.changed == (self.status == 'completed'))",message="changed must be false for every validated item and true for every completed item"
+// +kubebuilder:object:root=true
 type CertificateRenewalResult struct {
+	metav1.TypeMeta `json:",inline"`
 
-	// +kubebuilder:validation:Enum="microshift.openshift.io/v1alpha1"
-	APIVersion string `json:"apiVersion"`
-
-	// +kubebuilder:validation:Enum=CertificateRenewalResult
-	Kind        string        `json:"kind"`
 	GeneratedAt metav1.Time   `json:"generatedAt"`
 	Mode        RenewalMode   `json:"mode"`
 	Status      RenewalStatus `json:"status"`
@@ -174,13 +170,10 @@ const (
 )
 
 // Error is the versioned certificate-command failure document.
+// +kubebuilder:object:root=true
 type Error struct {
+	metav1.TypeMeta `json:",inline"`
 
-	// +kubebuilder:validation:Enum="microshift.openshift.io/v1alpha1"
-	APIVersion string `json:"apiVersion"`
-
-	// +kubebuilder:validation:Enum=Error
-	Kind        string      `json:"kind"`
 	GeneratedAt metav1.Time `json:"generatedAt"`
 	Code        ErrorCode   `json:"code"`
 
@@ -192,5 +185,5 @@ type Error struct {
 	// +kubebuilder:validation:Schemaless
 	// +kubebuilder:validation:Type=object
 	// +kubebuilder:pruning:PreserveUnknownFields
-	Details map[string]interface{} `json:"details"`
+	Details *runtime.RawExtension `json:"details"`
 }

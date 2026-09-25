@@ -4,21 +4,18 @@ Documentation       Certificate status JSON and YAML output against a running Mi
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
-Resource            ../../resources/ostree-health.resource
 Library             Collections
 Library             ../../resources/DataFormats.py
 
 Suite Setup         Setup
-Suite Teardown      Logout MicroShift Host
+Suite Teardown      Teardown
 
 
 *** Test Cases ***
 JSON And YAML Report The Same Certificates
     [Documentation]    Validate both formats, their field types, and deterministic certificate ordering.
-    ${json_output}=    Command Should Work    microshift certs status -o json
-    ${yaml_output}=    Command Should Work    microshift certs status --output=yaml
-    ${json_status}=    Json Parse    ${json_output}
-    ${yaml_status}=    Yaml Parse    ${yaml_output}
+    ${json_status}=    Read Certificate Status    json
+    ${yaml_status}=    Read Certificate Status    yaml
     Validate Status Document    ${json_status}
     Validate Status Document    ${yaml_status}
     Should Be Equal    ${json_status}[config]    ${yaml_status}[config]
@@ -37,13 +34,66 @@ Unknown Output Format Is Rejected
     Should Be Empty    ${stdout}
     Should Contain    ${stderr}    unsupported output format
 
+Invalid Arguments Produce Structured Errors
+    [Documentation]    Positional and flag errors emit only the requested Error document on stderr.
+    FOR    ${format}    IN    json    yaml
+        Certificate Error Should Be Reported
+        ...    microshift certs status unexpected --output=${format}    ${format}    InvalidArguments
+        Certificate Error Should Be Reported
+        ...    microshift certs status --invalid-status-flag -o ${format}    ${format}    InvalidArguments
+    END
+
+Unprivileged Status Produces Structured Errors
+    [Documentation]    Root privilege failures must follow the same machine-readable error contract.
+    FOR    ${format}    IN    json    yaml
+        Certificate Error Should Be Reported
+        ...    runuser -u nobody -- microshift certs status -o ${format}    ${format}    InsufficientPrivileges
+    END
+
 
 *** Keywords ***
 Setup
-    [Documentation]    Connect to the host and wait for MicroShift to be ready.
-    Check Required Env Variables
-    Login MicroShift Host
-    Wait For MicroShift Healthcheck Success
+    [Documentation]    Wait for MicroShift and its PKI, without requiring unrelated workloads to be healthy.
+    Setup Suite
+    Wait For MicroShift
+
+Teardown
+    [Documentation]    Remove the local kubeconfig and close the host connection.
+    Remove Kubeconfig
+    Logout MicroShift Host
+
+Read Certificate Status
+    [Documentation]    Read one status document and ensure no diagnostics accompany successful output.
+    [Arguments]    ${format}
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    microshift certs status --output=${format}
+    Should Be Equal As Integers    ${rc}    0
+    Should Be Empty    ${stderr}
+    ${status}=    Parse Certificate Document    ${stdout}    ${format}
+    RETURN    ${status}
+
+Certificate Error Should Be Reported
+    [Documentation]    Failed commands return non-zero with empty stdout and exactly one versioned error.
+    [Arguments]    ${command}    ${format}    ${code}
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    ${command}
+    Should Not Be Equal As Integers    ${rc}    0
+    Should Be Empty    ${stdout}
+    ${error}=    Parse Certificate Document    ${stderr}    ${format}
+    Should Be Equal    ${error}[apiVersion]    microshift.openshift.io/v1alpha1
+    Should Be Equal    ${error}[kind]    Error
+    Should Be Equal    ${error}[code]    ${code}
+    Should Not Be Empty    ${error}[message]
+    Should Not Be Empty    ${error}[generatedAt]
+    Should Be Equal    ${error}[details]    ${None}
+
+Parse Certificate Document
+    [Documentation]    Parse a single document using the requested format.
+    [Arguments]    ${document}    ${format}
+    IF    $format == 'json'
+        ${result}=    Json Parse    ${document}
+    ELSE
+        ${result}=    Yaml Parse    ${document}
+    END
+    RETURN    ${result}
 
 Validate Status Document
     [Documentation]    Check the versioned document structure and enum values.

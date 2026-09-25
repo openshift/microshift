@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"math"
@@ -13,7 +12,6 @@ import (
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	"sigs.k8s.io/yaml"
 
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
 	"github.com/openshift/microshift/pkg/config"
@@ -37,25 +35,28 @@ type certStatusOptions struct {
 
 // NewCertsCommand creates the certificate administration command family.
 func NewCertsCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
-	return newCertsCommand(ioStreams, shouldRunPrivileged)
+	return newCertsCommand(&certStatusOptions{
+		IOStreams:     ioStreams,
+		now:           time.Now,
+		loadConfig:    config.ActiveConfig,
+		loadInventory: loadCertificateInventory,
+	}, shouldRunPrivileged)
 }
 
-func newCertsCommand(ioStreams genericclioptions.IOStreams, requirePrivileges func() error) *cobra.Command {
+func newCertsCommand(options *certStatusOptions, requirePrivileges func() error) *cobra.Command {
 	command := &cobra.Command{
 		Use:   "certs",
 		Short: "Inspect and manage MicroShift certificates",
 		Args:  cobra.NoArgs,
 		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
-			return requirePrivileges()
+			if err := requirePrivileges(); err != nil {
+				return &certificateCommandError{certificatesv1alpha1.ErrorCodeInsufficientPrivileges, err}
+			}
+			return nil
 		},
 	}
-
-	options := &certStatusOptions{
-		IOStreams:     ioStreams,
-		now:           time.Now,
-		loadConfig:    config.ActiveConfig,
-		loadInventory: loadCertificateInventory,
-	}
+	command.SetOut(options.Out)
+	command.SetErr(options.ErrOut)
 	command.AddCommand(newCertsStatusCommand(options))
 	return command
 }
@@ -75,34 +76,41 @@ func newCertsStatusCommand(options *certStatusOptions) *cobra.Command {
 
 func (o *certStatusOptions) run() error {
 	if o.output != "" && o.output != certificateOutputJSON && o.output != certificateOutputYAML {
-		return fmt.Errorf("unsupported output format %q; supported formats: json, yaml", o.output)
+		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidArguments,
+			fmt.Errorf("unsupported output format %q; supported formats: json, yaml", o.output)}
 	}
 
 	cfg, err := o.loadConfig()
 	if err != nil {
-		return fmt.Errorf("failed to load MicroShift configuration: %w", err)
+		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidConfiguration,
+			fmt.Errorf("failed to load MicroShift configuration: %w", err)}
 	}
 	inventory, err := o.loadInventory(cfg)
 	if err != nil {
-		return fmt.Errorf("failed to load certificate inventory: %w", err)
+		return &certificateCommandError{certificatesv1alpha1.ErrorCodeCertificateInventoryFailed,
+			fmt.Errorf("failed to load certificate inventory: %w", err)}
 	}
 
 	status, err := newCertificateStatusList(inventory, cfg.Warnings, o.now())
 	if err != nil {
-		return fmt.Errorf("failed to build certificate status: %w", err)
+		return &certificateCommandError{certificatesv1alpha1.ErrorCodeCertificateInventoryFailed,
+			fmt.Errorf("failed to build certificate status: %w", err)}
 	}
-	switch o.output {
-	case certificateOutputJSON:
-		return writeCertificateStatusJSON(o.Out, status)
-	case certificateOutputYAML:
-		return writeCertificateStatusYAML(o.Out, status)
-	}
-	for _, warning := range status.Warnings {
-		if _, err := fmt.Fprintf(o.ErrOut, "WARNING: %s\n", warning); err != nil {
-			return err
+	switch c := o.output; c {
+	case certificateOutputJSON, certificateOutputYAML:
+		err = writeCertificateObject(o.Out, &status, c)
+	default:
+		for _, warning := range status.Warnings {
+			if _, err := fmt.Fprintf(o.ErrOut, "WARNING: %s\n", warning); err != nil {
+				return &certificateCommandError{certificatesv1alpha1.ErrorCodeInternalError, err}
+			}
 		}
+		err = writeCertificateStatusTable(o.Out, status)
 	}
-	return writeCertificateStatusTable(o.Out, status)
+	if err != nil {
+		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInternalError, err}
+	}
+	return nil
 }
 
 func loadCertificateInventory(cfg *config.Config) (certchains.CertificateInventory, error) {
@@ -162,8 +170,10 @@ func newCertificateStatusList(inventory certchains.CertificateInventory, warning
 		statusWarnings = []string{}
 	}
 	return certificatesv1alpha1.CertificateStatusList{
-		APIVersion:  certificatesv1alpha1.APIVersion,
-		Kind:        certificatesv1alpha1.CertificateStatusListKind,
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: certificatesv1alpha1.APIVersion,
+			Kind:       certificatesv1alpha1.CertificateStatusListKind,
+		},
 		GeneratedAt: metav1.NewTime(now),
 		Config: certificatesv1alpha1.CertificateStatusConfig{
 			ForceRestartOnRedZone: true,
@@ -173,21 +183,6 @@ func newCertificateStatusList(inventory certchains.CertificateInventory, warning
 		Items:    items,
 		Warnings: statusWarnings,
 	}, nil
-}
-
-func writeCertificateStatusJSON(out io.Writer, status certificatesv1alpha1.CertificateStatusList) error {
-	encoder := json.NewEncoder(out)
-	encoder.SetIndent("", "  ")
-	return encoder.Encode(status)
-}
-
-func writeCertificateStatusYAML(out io.Writer, status certificatesv1alpha1.CertificateStatusList) error {
-	contents, err := yaml.Marshal(status)
-	if err != nil {
-		return err
-	}
-	_, err = out.Write(contents)
-	return err
 }
 
 func writeCertificateStatusTable(out io.Writer, status certificatesv1alpha1.CertificateStatusList) error {
