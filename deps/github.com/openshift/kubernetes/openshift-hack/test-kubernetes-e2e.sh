@@ -32,6 +32,8 @@ TEST_SUITE="${TEST_SUITE:-parallel}"
 COMMON_SKIPS="\[Slow\]|\[Disruptive\]|\[Flaky\]|\[Disabled:.+\]|\[Skipped:${PLATFORM}\]|\[DedicatedJob\]|${NETWORK_SKIPS}"
 # Skip tests for features that require a TechPreview cluster. TODO: Remove when the feature is enabled by default.
 COMMON_SKIPS="\[OCPFeatureGate:VolumeGroupSnapshot\]|\[Feature:OffByDefault\]|\[DRA\]|${COMMON_SKIPS}"
+# SELinuxMount is GA, tests requiring it disabled can never pass (https://redhat.atlassian.net/browse/STOR-3089)
+COMMON_SKIPS="\[Feature:SELinuxMountReadWriteOncePodOnly\]|${COMMON_SKIPS}"
 
 case "${TEST_SUITE}" in
 serial)

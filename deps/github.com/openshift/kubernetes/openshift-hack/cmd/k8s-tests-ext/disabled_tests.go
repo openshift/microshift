@@ -200,6 +200,10 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 			// https://issues.redhat.com/browse/OCPBUGS-61381
 			// We should not run v1beta{1,2} tests because we are not currently serving them, not even in TechPreviewNoUpgrade
 			"[Feature:DynamicResourceAllocation] with v1beta",
+
+			// https://redhat.atlassian.net/browse/STOR-3089
+			// SELinuxMount is GA, tests requiring it disabled can never pass
+			"[Feature:SELinuxMountReadWriteOncePodOnly]",
 		},
 		// tests too slow to be part of conformance
 		"Slow": {

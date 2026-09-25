@@ -1,170 +1,162 @@
-- api embedded-component 81278704edb0a6c2e7c456431778acad4cd352fc to c1fd4253d254ab35366d0e41ca077715e40d5cae
-  - 1ce44c8b 2026-09-10T14:34:54+02:00 Add EgressIPNodeSelector feature gate
-  - 1fdf621c 2026-09-01T14:22:38-04:00 SPLAT-2874: Add VSpherePerComponentCredOverrides feature gate
+- api embedded-component c1fd4253d254ab35366d0e41ca077715e40d5cae to 03ac57f9648604bea9665391d6f4de5d8545db38
+  - 01339b05 2026-09-21T15:43:49-04:00 make update
+  - 957cf7ac 2026-09-21T15:35:54-04:00 Add integration tests for KMS pluginConfig reference
+  - e960aeb6 2026-09-21T15:35:50-04:00 Replace inline Vault KMS config with pluginConfig reference
+  - a9b3f04d 2026-09-21T10:46:24-03:00 Fix misleading certificate chain docs in TLSConfig
+  - 82593a72 2026-09-21T04:24:34+08:00 NO-JIRA: Fix codegen diagnostic formatting
+  - 0431e0a6 2026-09-18T10:18:04+02:00 chore: remove AzureWorkloadIdentity feature gate
+  - 559b4c50 2026-09-17T15:40:30-04:00 Promote TLSAdherence feature gate to GA
+  - de722246 2026-09-16T19:12:07-04:00 OPRUN-4768: Add serving TLS curve preferences
+  - 1025ebbe 2026-09-12T19:49:43-04:00 feat(network): Feature Gate OVN-Kubernetes uplink mode
+  - 4f7ce6e5 2026-09-12T19:42:58-04:00 operator: add allowNoUplink to OVN-Kubernetes GatewayConfig
+  - 27be5aed 2026-09-11T14:25:47+02:00 Remove feature gate VolumeGroupSnapshot
+  - 4367ed03 2026-09-10T15:03:38+02:00 Fix validation pattern for machine/vsphereprovider
+  - 8ab0c64b 2026-09-09T15:13:50-04:00 register DRADeviceTaintRules in all feature sets
+  - a9a75e79 2026-09-03T13:07:13+02:00 Graduate SELinuxMount to GA
+  - 9b3cc193 2026-09-02T06:26:01Z features: enable TLSAdherence feature gate for OKD featureset
 
-- cluster-csi-snapshot-controller-operator embedded-component 35ec0224eb0e5219d5eae012fb703223a6f3e1f7 to 03b68fd87ae423f78b2a31174d6c432acad47eb5
-  - 265006b 2026-09-09T09:57:04+02:00 Remove VolumeGroupSnapshot feature gate
+- cluster-dns-operator embedded-component c0ed09e329e9001629518604a58205e3fbe8284a to c480e21c16d3383a7c09752f8dea61743c765cfa
+  - 5fc2bdd7 2026-09-16T07:29:36Z Fix hermetic build failure by removing update-bindata from build target
+  - ceba2b01 2026-09-03T14:58:40Z NE-2880: Update issue template links
 
-- cluster-ingress-operator embedded-component 48b8f79897294e8701c22af8dcdddcb78fa30ff0 to 663473a1f787b5441c0ccb210de713f3be175b9c
-  - 9937b5e2 2026-09-09T21:59:56Z OCPBUGS-6718: Add regression test for RBAC wildcard elimination
-  - 6c4b90bc 2026-09-09T05:03:25Z OCPBUGS-6718: Add patch verb to core resources ClusterRole rule
-  - 3e2f8c5f 2026-09-08T20:25:43Z OCPBUGS-6718: Add patch verb to apps deployments ClusterRole rule
-  - 602e9e61 2026-09-05T04:36:52Z OCPBUGS-6718: Tighten pods and events verbs in RBAC Role
-  - b98efed0 2026-09-05T04:14:25Z OCPBUGS-6718: Add ingresscontrollers/finalizers to RBAC Role
-  - d902f72e 2026-09-04T19:15:16Z OCPBUGS-6718: Add list and watch verbs to events ClusterRole rule
-  - 48dced3d 2026-09-04T18:55:07Z OCPBUGS-6718: Replace wildcard verbs in RBAC manifests with explicit permissions
-  - 823f9d5c 2026-09-03T11:18:46+02:00 refactor: remove Azure workload identity feature gate
-  - baf9f26b 2026-08-01T04:01:20Z Delete the CRL controller
+- cluster-ingress-operator embedded-component 663473a1f787b5441c0ccb210de713f3be175b9c to a373f6b0e8b36ed26c84e2d0f1dee64dd81351d4
+  - 3aa0f575 2026-09-19T00:41:39Z NE-2837: Enable readOnlyRootFilesystem for cluster ingress components (#1558)
+  - 935c1706 2026-09-18T18:15:52+01:00 OCPBUGS-105442: Remove escalate/bind from Sail Library ClusterRole
+  - 5f60cc8b 2026-09-18T01:00:33Z NE-2909: retry takeover cleanup
+  - 305afa21 2026-09-18T00:45:04Z NE-2909: protect GatewayClass status cleanup
+  - ec9b0dd1 2026-09-18T00:24:48Z NE-2909: Clarify Gateway API unmanaged CRD alert signal
+  - 044df01e 2026-09-17T17:09:34Z NE-2909: Preserve legacy Gateway API CRD status
+  - 0f79bad5 2026-09-17T08:40:50Z Add pedjak to OWNERS
+  - 2beedfe7 2026-09-16T17:26:22-04:00 Revert "OCPBUGS-99921: Annotate GatewayClass when istiod is available to fix startup race"
+  - 7c7b621c 2026-09-16T17:25:41-04:00 Bump to OSSM 3.4.2 and Istio 1.30.4
+  - 7031f936 2026-09-16T18:50:41Z Clear stale Gateway API status extension
+  - 225fcfda 2026-09-16T16:38:35Z Restore legacy Gateway API CRD degradation
+  - 4b66436c 2026-09-16T10:37:29Z NE-2909: Guard Gateway API management transitions
+  - 2b740591 2026-09-16T10:14:48Z OCPBUGS-122346: Retry partial Gateway API index registration
+  - a59fbd01 2026-09-15T16:40:34-04:00 NE-2388: Add OTE e2e tests for AWS NLB security groups
+  - 8ee0ef75 2026-09-15T16:33:16-04:00 NE-2388: Add LB Security Group Selection for AWS NLB
+  - 4bae7094 2026-09-11T17:12:32-03:00 use featureset on VAP and VAPB
+  - 8a762485 2026-09-11T16:39:11-03:00 skip gatewayapimanagementmode tests if the CRD does not exist
+  - 75a46f25 2026-09-11T13:29:06+02:00 docs: clarify Azure workload identity token file
+  - 37f58b86 2026-09-10T16:05:15-03:00 address final comments
+  - 45626fa3 2026-09-10T16:05:15-03:00 use negative featuregate for CVO managing the VAP/VAPB and fix tests errors
+  - 5f5c5304 2026-09-10T16:05:15-03:00 Address new round of comments
+  - eda62fc5 2026-09-10T16:05:15-03:00 Address coderabbit and review comments
+  - f5e3bd9c 2026-09-10T16:05:15-03:00 fix failing unit test and stricten manifests
+  - 54d8f3ab 2026-09-10T16:05:15-03:00 remove unnecessary info metrics
+  - 894f85ad 2026-09-10T16:05:15-03:00 fix watching ingress resource when gate is disabled
+  - 7ea04981 2026-09-10T16:05:15-03:00 stop degrading cluster in case of unknown gwapi CRDs
+  - f3287920 2026-09-10T16:05:15-03:00 avoid race on metrics transitions
+  - 3b8faf0c 2026-09-10T16:05:15-03:00 remove degraded state, set new alert for transition failed
+  - 6a7a2017 2026-09-10T16:05:15-03:00 fix findings after e2e test
+  - 96865186 2026-09-10T16:05:15-03:00 Vendor new files
+  - 2f0b6a02 2026-09-10T16:05:14-03:00 NE-2779: export GatewayAPI CRDs on CIO image
+  - 860ba35f 2026-09-10T16:05:14-03:00 fix bugs found during self review
+  - d0f4ebeb 2026-09-10T16:05:14-03:00 Address review comments
+  - ec9b8ad2 2026-09-10T16:05:14-03:00 NE-2779: Implement e2e tests for management mode
+  - 98fbe406 2026-09-10T16:05:14-03:00 NE-2779: Implement managementmode reconciliation
+  - 3420e526 2026-09-09T14:40:00+02:00 OCPBUGS-86050 Update ROUTER_CURVES environment variable for go 1.26
 
-- cluster-kube-apiserver-operator embedded-component 7e0eee0325ab855d09906ba31c2ae2040bb1a7b1 to 04815ee59019750b027a547785fb20b654991c1b
-  - 70c0200 2026-09-10T22:22:04Z OCPBUGS-114428: Update build-machinery-go vendor dependency
-  - 15db4f3 2026-09-09T15:50:26+02:00 bump (*)
+- cluster-kube-apiserver-operator embedded-component 04815ee59019750b027a547785fb20b654991c1b to 4667fc04496a7906973fc27536ef12beeb5b7fd8
+  - a4faa3a 2026-09-23T10:58:42-04:00 bump(openshift/library-go): fitting
+  - ed19d9e 2026-09-23T10:58:18-04:00 bump(openshift/library-go): to get new KMS api
+  - 0353490 2026-09-23T17:30:56+05:30 Migrate e2e-encryption to ote
+  - ad75ab7 2026-09-22T10:36:31-04:00 apienablement: enable resource.k8s.io/v1beta2 when DeviceTaintRule is enabled
+  - a0cb46e 2026-09-22T08:33:30+02:00 bump (*)
+  - a85c312 2026-09-21T10:54:29+02:00 OPRUN-4768: bump openshift/api
+  - 2d34bce 2026-09-14T13:28:42+02:00 bump (*)
 
-- cluster-kube-controller-manager-operator embedded-component 330fe4a6ed1a15ae1c2b572138d596fd5780d318 to 416af3a20bd39d33d7506f04a6c483528aa9e6dc
-  - a885cc8 2026-09-10T22:20:13Z OCPBUGS-114428: Update build-machinery-go vendor dependency
+- kubernetes embedded-component c85a8c489d53f97824059d92f706a5e1a65f97fa to bf88f01942699d4a30562c0ae042d34ba0131881
+  - f759e305b 2026-09-23T15:32:29-04:00 UPSTREAM: <carry>: add explicit merge commit message to openshift-hack/rebase.sh
+  - b0892e485 2026-09-18T12:16:43-04:00 UPSTREAM: <carry>: skip SELinuxMountReadWriteOncePodOnly tests now that SELinuxMount is GA
+  - 34925bef9 2026-09-17T11:52:50-04:00 UPSTREAM: <carry>: Use FROM scratch for RHEL pause image
+  - 124b3a522 2026-09-16T13:50:45-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 059382600 2026-09-16T13:50:08-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - bb826b1d4 2026-08-20T03:06:27Z Release commit for Kubernetes v1.36.4
+  - 80ea0382d 2026-08-07T12:05:10Z Make sure gated pods are flushed with the same frequency as non-gated
+  - b8fe55419 2026-08-06T11:40:31-04:00 Update golang.org/x deps
+  - 1c4484e07 2026-07-28T19:23:03Z Always set UpdatePodResources when a starting container is resized
+  - 1eaf46caf 2026-07-28T13:59:36-05:00 client-go: restore FakeCustomStore conformance to cache.Store
+  - d03cc591d 2026-07-27T11:09:46+03:00 kubelet/dra: reset devices before processing response
+  - 9353e673e 2026-07-22T18:20:19Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.3
+  - a3f52dbe6 2026-07-20T07:27:48Z Unset WasFlushedFromUnschedulable for gated pods
+  - 45492be98 2026-07-18T17:41:27+08:00 DRA: key the structured allocator counter caches by PoolID
+  - c9ffbca92 2026-07-17T13:40:27Z Fix case where preemptor may be stuck in unschedulable queue
+  - cfb62a41f 2026-05-18T20:29:56Z Clarify multi-attach events
 
-- cluster-kube-scheduler-operator embedded-component 6a750a9fd626675a2bc35b43b75dbc182ce3d8e9 to 7d896ecefe171028a01f6b7cfdbf30bc5828b414
-  - 0b5505c 2026-09-10T22:21:28Z OCPBUGS-114428: Update build-machinery-go vendor dependency
+- kubernetes-kube-storage-version-migrator embedded-component fb49e56122b670121136c76177e2af2977b37682 to 3f74baced64e1be5ec9ca16e3a682cd4eca67c06
+  - 128fc67 2026-09-15T22:04:37Z UPSTREAM: <drop>: OCPBUGS-114428: tidy and vendor protobuf v1.36.12
+  - 9c3db88 2026-09-15T22:04:37Z UPSTREAM: <carry>: OCPBUGS-114428: tidy and vendor protobuf v1.36.12
+  - f6cefe9 2026-09-15T22:04:37Z UPSTREAM: <carry>: OCPBUGS-114428: Bump google.golang.org/protobuf to v1.36.12
 
-- cluster-network-operator embedded-component c44c178f408a77a9d2460bae64620d2bd3200ff7 to 61de77e4d4c4f65cd5b3d73e00308bfe837c1066
-  - b9e781b 2026-09-10T11:16:17+02:00 fix(ovn-kubernetes): disable local DB probes
+- machine-config-operator embedded-component aca585a4be883cb387fb78137f2a8dd742759ff3 to 13d6165ef6afe096006cb0ffc9d3a261d8a73bc4
+  - f283a90f 2026-09-22T15:21:15-04:00 tests: bump timeout for ImagePulledFromRegistry=Unknown transition for non-SNO cases
+  - c8d42a1a 2026-09-22T10:51:57-04:00 test: fix bootimage status helper and add CAPI
+  - 664523a3 2026-09-21T23:34:50+05:30 OCPBUGS-126899: Add MCN/PIS/MOSC/MOSB/OSImageStream to relatedObjects
+  - 28a3d5a9 2026-09-21T11:32:06-04:00 operator: add CAPI managers in status population
+  - 16f89f25 2026-09-17T17:29:09+02:00 OCPBUGS-86768: Nodes created with 4.13 base images cannot join the cluster
+  - 0e957628 2026-09-17T08:46:07-04:00 controller: degrade MachineConfigPool on PinnedImageSet degrade
+  - ff3e7099 2026-09-15T10:18:12-04:00 tests: refactor verification functions for CalculateStatus test cases
+  - 7990b47c 2026-09-11T18:28:31+02:00 OCPBUGS-122237: [TNF] Add infinite retry on untaint systemd unit
+  - 5acd9d6e 2026-09-11T11:57:03-04:00 vendor: bump openshift/api
+  - b5000ee1 2026-09-11T11:55:31-04:00 go.mod: bump openshift/api
+  - a3bbc197 2026-09-11T09:04:47Z NO-ISSUE: remove poll methods
+  - f7c96d7c 2026-09-10T12:22:27-04:00 controller: update helper determining if a new MOSB is needed to handle case when a successful MOSB is reassigned a new image
+  - b980037e 2026-09-10T16:07:02+02:00 OCPBUGS-121353: Pass missing proxy vars to bootstrap MCC
+  - 1f15c709 2026-09-10T10:39:40+02:00 OCPBUGS-115002: Remove BootImageSkewEnforcement references to gate component
+  - e575d217 2026-09-10T09:22:43+02:00 Mount emptyDir at /var/lib/haproxy/run instead of running haproxy as root
+  - b6b69efa 2026-09-10T11:17:56+05:30 OCPBUGS-100366: Re-queue ContainerRuntimeConfig on status update failure
+  - 7d9e7a86 2026-09-08T12:21:00-05:00 OCPBUGS-63048: Fix DoesNotExist assertions to detect object replacement
+  - 7bdcadba 2026-09-08T09:11:57+02:00 Create /var/lib/haproxy/run and run haproxy as root for HAProxy 3.2
+  - 1d34f8f9 2026-09-04T17:04:30+02:00 Switch on-prem HAProxy pods to haproxy-router-haproxy32 image
+  - ecc044d4 2026-09-04T08:06:00-04:00 templates/gcp: drop GCD health-check ranges in openshift-gcp-routes
+  - 62e50ea1 2026-08-22T21:13:30+05:30 Split wait-for-ipsec-connect into two services to avoid ipsec restart
+  - 09521e87 2026-08-12T11:55:17-05:00 Update nmstatectl format comment to clarify what it does
+  - 5368bce3 2026-08-12T11:50:32-05:00 OCPBUGS-90502: Run nmstatectl format in nmstate-configuration
+  - 35fc604c 2026-05-29T13:33:53+02:00 OCPBUGS-86571: templates: pass --dual-stack to nodeip-configuration
 
-- kubernetes embedded-component fb553cd105957b64651b393cb1a42f59faab190e to c85a8c489d53f97824059d92f706a5e1a65f97fa
-  - c659f228b 2026-09-09T09:41:42+02:00 UPSTREAM: revert: d974e69b84b Add volume group snapshot test driver
-  - a708b025e 2026-09-09T09:41:42+02:00 UPSTREAM: 141358: Enable group snapshot tests in all configurations
+- operator-framework-olm embedded-component cfe91e367d56b3bd96331942e3c7c7d434fd9c0d to d39f6bd7a27ec2a7408201c28ef25ff5825b83f9
+  - e611e7fc 2026-09-22T00:13:56Z Bump go.podman.io/common from 0.68.1 to 0.69.0 (#2047)
+  - a57cb137 2026-09-22T00:13:05Z Bump docker/login-action from 4.5.2 to 4.6.0 (#2050)
+  - 5d88fc49 2026-09-22T00:12:45Z Bump github.com/docker/cli (#2051)
+  - ecf56165 2026-09-22T00:12:27Z Bump docker/login-action from 4 to 4.5.2 (#2046)
+  - 743d89ae 2026-09-22T00:12:08Z Bump go.podman.io/image/v5 from 5.40.0 to 5.41.0 (#2045)
+  - b346c019 2026-09-22T00:11:49Z Bump google.golang.org/grpc from 1.82.1 to 1.83.0 (#2048)
+  - 96630b31 2026-09-22T00:11:30Z Bump github.com/mattn/go-sqlite3 from 1.14.48 to 1.14.49 (#2044)
+  - f0029bba 2026-09-22T00:11:11Z Bump actions/stale from 10 to 11 (#2043)
+  - 9a6347dd 2026-09-22T00:10:53Z Bump go.yaml.in/yaml/v3 from 3.0.4 to 3.0.5 (#2042)
+  - 35d3de0c 2026-09-22T00:10:35Z Bump the k8s-dependencies group with 4 updates (#2041)
+  - b54399c3 2026-09-22T00:10:12Z add cpu limits to catalogsource pods (#3915)
+  - 0e19ec0a 2026-09-22T00:09:53Z :seedling: Bump go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc (#3921)
+  - 76c94a44 2026-09-22T00:09:34Z :seedling: Bump golang.org/x/time from 0.15.0 to 0.16.0 (#3919)
+  - 945cb26d 2026-09-22T00:09:15Z :seedling: Bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.12.2 to 6.13.0 (#3916)
+  - 940a78c5 2026-09-22T00:08:55Z :seedling: Bump golang.org/x/net from 0.58.0 to 0.59.0 (#3918)
+  - 7ebf628e 2026-09-22T00:08:34Z :seedling: Bump golang.org/x/sync from 0.22.0 to 0.23.0 (#3917)
+  - 7d8f8c67 2026-09-22T00:08:15Z :seedling: Bump github.com/containerd/containerd from 1.7.34 to 1.7.35 (#3914)
+  - fbb7fa72 2026-09-22T00:07:56Z :seedling: Bump github.com/operator-framework/operator-registry (#3912)
+  - 2cfd8ddb 2026-09-22T00:07:36Z :seedling: Bump github.com/prometheus/client_model from 0.6.2 to 0.6.3 (#3911)
+  - e3f0527e 2026-09-22T00:07:16Z :seedling: Bump github.com/sirupsen/logrus from 1.10.1 to 1.10.2 (#3907)
+  - 98d30849 2026-09-22T00:06:57Z :seedling: Bump google.golang.org/grpc from 1.83.1 to 1.83.2 (#3908)
+  - 6f2bfc86 2026-09-22T00:06:38Z :seedling: Bump github.com/onsi/gomega from 1.42.1 to 1.43.0 (#3906)
+  - b10ad107 2026-09-22T00:06:19Z Fix nil pointer dereference in PatchDeployment (#3899)
+  - 258c0f94 2026-09-22T00:06:00Z reconciler: fix correctImages panic when pod has no containers (#3904)
+  - 3783803a 2026-09-22T00:05:42Z :seedling: Bump the k8s-dependencies group across 1 directory with 8 updates (#3900)
+  - 8b20195e 2026-09-22T00:05:17Z :seedling: Bump github.com/stretchr/testify from 1.12.0 to 1.12.1 (#3902)
+  - 43faac2e 2026-09-22T00:04:58Z :seedling: Bump github.com/sirupsen/logrus from 1.10.0 to 1.10.1 (#3901)
+  - 072f350a 2026-09-22T00:04:40Z :seedling: Bump google.golang.org/grpc from 1.83.0 to 1.83.1 (#3903)
+  - 8a165a0a 2026-09-15T12:08:51+02:00 Fix ClusterPackageExists to treat NotFound as absent, not an error
+  - e2356996 2026-09-15T11:06:19+02:00 Fix PolarionID:68521 startupProbe failureThreshold assertion
+  - 0b694f06 2026-09-10T14:03:29-05:00 UPSTREAM: <carry>: add per-scenario PSA compliance audit
 
-- kubernetes-kube-storage-version-migrator embedded-component 72835e43c7754356645e41031f3a99926b4d42e6 to fb49e56122b670121136c76177e2af2977b37682
-  - 80455ad 2026-09-12T23:11:54Z UPSTREAM: <carry>: OCPBUGS-114428: Update build-machinery-go vendor dependency
-
-- machine-config-operator embedded-component 95ada475a7d0c0928d9d3cbfbe37196196a337d8 to aca585a4be883cb387fb78137f2a8dd742759ff3
-  - 24cc51d3 2026-09-10T08:53:25Z Fix IsBootImageUpdateSupported to include vSphere and Azure platforms
-  - 3eb5fc05 2026-09-02T09:20:26+02:00 OCBPUGS-105283: Mount /etc/container in mosb
-  - 9dbb2d40 2026-08-31T23:03:30-04:00 updateLayeredOS deploy-from-self when skopeo < 1.22.2
-  - ee5a2278 2026-08-31T14:16:40-05:00 Fix CVE-2026-15792: Upgrade BuildKit to v0.31.2 and gRPC to v1.82.1
-  - e93ebc4c 2026-08-18T10:34:55+02:00 MCO-2468: Dump compact cache to CM for persistence
-
-- route-controller-manager embedded-component 59697cf7af4517dd44e28179a57f7f35b6ea0e22 to a158fff7ce3826058bd2d7338b206cdd600d0d40
-  - 6111c6d 2026-08-20T21:36:25-03:00 OCPBUGS-104856: clear unmanaged-route metric when the route is removed
-
-- oc image-amd64 e0e4c04430bf649f08f524f3a61ebffd2df1c6bc to 876e245c77f9daa471592fd6dd827a24c0d5814a
-  - cab7b76a 2026-09-10T14:58:11+12:00 Document search order for images when --idms-file specified
-  - 7418e085 2026-09-10T14:40:28+12:00 OCPBUGS-122005: Add --idms-file option to oc image info
-
-- router image-amd64 3381229146657d2e6bd94115dda0885f25cb3bed to d5cf9f2aa0bdd024f51a208f12558da9bac5ed38
-  - 46d38f6 2026-09-04T11:24:46-04:00 OCPBUGS-77056: Lock DeleteFunc to stop SARCompleted overwriting rejection
-
-- router image-amd64 3381229146657d2e6bd94115dda0885f25cb3bed to d5cf9f2aa0bdd024f51a208f12558da9bac5ed38
-  - 46d38f6 2026-09-04T11:24:46-04:00 OCPBUGS-77056: Lock DeleteFunc to stop SARCompleted overwriting rejection
-
-- ovn-kubernetes image-amd64 2f9add8106687de6dba052689b97a189f92439f9 to fe886495f2f706c1912d1417daa768c2d78c0597
-  - ea4b9c61 2026-09-09T16:32:51+05:30 sync test annotations with upstream changes
-  - 72c64c0c 2026-08-31T18:26:24-07:00 tests-ext: run OTE tests only in ovn-kubernetes conformance suites
-  - 1d21dae8 2026-08-28T09:21:55-07:00 docs: document multi-subnets for primary UDNs
-  - f6d58726 2026-08-27T23:38:03+05:30 Remove legacy moveACLsToNamespacedPortGroups function
-  - da3ada61 2026-08-27T19:15:50+05:30 Handle GetActiveNetworkForNamespace NotFound across callers
-  - 302f0fa8 2026-08-27T19:15:47+05:30 Handle GetPrimaryNADForNamespace NotFound across callers
-  - a2551e5f 2026-08-27T19:13:51+05:30 Fix wrong infrastructure-locked role when namespace is missing
-  - d9eda100 2026-08-27T12:56:31+05:30 evpn: fix nil dereference in shouldDeleteNeighbors
-  - ebef4f30 2026-08-26T10:02:32-07:00 routeadvertisements: identify DPU hosts by annotation
-  - a0ad99bf 2026-08-26T10:06:41+02:00 e2e: cover the published VRF name of primary UDNs and CUDNs
-  - 438306eb 2026-08-26T10:06:41+02:00 udn: publish the derived VRF name of primary networks
-  - 418d3eed 2026-08-26T10:06:41+02:00 udn API: add status.vrfName for the derived VRF device name
-  - 907b8fa1 2026-08-26T10:06:41+02:00 e2e: cover the published VRF name of Uplink-attached CUDNs
-  - 22b86333 2026-08-26T10:06:41+02:00 cudn: publish the derived VRF name of primary networks
-  - e0ae49b4 2026-08-26T10:06:41+02:00 cudn API: add status.vrfName for the derived VRF device name
-  - e3ab3cc7 2026-08-26T08:58:58+05:30 Register test images using tests extension
-  - 25c581be 2026-08-25T17:26:57-04:00 egressip: fix nondeterministic failover unit test
-  - d224c2c7 2026-08-25T12:04:15-04:00 e2e: activate dynamic CUDNs for route preservation
-  - 3b08c224 2026-08-25T12:04:14-04:00 e2e: make Uplink NodePort services dual-stack
-  - 013eb192 2026-08-25T12:04:14-04:00 ci: select DPU Uplink tests by feature label
-  - 5db253d0 2026-08-25T19:09:14+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
-  - 12b2bbca 2026-08-25T18:43:39+05:30 docs: add EgressIP design document
-  - d255ff59 2026-08-24T17:37:21-04:00 e2e: fix Uplink route checks for Dynamic UDNs
-  - 7920c7a1 2026-08-24T11:18:55+02:00 kind: write image archives under a unique temporary directory
-  - f08029b2 2026-08-24T11:02:30+02:00 kind: load single-platform image archives with docker
-  - e59eb55c 2026-08-24T09:44:18+02:00 kind: preload multus image instead of pulling it on every node
-  - 6a8019b5 2026-08-24T00:09:14-07:00 OKEP-6224 code changes: Add DHCP IPAM support for localnet UDNs
-  - 1f025268 2026-08-24T00:09:14-07:00 Add Vendored file changes for DHCP IPAM support for localnet CUDN
-  - 2baf225d 2026-08-21T15:27:58-04:00 Fix hybrid overlay node retry test race
-  - f878a1a9 2026-08-21T17:44:41+02:00 e2e: accept link-local IPv6 BGP next hops in route checks
-  - 4bec0960 2026-08-21T17:44:41+02:00 Uplink: report host-side gateway programming on HostGatewayReady
-  - a4fdfdc8 2026-08-21T17:44:41+02:00 e2e: cover Uplink route preservation across VRF enslavement
-  - 4ec2e4d7 2026-08-21T17:44:41+02:00 vrfmanager: preserve slave interface routes across enslavement
-  - 7bc78c9d 2026-08-21T16:45:05+02:00 release-note: add a section to PR description and a coderabbit rule
-  - e45e59af 2026-08-21T15:57:35+02:00 metrics: bound the /metrics scrape with a total collection budget
-  - 3e6a2620 2026-08-21T15:57:12+02:00 metrics: bound ovs/ovn appctl subprocesses on the scrape path
-  - 73a68b34 2026-08-21T15:44:50+02:00 [config] Add zone flag back to avoid breaking existing users.
-  - d5fd178e 2026-08-21T15:42:00+02:00 Uplink API: add the HostGatewayReady UplinkState condition
-  - 9e19db69 2026-08-21T14:55:16+02:00 [kind] don't update fs.inotify if the limits are already correct
-  - 4133e538 2026-08-21T11:48:02+02:00 Contributing guide: add info on incremental changes during review
-  - 0548e7a1 2026-08-21T09:18:25+05:30 Remove isEmptyStatusManagedField restriction from startup cleanup
-  - d16d3f73 2026-08-20T16:42:47+02:00 [OKEP] Add an OVNObservability API enhancement
-  - 25ffe53b 2026-08-20T05:25:11-07:00 test: remove obsolete OVN_HA mode
-  - 84d0a875 2026-08-20T05:25:11-07:00 config, tools: remove central-mode remnants
-  - 44672b06 2026-08-20T05:25:11-07:00 test: drop removed DB recovery skips
-  - dc34f545 2026-08-20T05:25:11-07:00 libovsdb, metrics: remove obsolete Raft support
-  - 79c813bb 2026-08-20T05:25:11-07:00 util: remove unused raft readiness probes
-  - c948dda8 2026-08-19T18:11:03+02:00 e2e: move DPU-sim BGP server network off the ipvrf allocator range
-  - 84dbd13d 2026-08-19T19:01:41+05:30 egressip: skip nodes with unusable host-cidrs annotation
-  - 1174da43 2026-08-19T07:57:23-04:00 add fixes to overlapping cases
-  - a98391ee 2026-08-19T07:57:23-04:00 e2e(evpn): add overlapping CUDN isolation tests to existing EVPN test table
-  - 65b34606 2026-08-19T07:57:23-04:00 e2e(evpn): add macVRFUseProxyDockerNetwork flag to runEVPNNetworkAndServers
-  - e2e0aeef 2026-08-19T13:24:10+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - 8cc12c2f 2026-08-19T13:24:10+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - e3b903ca 2026-08-19T13:24:10+02:00 egressip: set IFA_PROTO on EgressIP addresses
-  - 3d4ce441 2026-08-18T11:20:59Z deps: bump go.opentelemetry.io/otel to v1.44.0
-  - e1ea00f7 2026-08-18T15:36:15+05:30 egressip: fix typo and capitalization in error message
-  - bb45fc9e 2026-08-18T15:31:34+05:30 docs: fix mike version dropdown sticky header layout on scroll/mobile
-  - c41d04de 2026-08-18T15:05:06+05:30 docs: add section index landing pages using Kubernetes-style approach
-  - 85b39a14 2026-08-18T10:04:16+02:00 e2e: cover both Uplink DPU bridge resolution methods
-  - 53b4843d 2026-08-18T10:02:40+02:00 uplink: resolve DPU bridge from published host function
-  - 3d038c0c 2026-08-18T10:02:40+02:00 crd/uplink: add hostFunction to UplinkState status
-  - f439208c 2026-08-14T14:30:25-07:00 ci: restore no-uplink gateway coverage
-  - 41f539cb 2026-08-13T18:15:29-07:00 ovn: remove obsolete node zone annotation
-  - 46ed93df 2026-08-13T18:15:29-07:00 networkmanager: remove obsolete zone mode
-  - c8f6eba2 2026-08-13T18:15:29-07:00 ovn: complete node identity cleanup
-  - 558c325d 2026-08-13T18:10:30-07:00 test: keep network connect locality node-scoped
-  - c139d030 2026-08-13T18:10:29-07:00 test: use node identity in controller fixtures
-  - 4a15fdff 2026-08-13T18:10:29-07:00 ovn: use node identity for controller locality
-  - c7ec9183 2026-08-13T18:10:29-07:00 test: align zone fixtures with node-name zones
-  - 4242b3e9 2026-08-13T18:10:29-07:00 test: update egressip expectations for node-name zones
-  - 92dfb462 2026-08-13T18:10:29-07:00 ovn: treat missing node zone as unknown
-  - 98324ea8 2026-08-13T18:10:29-07:00 ovn: remove legacy default zone configuration
-  - 6b287d95 2026-08-10T16:23:37-07:00 e2e: fix egress IP traffic-monitor pod startup race
-  - 68deba90 2026-07-23T13:13:57-04:00 ci: aggregate coredump traces after e2e
-  - c2a2b225 2026-07-23T13:13:57-04:00 ci: make coredump reporting best effort
-  - aaf22bcc 2026-07-23T13:13:57-04:00 ci: post coredump traces to pull requests
-  - aa715ad3 2026-07-23T13:13:57-04:00 ci: print coredump stack traces in e2e jobs
-  - ae9bdc90 2026-07-23T13:13:57-04:00 contrib: support Go and FRR coredump traces
-  - 3941376e 2026-07-22T15:51:17-04:00 contrib: extract Fedora OVN coredump traces
-  - 6b89af49 2026-06-30T13:01:34+02:00 Add maintenance doc explaining what kinds of tasks exist
-
-- kubernetes image-amd64 fb553cd105957b64651b393cb1a42f59faab190e to c85a8c489d53f97824059d92f706a5e1a65f97fa
-  - c659f228b 2026-09-09T09:41:42+02:00 UPSTREAM: revert: d974e69b84b Add volume group snapshot test driver
-  - a708b025e 2026-09-09T09:41:42+02:00 UPSTREAM: 141358: Enable group snapshot tests in all configurations
-
-- oc image-arm64 2902632b849a20d312215e16f2058233f1713553 to 641593714a8ee6fa26e2228901cfd37d4f5937c8
+- oc image-amd64 876e245c77f9daa471592fd6dd827a24c0d5814a to 641593714a8ee6fa26e2228901cfd37d4f5937c8
   - e8279c8a 2026-09-21T16:31:25-04:00 OCPEDGE-2416: Refine topology transition handling
   - 8bbe244b 2026-09-17T14:13:05-04:00 OCPEDGE-2416: Add topology transition commands
   - fb0b6d90 2026-09-17T21:57:43+05:30 Fix spelling mistake WildcardPolicy
   - e4563f17 2026-09-14T17:14:51+05:30 Fix probe help text to use deployment configs terminology
   - 6313222d 2026-09-11T12:10:12+02:00 README: Mention gcc as an oc dependency
   - 18b02076 2026-09-11T11:21:33+05:30 docs(env): add deployment examples to oc set env help
-  - cab7b76a 2026-09-10T14:58:11+12:00 Document search order for images when --idms-file specified
-  - 7418e085 2026-09-10T14:40:28+12:00 OCPBUGS-122005: Add --idms-file option to oc image info
-  - a05a53d5 2026-09-02T12:28:55+05:30 docs(env): add deployment examples to oc set env help
-  - 28021fdd 2026-09-01T15:10:41+03:00 Move to openshift/osincli
 
-- router image-arm64 3381229146657d2e6bd94115dda0885f25cb3bed to d5cf9f2aa0bdd024f51a208f12558da9bac5ed38
-  - 46d38f6 2026-09-04T11:24:46-04:00 OCPBUGS-77056: Lock DeleteFunc to stop SARCompleted overwriting rejection
-
-- router image-arm64 3381229146657d2e6bd94115dda0885f25cb3bed to d5cf9f2aa0bdd024f51a208f12558da9bac5ed38
-  - 46d38f6 2026-09-04T11:24:46-04:00 OCPBUGS-77056: Lock DeleteFunc to stop SARCompleted overwriting rejection
-
-- kube-rbac-proxy image-arm64 0f9a53a85f8436587adbbdc58caaf89e500cd8db to 15f06dc655748d92897ba0d37cb8a0c40fb5d6fa
-  - a2ee598 2026-09-02T11:17:08+01:00 docs: add Agentic SDLC context files
-
-- ovn-kubernetes image-arm64 7b4de5ed3bd4381e3a17cdfddbe14be1432b9860 to 1fc2bd44c53712369a4aa0246b48154134294f13
+- ovn-kubernetes image-amd64 fe886495f2f706c1912d1417daa768c2d78c0597 to 1fc2bd44c53712369a4aa0246b48154134294f13
   - a2d2ad86 2026-09-21T16:16:51+05:30 sync test annotations with upstream changes
   - 898bc1b4 2026-09-21T16:15:34+05:30 OTE: Adapt to new NBDBContainerName deploymentconfig API
   - 16d1faac 2026-09-18T13:32:57+02:00 contrib: pass extra arguments through to the DPU simulator deploy
@@ -213,7 +205,6 @@
   - 3c3af7a2 2026-09-09T22:35:47+02:00 clustermanager/vtep: de-flake VTEP overlap convergence test
   - 7113fa9e 2026-09-09T16:32:16+02:00 kind: tolerate pod churn in the kube-system readiness wait
   - 7d97b8a5 2026-09-09T14:32:40+03:00 docs,make: add target for generating API reference docs
-  - ea4b9c61 2026-09-09T16:32:51+05:30 sync test annotations with upstream changes
   - 586c598e 2026-09-09T14:49:53+05:30 docs: document egressip primary node-network host route limitation
   - 89236a0e 2026-09-09T10:27:59+02:00 docs: update ADOPTERS.md to CNCF standards
   - 9f70f3b1 2026-09-08T13:52:15+02:00 docs,okep-3926: Reflect macSecurity suported on UserDefinedNetwork CRD
@@ -286,7 +277,6 @@
   - ed425847 2026-09-01T20:45:17+09:00 docs: add IIJ blog post on VM workload migration
   - b35f4178 2026-09-01T11:58:40+02:00 cni: skip conntrack flush for IPs owned by another pod
   - 24e6e5aa 2026-09-01T15:20:32+05:30 docs: fix blog post page layout for responsive consistency
-  - 72c64c0c 2026-08-31T18:26:24-07:00 tests-ext: run OTE tests only in ovn-kubernetes conformance suites
   - a366388d 2026-08-31T20:34:52-04:00 egressip: fix cleanup after namespace deletion
   - 68494d95 2026-08-31T20:08:02+02:00 Style blog post sidebar to match site-wide floating card design
   - 4ed60dd2 2026-08-31T20:08:01+02:00 Update documentation guide with blog post instructions
@@ -302,107 +292,16 @@
   - 1e4f61af 2026-08-29T17:40:53+02:00 udn: degrade host isolation instead of failing node startup
   - e75c5323 2026-08-28T17:57:02-04:00 ci: find PR by head branch for coredump comments
   - ef026c59 2026-08-28T15:12:04-04:00 kind: wait for CoreDNS rollout before checking pods
-  - 1d21dae8 2026-08-28T09:21:55-07:00 docs: document multi-subnets for primary UDNs
   - 3b2a8923 2026-08-28T10:35:20-04:00 udn: clean up pods after NAD deletion
-  - f6d58726 2026-08-27T23:38:03+05:30 Remove legacy moveACLsToNamespacedPortGroups function
-  - da3ada61 2026-08-27T19:15:50+05:30 Handle GetActiveNetworkForNamespace NotFound across callers
-  - 302f0fa8 2026-08-27T19:15:47+05:30 Handle GetPrimaryNADForNamespace NotFound across callers
-  - a2551e5f 2026-08-27T19:13:51+05:30 Fix wrong infrastructure-locked role when namespace is missing
-  - d9eda100 2026-08-27T12:56:31+05:30 evpn: fix nil dereference in shouldDeleteNeighbors
-  - ebef4f30 2026-08-26T10:02:32-07:00 routeadvertisements: identify DPU hosts by annotation
-  - a0ad99bf 2026-08-26T10:06:41+02:00 e2e: cover the published VRF name of primary UDNs and CUDNs
-  - 438306eb 2026-08-26T10:06:41+02:00 udn: publish the derived VRF name of primary networks
-  - 418d3eed 2026-08-26T10:06:41+02:00 udn API: add status.vrfName for the derived VRF device name
-  - 907b8fa1 2026-08-26T10:06:41+02:00 e2e: cover the published VRF name of Uplink-attached CUDNs
-  - 22b86333 2026-08-26T10:06:41+02:00 cudn: publish the derived VRF name of primary networks
-  - e0ae49b4 2026-08-26T10:06:41+02:00 cudn API: add status.vrfName for the derived VRF device name
-  - e3ab3cc7 2026-08-26T08:58:58+05:30 Register test images using tests extension
-  - 25c581be 2026-08-25T17:26:57-04:00 egressip: fix nondeterministic failover unit test
-  - d224c2c7 2026-08-25T12:04:15-04:00 e2e: activate dynamic CUDNs for route preservation
-  - 3b08c224 2026-08-25T12:04:14-04:00 e2e: make Uplink NodePort services dual-stack
-  - 013eb192 2026-08-25T12:04:14-04:00 ci: select DPU Uplink tests by feature label
-  - 5db253d0 2026-08-25T19:09:14+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
-  - 12b2bbca 2026-08-25T18:43:39+05:30 docs: add EgressIP design document
   - 56aceddc 2026-08-24T20:41:38-07:00 e2e: test EgressIP pod-to-pod connectivity from egress node
-  - d255ff59 2026-08-24T17:37:21-04:00 e2e: fix Uplink route checks for Dynamic UDNs
   - 27ba29a1 2026-08-24T13:49:24+02:00 reviews: update the docs and remove stale file
-  - 7920c7a1 2026-08-24T11:18:55+02:00 kind: write image archives under a unique temporary directory
-  - f08029b2 2026-08-24T11:02:30+02:00 kind: load single-platform image archives with docker
-  - e59eb55c 2026-08-24T09:44:18+02:00 kind: preload multus image instead of pulling it on every node
-  - 6a8019b5 2026-08-24T00:09:14-07:00 OKEP-6224 code changes: Add DHCP IPAM support for localnet UDNs
-  - 1f025268 2026-08-24T00:09:14-07:00 Add Vendored file changes for DHCP IPAM support for localnet CUDN
-  - 2baf225d 2026-08-21T15:27:58-04:00 Fix hybrid overlay node retry test race
-  - f878a1a9 2026-08-21T17:44:41+02:00 e2e: accept link-local IPv6 BGP next hops in route checks
-  - 4bec0960 2026-08-21T17:44:41+02:00 Uplink: report host-side gateway programming on HostGatewayReady
-  - a4fdfdc8 2026-08-21T17:44:41+02:00 e2e: cover Uplink route preservation across VRF enslavement
-  - 4ec2e4d7 2026-08-21T17:44:41+02:00 vrfmanager: preserve slave interface routes across enslavement
-  - 7bc78c9d 2026-08-21T16:45:05+02:00 release-note: add a section to PR description and a coderabbit rule
-  - e45e59af 2026-08-21T15:57:35+02:00 metrics: bound the /metrics scrape with a total collection budget
-  - 3e6a2620 2026-08-21T15:57:12+02:00 metrics: bound ovs/ovn appctl subprocesses on the scrape path
-  - 73a68b34 2026-08-21T15:44:50+02:00 [config] Add zone flag back to avoid breaking existing users.
-  - d5fd178e 2026-08-21T15:42:00+02:00 Uplink API: add the HostGatewayReady UplinkState condition
-  - 9e19db69 2026-08-21T14:55:16+02:00 [kind] don't update fs.inotify if the limits are already correct
-  - 4133e538 2026-08-21T11:48:02+02:00 Contributing guide: add info on incremental changes during review
-  - 0548e7a1 2026-08-21T09:18:25+05:30 Remove isEmptyStatusManagedField restriction from startup cleanup
-  - d16d3f73 2026-08-20T16:42:47+02:00 [OKEP] Add an OVNObservability API enhancement
-  - 25ffe53b 2026-08-20T05:25:11-07:00 test: remove obsolete OVN_HA mode
-  - 84d0a875 2026-08-20T05:25:11-07:00 config, tools: remove central-mode remnants
-  - 44672b06 2026-08-20T05:25:11-07:00 test: drop removed DB recovery skips
-  - dc34f545 2026-08-20T05:25:11-07:00 libovsdb, metrics: remove obsolete Raft support
-  - 79c813bb 2026-08-20T05:25:11-07:00 util: remove unused raft readiness probes
-  - c948dda8 2026-08-19T18:11:03+02:00 e2e: move DPU-sim BGP server network off the ipvrf allocator range
-  - 84dbd13d 2026-08-19T19:01:41+05:30 egressip: skip nodes with unusable host-cidrs annotation
-  - 1174da43 2026-08-19T07:57:23-04:00 add fixes to overlapping cases
-  - a98391ee 2026-08-19T07:57:23-04:00 e2e(evpn): add overlapping CUDN isolation tests to existing EVPN test table
-  - 65b34606 2026-08-19T07:57:23-04:00 e2e(evpn): add macVRFUseProxyDockerNetwork flag to runEVPNNetworkAndServers
-  - e2e0aeef 2026-08-19T13:24:10+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - 8cc12c2f 2026-08-19T13:24:10+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - e3b903ca 2026-08-19T13:24:10+02:00 egressip: set IFA_PROTO on EgressIP addresses
-  - 3d4ce441 2026-08-18T11:20:59Z deps: bump go.opentelemetry.io/otel to v1.44.0
-  - e1ea00f7 2026-08-18T15:36:15+05:30 egressip: fix typo and capitalization in error message
-  - bb45fc9e 2026-08-18T15:31:34+05:30 docs: fix mike version dropdown sticky header layout on scroll/mobile
-  - c41d04de 2026-08-18T15:05:06+05:30 docs: add section index landing pages using Kubernetes-style approach
-  - 85b39a14 2026-08-18T10:04:16+02:00 e2e: cover both Uplink DPU bridge resolution methods
-  - 53b4843d 2026-08-18T10:02:40+02:00 uplink: resolve DPU bridge from published host function
-  - 3d038c0c 2026-08-18T10:02:40+02:00 crd/uplink: add hostFunction to UplinkState status
-  - fbb644cc 2026-08-17T20:23:39Z sync test annotations with upstream changes
-  - 75e712ef 2026-08-17T13:17:21+02:00 Update area labels
-  - acc30fa1 2026-08-17T12:29:18+02:00 Uplink: dedup UplinkState test fixtures
-  - 3910687d 2026-08-17T11:53:26+02:00 Uplink: share the UplinkState reverse lookup
-  - 54d01387 2026-08-17T11:53:26+02:00 Uplink e2e: cover gateway readiness across deselection
-  - 72ad2245 2026-08-17T11:53:26+02:00 Uplink: reset gateway cache with state lifecycle
-  - 55aab4eb 2026-08-17T11:53:26+02:00 Uplink e2e: cover out-of-band UplinkState deletion recovery
-  - c77d0a93 2026-08-17T11:53:26+02:00 Uplink: restore GatewayReady on recreated UplinkStates
-  - e1444993 2026-08-17T11:53:26+02:00 Uplink: recreate UplinkState deleted out of band
-  - 632f2985 2026-08-17T11:53:26+02:00 controller: handle delete tombstones in onDelete
-  - f439208c 2026-08-14T14:30:25-07:00 ci: restore no-uplink gateway coverage
-  - 41f539cb 2026-08-13T18:15:29-07:00 ovn: remove obsolete node zone annotation
-  - 46ed93df 2026-08-13T18:15:29-07:00 networkmanager: remove obsolete zone mode
-  - c8f6eba2 2026-08-13T18:15:29-07:00 ovn: complete node identity cleanup
-  - 558c325d 2026-08-13T18:10:30-07:00 test: keep network connect locality node-scoped
-  - c139d030 2026-08-13T18:10:29-07:00 test: use node identity in controller fixtures
-  - 4a15fdff 2026-08-13T18:10:29-07:00 ovn: use node identity for controller locality
-  - c7ec9183 2026-08-13T18:10:29-07:00 test: align zone fixtures with node-name zones
-  - 4242b3e9 2026-08-13T18:10:29-07:00 test: update egressip expectations for node-name zones
-  - 92dfb462 2026-08-13T18:10:29-07:00 ovn: treat missing node zone as unknown
-  - 98324ea8 2026-08-13T18:10:29-07:00 ovn: remove legacy default zone configuration
-  - 6b287d95 2026-08-10T16:23:37-07:00 e2e: fix egress IP traffic-monitor pod startup race
-  - 68deba90 2026-07-23T13:13:57-04:00 ci: aggregate coredump traces after e2e
-  - c2a2b225 2026-07-23T13:13:57-04:00 ci: make coredump reporting best effort
-  - aaf22bcc 2026-07-23T13:13:57-04:00 ci: post coredump traces to pull requests
-  - aa715ad3 2026-07-23T13:13:57-04:00 ci: print coredump stack traces in e2e jobs
-  - ae9bdc90 2026-07-23T13:13:57-04:00 contrib: support Go and FRR coredump traces
-  - 3941376e 2026-07-22T15:51:17-04:00 contrib: extract Fedora OVN coredump traces
-  - 6b89af49 2026-06-30T13:01:34+02:00 Add maintenance doc explaining what kinds of tasks exist
 
-- kubernetes image-arm64 7b29fb077260554429dcef8234272e9fd25fcfbd to 24c68cdad3cbce3effffcab56f88a41369717685
+- kubernetes image-amd64 c85a8c489d53f97824059d92f706a5e1a65f97fa to bf88f01942699d4a30562c0ae042d34ba0131881
+  - f759e305b 2026-09-23T15:32:29-04:00 UPSTREAM: <carry>: add explicit merge commit message to openshift-hack/rebase.sh
   - b0892e485 2026-09-18T12:16:43-04:00 UPSTREAM: <carry>: skip SELinuxMountReadWriteOncePodOnly tests now that SELinuxMount is GA
   - 34925bef9 2026-09-17T11:52:50-04:00 UPSTREAM: <carry>: Use FROM scratch for RHEL pause image
   - 124b3a522 2026-09-16T13:50:45-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - 059382600 2026-09-16T13:50:08-04:00 UPSTREAM: <drop>: manually resolve conflicts
-  - c659f228b 2026-09-09T09:41:42+02:00 UPSTREAM: revert: d974e69b84b Add volume group snapshot test driver
-  - a708b025e 2026-09-09T09:41:42+02:00 UPSTREAM: 141358: Enable group snapshot tests in all configurations
-  - b45ea7b69 2026-08-26T16:56:47-04:00 UPSTREAM: <carry>: make graceful-termination-duration flag required for the watch-termination command
   - bb826b1d4 2026-08-20T03:06:27Z Release commit for Kubernetes v1.36.4
   - 80ea0382d 2026-08-07T12:05:10Z Make sure gated pods are flushed with the same frequency as non-gated
   - b8fe55419 2026-08-06T11:40:31-04:00 Update golang.org/x deps
@@ -414,4 +313,7 @@
   - 45492be98 2026-07-18T17:41:27+08:00 DRA: key the structured allocator counter caches by PoolID
   - c9ffbca92 2026-07-17T13:40:27Z Fix case where preemptor may be stuck in unschedulable queue
   - cfb62a41f 2026-05-18T20:29:56Z Clarify multi-attach events
+
+- kubernetes image-arm64 24c68cdad3cbce3effffcab56f88a41369717685 to bf88f01942699d4a30562c0ae042d34ba0131881
+  - f759e305b 2026-09-23T15:32:29-04:00 UPSTREAM: <carry>: add explicit merge commit message to openshift-hack/rebase.sh
 

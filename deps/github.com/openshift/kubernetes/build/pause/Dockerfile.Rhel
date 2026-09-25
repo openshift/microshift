@@ -1,12 +1,17 @@
 FROM registry.ci.openshift.org/ocp/builder:rhel-9-golang-1.26-openshift-5.0 AS builder
 WORKDIR /go/src/github.com/openshift/kubernetes/build/pause
 COPY . .
-RUN mkdir -p bin && \
-    gcc -Os -Wall -Werror -o bin/pause ./linux/pause.c
+RUN dnf install -y glibc-static
+# Compile and put in /pause along with a symlink from /usr/bin/pod -> ../../pause
+# because OpenShift currently uses /usr/bin/pod
+RUN mkdir -p /tree/usr/bin && \
+    gcc -Os -Wall -Werror -static -o /tree/pause ./linux/pause.c && \
+        ln -s ../../pause /tree/usr/bin/pod
 
-FROM registry.ci.openshift.org/ocp/5.0:base-rhel9
-COPY --from=builder /go/src/github.com/openshift/kubernetes/build/pause/bin/pause /usr/bin/pod
+FROM scratch
+# Copy in the output filesystem tree from the builder into the scratch container
+COPY --from=builder /tree/ /
 LABEL io.k8s.display-name="OpenShift Pod" \
       io.k8s.description="This is a component of OpenShift and contains the binary that holds the pod namespaces." \
       io.openshift.tags="openshift"
-ENTRYPOINT [ "/usr/bin/pod" ]
+ENTRYPOINT [ "/pause" ]
