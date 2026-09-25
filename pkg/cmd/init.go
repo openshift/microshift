@@ -56,7 +56,7 @@ func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 }
 
 func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
-	builder, err := certificateChainsSetup(cfg)
+	builder, err := certificateChainsSetup(cfg, config.DataDir)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 }
 
 //nolint:ireturn // Callers choose read-only inventory loading or certificate creation.
-func certificateChainsSetup(cfg *config.Config) (certchains.CertificateChainsBuilder, error) {
+func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.CertificateChainsBuilder, error) {
 	// Anchor certificate expiration to the next day. This forces
 	// homogenous expiry dates for all certificates with the same validity.
 	startTime := time.Now()
@@ -124,7 +124,7 @@ func certificateChainsSetup(cfg *config.Config) (certchains.CertificateChainsBui
 		externalCertNames = append(externalCertNames, cfg.Node.NodeIP)
 	}
 
-	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
+	certsDir := cryptomaterial.CertsDirectory(dataDir)
 
 	builder := certchains.NewCertificateChains(
 		// ------------------------------

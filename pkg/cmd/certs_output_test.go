@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -21,6 +22,8 @@ import (
 )
 
 func TestCertStatusErrors(t *testing.T) {
+	const sensitiveConfig = "proxy: http://test-user:certificate-test-secret@proxy.invalid:8080\ninvalid: ["
+	const configurationMessage = "failed to load MicroShift configuration; check /etc/microshift/config.yaml and /etc/microshift/config.d"
 	for _, format := range []string{"", "json", "yaml"} {
 		for _, tt := range []struct {
 			name      string
@@ -44,11 +47,12 @@ func TestCertStatusErrors(t *testing.T) {
 					loadConfig: func() (*config.Config, error) {
 						require.NotEqual(t, "privileges", tt.name, "privilege failures must not read configuration")
 						if tt.name == "configuration" {
-							return nil, errors.New("invalid configuration")
+							return nil, fmt.Errorf("failed to convert config yaml (%q) to json: invalid YAML", sensitiveConfig)
 						}
 						return &config.Config{Warnings: []string{"must not leak alongside an error"}}, nil
 					},
 					loadInventory: func(*config.Config) (certchains.CertificateInventory, error) {
+						require.NotEqual(t, "configuration", tt.name, "configuration failures must not load the inventory")
 						if tt.name == "inventory" {
 							return nil, errors.New("certificate file is unreadable")
 						}
@@ -75,9 +79,15 @@ func TestCertStatusErrors(t *testing.T) {
 				}
 				require.Equal(t, 1, RunCertsCommand(root, args))
 				require.Empty(t, stdout.String())
+				require.NotContains(t, stderr.String(), "certificate-test-secret")
+				require.NotContains(t, stderr.String(), "proxy.invalid")
+				require.NotContains(t, stderr.String(), "invalid YAML")
 				if format == "" {
 					require.True(t, strings.HasPrefix(stderr.String(), "Error: "))
 					require.NotContains(t, stderr.String(), "Usage:")
+					if tt.name == "configuration" {
+						require.Equal(t, "Error: "+configurationMessage+"\n", stderr.String())
+					}
 					return
 				}
 				data := stderr.Bytes()
@@ -92,6 +102,9 @@ func TestCertStatusErrors(t *testing.T) {
 				require.ErrorIs(t, decoder.Decode(new(any)), io.EOF, "stderr must contain exactly one document")
 				require.Equal(t, tt.code, document.Code)
 				require.NotEmpty(t, document.Message)
+				if tt.name == "configuration" {
+					require.Equal(t, configurationMessage, document.Message)
+				}
 				require.False(t, document.GeneratedAt.IsZero())
 				require.Nil(t, document.Details)
 				var fields map[string]json.RawMessage

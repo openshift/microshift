@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -82,8 +83,10 @@ func (o *certStatusOptions) run() error {
 
 	cfg, err := o.loadConfig()
 	if err != nil {
+		// Loader errors can include raw configuration and credentials. Do not
+		// retain their contents in errors returned by certificate commands.
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidConfiguration,
-			fmt.Errorf("failed to load MicroShift configuration: %w", err)}
+			errors.New("failed to load MicroShift configuration; check /etc/microshift/config.yaml and /etc/microshift/config.d")}
 	}
 	inventory, err := o.loadInventory(cfg)
 	if err != nil {
@@ -114,7 +117,7 @@ func (o *certStatusOptions) run() error {
 }
 
 func loadCertificateInventory(cfg *config.Config) (certchains.CertificateInventory, error) {
-	builder, err := certificateChainsSetup(cfg)
+	builder, err := certificateChainsSetup(cfg, config.DataDir)
 	if err != nil {
 		return nil, err
 	}

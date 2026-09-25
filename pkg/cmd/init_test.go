@@ -19,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -28,6 +29,92 @@ import (
 	"github.com/stretchr/testify/require"
 	"k8s.io/apiserver/pkg/authentication/user"
 )
+
+func TestProductionCertificateInventory(t *testing.T) {
+	cfg := &config.Config{
+		Network:   config.Network{ServiceNetwork: []string{"10.43.0.0/16"}},
+		Node:      config.Node{HostnameOverride: "test-node", NodeIP: "192.0.2.10"},
+		DNS:       config.DNS{BaseDomain: "example.test"},
+		ApiServer: config.ApiServer{AdvertiseAddress: "10.44.0.0"},
+	}
+	dataDir := t.TempDir()
+	builder, err := certificateChainsSetup(cfg, dataDir)
+	require.NoError(t, err)
+	chains, err := builder.Complete()
+	require.NoError(t, err)
+	// Use a fresh builder to exercise status's disk-loading path independently
+	// of the builder that created the certificates.
+	builder, err = certificateChainsSetup(cfg, dataDir)
+	require.NoError(t, err)
+	inventory, err := builder.LoadInventory()
+	require.NoError(t, err)
+	require.Equal(t, chains.Inventory(), inventory)
+
+	const (
+		ca       = certchains.CertificateRoleCA
+		client   = certchains.CertificateRoleClient
+		serving  = certchains.CertificateRoleServing
+		peer     = certchains.CertificateRolePeer
+		standard = certchains.RotationPolicyStandard
+		extended = certchains.RotationPolicyExtended
+	)
+	type metadata struct {
+		service string
+		role    certchains.CertificateRole
+		policy  certchains.RotationPolicy
+	}
+	expected := map[string]metadata{
+		"admin-kubeconfig-signer":                                                      {"authentication", ca, extended},
+		"admin-kubeconfig-signer/admin-kubeconfig-client":                              {"authentication", client, extended},
+		"admin-kubeconfig-signer/openshift-observability-client":                       {"observability", client, standard},
+		"aggregator-signer":                                                            {"kube-apiserver", ca, extended},
+		"aggregator-signer/aggregator-client":                                          {"kube-apiserver", client, standard},
+		"etcd-signer":                                                                  {"etcd", ca, extended},
+		"etcd-signer/apiserver-etcd-client":                                            {"kube-apiserver", client, extended},
+		"etcd-signer/etcd-peer":                                                        {"etcd", peer, extended},
+		"etcd-signer/etcd-serving":                                                     {"etcd", peer, extended},
+		"ingress-ca":                                                                   {"ingress", ca, extended},
+		"ingress-ca/router-default-serving":                                            {"ingress", serving, standard},
+		"kube-apiserver-external-signer":                                               {"kube-apiserver", ca, extended},
+		"kube-apiserver-external-signer/kube-external-serving":                         {"kube-apiserver", serving, standard},
+		"kube-apiserver-localhost-signer":                                              {"kube-apiserver", ca, extended},
+		"kube-apiserver-localhost-signer/kube-apiserver-localhost-serving":             {"kube-apiserver", serving, standard},
+		"kube-apiserver-service-network-signer":                                        {"kube-apiserver", ca, extended},
+		"kube-apiserver-service-network-signer/kube-apiserver-service-network-serving": {"kube-apiserver", serving, standard},
+		"kube-apiserver-to-kubelet-signer":                                             {"kube-apiserver", ca, extended},
+		"kube-apiserver-to-kubelet-signer/kube-apiserver-to-kubelet-client":            {"kube-apiserver", client, standard},
+		"kube-apiserver-to-kubelet-signer/metrics-server-kubelet-client":               {"metrics-server", client, standard},
+		"kube-control-plane-signer":                                                    {"control-plane", ca, extended},
+		"kube-control-plane-signer/cluster-policy-controller":                          {"cluster-policy-controller", client, standard},
+		"kube-control-plane-signer/kube-controller-manager":                            {"kube-controller-manager", client, standard},
+		"kube-control-plane-signer/kube-scheduler":                                     {"kube-scheduler", client, standard},
+		"kube-control-plane-signer/route-controller-manager":                           {"route-controller-manager", client, standard},
+		"kubelet-signer":                                                               {"kubelet", ca, extended},
+		"kubelet-signer/kube-csr-signer":                                               {"kubelet", ca, extended},
+		"kubelet-signer/kube-csr-signer/kubelet-client":                                {"kubelet", client, standard},
+		"kubelet-signer/kube-csr-signer/kubelet-server":                                {"kubelet", serving, standard},
+		"service-ca": {"service-ca", ca, extended},
+		"service-ca/route-controller-manager-serving": {"route-controller-manager", serving, standard},
+	}
+	require.Len(t, inventory, len(expected))
+	for _, entry := range inventory {
+		path := strings.Join(entry.Path, "/")
+		t.Run(path, func(t *testing.T) {
+			want, ok := expected[path]
+			require.True(t, ok, "unexpected certificate %q", path)
+			require.Equal(t, want, metadata{entry.Service, entry.Role, entry.RotationPolicy})
+			parts := strings.Split(path, "/")
+			require.Equal(t, parts[len(parts)-1], entry.Name)
+			if len(parts) == 1 {
+				require.Empty(t, entry.ParentCA)
+			} else {
+				require.Equal(t, parts[len(parts)-2], entry.ParentCA)
+			}
+		})
+		delete(expected, path)
+	}
+	require.Empty(t, expected, "every production certificate must be covered")
+}
 
 func Test_certsToRegenerate(t *testing.T) {
 	tests := []struct {

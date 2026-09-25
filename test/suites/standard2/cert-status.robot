@@ -2,6 +2,7 @@
 Documentation       Certificate status JSON and YAML output against a running MicroShift.
 
 Resource            ../../resources/common.resource
+Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
 Library             Collections
@@ -54,6 +55,16 @@ Unprivileged Status Produces Structured Errors
         ...    runuser -u nobody -- microshift certs status -o ${format}    ${format}    InsufficientPrivileges
     END
 
+Invalid Configuration Does Not Disclose Credentials
+    [Documentation]    The real config loader must not expose malformed YAML or proxy credentials in any format.
+    VAR    ${invalid_config}=
+    ...    proxy: http://test-user:certificate-test-secret@proxy.invalid:8080\ninvalid: [
+    Drop In MicroShift Config    ${invalid_config}    99-cert-status-invalid
+    FOR    ${format}    IN    ${EMPTY}    json    yaml
+        Configuration Error Should Be Sanitized    ${format}
+    END
+    [Teardown]    Remove Drop In MicroShift Config    99-cert-status-invalid
+
 
 *** Keywords ***
 Setup
@@ -82,12 +93,35 @@ Certificate Error Should Be Reported
     Should Not Be Equal As Integers    ${rc}    0
     Should Be Empty    ${stdout}
     ${error}=    Parse Certificate Document    ${stderr}    ${format}
+    Validate Certificate Error    ${error}    ${code}
+
+Validate Certificate Error
+    [Documentation]    Check the version, failure code, and required fields of an Error document.
+    [Arguments]    ${error}    ${code}
     Should Be Equal    ${error}[apiVersion]    microshift.openshift.io/v1alpha1
     Should Be Equal    ${error}[kind]    Error
     Should Be Equal    ${error}[code]    ${code}
     Should Not Be Empty    ${error}[message]
     Should Not Be Empty    ${error}[generatedAt]
     Should Be Equal    ${error}[details]    ${None}
+
+Configuration Error Should Be Sanitized
+    [Documentation]    Check empty stdout and an exact, configuration-independent error message.
+    [Arguments]    ${format}
+    ${output_flag}=    Set Variable If    $format == ''    ${EMPTY}    --output=${format}
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    microshift certs status ${output_flag}
+    Should Not Be Equal As Integers    ${rc}    0
+    Should Be Empty    ${stdout}
+    Should Not Contain    ${stderr}    certificate-test-secret
+    VAR    ${message}=
+    ...    failed to load MicroShift configuration; check /etc/microshift/config.yaml and /etc/microshift/config.d
+    IF    $format == ''
+        Should Be Equal    ${stderr}    Error: ${message}
+    ELSE
+        ${error}=    Parse Certificate Document    ${stderr}    ${format}
+        Validate Certificate Error    ${error}    InvalidConfiguration
+        Should Be Equal    ${error}[message]    ${message}
+    END
 
 Parse Certificate Document
     [Documentation]    Parse a single document using the requested format.
