@@ -1,2 +1,2 @@
 #!/bin/bash -x
-./scripts/auto-rebase/rebase_cluster_monitoring_operator.sh to "registry.ci.openshift.org/ocp/release-5:5.0.0-0.nightly-2026-09-23-031212" "registry.ci.openshift.org/ocp-arm64/release-5-arm64:5.0.0-0.nightly-arm64-2026-09-23-194146"
+./scripts/auto-rebase/rebase_cluster_monitoring_operator.sh to "registry.ci.openshift.org/ocp/release-5:5.0.0-0.nightly-2026-09-24-142420" "registry.ci.openshift.org/ocp-arm64/release-5-arm64:5.0.0-0.nightly-arm64-2026-09-25-023949"
