@@ -41,6 +41,10 @@ Invalid Arguments Produce Structured Errors
         ...    microshift certs status unexpected --output=${format}    ${format}    InvalidArguments
         Certificate Error Should Be Reported
         ...    microshift certs status --invalid-status-flag -o ${format}    ${format}    InvalidArguments
+        Certificate Error Should Be Reported
+        ...    microshift certs status --help --invalid-status-flag -o ${format}    ${format}    InvalidArguments
+        Certificate Error Should Be Reported
+        ...    microshift certs status -h --invalid-status-flag -o ${format}    ${format}    InvalidArguments
     END
 
 Unprivileged Status Produces Structured Errors

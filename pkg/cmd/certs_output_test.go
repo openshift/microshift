@@ -33,6 +33,8 @@ func TestCertStatusErrors(t *testing.T) {
 			{name: "certificate data", code: certificatesv1alpha1.ErrorCodeCertificateInventoryFailed},
 			{name: "arguments", code: certificatesv1alpha1.ErrorCodeInvalidArguments, arguments: []string{"unexpected"}},
 			{name: "flags", code: certificatesv1alpha1.ErrorCodeInvalidArguments, arguments: []string{"--invalid-status-flag"}},
+			{name: "flags after help", code: certificatesv1alpha1.ErrorCodeInvalidArguments, arguments: []string{"--help", "--invalid-status-flag"}},
+			{name: "flags after short help", code: certificatesv1alpha1.ErrorCodeInvalidArguments, arguments: []string{"-h", "--invalid-status-flag"}},
 		} {
 			t.Run(format+"/"+tt.name, func(t *testing.T) {
 				var stdout, stderr bytes.Buffer
@@ -111,6 +113,10 @@ func TestCertificateOutputFormat(t *testing.T) {
 	}{
 		{[]string{"certs", "status", "-o", "json"}, "json"},
 		{[]string{"certs", "status", "--output=yaml"}, "yaml"},
+		{[]string{"certs", "status", "--help", "-o", "json"}, "json"},
+		{[]string{"certs", "status", "-h", "--output=yaml"}, "yaml"},
+		{[]string{"certs", "status", "-o", "json", "--help=invalid"}, "json"},
+		{[]string{"certs", "status", "--help=invalid", "-o", "json"}, ""},
 		{[]string{"certs", "status", "--invalid", "-ojson"}, "json"},
 		{[]string{"certs", "status", "-o=yaml", "--invalid"}, "yaml"},
 		{[]string{"certs", "status", "--", "-o", "json"}, ""},

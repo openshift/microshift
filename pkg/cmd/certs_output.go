@@ -42,7 +42,6 @@ func RunCertsCommand(root *cobra.Command, args []string) int {
 		command = root
 	}
 	if err := cli.RunNoErrOutput(root); err != nil {
-
 		// If no output desired, just print stdout
 		out := command.ErrOrStderr()
 		format := certificateOutputFormat(args)
@@ -76,8 +75,12 @@ func certificateOutputFormat(args []string) string {
 	flags := pflag.NewFlagSet("certificate output", pflag.ContinueOnError)
 	flags.SetOutput(io.Discard)
 	flags.ParseErrorsAllowlist.UnknownFlags = true
+	flags.BoolP("help", "h", false, "")
 	output := flags.StringP("output", "o", "", "")
-	_ = flags.Parse(args)
+	if err := flags.Parse(args); err != nil {
+		// Preserve any output format parsed before the error.
+		return *output
+	}
 	return *output
 }
 
