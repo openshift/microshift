@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ${PODNAME}
+spec:
+  securityContext:
+    seLinuxOptions:
+      level: "${SELINUXLEVEL}"
+  containers:
+  - name: ${PODNAME}
+    image: ${IMAGE}
+    securityContext:
+      runAsUser: 1000
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      seccompProfile:
+        type: RuntimeDefault
+    volumeMounts:
+    - name: data
+      mountPath: ${MOUNTPATH}
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: ${PVCNAME}
