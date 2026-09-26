@@ -10,7 +10,7 @@
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5531bfe178d72d6e327273bcae1a2369999652dcad963a6934ee265d2359f4ec",
     "pod": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ad6377aafa1445cca77067bb8ee53faffccaa873c9b8c1b2b7eddd882b11dfbf",
     "service-ca-operator": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:81398c48cc6bda4137cc339311334f66dfbf8a676ee39f1b15cbde7ff369f4fb",
-    "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:e77365e44676fbd8ab9e4ce53f3a406856bbdfef3467c545a7df1197d84477af",
+    "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:a0e22c2bad21314228c89d0433dce45ddc64e2d8cc4b1d63a238449d2c196a56",
     "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:7b40043a2018b75522f6aead8ffcd3800f9ad4bae63b9cd370b355d926d521d0"
   }
 }
