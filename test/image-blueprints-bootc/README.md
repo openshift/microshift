@@ -41,17 +41,6 @@ Artifacts built in this layer cannot be cached as they depend on the current sou
 
 > Note: Total build times are up to 15 minutes.
 
-## Bootc Upstream Layer
-
-Artifacts built in this layer cannot be cached as they depend on the current sources.
-
-|Group |Build Time|Description|
-|------|----------|-----------|
-|group1| Average  | Current source prerequisites on CentOS used only in upstream
-|group2| Average  | Current source artifacts on CentOS used only in upstream
-
-> Note: Total build times are up to 15 minutes.
-
 ## Bootc Release Layer
 
 Artifacts built in this layer are cached as they depend on Brew RPM packages available only behind the VPN.
