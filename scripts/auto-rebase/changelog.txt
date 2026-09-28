@@ -1,21 +1,32 @@
-- api embedded-component 31af9f93e31ecd483504b3302d78f67c5a077a9e to c1bf12f5d04823f92c88af6c9835890de13b3474
-  - 6e7e2628 2026-09-15T15:28:51-04:00 register DRADeviceTaintRules in all feature sets
+- cluster-ingress-operator embedded-component fe8a2bcf6342fab7aa19c47b4397a7d226962136 to 4ef55ea002a406a2e9193594ef583a24ddb4ff3b
+  - aa41e213 2026-09-18T15:50:24-04:00 Revert "OCPBUGS-99921: Annotate GatewayClass when istiod is available to fix startup race"
+  - cd586692 2026-09-18T15:50:06-04:00 Bump OSSM to 3.4.2 and Istio to 1.30.4 in OCP 5.0
 
-- kubernetes embedded-component 45178365c1a52e2e1b5af4fa6bacfee5bafdd637 to 9d5b808d29c2db84866682910ffabca8a19cb722
-  - bfeecd96d 2026-09-22T12:13:36Z UPSTREAM: <carry>: Use FROM scratch for RHEL pause image
+- kubernetes embedded-component 9d5b808d29c2db84866682910ffabca8a19cb722 to 2a6104ec563aeaa77c97352f4d28580eea7918d2
+  - 6d452473f 2026-09-24T13:52:47Z UPSTREAM: <carry>: add explicit merge commit message to openshift-hack/rebase.sh
 
-- ovn-kubernetes image-amd64 3ce12184bf66e8be8abe365f81ffdfa7dbb4dd76 to 69562fb7062b12b271c3b7393680594fbfe0c9f7
-  - 662a5d2a 2026-09-21T17:15:30+02:00 e2e: exclude machine network subnets from UDN/BGP allocators
+- machine-config-operator embedded-component 1f4f3e726943feb8f982f9826689781f3154dd82 to cafc37a760319b235d5301e3790f83e2de9d78f7
+  - 403fd0d7 2026-09-24T07:58:41Z OCPBUGS-86768: Nodes created with 4.13 base images cannot join the cluster
 
-- kubernetes image-amd64 45178365c1a52e2e1b5af4fa6bacfee5bafdd637 to 9d5b808d29c2db84866682910ffabca8a19cb722
-  - bfeecd96d 2026-09-22T12:13:36Z UPSTREAM: <carry>: Use FROM scratch for RHEL pause image
-
-- router image-arm64 3381229146657d2e6bd94115dda0885f25cb3bed to a39a742e03e7be863c92c4b820025c6e0f78a7eb
+- router image-amd64 3381229146657d2e6bd94115dda0885f25cb3bed to a39a742e03e7be863c92c4b820025c6e0f78a7eb
   - a093b73 2026-09-15T20:17:25Z OCPBUGS-77056: Lock DeleteFunc to stop SARCompleted overwriting rejection
 
-- router image-arm64 3381229146657d2e6bd94115dda0885f25cb3bed to a39a742e03e7be863c92c4b820025c6e0f78a7eb
+- router image-amd64 3381229146657d2e6bd94115dda0885f25cb3bed to a39a742e03e7be863c92c4b820025c6e0f78a7eb
   - a093b73 2026-09-15T20:17:25Z OCPBUGS-77056: Lock DeleteFunc to stop SARCompleted overwriting rejection
 
-- kubernetes image-arm64 45178365c1a52e2e1b5af4fa6bacfee5bafdd637 to 9d5b808d29c2db84866682910ffabca8a19cb722
-  - bfeecd96d 2026-09-22T12:13:36Z UPSTREAM: <carry>: Use FROM scratch for RHEL pause image
+- ovn-kubernetes image-amd64 69562fb7062b12b271c3b7393680594fbfe0c9f7 to 1d2affb98c6ead7ef77bed3b0e169145e7f9d6cb
+  - 9a6f7b5d 2026-09-11T11:51:56+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
+  - ddfe256c 2026-09-11T11:51:56+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
+  - 25bb43c1 2026-09-11T11:51:56+02:00 egressip: set IFA_PROTO on EgressIP addresses
+
+- kubernetes image-amd64 9d5b808d29c2db84866682910ffabca8a19cb722 to 2a6104ec563aeaa77c97352f4d28580eea7918d2
+  - 6d452473f 2026-09-24T13:52:47Z UPSTREAM: <carry>: add explicit merge commit message to openshift-hack/rebase.sh
+
+- ovn-kubernetes image-arm64 69562fb7062b12b271c3b7393680594fbfe0c9f7 to 1d2affb98c6ead7ef77bed3b0e169145e7f9d6cb
+  - 9a6f7b5d 2026-09-11T11:51:56+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
+  - ddfe256c 2026-09-11T11:51:56+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
+  - 25bb43c1 2026-09-11T11:51:56+02:00 egressip: set IFA_PROTO on EgressIP addresses
+
+- kubernetes image-arm64 9d5b808d29c2db84866682910ffabca8a19cb722 to 2a6104ec563aeaa77c97352f4d28580eea7918d2
+  - 6d452473f 2026-09-24T13:52:47Z UPSTREAM: <carry>: add explicit merge commit message to openshift-hack/rebase.sh
 
