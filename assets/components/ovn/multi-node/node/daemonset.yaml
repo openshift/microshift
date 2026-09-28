@@ -184,8 +184,16 @@ spec:
             exec:
               command: ["rm","-f","/etc/cni/net.d/10-ovn-kubernetes.conf"]
         # The CNI conf file is written only once node init completes, so its
-        # presence is a reliable "started" signal. Bound a wedged init to ~180s
-        # while tolerating slow starts.
+        # presence is a reliable "started" signal.
+        #
+        # On a multinode secondary, node bring-up is cross-node: ovnkube-node
+        # must reach the primary's control plane, the 2-node etcd quorum must
+        # form, the interconnect chassis must register across hosts, and NB/SB
+        # must be reachable over TCP. During a cluster join these can take
+        # several minutes to stabilize, so we allow a longer startup grace here
+        # than single-node (which comes up against a local, already-present
+        # control plane). Bound a genuinely wedged init to ~10m while tolerating
+        # slow multinode joins.
         startupProbe:
           exec:
             command: ["test", "-f", "/etc/cni/net.d/10-ovn-kubernetes.conf"]
@@ -194,7 +202,7 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 5
-          failureThreshold: 36
+          failureThreshold: 120
         readinessProbe:
           exec:
             command: ["test", "-f", "/etc/cni/net.d/10-ovn-kubernetes.conf"]
