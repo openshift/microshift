@@ -1,6 +1,23 @@
-- kubernetes embedded-component 93afd702239e69df4bf4b7e66140455ab8282acd to 601ff80b0459adda2d2c5865bfb8d568a1fa68b7
-  - 6a771830b 2026-07-20T19:34:34Z UPSTREAM: <carry>: Fix ClusterIsIPv6() detection for dual-stack v6-primary clusters
+- api embedded-component 1cb630ce7109e6c4780332bb8140c8c4f7157426 to eb96322bf52288bf7931bb6240fd244cc362a68b
+  - 93c7014a 2026-09-21T13:07:30-04:00 Generated changes for release unique CRDs
+  - 70bf3908 2026-09-11T11:57:42-04:00 Adapt VSphereMultiVCenterDay2 gate to release-4.21 feature-gate DSL
+  - 10207546 2026-09-11T11:54:50-04:00 Added vSphere failure domain to vcenter ratcheting tests
+  - 3b5ba670 2026-09-11T11:54:49-04:00 Added vSphere failure domain to vcenter check
+  - 03fb6bce 2026-09-11T11:54:21-04:00 Revert "TRT-2701: Revert "SPLAT-2793: Promoted VSphereMultiVCenterDay2 feature gate to TP""
+  - fe9ac322 2026-09-11T11:53:43-04:00 Updated vcenter logic to make sure no server switching occurs
+  - a82f0109 2026-09-11T11:53:43-04:00 Added some ratcheting tests to cover change in min size of vCenters
+  - 97accb28 2026-09-11T11:53:42-04:00 Modified parent logic to not check size, but only changes in existence, and other review suggestions.
+  - 43e5c0e9 2026-09-11T11:53:42-04:00 Added vSphere Day 2 tests
+  - 0ea095ea 2026-09-11T11:53:42-04:00 Added vSphere Day 2 logic to CRDs
+  - 73fa1ab5 2026-09-11T11:53:39-04:00 Added new feature gate VSphereMultiVCenterDay2
 
-- kubernetes image-amd64 93afd702239e69df4bf4b7e66140455ab8282acd to 601ff80b0459adda2d2c5865bfb8d568a1fa68b7
-  - 6a771830b 2026-07-20T19:34:34Z UPSTREAM: <carry>: Fix ClusterIsIPv6() detection for dual-stack v6-primary clusters
+- cluster-kube-apiserver-operator embedded-component dc1c217c263cd220ddd2ed6fe827a466d47e3ebb to 9e86de8a28fc827ec86393bf4939754211b1ae85
+  - 4fd9a5e 2026-06-11T13:29:07Z Fix kube-apiserver-to-kubelet-signer refresh interval
+
+- cluster-network-operator embedded-component d1d5e0e61459c068cd5024746b54275685279f9f to 9fbc491dbb15dca6e4ee91f793831a155177e9f8
+  - 4865c61 2026-09-18T07:42:00-03:00 OCPBUGS-62144: Restart pods when rendering egressIP settings
+
+- machine-config-operator embedded-component 0c32560860e39c44babcc69692782c63119fb331 to f4736478f4532c51bdc6f181c0cb4f52987c28b3
+  - 8370190e 2026-09-12T10:36:30Z OCPBUGS-69681: limit ContainerRuntimeConfig status condition to 3
+  - 3ba80a54 2026-09-07T17:09:56+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
 
