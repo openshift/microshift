@@ -2,8 +2,8 @@
 # setup-localhost defaults
 
 known_hosts:
-  - '^localhost'
-  - '^microshift-'
+  - "^localhost"
+  - "^microshift-"
 local_packages:
   - rpm: python3-kubernetes
     pip: kubernetes

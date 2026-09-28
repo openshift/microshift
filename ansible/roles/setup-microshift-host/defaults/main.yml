@@ -25,7 +25,7 @@ install_packages:
   - python3-firewall
   - perf
   - rpm-build
-  - selinux-policy-devel 
+  - selinux-policy-devel
   - tar
   - vnstat
 

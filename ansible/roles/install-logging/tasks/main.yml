@@ -214,7 +214,7 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
       loop:
         - "{{ prometheus_config_dir }}"
         - "{{ prometheus_scrape_config_dir }}"
@@ -248,7 +248,7 @@
           ansible.builtin.template:
             src: exporters.yml.j2
             dest: "{{ prometheus_exporter_scrape_config }}"
-            mode: '0644'
+            mode: "0644"
             setype: container_file_t
             backup: true
           register: prometheus_exporter_config_template
@@ -257,7 +257,7 @@
           ansible.builtin.template:
             src: prometheus.yml.j2
             dest: "{{ prometheus_config_dir }}/prometheus.yml"
-            mode: '0644'
+            mode: "0644"
             setype: container_file_t
             backup: true
           register: prometheus_config_template
@@ -284,7 +284,7 @@
             src: "{{ prometheus_exporter_config_template.backup_file }}"
             dest: "{{ prometheus_exporter_scrape_config }}"
             remote_src: true
-            mode: '0644'
+            mode: "0644"
             setype: container_file_t
           when:
             - prometheus_exporter_config_template is defined
@@ -304,7 +304,7 @@
             src: "{{ prometheus_config_template.backup_file }}"
             dest: "{{ prometheus_config_dir }}/prometheus.yml"
             remote_src: true
-            mode: '0644'
+            mode: "0644"
             setype: container_file_t
           when:
             - prometheus_config_template is defined
@@ -331,7 +331,7 @@
       ansible.builtin.template:
         src: prometheus.container.j2
         dest: "{{ prometheus_quadlet_file }}"
-        mode: '0644'
+        mode: "0644"
       register: prometheus_quadlet_template
 
     - name: Reset failed Prometheus user unit state
@@ -369,8 +369,7 @@
             or prometheus_exporter_config_template.changed
             or prometheus_quadlet_template.changed
           ) | ternary('restarted', 'started') }}
-      environment:
-        "{{ prometheus_systemd_environment }}"
+      environment: "{{ prometheus_systemd_environment }}"
 
     - name: Verify Prometheus readiness
       block:

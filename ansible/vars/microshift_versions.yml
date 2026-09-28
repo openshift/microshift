@@ -14,7 +14,7 @@ microshift_versions:
     all_pods: 10
   "4.18":
     expected_pods: 6
-    all_pods: 9 
+    all_pods: 9
   "4.19":
     expected_pods: 6
     all_pods: 9

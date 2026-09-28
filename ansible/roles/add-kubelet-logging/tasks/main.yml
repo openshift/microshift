@@ -49,7 +49,7 @@
           ansible.builtin.copy:
             content: "{{ bearer_token_slurp.content | b64decode }}"
             dest: "{{ kubelet_auth_token_file }}"
-            mode: '0644'
+            mode: "0644"
             setype: container_file_t
           register: prometheus_token_install
           no_log: true
@@ -78,7 +78,7 @@
       ansible.builtin.file:
         path: "{{ kubelet_auth_token_file }}"
         state: file
-        mode: '0644'
+        mode: "0644"
         setype: container_file_t
       register: prometheus_token_permissions
 
@@ -88,7 +88,7 @@
           ansible.builtin.template:
             src: kubelet.yml.j2
             dest: "{{ prometheus_kubelet_scrape_config }}"
-            mode: '0644'
+            mode: "0644"
             setype: container_file_t
             backup: true
           register: prometheus_kubelet_config_template
@@ -111,7 +111,7 @@
             src: "{{ prometheus_kubelet_config_template.backup_file }}"
             dest: "{{ prometheus_kubelet_scrape_config }}"
             remote_src: true
-            mode: '0644'
+            mode: "0644"
             setype: container_file_t
           when:
             - prometheus_kubelet_config_template is defined

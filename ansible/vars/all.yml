@@ -1,6 +1,7 @@
+---
 # General setup
 create_devenv: false
-prometheus_logging: "{{ prometheus_logging_arg | default('true')  }}"
+prometheus_logging: "{{ prometheus_logging_arg | default('true') }}"
 
 # Results directory for performance metrics output
 results_base_dir: "{{ playbook_dir }}/results"
