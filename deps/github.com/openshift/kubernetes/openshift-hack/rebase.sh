@@ -106,7 +106,7 @@ if [ $? -eq 0 ]; then
   echo "No conflicts detected. Automatic merge looks to have succeeded"
 else
   # commit conflicts
-  git commit -a
+  git commit -am "Merge tag '$k8s_tag' into ${openshift_release}"
   # resolve conflicts
   git status
   # TODO(tjungblu): we follow-up with a more automated approach:
