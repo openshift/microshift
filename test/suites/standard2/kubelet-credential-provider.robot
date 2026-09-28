@@ -4,6 +4,7 @@ Documentation       Kubelet image credential provider configuration tests
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/ostree.resource
 Library             ../../resources/journalctl.py
 
 Suite Setup         Setup
@@ -160,10 +161,23 @@ Setup
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig
+    Make Usr Writable If Needed
     Command Should Work    install -d -o root -g root -m 0755 ${CP_BIN_DIR}
     Upload String To File    ${CP_MOCK_SCRIPT}    ${CP_MOCK_PROVIDER}
     Command Should Work    chmod 0755 ${CP_MOCK_PROVIDER}
     Upload String To File    ${CP_PROVIDER_CONFIG}    ${CP_CONFIG_FILE}
+
+Make Usr Writable If Needed
+    [Documentation]    /usr is read-only on ostree and bootc hosts. Create a transient
+    ...    overlay (lost on reboot) unless /usr is already writable, e.g. because
+    ...    another suite on this host already created one.
+    ${is_ostree}=    Is System OSTree
+    IF    ${is_ostree}
+        ${rc}=    Execute Command
+        ...    touch /usr/libexec/.cp-rf-probe && rm -f /usr/libexec/.cp-rf-probe
+        ...    sudo=True    return_rc=True    return_stdout=False
+        IF    ${rc} != 0    Create Usr Directory Overlay
+    END
 
 Teardown
     [Documentation]    Remove the drop-in and fixtures, restart MicroShift to restore clean state
