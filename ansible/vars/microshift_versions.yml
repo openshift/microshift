@@ -30,3 +30,6 @@ microshift_versions:
   "5.0":
     expected_pods: 6
     all_pods: 9
+  "5.1":
+    expected_pods: 6
+    all_pods: 9
