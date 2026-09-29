@@ -4,6 +4,7 @@ Documentation       Tests related to upgrading MicroShift
 Resource            ../../resources/common.resource
 Resource            ../../resources/ostree.resource
 Library             Collections
+Library             ../../resources/journalctl.py
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -32,6 +33,12 @@ Downgrade Is Blocked
     Remove Existing Backup For Current Deployment
     Backup For Deployment Should Not Exist    ${initial_deploy_id}
 
+    # Capture a journal cursor before staging the downgrade so the version
+    # compatibility failure is asserted only against logs produced by this
+    # downgrade attempt. The number of failed boots before greenboot rolls
+    # back (and the number of healthy boots after) is not fixed, so a cursor
+    # is more robust than a hardcoded recent-boot window.
+    ${cursor}=    Get Journal Cursor
     Deploy Commit Expecting A Rollback
     ...    ${OLDER_MICROSHIFT_REF}
     ...    False
@@ -39,7 +46,7 @@ Downgrade Is Blocked
 
     Wait Until Greenboot Health Check Exited
     Backup For Deployment Should Exist    ${initial_deploy_id}
-    Journal Should Have Information About Failed Version Comparison
+    Pattern Should Appear In Log Output    ${cursor}    FAIL version compatibility checks
 
 
 *** Keywords ***
