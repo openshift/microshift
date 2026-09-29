@@ -22,14 +22,23 @@ Downgrade Is Blocked
     ...    MicroShift "older" than existing data is blocked
     ...    and results in system rolling back.
 
-    ${initial_deploy_backup}=    Get Future Backup Name For Current Boot
+    # Capture the deployment ID (not deployment_boot) because the downgrade is
+    # blocked: the older MicroShift never rewrites the data version file, so the
+    # data keeps belonging to this deployment and every backup taken of it is
+    # keyed to this deployment ID. Only the boot ID suffix changes across the
+    # rollback reboots, and MicroShift prunes to a single backup per deployment,
+    # so we must assert on the deployment rather than on a specific boot.
+    ${initial_deploy_id}=    Get Booted Deployment Id
+    Remove Existing Backup For Current Deployment
+    Backup For Deployment Should Not Exist    ${initial_deploy_id}
+
     Deploy Commit Expecting A Rollback
     ...    ${OLDER_MICROSHIFT_REF}
     ...    False
     ...    ${BOOTC_REGISTRY}
 
     Wait Until Greenboot Health Check Exited
-    Backup Should Exist    ${initial_deploy_backup}
+    Backup For Deployment Should Exist    ${initial_deploy_id}
     Journal Should Have Information About Failed Version Comparison
 
 
