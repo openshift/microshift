@@ -110,24 +110,17 @@ func startCNIPlugin(ctx context.Context, cfg *config.Config, kubeconfigPath stri
 		return err
 	}
 
-	// Multinode only params: OVN_NB_PORT, OVN_SB_PORT, MultiNodeEnabled
+	// Multinode only params: OVN_NB_PORT, OVN_SB_PORT
 	extraParams := assets.RenderParams{
-		"OVNConfig":        ovnConfig,
-		"KubeconfigPath":   kubeconfigPath,
-		"KubeconfigDir":    filepath.Join(config.DataDir, "/resources/kubeadmin"),
-		"OVN_NB_PORT":      ovn.OVN_NB_PORT,
-		"OVN_SB_PORT":      ovn.OVN_SB_PORT,
-		"MultiNodeEnabled": cfg.MultiNode.Enabled,
+		"OVNConfig":      ovnConfig,
+		"KubeconfigPath": kubeconfigPath,
+		"KubeconfigDir":  filepath.Join(config.DataDir, "/resources/kubeadmin"),
+		"OVN_NB_PORT":    ovn.OVN_NB_PORT,
+		"OVN_SB_PORT":    ovn.OVN_SB_PORT,
 	}
-	// In multinode mode the configmap contains [OvnNorth]/[OvnSouth] stanzas
-	// with the primary's IP. Only the primary may write it; a worker applying
-	// the configmap would overwrite the primary IP with its own, breaking SBDB
-	// connectivity for every node that reads the configmap afterwards.
-	if !cfg.MultiNode.Enabled || !cfg.BootstrapKubeConfigExists() {
-		if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
-			klog.Warningf("Failed to apply configMap %v %v", cm, err)
-			return err
-		}
+	if err := assets.ApplyConfigMaps(ctx, cm, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+		klog.Warningf("Failed to apply configMap %v %v", cm, err)
+		return err
 	}
 	if err := assets.ApplyDaemonSets(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
 		klog.Warningf("Failed to apply apps %v %v", apps, err)
