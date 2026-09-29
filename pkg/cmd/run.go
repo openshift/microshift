@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
+	"github.com/openshift/microshift/pkg/admin/certificates"
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/admin/prerun"
 	"github.com/openshift/microshift/pkg/components"
@@ -146,6 +147,17 @@ func RunMicroshift(cfg *config.Config) error {
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
+	// Serialize startup PKI writes, then retain a shared lock for the process
+	// lifetime so offline renewal cannot race a start, even without systemd.
+	certificateLock, err := certificates.Lock(certificateLockPath, true)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = certificateLock.Close() }()
+	transaction := certificates.Transaction{DataDir: config.DataDir}
+	if err := checkCertificateStartup(&transaction); err != nil {
+		return err
+	}
 
 	microshiftStart := time.Now()
 	startRec := startuprecorder.New()
@@ -165,6 +177,11 @@ func RunMicroshift(cfg *config.Config) error {
 
 	if err := prerunDataManagement(); err != nil {
 		writeLogFileError(preRunFailedLogPath, err)
+		return err
+	}
+	// Data management may have restored a different data tree. Do not use an
+	// incomplete transaction from a restored backup either.
+	if err := checkCertificateStartup(&transaction); err != nil {
 		return err
 	}
 
@@ -211,8 +228,11 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 
 	// create kubeconfig for kube-scheduler, kubelet,controller-manager
-	if err := initKubeconfigs(cfg, certChains); err != nil {
+	if err := initKubeconfigs(cfg, certChains, config.DataDir); err != nil {
 		klog.Fatalf("failed to create the necessary kubeconfigs for internal components: %v", err)
+	}
+	if err := certificates.ShareLock(certificateLock); err != nil {
+		return fmt.Errorf("failed to retain certificate read lock: %w", err)
 	}
 
 	// Establish the context we will use to control execution
