@@ -54,6 +54,21 @@ Backup Should Not Exist
     ${exists}=    Does Backup Exist    ${deployment_id}    ${boot_id}
     Should Not Be True    ${exists}
 
+Backup For Deployment Should Exist
+    [Documentation]    Checks that at least one backup exists for the deployment,
+    ...    regardless of the boot ID. Robust to MicroShift pruning older
+    ...    per-deployment backups across reboots.
+    [Arguments]    ${deployment_id}
+    ${exists}=    Does Backup Exist For Deployment    ${deployment_id}
+    Should Be True    ${exists}
+
+Backup For Deployment Should Not Exist
+    [Documentation]    Checks that no backup exists for the deployment,
+    ...    regardless of the boot ID.
+    [Arguments]    ${deployment_id}
+    ${exists}=    Does Backup Exist For Deployment    ${deployment_id}
+    Should Not Be True    ${exists}
+
 Remove Existing Backup For Current Deployment
     [Documentation]    Remove any existing backup for currently running deployment
     ${deploy_id}=    Get Booted Deployment Id
