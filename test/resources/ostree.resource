@@ -99,21 +99,6 @@ Wait For Transaction To End
     Wait Until Keyword Succeeds    2m    15s
     ...    No Transaction In Progress
 
-Journal Should Have Information About Failed Version Comparison
-    [Documentation]    Assert that unhealthy deployment's journal contains
-    ...    information about failed version compatibility check
-
-    FOR    ${boot}    IN RANGE    -3    0
-        ${stdout}    ${rc}=    Execute Command
-        ...    journalctl --unit=microshift --boot=${boot} | grep "FAIL version compatibility checks"
-        ...    sudo=True
-        ...    return_stdout=True
-        ...    return_rc=True
-
-        Log Many    ${stdout}    ${rc}
-        Should Be Equal As Integers    0    ${rc}
-    END
-
 Expected Boot Count
     [Documentation]    Validate that the host rebooted only the specified number of times
     [Arguments]    ${reboot_count}

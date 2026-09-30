@@ -158,6 +158,20 @@ def does_backup_exist(deploy_id: str, boot_id: str = "") -> bool:
     return path_exists(path)
 
 
+def does_backup_exist_for_deployment(deploy_id: str) -> bool:
+    """
+    Check whether at least one backup exists for the given deployment,
+    regardless of the boot ID suffix.
+
+    MicroShift keeps a single backup per deployment and prunes older ones
+    on startup, so the surviving backup's boot ID is not predictable across
+    reboots. Matching on the deployment prefix is robust to that pruning.
+    """
+    prefix = get_deployment_backup_prefix_path(deploy_id)
+    _, rc = remote_sudo_rc(f"ls -d {prefix}_*")
+    return rc == 0
+
+
 def path_exists(path: str) -> bool:
     out, rc = remote_sudo_rc(f"test -e {path}")
     return rc == 0
