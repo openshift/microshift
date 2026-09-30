@@ -15,6 +15,7 @@
   ansible.builtin.file:
     path: "{{ kubeconfig_directory }}"
     state: directory
+    mode: "0700"
   delegate_to: localhost
   when: not kubeconfig_directory_check.stat.exists
 

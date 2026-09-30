@@ -7,10 +7,12 @@
     chdir: "{{ e2e_path }}/workloads/kube-burner"
   environment:
     BURST: "{{ kube_burner_workload.burst }}"
+    ES_SERVER: "{{ kube_burner_es_server }}"
     INDEXING: "{{ kube_burner_indexing }}"
     POD_READY_THRESHOLD: "{{ kube_burner_pod_ready }}"
     QPS: "{{ kube_burner_workload.qps }}"
     WORKLOAD: "{{ kube_burner_workload.name }}"
+  changed_when: true
 
 - name: "Log workload execution details"
   ansible.builtin.debug:

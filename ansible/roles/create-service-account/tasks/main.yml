@@ -5,13 +5,17 @@
   ansible.builtin.copy:
     src: metrics-sa.yaml
     dest: metrics-sa.yaml
+    mode: "0644"
 
 - name: Create service account for metrics gathering from kubelet
   ansible.builtin.command: oc apply -f metrics-sa.yaml
+  register: metrics_sa_apply
+  changed_when: "'created' in metrics_sa_apply.stdout or 'configured' in metrics_sa_apply.stdout"
 
 - name: Create token for service account
   ansible.builtin.command: oc create token metrics-server -n kube-system --duration 720h
   register: token
+  changed_when: true
   no_log: true
 
 - name: Remove metrics service account yaml

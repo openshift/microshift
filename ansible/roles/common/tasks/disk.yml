@@ -3,25 +3,55 @@
   ansible.builtin.include_tasks: roles/common/tasks/results-dir.yml
 
 - name: Disk space block
+  vars:
+    # Requested paths that du could not access at all.
+    disk_missing_paths: >-
+      {{ disk_usage.stderr_lines
+         | select('search', "cannot access '(" ~ (item.split() | map('regex_escape') | join('|')) ~ ")'")
+         | list }}
   block:
-    - name: Find disk usage
+    # A shell is needed because du_dirs entries may be globs such as /usr/bin/*.
+    - name: Find disk usage # noqa: command-instead-of-shell
       become: true
-      ansible.builtin.shell:
-        cmd: du -BM -t 1M --max-depth=1 {{ item }} | sort -rh
+      ansible.builtin.shell: du -BM -t 1M --max-depth=1 {{ item }}
       register: disk_usage
+      changed_when: false
+      # du exits 1 when it could not read part of a tree, for example the
+      # overlay mounts of running containers, and still reports the rest.
+      # That is tolerated and reported below. A requested path that does
+      # not exist, or any other exit code, is a measurement failure.
+      failed_when: >-
+        disk_usage.rc != 0
+        and not (disk_usage.rc == 1 and disk_usage.stdout | length > 0 and disk_missing_paths | length == 0)
+
+    - name: Report incomplete disk traversal
+      ansible.builtin.debug:
+        msg: "Disk usage for {{ item }} is incomplete: du could not read {{ disk_usage.stderr_lines | length }} path(s)"
+      when: disk_usage.rc == 1
+
+    - name: Sort disk usage
+      ansible.builtin.command:
+        argv:
+          - sort
+          - -rh
+        stdin: "{{ disk_usage.stdout }}"
+        stdin_add_newline: false
+      register: disk_usage_sorted
+      changed_when: false
 
     - name: Print disk_usage var
       ansible.builtin.debug:
-        var: disk_usage.stdout_lines
+        var: disk_usage_sorted.stdout_lines
 
     - name: Add disk info to local file
       ansible.builtin.lineinfile:
         path: "{{ results_dir }}/{{ filename }}"
         line: "{{ disk_item }}"
         create: true
+        mode: "0644"
       delegate_to: localhost
       with_items:
         - "{{ item }}:"
-        - "{{ disk_usage.stdout_lines }}"
+        - "{{ disk_usage_sorted.stdout_lines }}"
       loop_control:
         loop_var: disk_item

@@ -91,6 +91,7 @@
 
     - name: Rebuild initramfs
       ansible.builtin.command: dracut --force
+      changed_when: true
       when: nouveau_blacklist.changed or driver_install.changed
 
     - name: Enable NVIDIA services
@@ -127,6 +128,8 @@
         suffix: nvidia-selinux
       register: selinux_temp_dir
 
+    # The policy source is written into a fresh temporary directory on every
+    # run, so it is always compiled and installed.
     - name: Create SELinux policy module for NVIDIA containers
       ansible.builtin.copy:
         content: |
@@ -141,17 +144,16 @@
           allow container_t xserver_misc_device_t:chr_file map;
         dest: "{{ selinux_temp_dir.path }}/nvidia-container-microshift.te"
         mode: "0644"
-      register: selinux_policy_file
 
     - name: Compile SELinux policy module
       ansible.builtin.shell: |
         checkmodule -m -M -o {{ selinux_temp_dir.path }}/nvidia-container-microshift.mod {{ selinux_temp_dir.path }}/nvidia-container-microshift.te
         semodule_package -o {{ selinux_temp_dir.path }}/nvidia-container-microshift.pp -m {{ selinux_temp_dir.path }}/nvidia-container-microshift.mod
-      when: selinux_policy_file.changed
+      changed_when: true
 
     - name: Install SELinux policy module
       ansible.builtin.command: semodule -i {{ selinux_temp_dir.path }}/nvidia-container-microshift.pp
-      when: selinux_policy_file.changed
+      changed_when: true
 
     - name: Clean up SELinux temporary directory
       ansible.builtin.file:
