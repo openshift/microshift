@@ -4,10 +4,10 @@ metadata:
   name: cert-manager-images
   namespace: cert-manager
 data:
-  cert-manager-webhook: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:681a5f3e02131df294a2b83933584403fe4035d43d98530a13f83a77f71171fa
-  cert-manager-ca-injector: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:681a5f3e02131df294a2b83933584403fe4035d43d98530a13f83a77f71171fa
-  cert-manager-controller: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:681a5f3e02131df294a2b83933584403fe4035d43d98530a13f83a77f71171fa
-  cert-manager-acmesolver: registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:6806f7194b8d3c4d894caa1821d40a52b72a433f19f8470bcd6e5c90b8667f24
-  cert-manager-istiocsr: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:815517b1210632cf5e307aea4052355534b1955ce154d3cd0a637eb942fff815
-  controller: registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:9207cabe93f5133f56756aef5d72a5f588a3db96f1be8494e1b9aa139fcce542
-  cert-manager-trust-manager: registry.redhat.io/cert-manager/cert-manager-trust-manager-rhel9@sha256:c6b5e8b2779e64004c198d55750a0a0978478148ba7675f2ce9d2c5097708a68
+  cert-manager-webhook: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:d5e31002f72b74edfd91e09b72c4c37eb3bbbeb7ddbc69202f5d82b8f61c8ab4
+  cert-manager-ca-injector: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:d5e31002f72b74edfd91e09b72c4c37eb3bbbeb7ddbc69202f5d82b8f61c8ab4
+  cert-manager-controller: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:d5e31002f72b74edfd91e09b72c4c37eb3bbbeb7ddbc69202f5d82b8f61c8ab4
+  cert-manager-acmesolver: registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:6df582e555424ab8a71758b228e72d1649206002fe2293398bcedd5001c8b11d
+  cert-manager-istiocsr: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:0329f6bd8b196ecd1fb76dde04b8f3b9b2e64a1064db05b7d5211b50d8353a95
+  controller: registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:403674a15e95ce09e0823b49c961f09a070e36c33d051c8a97e9cafc260da397
+  cert-manager-trust-manager: registry.redhat.io/cert-manager/cert-manager-trust-manager-rhel9@sha256:41b67648465fa70bec1fb0a771a15c04c1daf0b1d053b0872ca8016f2b2f7f80
