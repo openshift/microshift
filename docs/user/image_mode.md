@@ -117,10 +117,10 @@ the local repository is available to the build:
 
 ```bash
 PULL_SECRET=~/.pull-secret.json
-USER_PASSWD="<your_redhat_user_password>"
+export USER_PASSWD="<your_redhat_user_password>"
 IMAGE_NAME=microshift-source-bootc
 
-sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
+sudo -E podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --secret id=user_passwd,env=USER_PASSWD \
     -f docs/config/Containerfile.bootc-source-rhel9 \
     _output/rpmbuild/RPMS

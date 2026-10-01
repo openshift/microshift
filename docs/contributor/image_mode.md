@@ -162,7 +162,7 @@ procedure needs to be adjusted in the following manner to create
 multi-architecture images.
 
 ```bash
-PULL_SECRET=~/.pull-secret.json
+export PULL_SECRET=~/.pull-secret.json
 USER_PASSWD="<your_redhat_user_password>"
 IMAGE_ARCH=amd64 # Use amd64 or arm64 depending on the current platform
 IMAGE_PLATFORM="linux/${IMAGE_ARCH}"
@@ -174,7 +174,7 @@ IMAGE_NAME="microshift-source-bootc:linux-${IMAGE_ARCH}"
 # arm64 names, so derive DEPS_REPO_URL from ${IMAGE_ARCH} and pass it explicitly.
 DEPS_ARCH=$([ "${IMAGE_ARCH}" = "arm64" ] && echo aarch64 || echo x86_64)
 DEPS_REPO_URL="https://mirror.openshift.com/pub/openshift-v5/${DEPS_ARCH}/dependencies/rpms/5.1-el9-beta"
-sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
+sudo -E podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --platform "${IMAGE_PLATFORM}" \
     --secret id=user_passwd,env=USER_PASSWD \
     --build-arg DEPS_REPO_URL="${DEPS_REPO_URL}" \
