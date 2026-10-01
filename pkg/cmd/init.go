@@ -68,12 +68,15 @@ func legacyKubeControlPlaneSignerDir(certsDir string) string {
 
 // migrateLegacyCertLayout detects the pre-consolidation cert layout and atomically
 // backs it up so certSetup can regenerate a fresh 6-CA hierarchy.
-func migrateLegacyCertLayout(certsDir, version string) error {
-	if _, err := os.Stat(legacyKubeControlPlaneSignerDir(certsDir)); os.IsNotExist(err) {
-		return nil // fresh install or already migrated
+func migrateLegacyCertLayout(certsDir, gitVersion string) error {
+	if _, err := os.Stat(legacyKubeControlPlaneSignerDir(certsDir)); err != nil {
+		if os.IsNotExist(err) {
+			return nil // fresh install or already migrated
+		}
+		return fmt.Errorf("failed to check legacy cert layout: %w", err)
 	}
 	ts := strconv.FormatInt(time.Now().Unix(), 10)
-	backupDir := certsDir + ".backup." + version + "." + ts
+	backupDir := certsDir + ".backup." + gitVersion + "." + ts
 	klog.Infof("Migrating cert layout: backing up %s → %s", certsDir, backupDir)
 	return os.Rename(certsDir, backupDir)
 }
