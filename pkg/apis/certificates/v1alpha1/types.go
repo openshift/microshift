@@ -23,7 +23,7 @@ const (
 	CertificateRolePeer    CertificateRole = "peer"
 )
 
-// RotationPolicy identifies the thresholds used to calculate a certificate zone.
+// RotationPolicy identifies the thresholds used to calculate certificate status.
 // +kubebuilder:validation:Enum=standard;extended
 type RotationPolicy string
 
@@ -32,14 +32,15 @@ const (
 	RotationPolicyExtended RotationPolicy = "extended"
 )
 
-// CertificateZone identifies the current renewal urgency of a certificate.
-// +kubebuilder:validation:Enum=green;yellow;red
-type CertificateZone string
+// CertificateStatus identifies the current renewal urgency of a certificate.
+// +kubebuilder:validation:Enum=Healthy;ExpiresSoon;ExpirationImminent;Expired
+type CertificateStatus string
 
 const (
-	CertificateZoneGreen  CertificateZone = "green"
-	CertificateZoneYellow CertificateZone = "yellow"
-	CertificateZoneRed    CertificateZone = "red"
+	CertificateStatusHealthy            CertificateStatus = "Healthy"
+	CertificateStatusExpiresSoon        CertificateStatus = "ExpiresSoon"
+	CertificateStatusExpirationImminent CertificateStatus = "ExpirationImminent"
+	CertificateStatusExpired            CertificateStatus = "Expired"
 )
 
 // CertificateStatusList reports the state of all managed certificates.
@@ -47,7 +48,7 @@ const (
 type CertificateStatusList struct {
 	metav1.TypeMeta `json:",inline"`
 
-	// GeneratedAt is the time used to calculate zones and remaining validity.
+	// GeneratedAt is the time used to calculate statuses and remaining validity.
 	GeneratedAt metav1.Time             `json:"generatedAt"`
 	Config      CertificateStatusConfig `json:"config"`
 
@@ -60,7 +61,7 @@ type CertificateStatusList struct {
 
 // CertificateStatusConfig reports the effective certificate policy.
 type CertificateStatusConfig struct {
-	ForceRestartOnRedZone bool `json:"forceRestartOnRedZone"`
+	ForceRestartOnExpirationImminent bool `json:"forceRestartOnExpirationImminent"`
 
 	// ServingValidity is a positive Go duration string.
 	// +kubebuilder:validation:MinLength=1
@@ -78,13 +79,13 @@ type CertificateStatusItem struct {
 	Service string `json:"service"`
 
 	// +kubebuilder:validation:MinLength=1
-	Name           string          `json:"name"`
-	Role           CertificateRole `json:"role"`
-	RotationPolicy RotationPolicy  `json:"rotationPolicy"`
-	Zone           CertificateZone `json:"zone"`
-	NotBefore      metav1.Time     `json:"notBefore"`
-	NotAfter       metav1.Time     `json:"notAfter"`
-	// RemainingSeconds is negative when the certificate has expired.
+	Name           string            `json:"name"`
+	Role           CertificateRole   `json:"role"`
+	RotationPolicy RotationPolicy    `json:"rotationPolicy"`
+	Status         CertificateStatus `json:"status"`
+	NotBefore      metav1.Time       `json:"notBefore"`
+	NotAfter       metav1.Time       `json:"notAfter"`
+	// RemainingSeconds is zero at expiry and negative afterward.
 	RemainingSeconds int64 `json:"remainingSeconds"`
 }
 

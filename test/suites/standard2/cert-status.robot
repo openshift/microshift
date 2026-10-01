@@ -26,6 +26,16 @@ JSON And YAML Report The Same Certificates
     ${yaml_items}=    Stable Certificate Fields    ${yaml_status}
     Should Be Equal    ${json_items}    ${yaml_items}
 
+Table Reports Descriptive Certificate States
+    [Documentation]    The table uses the same descriptive state names as structured output, not colors.
+    ${stdout}=    Command Should Work    microshift certs status
+    ${rows}=    Evaluate    $stdout.splitlines()
+    Should Be True    $rows[0].split() == ['SERVICE', 'CERTIFICATE', 'STATUS', 'EXPIRY', 'MESSAGE']
+    Should Be True    len($rows) > 1
+    FOR    ${row}    IN    @{rows}[1:]
+        Validate Certificate Table Message    ${row}
+    END
+
 Unknown Output Format Is Rejected
     [Documentation]    Unsupported formats fail without producing status on stdout.
     ${stdout}    ${stderr}    ${rc}=    Execute Command
@@ -86,6 +96,28 @@ Read Certificate Status
     ${status}=    Parse Certificate Document    ${stdout}    ${format}
     RETURN    ${status}
 
+Validate Certificate Table Message
+    [Documentation]    Each current-validity state explains its warning or critical threshold in days.
+    [Arguments]    ${row}
+    ${fields}=    Evaluate    $row.split(maxsplit=4)
+    Length Should Be    ${fields}    5
+    VAR    ${state}=    ${fields}[2]
+    VAR    ${message}=    ${fields}[4]
+    Should Be True    $state in ('Healthy', 'ExpiresSoon', 'ExpirationImminent', 'Expired')
+    IF    $state == 'Healthy'
+        Should Match Regexp
+        ...    ${message}    ^Valid for [0-9]+ days$
+    ELSE IF    $state == 'ExpiresSoon'
+        Should Match Regexp
+        ...    ${message}    ^Expires in [0-9]+ days, which is at or below the warning threshold of [0-9]+ days$
+    ELSE IF    $state == 'ExpirationImminent'
+        Should Match Regexp
+        ...    ${message}
+        ...    ^(Expires in [0-9]+ days, which is at or below the critical threshold of [0-9]+ days|Valid in [0-9]+ days)$
+    ELSE
+        Should Match Regexp    ${message}    ^Expired [0-9]+ days ago$
+    END
+
 Certificate Error Should Be Reported
     [Documentation]    Failed commands return non-zero with empty stdout and exactly one versioned error.
     [Arguments]    ${command}    ${format}    ${code}
@@ -141,7 +173,8 @@ Validate Status Document
     Should Not Be Empty    ${status}[generatedAt]
     Dictionary Should Contain Key    ${status}    warnings
     Should Be True    isinstance($status['warnings'], list)
-    Should Be True    isinstance($status['config']['forceRestartOnRedZone'], bool)
+    Should Be True    isinstance($status['config']['forceRestartOnExpirationImminent'], bool)
+    Dictionary Should Not Contain Key    ${status}[config]    forceRestartOnRedZone
     Should Not Be Empty    ${status}[items]
     FOR    ${item}    IN    @{status}[items]
         Validate Status Item    ${item}
@@ -155,8 +188,10 @@ Validate Status Item
     Should Not Be Empty    ${item}[name]
     Should Be True    $item['role'] in ('ca', 'serving', 'client', 'peer')
     Should Be True    $item['rotationPolicy'] in ('standard', 'extended')
-    Should Be True    $item['zone'] in ('green', 'yellow', 'red')
+    Should Be True    $item['status'] in ('Healthy', 'ExpiresSoon', 'ExpirationImminent', 'Expired')
+    Dictionary Should Not Contain Key    ${item}    zone
     Should Be True    isinstance($item['remainingSeconds'], int)
+    Should Be True    ($item['status'] == 'Expired') == ($item['remainingSeconds'] <= 0)
     Should Not Be Empty    ${item}[notBefore]
     Should Not Be Empty    ${item}[notAfter]
 
@@ -171,5 +206,5 @@ Stable Certificate Fields
     [Documentation]    Select fields that are independent of invocation time.
     [Arguments]    ${status}
     ${items}=    Evaluate
-    ...    [{k: v for k, v in item.items() if k not in ('remainingSeconds', 'zone')} for item in $status['items']]
+    ...    [{k: v for k, v in item.items() if k not in ('remainingSeconds', 'status')} for item in $status['items']]
     RETURN    ${items}

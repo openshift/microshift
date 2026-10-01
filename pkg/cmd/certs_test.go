@@ -33,13 +33,13 @@ func TestNewCertificateStatusList(t *testing.T) {
 	require.Equal(t, "CertificateStatusList", status.Kind)
 	require.Equal(t, "2026-09-08T10:30:00Z", status.GeneratedAt.Format(time.RFC3339))
 	require.Equal(t, certificatesv1alpha1.CertificateStatusConfig{
-		ForceRestartOnRedZone: true,
-		ServingValidity:       "8760h",
-		CAValidity:            "87600h",
+		ForceRestartOnExpirationImminent: true,
+		ServingValidity:                  "8760h",
+		CAValidity:                       "87600h",
 	}, status.Config)
 	require.Equal(t, []string{}, status.Warnings)
 	require.Equal(t, []string{"cert-a", "cert-z", "cert-b"}, []string{status.Items[0].Name, status.Items[1].Name, status.Items[2].Name})
-	require.Equal(t, certificatesv1alpha1.CertificateZoneYellow, status.Items[0].Zone)
+	require.Equal(t, certificatesv1alpha1.CertificateStatusExpiresSoon, status.Items[0].Status)
 	require.Equal(t, int64((500*time.Hour)/time.Second), status.Items[0].RemainingSeconds)
 	require.Equal(t, "cert-b", inventory[0].Name, "building status must not reorder the inventory")
 }
@@ -57,13 +57,13 @@ func TestCertStatusOutput(t *testing.T) {
 		"apiVersion":"microshift.openshift.io/v1alpha1",
 		"kind":"CertificateStatusList",
 		"generatedAt":"2026-09-08T10:30:00Z",
-		"config":{"forceRestartOnRedZone":true,"servingValidity":"8760h","caValidity":"87600h"},
+		"config":{"forceRestartOnExpirationImminent":true,"servingValidity":"8760h","caValidity":"87600h"},
 		"items":[{
 			"service":"etcd",
 			"name":"etcd-serving",
 			"role":"peer",
 			"rotationPolicy":"extended",
-			"zone":"red",
+			"status":"ExpirationImminent",
 			"notBefore":"2026-08-01T22:30:00Z",
 			"notAfter":"2026-09-12T14:30:00Z",
 			"remainingSeconds":360000
@@ -87,9 +87,9 @@ func TestCertStatusOutput(t *testing.T) {
 	var tableOutput bytes.Buffer
 	require.NoError(t, writeCertificateStatusTable(&tableOutput, status))
 	require.Equal(t, tableOutput.String(), decodedTable.String())
-	require.Contains(t, tableOutput.String(), "SERVICE  CERTIFICATE   STATUS  EXPIRY")
-	require.Contains(t, tableOutput.String(), "etcd     etcd-serving  Red")
-	require.Contains(t, tableOutput.String(), "Expiring  Expires in 5 days")
+	require.Contains(t, tableOutput.String(), "SERVICE  CERTIFICATE   STATUS              EXPIRY")
+	require.Contains(t, tableOutput.String(), "etcd     etcd-serving  ExpirationImminent")
+	require.Contains(t, tableOutput.String(), "Expires in 5 days, which is at or below the critical threshold of 5 days")
 }
 
 func TestCertStatusOptionsRun(t *testing.T) {
@@ -126,6 +126,69 @@ func TestCertStatusOptionsRun(t *testing.T) {
 	require.Empty(t, stdout.String())
 }
 
+func TestCertStatusStates(t *testing.T) {
+	now := time.Date(2026, time.September, 8, 10, 30, 0, 0, time.UTC)
+	for _, tt := range []struct {
+		name                string
+		notBefore, notAfter time.Duration
+		want                certificatesv1alpha1.CertificateStatus
+		message             string
+	}{
+		{"healthy", -100 * time.Hour, 900 * time.Hour, certificatesv1alpha1.CertificateStatusHealthy, "Valid for 38 days"},
+		{"expires soon", -500 * time.Hour, 500 * time.Hour, certificatesv1alpha1.CertificateStatusExpiresSoon, "Expires in 21 days, which is at or below the warning threshold of 25 days"},
+		{"expiration imminent", -800 * time.Hour, 200 * time.Hour, certificatesv1alpha1.CertificateStatusExpirationImminent, "Expires in 9 days, which is at or below the critical threshold of 14 days"},
+		{"expired", -1000 * time.Hour, -time.Hour, certificatesv1alpha1.CertificateStatusExpired, "Expired 1 days ago"},
+		{"exactly at expiry", -1000 * time.Hour, 0, certificatesv1alpha1.CertificateStatusExpired, "Expired 0 days ago"},
+		{"not yet valid", time.Hour, 1000 * time.Hour, certificatesv1alpha1.CertificateStatusExpirationImminent, "Valid in 1 days"},
+	} {
+		for _, format := range []string{"", certificateOutputJSON, certificateOutputYAML} {
+			t.Run(tt.name+"/"+format, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				options := &certStatusOptions{
+					IOStreams: genericclioptions.IOStreams{Out: &stdout, ErrOut: &stderr},
+					now:       func() time.Time { return now },
+					loadConfig: func() (*config.Config, error) {
+						return &config.Config{}, nil
+					},
+					loadInventory: func(*config.Config) (certchains.CertificateInventory, error) {
+						return certchains.CertificateInventory{
+							certificateInventoryEntry("test", "test-serving", certchains.CertificateRoleServing,
+								certchains.RotationPolicyStandard, now.Add(tt.notBefore), now.Add(tt.notAfter)),
+						}, nil
+					},
+				}
+				command := newCertsCommand(options, func() error { return nil })
+				args := []string{"status"}
+				if format != "" {
+					args = append(args, "-o", format)
+				}
+				require.Zero(t, RunCertsCommand(command, args), "certificate state must not change the exit code")
+				require.Empty(t, stderr.String())
+				if format == "" {
+					rows := strings.Split(strings.TrimSpace(stdout.String()), "\n")
+					require.Len(t, rows, 2)
+					require.Equal(t, []string{"SERVICE", "CERTIFICATE", "STATUS", "EXPIRY", "MESSAGE"}, strings.Fields(rows[0]))
+					fields := strings.Fields(rows[1])
+					require.GreaterOrEqual(t, len(fields), 5)
+					require.Equal(t, string(tt.want), fields[2])
+					require.Equal(t, tt.message, strings.Join(fields[4:], " "))
+					return
+				}
+				decoded, gvk, err := certificateCodecs.UniversalDeserializer().Decode(stdout.Bytes(), nil, nil)
+				require.NoError(t, err)
+				require.NotContains(t, stdout.String(), "zone", "the legacy zone field must not be emitted")
+				require.NotContains(t, stdout.String(), "forceRestartOnRedZone")
+				require.Equal(t, certificatesv1alpha1.GroupVersion.WithKind(certificatesv1alpha1.CertificateStatusListKind), *gvk)
+				status, ok := decoded.(*certificatesv1alpha1.CertificateStatusList)
+				require.True(t, ok)
+				require.Len(t, status.Items, 1)
+				require.Equal(t, tt.want, status.Items[0].Status)
+				require.Equal(t, int64(tt.notAfter/time.Second), status.Items[0].RemainingSeconds)
+			})
+		}
+	}
+}
+
 func TestCertStatusStructuredOutputFlags(t *testing.T) {
 	now := time.Date(2026, time.September, 8, 10, 30, 0, 0, time.UTC)
 	for _, args := range [][]string{{"-o", "json"}, {"--output=json"}, {"-o", "yaml"}, {"--output=yaml"}} {
@@ -155,6 +218,47 @@ func TestCertStatusStructuredOutputFlags(t *testing.T) {
 			require.Equal(t, certificatesv1alpha1.CertificateStatusListKind, status.Kind)
 			require.NotNil(t, status.Items, "empty inventories must serialize as []")
 			require.Equal(t, []string{"configuration warning"}, status.Warnings)
+		})
+	}
+}
+
+func TestCertificateStatusThresholdMessages(t *testing.T) {
+	now := time.Date(2026, time.September, 8, 10, 30, 0, 0, time.UTC)
+	const day = 24 * time.Hour
+	for _, tt := range []struct {
+		name                string
+		policy              certchains.RotationPolicy
+		validity, remaining time.Duration
+		message             string
+	}{
+		{"standard healthy", certchains.RotationPolicyStandard, 365 * day, 300 * day,
+			"Valid for 300 days"},
+		{"standard warning boundary", certchains.RotationPolicyStandard, 1000 * day, 583 * day,
+			"Expires in 583 days, which is at or below the warning threshold of 583 days"},
+		{"standard critical boundary", certchains.RotationPolicyStandard, 1000 * day, 333 * day,
+			"Expires in 333 days, which is at or below the critical threshold of 333 days"},
+		{"extended healthy", certchains.RotationPolicyExtended, 3650 * day, 1000 * day,
+			"Valid for 1000 days"},
+		{"extended warning boundary", certchains.RotationPolicyExtended, 1000 * day, 150 * day,
+			"Expires in 150 days, which is at or below the warning threshold of 150 days"},
+		{"extended critical boundary", certchains.RotationPolicyExtended, 1000 * day, 100 * day,
+			"Expires in 100 days, which is at or below the critical threshold of 100 days"},
+		{"custom six week lifetime", certchains.RotationPolicyStandard, 42 * day, 20 * day,
+			"Expires in 20 days, which is at or below the warning threshold of 25 days"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			status, err := newCertificateStatusList(certchains.CertificateInventory{
+				certificateInventoryEntry("test", "test-certificate", certchains.CertificateRoleServing, tt.policy,
+					now.Add(tt.remaining-tt.validity), now.Add(tt.remaining)),
+			}, nil, now)
+			require.NoError(t, err)
+			message, err := humanCertificateStatus(status.Items[0], now)
+			require.NoError(t, err)
+			require.Equal(t, tt.message, message)
+			status.Items[0].RotationPolicy = "invalid"
+			var out bytes.Buffer
+			require.ErrorContains(t, writeCertificateStatusTable(&out, status), "unknown rotation policy")
+			require.Empty(t, out.String(), "invalid policy must not produce a partial table")
 		})
 	}
 }

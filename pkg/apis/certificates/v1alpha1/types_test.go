@@ -17,9 +17,9 @@ func TestCertificateStatusRoundTrip(t *testing.T) {
 		"apiVersion":"microshift.openshift.io/v1alpha1",
 		"kind":"CertificateStatusList",
 		"generatedAt":"2026-09-08T10:30:00Z",
-		"config":{"forceRestartOnRedZone":false,"servingValidity":"8760h","caValidity":"87600h"},
+		"config":{"forceRestartOnExpirationImminent":false,"servingValidity":"8760h","caValidity":"87600h"},
 		"items":[{
-			"service":"etcd","name":"etcd-serving","role":"peer","rotationPolicy":"extended","zone":"red",
+			"service":"etcd","name":"etcd-serving","role":"peer","rotationPolicy":"extended","status":"Expired",
 			"notBefore":"2016-09-07T10:30:00Z","notAfter":"2026-09-07T10:30:00Z","remainingSeconds":-86400
 		}],
 		"warnings":[]
@@ -28,8 +28,8 @@ func TestCertificateStatusRoundTrip(t *testing.T) {
 	require.NoError(t, json.Unmarshal([]byte(document), &status))
 	require.Equal(t, certificatesv1alpha1.CertificateRolePeer, status.Items[0].Role)
 	require.Equal(t, certificatesv1alpha1.RotationPolicyExtended, status.Items[0].RotationPolicy)
-	require.Equal(t, certificatesv1alpha1.CertificateZoneRed, status.Items[0].Zone)
-	require.False(t, status.Config.ForceRestartOnRedZone)
+	require.Equal(t, certificatesv1alpha1.CertificateStatusExpired, status.Items[0].Status)
+	require.False(t, status.Config.ForceRestartOnExpirationImminent)
 	require.Equal(t, int64(-86400), status.Items[0].RemainingSeconds)
 	require.NotNil(t, status.Warnings)
 

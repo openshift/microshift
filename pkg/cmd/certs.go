@@ -152,7 +152,7 @@ func newCertificateStatusList(inventory certchains.CertificateInventory, warning
 		default:
 			return certificatesv1alpha1.CertificateStatusList{}, fmt.Errorf("certificate %q has invalid role %q", entry.Name, entry.Role)
 		}
-		zone, err := entry.ZoneAt(now)
+		state, err := entry.StatusAt(now)
 		if err != nil {
 			return certificatesv1alpha1.CertificateStatusList{}, err
 		}
@@ -161,7 +161,7 @@ func newCertificateStatusList(inventory certchains.CertificateInventory, warning
 			Name:             entry.Name,
 			Role:             certificatesv1alpha1.CertificateRole(entry.Role),
 			RotationPolicy:   certificatesv1alpha1.RotationPolicy(entry.RotationPolicy),
-			Zone:             certificatesv1alpha1.CertificateZone(zone),
+			Status:           certificatesv1alpha1.CertificateStatus(state),
 			NotBefore:        metav1.NewTime(entry.Certificate.NotBefore.UTC()),
 			NotAfter:         metav1.NewTime(entry.Certificate.NotAfter.UTC()),
 			RemainingSeconds: int64(entry.Certificate.NotAfter.Sub(now).Seconds()),
@@ -179,9 +179,9 @@ func newCertificateStatusList(inventory certchains.CertificateInventory, warning
 		},
 		GeneratedAt: metav1.NewTime(now),
 		Config: certificatesv1alpha1.CertificateStatusConfig{
-			ForceRestartOnRedZone: true,
-			ServingValidity:       durationInHours(cryptomaterial.ShortLivedCertificateValidity),
-			CAValidity:            durationInHours(cryptomaterial.LongLivedCertificateValidity),
+			ForceRestartOnExpirationImminent: true,
+			ServingValidity:                  durationInHours(cryptomaterial.ShortLivedCertificateValidity),
+			CAValidity:                       durationInHours(cryptomaterial.LongLivedCertificateValidity),
 		},
 		Items:    items,
 		Warnings: statusWarnings,
@@ -190,17 +190,19 @@ func newCertificateStatusList(inventory certchains.CertificateInventory, warning
 
 func writeCertificateStatusTable(out io.Writer, status certificatesv1alpha1.CertificateStatusList) error {
 	w := tabwriter.NewWriter(out, 0, 4, 2, ' ', 0)
-	if _, err := fmt.Fprintln(w, "SERVICE\tCERTIFICATE\tSTATUS\tEXPIRY\tREASON\tMESSAGE"); err != nil {
+	if _, err := fmt.Fprintln(w, "SERVICE\tCERTIFICATE\tSTATUS\tEXPIRY\tMESSAGE"); err != nil {
 		return err
 	}
 	for _, item := range status.Items {
-		reason, message := humanCertificateStatus(item, status.GeneratedAt.Time)
-		if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n",
+		message, err := humanCertificateStatus(item, status.GeneratedAt.Time)
+		if err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
 			item.Service,
 			item.Name,
-			humanCertificateZone(item.Zone),
+			item.Status,
 			item.NotAfter.UTC().Format(time.RFC3339),
-			reason,
 			message,
 		); err != nil {
 			return err
@@ -209,31 +211,28 @@ func writeCertificateStatusTable(out io.Writer, status certificatesv1alpha1.Cert
 	return w.Flush()
 }
 
-func humanCertificateStatus(item certificatesv1alpha1.CertificateStatusItem, now time.Time) (string, string) {
-	if now.Before(item.NotBefore.Time) {
-		return "NotYetValid", fmt.Sprintf("Valid in %d days", daysUntil(item.NotBefore.Sub(now)))
-	}
+func humanCertificateStatus(item certificatesv1alpha1.CertificateStatusItem, now time.Time) (string, error) {
 	if !now.Before(item.NotAfter.Time) {
-		return "Expired", fmt.Sprintf("Expired %d days ago", daysUntil(now.Sub(item.NotAfter.Time)))
+		return fmt.Sprintf("Expired %d days ago", daysUntil(now.Sub(item.NotAfter.Time))), nil
 	}
+	if now.Before(item.NotBefore.Time) {
+		return fmt.Sprintf("Valid in %d days", daysUntil(item.NotBefore.Sub(now))), nil
+	}
+	warning, critical, err := certchains.RotationPolicy(item.RotationPolicy).StatusThresholds()
+	if err != nil {
+		return "", fmt.Errorf("certificate %q has %w", item.Name, err)
+	}
+	validity := item.NotAfter.Sub(item.NotBefore.Time)
 	remainingDays := daysUntil(item.NotAfter.Sub(now))
-	if item.Zone == certificatesv1alpha1.CertificateZoneGreen {
-		return "NotExpiring", fmt.Sprintf("Valid for %d days", remainingDays)
+	warningDays := daysUntil(time.Duration(float64(validity) * warning))
+	if item.Status == certificatesv1alpha1.CertificateStatusHealthy {
+		return fmt.Sprintf("Valid for %d days", remainingDays), nil
 	}
-	return "Expiring", fmt.Sprintf("Expires in %d days", remainingDays)
-}
-
-func humanCertificateZone(zone certificatesv1alpha1.CertificateZone) string {
-	switch zone {
-	case certificatesv1alpha1.CertificateZoneGreen:
-		return "Green"
-	case certificatesv1alpha1.CertificateZoneYellow:
-		return "Yellow"
-	case certificatesv1alpha1.CertificateZoneRed:
-		return "Red"
-	default:
-		return string(zone)
+	if item.Status == certificatesv1alpha1.CertificateStatusExpirationImminent {
+		criticalDays := daysUntil(time.Duration(float64(validity) * critical))
+		return fmt.Sprintf("Expires in %d days, which is at or below the critical threshold of %d days", remainingDays, criticalDays), nil
 	}
+	return fmt.Sprintf("Expires in %d days, which is at or below the warning threshold of %d days", remainingDays, warningDays), nil
 }
 
 func daysUntil(duration time.Duration) int64 {

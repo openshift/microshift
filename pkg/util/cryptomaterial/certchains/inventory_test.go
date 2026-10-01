@@ -120,64 +120,99 @@ func TestCertificateInventory_ByRole(t *testing.T) {
 	}
 }
 
-func TestCertificateInventoryEntry_ZoneAt(t *testing.T) {
+func TestCertificateInventoryEntry_StatusAt(t *testing.T) {
 	now := time.Date(2026, time.September, 8, 10, 30, 0, 0, time.UTC)
 	tests := []struct {
 		name      string
 		policy    RotationPolicy
 		notBefore time.Time
 		notAfter  time.Time
-		want      CertificateZone
+		want      CertificateStatus
 		wantError bool
 	}{
 		{
-			name:      "standard green",
+			name:      "standard healthy",
 			policy:    RotationPolicyStandard,
 			notBefore: now.Add(-4169 * time.Hour),
 			notAfter:  now.Add(5831 * time.Hour),
-			want:      CertificateZoneGreen,
+			want:      CertificateStatusHealthy,
 		},
 		{
-			name:      "standard green boundary is yellow",
+			name:      "standard healthy boundary expires soon",
 			policy:    RotationPolicyStandard,
 			notBefore: now.Add(-417 * time.Hour),
 			notAfter:  now.Add(583 * time.Hour),
-			want:      CertificateZoneYellow,
+			want:      CertificateStatusExpiresSoon,
 		},
 		{
-			name:      "standard yellow boundary is red",
+			name:      "standard expires soon boundary is imminent",
 			policy:    RotationPolicyStandard,
 			notBefore: now.Add(-667 * time.Hour),
 			notAfter:  now.Add(333 * time.Hour),
-			want:      CertificateZoneRed,
+			want:      CertificateStatusExpirationImminent,
 		},
 		{
-			name:      "extended green boundary is yellow",
+			name:      "extended healthy",
+			policy:    RotationPolicyExtended,
+			notBefore: now.Add(-849 * time.Hour),
+			notAfter:  now.Add(151 * time.Hour),
+			want:      CertificateStatusHealthy,
+		},
+		{
+			name:      "extended healthy boundary expires soon",
 			policy:    RotationPolicyExtended,
 			notBefore: now.Add(-850 * time.Hour),
 			notAfter:  now.Add(150 * time.Hour),
-			want:      CertificateZoneYellow,
+			want:      CertificateStatusExpiresSoon,
 		},
 		{
-			name:      "extended yellow boundary is red",
+			name:      "extended expires soon boundary is imminent",
 			policy:    RotationPolicyExtended,
 			notBefore: now.Add(-900 * time.Hour),
 			notAfter:  now.Add(100 * time.Hour),
-			want:      CertificateZoneRed,
+			want:      CertificateStatusExpirationImminent,
 		},
 		{
 			name:      "not yet valid",
 			policy:    RotationPolicyStandard,
 			notBefore: now.Add(time.Hour),
 			notAfter:  now.Add(1000 * time.Hour),
-			want:      CertificateZoneRed,
+			want:      CertificateStatusExpirationImminent,
 		},
 		{
-			name:      "expired",
+			name:      "validity starts now",
+			policy:    RotationPolicyStandard,
+			notBefore: now,
+			notAfter:  now.Add(1000 * time.Hour),
+			want:      CertificateStatusHealthy,
+		},
+		{
+			name:      "just before expiry",
+			policy:    RotationPolicyStandard,
+			notBefore: now.Add(-1000 * time.Hour),
+			notAfter:  now.Add(time.Second),
+			want:      CertificateStatusExpirationImminent,
+		},
+		{
+			name:      "exactly at expiry",
 			policy:    RotationPolicyStandard,
 			notBefore: now.Add(-1000 * time.Hour),
 			notAfter:  now,
-			want:      CertificateZoneRed,
+			want:      CertificateStatusExpired,
+		},
+		{
+			name:      "expired",
+			policy:    RotationPolicyExtended,
+			notBefore: now.Add(-1000 * time.Hour),
+			notAfter:  now.Add(-time.Second),
+			want:      CertificateStatusExpired,
+		},
+		{
+			name:      "zero validity",
+			policy:    RotationPolicyStandard,
+			notBefore: now,
+			notAfter:  now,
+			want:      CertificateStatusExpired,
 		},
 		{
 			name:      "unknown policy",
@@ -198,7 +233,7 @@ func TestCertificateInventoryEntry_ZoneAt(t *testing.T) {
 					NotAfter:  tt.notAfter,
 				},
 			}
-			got, err := entry.ZoneAt(now)
+			got, err := entry.StatusAt(now)
 			if tt.wantError {
 				require.Error(t, err)
 				return

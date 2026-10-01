@@ -23,7 +23,7 @@ const (
 	CertificateRolePeer    CertificateRole = "peer"
 )
 
-// RotationPolicy identifies the thresholds used to classify certificate zones.
+// RotationPolicy identifies the thresholds used to classify certificate status.
 type RotationPolicy string
 
 const (
@@ -32,13 +32,27 @@ const (
 	RotationPolicyExtended RotationPolicy = "extended"
 )
 
-// CertificateZone identifies the current renewal urgency of a certificate.
-type CertificateZone string
+// StatusThresholds returns fractions of total validity remaining at which
+// a certificate becomes ExpiresSoon (warning) or ExpirationImminent (critical).
+func (policy RotationPolicy) StatusThresholds() (warning, critical float64, err error) {
+	switch policy {
+	case RotationPolicyStandard:
+		return 0.583, 0.333, nil
+	case RotationPolicyExtended:
+		return 0.15, 0.10, nil
+	case RotationPolicyUnknown:
+	}
+	return 0, 0, fmt.Errorf("unknown rotation policy %q", policy)
+}
+
+// CertificateStatus identifies the current renewal urgency of a certificate.
+type CertificateStatus string
 
 const (
-	CertificateZoneGreen  CertificateZone = "green"
-	CertificateZoneYellow CertificateZone = "yellow"
-	CertificateZoneRed    CertificateZone = "red"
+	CertificateStatusHealthy            CertificateStatus = "Healthy"
+	CertificateStatusExpiresSoon        CertificateStatus = "ExpiresSoon"
+	CertificateStatusExpirationImminent CertificateStatus = "ExpirationImminent"
+	CertificateStatusExpired            CertificateStatus = "Expired"
 )
 
 // CertificateInventoryEntry describes one certificate managed by the chain.
@@ -67,39 +81,35 @@ func (i CertificateInventory) ByRole(role CertificateRole) CertificateInventory 
 	return entries
 }
 
-// ZoneAt calculates the certificate's renewal zone at the provided time.
-func (entry CertificateInventoryEntry) ZoneAt(now time.Time) (CertificateZone, error) {
+// StatusAt calculates the certificate's status at the provided time.
+func (entry CertificateInventoryEntry) StatusAt(now time.Time) (CertificateStatus, error) {
 	certificate := entry.Certificate
-	if now.Before(certificate.NotBefore) || !now.Before(certificate.NotAfter) {
-		return CertificateZoneRed, nil
+	if !now.Before(certificate.NotAfter) {
+		return CertificateStatusExpired, nil
+	}
+	if now.Before(certificate.NotBefore) {
+		return CertificateStatusExpirationImminent, nil
 	}
 
 	validity := certificate.NotAfter.Sub(certificate.NotBefore)
 	if validity <= 0 {
-		return CertificateZoneRed, nil
+		return CertificateStatusExpirationImminent, nil
 	}
 	remaining := certificate.NotAfter.Sub(now)
 	ratio := float64(remaining) / float64(validity)
 
-	var greenThreshold, yellowThreshold float64
-	switch entry.RotationPolicy {
-	case RotationPolicyStandard:
-		greenThreshold, yellowThreshold = 0.583, 0.333
-	case RotationPolicyExtended:
-		greenThreshold, yellowThreshold = 0.15, 0.10
-	case RotationPolicyUnknown:
-		return "", fmt.Errorf("certificate %q has unknown rotation policy %q", entry.Name, entry.RotationPolicy)
-	default:
-		return "", fmt.Errorf("certificate %q has unknown rotation policy %q", entry.Name, entry.RotationPolicy)
+	warning, critical, err := entry.RotationPolicy.StatusThresholds()
+	if err != nil {
+		return "", fmt.Errorf("certificate %q has %w", entry.Name, err)
 	}
 
 	switch {
-	case ratio > greenThreshold:
-		return CertificateZoneGreen, nil
-	case ratio > yellowThreshold:
-		return CertificateZoneYellow, nil
+	case ratio > warning:
+		return CertificateStatusHealthy, nil
+	case ratio > critical:
+		return CertificateStatusExpiresSoon, nil
 	default:
-		return CertificateZoneRed, nil
+		return CertificateStatusExpirationImminent, nil
 	}
 }
 
