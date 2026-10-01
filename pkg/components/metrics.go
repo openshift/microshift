@@ -182,7 +182,7 @@ func ProvisionMetricsClientCA(ctx context.Context, cfg *config.Config) error {
 	}
 
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
-	caCertPath := cryptomaterial.CACertPath(cryptomaterial.AdminKubeconfigSignerDir(certsDir))
+	caCertPath := cryptomaterial.CACertPath(cryptomaterial.ClientCADir(certsDir))
 	caPEM, err := os.ReadFile(caCertPath)
 	if err != nil {
 		return fmt.Errorf("reading admin-kubeconfig-signer CA: %w", err)
