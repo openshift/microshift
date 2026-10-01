@@ -98,15 +98,12 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 	s.verbosity = cfg.GetVerbosity()
 
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
-	kubeCSRSignerDir := cryptomaterial.CSRSignerCertDir(certsDir)
 	kubeletClientDir := cryptomaterial.KubeAPIServerToKubeletClientCertDir(certsDir)
 	clientCABundlePath := cryptomaterial.TotalClientCABundlePath(certsDir)
 	aggregatorCAPath := cryptomaterial.CACertPath(cryptomaterial.AggregatorSignerDir(certsDir))
 	aggregatorClientCertDir := cryptomaterial.AggregatorClientCertDir(certsDir)
 	etcdClientCertDir := cryptomaterial.EtcdAPIServerClientCertDir(certsDir)
-	serviceNetworkServingCertDir := cryptomaterial.KubeAPIServerServiceNetworkServingCertDir(certsDir)
-	servingCert := cryptomaterial.ServingCertPath(serviceNetworkServingCertDir)
-	servingKey := cryptomaterial.ServingKeyPath(serviceNetworkServingCertDir)
+	kasServingCertDir := cryptomaterial.KASServingCertDir(certsDir)
 
 	if err := s.configureAuditPolicy(cfg); err != nil {
 		return fmt.Errorf("failed to configure kube-apiserver audit policy: %w", err)
@@ -119,20 +116,8 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 	namedCerts := []configv1.NamedCertificate{
 		{
 			CertInfo: configv1.CertInfo{
-				CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
-				KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerExternalServingCertDir(certsDir)),
-			},
-		},
-		{
-			CertInfo: configv1.CertInfo{
-				CertFile: cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
-				KeyFile:  cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(certsDir)),
-			},
-		},
-		{
-			CertInfo: configv1.CertInfo{
-				CertFile: servingCert,
-				KeyFile:  servingKey,
+				CertFile: cryptomaterial.ServingCertPath(kasServingCertDir),
+				KeyFile:  cryptomaterial.ServingKeyPath(kasServingCertDir),
 			},
 		},
 	}
@@ -188,11 +173,11 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 			"audit-log-maxbackup":           {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFiles)},
 			"audit-log-maxsize":             {strconv.Itoa(cfg.ApiServer.AuditLog.MaxFileSize)},
 			"client-ca-file":                {clientCABundlePath},
-			"etcd-cafile":                   {cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))},
+			"etcd-cafile":                   {cryptomaterial.CACertPath(cryptomaterial.PeerCADir(certsDir))},
 			"etcd-certfile":                 {cryptomaterial.ClientCertPath(etcdClientCertDir)},
 			"etcd-keyfile":                  {cryptomaterial.ClientKeyPath(etcdClientCertDir)},
 			"etcd-servers":                  etcdServers,
-			"kubelet-certificate-authority": {cryptomaterial.CABundlePath(kubeCSRSignerDir)},
+			"kubelet-certificate-authority": {cryptomaterial.KubeletServingCAPath(certsDir)},
 			"kubelet-client-certificate":    {cryptomaterial.ClientCertPath(kubeletClientDir)},
 			"kubelet-client-key":            {cryptomaterial.ClientKeyPath(kubeletClientDir)},
 			// MicroShift nodes expose these two types of addresses. In order to support having more than one
@@ -210,8 +195,8 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 			"requestheader-client-ca-file":     {aggregatorCAPath},
 			"service-account-signing-key-file": {filepath.Join(config.DataDir, "/resources/kube-apiserver/secrets/service-account-key/service-account.key")},
 			"service-node-port-range":          {cfg.Network.ServiceNodePortRange},
-			"tls-cert-file":                    {servingCert},
-			"tls-private-key-file":             {servingKey},
+			"tls-cert-file":                    {cryptomaterial.ServingCertPath(kasServingCertDir)},
+			"tls-private-key-file":             {cryptomaterial.ServingKeyPath(kasServingCertDir)},
 			"disable-admission-plugins": {
 				"authorization.openshift.io/RestrictSubjectBindings",
 				"authorization.openshift.io/ValidateRoleBindingRestriction",
@@ -430,7 +415,7 @@ func discoverEtcdServers(ctx context.Context, kubeconfigPath string) ([]string, 
 	tlsInfo := transport.TLSInfo{
 		CertFile:      cryptomaterial.PeerCertPath(etcdPeerCertDir),
 		KeyFile:       cryptomaterial.PeerKeyPath(etcdPeerCertDir),
-		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
+		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.PeerCADir(certsDir)),
 	}
 	tlsConfig, err := tlsInfo.ClientConfig()
 	if err != nil {
