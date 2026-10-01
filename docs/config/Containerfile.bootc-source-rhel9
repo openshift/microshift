@@ -15,7 +15,7 @@ FROM registry.redhat.io/rhel9-eus/rhel-9.8-bootc:9.8
 #
 # NOTE: the URL is architecture specific. Override it with '--build-arg' when
 # building for aarch64 (replace 'x86_64' with 'aarch64').
-ARG DEPS_REPO_URL=https://mirror.openshift.com/pub/openshift-v5/x86_64/dependencies/rpms/5.0-el9-beta
+ARG DEPS_REPO_URL=https://mirror.openshift.com/pub/openshift-v5/x86_64/dependencies/rpms/5.1-el9-beta
 
 # Copy the locally built MicroShift RPM repository (the RPMs produced by
 # 'make rpm' together with the 'repodata' created by 'createrepo_c') into the

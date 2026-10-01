@@ -7,7 +7,7 @@ This document demonstrates how to run that `bootc` image directly using `podman`
 which is the fastest way to exercise a source build without installing it on a
 host.
 
-> **NOTE**:  
+> **NOTE**:
 >
 > Use the `podman` approach only for development purposes to benefit from
 > the fast turnaround times it allows. Do not use it for production use cases.
@@ -173,7 +173,7 @@ IMAGE_NAME="microshift-source-bootc:linux-${IMAGE_ARCH}"
 # specific and uses RPM arch names (x86_64 / aarch64) rather than the amd64 /
 # arm64 names, so derive DEPS_REPO_URL from ${IMAGE_ARCH} and pass it explicitly.
 DEPS_ARCH=$([ "${IMAGE_ARCH}" = "arm64" ] && echo aarch64 || echo x86_64)
-DEPS_REPO_URL="https://mirror.openshift.com/pub/openshift-v5/${DEPS_ARCH}/dependencies/rpms/5.0-el9-beta"
+DEPS_REPO_URL="https://mirror.openshift.com/pub/openshift-v5/${DEPS_ARCH}/dependencies/rpms/5.1-el9-beta"
 sudo podman build --authfile "${PULL_SECRET}" -t "${IMAGE_NAME}" \
     --platform "${IMAGE_PLATFORM}" \
     --secret id=user_passwd,env=USER_PASSWD \
@@ -283,4 +283,3 @@ ExecStartPre=/sbin/usermod -a -G hugetlbfs openvswitch
 ExecStartPre=/bin/chown -Rhv openvswitch. /etc/openvswitch
 EOF
 ```
-

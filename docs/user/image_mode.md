@@ -63,14 +63,14 @@ The RPMs are written under `_output/rpmbuild/RPMS`:
 
 ```bash
 $ find _output/rpmbuild/RPMS -name '*.rpm' | head
-_output/rpmbuild/RPMS/x86_64/microshift-5.0.0_0.nightly...el9.x86_64.rpm
-_output/rpmbuild/RPMS/x86_64/microshift-networking-5.0.0_0.nightly...el9.x86_64.rpm
-_output/rpmbuild/RPMS/noarch/microshift-release-info-5.0.0_0.nightly...el9.noarch.rpm
+_output/rpmbuild/RPMS/x86_64/microshift-5.1.0_0.nightly...el9.x86_64.rpm
+_output/rpmbuild/RPMS/x86_64/microshift-networking-5.1.0_0.nightly...el9.x86_64.rpm
+_output/rpmbuild/RPMS/noarch/microshift-release-info-5.1.0_0.nightly...el9.noarch.rpm
 ...
 ```
 
 > The version string encodes the source commit (for example
-> `5.0.0_0.nightly_..._<git-sha>`), so it differs from any released MicroShift
+> `5.1.0_0.nightly_..._<git-sha>`), so it differs from any released MicroShift
 > version. This is how you confirm the resulting image contains your source build
 > rather than a released RPM.
 
