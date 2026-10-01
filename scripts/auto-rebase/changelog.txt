@@ -1,3 +1,3 @@
-- cluster-kube-apiserver-operator embedded-component 1b48403438c3e0eb2ccb5cae331f12fe9abe169c to d9337a500419d77ac4ffae75a894ae6e5910509b
-  - 180b9e6 2026-09-26T01:45:37+00:00 Fix kube-apiserver-to-kubelet-signer refresh interval
+- oc image-arm64 a2c805b5894a8a1a6bcb16e7023203e3f01952b4 to 270921939bb63f95219f865d138f8f0208369097
+  - bf317643 2026-09-24T06:08:47+00:00 OCPBUGS-103551,OCPBUGS-103599: Use patched x/net fork v0.43.0-sec.4
 
