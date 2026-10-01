@@ -1,0 +1,8 @@
+- coredns image-arm64 37aaba896e97f4b9a091aab6d36f2213b8854474 to bbbbf9a28f179e92c9481a2923c989ddeb84999b
+  - 16b730b 2026-09-26T04:43:58Z UPSTREAM: <drop>: OCPBUGS-114428: vendor protobuf v1.36.12
+  - 04ef2c0 2026-09-26T04:43:56Z UPSTREAM: <carry>: OCPBUGS-114428: vendor protobuf v1.36.12
+  - 104fb28 2026-09-26T04:43:54Z UPSTREAM: <carry>: OCPBUGS-114428: Bump google.golang.org/protobuf to v1.36.12
+
+- kubernetes image-arm64 2a6104ec563aeaa77c97352f4d28580eea7918d2 to 6e14e03bbd62c101525891f1d409ac6a9262cee1
+  - 890ca6e59 2026-09-25T13:43:08-04:00 UPSTREAM: 142167: Refuse UNC symlink targets in Windows subPath resolution
+
