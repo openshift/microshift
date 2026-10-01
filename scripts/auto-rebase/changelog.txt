@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component 8df98a1e751a0a9d60970fa3d6109ce7d6f1183c to 3e6ad43708c45c144e2f3835d61e9db21c03e631
+  - 582672a2 2026-09-21T17:41:12+00:00 controller: update message for MachineOSBuildFailed condition
+
