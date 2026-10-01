@@ -23,7 +23,7 @@ ${NIC2_NAME}            ${EMPTY}
 ${NICS_COUNT}           2
 ${NMCLI_CMD}            nmcli -f name,type connection | awk '$NF == "ethernet" { $NF=""; print $0 }'
 ${OSSL_CMD}             openssl x509 -text -noout -in
-${CERT_FILE}            /var/lib/microshift/certs/kube-apiserver-external-signer/kube-external-serving/server.crt
+${CERT_FILE}            /var/lib/microshift/certs/serving-ca/kube-apiserver-serving/server.crt
 ${GREP_SUBJ_IPS}        grep -A1 'Subject Alternative Name:' | tail -1
 
 

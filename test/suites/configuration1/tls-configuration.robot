@@ -36,7 +36,7 @@ ${TLS_INVALID_VERSION}              SEPARATOR=\n
 ...                                 \ \ \ \ cipherSuites:
 ...                                 \ \ \ \ - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
 ...                                 \ \ \ \ minVersion: VersionTLSInvalid
-${APISERVER_ETCD_CLIENT_CERT}       /var/lib/microshift/certs/etcd-signer/apiserver-etcd-client
+${APISERVER_ETCD_CLIENT_CERT}       /var/lib/microshift/certs/peer-ca/apiserver-etcd-client
 
 
 *** Test Cases ***
