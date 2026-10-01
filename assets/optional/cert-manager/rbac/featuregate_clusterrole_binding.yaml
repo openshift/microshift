@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: featuregate-reader
+    app.kubernetes.io/instance: featuregate-reader
+    app.kubernetes.io/created-by: cert-manager-operator
+    app.kubernetes.io/part-of: cert-manager-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: featuregate-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: featuregate-reader
+subjects:
+- kind: ServiceAccount
+  name: controller-manager
+  namespace: system

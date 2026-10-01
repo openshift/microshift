@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: openshift-c2cc
+  name: c2cc-probe
+  labels:
+    app: c2cc-probe
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: c2cc-probe
+  template:
+    metadata:
+      labels:
+        app: c2cc-probe
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+        openshift.io/required-scc: privileged
+    spec:
+      serviceAccountName: c2cc-probe
+      containers:
+      - name: c2cc-probe
+        image: '{{ .ReleaseImage.cli }}'
+        imagePullPolicy: IfNotPresent
+        command:
+        - /host/usr/bin/microshift
+        - c2cc-probe
+        ports:
+        - containerPort: 8080
+          name: probe
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        volumeMounts:
+        - name: microshift-binary
+          mountPath: /host/usr/bin/microshift
+          readOnly: true
+      volumes:
+      - name: microshift-binary
+        hostPath:
+          path: /usr/bin/microshift
+          type: File
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      priorityClassName: system-cluster-critical
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 120
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 120

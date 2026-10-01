@@ -42,6 +42,86 @@ type IngressStatusEnum string
 type DefaultHttpVersionPolicy int32
 type WildcardPolicy string
 
+// TLSSecurityProfile defines the schema for a TLS security profile. This object
+// is used by operators to apply TLS security settings to operands.
+// +union
+type TLSSecurityProfile struct {
+	// type is one of Old, Intermediate, Modern or Custom. Custom provides the
+	// ability to specify individual TLS security profile parameters.
+	//
+	// The profiles are based on the Mozilla Server Side TLS configuration
+	// guidelines. The cipher lists consist of the configuration's
+	// "ciphersuites" followed by the "ciphers" from the guidelines.
+	//
+	// The profiles are intent based, so they may change over time as new ciphers are
+	// developed and existing ciphers are found to be insecure. Depending on
+	// precisely which ciphers are available to a process, the list may be reduced.
+	//
+	// +unionDiscriminator
+	// +optional
+	Type configv1.TLSProfileType `json:"type"`
+
+	// old is a TLS profile for use when services need to be accessed by very old
+	// clients or libraries and should be used only as a last resort.
+	//
+	// +optional
+	// +nullable
+	Old *configv1.OldTLSProfile `json:"old,omitempty"`
+
+	// intermediate is a TLS profile for use when you do not need compatibility with
+	// legacy clients and want to remain highly secure while being compatible with
+	// most clients currently in use.
+	//
+	// +optional
+	// +nullable
+	Intermediate *configv1.IntermediateTLSProfile `json:"intermediate,omitempty"`
+
+	// modern is a TLS security profile for use with clients that support TLS 1.3 and
+	// do not need backward compatibility for older clients.
+	//
+	// +optional
+	// +nullable
+	Modern *configv1.ModernTLSProfile `json:"modern,omitempty"`
+
+	// custom is a user-defined TLS security profile. Be extremely careful using a custom
+	// profile as invalid configurations can be catastrophic. An example custom profile
+	// looks like this:
+	//
+	//   minTLSVersion: VersionTLS11
+	//   ciphers:
+	//     - ECDHE-ECDSA-CHACHA20-POLY1305
+	//     - ECDHE-RSA-CHACHA20-POLY1305
+	//     - ECDHE-RSA-AES128-GCM-SHA256
+	//     - ECDHE-ECDSA-AES128-GCM-SHA256
+	//
+	// +optional
+	// +nullable
+	Custom *CustomTLSProfile `json:"custom,omitempty"`
+}
+
+// CustomTLSProfile is a user-defined TLS security profile. Be extremely careful
+// using a custom TLS profile as invalid configurations can be catastrophic.
+type CustomTLSProfile struct {
+	// ciphers is used to specify the cipher algorithms that are negotiated
+	// during the TLS handshake. Operators may remove entries that their operands
+	// do not support. For example, to use only ECDHE-RSA-AES128-GCM-SHA256 (yaml):
+	//
+	//   ciphers:
+	//     - ECDHE-RSA-AES128-GCM-SHA256
+	//
+	// TLS 1.3 cipher suites (e.g. TLS_AES_128_GCM_SHA256) are not configurable
+	// and are always enabled when TLS 1.3 is negotiated.
+	// +listType=atomic
+	Ciphers []string `json:"ciphers"`
+	// minTLSVersion is used to specify the minimal version of the TLS protocol
+	// that is negotiated during the TLS handshake. For example, to use TLS
+	// versions 1.1, 1.2 and 1.3 (yaml):
+	//
+	//   minTLSVersion: VersionTLS11
+	//
+	MinTLSVersion configv1.TLSProtocolVersion `json:"minTLSVersion"`
+}
+
 type IngressConfig struct {
 	// Default router status, can be Managed or Removed.
 	// +kubebuilder:default=Managed
@@ -148,7 +228,7 @@ type IngressConfig struct {
 	// controller, resulting in a rollout.
 	//
 	// +optional
-	TLSSecurityProfile *configv1.TLSSecurityProfile `json:"tlsSecurityProfile,omitempty"`
+	TLSSecurityProfile *TLSSecurityProfile `json:"tlsSecurityProfile,omitempty"`
 
 	// clientTLS specifies settings for requesting and verifying client
 	// certificates, which can be used to enable mutual TLS for

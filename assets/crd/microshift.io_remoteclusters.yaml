@@ -1,0 +1,133 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: remoteclusters.microshift.io
+spec:
+  group: microshift.io
+  names:
+    kind: RemoteCluster
+    listKind: RemoteClusterList
+    plural: remoteclusters
+    singular: remotecluster
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          RemoteCluster represents a remote cluster's healthcheck probe target.
+          Created by the C2CC controller, read and updated by the probe pod.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              probeInterval:
+                default: 10s
+                description: Interval between probe attempts (e.g. "10s", "1m").
+                type: string
+              probeTargets:
+                description: IP:port targets to probe (one per address family, max
+                  2).
+                items:
+                  type: string
+                maxItems: 2
+                minItems: 1
+                type: array
+            required:
+            - probeInterval
+            - probeTargets
+            type: object
+          status:
+            description: RemoteClusterStatus is populated by the probe pod with health
+              probe results.
+            properties:
+              errors:
+                items:
+                  type: string
+                type: array
+              lastProbeTime:
+                format: date-time
+                type: string
+              lastSuccessfulProbe:
+                format: date-time
+                type: string
+              state:
+                default: NeverProbed
+                enum:
+                - NeverProbed
+                - Healthy
+                - Unhealthy
+                type: string
+              targetResults:
+                description: |-
+                  Per-target probe results (one entry per ProbeTargets element).
+                  Each entry includes target-specific state and latency statistics.
+                items:
+                  description: TargetResult contains the probe result for a single
+                    target.
+                  properties:
+                    error:
+                      type: string
+                    latency:
+                      description: |-
+                        LatencyStats contains latency statistics computed from a rolling window of probe samples.
+                        All duration values are serialized as Go duration strings (e.g. "1.234ms").
+                      properties:
+                        avg:
+                          type: string
+                        last:
+                          type: string
+                        max:
+                          type: string
+                        min:
+                          type: string
+                        stddev:
+                          type: string
+                      required:
+                      - avg
+                      - last
+                      - max
+                      - min
+                      - stddev
+                      type: object
+                    state:
+                      enum:
+                      - Healthy
+                      - Unhealthy
+                      type: string
+                    target:
+                      type: string
+                  required:
+                  - state
+                  - target
+                  type: object
+                type: array
+            required:
+            - state
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

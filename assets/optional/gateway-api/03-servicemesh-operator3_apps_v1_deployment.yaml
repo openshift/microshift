@@ -64,7 +64,7 @@ spec:
           command:
             - /usr/local/bin/manager
           image: manager
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
               path: /healthz

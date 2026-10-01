@@ -24,6 +24,8 @@ assets:
       - file: issuers.cert-manager.io-crd.yaml
       - file: operator.openshift.io_certmanagers.yaml
       - file: operator.openshift.io_istiocsrs.yaml
+      - file: operator.openshift.io_trustmanagers.yaml
+      - file: customresourcedefinition_bundles.trust.cert-manager.io.yml
       - file: orders.acme.cert-manager.io-crd.yaml
   - dir: optional/cert-manager/crd/patches/
     src: cert-manager-operator/config/crd/patches/
@@ -50,6 +52,8 @@ assets:
       - file: auth_proxy_service.yaml
       - file: certmanager_editor_role.yaml
       - file: certmanager_viewer_role.yaml
+      - file: featuregate_clusterrole.yaml
+      - file: featuregate_clusterrole_binding.yaml
       - file: kustomization.yaml
       - file: leader_election_role.yaml
       - file: leader_election_role_binding.yaml

@@ -37,6 +37,8 @@ spec:
             requests:
               memory: 120Mi
               cpu: 10m
+          env:
+            - name: OPERATOR_IMAGE_VERSION
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /var/run/secrets/signing-key

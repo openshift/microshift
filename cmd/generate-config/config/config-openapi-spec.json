@@ -2,6 +2,7 @@
   "type": "object",
   "required": [
     "apiServer",
+    "clusterToCluster",
     "debugging",
     "dns",
     "etcd",
@@ -178,6 +179,97 @@
         }
       }
     },
+    "clusterToCluster": {
+      "type": "object",
+      "required": [
+        "dns",
+        "routing"
+      ],
+      "properties": {
+        "dns": {
+          "description": "DNS cache settings for CoreDNS server blocks generated for remote clusters.",
+          "type": "object",
+          "properties": {
+            "cacheNegativeTTL": {
+              "description": "Maximum TTL (seconds) for denial (NXDOMAIN/NODATA) DNS cache entries in CoreDNS\nserver blocks generated for remote clusters. Must be \u003e= 0. Setting to 0 disables denial caching.",
+              "type": "integer",
+              "default": 10,
+              "minimum": 0
+            },
+            "cacheTTL": {
+              "description": "Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks\ngenerated for remote clusters. Must be \u003e= 0. Setting to 0 disables positive caching.",
+              "type": "integer",
+              "default": 10,
+              "minimum": 0
+            }
+          }
+        },
+        "probeInterval": {
+          "description": "Interval between healthcheck probe attempts to each remote cluster.\nParsed as a Go duration string (e.g. \"10s\", \"1m\"). Must be between 1s and 5m.",
+          "type": "string",
+          "default": "10s"
+        },
+        "remoteClusters": {
+          "description": "List of remote clusters to establish connectivity with.\nC2CC is disabled when this list is empty.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "clusterNetwork",
+              "nextHop",
+              "serviceNetwork"
+            ],
+            "properties": {
+              "clusterNetwork": {
+                "description": "Pod CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "domain": {
+                "description": "DNS domain suffix for the remote cluster (e.g., \"cluster-b.remote\").\nServices are reachable as \u003csvc\u003e.\u003cns\u003e.svc.\u003cdomain\u003e.\nOptional — if empty, no DNS forwarding is configured for this remote.",
+                "type": "string"
+              },
+              "nextHop": {
+                "description": "IP addresses of the remote cluster's node, used as next-hop for routing.\nAt most one IPv4 and one IPv6 address. Dual-stack clusters need both.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "serviceNetwork": {
+                "description": "Service CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "routing": {
+          "description": "Linux policy routing table settings for C2CC routes.",
+          "type": "object",
+          "properties": {
+            "routeTableID": {
+              "description": "Linux policy routing table ID for direct routes to remote cluster CIDRs.\nThe route protocol number is set to the same value.\nMust be between 1 and 252 (253-255 are reserved by the kernel).\nMust differ from serviceRouteTableID.",
+              "type": "integer",
+              "default": 200,
+              "maximum": 252,
+              "minimum": 1
+            },
+            "serviceRouteTableID": {
+              "description": "Linux policy routing table ID for service routes via the OVN management port.\nThe route protocol number is set to the same value.\nMust be between 1 and 252 (253-255 are reserved by the kernel).\nMust differ from routeTableID.",
+              "type": "integer",
+              "default": 201,
+              "maximum": 252,
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
     "debugging": {
       "type": "object",
       "required": [
@@ -202,6 +294,11 @@
           "type": "string",
           "default": "example.com",
           "example": "microshift.example.com"
+        },
+        "configFile": {
+          "description": "configFile is the path to a custom CoreDNS Corefile on the host filesystem.\nWhen set, MicroShift uses this file as the Corefile in the dns-default ConfigMap,\nfully replacing the default template-rendered configuration.\nChanges to this file are detected at runtime and applied without restarting MicroShift.\nMutually exclusive with dns.hosts: setting both causes a startup error.",
+          "type": "string",
+          "example": "/etc/microshift/dns/Corefile"
         },
         "hosts": {
           "description": "Hosts contains configuration for the hosts file.",
@@ -764,6 +861,10 @@
             "custom": {
               "description": "custom is a user-defined TLS security profile. Be extremely careful using a custom\nprofile as invalid configurations can be catastrophic. An example custom profile\nlooks like this:\n\n  minTLSVersion: VersionTLS11\n  ciphers:\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256",
               "type": "object",
+              "required": [
+                "ciphers",
+                "minTLSVersion"
+              ],
               "properties": {
                 "ciphers": {
                   "description": "ciphers is used to specify the cipher algorithms that are negotiated\nduring the TLS handshake. Operators may remove entries that their operands\ndo not support. For example, to use only ECDHE-RSA-AES128-GCM-SHA256 (yaml):\n\n  ciphers:\n    - ECDHE-RSA-AES128-GCM-SHA256\n\nTLS 1.3 cipher suites (e.g. TLS_AES_128_GCM_SHA256) are not configurable\nand are always enabled when TLS 1.3 is negotiated.",
@@ -787,22 +888,22 @@
               "nullable": true
             },
             "intermediate": {
-              "description": "intermediate is a TLS profile for use when you do not need compatibility with\nlegacy clients and want to remain highly secure while being compatible with\nmost clients currently in use.\n\nThis profile is equivalent to a Custom profile specified as:\n  minTLSVersion: VersionTLS12\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305",
+              "description": "intermediate is a TLS profile for use when you do not need compatibility with\nlegacy clients and want to remain highly secure while being compatible with\nmost clients currently in use.",
               "type": "object",
               "nullable": true
             },
             "modern": {
-              "description": "modern is a TLS security profile for use with clients that support TLS 1.3 and\ndo not need backward compatibility for older clients.\n\nThis profile is equivalent to a Custom profile specified as:\n  minTLSVersion: VersionTLS13\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256",
+              "description": "modern is a TLS security profile for use with clients that support TLS 1.3 and\ndo not need backward compatibility for older clients.",
               "type": "object",
               "nullable": true
             },
             "old": {
-              "description": "old is a TLS profile for use when services need to be accessed by very old\nclients or libraries and should be used only as a last resort.\n\nThis profile is equivalent to a Custom profile specified as:\n  minTLSVersion: VersionTLS10\n  ciphers:\n    - TLS_AES_128_GCM_SHA256\n    - TLS_AES_256_GCM_SHA384\n    - TLS_CHACHA20_POLY1305_SHA256\n    - ECDHE-ECDSA-AES128-GCM-SHA256\n    - ECDHE-RSA-AES128-GCM-SHA256\n    - ECDHE-ECDSA-AES256-GCM-SHA384\n    - ECDHE-RSA-AES256-GCM-SHA384\n    - ECDHE-ECDSA-CHACHA20-POLY1305\n    - ECDHE-RSA-CHACHA20-POLY1305\n    - ECDHE-ECDSA-AES128-SHA256\n    - ECDHE-RSA-AES128-SHA256\n    - ECDHE-ECDSA-AES128-SHA\n    - ECDHE-RSA-AES128-SHA\n    - ECDHE-ECDSA-AES256-SHA\n    - ECDHE-RSA-AES256-SHA\n    - AES128-GCM-SHA256\n    - AES256-GCM-SHA384\n    - AES128-SHA256\n    - AES128-SHA\n    - AES256-SHA\n    - DES-CBC3-SHA",
+              "description": "old is a TLS profile for use when services need to be accessed by very old\nclients or libraries and should be used only as a last resort.",
               "type": "object",
               "nullable": true
             },
             "type": {
-              "description": "type is one of Old, Intermediate, Modern or Custom. Custom provides the\nability to specify individual TLS security profile parameters.\n\nThe profiles are based on version 5.7 of the Mozilla Server Side TLS\nconfiguration guidelines. The cipher lists consist of the configuration's\n\"ciphersuites\" followed by the Go-specific \"ciphers\" from the guidelines.\nSee: https://ssl-config.mozilla.org/guidelines/5.7.json\n\nThe profiles are intent based, so they may change over time as new ciphers are\ndeveloped and existing ciphers are found to be insecure. Depending on\nprecisely which ciphers are available to a process, the list may be reduced.",
+              "description": "type is one of Old, Intermediate, Modern or Custom. Custom provides the\nability to specify individual TLS security profile parameters.\n\nThe profiles are based on the Mozilla Server Side TLS configuration\nguidelines. The cipher lists consist of the configuration's\n\"ciphersuites\" followed by the \"ciphers\" from the guidelines.\n\nThe profiles are intent based, so they may change over time as new ciphers are\ndeveloped and existing ciphers are found to be insecure. Depending on\nprecisely which ciphers are available to a process, the list may be reduced.",
               "type": "string",
               "enum": [
                 "Old",

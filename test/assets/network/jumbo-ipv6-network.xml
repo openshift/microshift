@@ -1,0 +1,14 @@
+<network>
+  <name>jumbo-ipv6</name>
+  <forward mode="nat">
+    <nat ipv6='yes'>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <mtu size='9000'/>
+  <ip family="ipv6" address="2001:db8:ca7:fe::1" prefix="96">
+    <dhcp>
+      <range start="2001:db8:ca7:fe::1000" end="2001:db8:ca7:fe::2000" />
+    </dhcp>
+  </ip>
+</network>

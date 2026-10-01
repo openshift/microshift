@@ -15,3 +15,7 @@ resources:
 - auth_proxy_role.yaml
 - auth_proxy_role_binding.yaml
 - auth_proxy_client_clusterrole.yaml
+# RBAC for reading featuregates.config.openshift.io resource to determine
+# feature enabling.
+- featuregate_clusterrole.yaml
+- featuregate_clusterrole_binding.yaml

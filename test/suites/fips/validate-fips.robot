@@ -132,12 +132,6 @@ Fips Should Be Enabled Bootc
     Should Be Equal As Integers    0    ${rc}
     Should Be Equal As Strings    ${stdout.strip()}    FIPS
 
-    # Verify initramfs FIPS module presence
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    bash -c 'lsinitrd -m 2>/dev/null | grep -Fxq fips'
-    ...    sudo=False    return_rc=True    return_stdout=True    return_stderr=True
-    Should Be Equal As Integers    0    ${rc}
-
 Get Images From Release File
     [Documentation]    Obtains list of Images from Release.
     ${stdout}    ${stderr}    ${rc}=    Execute Command

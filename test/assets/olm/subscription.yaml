@@ -1,9 +1,11 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: amq-broker
+  name: hello-microshift-operator
   namespace: openshift-operators
 spec:
-  name: amq-broker-rhel8
-  source: redhat-operators
+  channel: alpha
+  name: hello-microshift-operator
+  source: hello-microshift-catalog
   sourceNamespace: openshift-marketplace
+  installPlanApproval: Automatic

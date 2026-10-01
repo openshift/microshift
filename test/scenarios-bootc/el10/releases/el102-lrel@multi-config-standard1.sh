@@ -59,6 +59,9 @@ scenario_run_tests() {
         sleep 5
     done
 
+    # Stop MicroShift before applying TLS configuration
+    run_command_on_vm host1 "sudo systemctl stop microshift" || true
+
     # Apply TLSv1.3 configuration via drop-in config
     echo "INFO: Configuring TLSv1.3..."
     run_command_on_vm host1 "sudo mkdir -p /etc/microshift/config.d"
@@ -68,9 +71,8 @@ apiServer:
     minVersion: VersionTLS13
 EOF"
 
-    # Restart MicroShift to apply TLS configuration
-    echo "INFO: Restarting MicroShift to apply TLS configuration..."
-    run_command_on_vm host1 "sudo systemctl restart microshift"
+    # Start MicroShift to apply TLS configuration
+    run_command_on_vm host1 "sudo systemctl start microshift"
 
     # Wait for MicroShift to be ready
     wait_for_microshift_to_be_ready host1
@@ -93,7 +95,6 @@ EOF"
     echo "INFO: Cleaning up LVMS workloads..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/cleanupWorkload.sh"
 
-    # Run all standard1 tests except version (which requires RPM install verification)
     echo "INFO: Running validation tests for multi-config scenario..."
     run_tests host1 \
         --variable "EXPECTED_OS_VERSION:10.2" \

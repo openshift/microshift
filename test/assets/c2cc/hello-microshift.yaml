@@ -1,0 +1,59 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: hello-microshift
+  labels:
+    app: hello-microshift
+spec:
+  terminationGracePeriodSeconds: 0
+  containers:
+  - name: hello-microshift
+    image: quay.io/microshift/busybox:1.36
+    command: ["/bin/sh"]
+    args:
+    - -c
+    - |
+      mkdir -p /tmp/www/cgi-bin
+      cat > /tmp/www/cgi-bin/hello <<SCRIPT
+      #!/bin/sh
+      echo "Content-Type: text/plain"
+      echo ""
+      SRC=\$(echo "\${REMOTE_ADDR}" | sed 's/\[//;s/\]//;s/^::ffff://')
+      echo "Hello from ${MY_POD_IP}, source: \${SRC}"
+      SCRIPT
+      chmod +x /tmp/www/cgi-bin/hello
+      httpd -f -p 8080 -h /tmp/www
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    env:
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 1001
+      seccompProfile:
+        type: RuntimeDefault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-microshift
+  labels:
+    app: hello-microshift
+spec:
+  ipFamilyPolicy: PreferDualStack
+  selector:
+    app: hello-microshift
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP

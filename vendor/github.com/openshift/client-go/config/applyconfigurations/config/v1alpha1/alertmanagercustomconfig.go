@@ -47,7 +47,7 @@ type AlertmanagerCustomConfigApplyConfiguration struct {
 	// - name: memory
 	// request: 40Mi
 	// limit: null
-	// Maximum length for this list is 10.
+	// Maximum length for this list is 5.
 	// Minimum length for this list is 1.
 	// Each resource name must be unique within this list.
 	Resources []ContainerResourceApplyConfiguration `json:"resources,omitempty"`
@@ -90,12 +90,10 @@ type AlertmanagerCustomConfigApplyConfiguration struct {
 	// Minimum length for this list is 1.
 	// Entries must have unique topologyKey and whenUnsatisfiable pairs.
 	TopologySpreadConstraints []v1.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty"`
-	// volumeClaimTemplate Defines persistent storage for Alertmanager. Use this setting to
-	// configure the persistent volume claim, including storage class, volume
-	// size, and name.
+	// volumeClaimTemplate defines persistent storage for Alertmanager. Use this setting to
+	// configure the persistent volume claim, including storage class and volume size.
 	// If omitted, the Pod uses ephemeral storage and alert data will not persist
 	// across restarts.
-	// This field is optional.
 	VolumeClaimTemplate *v1.PersistentVolumeClaim `json:"volumeClaimTemplate,omitempty"`
 }
 

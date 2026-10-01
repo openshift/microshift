@@ -112,6 +112,7 @@ Test Case Teardown
     Named PVC Should Be Deleted    test-claim-thin
     Named PVC Should Be Deleted    snapshot-restore
     Remove Namespace    ${NAMESPACE}
+    No Topolvm LogicalVolumes Should Exist
 
 Write To Volume
     [Documentation]    Write some simple text to the data volume

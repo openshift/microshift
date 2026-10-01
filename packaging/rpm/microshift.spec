@@ -16,6 +16,13 @@
 # modifying the Go binaries breaks the DWARF debugging
 %global __os_install_post %{_rpmconfigdir}/brp-compress
 
+# TuneD profile directory changed in RHEL 10
+%if 0%{?rhel} >= 10
+%global tuned_profile_dir %{_prefix}/lib/tuned/profiles
+%else
+%global tuned_profile_dir %{_prefix}/lib/tuned
+%endif
+
 # SELinux specifics
 %global selinuxtype targeted
 %define selinux_policyver 3.14.3-67
@@ -64,10 +71,8 @@ BuildRequires: systemd
 BuildRequires: golang
 # DO NOT REMOVE
 
-# TODO: The cri-o and cri-tools versions are relaxed in the transition period.
-# They need to be updated to target a single version range before the release.
-Requires: cri-o >= 1.34.0, cri-o < 1.36.0
-Requires: cri-tools >= 1.34.0, cri-tools < 1.36.0
+Requires: cri-o >= 1.35.0, cri-o < 1.36.0
+Requires: cri-tools >= 1.35.0, cri-tools < 1.36.0
 # The container networking plugins package has been removed from RHEL 10 and
 # cri-o no longer has an explicit dependency on it.
 # Ensure that the package is installed on RHEL 9 as a weak dependency, skipping
@@ -438,9 +443,16 @@ install -p -m644 assets/components/multus/release-multus-{x86_64,aarch64}.json %
 install -p -m644 packaging/tuned/microshift-cleanup-kubelet.service %{buildroot}%{_unitdir}/microshift-cleanup-kubelet.service
 
 # low-latency
-install -d -m755 %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline
-install -p -m644 packaging/tuned/profile/tuned.conf %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline/tuned.conf
-install -p -m755 packaging/tuned/profile/script.sh %{buildroot}/%{_prefix}/lib/tuned/microshift-baseline/script.sh
+install -d -m755 %{buildroot}/%{tuned_profile_dir}/microshift-baseline
+install -p -m644 packaging/tuned/profile/tuned.conf %{buildroot}/%{tuned_profile_dir}/microshift-baseline/tuned.conf
+install -p -m755 packaging/tuned/profile/script.sh %{buildroot}/%{tuned_profile_dir}/microshift-baseline/script.sh
+%if 0%{?rhel} < 10
+# TuneD on RHEL 10 looks for profiles in /usr/lib/tuned/profiles/
+# Until we have RHEL10 builders, the profile needs to be symlinked
+# so the package is usable on both RHEL 9 and RHEL 10.
+install -d -m755 %{buildroot}/%{_prefix}/lib/tuned/profiles
+ln -s ../microshift-baseline %{buildroot}/%{_prefix}/lib/tuned/profiles/microshift-baseline
+%endif
 install -d -m755 %{buildroot}%{_sysconfdir}/tuned
 install -p -m644 packaging/tuned/profile/variables.conf %{buildroot}%{_sysconfdir}/tuned/microshift-baseline-variables.conf
 
@@ -562,7 +574,7 @@ install -p -m644 assets/optional/cert-manager/kustomization.yaml %{buildroot}/%{
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd
 install -p -m644 assets/optional/cert-manager/crd/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/bases
-install -p -m644 assets/optional/cert-manager/crd/bases/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/bases
+install -p -m644 assets/optional/cert-manager/crd/bases/*.yaml assets/optional/cert-manager/crd/bases/*.yml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/bases
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/patches
 install -p -m644 assets/optional/cert-manager/crd/patches/*.yaml %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/crd/patches
 install -d -m755 %{buildroot}/%{_prefix}/lib/microshift/manifests.d/060-microshift-cert-manager/rbac
@@ -744,7 +756,10 @@ fi
 %{_datadir}/microshift/release/release-multus-{x86_64,aarch64}.json
 
 %files low-latency
-%{_prefix}/lib/tuned/microshift-baseline
+%{tuned_profile_dir}/microshift-baseline
+%if 0%{?rhel} < 10
+%{_prefix}/lib/tuned/profiles/microshift-baseline
+%endif
 %config(noreplace) %{_sysconfdir}/tuned/microshift-baseline-variables.conf
 %{_sysconfdir}/crio/crio.conf.d/05-high-performance-runtime.conf
 %{_prefix}/lib/microshift/manifests.d/002-microshift-low-latency/

@@ -64,6 +64,7 @@ Teardown For Workload Partitioning
     Remove Drop In MicroShift Config    10-kubelet
     Systemctl    restart    crio.service
     Restart MicroShift
+    Wait For MicroShift Healthcheck Success
 
 Configure Kubelet For Workload Partitioning
     [Documentation]    configure microshift with kubelet CPU configuration
@@ -252,6 +253,7 @@ Cleanup And Create NS
     Cleanup MicroShift    --all    --keep-images
     Remove Files    ${KUBELET_CPU_STATE_FILE}
     Restart MicroShift
+    Wait For MicroShift Healthcheck Success
     ${ns}=    Create Unique Namespace
     VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
 

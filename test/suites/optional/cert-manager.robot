@@ -13,10 +13,11 @@ Resource            ../../resources/oc.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-network.resource
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/optional-config.resource
 Resource            ../../resources/ostree-health.resource
 
-Suite Setup         Setup Suite With Namespace
-Suite Teardown      Teardown Suite With Namespace
+Suite Setup         Setup
+Suite Teardown      Teardown
 
 Test Tags           cert-manager    certificates    tls
 
@@ -96,6 +97,18 @@ Test Cert manager with local acme server
 
 
 *** Keywords ***
+Setup
+    [Documentation]    Setup cert-manager suite with only its required optionals
+    Setup Suite
+    Setup MicroShift With Optionals    060-microshift-cert-manager
+    ${ns}=    Create Unique Namespace
+    VAR    ${NAMESPACE}=    ${ns}    scope=SUITE
+
+Teardown
+    [Documentation]    Restore config and teardown suite
+    Teardown MicroShift With Optionals
+    Teardown Suite With Namespace
+
 Deploy Hello MicroShift
     [Documentation]    Deploys the hello microshift application (service included)
     ...    in the given namespace.

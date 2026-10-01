@@ -81,8 +81,8 @@ export FAKE_NEXT_MINOR_VERSION=$(( "${MINOR_VERSION}" + 1 ))
 #
 # For a release branch, the current release repository should come from the
 # official 'rhocp' stream.
-CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v4/${UNAME_M}/microshift/ocp-dev-preview/latest-4.22/el9/os"
-CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
+CURRENT_RELEASE_REPO="rhocp-4.22-for-rhel-9-${UNAME_M}-rpms"
+CURRENT_RELEASE_VERSION="$(get_vrel_from_rhsm "${CURRENT_RELEASE_REPO}")"
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
 
@@ -112,7 +112,7 @@ export YMINUS2_RELEASE_VERSION
 
 # The 'rhocp_minor_y' variable should be the minor version number, if the
 # current release is available through the 'rhocp' stream, otherwise empty.
-RHOCP_MINOR_Y=""
+RHOCP_MINOR_Y=22
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. If the mirror for current minor is not
 # available yet, it should point to an older release.
@@ -139,7 +139,7 @@ export CNCF_SONOBUOY_VERSION=v0.57.3
 export CNCF_SYSTEMD_LOGS_VERSION=v0.4
 
 # The current version of the microshift-gitops package.
-export GITOPS_VERSION=1.19
+export GITOPS_VERSION=1.21
 
 # The brew release versions needed for release regression testing
 BREW_Y0_RELEASE_VERSION="$(get_vrel_from_rpm "${BREW_RPM_SOURCE}/4.${MINOR_VERSION}-zstream/${UNAME_M}/")"
@@ -170,6 +170,6 @@ export BREW_LREL_RELEASE_VERSION
 
 # Branch and commit for the openshift-tests-private repository
 OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH="release-4.${MINOR_VERSION}"
-OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT="b5111e366dc8f517732c6d48219ed659497de8e0"
+OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT="264a5b49369c2db96100374758c9c5cfb29a0259"
 export OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH
 export OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT

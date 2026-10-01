@@ -69,6 +69,7 @@ MicroShift-Tuned Requires Config To Function
 Setup
     [Documentation]    Setup test for the test suite
     Login MicroShift Host
+    Wait Until Greenboot Health Check Exited
     # We don't need MicroShift service when testing microshift-tuned.service
     Stop MicroShift
     Disable MicroShift
@@ -83,6 +84,8 @@ Teardown
     Command Should Work    mv /etc/microshift/tuned.yaml.bak /etc/microshift/tuned.yaml
     Enable MicroShift
     Restart MicroShift-Tuned Expecting Reboot
+    # Let's leave VM in a state ready to pick up by next suite
+    Wait For MicroShift Healthcheck Success
     Logout MicroShift Host
 
 Restart MicroShift-Tuned Expecting Reboot

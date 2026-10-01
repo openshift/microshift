@@ -62,6 +62,8 @@ type Config struct {
 
 	GenericDevicePlugin GenericDevicePlugin `json:"genericDevicePlugin"`
 
+	C2CC C2CC `json:"clusterToCluster"`
+
 	// Internal-only fields
 	userSettings *Config `json:"-"` // the values read from the config file
 
@@ -182,7 +184,7 @@ func (c *Config) fillDefaults() error {
 		ForwardedHeaderPolicy:    "Append",
 		HTTPEmptyRequestsPolicy:  "Respond",
 		ServingCertificateSecret: "router-certs-default",
-		TLSSecurityProfile: &configv1.TLSSecurityProfile{
+		TLSSecurityProfile: &TLSSecurityProfile{
 			Type: configv1.TLSProfileIntermediateType,
 		},
 		AccessLogging: AccessLogging{
@@ -197,6 +199,11 @@ func (c *Config) fillDefaults() error {
 	c.GenericDevicePlugin = genericDevicePluginDefaults()
 	c.Telemetry = telemetryDefaults()
 	c.DNS = dnsDefaults()
+	c.C2CC = C2CC{
+		DNS:           C2CCDNS{CacheTTL: ptr.To(10), CacheNegativeTTL: ptr.To(10)},
+		Routing:       C2CCRouting{RouteTableID: ptr.To(200), ServiceRouteTableID: ptr.To(201)},
+		ProbeInterval: "10s",
+	}
 	return nil
 }
 
@@ -208,6 +215,9 @@ func (c *Config) incorporateUserSettings(u *Config) {
 
 	if u.DNS.BaseDomain != "" {
 		c.DNS.BaseDomain = u.DNS.BaseDomain
+	}
+	if u.DNS.ConfigFile != "" {
+		c.DNS.ConfigFile = u.DNS.ConfigFile
 	}
 
 	if u.Network.CNIPlugin != "" {
@@ -329,6 +339,25 @@ func (c *Config) incorporateUserSettings(u *Config) {
 	}
 
 	u.GenericDevicePlugin.incorporateUserSettings(c)
+
+	if u.C2CC.RemoteClusters != nil {
+		c.C2CC.RemoteClusters = u.C2CC.RemoteClusters
+	}
+	if u.C2CC.DNS.CacheTTL != nil {
+		c.C2CC.DNS.CacheTTL = u.C2CC.DNS.CacheTTL
+	}
+	if u.C2CC.DNS.CacheNegativeTTL != nil {
+		c.C2CC.DNS.CacheNegativeTTL = u.C2CC.DNS.CacheNegativeTTL
+	}
+	if u.C2CC.ProbeInterval != "" {
+		c.C2CC.ProbeInterval = u.C2CC.ProbeInterval
+	}
+	if u.C2CC.Routing.RouteTableID != nil {
+		c.C2CC.Routing.RouteTableID = u.C2CC.Routing.RouteTableID
+	}
+	if u.C2CC.Routing.ServiceRouteTableID != nil {
+		c.C2CC.Routing.ServiceRouteTableID = u.C2CC.Routing.ServiceRouteTableID
+	}
 
 	if u.Ingress.TuningOptions.HeaderBufferBytes > 0 {
 		c.Ingress.TuningOptions.HeaderBufferBytes = u.Ingress.TuningOptions.HeaderBufferBytes
@@ -487,6 +516,9 @@ func (c *Config) updateComputedValues() error {
 		}
 		c.Node.NodeIPV6 = ip
 	}
+
+	c.C2CC.stripEmptyRemoteClusters()
+	c.C2CC.resolveRoutingDefaults()
 
 	clusterDNS, err := c.computeClusterDNS()
 	if err != nil {
@@ -689,6 +721,11 @@ func (c *Config) validate() error {
 	}
 	if err := c.Network.Multus.Validate(); err != nil {
 		return fmt.Errorf("error validating multus configuration: %v", err)
+	}
+	if c.C2CC.IsEnabled() {
+		if err := c.C2CC.validate(c); err != nil {
+			return fmt.Errorf("error validating clusterToCluster: %w", err)
+		}
 	}
 	return nil
 }

@@ -1,0 +1,1 @@
+../../../el9/layer1-base/group1/rhel96-test-agent.containerfile

@@ -653,6 +653,7 @@ func NewMainKubelet(ctx context.Context,
 		nodeStatusMaxImages:          nodeStatusMaxImages,
 		tracer:                       tracer,
 		nodeStartupLatencyTracker:    kubeDeps.NodeStartupLatencyTracker,
+		podStartupLatencyTracker:     kubeDeps.PodStartupLatencyTracker,
 		healthChecker:                kubeDeps.HealthChecker,
 		flagz:                        kubeDeps.Flagz,
 	}
@@ -815,10 +816,11 @@ func NewMainKubelet(ctx context.Context,
 		kubeCfg.MemorySwap.SwapBehavior,
 		kubeDeps.ContainerManager.GetNodeAllocatableAbsolute,
 		*kubeCfg.MemoryThrottlingFactor,
-		kubeDeps.PodStartupLatencyTracker,
+		klet.podStartupLatencyTracker,
 		kubeDeps.TracerProvider,
 		tokenManager,
 		getServiceAccount,
+		klet.podStartupLatencyTracker,
 	)
 	if err != nil {
 		return nil, err
@@ -1529,6 +1531,9 @@ type Kubelet struct {
 
 	// Track node startup latencies
 	nodeStartupLatencyTracker util.NodeStartupLatencyTracker
+
+	// Track pod startup latencies
+	podStartupLatencyTracker util.PodStartupLatencyTracker
 
 	// Health check kubelet
 	healthChecker watchdog.HealthChecker
@@ -3201,7 +3206,15 @@ func (pp *kubeletPodsProvider) GetPods() []*v1.Pod {
 }
 
 func (pp *kubeletPodsProvider) GetPodByName(namespace, name string) (*v1.Pod, bool) {
-	return pp.kl.podManager.GetPodByName(namespace, name)
+	pod, found := pp.kl.podManager.GetPodByName(namespace, name)
+	if !found {
+		return nil, false
+	}
+	// use the same filtering logic as GetActivePods
+	if pp.kl.isPodInactive(pod) {
+		return nil, false
+	}
+	return pod, true
 }
 
 // ListenAndServePodResources runs the kubelet podresources grpc service

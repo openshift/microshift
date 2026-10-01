@@ -360,9 +360,8 @@ The following repositories have been already bumped as well:
 
 <URLs to api/client-go/library-go/apiserver-library-go/operators>
 
-Followup work has been assigned to appropriate teams
-through bugzillas linked in the code. Please treat
-them as the highest priority after landing the bump.
+A Jira ticket has been opened for the rebase process.
+It has been linked to the pull request.
 
 Finally, this means we are blocking ALL PRs to our
 kubernetes fork.
@@ -404,9 +403,54 @@ them as the highest priority and release blockers for your team:
 1. Update cluster-kube-apiserver-operator `pre-release-lifecycle` alert's
 `removed_release` version similarly to https://github.com/openshift/cluster-kube-apiserver-operator/pull/1382.
 
-## Updating with `git merge`
+## Updating with `redhat-chai-bot`
 
 *This is the preferred way to update to patch releases of kubernetes*
+
+[chai-bot](slack://app?team=T027F3GAJ&id=A0AJUKWDUR1&tab=messages) (ship-help-bot) is an internal tool has been given instructions to
+periodically check for upstream patch releases and complete the rebase autonomously. The steps taken are outlined below:
+
+
+1. Fetch upstream tags over the past 31 days:
+```
+git fetch --tags upstream && git tag --sort=-creatordate | grep -E 'v[0-9]+\.[0-9]+\.[0-9]+$' | awk -v cutoff="$(date -d '31 days ago' +%s)" '$2 >= cutoff {print $1}'
+```
+where `upstream` points at https://github.com/kubernetes/kubernetes/
+
+2. Determine whether any patch release have occurred that have not yet been rebased and merged. If such patch releases exist, 
+   the corresponding openshift branches are found and marked to be rebased. Otherwise, chai-bot reports that there is no rebase necessary.
+  - *Branches tracking master are skipped.*
+
+3. Output a mapping table of upstream release to openshift version, as well as whether that branch needs to be rebased, to the appropriate team:
+```
+*Kubernetes patch rebase check*
+
+Upstream Release   OCP Branch      Current k8s   Status     Notes
+─────────────────  ──────────────  ────────────  ─────────  ──────────────────────────
+v1.35.6            master          1.35.3        REBASE     Patch 3 → 6
+v1.35.6            release-5.1     1.35.3        SKIP       Points at openshift/master
+v1.35.6            release-4.22    1.35.5        REBASE     Patch 5 → 6
+v1.34.9            release-4.21    1.34.8        REBASE     Patch 8 → 9
+```
+
+4. For each branch requiring a rebase, chai-bot runs [rebase.sh](https://github.com/openshift/kubernetes/blob/master/openshift-hack/rebase.sh) (see usage below) with
+   the appropriate parameters of `kubernetes_tag` and `openshift_release`.
+
+5. After each successful rebase, a message is posted to the appropriate team:
+```
+*:white_check_mark: Rebase of openshift/kubernetes:{openshift_release} → {kubernetes_tag} complete*
+
+Branch pushed: <fork_repo>:{branch_name}
+• Kubernetes version: {old_version} → {kubernetes_tag}
+• Merge conflicts: {list of files or "None"}
+
+_Open a PR against `openshift/kubernetes:{openshift_release}` when ready._
+```
+On rebase failure, a message containing failure details is posted instead and the next branch is rebased.
+
+6. A final summary is posted and permission to open a pull request for each rebase is requested.
+
+## Updating with `git merge`
 
 After the initial bump as described above it is possible to update
 to newer released version using `git merge`. To do that follow these steps:
@@ -512,26 +556,24 @@ etcd version 3.5.6 or greater required
 Grab newer version of etcd from https://github.com/etcd-io/etcd/releases/ and place
 it in `/usr/local/bin/etcd`.
 
-## Updating with `rebase.sh` (experimental)
+## Updating with `rebase.sh`
 
-The above steps are available as a script that will merge and rebase along the happy path without automatic conflict
-resolution and at the end will create a PR for you.
+In the event that chai-bot fails to rebase, [rebase.sh](https://github.com/openshift/kubernetes/blob/master/openshift-hack/rebase.sh) can also be run manually.
 
 Here are the steps:
-1. Create a new BugZilla with the respective OpenShift version to rebase (Target Release stays ---),
-   Prio&Severity to High with a proper description of the change logs.
-   See [BZ2021468](https://bugzilla.redhat.com/show_bug.cgi?id=2021468) as an example.
+1. Create a new Jira ticket under OCPBUGS with the respective OpenShift version to rebase,
+   Target Backport Version to the previous minor version + .z
 2. It's best to start off with a fresh fork of [openshift/kubernetes](https://github.com/openshift/kubernetes/). Stay on the master branch.
-3. This script requires `jq`, `git`, `podman` and `bash`, `gh` is optional.
+3. This script requires `git`, `podman` and `bash`, and optionally uses `gh` to create a pull request.
 4. In the root dir of that fork run:
 ```
-openshift-hack/rebase.sh --k8s-tag=v1.25.2 --openshift-release=release-4.12 --bugzilla-id=2003027
+openshift-hack/rebase.sh --k8s-tag=v1.25.2 --openshift-release=release-4.12 --jira-id=OCPBUGS-90150
 ```
 
 where `k8s-tag` is the [kubernetes/kubernetes](https://github.com/kubernetes/kubernetes/) release tag, the `openshift-release`
-is the OpenShift release branch in [openshift/kubernetes](https://github.com/openshift/kubernetes/) and the `bugzilla-id` is the
-BugZilla ID created in step (1).
+is the OpenShift release branch in [openshift/kubernetes](https://github.com/openshift/kubernetes/) and the `jira-id` is the
+Jira ticket number created in step (1).
 
 5. In case of conflicts, it will ask you to step into another shell to resolve those. The script will continue by committing the resolution with `UPSTREAM: <drop>`.
 6. At the end, there will be a "rebase-$VERSION" branch pushed to your fork.
-7. If you have `gh` installed and are logged in, it will attempt to create a PR for you by opening a web browser.
+7. A pull request will be created with the title `$jira_id: Rebase $k8s_tag in $openshift_release` against the corresponding openshift branch.

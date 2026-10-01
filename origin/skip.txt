@@ -195,4 +195,13 @@
 "[Jira:service-ca][sig-api-machinery] Service CA Operator should have a running operator and managed resources [Suite:openshift/service-ca-operator/conformance/parallel]"
 "[sig-storage] PersistentVolumes NFS with Single PV - PVC pairs create a PVC and use it multiple times in a single pod"
 "[sig-storage] CSI Mock volume service account token CSIServiceAccountToken token should be plumbed down only in secrets when serviceAccountTokenInSecrets=true"
+"[Jira:\"Cluster Version Operator\"] cluster-version-operator readiness checks should report node count matching the actual cluster"
+"[Jira:\"Cluster Version Operator\"] cluster-version-operator readiness checks should complete all checks within 60 seconds"
+"[Jira:\"Cluster Version Operator\"] cluster-version-operator readiness checks should report operator count matching actual ClusterOperators"
+"[Jira:\"Cluster Version Operator\"] cluster-version-operator readiness checks should produce valid JSON that round-trips"
+"[Jira:\"Cluster Version Operator\"] cluster-version-operator readiness checks should report PDB count matching actual PodDisruptionBudgets"
+"[Jira:\"Cluster Version Operator\"] cluster-version-operator readiness checks should report network type matching actual Network config"
+"[Jira:\"Cluster Version Operator\"] cluster-version-operator readiness checks should report etcd member count matching actual etcd pods"
+"[Jira:\"Cluster Version Operator\"] cluster-version-operator readiness checks should report cluster conditions matching ClusterVersion status"
+"[Jira:\"Cluster Version Operator\"] cluster-version-operator readiness checks should run all checks without errors"
 

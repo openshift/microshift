@@ -41,6 +41,44 @@ apiServer:
         # to serve from the API server. Allowed values: VersionTLS12, VersionTLS13.
         # Defaults to VersionTLS12.
         minVersion: VersionTLS12
+clusterToCluster:
+    # DNS cache settings for CoreDNS server blocks generated for remote clusters.
+    dns:
+        # Maximum TTL (seconds) for denial (NXDOMAIN/NODATA) DNS cache entries in CoreDNS
+        # server blocks generated for remote clusters. Must be >= 0. Setting to 0 disables denial caching.
+        cacheNegativeTTL: 10
+        # Maximum TTL (seconds) for positive DNS cache entries in CoreDNS server blocks
+        # generated for remote clusters. Must be >= 0. Setting to 0 disables positive caching.
+        cacheTTL: 10
+    # Interval between healthcheck probe attempts to each remote cluster.
+    # Parsed as a Go duration string (e.g. "10s", "1m"). Must be between 1s and 5m.
+    probeInterval: 10s
+    # List of remote clusters to establish connectivity with.
+    # C2CC is disabled when this list is empty.
+    remoteClusters:
+        - # Pod CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
+          clusterNetwork: []
+          # DNS domain suffix for the remote cluster (e.g., "cluster-b.remote").
+          # Services are reachable as <svc>.<ns>.svc.<domain>.
+          # Optional — if empty, no DNS forwarding is configured for this remote.
+          domain: ""
+          # IP addresses of the remote cluster's node, used as next-hop for routing.
+          # At most one IPv4 and one IPv6 address. Dual-stack clusters need both.
+          nextHop: []
+          # Service CIDRs of the remote cluster. Must not overlap with local cluster or other remotes.
+          serviceNetwork: []
+    # Linux policy routing table settings for C2CC routes.
+    routing:
+        # Linux policy routing table ID for direct routes to remote cluster CIDRs.
+        # The route protocol number is set to the same value.
+        # Must be between 1 and 252 (253-255 are reserved by the kernel).
+        # Must differ from serviceRouteTableID.
+        routeTableID: 200
+        # Linux policy routing table ID for service routes via the OVN management port.
+        # The route protocol number is set to the same value.
+        # Must be between 1 and 252 (253-255 are reserved by the kernel).
+        # Must differ from routeTableID.
+        serviceRouteTableID: 201
 debugging:
     # Valid values are: "Normal", "Debug", "Trace", "TraceAll".
     # Defaults to "Normal".
@@ -58,6 +96,14 @@ dns:
     # example:
     #   microshift.example.com
     baseDomain: example.com
+    # configFile is the path to a custom CoreDNS Corefile on the host filesystem.
+    # When set, MicroShift uses this file as the Corefile in the dns-default ConfigMap,
+    # fully replacing the default template-rendered configuration.
+    # Changes to this file are detected at runtime and applied without restarting MicroShift.
+    # Mutually exclusive with dns.hosts: setting both causes a startup error.
+    # example:
+    #   /etc/microshift/dns/Corefile
+    configFile: ""
     # Hosts contains configuration for the hosts file.
     hosts:
         # File is the path to the hosts file to monitor.
@@ -449,65 +495,19 @@ ingress:
         # intermediate is a TLS profile for use when you do not need compatibility with
         # legacy clients and want to remain highly secure while being compatible with
         # most clients currently in use.
-
-        # This profile is equivalent to a Custom profile specified as:
-        #   minTLSVersion: VersionTLS12
-        #   ciphers:
-        #     - TLS_AES_128_GCM_SHA256
-        #     - TLS_AES_256_GCM_SHA384
-        #     - TLS_CHACHA20_POLY1305_SHA256
-        #     - ECDHE-ECDSA-AES128-GCM-SHA256
-        #     - ECDHE-RSA-AES128-GCM-SHA256
-        #     - ECDHE-ECDSA-AES256-GCM-SHA384
-        #     - ECDHE-RSA-AES256-GCM-SHA384
-        #     - ECDHE-ECDSA-CHACHA20-POLY1305
-        #     - ECDHE-RSA-CHACHA20-POLY1305
         intermediate: {}
         # modern is a TLS security profile for use with clients that support TLS 1.3 and
         # do not need backward compatibility for older clients.
-
-        # This profile is equivalent to a Custom profile specified as:
-        #   minTLSVersion: VersionTLS13
-        #   ciphers:
-        #     - TLS_AES_128_GCM_SHA256
-        #     - TLS_AES_256_GCM_SHA384
-        #     - TLS_CHACHA20_POLY1305_SHA256
         modern: {}
         # old is a TLS profile for use when services need to be accessed by very old
         # clients or libraries and should be used only as a last resort.
-
-        # This profile is equivalent to a Custom profile specified as:
-        #   minTLSVersion: VersionTLS10
-        #   ciphers:
-        #     - TLS_AES_128_GCM_SHA256
-        #     - TLS_AES_256_GCM_SHA384
-        #     - TLS_CHACHA20_POLY1305_SHA256
-        #     - ECDHE-ECDSA-AES128-GCM-SHA256
-        #     - ECDHE-RSA-AES128-GCM-SHA256
-        #     - ECDHE-ECDSA-AES256-GCM-SHA384
-        #     - ECDHE-RSA-AES256-GCM-SHA384
-        #     - ECDHE-ECDSA-CHACHA20-POLY1305
-        #     - ECDHE-RSA-CHACHA20-POLY1305
-        #     - ECDHE-ECDSA-AES128-SHA256
-        #     - ECDHE-RSA-AES128-SHA256
-        #     - ECDHE-ECDSA-AES128-SHA
-        #     - ECDHE-RSA-AES128-SHA
-        #     - ECDHE-ECDSA-AES256-SHA
-        #     - ECDHE-RSA-AES256-SHA
-        #     - AES128-GCM-SHA256
-        #     - AES256-GCM-SHA384
-        #     - AES128-SHA256
-        #     - AES128-SHA
-        #     - AES256-SHA
-        #     - DES-CBC3-SHA
         old: {}
         # type is one of Old, Intermediate, Modern or Custom. Custom provides the
         # ability to specify individual TLS security profile parameters.
 
-        # The profiles are based on version 5.7 of the Mozilla Server Side TLS
-        # configuration guidelines. The cipher lists consist of the configuration's
-        # "ciphersuites" followed by the Go-specific "ciphers" from the guidelines.
-        # See: https://ssl-config.mozilla.org/guidelines/5.7.json
+        # The profiles are based on the Mozilla Server Side TLS configuration
+        # guidelines. The cipher lists consist of the configuration's
+        # "ciphersuites" followed by the "ciphers" from the guidelines.
 
         # The profiles are intent based, so they may change over time as new ciphers are
         # developed and existing ciphers are found to be insecure. Depending on

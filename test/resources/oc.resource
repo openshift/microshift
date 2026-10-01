@@ -57,7 +57,7 @@ Oc Exec
     [Documentation]    Run 'oc exec' on a specific pod in the curret test namespace
     ...    Returns the command's combined STDOUT/STDER
     [Arguments]    ${pod}    ${cmd}    ${ns}=${NAMESPACE}    ${type}=pod
-    ${output}=    Run With Kubeconfig    oc exec -n ${ns} ${type}/${pod} -- /bin/bash -c '${cmd}'
+    ${output}=    Run With Kubeconfig    oc exec -n ${ns} ${type}/${pod} -- /bin/sh -c '${cmd}'
     RETURN    ${output}
 
 Oc Wait
@@ -151,7 +151,9 @@ Named VolumeSnapshot Should Be Ready
     ...    ${name}    Name of volumesnapshot to wait for
     ...    ${timeout}    Period of time to wait for volumeSnapshot ready "readyToUse" state.
     [Arguments]    ${name}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
-    Oc Wait    volumesnapshot/${name} -n ${NAMESPACE}    --for=jsonpath='{.status.readyToUse}=true'
+    Oc Wait
+    ...    volumesnapshot/${name} -n ${NAMESPACE}
+    ...    --for=jsonpath='{.status.readyToUse}=true' --timeout=${timeout}
 
 Named VolumeSnapshot Should Be Deleted
     [Documentation]    Wait for volumesnapshot with ${name} to be deleted
@@ -160,6 +162,21 @@ Named VolumeSnapshot Should Be Deleted
     ...    ${timeout}    Period of time to wait for volumesnapshot to reach ready status.
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} volumesnapshot/${name}    --for=Delete --timeout=${timeout}
+
+No Topolvm LogicalVolumes Should Exist
+    [Documentation]    Wait until all topolvm LogicalVolumes are deleted.
+    ...    ${timeout}    Period of time to wait for all LogicalVolumes to be removed.
+    [Arguments]    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
+    Wait Until Keyword Succeeds    ${timeout}    5s
+    ...    Verify No LogicalVolumes Exist
+
+Verify No LogicalVolumes Exist
+    [Documentation]    Assert that no topolvm LogicalVolumes currently exist.
+    ${output}    ${rc}=    Run With Kubeconfig
+    ...    oc get logicalvolumes.topolvm.io -o name --no-headers
+    ...    allow_fail=${TRUE}
+    ...    return_rc=${TRUE}
+    Should Be Empty    ${output}
 
 Oc Create
     [Documentation]    Run 'oc create' on a specific resource in the current test namespace

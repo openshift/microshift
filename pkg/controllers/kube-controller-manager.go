@@ -111,10 +111,24 @@ func configure(ctx context.Context, cfg *config.Config) (args []string, applyFn 
 
 	args, err = mergeAndConvertToArgs(overrides)
 	applyFn = func() error {
-		return assets.ApplyNamespaces(ctx, []string{
+		kubeconfigPath := cfg.KubeConfigPath(config.KubeAdmin)
+		if err := assets.ApplyNamespaces(ctx, []string{
 			"controllers/kube-controller-manager/namespace-openshift-kube-controller-manager.yaml",
 			"core/namespace-openshift-infra.yaml",
-		}, cfg.KubeConfigPath(config.KubeAdmin))
+		}, kubeconfigPath); err != nil {
+			return fmt.Errorf("failed to apply kube-controller-manager namespaces: %w", err)
+		}
+		if err := assets.ApplyClusterRoles(ctx, []string{
+			"controllers/kube-controller-manager/csr_approver_clusterrole.yaml",
+		}, kubeconfigPath); err != nil {
+			return fmt.Errorf("failed to apply kube-controller-manager cluster roles: %w", err)
+		}
+		if err := assets.ApplyClusterRoleBindings(ctx, []string{
+			"controllers/kube-controller-manager/csr_approver_clusterrolebinding.yaml",
+		}, kubeconfigPath); err != nil {
+			return fmt.Errorf("failed to apply kube-controller-manager cluster role bindings: %w", err)
+		}
+		return nil
 	}
 	return args, applyFn, err
 }
@@ -157,7 +171,7 @@ func (s *KubeControllerManager) Run(ctx context.Context, ready chan<- struct{}, 
 	}()
 
 	if err := s.applyFn(); err != nil {
-		return fmt.Errorf("failed to apply openshift namespaces: %w", err)
+		return err
 	}
 
 	select {

@@ -1,13 +1,13 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: redhat-operators
+  name: hello-microshift-catalog
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
-  image: registry.redhat.io/redhat/redhat-operator-index:v4.16
-  displayName: Red Hat Operators
-  publisher: Red Hat
+  image: quay.io/microshift/hello-microshift-catalog:latest
+  displayName: Hello MicroShift Catalog
+  publisher: MicroShift CI
   grpcPodConfig:
     securityContextConfig: restricted
   updateStrategy:

@@ -2,7 +2,7 @@
 
 # READ FIRST BEFORE USING THIS SCRIPT
 #
-# This script requires jq, git, podman and bash to work properly (dependencies are checked for you).
+# This script requires git, podman and bash to work properly (dependencies are checked for you).
 # The Github CLI "gh" is optional, but convenient to create a pull request automatically at the end.
 #
 # This script generates a git remote structure described in:
@@ -11,16 +11,16 @@
 #
 # The usage is described in /Rebase.openshift.md.
 
-# validate input args --k8s-tag=v1.21.2 --openshift-release=release-4.8 --bugzilla-id=2003027
+# validate input args --k8s-tag=v1.21.2 --openshift-release=release-4.8 --jira-id=OCPBUGS-91759
 k8s_tag=""
 openshift_release=""
-bugzilla_id=""
+jira_id=""
 
 usage() {
   echo "Available arguments:"
   echo "  --k8s-tag            (required) Example: --k8s-tag=v1.21.2"
   echo "  --openshift-release  (required) Example: --openshift-release=release-4.8"
-  echo "  --bugzilla-id        (optional) creates new PR against openshift/kubernetes:${openshift-release}: Example: --bugzilla-id=2003027"
+  echo "  --jira-id        (optional) Include Jira ticket in PR title: Example: --jira-id=OCPBUGS-1234"
 }
 
 for i in "$@"; do
@@ -33,8 +33,8 @@ for i in "$@"; do
     openshift_release="${i#*=}"
     shift
     ;;
-  --bugzilla-id=*)
-    bugzilla_id="${i#*=}"
+  --jira-id=*)
+    jira_id="${i#*=}"
     shift
     ;;
   *)
@@ -61,16 +61,11 @@ fi
 echo "Processed arguments are:"
 echo "--k8s_tag=${k8s_tag}"
 echo "--openshift_release=${openshift_release}"
-echo "--bugzilla_id=${bugzilla_id}"
+echo "--jira_id=${jira_id}"
 
 # prerequisites (check git, podman, ... is present)
 if ! command -v git &>/dev/null; then
   echo "git not installed, exiting"
-  exit 1
-fi
-
-if ! command -v jq &>/dev/null; then
-  echo "jq not installed, exiting"
   exit 1
 fi
 
@@ -98,9 +93,13 @@ git fetch upstream --tags -f
 git remote add openshift git@github.com:openshift/kubernetes.git
 git fetch openshift
 
-#git checkout --track "openshift/$openshift_release"
+git checkout --track "openshift/$openshift_release"
 git pull openshift "$openshift_release"
 
+if [ -z "$(git tag -l "$k8s_tag")" ]; then
+    echo "No such tag exists in upstream for: $k8s_tag"
+	exit 1
+fi
 git merge "$k8s_tag"
 # shellcheck disable=SC2181
 if [ $? -eq 0 ]; then
@@ -125,18 +124,17 @@ fi
 
 # openshift-hack/images/hyperkube/Dockerfile.rhel still has FROM pointing to old tag
 # we need to remove the prefix "v" from the $k8s_tag to stay compatible
-sed -i -E "s/(io.openshift.build.versions=\"kubernetes=)(1.[1-9]+.[1-9]+)/\1${k8s_tag:1}/" openshift-hack/images/hyperkube/Dockerfile.rhel
+podman run --rm -v "$(pwd):/workspace:Z" docker.io/library/alpine:latest \
+  sed -i -E "s/(io.openshift.build.versions=\"kubernetes=)(1.[1-9]+.[1-9]+)/\1${k8s_tag:1}/" \
+  /workspace/openshift-hack/images/hyperkube/Dockerfile.rhel
 go_mod_go_ver=$(grep -E 'go 1\.[1-9][0-9]?' go.mod | sed -E 's/go (1\.[1-9][0-9]?)/\1/' | cut -d '.' -f 1,2) # Need to handle mod versions like 1.23 and 1.23.4; our release images only have major.minor
-tag="rhel-8-release-golang-${go_mod_go_ver}-openshift-${openshift_release#release-}"
-
-# update openshift go.mod dependencies
-sed -i -E "/=>/! s/(\tgithub.com\/openshift\/[a-z|-]+) (.*)$/\1 $openshift_release/" go.mod
+tag=$(grep "^  tag:" .ci-operator.yaml | head -n1 | sed -E 's/.*: (.*)/\1/')
 
 echo "> go mod tidy && hack/update-vendor.sh"
-podman run -it --rm -v "$(pwd):/go/k8s.io/kubernetes:Z" \
+podman run --rm -v "$(pwd):/go/k8s.io/kubernetes:Z" \
   --workdir=/go/k8s.io/kubernetes \
   "registry.ci.openshift.org/openshift/release:$tag" \
-  go mod tidy && hack/update-vendor.sh
+  /bin/bash -c "go mod tidy && hack/update-vendor.sh"
 
 # shellcheck disable=SC2181
 if [ $? -ne 0 ]; then
@@ -144,10 +142,26 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-podman run -it --rm -v "$(pwd):/go/k8s.io/kubernetes:Z" \
+echo "> make clean to remove stale _output directory"
+podman run --rm -v "$(pwd):/go/k8s.io/kubernetes:Z" \
+  --workdir=/go/k8s.io/kubernetes \
+  "registry.ci.openshift.org/openshift/release:$tag" \
+  make clean
+# shellcheck disable=SC2181
+if [ $? -ne 0 ]; then
+   echo "make clean failed — check filesystem permissions on _output/"
+   exit 1
+fi
+
+podman run --rm -v "$(pwd):/go/k8s.io/kubernetes:Z" \
   --workdir=/go/k8s.io/kubernetes \
   "registry.ci.openshift.org/openshift/release:$tag" \
   make update OS_RUN_WITHOUT_DOCKER=yes
+# shellcheck disable=SC2181
+if [ $? -ne 0 ]; then
+   echo "make update failed"
+   exit 1
+fi
 
 git add -A
 git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image"
@@ -155,21 +169,19 @@ git commit -m "UPSTREAM: <drop>: hack/update-vendor.sh, make update and update i
 remote_branch="rebase-$k8s_tag"
 git push origin "$openshift_release:$remote_branch"
 
-XY=$(echo "$k8s_tag" | sed -E "s/v(1\.[0-9]+)\.[0-9]+/\1/")
-ver=$(echo "$k8s_tag" | sed "s/\.//g")
-link="https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-$XY.md#$ver"
-if [ -n "${bugzilla_id}" ]; then
-  if command -v gh &>/dev/null; then
-    XY=$(echo "$k8s_tag" | sed -E "s/v(1\.[0-9]+)\.[0-9]+/\1/")
-    ver=$(echo "$k8s_tag" | sed "s/\.//g")
-    link="https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-$XY.md#$ver"
+if command -v gh &>/dev/null; then
+  XY=$(echo "$k8s_tag" | sed -E "s/v(1\.[0-9]+)\.[0-9]+/\1/")
+  ver=$(echo "$k8s_tag" | sed "s/\.//g")
+  link="https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-$XY.md#$ver"
 
-    # opens a web browser, because we can't properly create PRs against remote repositories with the GH CLI (yet):
-    # https://github.com/cli/cli/issues/2691
-    gh pr create \
-      --title "Bug $bugzilla_id: Rebase $k8s_tag" \
-      --body "CHANGELOG $link" \
-      --web
-
+  title="Rebase $k8s_tag in $openshift_release"
+  if [ -n "${jira_id}" ]; then
+    title="$jira_id: $title"
   fi
+
+  gh pr create \
+    --title "$title" \
+    --body "CHANGELOG $link" \
+    --base "$openshift_release" \
+    --head "$remote_branch"
 fi

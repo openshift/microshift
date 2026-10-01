@@ -17,8 +17,7 @@ VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
 # shellcheck disable=SC2034  # used elsewhere
 WEB_SERVER_URL="http://[${VM_BRIDGE_IP}]:${WEB_SERVER_PORT}"
 
-# TODO: Consider using tuned image once it is enabled in the build system
-start_image="rhel98-brew-lrel-optional"
+start_image="rhel98-brew-lrel-tuned"
 
 scenario_create_vms() {
     exit_if_commit_not_found "${start_image}"
@@ -63,6 +62,9 @@ scenario_run_tests() {
         sleep 5
     done
 
+    # Stop MicroShift before applying TLS configuration
+    run_command_on_vm host1 "sudo systemctl stop microshift" || true
+
     # Apply TLSv1.3 configuration via drop-in config
     echo "INFO: Configuring TLSv1.3..."
     run_command_on_vm host1 "sudo mkdir -p /etc/microshift/config.d"
@@ -72,8 +74,8 @@ apiServer:
     minVersion: VersionTLS13
 EOF"
 
-    # Restart MicroShift to apply TLS configuration
-    run_command_on_vm host1 "sudo systemctl restart microshift"
+    # Start MicroShift to apply TLS configuration
+    run_command_on_vm host1 "sudo systemctl start microshift"
 
     # Wait for MicroShift to be ready
     wait_for_microshift_to_be_ready host1

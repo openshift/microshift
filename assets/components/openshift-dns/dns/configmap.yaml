@@ -1,6 +1,7 @@
 apiVersion: v1
 data:
   Corefile: |
+    {{- .C2CCDNSBlocks }}
     .:5353 {
         bufsize 1232
         errors

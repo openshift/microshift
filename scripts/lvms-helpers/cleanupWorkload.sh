@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ux
+set -eux
 
 # Set KUBECONFIG path - use dynamic IP-based path
 KUBECONFIG=${KUBECONFIG:-/var/lib/microshift/resources/kubeadmin/kubeconfig}

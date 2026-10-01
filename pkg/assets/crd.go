@@ -2,6 +2,7 @@ package assets
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 
 	apiextv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apiextclientv1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apiruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -107,13 +109,21 @@ func WaitForCrdsEstablished(ctx context.Context, cfg *config.Config) error {
 	return nil
 }
 
-func readCRDOrDie(objBytes []byte) *apiextv1.CustomResourceDefinition {
+func readCRD(objBytes []byte) (*apiextv1.CustomResourceDefinition, error) {
 	var crd apiextv1.CustomResourceDefinition
 	err := apiruntime.DecodeInto(apiExtensionsCodecs.UniversalDecoder(apiextv1.SchemeGroupVersion), objBytes, &crd)
 	if err != nil {
+		return nil, err
+	}
+	return &crd, nil
+}
+
+func readCRDOrDie(objBytes []byte) *apiextv1.CustomResourceDefinition {
+	crd, err := readCRD(objBytes)
+	if err != nil {
 		panic(err)
 	}
-	return &crd
+	return crd
 }
 
 func applyCRD(ctx context.Context, client *apiextclientv1.ApiextensionsV1Client, crd *apiextv1.CustomResourceDefinition) error {
@@ -180,6 +190,45 @@ func ApplyCRDs(ctx context.Context, cfg *config.Config) error {
 	}
 
 	return nil
+}
+
+func DeleteCRDs(ctx context.Context, crds []string, kubeconfigPath string) error {
+	lock.Lock()
+	defer lock.Unlock()
+
+	restConfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	if err != nil {
+		return err
+	}
+	rest.AddUserAgent(restConfig, "crd-agent")
+
+	client, err := apiextclientv1.NewForConfig(restConfig)
+	if err != nil {
+		return fmt.Errorf("failed to create client: %v", err)
+	}
+
+	var errs []error
+	for _, crd := range crds {
+		crdBytes, err := embedded.Asset(crd)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("error getting asset %s: %v", crd, err))
+			continue
+		}
+		c, err := readCRD(crdBytes)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("decoding CRD from asset %s: %w", crd, err))
+			continue
+		}
+		klog.Infof("Deleting CRD %s", c.Name)
+		if err := client.CustomResourceDefinitions().Delete(ctx, c.Name, metav1.DeleteOptions{}); err != nil {
+			if !apierrors.IsNotFound(err) {
+				errs = append(errs, fmt.Errorf("deleting CRD %s: %w", c.Name, err))
+			}
+		} else {
+			klog.Infof("Deleted CRD %s", c.Name)
+		}
+	}
+	return errors.Join(errs...)
 }
 
 func ApplyCRDAndWaitForEstablish(ctx context.Context, crds []string, kubeconfigPath string) error {

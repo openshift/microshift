@@ -30,10 +30,24 @@ apiServer:
     tls:
         cipherSuites: []
         minVersion: ""
+clusterToCluster:
+    dns:
+        cacheNegativeTTL: 0
+        cacheTTL: 0
+    probeInterval: ""
+    remoteClusters:
+        - clusterNetwork: []
+          domain: ""
+          nextHop: []
+          serviceNetwork: []
+    routing:
+        routeTableID: 0
+        serviceRouteTableID: 0
 debugging:
     logLevel: ""
 dns:
     baseDomain: ""
+    configFile: ""
     hosts:
         file: ""
         status: ""
@@ -182,10 +196,24 @@ apiServer:
     tls:
         cipherSuites: []
         minVersion: VersionTLS12
+clusterToCluster:
+    dns:
+        cacheNegativeTTL: 10
+        cacheTTL: 10
+    probeInterval: 10s
+    remoteClusters:
+        - clusterNetwork: []
+          domain: ""
+          nextHop: []
+          serviceNetwork: []
+    routing:
+        routeTableID: 200
+        serviceRouteTableID: 201
 debugging:
     logLevel: Normal
 dns:
     baseDomain: example.com
+    configFile: ""
     hosts:
         file: /etc/hosts
         status: Disabled

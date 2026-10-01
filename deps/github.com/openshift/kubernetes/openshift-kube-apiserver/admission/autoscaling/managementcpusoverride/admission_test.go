@@ -87,7 +87,7 @@ func TestAdmit(t *testing.T) {
 			pod:                testManagedPodWithWorkloadAnnotation("500m", "250m", "500Mi", "250Mi", "non-existent"),
 			expectedCpuRequest: resource.MustParse("250m"),
 			namespace:          testManagedNamespace(),
-			nodes:              []*corev1.Node{testNodeWithManagementResource()},
+			nodes:              []*corev1.Node{testNode()},
 			infra:              testClusterSNOInfra(),
 			expectedError:      fmt.Errorf("the pod namespace %q does not allow the workload type non-existent", "managed-namespace"),
 		},
@@ -96,7 +96,7 @@ func TestAdmit(t *testing.T) {
 			pod:                testPod("500m", "250m", "500Mi", "250Mi"),
 			expectedCpuRequest: resource.MustParse("250m"),
 			namespace:          testManagedNamespace(),
-			nodes:              []*corev1.Node{testNodeWithManagementResource()},
+			nodes:              []*corev1.Node{testNode()},
 		},
 		{
 			name: "should return admission error when the pod has more than one workload annotation",
@@ -112,7 +112,7 @@ func TestAdmit(t *testing.T) {
 			),
 			expectedCpuRequest: resource.MustParse("250m"),
 			namespace:          testManagedNamespace(),
-			nodes:              []*corev1.Node{testNodeWithManagementResource()},
+			nodes:              []*corev1.Node{testNode()},
 			infra:              testClusterSNOInfra(),
 			expectedError:      fmt.Errorf("the pod can not have more than one workload annotations"),
 		},
@@ -129,7 +129,7 @@ func TestAdmit(t *testing.T) {
 			),
 			expectedCpuRequest: resource.MustParse("250m"),
 			namespace:          testManagedNamespace(),
-			nodes:              []*corev1.Node{testNodeWithManagementResource()},
+			nodes:              []*corev1.Node{testNode()},
 			infra:              testClusterSNOInfra(),
 			expectedError:      fmt.Errorf("the workload annotation key should have format %s<workload_type>", podWorkloadTargetAnnotationPrefix),
 		},
@@ -146,7 +146,7 @@ func TestAdmit(t *testing.T) {
 			),
 			expectedCpuRequest: resource.MustParse("250m"),
 			namespace:          testManagedNamespace(),
-			nodes:              []*corev1.Node{testNodeWithManagementResource()},
+			nodes:              []*corev1.Node{testNode()},
 			infra:              testClusterSNOInfra(),
 			expectedError:      fmt.Errorf(`failed to get workload annotation effect: failed to parse "{" annotation value: unexpected end of JSON input`),
 		},
@@ -163,7 +163,7 @@ func TestAdmit(t *testing.T) {
 			),
 			expectedCpuRequest: resource.MustParse("250m"),
 			namespace:          testManagedNamespace(),
-			nodes:              []*corev1.Node{testNodeWithManagementResource()},
+			nodes:              []*corev1.Node{testNode()},
 			expectedError:      fmt.Errorf(`failed to get workload annotation effect: the workload annotation value map["test":"test"] does not have "effect" key`),
 			infra:              testClusterSNOInfra(),
 		},
@@ -183,7 +183,7 @@ func TestAdmit(t *testing.T) {
 				workloadAdmissionWarning: "skipping pod CPUs requests modifications because the namespace namespace is not annotated with workload.openshift.io/allowed to allow workload partitioning",
 			},
 			namespace: testNamespace(),
-			nodes:     []*corev1.Node{testNodeWithManagementResource()},
+			nodes:     []*corev1.Node{testNode()},
 			infra:     testClusterSNOInfra(),
 		},
 		{
@@ -196,7 +196,7 @@ func TestAdmit(t *testing.T) {
 				fmt.Sprintf("%s%s", containerResourcesAnnotationPrefix, "initTest"):            fmt.Sprintf(`{"%s":256}`, containerResourcesAnnotationValueKeyCPUShares),
 				fmt.Sprintf("%s%s", podWorkloadTargetAnnotationPrefix, workloadTypeManagement): fmt.Sprintf(`{"%s":"%s"}`, podWorkloadAnnotationEffect, workloadEffectPreferredDuringScheduling),
 			},
-			nodes: []*corev1.Node{testNodeWithManagementResource()},
+			nodes: []*corev1.Node{testNode()},
 			infra: testClusterSNOInfra(),
 		},
 		{
@@ -209,7 +209,7 @@ func TestAdmit(t *testing.T) {
 				fmt.Sprintf("%s%s", containerResourcesAnnotationPrefix, "initTest"):            fmt.Sprintf(`{"%s": 2}`, containerResourcesAnnotationValueKeyCPUShares),
 				fmt.Sprintf("%s%s", podWorkloadTargetAnnotationPrefix, workloadTypeManagement): fmt.Sprintf(`{"%s":"%s"}`, podWorkloadAnnotationEffect, workloadEffectPreferredDuringScheduling),
 			},
-			nodes: []*corev1.Node{testNodeWithManagementResource()},
+			nodes: []*corev1.Node{testNode()},
 			infra: testClusterSNOInfra(),
 		},
 		{
@@ -221,7 +221,7 @@ func TestAdmit(t *testing.T) {
 				fmt.Sprintf("%s%s", podWorkloadTargetAnnotationPrefix, workloadTypeManagement): fmt.Sprintf(`{"%s":"%s"}`, podWorkloadAnnotationEffect, workloadEffectPreferredDuringScheduling),
 				kubetypes.ConfigSourceAnnotationKey:                                            kubetypes.FileSource,
 			},
-			nodes: []*corev1.Node{testNodeWithManagementResource()},
+			nodes: []*corev1.Node{testNode()},
 			infra: testClusterSNOInfra(),
 		},
 		{
@@ -232,7 +232,7 @@ func TestAdmit(t *testing.T) {
 			expectedAnnotations: map[string]string{
 				workloadAdmissionWarning: "skip pod CPUs requests modifications because it has guaranteed QoS class",
 			},
-			nodes: []*corev1.Node{testNodeWithManagementResource()},
+			nodes: []*corev1.Node{testNode()},
 			infra: testClusterSNOInfra(),
 		},
 		{
@@ -245,7 +245,7 @@ func TestAdmit(t *testing.T) {
 				fmt.Sprintf("%s%s", containerResourcesAnnotationPrefix, "initTest"):            fmt.Sprintf(`{"%s":256,"cpulimit":500}`, containerResourcesAnnotationValueKeyCPUShares),
 				fmt.Sprintf("%s%s", podWorkloadTargetAnnotationPrefix, workloadTypeManagement): fmt.Sprintf(`{"%s":"%s"}`, podWorkloadAnnotationEffect, workloadEffectPreferredDuringScheduling),
 			},
-			nodes: []*corev1.Node{testNodeWithManagementResource()},
+			nodes: []*corev1.Node{testNode()},
 			infra: testClusterSNOInfra(),
 		},
 		{
@@ -256,7 +256,7 @@ func TestAdmit(t *testing.T) {
 			expectedAnnotations: map[string]string{
 				workloadAdmissionWarning: fmt.Sprintf("skip pod CPUs requests modifications because it will change the pod QoS class from %s to %s", corev1.PodQOSBurstable, corev1.PodQOSBestEffort),
 			},
-			nodes: []*corev1.Node{testNodeWithManagementResource()},
+			nodes: []*corev1.Node{testNode()},
 			infra: testClusterSNOInfra(),
 		},
 		{
@@ -266,15 +266,6 @@ func TestAdmit(t *testing.T) {
 			namespace:          testManagedNamespace(),
 			nodes:              []*corev1.Node{testNode()},
 			infra:              testClusterInfraWithoutWorkloadPartitioning(),
-		},
-		{
-			name:               "should return admission error when the cluster does not have any nodes",
-			pod:                testManagedPod("500m", "250m", "500Mi", "250Mi"),
-			expectedCpuRequest: resource.MustParse("250m"),
-			namespace:          testManagedNamespace(),
-			nodes:              []*corev1.Node{},
-			infra:              testClusterSNOInfra(),
-			expectedError:      fmt.Errorf("the cluster does not have any nodes"),
 		},
 	}
 

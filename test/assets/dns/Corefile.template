@@ -1,0 +1,24 @@
+.:5353 {
+    bufsize 1232
+    errors
+    health {
+        lameduck 20s
+    }
+    ready
+    kubernetes cluster.local in-addr.arpa ip6.arpa {
+        pods insecure
+        fallthrough in-addr.arpa ip6.arpa
+    }
+    prometheus 127.0.0.1:9153
+    forward . /etc/resolv.conf {
+        policy sequential
+    }
+    cache 900 {
+        denial 9984 30
+    }
+    hosts {
+        ${COREFILE_HOST_IP} ${COREFILE_HOSTNAME}
+        fallthrough
+    }
+    reload
+}

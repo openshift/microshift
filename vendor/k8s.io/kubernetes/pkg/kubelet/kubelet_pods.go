@@ -766,7 +766,7 @@ func (kl *Kubelet) makeEnvironmentVariables(pod *v1.Pod, container *v1.Container
 	var (
 		configMaps = make(map[string]*v1.ConfigMap)
 		secrets    = make(map[string]*v1.Secret)
-		tmpEnv     = make(map[string]string)
+		tmpEnv     = make(map[string]string) // TODO: switch to map[string][]byte
 	)
 
 	// Env will override EnvFrom variables.
@@ -798,6 +798,7 @@ func (kl *Kubelet) makeEnvironmentVariables(pod *v1.Pod, container *v1.Container
 					k = envFrom.Prefix + k
 				}
 
+				// TODO: validate no NUL bytes
 				tmpEnv[k] = v
 			}
 		case envFrom.SecretRef != nil:
@@ -825,6 +826,7 @@ func (kl *Kubelet) makeEnvironmentVariables(pod *v1.Pod, container *v1.Container
 					k = envFrom.Prefix + k
 				}
 
+				// TODO: validate no NUL bytes
 				tmpEnv[k] = string(v)
 			}
 		}
@@ -918,6 +920,7 @@ func (kl *Kubelet) makeEnvironmentVariables(pod *v1.Pod, container *v1.Container
 					}
 					return result, fmt.Errorf("couldn't find key %v in Secret %v/%v", key, pod.Namespace, name)
 				}
+				// TODO: validate no NUL bytes
 				runtimeVal = string(runtimeValBytes)
 			case utilfeature.DefaultFeatureGate.Enabled(features.EnvFiles) && envVar.ValueFrom.FileKeyRef != nil:
 				f := envVar.ValueFrom.FileKeyRef
@@ -1125,20 +1128,29 @@ func (kl *Kubelet) PodIsFinished(pod *v1.Pod) bool {
 func (kl *Kubelet) filterOutInactivePods(pods []*v1.Pod) []*v1.Pod {
 	filteredPods := make([]*v1.Pod, 0, len(pods))
 	for _, p := range pods {
-		// if a pod is fully terminated by UID, it should be excluded from the
-		// list of pods
-		if kl.podWorkers.IsPodKnownTerminated(p.UID) {
+		if kl.isPodInactive(p) {
 			continue
 		}
-
-		// terminal pods are considered inactive UNLESS they are actively terminating
-		if kl.isAdmittedPodTerminal(p) && !kl.podWorkers.IsPodTerminationRequested(p.UID) {
-			continue
-		}
-
 		filteredPods = append(filteredPods, p)
 	}
 	return filteredPods
+}
+
+// isPodInactive returns true if the pod is in a terminal phase
+// or is known to be fully terminated. This method should only be used
+// when the pod being processed is upstream of the pod worker, i.e.
+// the pods the pod manager is aware of.
+func (kl *Kubelet) isPodInactive(p *v1.Pod) bool {
+	// if a pod is fully terminated by UID, it should be excluded from the
+	// list of pods
+	if kl.podWorkers.IsPodKnownTerminated(p.UID) {
+		return true
+	}
+	// terminal pods are considered inactive UNLESS they are actively terminating
+	if kl.isAdmittedPodTerminal(p) && !kl.podWorkers.IsPodTerminationRequested(p.UID) {
+		return true
+	}
+	return false
 }
 
 // isAdmittedPodTerminal returns true if the provided config source pod is in

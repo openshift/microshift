@@ -46,32 +46,57 @@ download_build_cache() {
     if ./bin/manage_build_cache.sh verify -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}" ; then
         # Download the cached images
         ./bin/manage_build_cache.sh download -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}"
-        return 0
+        return $?
     fi
     return 1
 }
 
-# Run image build for the 'base' layers and update the cache:
+# Run image build for the 'base' and 'release' layers and update the cache:
 # - Upload build artifacts
 # - Update 'last' to point to the current build tag
 # - Clean up older images, preserving the 'last' and the previous build tag
 # Note that the build and upload are skipped if valid cached data already exists.
 update_build_cache() {
+    local pid_ostree pid_bootc9 pid_bootc10
+    local failed=false
+
     if ./bin/manage_build_cache.sh verify -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" ; then
         echo "Valid build cache already exists for the '${SCENARIO_BUILD_BRANCH}' branch and '${SCENARIO_BUILD_TAG}' tag"
         echo "WARNING: Skipping cache build, update and cleanup procedures"
         return
     fi
 
-    # Build the composer-cli base layer and brew RPMs to be cached
-    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
-    $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer4-release
+    # Re-build from source before updating the cache because some of the
+    # build artifacts may be cached
+    $(dry_run) bash -x ./bin/build_rpms.sh
 
-    # Build templates
+    # Build templates and run registry mirroring to be used by bootc image builds
     $(dry_run) bash -x ./bin/build_bootc_images.sh -g ./image-blueprints-bootc/templates
-    # Build the bootc base layer and brew RPMs to be cached
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
-    $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-release
+
+    # Build the ostree layers in parallel
+    $(dry_run) bash -xc './bin/build_images.sh -l ./image-blueprints/layer1-base && ./bin/build_images.sh -l ./image-blueprints/layer4-release' &
+    pid_ostree=$!
+
+    # Build the bootc layers in parallel, skipping extraction and mirroring (-E)
+    # as they were already done by the templates build above
+    $(dry_run) bash -xc './bin/build_bootc_images.sh -E -l ./image-blueprints-bootc/el9/layer1-base  -l ./image-blueprints-bootc/el9/layer4-release' &
+    pid_bootc9=$!
+    $(dry_run) bash -xc './bin/build_bootc_images.sh -E -l ./image-blueprints-bootc/el10/layer1-base -l ./image-blueprints-bootc/el10/layer4-release' &
+    pid_bootc10=$!
+
+    # Wait for all the build processes to complete, exit early and clean up if any command fails
+    for pid in "${pid_ostree}" "${pid_bootc9}" "${pid_bootc10}"; do
+        if ! wait "${pid}"; then
+            failed=true
+            break
+        fi
+    done
+
+    if ${failed}; then
+        echo "ERROR: One of the image build commands failed"
+        kill "${pid_ostree}" "${pid_bootc9}" "${pid_bootc10}" 2>/dev/null || true
+        exit 1
+    fi
 
     # Prepare for the cache upload by stopping composer services and cleaning
     # temporary artifacts
@@ -128,20 +153,30 @@ run_bootc_image_build() {
             return
         fi
 
+        # C2CC scenarios require both el9 and el10 presubmit images
+        if [[ "${CI_JOB_NAME}" =~ .*c2cc.* ]]; then
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base -l ./image-blueprints-bootc/el10/layer1-base
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit -l ./image-blueprints-bootc/el10/layer2-presubmit
+            return
+        fi
+
         local -r os="${CI_JOB_NAME##*-}"
 
         if [[ "${os}" == "el9" || "${os}" == "el10" ]]; then
 
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer1-base"
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer2-presubmit"
 
             if [[ "${os}" == "el10" ]]; then
                 # Build el9 images for upgrade tests
-                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit
+                $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el10/layer5-upgrade
             fi
 
             if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
                 $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer3-periodic"
+            fi
+            if [[ "${CI_JOB_NAME}" =~ .*release.* ]]; then
+                $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer4-release"
             fi
         fi
 
@@ -150,13 +185,11 @@ run_bootc_image_build() {
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/upstream
         fi
     else
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer1-base
         # Full build for all OS versions
-        for os_ver in el9 el10; do
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer2-presubmit"
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os_ver}/layer3-periodic"
-        done
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/layer4-release
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base -l ./image-blueprints-bootc/el10/layer1-base
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit -l ./image-blueprints-bootc/el10/layer2-presubmit
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer3-periodic -l ./image-blueprints-bootc/el10/layer3-periodic
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer4-release -l ./image-blueprints-bootc/el10/layer4-release
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/upstream
     fi
 }
@@ -198,10 +231,6 @@ fi
 # Check the build mode: "try using cache" (default) or "update cache"
 if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
     if ${HAS_CACHE_ACCESS} ; then
-        # Re-build from source before updating the cache because some
-        # build artifacts may be cached
-        $(dry_run) bash -x ./bin/build_rpms.sh
-
         update_build_cache
     else
         echo "ERROR: Access to the build cache is not available"

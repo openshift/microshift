@@ -64,6 +64,7 @@ func (p *v1PodResourcesServer) List(ctx context.Context, req *podresourcesv1.Lis
 
 	var pods []*v1.Pod
 	if p.useActivePods {
+		// GetActivePods already filters out terminal pods, so no need for additional filtering.
 		pods = p.podsProvider.GetActivePods()
 	} else {
 		pods = p.podsProvider.GetPods()

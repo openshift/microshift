@@ -18,6 +18,18 @@ type ClusterMonitoringSpecApplyConfiguration struct {
 	// When omitted, this means no opinion and the platform is left to choose a reasonable default, that is subject to change over time.
 	// The current default value is `DefaultConfig`.
 	AlertmanagerConfig *AlertmanagerConfigApplyConfiguration `json:"alertmanagerConfig,omitempty"`
+	// prometheusConfig provides configuration options for the default platform Prometheus instance
+	// that runs in the `openshift-monitoring` namespace. This configuration applies only to the
+	// platform Prometheus instance; user-workload Prometheus instances are configured separately.
+	//
+	// This field allows you to customize how the platform Prometheus is deployed and operated, including:
+	// - Pod scheduling (node selectors, tolerations, topology spread constraints)
+	// - Resource allocation (CPU, memory requests/limits)
+	// - Retention policies (how long metrics are stored)
+	// - External integrations (remote write, additional alertmanagers)
+	//
+	// This field is optional. When omitted, the platform chooses reasonable defaults, which may change over time.
+	PrometheusConfig *PrometheusConfigApplyConfiguration `json:"prometheusConfig,omitempty"`
 	// metricsServerConfig is an optional field that can be used to configure the Kubernetes Metrics Server that runs in the openshift-monitoring namespace.
 	// Specifically, it can configure how the Metrics Server instance is deployed, pod scheduling, its audit policy and log verbosity.
 	// When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time.
@@ -33,6 +45,25 @@ type ClusterMonitoringSpecApplyConfiguration struct {
 	// between API versions.
 	// When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time.
 	PrometheusOperatorAdmissionWebhookConfig *PrometheusOperatorAdmissionWebhookConfigApplyConfiguration `json:"prometheusOperatorAdmissionWebhookConfig,omitempty"`
+	// openShiftStateMetricsConfig is an optional field that can be used to configure the openshift-state-metrics
+	// agent that runs in the openshift-monitoring namespace. The openshift-state-metrics agent generates metrics
+	// about the state of OpenShift-specific Kubernetes objects, such as routes, builds, and deployments.
+	// When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time.
+	OpenShiftStateMetricsConfig *OpenShiftStateMetricsConfigApplyConfiguration `json:"openShiftStateMetricsConfig,omitempty"`
+	// telemeterClientConfig is an optional field that can be used to configure the Telemeter Client
+	// component that runs in the openshift-monitoring namespace. The Telemeter Client collects
+	// selected monitoring metrics and forwards them to Red Hat for telemetry purposes.
+	// When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time.
+	// When set, at least one field must be specified within telemeterClientConfig.
+	TelemeterClientConfig *TelemeterClientConfigApplyConfiguration `json:"telemeterClientConfig,omitempty"`
+	// thanosQuerierConfig is an optional field that can be used to configure the Thanos Querier
+	// component that runs in the openshift-monitoring namespace. The Thanos Querier provides
+	// a global query view by aggregating and deduplicating metrics from multiple Prometheus instances.
+	// When omitted, this means no opinion and the platform is left to choose a reasonable default, which is subject to change over time.
+	// The current default deploys the Thanos Querier on linux nodes with 5m CPU and 12Mi memory
+	// requests, and no custom tolerations or topology spread constraints.
+	// When set, at least one field must be specified within thanosQuerierConfig.
+	ThanosQuerierConfig *ThanosQuerierConfigApplyConfiguration `json:"thanosQuerierConfig,omitempty"`
 }
 
 // ClusterMonitoringSpecApplyConfiguration constructs a declarative configuration of the ClusterMonitoringSpec type for use with
@@ -57,6 +88,14 @@ func (b *ClusterMonitoringSpecApplyConfiguration) WithAlertmanagerConfig(value *
 	return b
 }
 
+// WithPrometheusConfig sets the PrometheusConfig field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the PrometheusConfig field is set to the value of the last call.
+func (b *ClusterMonitoringSpecApplyConfiguration) WithPrometheusConfig(value *PrometheusConfigApplyConfiguration) *ClusterMonitoringSpecApplyConfiguration {
+	b.PrometheusConfig = value
+	return b
+}
+
 // WithMetricsServerConfig sets the MetricsServerConfig field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the MetricsServerConfig field is set to the value of the last call.
@@ -78,5 +117,29 @@ func (b *ClusterMonitoringSpecApplyConfiguration) WithPrometheusOperatorConfig(v
 // If called multiple times, the PrometheusOperatorAdmissionWebhookConfig field is set to the value of the last call.
 func (b *ClusterMonitoringSpecApplyConfiguration) WithPrometheusOperatorAdmissionWebhookConfig(value *PrometheusOperatorAdmissionWebhookConfigApplyConfiguration) *ClusterMonitoringSpecApplyConfiguration {
 	b.PrometheusOperatorAdmissionWebhookConfig = value
+	return b
+}
+
+// WithOpenShiftStateMetricsConfig sets the OpenShiftStateMetricsConfig field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the OpenShiftStateMetricsConfig field is set to the value of the last call.
+func (b *ClusterMonitoringSpecApplyConfiguration) WithOpenShiftStateMetricsConfig(value *OpenShiftStateMetricsConfigApplyConfiguration) *ClusterMonitoringSpecApplyConfiguration {
+	b.OpenShiftStateMetricsConfig = value
+	return b
+}
+
+// WithTelemeterClientConfig sets the TelemeterClientConfig field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the TelemeterClientConfig field is set to the value of the last call.
+func (b *ClusterMonitoringSpecApplyConfiguration) WithTelemeterClientConfig(value *TelemeterClientConfigApplyConfiguration) *ClusterMonitoringSpecApplyConfiguration {
+	b.TelemeterClientConfig = value
+	return b
+}
+
+// WithThanosQuerierConfig sets the ThanosQuerierConfig field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the ThanosQuerierConfig field is set to the value of the last call.
+func (b *ClusterMonitoringSpecApplyConfiguration) WithThanosQuerierConfig(value *ThanosQuerierConfigApplyConfiguration) *ClusterMonitoringSpecApplyConfiguration {
+	b.ThanosQuerierConfig = value
 	return b
 }

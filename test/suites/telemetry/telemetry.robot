@@ -6,6 +6,7 @@ Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/observability.resource
+Resource            ../../resources/ostree-health.resource
 Library             ../../resources/journalctl.py
 Library             ../../resources/prometheus.py
 Library             ../../resources/ProxyLibrary.py
@@ -110,6 +111,7 @@ Setup
 
 Teardown
     [Documentation]    Test suite teardown
+    Wait For MicroShift Healthcheck Success
     Logout MicroShift Host
     Remove Kubeconfig
 

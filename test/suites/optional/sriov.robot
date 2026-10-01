@@ -2,9 +2,10 @@
 Documentation       MicroShift SR-IOV tests
 
 Resource            ../../resources/microshift-process.resource
+Resource            ../../resources/optional-config.resource
 
-Suite Setup         Setup Suite
-Suite Teardown      Teardown Suite
+Suite Setup         Setup
+Suite Teardown      Teardown
 
 Test Tags           optional    sriov    slow
 
@@ -47,6 +48,16 @@ Create VFs And Verify
 
 
 *** Keywords ***
+Setup
+    [Documentation]    Setup sriov suite with only its required optionals
+    Setup Suite
+    Setup MicroShift With Optionals    070-microshift-sriov
+
+Teardown
+    [Documentation]    Restore config and teardown suite
+    Teardown MicroShift With Optionals
+    Teardown Suite
+
 Cleanup SR-IOV Policy
     [Documentation]    Deletes the policy
     Run With Kubeconfig    oc delete -f ${OUTPUT_DIR}/final-sriov-policy.yaml -n sriov-network-operator

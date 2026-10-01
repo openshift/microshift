@@ -1,9 +1,9 @@
 reviewers:
+  - control-plane-approvers
   - 2uasimojo
-  - benluddy
   - jsafrane
   - sanchezl
 approvers:
-  - benluddy
+  - control-plane-approvers
   - jsafrane
   - sanchezl
