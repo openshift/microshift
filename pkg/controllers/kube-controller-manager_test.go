@@ -72,10 +72,10 @@ func TestConfigure(t *testing.T) {
 		"--secure-port=10257",
 		fmt.Sprintf("--service-account-private-key-file=%s", kcmServiceAccountPrivateKeyFile()),
 		fmt.Sprintf("--service-cluster-ip-range=%s", cfg.Network.ServiceNetwork[0]),
-		fmt.Sprintf("--tls-cert-file=%s", cryptomaterial.ServingCertPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))),
+		fmt.Sprintf("--tls-cert-file=%s", cryptomaterial.ServingCertPath(cryptomaterial.KASServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))),
 		fmt.Sprintf("--tls-cipher-suites=%s", strings.Join(crypto.OpenSSLToIANACipherSuites(fixedTLSProfile.Ciphers), ",")),
 		fmt.Sprintf("--tls-min-version=%s", string(fixedTLSProfile.MinTLSVersion)),
-		fmt.Sprintf("--tls-private-key-file=%s", cryptomaterial.ServingKeyPath(cryptomaterial.KubeAPIServerLocalhostServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))),
+		fmt.Sprintf("--tls-private-key-file=%s", cryptomaterial.ServingKeyPath(cryptomaterial.KASServingCertDir(cryptomaterial.CertsDirectory(config.DataDir)))),
 		"--use-service-account-credentials=true",
 		"-v=2",
 	}
