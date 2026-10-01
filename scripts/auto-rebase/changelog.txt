@@ -1,17 +1,3 @@
-- api embedded-component 05da40ea98557f8351483a39db3d0e7d9076bc8f to b32f49f8a70985c6ad9abb2dc579abc18d143051
-  - 760409d0 2026-09-21T12:57:51-04:00 Generated changes for release unique CRDs
-  - 86c3aa9e 2026-09-14T08:56:54-04:00 Fix missing failure-domain/vCenter XValidation in CustomNoUpgrade CRDs
-  - ea9f400f 2026-09-14T08:39:04-04:00 Regenerate derived artifacts for VSphereMultiVCenterDay2 backport
-  - 0425a9d1 2026-09-14T08:37:35-04:00 Added vSphere failure domain to vcenter ratcheting tests
-  - e1bd70c8 2026-09-14T08:37:35-04:00 Added vSphere failure domain to vcenter check
-  - c2253008 2026-09-14T08:37:16-04:00 Revert "TRT-2701: Revert "SPLAT-2793: Promoted VSphereMultiVCenterDay2 feature gate to TP""
-  - 43db6806 2026-09-14T08:36:46-04:00 Updated vcenter logic to make sure no server switching occurs
-  - f6577ebc 2026-09-14T08:36:40-04:00 Added some ratcheting tests to cover change in min size of vCenters
-  - cdcc0d12 2026-09-14T08:36:40-04:00 Modified parent logic to not check size, but only changes in existence, and other review suggestions.
-  - 4a0a0f69 2026-09-14T08:36:32-04:00 Added vSphere Day 2 tests
-  - d4097494 2026-09-14T08:36:32-04:00 Added vSphere Day 2 logic to CRDs
-  - 424381b2 2026-09-14T08:36:14-04:00 Added new feature gate VSphereMultiVCenterDay2
-
-- cluster-kube-apiserver-operator embedded-component e9accf887ef1182f0a96e3086d54441ba8bcae40 to 37d84f7e47f675f3a785f66c20dd2972d3289dbe
-  - fdeb042 2026-09-25T03:23:12Z Fix kube-apiserver-to-kubelet-signer refresh interval
+- ovn-kubernetes image-arm64 c28f7669a9ef8e28a47163b1656c5647ea8a725c to a281044818c2362c39a7688f1081ca584ee34e42
+  - ccf54566 2026-08-25T10:03:32-07:00 EgressIP: add route policies for east-west traffic between networks
 
