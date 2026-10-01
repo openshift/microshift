@@ -55,11 +55,6 @@ func ServingCADir(certsDir string) string { return filepath.Join(certsDir, "serv
 // PeerCADir returns the path to the peer (etcd) CA directory.
 func PeerCADir(certsDir string) string { return filepath.Join(certsDir, "peer-ca") }
 
-// legacyKubeControlPlaneSignerDir returns the old CA path used only for migration detection.
-func legacyKubeControlPlaneSignerDir(certsDir string) string {
-	return filepath.Join(certsDir, "kube-control-plane-signer")
-}
-
 // Client CA leaf directories (all under client-ca/).
 func KubeSchedulerClientCertDir(certsDir string) string {
 	return filepath.Join(ClientCADir(certsDir), "kube-scheduler")
