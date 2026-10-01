@@ -1,23 +1,44 @@
-- api embedded-component 1cb630ce7109e6c4780332bb8140c8c4f7157426 to eb96322bf52288bf7931bb6240fd244cc362a68b
-  - 93c7014a 2026-09-21T13:07:30-04:00 Generated changes for release unique CRDs
-  - 70bf3908 2026-09-11T11:57:42-04:00 Adapt VSphereMultiVCenterDay2 gate to release-4.21 feature-gate DSL
-  - 10207546 2026-09-11T11:54:50-04:00 Added vSphere failure domain to vcenter ratcheting tests
-  - 3b5ba670 2026-09-11T11:54:49-04:00 Added vSphere failure domain to vcenter check
-  - 03fb6bce 2026-09-11T11:54:21-04:00 Revert "TRT-2701: Revert "SPLAT-2793: Promoted VSphereMultiVCenterDay2 feature gate to TP""
-  - fe9ac322 2026-09-11T11:53:43-04:00 Updated vcenter logic to make sure no server switching occurs
-  - a82f0109 2026-09-11T11:53:43-04:00 Added some ratcheting tests to cover change in min size of vCenters
-  - 97accb28 2026-09-11T11:53:42-04:00 Modified parent logic to not check size, but only changes in existence, and other review suggestions.
-  - 43e5c0e9 2026-09-11T11:53:42-04:00 Added vSphere Day 2 tests
-  - 0ea095ea 2026-09-11T11:53:42-04:00 Added vSphere Day 2 logic to CRDs
-  - 73fa1ab5 2026-09-11T11:53:39-04:00 Added new feature gate VSphereMultiVCenterDay2
+- cluster-kube-apiserver-operator embedded-component 9e86de8a28fc827ec86393bf4939754211b1ae85 to 1c840109b6f83880e73b5d12bd58f3b902438afe
+  - 86c3266 2026-09-28T23:32:47+05:30 Bump of library-go to include changes done in https://github.com/openshift/library-go/pull/2491
 
-- cluster-kube-apiserver-operator embedded-component dc1c217c263cd220ddd2ed6fe827a466d47e3ebb to 9e86de8a28fc827ec86393bf4939754211b1ae85
-  - 4fd9a5e 2026-06-11T13:29:07Z Fix kube-apiserver-to-kubelet-signer refresh interval
+- cluster-network-operator embedded-component 9fbc491dbb15dca6e4ee91f793831a155177e9f8 to bd4ada0046efe2f4ec12aac7ce1f555c9e510830
+  - bf82f86 2026-09-24T06:12:21Z Allow per-node OVN encap IP override via env-overrides
 
-- cluster-network-operator embedded-component d1d5e0e61459c068cd5024746b54275685279f9f to 9fbc491dbb15dca6e4ee91f793831a155177e9f8
-  - 4865c61 2026-09-18T07:42:00-03:00 OCPBUGS-62144: Restart pods when rendering egressIP settings
+- machine-config-operator embedded-component f4736478f4532c51bdc6f181c0cb4f52987c28b3 to b13ad2aab188dc77776734da29afbf904f8b5006
+  - 7bc3ec1e 2026-09-29T09:40:46+02:00 OCPBUGS-128598: wrong early exit during kubelet MCs regeneration
+  - 04583fc7 2026-09-22T20:01:30Z controller: update helper determining if a new MOSB is needed to handle case when a successful MOSB is reassigned a new image
 
-- machine-config-operator embedded-component 0c32560860e39c44babcc69692782c63119fb331 to f4736478f4532c51bdc6f181c0cb4f52987c28b3
-  - 8370190e 2026-09-12T10:36:30Z OCPBUGS-69681: limit ContainerRuntimeConfig status condition to 3
-  - 3ba80a54 2026-09-07T17:09:56+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+- ovn-kubernetes image-amd64 e2e61dbe576da162f711394c89068b8067f72343 to 722c77ee7df6466c422023071f72ec06ad7b8dda
+  - c53c330c 2026-09-11T17:29:47+05:30 Remove legacy moveACLsToNamespacedPortGroups function
+  - 17c44bdf 2026-09-11T17:29:47+05:30 Handle GetActiveNetworkForNamespace NotFound across callers
+  - 085cd7f9 2026-09-11T17:29:45+05:30 Handle GetPrimaryNADForNamespace NotFound across callers
+  - 0b0a44c6 2026-09-11T17:28:09+05:30 Fix wrong infrastructure-locked role when namespace is missing
+  - 87aca900 2026-09-11T17:27:54+05:30 [config] Add zone flag back to avoid breaking existing users.
+  - 57bd1502 2026-09-11T17:27:54+05:30 ovn: remove obsolete node zone annotation
+  - f21b87b4 2026-09-11T17:27:54+05:30 networkmanager: remove obsolete zone mode
+  - 9612ed50 2026-09-11T17:27:54+05:30 ovn: complete node identity cleanup
+  - 62c65bee 2026-09-11T17:27:54+05:30 test: keep network connect locality node-scoped
+  - 12c838e0 2026-09-11T17:27:54+05:30 test: use node identity in controller fixtures
+  - dbd653c9 2026-09-11T17:27:54+05:30 ovn: use node identity for controller locality
+  - 5aef0568 2026-09-11T17:27:54+05:30 test: align zone fixtures with node-name zones
+  - c90c13bb 2026-09-11T17:27:54+05:30 test: update egressip expectations for node-name zones
+  - 89a5de3c 2026-09-11T17:27:54+05:30 ovn: treat missing node zone as unknown
+  - 484e4c73 2026-09-11T17:27:53+05:30 ovn: remove legacy default zone configuration
+
+- ovn-kubernetes image-arm64 e2e61dbe576da162f711394c89068b8067f72343 to 722c77ee7df6466c422023071f72ec06ad7b8dda
+  - c53c330c 2026-09-11T17:29:47+05:30 Remove legacy moveACLsToNamespacedPortGroups function
+  - 17c44bdf 2026-09-11T17:29:47+05:30 Handle GetActiveNetworkForNamespace NotFound across callers
+  - 085cd7f9 2026-09-11T17:29:45+05:30 Handle GetPrimaryNADForNamespace NotFound across callers
+  - 0b0a44c6 2026-09-11T17:28:09+05:30 Fix wrong infrastructure-locked role when namespace is missing
+  - 87aca900 2026-09-11T17:27:54+05:30 [config] Add zone flag back to avoid breaking existing users.
+  - 57bd1502 2026-09-11T17:27:54+05:30 ovn: remove obsolete node zone annotation
+  - f21b87b4 2026-09-11T17:27:54+05:30 networkmanager: remove obsolete zone mode
+  - 9612ed50 2026-09-11T17:27:54+05:30 ovn: complete node identity cleanup
+  - 62c65bee 2026-09-11T17:27:54+05:30 test: keep network connect locality node-scoped
+  - 12c838e0 2026-09-11T17:27:54+05:30 test: use node identity in controller fixtures
+  - dbd653c9 2026-09-11T17:27:54+05:30 ovn: use node identity for controller locality
+  - 5aef0568 2026-09-11T17:27:54+05:30 test: align zone fixtures with node-name zones
+  - c90c13bb 2026-09-11T17:27:54+05:30 test: update egressip expectations for node-name zones
+  - 89a5de3c 2026-09-11T17:27:54+05:30 ovn: treat missing node zone as unknown
+  - 484e4c73 2026-09-11T17:27:53+05:30 ovn: remove legacy default zone configuration
 

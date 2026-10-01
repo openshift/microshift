@@ -2,17 +2,17 @@ https://github.com/openshift/api embedded-component eb96322bf52288bf7931bb6240fd
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component eb43a7a80d1b314eb8bbe63b6b73de91ba8cc7aa
 https://github.com/openshift/cluster-dns-operator embedded-component 41a53fed36e6e99c7c9ceb3a699c3547ee5d9bb9
 https://github.com/openshift/cluster-ingress-operator embedded-component f30c6160c94034639739df5ce940d60d1d7c028a
-https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 9e86de8a28fc827ec86393bf4939754211b1ae85
+https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 1c840109b6f83880e73b5d12bd58f3b902438afe
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 395de96705749de9c6a5f25747b9d5c3d5f65a8f
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 5ef1df3be41d38ddae9b3d22ce51ba486939e9f1
-https://github.com/openshift/cluster-network-operator embedded-component 9fbc491dbb15dca6e4ee91f793831a155177e9f8
+https://github.com/openshift/cluster-network-operator embedded-component bd4ada0046efe2f4ec12aac7ce1f555c9e510830
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component 2617a201bb3607192a9f82faa18384676f611e3c
 https://github.com/openshift/cluster-policy-controller embedded-component e510507e20f6eb09694c880ecd79fa512a2b3470
 https://github.com/openshift/csi-external-snapshotter embedded-component 2c14afc50a30de62cb00cc8263b061383cfbd3b5
 https://github.com/openshift/etcd embedded-component b6dda5413ec33fc88fc9751d98d3b4bd96ea877d
 https://github.com/openshift/kubernetes embedded-component 601ff80b0459adda2d2c5865bfb8d568a1fa68b7
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component ce5ff17e9a81ce754567e6dd5053d13409c251e9
-https://github.com/openshift/machine-config-operator embedded-component f4736478f4532c51bdc6f181c0cb4f52987c28b3
+https://github.com/openshift/machine-config-operator embedded-component b13ad2aab188dc77776734da29afbf904f8b5006
 https://github.com/openshift/openshift-controller-manager embedded-component 438d52e79d691e016d66eabfe9a53c84229db40c
 https://github.com/openshift/operator-framework-olm embedded-component e0c18696b033d125090f0af6205ec5cd39eaf9de
 https://github.com/openshift/route-controller-manager embedded-component 166a3e96f8151d9e789b3951ae75b03cdede5081
@@ -22,7 +22,7 @@ https://github.com/openshift/coredns image-amd64 7486e9e4330c1e41d9a91e4673b7f27
 https://github.com/openshift/csi-external-snapshotter image-amd64 2c14afc50a30de62cb00cc8263b061383cfbd3b5
 https://github.com/openshift/router image-amd64 22531cf0bb2435e73437be73c244913de4844812
 https://github.com/openshift/kube-rbac-proxy image-amd64 cd636680e06a55395c26570dff0cb37277014388
-https://github.com/openshift/ovn-kubernetes image-amd64 e2e61dbe576da162f711394c89068b8067f72343
+https://github.com/openshift/ovn-kubernetes image-amd64 722c77ee7df6466c422023071f72ec06ad7b8dda
 https://github.com/openshift/kubernetes image-amd64 601ff80b0459adda2d2c5865bfb8d568a1fa68b7
 https://github.com/openshift/service-ca-operator image-amd64 e9622ba18c86bf24aceab0c19fdcb87339c14f44
 https://github.com/openshift/oc image-arm64 d0bf7cc5959bf8408912e5276f2ea9e269ede24d
@@ -30,6 +30,6 @@ https://github.com/openshift/coredns image-arm64 7486e9e4330c1e41d9a91e4673b7f27
 https://github.com/openshift/csi-external-snapshotter image-arm64 2c14afc50a30de62cb00cc8263b061383cfbd3b5
 https://github.com/openshift/router image-arm64 22531cf0bb2435e73437be73c244913de4844812
 https://github.com/openshift/kube-rbac-proxy image-arm64 cd636680e06a55395c26570dff0cb37277014388
-https://github.com/openshift/ovn-kubernetes image-arm64 e2e61dbe576da162f711394c89068b8067f72343
+https://github.com/openshift/ovn-kubernetes image-arm64 722c77ee7df6466c422023071f72ec06ad7b8dda
 https://github.com/openshift/kubernetes image-arm64 601ff80b0459adda2d2c5865bfb8d568a1fa68b7
 https://github.com/openshift/service-ca-operator image-arm64 e9622ba18c86bf24aceab0c19fdcb87339c14f44
