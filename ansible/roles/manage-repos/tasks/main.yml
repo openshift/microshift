@@ -195,17 +195,3 @@
         disablerepo: "*"
         disable_gpg_check: true
         state: present
-
-- name: Gather the package facts
-  ansible.builtin.package_facts:
-    manager: auto
-
-- name: Pbench-agent is installed
-  ansible.builtin.set_fact:
-    pbench_installed: true
-  when: "'pbench-agent' in ansible_facts.packages"
-
-- name: Pbench-agent is not installed
-  ansible.builtin.set_fact:
-    pbench_installed: false
-  when: "'pbench-agent' not in ansible_facts.packages"
