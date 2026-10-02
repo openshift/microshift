@@ -61,28 +61,6 @@
   ansible.builtin.pause:
     seconds: 60
 
-- name: Pbench recording start
-  become: true
-  when: install_pbench | bool
-  environment:
-    PBENCH_TOOL_DATA_SINK: localhost:8081
-  block:
-    - name: Source pbench-agent & register-tool-set
-      ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
-
-    - name: Set new pidstat interval
-      ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool --name=pidstat -- --interval={{ sample_interval }}
-
-    - name: Start pbench-user-benchmark recording
-      ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-user-benchmark --config=microshift -- sleep {{ pbench_record_duration }}
-      async: "{{ pbench_record_duration | int * 2 }}"
-      poll: 0
-      register: pbench_user_benchmark_result
-
-    - name: Pause for 60 seconds to gather steady state for pbench tool recording
-      ansible.builtin.pause:
-        seconds: 60
-
 - name: Record network measurement start epoch
   ansible.builtin.command: date +%s
   register: network_start_epoch
@@ -97,24 +75,6 @@
 - name: Create service account task(s)
   ansible.builtin.include_role:
     name: create-service-account
-
-- name: Finish pbench capture
-  become: true
-  when: install_pbench | bool
-  environment:
-    PBENCH_USER: microshift
-  block:
-    - name: Check on pbench-user-benchmark status
-      ansible.builtin.async_status:
-        jid: "{{ pbench_user_benchmark_result.ansible_job_id }}"
-      register: job_result
-      until: job_result.finished
-      retries: 240
-      delay: 15
-
-    - name: Source pbench-agent & move results
-      ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-move-results
-      ignore_errors: true
 
 - name: Record fully running disk utilization
   vars:
