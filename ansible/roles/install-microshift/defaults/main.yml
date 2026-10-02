@@ -8,7 +8,6 @@ etcd_repo: https://github.com/openshift/etcd.git
 
 microshift_dir: "{{ ansible_facts.env.HOME }}/microshift"
 microshift_repo: https://github.com/openshift/microshift.git
-microshift_rpms: []
 microshift_version: 4.22.0
 # Optional existing MicroShift Git worktree to build instead of updating
 # microshift_dir from microshift_repo.
@@ -20,6 +19,11 @@ microshift_git_revision: "release-{{ (microshift_version | regex_replace('^lates
 # Optional additional Git refspec to fetch when building from source,
 # e.g. "+refs/pull/123/head:refs/remotes/origin/pr-123"
 microshift_git_refspec: ""
+# Directory holding the RPMs produced by the source build.
+microshift_rpm_repo_dir: "{{ microshift_build_dir }}/_output/rpmbuild"
+# Install every RPM produced by the source build, including optional
+# components, instead of only the core packages.
+microshift_install_optional_rpms: false
 
 du_dirs:
   - /

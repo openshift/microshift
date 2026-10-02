@@ -154,6 +154,7 @@ Most of the following variables are defined in `vars/all.yml`. The source-build 
 | `microshift_source_dir` | Existing MicroShift Git worktree on the managed host to build instead of updating the default checkout | `""` |
 | `microshift_git_revision` | Git revision to check out when building MicroShift from source | `"release-<major.minor>"` |
 | `microshift_git_refspec` | Additional Git refspec to fetch when building MicroShift from source (e.g. `+refs/pull/123/head:refs/remotes/origin/pr-123`) | `""` |
+| `microshift_install_optional_rpms` | Install every RPM produced by a source build, including optional components, instead of only the core packages | `false` |
 | `build_etcd_binary` | Build and deploy a separate etcd process | `false` |
 | `microshift_version` | MicroShift version to install (supports EC/RC prereleases) | `"4.20"` |
 | `enable_gpu` | Install NVIDIA GPU drivers and container toolkit for GPU workloads | `false` |
@@ -168,6 +169,11 @@ repository in detached HEAD state until a later branch-based run updates it.
 
 Set `microshift_source_dir` to build a complete Git worktree that is already present on the managed host. The caller is responsible for staging and
 updating the worktree, including its `.git` metadata. When set, the Git checkout task is skipped and the Git revision and refspec variables are ignored.
+
+Source builds install the same core runtime components as a package install, plus `microshift-release-info`: the `microshift` package and the
+packages it requires. The built RPMs are served from a temporary local repository that is removed after the installation. Set
+`microshift_install_optional_rpms` to `true` to install every built RPM instead, including the optional components. The optional metrics node
+exporter listens on port 9100, which conflicts with the host node exporter installed when `prometheus_logging` is enabled.
 
 When repository management is enabled, source builds provision runtime dependencies from the stream's OpenShift repository when it is available. If
 that repository is unavailable, or

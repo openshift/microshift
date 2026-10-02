@@ -78,22 +78,80 @@
 
     - name: Find built RPMs
       ansible.builtin.find:
-        paths: "{{ microshift_build_dir }}"
+        paths: "{{ microshift_rpm_repo_dir }}/RPMS"
         patterns: "*.rpm"
         recurse: true
       register: microshift_find
 
-    - name: Make list of built RPM paths
+    - name: Make lists of built RPMs
       ansible.builtin.set_fact:
-        microshift_rpms: "{{ microshift_rpms + [item.path] }}"
-      with_items: "{{ microshift_find.files }}"
+        microshift_rpms: "{{ microshift_find.files | map(attribute='path') | list }}"
+        microshift_core_rpms: >-
+          {{
+            microshift_find.files | map(attribute='path') | map('basename')
+            | select('match', '^microshift(-release-info|-selinux|-networking|-greenboot)?-[0-9]')
+            | map('regex_replace', '\.rpm$', '') | list
+          }}
 
-    - name: Install microshift RPMs
+    - name: Validate that core RPMs were built
+      ansible.builtin.assert:
+        that: microshift_core_rpms | length == 5
+        fail_msg: "Expected 5 core MicroShift RPMs in the build output, found: {{ microshift_core_rpms }}"
+
+    - name: Install all built microshift RPMs
       become: true
       ansible.builtin.dnf:
         name: "{{ microshift_rpms }}"
         state: present
         disable_gpg_check: true
+      when: microshift_install_optional_rpms | bool
+
+    - name: Install core microshift RPMs
+      when: not (microshift_install_optional_rpms | bool)
+      block:
+        - name: Install createrepo
+          become: true
+          ansible.builtin.dnf:
+            name: createrepo_c
+            state: present
+
+        - name: Create local RPM repository metadata
+          ansible.builtin.command:
+            argv:
+              - createrepo_c
+              - "{{ microshift_rpm_repo_dir }}"
+          changed_when: true
+
+        - name: Add local RPM repository
+          become: true
+          ansible.builtin.yum_repository:
+            name: microshift-local
+            description: MicroShift local build
+            baseurl: "file://{{ microshift_rpm_repo_dir }}"
+            enabled: false
+            gpgcheck: false
+            priority: 1
+
+        - name: Install core microshift RPMs from local repository
+          become: true
+          ansible.builtin.dnf:
+            name:
+              - microshift
+              - microshift-release-info
+            enablerepo: microshift-local
+            update_cache: true
+            state: present
+
+        - name: Validate that installed core RPMs match the build
+          ansible.builtin.command:
+            argv: "{{ ['rpm', '-q'] + microshift_core_rpms }}"
+          changed_when: false
+      always:
+        - name: Remove local RPM repository
+          become: true
+          ansible.builtin.yum_repository:
+            name: microshift-local
+            state: absent
 
 - name: Install microshift package on RHEL
   when:
