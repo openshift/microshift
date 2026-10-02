@@ -5,7 +5,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"slices"
@@ -13,7 +15,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
 
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
@@ -74,7 +78,43 @@ func TestRunCommandOtherCommands(t *testing.T) {
 	require.NotContains(t, stderr, certificatesv1alpha1.APIVersion)
 }
 
+func TestRunCommandCertificateHooks(t *testing.T) {
+	for _, hook := range []string{"injected", "root", "root-error"} {
+		for _, format := range []string{"json", "yaml"} {
+			t.Run(hook+"/"+format, func(t *testing.T) {
+				stdout, stderr, code := executeRunCommandWithEnv(t,
+					[]string{"MICROSHIFT_TEST_CERTIFICATE_HOOK=" + hook}, "certs", "status", "-o", format)
+				if hook != "root-error" {
+					require.Zero(t, code)
+					require.Equal(t, "command ran\n", stdout)
+					require.Empty(t, stderr, "root initialization must not add logs to structured output")
+					return
+				}
+				require.Equal(t, 1, code)
+				require.Empty(t, stdout)
+				data := []byte(stderr)
+				if format == "yaml" {
+					var err error
+					data, err = yaml.YAMLToJSONStrict(data)
+					require.NoError(t, err)
+				}
+				decoder := json.NewDecoder(bytes.NewReader(data))
+				var document certificatesv1alpha1.Error
+				require.NoError(t, decoder.Decode(&document))
+				require.ErrorIs(t, decoder.Decode(new(any)), io.EOF)
+				require.Equal(t, certificatesv1alpha1.ErrorKind, document.Kind)
+				require.Equal(t, "root hook failed", document.Message)
+			})
+		}
+	}
+}
+
 func executeRunCommand(t *testing.T, args ...string) (string, string, int) {
+	t.Helper()
+	return executeRunCommandWithEnv(t, nil, args...)
+}
+
+func executeRunCommandWithEnv(t *testing.T, env []string, args ...string) (string, string, int) {
 	t.Helper()
 	executable, err := os.Executable()
 	require.NoError(t, err)
@@ -82,6 +122,7 @@ func executeRunCommand(t *testing.T, args ...string) (string, string, int) {
 	defer cancel()
 	command := exec.CommandContext(ctx, executable, append([]string{"-test.run=^TestRunCommandHelperProcess$", "--"}, args...)...)
 	command.Env = append(os.Environ(), "MICROSHIFT_TEST_RUN_COMMAND=1")
+	command.Env = append(command.Env, env...)
 	var stdout, stderr bytes.Buffer
 	command.Stdout = &stdout
 	command.Stderr = &stderr
@@ -100,5 +141,42 @@ func TestRunCommandHelperProcess(t *testing.T) {
 	}
 	separator := slices.Index(os.Args, "--")
 	require.NotEqual(t, -1, separator)
-	os.Exit(runCommand(newCommand(), os.Args[separator+1:]))
+	command := newCommand()
+	if hook := os.Getenv("MICROSHIFT_TEST_CERTIFICATE_HOOK"); hook != "" {
+		configureCertificateHookTest(t, command, hook)
+	}
+	os.Exit(runCommand(command, os.Args[separator+1:]))
+}
+
+func configureCertificateHookTest(t *testing.T, root *cobra.Command, hook string) {
+	t.Helper()
+	log.SetFlags(log.LstdFlags)
+	rootCalls := 0
+	if hook != "injected" {
+		root.PersistentPreRunE = func(*cobra.Command, []string) error {
+			rootCalls++
+			klog.Info("root initialization diagnostic")
+			if hook == "root-error" {
+				return errors.New("root hook failed")
+			}
+			return nil
+		}
+	}
+	status, _, err := root.Find([]string{"certs", "status"})
+	require.NoError(t, err)
+	require.NotNil(t, status.PreRunE, "privilege checks belong to the executable subcommand")
+	// Stub privilege and inventory work so this subprocess test is independent
+	// of the invoking user's permissions and host configuration.
+	status.PreRunE = func(*cobra.Command, []string) error {
+		require.NotEqual(t, "root-error", hook, "root failure must stop execution")
+		require.Zero(t, log.Flags(), "the injected root hook must initialize logging first")
+		if hook == "root" {
+			require.Equal(t, 1, rootCalls)
+		}
+		return nil
+	}
+	status.RunE = func(command *cobra.Command, _ []string) error {
+		command.Println("command ran")
+		return nil
+	}
 }

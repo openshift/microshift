@@ -49,24 +49,30 @@ func newCertsCommand(options *certStatusOptions, requirePrivileges func() error)
 		Use:   "certs",
 		Short: "Inspect and manage MicroShift certificates",
 		Args:  cobra.NoArgs,
-		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
-			if err := requirePrivileges(); err != nil {
-				return &certificateCommandError{certificatesv1alpha1.ErrorCodeInsufficientPrivileges, err}
-			}
-			return nil
-		},
 	}
 	command.SetOut(options.Out)
 	command.SetErr(options.ErrOut)
-	command.AddCommand(newCertsStatusCommand(options))
+	command.AddCommand(newCertsStatusCommand(options, requirePrivileges))
 	return command
 }
 
-func newCertsStatusCommand(options *certStatusOptions) *cobra.Command {
+// certificatePreRun checks privileges without shadowing root initialization.
+// Attach it to each executable certificate subcommand as PreRunE.
+func certificatePreRun(requirePrivileges func() error) func(*cobra.Command, []string) error {
+	return func(_ *cobra.Command, _ []string) error {
+		if err := requirePrivileges(); err != nil {
+			return &certificateCommandError{certificatesv1alpha1.ErrorCodeInsufficientPrivileges, err}
+		}
+		return nil
+	}
+}
+
+func newCertsStatusCommand(options *certStatusOptions, requirePrivileges func() error) *cobra.Command {
 	command := &cobra.Command{
-		Use:   "status",
-		Short: "Report the status of managed MicroShift certificates",
-		Args:  cobra.NoArgs,
+		Use:     "status",
+		Short:   "Report the status of managed MicroShift certificates",
+		Args:    cobra.NoArgs,
+		PreRunE: certificatePreRun(requirePrivileges),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return options.run()
 		},
@@ -218,20 +224,23 @@ func humanCertificateStatus(item certificatesv1alpha1.CertificateStatusItem, now
 	if now.Before(item.NotBefore.Time) {
 		return fmt.Sprintf("Valid in %d days", daysUntil(item.NotBefore.Sub(now))), nil
 	}
+
+	remainingDays := daysUntil(item.NotAfter.Sub(now))
+	if item.Status == certificatesv1alpha1.CertificateStatusHealthy {
+		return fmt.Sprintf("Valid for %d days", remainingDays), nil
+	}
+
 	warning, critical, err := certchains.RotationPolicy(item.RotationPolicy).StatusThresholds()
 	if err != nil {
 		return "", fmt.Errorf("certificate %q has %w", item.Name, err)
 	}
+
 	validity := item.NotAfter.Sub(item.NotBefore.Time)
-	remainingDays := daysUntil(item.NotAfter.Sub(now))
-	warningDays := daysUntil(time.Duration(float64(validity) * warning))
-	if item.Status == certificatesv1alpha1.CertificateStatusHealthy {
-		return fmt.Sprintf("Valid for %d days", remainingDays), nil
-	}
 	if item.Status == certificatesv1alpha1.CertificateStatusExpirationImminent {
 		criticalDays := daysUntil(time.Duration(float64(validity) * critical))
 		return fmt.Sprintf("Expires in %d days, which is at or below the critical threshold of %d days", remainingDays, criticalDays), nil
 	}
+	warningDays := daysUntil(time.Duration(float64(validity) * warning))
 	return fmt.Sprintf("Expires in %d days, which is at or below the warning threshold of %d days", remainingDays, warningDays), nil
 }
 

@@ -14,12 +14,94 @@ import (
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/yaml"
 
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
 )
+
+func TestCertsCommandRunHooks(t *testing.T) {
+	for _, hook := range []string{"PersistentPreRun", "PersistentPreRunE"} {
+		for _, failure := range []string{"", "root", "privileges"} {
+			if hook == "PersistentPreRun" && failure == "root" {
+				continue
+			}
+			t.Run(hook+"/"+failure, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				var calls []string
+				options := &certStatusOptions{
+					IOStreams: genericclioptions.IOStreams{Out: &stdout, ErrOut: &stderr},
+					now:       time.Now,
+					loadConfig: func() (*config.Config, error) {
+						calls = append(calls, "config")
+						return &config.Config{}, nil
+					},
+					loadInventory: func(*config.Config) (certchains.CertificateInventory, error) {
+						calls = append(calls, "inventory")
+						return nil, nil
+					},
+				}
+				root := &cobra.Command{Use: "microshift"}
+				root.AddCommand(newCertsCommand(options, func() error {
+					calls = append(calls, "privileges")
+					if failure == "privileges" {
+						return errors.New("privilege check failed")
+					}
+					return nil
+				}))
+				if hook == "PersistentPreRun" {
+					root.PersistentPreRun = func(*cobra.Command, []string) { calls = append(calls, "root") }
+				} else {
+					root.PersistentPreRunE = func(*cobra.Command, []string) error {
+						calls = append(calls, "root")
+						if failure == "root" {
+							return &certificateCommandError{certificatesv1alpha1.ErrorCodeInternalError, errors.New("root hook failed")}
+						}
+						return nil
+					}
+				}
+				code := RunCertsCommand(root, []string{"certs", "status", "-o", "json"})
+				if failure == "" {
+					require.Zero(t, code)
+					require.Equal(t, []string{"root", "privileges", "config", "inventory"}, calls)
+					require.Empty(t, stderr.String())
+					return
+				}
+				require.Equal(t, 1, code)
+				require.Empty(t, stdout.String())
+				var document certificatesv1alpha1.Error
+				require.NoError(t, json.Unmarshal(stderr.Bytes(), &document))
+				if failure == "root" {
+					require.Equal(t, []string{"root"}, calls)
+					require.Equal(t, certificatesv1alpha1.ErrorCodeInternalError, document.Code)
+				} else {
+					require.Equal(t, []string{"root", "privileges"}, calls)
+					require.Equal(t, certificatesv1alpha1.ErrorCodeInsufficientPrivileges, document.Code)
+				}
+			})
+		}
+	}
+}
+
+func TestCertsCommandRestoresLogging(t *testing.T) {
+	state := klog.CaptureState()
+	t.Cleanup(state.Restore)
+	var logs bytes.Buffer
+	klog.ClearLogger()
+	klog.LogToStderr(false)
+	klog.SetOutput(&logs)
+	root := &cobra.Command{Use: "microshift"}
+	root.SetOut(io.Discard)
+	root.SetErr(io.Discard)
+	root.AddCommand(newCertsCommand(&certStatusOptions{}, func() error { return errors.New("privileges required") }))
+	require.Equal(t, 1, RunCertsCommand(root, []string{"certs", "status", "-o", "json"}))
+	require.Empty(t, logs.String())
+	klog.Info("logging after certificate command")
+	klog.Flush()
+	require.Contains(t, logs.String(), "logging after certificate command")
+}
 
 func TestCertStatusErrors(t *testing.T) {
 	const sensitiveConfig = "proxy: http://test-user:certificate-test-secret@proxy.invalid:8080\ninvalid: ["

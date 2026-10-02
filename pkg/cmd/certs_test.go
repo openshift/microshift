@@ -139,7 +139,8 @@ func TestCertStatusStates(t *testing.T) {
 		{"expiration imminent", -800 * time.Hour, 200 * time.Hour, certificatesv1alpha1.CertificateStatusExpirationImminent, "Expires in 9 days, which is at or below the critical threshold of 14 days"},
 		{"expired", -1000 * time.Hour, -time.Hour, certificatesv1alpha1.CertificateStatusExpired, "Expired 1 days ago"},
 		{"exactly at expiry", -1000 * time.Hour, 0, certificatesv1alpha1.CertificateStatusExpired, "Expired 0 days ago"},
-		{"not yet valid", time.Hour, 1000 * time.Hour, certificatesv1alpha1.CertificateStatusExpirationImminent, "Valid in 1 days"},
+		{"not yet valid", time.Hour, 1000 * time.Hour, certificatesv1alpha1.CertificateStatusNotYetValid, "Valid in 1 days"},
+		{"validity starts now", 0, 1000 * time.Hour, certificatesv1alpha1.CertificateStatusHealthy, "Valid for 42 days"},
 	} {
 		for _, format := range []string{"", certificateOutputJSON, certificateOutputYAML} {
 			t.Run(tt.name+"/"+format, func(t *testing.T) {
@@ -257,7 +258,13 @@ func TestCertificateStatusThresholdMessages(t *testing.T) {
 			require.Equal(t, tt.message, message)
 			status.Items[0].RotationPolicy = "invalid"
 			var out bytes.Buffer
-			require.ErrorContains(t, writeCertificateStatusTable(&out, status), "unknown rotation policy")
+			err = writeCertificateStatusTable(&out, status)
+			if status.Items[0].Status == certificatesv1alpha1.CertificateStatusHealthy {
+				require.NoError(t, err, "healthy messages do not need rotation-policy thresholds")
+				require.Contains(t, out.String(), tt.message)
+				return
+			}
+			require.ErrorContains(t, err, "unknown rotation policy")
 			require.Empty(t, out.String(), "invalid policy must not produce a partial table")
 		})
 	}

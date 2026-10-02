@@ -21,6 +21,9 @@ func TestCertificateStatusRoundTrip(t *testing.T) {
 		"items":[{
 			"service":"etcd","name":"etcd-serving","role":"peer","rotationPolicy":"extended","status":"Expired",
 			"notBefore":"2016-09-07T10:30:00Z","notAfter":"2026-09-07T10:30:00Z","remainingSeconds":-86400
+		},{
+			"service":"test","name":"test-serving","role":"serving","rotationPolicy":"standard","status":"NotYetValid",
+			"notBefore":"2026-09-09T10:30:00Z","notAfter":"2026-09-10T10:30:00Z","remainingSeconds":172800
 		}],
 		"warnings":[]
 	}`
@@ -31,6 +34,7 @@ func TestCertificateStatusRoundTrip(t *testing.T) {
 	require.Equal(t, certificatesv1alpha1.CertificateStatusExpired, status.Items[0].Status)
 	require.False(t, status.Config.ForceRestartOnExpirationImminent)
 	require.Equal(t, int64(-86400), status.Items[0].RemainingSeconds)
+	require.Equal(t, certificatesv1alpha1.CertificateStatusNotYetValid, status.Items[1].Status)
 	require.NotNil(t, status.Warnings)
 
 	encoded, err := yaml.Marshal(status)

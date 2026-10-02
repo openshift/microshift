@@ -177,7 +177,14 @@ func TestCertificateInventoryEntry_StatusAt(t *testing.T) {
 			policy:    RotationPolicyStandard,
 			notBefore: now.Add(time.Hour),
 			notAfter:  now.Add(1000 * time.Hour),
-			want:      CertificateStatusExpirationImminent,
+			want:      CertificateStatusNotYetValid,
+		},
+		{
+			name:      "extended not yet valid",
+			policy:    RotationPolicyExtended,
+			notBefore: now.Add(time.Second),
+			notAfter:  now.Add(1000 * time.Hour),
+			want:      CertificateStatusNotYetValid,
 		},
 		{
 			name:      "validity starts now",
@@ -205,6 +212,13 @@ func TestCertificateInventoryEntry_StatusAt(t *testing.T) {
 			policy:    RotationPolicyExtended,
 			notBefore: now.Add(-1000 * time.Hour),
 			notAfter:  now.Add(-time.Second),
+			want:      CertificateStatusExpired,
+		},
+		{
+			name:      "expired takes precedence over future not before",
+			policy:    RotationPolicyStandard,
+			notBefore: now.Add(time.Hour),
+			notAfter:  now,
 			want:      CertificateStatusExpired,
 		},
 		{

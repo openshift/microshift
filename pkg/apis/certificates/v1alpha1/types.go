@@ -33,7 +33,7 @@ const (
 )
 
 // CertificateStatus identifies the current renewal urgency of a certificate.
-// +kubebuilder:validation:Enum=Healthy;ExpiresSoon;ExpirationImminent;Expired
+// +kubebuilder:validation:Enum=Healthy;ExpiresSoon;ExpirationImminent;Expired;NotYetValid
 type CertificateStatus string
 
 const (
@@ -41,6 +41,7 @@ const (
 	CertificateStatusExpiresSoon        CertificateStatus = "ExpiresSoon"
 	CertificateStatusExpirationImminent CertificateStatus = "ExpirationImminent"
 	CertificateStatusExpired            CertificateStatus = "Expired"
+	CertificateStatusNotYetValid        CertificateStatus = "NotYetValid"
 )
 
 // CertificateStatusList reports the state of all managed certificates.

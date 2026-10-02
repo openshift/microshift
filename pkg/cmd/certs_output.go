@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/component-base/cli"
+	"k8s.io/klog/v2"
 
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
 )
@@ -35,6 +36,15 @@ func (e *certificateCommandError) Unwrap() error { return e.err }
 // Unlike cli.Run, it formats errors itself so diagnostics cannot be appended
 // to a machine-readable Error document, including failures before RunE.
 func RunCertsCommand(root *cobra.Command, args []string) int {
+	format := certificateOutputFormat(args)
+	if format == certificateOutputJSON || format == certificateOutputYAML {
+		// Structured output owns stdout/stderr, including during root hooks.
+		// Suppress klog diagnostics such as the runner's race-detection banner;
+		// command errors and warnings are still reported in API documents.
+		state := klog.CaptureState()
+		defer state.Restore()
+		klog.SetLogger(klog.New(nil))
+	}
 	root.SetArgs(args)
 	root.SilenceUsage = true
 	command, _, _ := root.Find(args)
@@ -44,7 +54,6 @@ func RunCertsCommand(root *cobra.Command, args []string) int {
 	if err := cli.RunNoErrOutput(root); err != nil {
 		// If no output desired, just print stdout
 		out := command.ErrOrStderr()
-		format := certificateOutputFormat(args)
 		if format != certificateOutputJSON && format != certificateOutputYAML {
 			_, _ = fmt.Fprintf(out, "Error: %v\n", err)
 			return 1

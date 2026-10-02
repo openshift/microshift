@@ -53,6 +53,7 @@ const (
 	CertificateStatusExpiresSoon        CertificateStatus = "ExpiresSoon"
 	CertificateStatusExpirationImminent CertificateStatus = "ExpirationImminent"
 	CertificateStatusExpired            CertificateStatus = "Expired"
+	CertificateStatusNotYetValid        CertificateStatus = "NotYetValid"
 )
 
 // CertificateInventoryEntry describes one certificate managed by the chain.
@@ -88,7 +89,7 @@ func (entry CertificateInventoryEntry) StatusAt(now time.Time) (CertificateStatu
 		return CertificateStatusExpired, nil
 	}
 	if now.Before(certificate.NotBefore) {
-		return CertificateStatusExpirationImminent, nil
+		return CertificateStatusNotYetValid, nil
 	}
 
 	validity := certificate.NotAfter.Sub(certificate.NotBefore)

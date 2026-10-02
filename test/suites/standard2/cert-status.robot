@@ -97,13 +97,13 @@ Read Certificate Status
     RETURN    ${status}
 
 Validate Certificate Table Message
-    [Documentation]    Each current-validity state explains its warning or critical threshold in days.
+    [Documentation]    Messages distinguish upcoming validity from expiry and include thresholds when expiring.
     [Arguments]    ${row}
     ${fields}=    Evaluate    $row.split(maxsplit=4)
     Length Should Be    ${fields}    5
     VAR    ${state}=    ${fields}[2]
     VAR    ${message}=    ${fields}[4]
-    Should Be True    $state in ('Healthy', 'ExpiresSoon', 'ExpirationImminent', 'Expired')
+    Should Be True    $state in ('Healthy', 'ExpiresSoon', 'ExpirationImminent', 'Expired', 'NotYetValid')
     IF    $state == 'Healthy'
         Should Match Regexp
         ...    ${message}    ^Valid for [0-9]+ days$
@@ -113,7 +113,9 @@ Validate Certificate Table Message
     ELSE IF    $state == 'ExpirationImminent'
         Should Match Regexp
         ...    ${message}
-        ...    ^(Expires in [0-9]+ days, which is at or below the critical threshold of [0-9]+ days|Valid in [0-9]+ days)$
+        ...    ^Expires in [0-9]+ days, which is at or below the critical threshold of [0-9]+ days$
+    ELSE IF    $state == 'NotYetValid'
+        Should Match Regexp    ${message}    ^Valid in [0-9]+ days$
     ELSE
         Should Match Regexp    ${message}    ^Expired [0-9]+ days ago$
     END
@@ -177,23 +179,32 @@ Validate Status Document
     Dictionary Should Not Contain Key    ${status}[config]    forceRestartOnRedZone
     Should Not Be Empty    ${status}[items]
     FOR    ${item}    IN    @{status}[items]
-        Validate Status Item    ${item}
+        Validate Status Item    ${item}    ${status}[generatedAt]
     END
     Certificates Should Be Sorted    ${status}
 
 Validate Status Item
     [Documentation]    Check the public fields for one managed certificate.
-    [Arguments]    ${item}
+    [Arguments]    ${item}    ${generated_at}
     Should Not Be Empty    ${item}[service]
     Should Not Be Empty    ${item}[name]
     Should Be True    $item['role'] in ('ca', 'serving', 'client', 'peer')
     Should Be True    $item['rotationPolicy'] in ('standard', 'extended')
-    Should Be True    $item['status'] in ('Healthy', 'ExpiresSoon', 'ExpirationImminent', 'Expired')
     Dictionary Should Not Contain Key    ${item}    zone
+    Validate Certificate Validity    ${item}    ${generated_at}
+
+Validate Certificate Validity
+    [Documentation]    Invalid validity windows take precedence over policy-derived expiry thresholds.
+    [Arguments]    ${item}    ${generated_at}
+    Should Be True    $item['status'] in ('Healthy', 'ExpiresSoon', 'ExpirationImminent', 'Expired', 'NotYetValid')
     Should Be True    isinstance($item['remainingSeconds'], int)
     Should Be True    ($item['status'] == 'Expired') == ($item['remainingSeconds'] <= 0)
     Should Not Be Empty    ${item}[notBefore]
     Should Not Be Empty    ${item}[notAfter]
+    ${not_yet_valid}=    Evaluate
+    ...    datetime.datetime.fromisoformat($generated_at.replace('Z', '+00:00')) < datetime.datetime.fromisoformat($item['notBefore'].replace('Z', '+00:00'))
+    ...    modules=datetime
+    Should Be True    ($item['status'] == 'NotYetValid') == ($not_yet_valid and $item['remainingSeconds'] > 0)
 
 Certificates Should Be Sorted
     [Documentation]    Check deterministic ordering by service and certificate name.
