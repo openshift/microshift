@@ -231,7 +231,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
 	google.golang.org/grpc v1.81.1 // indirect
-	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af // indirect
+	google.golang.org/protobuf v1.36.12 // indirect
 	k8s.io/gengo/v2 v2.0.0-20250922181213-ec3ebc5fd46b // indirect
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/kubernetes v1.36.4
@@ -241,7 +241,7 @@ replace (
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260424201627-4d4cc33d669d // from kubernetes
 	k8s.io/klog/v2 => ./deps/k8s.io/klog // deps clone github.com/kubernetes/klog from kubernetes
 	k8s.io/kubernetes => ./deps/github.com/openshift/kubernetes // deps copy
-	sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260914145514-05d6b0c45379 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
+	sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260930190547-236d1d76ab05 // release kube-storage-version-migrator via kubernetes-kube-storage-version-migrator
 )
 
 replace (
