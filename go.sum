@@ -314,8 +314,8 @@ github.com/openshift/client-go v0.0.0-20260715172546-dac61734e0ec h1:UDjX+mot5IV
 github.com/openshift/client-go v0.0.0-20260715172546-dac61734e0ec/go.mod h1:iMHec0APKVjOH8GfL/RxddX8DuiuSvPlRe+s7KDqlyA=
 github.com/openshift/cluster-policy-controller v0.0.0-20260811140609-469bbf211d35 h1:ltkGdV6r1OWjvvOuJt3VXWRypjGuLnNvTEP8sCkuU8c=
 github.com/openshift/cluster-policy-controller v0.0.0-20260811140609-469bbf211d35/go.mod h1:ujufpXCwp5BBm/OseRiag45V2v7SOhow/O6EoMrVfWg=
-github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260914145514-05d6b0c45379 h1:TXojEUBAosc7QnHbC1Fi8iTLLh1vykN+Rj5ri0p08ao=
-github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260914145514-05d6b0c45379/go.mod h1:VCEhrDaKKWEti2zVSo9C5DV0A1EYfGrvSWnZJ6m+4Do=
+github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260930190547-236d1d76ab05 h1:mUTGgUsCAvAuBFaUTWFUv3qizSqWBSwJjMbF2411Gh4=
+github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260930190547-236d1d76ab05/go.mod h1:P2tk2ANbjZ/UpSwlhc7st79vCaX4zfN+drSa/nNNafw=
 github.com/openshift/library-go v0.0.0-20260720185249-0595e37fe20f h1:NdSEtKB+vvHlGELA+jX/c+TALNwe8iSsJAQYvMabgHQ=
 github.com/openshift/library-go v0.0.0-20260720185249-0595e37fe20f/go.mod h1:iWcB6wgeOhsByZAZGhmzBtEnrLQzABL0s3aeou8AmSI=
 github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260424201627-4d4cc33d669d h1:t+XyaZL4LpQx/AY2SETlMCQPLc9vd05ZZ7WXvD9doME=
@@ -514,8 +514,8 @@ google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa h1:
 google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa/go.mod h1:4Hqkh8ycfw05ld/3BWL7rJOSfebL2Q+DVDeRgYgxUU8=
 google.golang.org/grpc v1.81.1 h1:VnnIIZ88UzOOKLukQi+ImGz8O1Wdp8nAGGnvOfEIWQQ=
 google.golang.org/grpc v1.81.1/go.mod h1:xGH9GfzOyMTGIOXBJmXt+BX/V0kcdQbdcuwQ/zNw42I=
-google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af h1:+5/Sw3GsDNlEmu7TfklWKPdQ0Ykja5VEmq2i817+jbI=
-google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
+google.golang.org/protobuf v1.36.12 h1:pJOKDDOyeXErUroCihFAd5LQuwXBSpVnKGrj5o/fwxc=
+google.golang.org/protobuf v1.36.12/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
