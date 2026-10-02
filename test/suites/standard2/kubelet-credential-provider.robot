@@ -197,7 +197,6 @@ Restart MicroShift With Cursor
 Apply Credential Provider Config
     [Documentation]    Apply a drop-in config and restart MicroShift, recording the journal cursor
     [Arguments]    ${config}
-    Remove Drop In MicroShift Config    ${CP_DROPIN}
     Drop In MicroShift Config    ${config}    ${CP_DROPIN}
     Restart MicroShift With Cursor
 
@@ -206,7 +205,6 @@ Apply Invalid Credential Provider Config
     ...    Assumes MicroShift is already running clean: the suite starts healthy and every
     ...    test's teardown restarts to a clean state, so no extra clean restart is needed here.
     [Arguments]    ${config}
-    Remove Drop In MicroShift Config    ${CP_DROPIN}
     Drop In MicroShift Config    ${config}    ${CP_DROPIN}
     ${cursor}=    Get Journal Cursor
     VAR    ${CURSOR}=    ${cursor}    scope=TEST
