@@ -21,6 +21,7 @@
   ansible.builtin.git:
     repo: "{{ e2e_repo }}"
     dest: "{{ e2e_path }}"
+    version: "{{ e2e_git_revision }}"
     update: false
 
 - name: Check if we have kube-burner installed
@@ -47,6 +48,7 @@
       ansible.builtin.file:
         path: "{{ local_bin_path }}"
         state: directory
+        mode: "0755"
       when: not local_bin_directory_check.stat.exists
 
     - name: Extract kube-burner files

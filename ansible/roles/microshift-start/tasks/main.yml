@@ -4,15 +4,20 @@
 - name: Resolve kubernetes nodename
   ansible.builtin.include_tasks: roles/common/tasks/nodename.yml
 
-- name: Check if microshift has run
-  ansible.builtin.shell: systemctl show -p ActiveEnterTimestampMonotonic microshift | awk -F"=" '{print $2}'
-  register: microshift_active
-  ignore_errors: true
+- name: Stop and disable microshift service
+  become: true
+  ansible.builtin.systemd:
+    name: microshift
+    state: stopped
+    enabled: false
+  register: microshift_service
 
+# The systemd module reports the unit status as it was before stopping it, so
+# a non-zero ActiveEnterTimestampMonotonic means MicroShift ran since boot.
 - name: Clean up existing MicroShift data
   when:
     - cleanup_microshift | default('true') | bool
-    - microshift_active.stdout | int != 0
+    - (microshift_service.status.ActiveEnterTimestampMonotonic | default(0)) | int != 0
   block:
     - name: Find microshift cleanup script
       ansible.builtin.find:
@@ -29,19 +34,18 @@
 
     - name: Cleanup microshift data
       become: true
-      ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
-
-- name: Disable microshift service
-  become: true
-  ansible.builtin.systemd:
-    name: microshift
-    state: stopped
-    enabled: false
+      ansible.builtin.command:
+        argv:
+          - "{{ microshift_cleanup_bin }}"
+          - --all
+        stdin: "1"
+      changed_when: true
 
 - name: Create .kube home dir
   ansible.builtin.file:
     path: ~/.kube/
     state: directory
+    mode: "0700"
 
 - name: Reboot machine
   become: true
@@ -69,9 +73,11 @@
   block:
     - name: Source pbench-agent & register-tool-set
       ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool-set
+      changed_when: true
 
     - name: Set new pidstat interval
       ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-register-tool --name=pidstat -- --interval={{ sample_interval }}
+      changed_when: true
 
     - name: Start pbench-user-benchmark recording
       ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-user-benchmark --config=microshift -- sleep {{ pbench_record_duration }}
@@ -86,6 +92,7 @@
 - name: Record network measurement start epoch
   ansible.builtin.command: date +%s
   register: network_start_epoch
+  changed_when: false
 
 - name: Measure microshift service boot time
   ansible.builtin.include_tasks: roles/common/tasks/boot.yml
@@ -114,7 +121,14 @@
 
     - name: Source pbench-agent & move results
       ansible.builtin.shell: source /etc/profile.d/pbench-agent.sh && pbench-move-results
-      ignore_errors: true
+      register: pbench_move_results
+      changed_when: true
+      failed_when: false
+
+    - name: Report pbench results that could not be moved
+      ansible.builtin.debug:
+        msg: "pbench-move-results failed (rc={{ pbench_move_results.rc }}); results remain on the host"
+      when: pbench_move_results.rc != 0
 
 - name: Record fully running disk utilization
   vars:
@@ -135,16 +149,19 @@
       become: true
       ansible.builtin.command: python3 /tmp/crio-df.py -v
       register: crio_df
+      changed_when: false
 
     - name: Save container image sizes to results
       ansible.builtin.copy:
         content: "{{ crio_df.stdout }}"
         dest: "{{ results_dir }}/images.txt"
+        mode: "0644"
       delegate_to: localhost
 
 - name: Record network measurement end epoch
   ansible.builtin.command: date +%s
   register: network_end_epoch
+  changed_when: false
 
 - name: Resolve prometheus network query settings
   ansible.builtin.set_fact:
@@ -180,10 +197,12 @@
         {{ network_start_epoch.stdout }}
         {{ network_end_epoch.stdout }}
       register: prom_network
+      changed_when: false
       delegate_to: localhost
 
     - name: Save network data to results
       ansible.builtin.copy:
         content: "{{ prom_network.stdout }}"
         dest: "{{ results_dir }}/network.txt"
+        mode: "0644"
       delegate_to: localhost

@@ -155,10 +155,13 @@ Most of the following variables are defined in `vars/all.yml`. The source-build 
 | `microshift_git_revision` | Git revision to check out when building MicroShift from source | `"release-<major.minor>"` |
 | `microshift_git_refspec` | Additional Git refspec to fetch when building MicroShift from source (e.g. `+refs/pull/123/head:refs/remotes/origin/pr-123`) | `""` |
 | `build_etcd_binary` | Build and deploy a separate etcd process | `false` |
+| `etcd_git_revision` | Git revision to check out when building etcd from source | `"main"` |
+| `e2e_git_revision` | Git revision to check out when cloning the e2e-benchmarking workloads | `"master"` |
 | `microshift_version` | MicroShift version to install (supports EC/RC prereleases) | `"4.20"` |
 | `enable_gpu` | Install NVIDIA GPU drivers and container toolkit for GPU workloads | `false` |
 | `deploy_gpu_test` | Deploy a test GPU workload to validate GPU functionality | `true` |
 | `run_workloads` | Run kube-burner performance workloads | `false` |
+| `kube_burner_es_server` | Elasticsearch server that kube-burner indexes results to when indexing is enabled | `""` |
 | `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.8") | `undefined` |
 
 Source builds update the existing checkout in `microshift_dir` to `microshift_git_revision`. By default, the revision is the release branch derived from

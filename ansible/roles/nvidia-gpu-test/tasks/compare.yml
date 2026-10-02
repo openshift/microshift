@@ -1,0 +1,16 @@
+---
+# Compare the GPUs listed by nvidia-smi on the host with those the pod sees.
+# Expects host_nvidia_smi and pod_nvidia_smi_logs to be registered.
+
+- name: Count GPUs listed by nvidia-smi on the host and in the pod
+  ansible.builtin.set_fact:
+    host_gpu_count: "{{ host_nvidia_smi.stdout | regex_findall('^\\| +[0-9]+ +', multiline=True) | length }}"
+    pod_gpu_count: "{{ pod_nvidia_smi_logs.stdout | regex_findall('^\\| +[0-9]+ +', multiline=True) | length }}"
+
+- name: Compare GPU visibility
+  ansible.builtin.assert:
+    that:
+      - host_gpu_count | int > 0
+      - host_gpu_count | int == pod_gpu_count | int
+    success_msg: "SUCCESS: Pod can see all {{ host_gpu_count }} host GPUs"
+    fail_msg: "GPU count mismatch: host {{ host_gpu_count }}, pod {{ pod_gpu_count }}"

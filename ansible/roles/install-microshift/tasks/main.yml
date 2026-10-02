@@ -1,21 +1,18 @@
 ---
 # install-microshift tasks
 
-- name: Check if microshift is installed
-  ansible.builtin.command: rpm -q microshift
-  register: microshift_installed
-  ignore_errors: true
-  changed_when: false
+- name: Gather installed package facts
+  ansible.builtin.package_facts:
+    manager: auto
 
 - name: Cleanup and uninstall existing microshift
-  when: microshift_installed.rc == 0
+  when: "'microshift' in ansible_facts.packages"
   block:
     - name: Stop microshift service
       become: true
       ansible.builtin.systemd:
         name: microshift
         state: stopped
-      ignore_errors: true
 
     - name: Find microshift cleanup script
       ansible.builtin.find:
@@ -28,7 +25,12 @@
 
     - name: Cleanup microshift data
       become: true
-      ansible.builtin.shell: echo 1 | {{ find_cleanup.files[0].path }} --all
+      ansible.builtin.command:
+        argv:
+          - "{{ find_cleanup.files[0].path }}"
+          - --all
+        stdin: "1"
+      changed_when: true
       when: find_cleanup.files | length > 0
 
     - name: Uninstall microshift packages and dependencies
@@ -70,11 +72,13 @@
       ansible.builtin.command: make clean
       args:
         chdir: "{{ microshift_build_dir }}"
+      changed_when: true
 
     - name: Make rpm
       ansible.builtin.command: make rpm
       args:
         chdir: "{{ microshift_build_dir }}"
+      changed_when: true
 
     - name: Find built RPMs
       ansible.builtin.find:
@@ -120,11 +124,13 @@
       ansible.builtin.git:
         repo: "{{ etcd_repo }}"
         dest: "{{ etcd_dir }}"
+        version: "{{ etcd_git_revision }}"
 
     - name: Make etcd binary
       ansible.builtin.command: make
       args:
         chdir: "{{ etcd_dir }}"
+      changed_when: true
 
     - name: Install etcd binary
       become: true
