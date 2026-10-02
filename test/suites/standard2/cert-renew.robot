@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation       Offline certificate renewal, read-only planning, and structured output.
+Documentation       Online certificate preparation, startup activation, and structured output.
 
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-host.resource
@@ -15,15 +15,21 @@ Test Tags           restart
 
 *** Variables ***
 ${CERTIFICATE_LOCK}     /var/lib/microshift-backups/certs.lock
+${RUNTIME_LOCK}         /var/lib/microshift-backups/certs-runtime.lock
 
 
 *** Test Cases ***
-Running Service Holds The Certificate Lock
-    [Documentation]    The persistent lock uses existing SELinux policy and excludes writers while MicroShift runs.
+Running Service Allows Pending Renewal
+    [Documentation]    Runtime and operation locks use existing SELinux policy and separate activation from preparation.
     ${metadata}=    Command Should Work    stat -c '%a %C' ${CERTIFICATE_LOCK}
     Should Match Regexp    ${metadata}    ^600 .*:container_var_lib_t:
     ${rc}=    Execute Command
     ...    flock -n -x ${CERTIFICATE_LOCK} true    sudo=True    return_stdout=False    return_rc=True
+    Should Be Equal As Integers    ${rc}    0
+    ${metadata}=    Command Should Work    stat -c '%a %C' ${RUNTIME_LOCK}
+    Should Match Regexp    ${metadata}    ^600 .*:container_var_lib_t:
+    ${rc}=    Execute Command
+    ...    flock -n -x ${RUNTIME_LOCK} true    sudo=True    return_stdout=False    return_rc=True
     Should Be Equal As Integers    ${rc}    1
     Certificate Status Document
 
@@ -41,18 +47,23 @@ Dry Run Validates Both Modes Without Changing Material
     Should Be Equal    ${before}    ${after}
     MicroShift Service Is Active
 
-Apply Is Refused While Running
-    [Documentation]    Applying either mode must fail with empty stdout and a structured service-state error.
+Renewal Can Replace Pending Material While Running
+    [Documentation]    Both modes prepare successfully without touching active files or restarting the service.
     ${before}=    Certificate Material Digest
-    FOR    ${format}    IN    json    yaml
-        FOR    ${mode}    IN    serving    ca
-            Renewal Error Should Be Reported
-            ...    microshift certs renew --${mode} -o ${format}    ${format}    MicroShiftRunning
-        END
+    ${pid}=    MicroShift Process ID
+    ${status}=    Certificate Status Document
+    FOR    ${mode}    IN    serving    ca
+        ${result}=    Renewal Document    ${mode}    json
+        Validate Renewal Document    ${result}    ${mode}    ${False}    ${status}
+        Pending Renewal Matches Result    ${result}
     END
     ${after}=    Certificate Material Digest
     Should Be Equal    ${before}    ${after}
+    ${current_pid}=    MicroShift Process ID
+    Should Be Equal    ${pid}    ${current_pid}
     MicroShift Service Is Active
+    Wait For MicroShift
+    [Teardown]    Restart MicroShift
 
 Exactly One Renewal Mode Is Required
     [Documentation]    Missing and conflicting mode selections are rejected before staging.
@@ -69,32 +80,62 @@ Unprivileged Dry Run Is Refused
         Renewal Error Should Be Reported
         ...    runuser -u nobody -- microshift certs renew --serving --dry-run -o ${format}
         ...    ${format}    InsufficientPrivileges
+        Renewal Error Should Be Reported
+        ...    runuser -u nobody -- microshift certs renew --ca -o ${format}
+        ...    ${format}    InsufficientPrivileges
     END
 
 Leaf Renewal Keeps CAs Unchanged
-    [Documentation]    Renew leaves offline, verify CA bytes, then verify API readiness with regenerated kubeconfigs.
-    Stop MicroShift
+    [Documentation]    Prepare leaves online, preserve active TLS and CA bytes, and activate only on restart.
     ${before}=    Certificate Status Document
+    ${files_before}=    Certificate Material Digest
+    ${served_before}=    Served Certificate Fingerprints
     ${ca_before}=    CA Material Digest
     ${result}=    Renewal Document    serving    json
     Validate Renewal Document    ${result}    serving    ${False}    ${before}
     ${ca_after}=    CA Material Digest
     Should Be Equal    ${ca_before}    ${ca_after}
+    Renewal Has Not Changed Active Material    ${files_before}    ${served_before}
+    Pending Renewal Matches Result    ${result}
+    Restart MicroShift
     Renewal Matches Current Status    ${result}
-    Renewal Has Finished Offline
-    [Teardown]    Start And Wait For MicroShift
+    ${ca_after}=    CA Material Digest
+    Should Be Equal    ${ca_before}    ${ca_after}
+    ${served_after}=    Served Certificate Fingerprints
+    Should Not Be Equal    ${served_before}    ${served_after}
+    Renewal Activation Has Finished
 
 CA Renewal Updates The Whole Chain
-    [Documentation]    Rotate all CAs and descendants, expose redistribution impact, and restart successfully.
-    Stop MicroShift
+    [Documentation]    Prepare all CAs online with old credentials still usable; activate the new chain on restart.
     ${before}=    Certificate Status Document
+    ${files_before}=    Certificate Material Digest
+    ${served_before}=    Served Certificate Fingerprints
     ${ca_before}=    CA Material Digest
     ${result}=    Renewal Document    ca    yaml
     Validate Renewal Document    ${result}    ca    ${False}    ${before}
+    Renewal Has Not Changed Active Material    ${files_before}    ${served_before}
+    Pending Renewal Matches Result    ${result}
+    Restart MicroShift
     ${ca_after}=    CA Material Digest
     Should Not Be Equal    ${ca_before}    ${ca_after}
     Renewal Matches Current Status    ${result}
-    Renewal Has Finished Offline
+    Renewal Activation Has Finished
+
+Stopped Renewal Waits For Startup Too
+    [Documentation]    Preparation while stopped has the same pending contract and does not start the service.
+    Stop MicroShift
+    ${before}=    Certificate Status Document
+    ${files_before}=    Certificate Material Digest
+    ${result}=    Renewal Document    serving    yaml
+    Validate Renewal Document    ${result}    serving    ${False}    ${before}
+    ${files_after}=    Certificate Material Digest
+    Should Be Equal    ${files_before}    ${files_after}
+    Pending Renewal Matches Result    ${result}
+    ${state}=    Get Systemd Setting    microshift.service    ActiveState
+    Should Be Equal    ${state}    inactive
+    Start And Wait For MicroShift
+    Renewal Matches Current Status    ${result}
+    Renewal Activation Has Finished
     [Teardown]    Start And Wait For MicroShift
 
 
@@ -159,7 +200,7 @@ Validate Renewal Document
     Should Be Equal    ${result}[kind]    CertificateRenewalResult
     Should Be Equal    ${result}[mode]    ${mode}
     Should Be Equal    ${result}[dryRun]    ${dry_run}
-    Should Be True    $result['status'] == ('validated' if $dry_run else 'completed')
+    Should Be True    $result['status'] == ('validated' if $dry_run else 'pending')
     Validate Renewal Items    ${result}    ${mode}    ${dry_run}    ${before}
     Should Be Equal    ${result}[impact][serviceRestartRequired]    ${True}
     Should Be True    $result['impact']['kubeconfigRedistributionRequired'] == ($mode == 'ca')
@@ -189,13 +230,45 @@ Renewal Matches Current Status
         Should Be True    $expiries[($item['service'], $item['name'])] == $item['newNotAfter']
     END
 
-Renewal Has Finished Offline
-    [Documentation]    Renewal must not restart the service or leave a transaction behind.
-    ${state}=    Get Systemd Setting    microshift.service    ActiveState
-    Should Be Equal    ${state}    inactive
+Renewal Activation Has Finished
+    [Documentation]    Activation removes the pending generation and releases the operation lock.
+    MicroShift Service Is Active
+    ${status}=    Certificate Status Document
+    Dictionary Should Not Contain Key    ${status}    pendingRenewal
     Command Should Work    test ! -e /var/lib/microshift/.cert-renewal
     Certificate Lock Is Stable
     Command Should Work    flock -n -x ${CERTIFICATE_LOCK} true
+
+Pending Renewal Matches Result
+    [Documentation]    Status distinguishes active expiry dates from the prepared replacement dates.
+    [Arguments]    ${result}
+    ${status}=    Certificate Status Document
+    Should Be Equal    ${status}[pendingRenewal][items]    ${result}[items]
+    ${active}=    Evaluate    {(i['service'], i['name']): i['notAfter'] for i in $status['items']}
+    FOR    ${item}    IN    @{result}[items]
+        Should Be True    $active[($item['service'], $item['name'])] == $item['currentNotAfter']
+    END
+
+Served Certificate Fingerprints
+    [Documentation]    Observe fresh API server, etcd and kubelet TLS handshakes without exposing private keys.
+    # s_client may fail without client authentication; x509 must still parse a valid server certificate.
+    ${command}=    Catenate    SEPARATOR=${SPACE}
+    ...    bash -c 'for port in 6443 2379 10250; do
+    ...    timeout 10 openssl s_client -connect 127.0.0.1:$port -servername localhost </dev/null 2>/dev/null
+    ...    | openssl x509 -noout -fingerprint -sha256 || exit 1; done'
+    ${fingerprints}=    Command Should Work    ${command}
+    RETURN    ${fingerprints}
+
+Renewal Has Not Changed Active Material
+    [Documentation]    Active files, served TLS identities and API health remain unchanged before restart.
+    [Arguments]    ${files_before}    ${served_before}
+    ${files_after}=    Certificate Material Digest
+    Should Be Equal    ${files_before}    ${files_after}
+    FOR    ${attempt}    IN RANGE    3
+        ${served_after}=    Served Certificate Fingerprints
+        Should Be Equal    ${served_before}    ${served_after}
+        Wait For MicroShift
+    END
 
 Renewal Error Should Be Reported
     [Documentation]    Failed invocations emit only an Error document on stderr.

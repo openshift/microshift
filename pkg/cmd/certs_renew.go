@@ -31,14 +31,16 @@ type certRenewOptions struct {
 	prepare             func(bool) (func(), error)
 }
 
-func newCertsRenewCommand(options *certRenewOptions) *cobra.Command {
+func newCertsRenewCommand(options *certRenewOptions, requirePrivileges func() error) *cobra.Command {
 	command := &cobra.Command{
 		Use:   "renew",
-		Short: "Renew managed certificates while MicroShift is stopped",
+		Short: "Prepare renewed certificates for the next MicroShift start",
 		Long: "Renew all managed leaf certificates with --serving, or all CAs and descendants with --ca. " +
-			"Use --dry-run to validate and preview renewal without changing files, including while MicroShift is running.",
-		Args: cobra.NoArgs,
-		RunE: func(_ *cobra.Command, _ []string) error { return options.run() },
+			"Active certificates and kubeconfigs remain unchanged until the next start. Renewal is safe while MicroShift is running. " +
+			"Use --dry-run to validate and preview renewal without changing files.",
+		Args:    cobra.NoArgs,
+		PreRunE: certificatePreRun(requirePrivileges),
+		RunE:    func(_ *cobra.Command, _ []string) error { return options.run() },
 	}
 	command.Flags().BoolVar(&options.serving, "serving", false, "Renew all serving, client, and peer certificates without changing CAs")
 	command.Flags().BoolVar(&options.ca, "ca", false, "Renew all CAs and their descendant certificates")
@@ -124,7 +126,7 @@ func newCertificateRenewalResult(plan []certchains.CertificateRenewalPlanEntry, 
 	if len(plan) == 0 {
 		return nil, fmt.Errorf("no certificates selected for renewal")
 	}
-	mode, state := certificatesv1alpha1.RenewalModeServing, certificatesv1alpha1.RenewalStatusCompleted
+	mode, state := certificatesv1alpha1.RenewalModeServing, certificatesv1alpha1.RenewalStatusPending
 	if renewCAs {
 		mode = certificatesv1alpha1.RenewalModeCA
 	}
@@ -166,9 +168,10 @@ func newCertificateRenewalResult(plan []certchains.CertificateRenewalPlanEntry, 
 		})
 	}
 	if renewCAs {
-		result.Warnings = append(result.Warnings, "Kubeconfigs stored outside the MicroShift data directory must be copied again after renewal.")
+		result.Warnings = append(result.Warnings, "Kubeconfigs stored outside the MicroShift data directory must be copied again after activation at the next MicroShift start.")
 	}
-	result.Warnings = append(result.Warnings, "Applications that cache certificates or CA bundles may need to be reloaded or restarted after renewal.")
+	result.Warnings = append(result.Warnings, "Applications that cache certificates or CA bundles may need to be reloaded or restarted after activation.",
+		"Pending renewal does not extend the lifetime of active certificates or change the running service's automatic rotation deadline.")
 	return result, nil
 }
 
@@ -178,7 +181,7 @@ func writeCertificateRenewalTable(out io.Writer, result *certificatesv1alpha1.Ce
 			return err
 		}
 	} else {
-		if err := writeCompletedCertificateRenewal(out, result, renewed); err != nil {
+		if err := writePendingCertificateRenewal(out, result, renewed); err != nil {
 			return err
 		}
 	}
@@ -187,14 +190,14 @@ func writeCertificateRenewalTable(out io.Writer, result *certificatesv1alpha1.Ce
 			return err
 		}
 	}
-	if _, err := fmt.Fprintln(out, "MicroShift must be stopped for renewal. Start microshift.service after renewal completes."); err != nil {
+	if _, err := fmt.Fprintln(out, "Active certificates and kubeconfigs are unchanged. Start or restart microshift.service to activate a pending renewal."); err != nil {
 		return err
 	}
 	return nil
 }
 
-func writeCompletedCertificateRenewal(out io.Writer, result *certificatesv1alpha1.CertificateRenewalResult, renewed certchains.CertificateInventory) error {
-	if _, err := fmt.Fprintf(out, "Renewed %d certificates.\n", len(result.Items)); err != nil {
+func writePendingCertificateRenewal(out io.Writer, result *certificatesv1alpha1.CertificateRenewalResult, renewed certchains.CertificateInventory) error {
+	if _, err := fmt.Fprintf(out, "Prepared %d renewed certificates for activation at the next MicroShift start. Pending certificates:\n", len(result.Items)); err != nil {
 		return err
 	}
 	status, err := newCertificateStatusList(renewed, nil, result.GeneratedAt.Time)

@@ -22,6 +22,7 @@ func newTestTransaction(t *testing.T) *Transaction {
 	for _, name := range []string{"certs", "resources"} {
 		require.NoError(t, os.WriteFile(filepath.Join(tx.Stage(), name, "original"), []byte("new"), 0600))
 	}
+	require.NoError(t, tx.Publish([]byte(`{"validated":true}`)))
 	return tx
 }
 
@@ -134,7 +135,7 @@ func TestCertificateLock(t *testing.T) {
 	require.ErrorIs(t, err, ErrBusy)
 	_, err = Lock(path, true)
 	require.ErrorIs(t, err, ErrBusy)
-	require.NoError(t, ShareLock(writer))
+	require.NoError(t, writer.Close())
 	reader, err = Lock(path, false)
 	require.NoError(t, err)
 	require.NoError(t, reader.Close())

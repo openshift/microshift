@@ -94,21 +94,31 @@ CA is expired or not yet valid, leaf-only renewal is refused; use `--ca` to rene
 the chain.
 Configurable validity periods are not yet implemented by this command.
 
-For actual renewal, schedule a maintenance window, stop MicroShift, renew, then
-start it explicitly:
+Prepare renewal while MicroShift is running, then activate it by restarting
+MicroShift during your maintenance window:
 
 ```bash
-sudo systemctl stop microshift
 sudo microshift certs renew --serving
-sudo systemctl start microshift
+sudo microshift certs status -o yaml
+# At the chosen maintenance window:
+sudo systemctl restart microshift
 ```
 
-Replace `--serving` with `--ca` to renew the whole chain. Renewal refuses to apply
-while MicroShift or its etcd scope is active. It never stops or starts a service
-for you. Successful table output includes status for the renewed certificates.
+Replace `--serving` with `--ca` to renew the whole chain. Renewal saves a validated
+pending generation without changing active certificates, bundles, or kubeconfigs.
+It never stops or starts a service. If MicroShift is already stopped, preparation
+has the same behavior: start it to activate the pending generation. Successful
+table output explicitly describes the pending certificates, not those in use.
+
+Status continues to report active files in `items`. When renewal is pending,
+JSON/YAML also includes `pendingRenewal`, a `CertificateRenewalResult` containing
+the prepared expiry dates, and all formats warn that a restart is required.
+Preparation does not extend active certificate lifetimes or reset the running
+service's automatic rotation deadline. Restart before the active certificates
+expire; the pending certificates' validity also starts at generation, not activation.
 
 Generated kubeconfigs under `/var/lib/microshift/resources` are updated in the
-same transaction. After **CA renewal**, redistribute those kubeconfigs to any
+same transaction at activation. After **CA activation**, redistribute those kubeconfigs to any
 external locations where you previously copied them. Existing external
 kubeconfigs remain trusted after leaf-only renewal until their own certificates
 expire. Applications that cache certificates or CA bundles may need a reload or
@@ -117,39 +127,55 @@ restart after either operation.
 Both modes accept `-o json` and `-o yaml`. A successful command emits one versioned
 `CertificateRenewalResult` with deterministically ordered `items` and an `impact`
 summary. Dry-run reports `status: validated`, `dryRun: true`, and `changed: false`
-for every item. Applied renewal reports `status: completed`, `dryRun: false`, and
-`changed: true`, with expiry dates read back from the committed certificates.
-Running renewal twice issues fresh certificates each time; it is not a no-op.
+for every item. Prepared renewal reports `status: pending`, `dryRun: false`, and
+`changed: true`, with expiry dates read back from the pending certificates.
+`changed` refers to the prepared material, not active files. Running renewal again
+prepares a fresh replacement for the pending generation, using the active PKI as
+its base. A generation or validation failure preserves the previous pending set.
+Dry-run likewise plans against active files and does not change a pending renewal.
 
 ### Recovery
 
 Renewal stages certificates, keys, bundles, and generated resources under
 `/var/lib/microshift/.cert-renewal`, on the same filesystem as the active data.
-It validates staging before replacement and keeps recoverable originals until
-post-commit validation succeeds. The etcd database is not copied or replaced.
+An atomically published record identifies the complete pending generation.
+Startup revalidates it after any data restore and before components read PKI.
+Activation requires the previous etcd scope to be stopped. If its state cannot be
+determined, activation fails without replacing active files.
+Configuration and active-PKI hashes must still match preparation; otherwise
+startup refuses activation and asks you to run renewal again. Unrelated resource
+files are refreshed from the current data tree before activation, not restored
+from an old preparation-time snapshot. No raw configuration is saved in metadata.
+Activation keeps recoverable originals until post-commit validation succeeds.
+The etcd database is not copied or replaced.
 Allow enough free space for staging the `certs` and `resources` trees.
 Renewal rejects symlinks and special files in these trees instead of following
 them outside staging.
 
 Failures before replacement leave active material untouched. Failed replacement
 or validation restores the originals. If the process or host is interrupted
-during replacement or rollback, the next `certs status` or `certs renew` command
-recovers the interrupted transaction before proceeding. This recovery also
-applies to a subsequent dry-run and requires MicroShift to be stopped:
+during activation or rollback, the next startup restores the originals before
+using the data. The next `certs status` or `certs renew` can also recover an
+interrupted activation while MicroShift is stopped. This recovery also applies
+to a subsequent dry-run:
 
 ```bash
 sudo systemctl stop microshift
 sudo microshift certs status
 ```
 
-Startup refuses to use an incomplete transaction. Do not delete the transaction
+Recovery of an interrupted activation discards its pending generation; use status
+to inspect the restored material and prepare renewal again if needed.
+Startup refuses to use an unrecoverable transaction. Do not delete the transaction
 directory manually: it may contain the only recoverable copies. If recovery
 fails, keep MicroShift stopped and preserve that directory for troubleshooting.
-Status and dry-run share a lock at `/var/lib/microshift-backups/certs.lock` with
-the running service; startup writes, renewal, and recovery exclude concurrent
-certificate commands. The lock file stays outside the data directory so renewal
-and backup restoration cannot replace it. Do not delete it: the file persists,
-but its lock is released automatically when the owning process closes it or exits.
+Status and dry-run share an operation lock at
+`/var/lib/microshift-backups/certs.lock`; startup writes, preparation and recovery
+exclude concurrent certificate operations. The running service instead holds
+`/var/lib/microshift-backups/certs-runtime.lock`, which prevents live recovery
+without blocking preparation. Both files stay outside the data directory so
+backup restoration cannot replace them. Do not delete them: the files persist,
+but locks are released when the owning processes close them or exit.
 
 ## Warnings and Errors
 

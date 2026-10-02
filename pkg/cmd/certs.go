@@ -32,6 +32,7 @@ type certStatusOptions struct {
 	now           func() time.Time
 	loadConfig    func() (*config.Config, error)
 	loadInventory func(*config.Config) (certchains.CertificateInventory, error)
+	loadPending   func() (*certificatesv1alpha1.CertificateRenewalResult, error)
 	prepare       func(bool) (func(), error)
 }
 
@@ -43,6 +44,9 @@ func NewCertsCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 		loadConfig:    config.ActiveConfig,
 		loadInventory: loadCertificateInventory,
 		prepare:       prepareCertificateAccess,
+		loadPending: func() (*certificatesv1alpha1.CertificateRenewalResult, error) {
+			return loadPendingCertificateRenewal(config.DataDir)
+		},
 	}, shouldRunPrivileged)
 	command.AddCommand(newCertsRenewCommand(&certRenewOptions{
 		IOStreams: ioStreams, now: time.Now, loadConfig: config.ActiveConfig,
@@ -57,7 +61,7 @@ func NewCertsCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 		apply: func(cfg *config.Config, renewCAs bool) (certchains.CertificateInventory, error) {
 			return applyCertificateRenewal(cfg, config.DataDir, renewCAs)
 		},
-	}))
+	}, shouldRunPrivileged))
 	return command
 }
 
@@ -127,6 +131,15 @@ func (o *certStatusOptions) run() error {
 	if err != nil {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeCertificateInventoryFailed,
 			fmt.Errorf("failed to build certificate status: %w", err)}
+	}
+	if o.loadPending != nil {
+		status.PendingRenewal, err = o.loadPending()
+		if err != nil {
+			return &certificateCommandError{certificatesv1alpha1.ErrorCodeCertificateInventoryFailed, err}
+		}
+		if status.PendingRenewal != nil {
+			status.Warnings = append(status.Warnings, "Renewed certificates are pending activation. Status items describe active files; restart MicroShift to activate the pending renewal.")
+		}
 	}
 	switch c := o.output; c {
 	case certificateOutputJSON, certificateOutputYAML:
