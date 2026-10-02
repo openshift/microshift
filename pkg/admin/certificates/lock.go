@@ -12,11 +12,12 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-var ErrBusy = errors.New("MicroShift or another certificate operation is using the PKI")
+var ErrBusy = errors.New("MicroShift startup or another certificate operation is using the PKI")
 
 // Lock uses a stable file shared by run, status, and renewal.
-// Readers and the running service hold shared locks; replacement and recovery
-// require an exclusive lock. The file must not be unlinked on release.
+// Readers hold shared locks; startup and pending renewal require an exclusive
+// operation lock. A separate runtime lock prevents recovery while running.
+// The file must not be unlinked on release.
 func Lock(path string, exclusive bool) (*os.File, error) {
 	directory := filepath.Dir(path)
 	if err := os.MkdirAll(directory, 0700); err != nil {
@@ -67,10 +68,6 @@ func labelLockPath(path string) error {
 	}
 	return exec.Command("restorecon", "--", path).Run()
 }
-
-// ShareLock allows status and dry-run readers after startup has finished
-// generating certificates, while still excluding offline renewal.
-func ShareLock(file *os.File) error { return flock(file, unix.LOCK_SH) }
 
 func flock(file *os.File, mode int) error {
 	//nolint:gosec // An open OS file descriptor fits the syscall's signed int argument.

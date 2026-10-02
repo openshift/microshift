@@ -10,6 +10,7 @@ type CertificateChainsBuilder interface {
 	WithSigners(signers ...CertificateSignerBuilder) CertificateChainsBuilder
 	WithCABundle(bundlePath string, signerNames ...[]string) CertificateChainsBuilder
 	LoadInventory() (CertificateInventory, error)
+	Load() (*CertificateChains, error)
 	PlanRenewal(renewCAs bool, now time.Time) ([]CertificateRenewalPlanEntry, error)
 	ValidateRenewal(renewCAs bool, now time.Time) (CertificateInventory, error)
 	Complete() (*CertificateChains, error)

@@ -1,4 +1,4 @@
-// Package certificates provides recoverable, offline replacement of MicroShift PKI.
+// Package certificates provides staged renewal and recoverable replacement of MicroShift PKI.
 package certificates
 
 import (
@@ -19,18 +19,25 @@ type RecoveryError struct{ Err error }
 func (e *RecoveryError) Error() string { return e.Err.Error() }
 func (e *RecoveryError) Unwrap() error { return e.Err }
 
-// Transaction replaces the PKI and generated resources together. Callers must
-// hold the certificate write lock and keep MicroShift stopped until completion.
+// Transaction prepares and activates PKI and generated resources together.
+// Callers hold the operation lock. Only Commit and Recover require stopped services.
 type Transaction struct {
 	DataDir string
+	stage   string
 	// rename is injectable for commit/rollback fault-injection tests.
 	rename func(string, string) error
 }
 
 func (t *Transaction) directory() string { return filepath.Join(t.DataDir, transactionDirectory) }
-func (t *Transaction) Stage() string     { return filepath.Join(t.directory(), "stage") }
-func (t *Transaction) marker() string    { return filepath.Join(t.directory(), "committing") }
+func (t *Transaction) Stage() string {
+	if t.stage != "" {
+		return t.stage
+	}
+	return filepath.Join(t.directory(), "stage")
+}
+func (t *Transaction) marker() string { return filepath.Join(t.directory(), "committing") }
 
+// Pending reports an interrupted active-file commit, not a published generation.
 func (t *Transaction) Pending() (bool, error) {
 	if err := t.validatePaths(); err != nil {
 		return false, err
@@ -81,7 +88,11 @@ func (t *Transaction) Prepare() error {
 	if err := t.Discard(); err != nil {
 		return err
 	}
-	if err := os.MkdirAll(t.Stage(), 0700); err != nil {
+	if err := os.MkdirAll(t.directory(), 0700); err != nil {
+		return err
+	}
+	t.stage, err = os.MkdirTemp(t.directory(), "stage-")
+	if err != nil {
 		return err
 	}
 	for _, name := range []string{"certs", "resources"} {
@@ -100,8 +111,12 @@ func (t *Transaction) Prepare() error {
 // marker is written before the first rename. Recovery is idempotent, including
 // when interrupted between directory renames or during rollback itself.
 func (t *Transaction) Commit(validate func() error) error {
-	if err := t.validatePaths(); err != nil {
+	pending, err := t.Pending()
+	if err != nil {
 		return err
+	}
+	if pending {
+		return fmt.Errorf("an interrupted activation must be recovered before commit")
 	}
 	if err := syncTree(t.Stage()); err != nil {
 		return err
@@ -112,6 +127,11 @@ func (t *Transaction) Commit(validate func() error) error {
 		}
 	}
 	previous := filepath.Join(t.directory(), "previous")
+	// A crash before the commit marker was created can leave this empty tree.
+	// No active replacement occurs without a durable marker.
+	if err := os.RemoveAll(previous); err != nil {
+		return err
+	}
 	if err := os.Mkdir(previous, 0700); err != nil {
 		return err
 	}
@@ -217,6 +237,12 @@ func (t *Transaction) Recover() error {
 }
 
 func (t *Transaction) finish() error {
+	if err := os.Remove(t.readyPath()); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	if err := syncDirectory(t.directory()); err != nil {
+		return err
+	}
 	if err := os.Remove(t.marker()); err != nil {
 		return err
 	}
@@ -226,7 +252,7 @@ func (t *Transaction) finish() error {
 	return t.Discard()
 }
 
-// Discard removes staging only when no committed replacement needs recovery.
+// Discard removes unpublished staging, preserving pending activation or recovery.
 func (t *Transaction) Discard() error {
 	pending, err := t.Pending()
 	if err != nil {
@@ -235,7 +261,7 @@ func (t *Transaction) Discard() error {
 	if pending {
 		return nil // Never delete the only recoverable copy of active material.
 	}
-	return os.RemoveAll(t.directory())
+	return t.discardUnpublished()
 }
 
 func regularTree(root string) error {

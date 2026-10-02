@@ -53,9 +53,25 @@ func TestCertificateRenewalApply(t *testing.T) {
 			renewed, err := applyCertificateRenewal(cfg, dataDir, mode == "ca")
 			require.NoError(t, err)
 			require.Len(t, renewed, wantCount)
+			require.Equal(t, beforeFiles, activeCertificateFileDigests(t, dataDir), "preparation must not touch active files")
+			pending, err := loadPendingCertificateRenewal(dataDir)
+			require.NoError(t, err)
+			require.Equal(t, certificatesv1alpha1.RenewalStatusPending, pending.Status)
+			require.Len(t, pending.Items, wantCount)
+			// Resources may change between preparation and activation.
+			require.NoError(t, os.WriteFile(filepath.Join(unrelated, "kubeconfig"), []byte("updated component data"), 0600))
+			tx := &certificates.Transaction{DataDir: dataDir}
+			require.ErrorContains(t, activateCertificateRenewal(cfg, tx, func() error { return errors.New("etcd running") }, time.Now()), "etcd running")
+			require.NoError(t, activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now()))
+			activeFiles := activeCertificateFileDigests(t, dataDir)
+			loaded, err := loadActivatedCertificates(cfg, dataDir)
+			require.NoError(t, err)
+			require.Len(t, loaded.Inventory(), len(before))
+			require.NotEmpty(t, cfg.Ingress.ServingCertificate)
+			require.Equal(t, activeFiles, activeCertificateFileDigests(t, dataDir), "startup must retain the exact activated material")
 			contents, err := os.ReadFile(filepath.Join(unrelated, "kubeconfig"))
 			require.NoError(t, err)
-			require.Equal(t, "unrelated component data", string(contents))
+			require.Equal(t, "updated component data", string(contents))
 			_, err = validateCertificateRenewal(cfg, dataDir, before, mode == "ca")
 			require.NoError(t, err)
 			_, err = os.Stat(filepath.Join(dataDir, ".cert-renewal"))
@@ -100,7 +116,7 @@ func TestCertRenewCommand(t *testing.T) {
 					},
 				}
 				root := newCertsCommand(&certStatusOptions{IOStreams: options.IOStreams}, func() error { return nil })
-				root.AddCommand(newCertsRenewCommand(options))
+				root.AddCommand(newCertsRenewCommand(options, func() error { return nil }))
 				args := []string{"renew", "--serving"}
 				if dryRun {
 					args = append(args, "--dry-run")
@@ -135,7 +151,7 @@ func TestCertRenewCommand(t *testing.T) {
 				if dryRun {
 					require.Equal(t, certificatesv1alpha1.RenewalStatusValidated, result.Status)
 				} else {
-					require.Equal(t, certificatesv1alpha1.RenewalStatusCompleted, result.Status)
+					require.Equal(t, certificatesv1alpha1.RenewalStatusPending, result.Status)
 				}
 				require.True(t, result.Impact.ServiceRestartRequired)
 				require.False(t, result.Impact.KubeconfigRedistributionRequired)
@@ -153,7 +169,6 @@ func TestCertRenewErrors(t *testing.T) {
 		{"missing mode", nil, certificatesv1alpha1.ErrorCodeInvalidArguments},
 		{"both modes", []string{"--ca", "--serving"}, certificatesv1alpha1.ErrorCodeInvalidArguments},
 		{"configuration", []string{"--ca", "--dry-run"}, certificatesv1alpha1.ErrorCodeInvalidConfiguration},
-		{"running", []string{"--ca"}, certificatesv1alpha1.ErrorCodeMicroShiftRunning},
 		{"planning", []string{"--serving", "--dry-run"}, certificatesv1alpha1.ErrorCodeRenewalFailed},
 		{"inventory", []string{"--serving", "--dry-run"}, certificatesv1alpha1.ErrorCodeCertificateInventoryFailed},
 		{"recovery", []string{"--serving"}, certificatesv1alpha1.ErrorCodeRecoveryFailed},
@@ -172,7 +187,7 @@ func TestCertRenewErrors(t *testing.T) {
 						return &config.Config{}, nil
 					},
 					prepare: func(bool) (func(), error) {
-						if tt.name == "running" || tt.name == "recovery" {
+						if tt.name == "recovery" {
 							return nil, &certificateCommandError{tt.code, errors.New("operation refused")}
 						}
 						return func() {}, nil
@@ -194,7 +209,7 @@ func TestCertRenewErrors(t *testing.T) {
 					},
 				}
 				root := newCertsCommand(&certStatusOptions{IOStreams: options.IOStreams}, func() error { return nil })
-				root.AddCommand(newCertsRenewCommand(options))
+				root.AddCommand(newCertsRenewCommand(options, func() error { return nil }))
 				args := append([]string{"renew", "-o", output}, tt.args...)
 				require.Equal(t, 1, RunCertsCommand(root, args))
 				require.Empty(t, stdout.String())
@@ -213,6 +228,15 @@ func TestCertRenewErrors(t *testing.T) {
 			})
 		}
 	}
+}
+
+func activeCertificateFileDigests(t *testing.T, dir string) map[string][32]byte {
+	t.Helper()
+	files := certificateFileDigests(t, filepath.Join(dir, "certs"))
+	for path, digest := range certificateFileDigests(t, filepath.Join(dir, "resources")) {
+		files[path] = digest
+	}
+	return files
 }
 
 func certificateFileDigests(t *testing.T, dir string) map[string][32]byte {

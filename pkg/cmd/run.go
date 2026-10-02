@@ -147,15 +147,20 @@ func RunMicroshift(cfg *config.Config) error {
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
-	// Serialize startup PKI writes, then retain a shared lock for the process
-	// lifetime so offline renewal cannot race a start, even without systemd.
+	// Keep activation/recovery exclusive to startup, but allow pending renewal
+	// while the service is running. The operation lock serializes CLI writers.
+	runtimeLock, err := certificates.Lock(certificateRuntimeLockPath, true)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = runtimeLock.Close() }()
 	certificateLock, err := certificates.Lock(certificateLockPath, true)
 	if err != nil {
 		return err
 	}
 	defer func() { _ = certificateLock.Close() }()
 	transaction := certificates.Transaction{DataDir: config.DataDir}
-	if err := checkCertificateStartup(&transaction); err != nil {
+	if err := recoverCertificateStartup(&transaction, certificateEtcdStopped); err != nil {
 		return err
 	}
 
@@ -181,7 +186,7 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 	// Data management may have restored a different data tree. Do not use an
 	// incomplete transaction from a restored backup either.
-	if err := checkCertificateStartup(&transaction); err != nil {
+	if err := recoverCertificateStartup(&transaction, certificateEtcdStopped); err != nil {
 		return err
 	}
 
@@ -222,7 +227,19 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
-	certChains, err := initCerts(cfg)
+	pendingRenewal, err := transaction.LoadPending()
+	if err != nil {
+		return err
+	}
+	if err := activateCertificateRenewal(cfg, &transaction, certificateEtcdStopped, time.Now()); err != nil {
+		return fmt.Errorf("failed to activate pending certificate renewal: %w", err)
+	}
+	var certChains *certchains.CertificateChains
+	if pendingRenewal == nil {
+		certChains, err = initCerts(cfg)
+	} else {
+		certChains, err = loadActivatedCertificates(cfg, config.DataDir)
+	}
 	if err != nil {
 		klog.Fatalf("failed to retrieve the necessary certificates: %v", err)
 	}
@@ -231,8 +248,8 @@ func RunMicroshift(cfg *config.Config) error {
 	if err := initKubeconfigs(cfg, certChains, config.DataDir); err != nil {
 		klog.Fatalf("failed to create the necessary kubeconfigs for internal components: %v", err)
 	}
-	if err := certificates.ShareLock(certificateLock); err != nil {
-		return fmt.Errorf("failed to retain certificate read lock: %w", err)
+	if err := certificateLock.Close(); err != nil {
+		return fmt.Errorf("failed to release certificate operation lock: %w", err)
 	}
 
 	// Establish the context we will use to control execution
