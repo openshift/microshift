@@ -56,6 +56,11 @@ type CertificateStatusList struct {
 	// Items are sorted by service and then certificate name.
 	Items []CertificateStatusItem `json:"items"`
 
+	// PendingRenewal describes prepared certificates, not the active files in Items.
+	// It is absent when no renewal is awaiting the next MicroShift start.
+	// +optional
+	PendingRenewal *CertificateRenewalResult `json:"pendingRenewal,omitempty"`
+
 	// Warnings is an empty array when no warnings apply.
 	Warnings []string `json:"warnings"`
 }
@@ -99,19 +104,19 @@ const (
 	RenewalModeCA      RenewalMode = "ca"
 )
 
-// RenewalStatus distinguishes a validated dry-run from a committed renewal.
-// +kubebuilder:validation:Enum=validated;completed
+// RenewalStatus distinguishes a validated dry-run from renewal awaiting activation.
+// +kubebuilder:validation:Enum=validated;pending
 type RenewalStatus string
 
 const (
 	RenewalStatusValidated RenewalStatus = "validated"
-	RenewalStatusCompleted RenewalStatus = "completed"
+	RenewalStatusPending   RenewalStatus = "pending"
 )
 
-// CertificateRenewalResult describes a successful dry-run or completed renewal.
+// CertificateRenewalResult describes a successful dry-run or pending renewal.
 // Failed operations return an Error document instead.
-// +kubebuilder:validation:XValidation:rule="self.status == 'validated' ? self.dryRun : !self.dryRun",message="validated results require dryRun=true; completed results require dryRun=false"
-// +kubebuilder:validation:XValidation:rule="self.items.all(item, item.changed == (self.status == 'completed'))",message="changed must be false for every validated item and true for every completed item"
+// +kubebuilder:validation:XValidation:rule="self.status == 'validated' ? self.dryRun : !self.dryRun",message="validated results require dryRun=true; pending results require dryRun=false"
+// +kubebuilder:validation:XValidation:rule="self.items.all(item, item.changed == (self.status == 'pending'))",message="changed must be false for every validated item and true for every pending item"
 // +kubebuilder:object:root=true
 type CertificateRenewalResult struct {
 	metav1.TypeMeta `json:",inline"`
@@ -144,9 +149,10 @@ type CertificateRenewalItem struct {
 	ParentCA        *string     `json:"parentCA"`
 	CurrentNotAfter metav1.Time `json:"currentNotAfter"`
 
-	// NewNotAfter is proposed for validated results and applied for completed results.
+	// NewNotAfter is proposed for validated results and prepared for pending results.
 	NewNotAfter metav1.Time `json:"newNotAfter"`
-	Changed     bool        `json:"changed"`
+	// Changed refers to pending material; active files are unchanged until startup.
+	Changed bool `json:"changed"`
 }
 
 // CertificateRenewalImpact describes the actions required after renewal.

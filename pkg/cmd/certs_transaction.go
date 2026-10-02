@@ -23,27 +23,34 @@ import (
 
 // Keep the lock outside DataDir, which startup may replace during restore.
 const certificateLockPath = config.BackupsDir + "/certs.lock"
+const certificateRuntimeLockPath = config.BackupsDir + "/certs-runtime.lock"
 
-func checkCertificateStartup(transaction *certificates.Transaction) error {
+func recoverCertificateStartup(transaction *certificates.Transaction, etcdStopped func() error) error {
 	if pending, err := transaction.Pending(); err != nil {
 		return err
 	} else if pending {
-		return fmt.Errorf("interrupted certificate renewal: stop MicroShift and run microshift certs status to recover before starting")
+		if err := etcdStopped(); err != nil {
+			return err
+		}
+		return transaction.Recover()
 	}
 	return nil
 }
 
 func prepareCertificateAccess(writing bool) (func(), error) {
 	transaction := &certificates.Transaction{DataDir: config.DataDir}
-	return prepareCertificateTransaction(transaction, certificateLockPath, writing, certificateServicesStopped)
+	return prepareCertificateTransaction(transaction, certificateLockPath, writing, func() error {
+		// Recovery changes active paths, unlike preparing a pending renewal.
+		runtimeLock, err := certificates.Lock(certificateRuntimeLockPath, true)
+		if err != nil {
+			return err
+		}
+		defer func() { _ = runtimeLock.Close() }()
+		return certificateServicesStopped()
+	})
 }
 
 func prepareCertificateTransaction(transaction *certificates.Transaction, lockPath string, writing bool, stopped func() error) (func(), error) {
-	if writing {
-		if err := stopped(); err != nil {
-			return nil, err
-		}
-	}
 	lock, err := certificates.Lock(lockPath, writing)
 	if err != nil {
 		return nil, &certificateCommandError{certificatesv1alpha1.ErrorCodeRenewalFailed, err}
@@ -63,10 +70,10 @@ func prepareCertificateTransaction(transaction *certificates.Transaction, lockPa
 		if err != nil {
 			return nil, &certificateCommandError{certificatesv1alpha1.ErrorCodeRecoveryFailed, err}
 		}
-		if err := stopped(); err != nil {
-			release()
-			return nil, &certificateCommandError{certificatesv1alpha1.ErrorCodeRecoveryFailed, err}
-		}
+	}
+	if err := stopped(); err != nil {
+		release()
+		return nil, &certificateCommandError{certificatesv1alpha1.ErrorCodeRecoveryFailed, err}
 	}
 	if err := transaction.Recover(); err != nil {
 		release()
@@ -76,7 +83,15 @@ func prepareCertificateTransaction(transaction *certificates.Transaction, lockPa
 }
 
 func certificateServicesStopped() error {
-	for _, service := range []string{"microshift.service", "microshift-etcd.scope"} {
+	return certificateUnitsStopped("microshift.service", "microshift-etcd.scope")
+}
+
+func certificateEtcdStopped() error {
+	return certificateUnitsStopped("microshift-etcd.scope")
+}
+
+func certificateUnitsStopped(services ...string) error {
+	for _, service := range services {
 		out, err := exec.Command("systemctl", "show", "-p", "ActiveState", "--value", service).Output()
 		if err != nil {
 			return &certificateCommandError{certificatesv1alpha1.ErrorCodeInternalError,
@@ -85,7 +100,7 @@ func certificateServicesStopped() error {
 		state := strings.TrimSpace(string(out))
 		if state != "inactive" && state != systemdStateFailed {
 			return &certificateCommandError{certificatesv1alpha1.ErrorCodeMicroShiftRunning,
-				fmt.Errorf("MicroShift must be stopped before certificates can be renewed (%s is %s)", service, state)}
+				fmt.Errorf("certificate activation or recovery requires %s to be stopped (state: %s)", service, state)}
 		}
 	}
 	return nil
@@ -104,6 +119,17 @@ func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) 
 	}
 	before, err := builder.LoadInventory()
 	if err != nil {
+		return nil, err
+	}
+	plan, err := builder.PlanRenewal(renewCAs, time.Now())
+	if err != nil {
+		return nil, err
+	}
+	state, err := newPendingCertificateRenewal(cfg, dataDir)
+	if err != nil {
+		return nil, err
+	}
+	if err := validatePendingCertificateHash(stage, state.OriginalHash); err != nil {
 		return nil, err
 	}
 	// Existing PKI writers warn on stderr about long-lived certificates. The
@@ -130,25 +156,14 @@ func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) 
 	if err != nil {
 		return nil, err
 	}
-	if err := transaction.Commit(func() error {
-		committed, err := validateCertificateRenewal(cfg, dataDir, before, renewCAs)
-		if err != nil {
-			return err
-		}
-		if len(committed) != len(staged) {
-			return fmt.Errorf("committed inventory differs from validated staging")
-		}
-		for i := range staged {
-			if !bytes.Equal(staged[i].Certificate.Raw, committed[i].Certificate.Raw) {
-				return fmt.Errorf("committed certificate %q differs from validated staging", staged[i].Name)
-			}
-		}
-		inventory = committed
-		return nil
-	}); err != nil {
+	state.Result, err = newCertificateRenewalResult(plan, staged, cfg.Warnings, renewCAs, false, time.Now())
+	if err != nil {
 		return nil, err
 	}
-	return inventory, nil
+	if err := publishCertificateRenewal(transaction, state); err != nil {
+		return nil, err
+	}
+	return staged, nil
 }
 
 func quietCertificateGeneration(generate func() error) error {

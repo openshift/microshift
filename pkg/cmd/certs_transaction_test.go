@@ -49,11 +49,7 @@ func TestPrepareCertificateTransaction(t *testing.T) {
 			stoppedChecks := 0
 			release, err := prepareCertificateTransaction(tx, lockPath, writing, func() error { stoppedChecks++; return nil })
 			require.NoError(t, err)
-			if writing {
-				require.Equal(t, 1, stoppedChecks)
-			} else {
-				require.Zero(t, stoppedChecks, "status and dry-run do not require a stopped service")
-			}
+			require.Zero(t, stoppedChecks, "preparing renewal, status and dry-run do not require a stopped service")
 			_, err = certificates.Lock(lockPath, true)
 			require.ErrorIs(t, err, certificates.ErrBusy)
 			release()
@@ -76,7 +72,7 @@ func TestPrepareCertificateRecovery(t *testing.T) {
 				require.NoError(t, os.Mkdir(filepath.Join(tx.DataDir, name), 0700))
 			}
 			require.NoError(t, os.WriteFile(filepath.Join(transactionDir, "committing"), nil, 0600))
-			require.ErrorContains(t, checkCertificateStartup(tx), "interrupted certificate renewal")
+			require.ErrorContains(t, recoverCertificateStartup(tx, func() error { return errors.New("etcd still running") }), "etcd still running")
 			lockPath := filepath.Join(t.TempDir(), "lock")
 			release, err := prepareCertificateTransaction(tx, lockPath, false, func() error {
 				if !stopped {
@@ -99,7 +95,7 @@ func TestPrepareCertificateRecovery(t *testing.T) {
 					require.Equal(t, "old", string(contents))
 				}
 				require.NoDirExists(t, transactionDir)
-				require.NoError(t, checkCertificateStartup(tx))
+				require.NoError(t, recoverCertificateStartup(tx, func() error { return nil }))
 			}
 			lock, err := certificates.Lock(lockPath, true)
 			require.NoError(t, err, "failed recovery must release its lock")
