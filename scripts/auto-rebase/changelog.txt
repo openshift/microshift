@@ -1,3 +1,3 @@
-- machine-config-operator embedded-component 8df98a1e751a0a9d60970fa3d6109ce7d6f1183c to 3e6ad43708c45c144e2f3835d61e9db21c03e631
-  - 582672a2 2026-09-21T17:41:12+00:00 controller: update message for MachineOSBuildFailed condition
+- cluster-csi-snapshot-controller-operator embedded-component 6fe700087e8be6513285edd18f461790fecc65c3 to 54a9349e3d46979dd943c4b4b7eb4fd4e9b2b494
+  - b8abc4a 2026-09-01T15:02:23-05:00 OCPBUGS-103405: CVE-2026-33814 - replace golang.org/x/net with openshift-sustaining fork
 
