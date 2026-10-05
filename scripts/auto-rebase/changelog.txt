@@ -1,3 +1,9 @@
-- oc image-arm64 a2c805b5894a8a1a6bcb16e7023203e3f01952b4 to 270921939bb63f95219f865d138f8f0208369097
+- cluster-csi-snapshot-controller-operator embedded-component cf99de974354133f853928cff9e19ad19c5347d9 to 75abb4acc2cf816fc05a3d98bc4a0238deea24d4
+  - 7a305f4 2026-09-01T15:11:26-05:00 OCPBUGS-103626: CVE-2026-33814 - replace golang.org/x/net with openshift-sustaining fork
+
+- machine-config-operator embedded-component c8211b20755a6970e0410ca8b9fc7212af0be96f to f331b9031b24850c6651b603c49031376fc8235a
+  - 64f3529e 2026-09-30T15:33:21+02:00 Merge pull request #6603 from openshift-cherrypick-robot/cherry-pick-6599-to-release-4.20
+
+- oc image-amd64 a2c805b5894a8a1a6bcb16e7023203e3f01952b4 to 270921939bb63f95219f865d138f8f0208369097
   - bf317643 2026-09-24T06:08:47+00:00 OCPBUGS-103551,OCPBUGS-103599: Use patched x/net fork v0.43.0-sec.4
 
