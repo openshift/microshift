@@ -1,0 +1,6 @@
+- cluster-ingress-operator embedded-component 486cf49118585fbb2431a28002f0f6406f9b5b62 to fd63a64723ae8d734aef449ec140e7884fa8bdf1
+  - 11d2089 2026-08-31T22:00:48+05:30 OCPBUGS-102952: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- operator-framework-olm embedded-component 6dabe49ae51c3a93043cee45062fdd5ffb1e4645 to c6bdcdc0f8d54b42e0ee12ded744b0cd3914ba20
+  - 654d9650 2026-08-31T13:13:40+05:30 OCPBUGS-103070: CVE-2026-33814: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3
+
