@@ -15,6 +15,15 @@ COLLECTION_REQ_FILE="${ROOTDIR}/scripts/requirements-ansible.yml"
 COLLECTION_REQ_STAMP="${VENV}/.requirements.yml"
 COLLECTIONS_PATH="${VENV}/collections"
 
+# Reject stale direct dependency pins before downloading or installing tools.
+while IFS= read -r requirement || [[ -n "${requirement}" ]]; do
+    [[ -z "${requirement}" || "${requirement}" == \#* ]] && continue
+    if ! grep -Fxq "${requirement} \\" "${REQ_LOCK_FILE}"; then
+        echo "Missing lock entry for '${requirement}'; regenerate scripts/requirements-ansible.lock." >&2
+        exit 1
+    fi
+done < "${REQ_FILE}"
+
 export UV_CACHE_DIR="${ROOTDIR}/_output/uv-cache"
 export UV_MANAGED_PYTHON=1
 export UV_PYTHON_INSTALL_DIR="${ROOTDIR}/_output/uv-python"
@@ -57,4 +66,4 @@ fi
 
 cd "${ROOTDIR}"
 
-exec "${VENV}/bin/ansible-lint" ansible/
+exec "${VENV}/bin/ansible-lint" --strict ansible/
