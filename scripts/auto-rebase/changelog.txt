@@ -1,44 +1,25 @@
-- cluster-kube-apiserver-operator embedded-component 9e86de8a28fc827ec86393bf4939754211b1ae85 to 1c840109b6f83880e73b5d12bd58f3b902438afe
-  - 86c3266 2026-09-28T23:32:47+05:30 Bump of library-go to include changes done in https://github.com/openshift/library-go/pull/2491
+- csi-external-snapshotter embedded-component 2c14afc50a30de62cb00cc8263b061383cfbd3b5 to d5255eb9b32130c684957e258bd1b2f40f0a70fa
+  - 50926f3 2026-09-23T11:05:39+05:30 UPSTREAM: 1421: Replace golang.org/x/net with github.com/openshift-sustaining/net v0.50.0-sec.3
 
-- cluster-network-operator embedded-component 9fbc491dbb15dca6e4ee91f793831a155177e9f8 to bd4ada0046efe2f4ec12aac7ce1f555c9e510830
-  - bf82f86 2026-09-24T06:12:21Z Allow per-node OVN encap IP override via env-overrides
+- csi-external-snapshotter image-amd64 2c14afc50a30de62cb00cc8263b061383cfbd3b5 to d5255eb9b32130c684957e258bd1b2f40f0a70fa
+  - 50926f3 2026-09-23T11:05:39+05:30 UPSTREAM: 1421: Replace golang.org/x/net with github.com/openshift-sustaining/net v0.50.0-sec.3
 
-- machine-config-operator embedded-component f4736478f4532c51bdc6f181c0cb4f52987c28b3 to b13ad2aab188dc77776734da29afbf904f8b5006
-  - 7bc3ec1e 2026-09-29T09:40:46+02:00 OCPBUGS-128598: wrong early exit during kubelet MCs regeneration
-  - 04583fc7 2026-09-22T20:01:30Z controller: update helper determining if a new MOSB is needed to handle case when a successful MOSB is reassigned a new image
+- ovn-kubernetes image-amd64 722c77ee7df6466c422023071f72ec06ad7b8dda to dda741fdb17fa76235b6550e42b0de467026421b
+  - e4712052 2026-09-29T18:00:53+05:30 docs: add EgressIP design document
+  - 33cf5f82 2026-09-29T17:58:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
+  - 662a5d2a 2026-09-21T17:15:30+02:00 e2e: exclude machine network subnets from UDN/BGP allocators
+  - 9a6f7b5d 2026-09-11T11:51:56+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
+  - ddfe256c 2026-09-11T11:51:56+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
+  - 25bb43c1 2026-09-11T11:51:56+02:00 egressip: set IFA_PROTO on EgressIP addresses
 
-- ovn-kubernetes image-amd64 e2e61dbe576da162f711394c89068b8067f72343 to 722c77ee7df6466c422023071f72ec06ad7b8dda
-  - c53c330c 2026-09-11T17:29:47+05:30 Remove legacy moveACLsToNamespacedPortGroups function
-  - 17c44bdf 2026-09-11T17:29:47+05:30 Handle GetActiveNetworkForNamespace NotFound across callers
-  - 085cd7f9 2026-09-11T17:29:45+05:30 Handle GetPrimaryNADForNamespace NotFound across callers
-  - 0b0a44c6 2026-09-11T17:28:09+05:30 Fix wrong infrastructure-locked role when namespace is missing
-  - 87aca900 2026-09-11T17:27:54+05:30 [config] Add zone flag back to avoid breaking existing users.
-  - 57bd1502 2026-09-11T17:27:54+05:30 ovn: remove obsolete node zone annotation
-  - f21b87b4 2026-09-11T17:27:54+05:30 networkmanager: remove obsolete zone mode
-  - 9612ed50 2026-09-11T17:27:54+05:30 ovn: complete node identity cleanup
-  - 62c65bee 2026-09-11T17:27:54+05:30 test: keep network connect locality node-scoped
-  - 12c838e0 2026-09-11T17:27:54+05:30 test: use node identity in controller fixtures
-  - dbd653c9 2026-09-11T17:27:54+05:30 ovn: use node identity for controller locality
-  - 5aef0568 2026-09-11T17:27:54+05:30 test: align zone fixtures with node-name zones
-  - c90c13bb 2026-09-11T17:27:54+05:30 test: update egressip expectations for node-name zones
-  - 89a5de3c 2026-09-11T17:27:54+05:30 ovn: treat missing node zone as unknown
-  - 484e4c73 2026-09-11T17:27:53+05:30 ovn: remove legacy default zone configuration
+- csi-external-snapshotter image-arm64 2c14afc50a30de62cb00cc8263b061383cfbd3b5 to d5255eb9b32130c684957e258bd1b2f40f0a70fa
+  - 50926f3 2026-09-23T11:05:39+05:30 UPSTREAM: 1421: Replace golang.org/x/net with github.com/openshift-sustaining/net v0.50.0-sec.3
 
-- ovn-kubernetes image-arm64 e2e61dbe576da162f711394c89068b8067f72343 to 722c77ee7df6466c422023071f72ec06ad7b8dda
-  - c53c330c 2026-09-11T17:29:47+05:30 Remove legacy moveACLsToNamespacedPortGroups function
-  - 17c44bdf 2026-09-11T17:29:47+05:30 Handle GetActiveNetworkForNamespace NotFound across callers
-  - 085cd7f9 2026-09-11T17:29:45+05:30 Handle GetPrimaryNADForNamespace NotFound across callers
-  - 0b0a44c6 2026-09-11T17:28:09+05:30 Fix wrong infrastructure-locked role when namespace is missing
-  - 87aca900 2026-09-11T17:27:54+05:30 [config] Add zone flag back to avoid breaking existing users.
-  - 57bd1502 2026-09-11T17:27:54+05:30 ovn: remove obsolete node zone annotation
-  - f21b87b4 2026-09-11T17:27:54+05:30 networkmanager: remove obsolete zone mode
-  - 9612ed50 2026-09-11T17:27:54+05:30 ovn: complete node identity cleanup
-  - 62c65bee 2026-09-11T17:27:54+05:30 test: keep network connect locality node-scoped
-  - 12c838e0 2026-09-11T17:27:54+05:30 test: use node identity in controller fixtures
-  - dbd653c9 2026-09-11T17:27:54+05:30 ovn: use node identity for controller locality
-  - 5aef0568 2026-09-11T17:27:54+05:30 test: align zone fixtures with node-name zones
-  - c90c13bb 2026-09-11T17:27:54+05:30 test: update egressip expectations for node-name zones
-  - 89a5de3c 2026-09-11T17:27:54+05:30 ovn: treat missing node zone as unknown
-  - 484e4c73 2026-09-11T17:27:53+05:30 ovn: remove legacy default zone configuration
+- ovn-kubernetes image-arm64 722c77ee7df6466c422023071f72ec06ad7b8dda to dda741fdb17fa76235b6550e42b0de467026421b
+  - e4712052 2026-09-29T18:00:53+05:30 docs: add EgressIP design document
+  - 33cf5f82 2026-09-29T17:58:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
+  - 662a5d2a 2026-09-21T17:15:30+02:00 e2e: exclude machine network subnets from UDN/BGP allocators
+  - 9a6f7b5d 2026-09-11T11:51:56+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
+  - ddfe256c 2026-09-11T11:51:56+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
+  - 25bb43c1 2026-09-11T11:51:56+02:00 egressip: set IFA_PROTO on EgressIP addresses
 
