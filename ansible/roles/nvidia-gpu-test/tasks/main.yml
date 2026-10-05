@@ -9,7 +9,10 @@
 
 - name: Count GPUs on host
   ansible.builtin.shell: |
+    set -o pipefail
     nvidia-smi | grep -c -E "^\| +[0-9]+ +"
+  args:
+    executable: /bin/bash
   register: gpu_count
   changed_when: false
 
@@ -34,6 +37,7 @@
   delegate_to: localhost
   become: false
   register: gpu_workload_deploy
+  changed_when: "'created' in gpu_workload_deploy.stdout or 'configured' in gpu_workload_deploy.stdout"
 
 - name: Wait for GPU test pods to complete
   ansible.builtin.shell: |
@@ -74,24 +78,7 @@
       {{ pod_nvidia_smi_logs.stdout }}
 
 - name: Compare GPU visibility
-  ansible.builtin.shell: |
-    host_gpus=$(echo "{{ host_nvidia_smi.stdout }}" | grep -c -E "^\| +[0-9]+ +")
-    pod_gpus=$(echo "{{ pod_nvidia_smi_logs.stdout }}" | grep -c -E "^\| +[0-9]+ +")
-    echo "Host GPUs: $host_gpus, Pod GPUs: $pod_gpus"
-    if [ "$host_gpus" = "$pod_gpus" ]; then
-      echo "SUCCESS: Pod can see all host GPUs"
-    else
-      echo "WARNING: GPU count mismatch"
-      exit 1
-    fi
-  delegate_to: localhost
-  become: false
-  register: gpu_comparison
-  changed_when: false
-
-- name: Display GPU comparison result
-  ansible.builtin.debug:
-    msg: "{{ gpu_comparison.stdout }}"
+  ansible.builtin.include_tasks: compare.yml
 
 - name: Get cuda-vector-add pod logs
   ansible.builtin.shell: |
@@ -116,8 +103,8 @@
       GPU Test Summary:
       ========================================
       Host GPUs Detected: {{ gpu_count.stdout | trim }}
-      Pod GPUs Visible: {{ pod_nvidia_smi_logs.stdout | regex_findall('^\| +[0-9]+ +', multiline=True) | length }}
-      GPU Visibility: {{ 'PASSED - All GPUs visible in pod' if gpu_comparison.rc == 0 else 'FAILED - GPU count mismatch' }}
+      Pod GPUs Visible: {{ pod_gpu_count }}
+      GPU Visibility: {{ 'PASSED - All GPUs visible in pod' if host_gpu_count | int == pod_gpu_count | int else 'FAILED - GPU count mismatch' }}
 
       nvidia-smi Status: {{ 'PASSED' if pod_nvidia_smi_logs.rc == 0 else 'FAILED' }}
       cuda-vector-add Status: {{ 'PASSED' if 'Test PASSED' in cuda_vector_add_logs.stdout else 'FAILED' }}
@@ -165,8 +152,8 @@
           ========================================
           Host: {{ hostvars[groups['microshift'][0]]['ansible_host'] }}
           Host GPUs Detected: {{ gpu_count.stdout | trim }}
-          Pod GPUs Visible: {{ pod_nvidia_smi_logs.stdout | regex_findall('^\| +[0-9]+ +', multiline=True) | length }}
-          GPU Visibility: {{ 'PASSED - All GPUs visible in pod' if gpu_comparison.rc == 0 else 'FAILED - GPU count mismatch' }}
+          Pod GPUs Visible: {{ pod_gpu_count }}
+          GPU Visibility: {{ 'PASSED - All GPUs visible in pod' if host_gpu_count | int == pod_gpu_count | int else 'FAILED - GPU count mismatch' }}
           nvidia-smi Status: {{ 'PASSED' if pod_nvidia_smi_logs.rc == 0 else 'FAILED' }}
           cuda-vector-add Status: {{ 'PASSED' if 'Test PASSED' in cuda_vector_add_logs.stdout else 'FAILED' }}
           CUDA Test Result: {{ 'Success' if 'Test PASSED' in cuda_vector_add_logs.stdout else 'Failed' }}

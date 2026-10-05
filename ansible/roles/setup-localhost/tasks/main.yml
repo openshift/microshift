@@ -19,11 +19,15 @@
 
 - name: Write the new ssh fingerprint to known hosts
   ansible.builtin.shell: "ssh-keyscan {{ item }} >> ~/.ssh/known_hosts"
+  changed_when: true
   with_inventory_hostnames:
     - all
 
 - name: Copy SSH key to MicroShift hosts
   ansible.builtin.command: sshpass -p {{ microshift_pass }} ssh-copy-id {{ ansible_user }}@{{ item }}
+  register: ssh_copy_id
+  changed_when: "'Number of key(s) added' in (ssh_copy_id.stdout ~ ssh_copy_id.stderr)"
+  no_log: true
   with_inventory_hostnames:
     - microshift
 

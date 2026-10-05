@@ -7,16 +7,11 @@
     - name: Subscription-manager tasks
       when: manage_subscription | bool
       block:
-        - name: Check if we have subscription-manager installed
-          ansible.builtin.command: which subscription-manager
-          register: sm_present
-          ignore_errors: true
-
         - name: Install subscription-manager
           ansible.builtin.dnf:
             name:
               - subscription-manager
-          when: sm_present.rc != 0
+            state: present
 
         - name: Register host with subscription manager
           community.general.redhat_subscription:
@@ -26,7 +21,13 @@
           no_log: true
 
         - name: Enable repo management from subscription-manager
-          ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
+          community.general.ini_file:
+            path: /etc/rhsm/rhsm.conf
+            section: rhsm
+            option: manage_repos
+            value: "1"
+            no_extra_spaces: false
+            mode: "0644"
 
     - name: Slurp redhat-release
       ansible.builtin.slurp:
@@ -106,6 +107,9 @@
           loop_control:
             label: "{{ item.repo_name }}"
 
+        - name: Refresh metadata of updated repositories
+          ansible.builtin.meta: flush_handlers
+
     - name: Remove fallback dependency mirrors after OpenShift repo recovers
       ansible.builtin.file:
         path: "/etc/yum.repos.d/{{ item.repo_name }}.repo"
@@ -164,6 +168,9 @@
         - build_microshift | bool
         - microshift_prerelease | bool
 
+    - name: Refresh metadata of updated prerelease dependency repositories
+      ansible.builtin.meta: flush_handlers
+
     - name: Check microshift prerelease mirrors
       ansible.builtin.include_tasks: probe-mirror.yaml
       loop: "{{ repo_list }}"
@@ -181,6 +188,9 @@
       when:
         - microshift_prerelease | bool
         - not (build_microshift | bool)
+
+    - name: Refresh metadata of updated prerelease repositories
+      ansible.builtin.meta: flush_handlers
 
     - name: Enable OpenShift repo for released microshift
       community.general.rhsm_repository:

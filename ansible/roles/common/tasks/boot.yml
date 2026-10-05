@@ -27,7 +27,12 @@
 
     - name: Cleanup microshift data
       become: true
-      ansible.builtin.shell: echo 1 | {{ microshift_cleanup_bin }} --all
+      ansible.builtin.command:
+        argv:
+          - "{{ microshift_cleanup_bin }}"
+          - --all
+        stdin: "1"
+      changed_when: true
 - name: Reboot when requested
   when: reboot | default('false') | bool
   block:
@@ -73,4 +78,5 @@
   ansible.builtin.copy:
     content: "{{ script_output.stdout }}"
     dest: "{{ results_dir }}/{{ boot_output_filename | default('boot_quick.txt') }}"
+    mode: "0644"
   delegate_to: localhost

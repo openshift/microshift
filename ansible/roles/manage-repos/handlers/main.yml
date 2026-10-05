@@ -1,0 +1,10 @@
+---
+# manage-repos handlers
+
+- name: Clean repository metadata
+  ansible.builtin.command:
+    argv:
+      - dnf
+      - clean
+      - metadata
+  changed_when: true
