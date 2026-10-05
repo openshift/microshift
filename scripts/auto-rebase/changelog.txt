@@ -1,3 +1,14 @@
-- ovn-kubernetes image-arm64 c28f7669a9ef8e28a47163b1656c5647ea8a725c to a281044818c2362c39a7688f1081ca584ee34e42
+- cluster-csi-snapshot-controller-operator embedded-component a99bd8ffb9aa596fa8d6932d5d93e0613c5d367f to 8b96b8d58079376b3e56062e724581d1714e2a50
+  - badf904 2026-08-31T22:41:42-05:00 OCPBUGS-103839: CVE-2026-33814 - replace golang.org/x/net with openshift-sustaining fork
+
+- cluster-network-operator embedded-component 907dc8b385a37ba34798eb104c489ba1dc7aeef9 to 8e06ca47f7dceae831760686b68f9d909a6e46d6
+  - 8b2a59a 2026-09-23T13:40:42Z OCPBUGS-62144: Restart pods when rendering egressIP settings
+
+- machine-config-operator embedded-component d87a335c2ca5c48ca5aa485754d3548f5ecb42af to be7823714722585bc304d1eee0704c933d1486b1
+  - fa58cb5c 2026-09-29T16:05:53Z OCPBUGS-128598: wrong early exit during kubelet MCs regeneration
+  - d0bb0063 2026-09-28T08:45:21-04:00 controller: update helper determining if a new MOSB is needed to handle case when a successful MOSB is reassigned a new image
+  - 84a5405c 2026-09-07T17:10:32+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+
+- ovn-kubernetes image-amd64 c28f7669a9ef8e28a47163b1656c5647ea8a725c to a281044818c2362c39a7688f1081ca584ee34e42
   - ccf54566 2026-08-25T10:03:32-07:00 EgressIP: add route policies for east-west traffic between networks
 
