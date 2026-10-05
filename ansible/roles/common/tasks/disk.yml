@@ -4,11 +4,25 @@
 
 - name: Disk space block
   vars:
-    # Requested paths that du could not access at all.
-    disk_missing_paths: >-
+    # Requested paths that du could not access at all, for any reason.
+    disk_unreadable_paths: >-
       {{ disk_usage.stderr_lines
          | select('search', "cannot access '(" ~ (item.split() | map('regex_escape') | join('|')) ~ ")'")
          | list }}
+    # The subset of those that do not exist. Other reasons, such as
+    # permission denied, are never treated as an absent path.
+    disk_missing_paths: >-
+      {{ disk_unreadable_paths
+         | select('search', ': No such file or directory$')
+         | list }}
+    # The requested path does not exist yet and du reported nothing else.
+    # This is expected for the initial measurement on a fresh host, where
+    # /var/lib/containers/storage/ is only created once cri-o is installed.
+    disk_path_absent: >-
+      {{ disk_usage.rc == 1
+         and disk_usage.stdout | length == 0
+         and disk_missing_paths | length > 0
+         and disk_missing_paths | length == disk_usage.stderr_lines | length }}
   block:
     # A shell is needed because du_dirs entries may be globs such as /usr/bin/*.
     - name: Find disk usage # noqa: command-instead-of-shell
@@ -18,16 +32,22 @@
       changed_when: false
       # du exits 1 when it could not read part of a tree, for example the
       # overlay mounts of running containers, and still reports the rest.
-      # That is tolerated and reported below. A requested path that does
-      # not exist, or any other exit code, is a measurement failure.
+      # That is tolerated and reported below, as is a requested path that
+      # does not exist yet. Any other failure is a measurement failure.
       failed_when: >-
         disk_usage.rc != 0
-        and not (disk_usage.rc == 1 and disk_usage.stdout | length > 0 and disk_missing_paths | length == 0)
+        and not (disk_usage.rc == 1 and disk_usage.stdout | length > 0 and disk_unreadable_paths | length == 0)
+        and not disk_path_absent | bool
+
+    - name: Report absent path
+      ansible.builtin.debug:
+        msg: "Disk usage for {{ item }} is empty: the path does not exist"
+      when: disk_path_absent | bool
 
     - name: Report incomplete disk traversal
       ansible.builtin.debug:
         msg: "Disk usage for {{ item }} is incomplete: du could not read {{ disk_usage.stderr_lines | length }} path(s)"
-      when: disk_usage.rc == 1
+      when: disk_usage.rc == 1 and not disk_path_absent | bool
 
     - name: Sort disk usage
       ansible.builtin.command:
@@ -38,10 +58,13 @@
         stdin_add_newline: false
       register: disk_usage_sorted
       changed_when: false
+      # An empty stdin would leave sort waiting on the controller's stdin.
+      when: disk_usage.stdout | length > 0
 
     - name: Print disk_usage var
       ansible.builtin.debug:
         var: disk_usage_sorted.stdout_lines
+      when: disk_usage.stdout | length > 0
 
     - name: Add disk info to local file
       ansible.builtin.lineinfile:
@@ -52,6 +75,6 @@
       delegate_to: localhost
       with_items:
         - "{{ item }}:"
-        - "{{ disk_usage_sorted.stdout_lines }}"
+        - "{{ disk_usage_sorted.stdout_lines | default([]) }}"
       loop_control:
         loop_var: disk_item
