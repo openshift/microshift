@@ -51,7 +51,7 @@ Pre-merge checks run via `scripts/verify/`:
 | `verify-shell.sh` | shellcheck for all bash scripts |
 | `verify-rf.sh` | Robot Framework syntax (robocop) |
 | `verify-py.sh` | Python linting (flake8) |
-| `make lint-ansible` (`verify-ansible.sh`, opt-in) | Ansible playbook and role linting |
+| `make lint-ansible` (`verify-ansible.sh`) | Ansible playbook and role linting |
 | `verify-containers.sh` | Containerfile linting (hadolint) |
 | `verify-assets.sh` | Asset integrity |
 | `verify-images.sh` | Image blueprint validation |
@@ -122,12 +122,12 @@ MicroShift's dependencies are kept in sync with OpenShift via automated nightly 
 
 ### Ansible
 
-- Run `make lint-ansible` to check the playbooks and roles under `ansible/`
-- This check remains opt-in until the staged lint cleanup is complete and CI
-  enforcement is enabled
-- Rule families listed in `.ansible-lint` as warnings remain visible while the
-  staged lint cleanup is in progress; they become fatal when removed from the
-  warning list
+- Run `make lint-ansible` to check all playbooks and roles under `ansible/` with
+  the pinned toolchain; lint failures and warnings fail the check
+- CI runs `make verify-ansible` in the required `verify-ansible` job when Ansible
+  files or lint tooling change
+- When updating `scripts/requirements-ansible.txt`, regenerate
+  `scripts/requirements-ansible.lock` using the command in its header
 
 ### General
 
