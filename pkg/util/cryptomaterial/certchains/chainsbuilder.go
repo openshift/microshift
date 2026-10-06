@@ -8,6 +8,7 @@ import (
 type CertificateChainsBuilder interface {
 	WithSigners(signers ...CertificateSignerBuilder) CertificateChainsBuilder
 	WithCABundle(bundlePath string, signerNames ...[]string) CertificateChainsBuilder
+	LoadInventory() (CertificateInventory, error)
 	Complete() (*CertificateChains, error)
 }
 
