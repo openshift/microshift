@@ -2,35 +2,34 @@
 {% set address = address | string -%}
 {{ ('[' ~ address ~ ']') if ':' in address and not address.startswith('[') else address }}:{{ port }}
 {%- endmacro %}
+{% macro kubelet_targets() %}
+    static_configs:
+{% for host in microshift_hosts %}
+      - targets:
+          - '{{ prometheus_target(hostvars[host].ansible_host | default(host), 10250) }}'
+        labels:
+          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
+{% endfor %}
+{%- endmacro %}
 {% set microshift_hosts = groups.get('microshift', []) %}
 {% if microshift_hosts | length > 0 %}
+# Job names match the kube-burner-ocp microshift-metrics.yml profile.
 scrape_configs:
-{% for host in microshift_hosts %}
-  - job_name: kubelet-{{ host }}
+  - job_name: kubelet-microshift
     scheme: https
     authorization:
       credentials_file: "{{ prometheus_container_token_path }}"
     tls_config:
       insecure_skip_verify: true
-    static_configs:
-      - targets:
-          - '{{ prometheus_target(hostvars[host].ansible_host | default(host), 10250) }}'
-        labels:
-          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
-
-  - job_name: kubelet-{{ host }}-cadvisor
+{{ kubelet_targets() }}
+  - job_name: kubelet-microshift-cadvisor
     scheme: https
     authorization:
       credentials_file: "{{ prometheus_container_token_path }}"
     tls_config:
       insecure_skip_verify: true
     metrics_path: /metrics/cadvisor
-    static_configs:
-      - targets:
-          - '{{ prometheus_target(hostvars[host].ansible_host | default(host), 10250) }}'
-        labels:
-          instance: '{{ hostvars[host].kubernetes_nodename | default(host) }}'
-{% endfor %}
+{{ kubelet_targets() }}
 {% else %}
 scrape_configs: []
 {% endif %}

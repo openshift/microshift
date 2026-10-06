@@ -30,24 +30,3 @@
   no_log: true
   with_inventory_hostnames:
     - microshift
-
-- name: Check if python packages are installed via pip
-  ansible.builtin.command: "pip3 show {{ item.pip }}"
-  register: pip_check
-  ignore_errors: true
-  changed_when: false
-  loop: "{{ local_packages }}"
-
-- name: Build list of packages not installed via pip
-  ansible.builtin.set_fact:
-    packages_to_install: "{{ pip_check.results | selectattr('rc', 'ne', 0) | map(attribute='item.rpm') | list }}"
-
-- name: Install local ansible prereq packages
-  ansible.builtin.dnf:
-    name: "{{ packages_to_install }}"
-    state: present
-    update_cache: true
-  when:
-    - packages_to_install | length > 0
-    - (ansible_facts.distribution == "CentOS") or (ansible_facts.distribution == "RedHat") or (ansible_facts.distribution == "Fedora")
-  become: true

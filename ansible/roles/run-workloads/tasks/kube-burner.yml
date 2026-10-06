@@ -1,37 +1,42 @@
 ---
 # kube-burner tasks
 
+- name: Generate kube-burner run id
+  ansible.builtin.set_fact:
+    kube_burner_uuid: "{{ lookup('pipe', 'uuidgen') }}"
+
 - name: "Run kube-burner workload {{ kube_burner_workload.name ~ ' QPS=' ~ kube_burner_workload.qps }}"
   ansible.builtin.command:
     cmd: ./run.sh
-    chdir: "{{ e2e_path }}/workloads/kube-burner"
+    chdir: "{{ e2e_path }}/workloads/kube-burner-ocp-wrapper"
   environment:
-    BURST: "{{ kube_burner_workload.burst }}"
-    ES_SERVER: "{{ kube_burner_es_server }}"
-    INDEXING: "{{ kube_burner_indexing }}"
-    POD_READY_THRESHOLD: "{{ kube_burner_pod_ready }}"
-    QPS: "{{ kube_burner_workload.qps }}"
+    KUBECONFIG: "{{ kube_burner_kubeconfig }}"
+    PLATFORM: microshift
     WORKLOAD: "{{ kube_burner_workload.name }}"
+    QPS: "{{ kube_burner_workload.qps }}"
+    BURST: "{{ kube_burner_workload.burst | default(kube_burner_workload.qps) }}"
+    ITERATIONS: "{{ kube_burner_iterations }}"
+    UUID: "{{ kube_burner_uuid }}"
+    GC: "true"
+    ES_SERVER: "{{ kube_burner_es_server if kube_burner_metrics_enabled | bool else '' }}"
+    ES_INDEX: "{{ kube_burner_es_index }}"
+    KUBE_BURNER_VERSION: "{{ kube_burner_version }}"
+    KUBE_BURNER_URL: "{{ kube_burner_url }}"
+    EXTRA_FLAGS: >-
+      --alerting=false
+      {{ kube_burner_workload_flags[kube_burner_workload.name] }}
+      {{ kube_burner_metrics_flags if kube_burner_metrics_enabled | bool else '' }}
+      {{ kube_burner_extra_flags }}
   changed_when: true
 
-- name: "Log workload execution details"
-  ansible.builtin.debug:
-    msg: "Completed {{ kube_burner_workload.name }} with QPS={{ kube_burner_workload.qps }}, BURST={{ kube_burner_workload.burst }}"
-
-- name: Pause before deleting workload namespaces
-  ansible.builtin.pause:
-    seconds: "{{ pre_delete_pause_duration }}"
-
-- name: Cleanup previous workload namespace
-  kubernetes.core.k8s:
-    api_version: v1
-    kind: Namespace
-    state: absent
-    label_selectors: "{{ delete_label_selectors }}"
-    delete_options:
-      gracePeriodSeconds: "{{ delete_grace_period }}"
-    wait: true
-    wait_timeout: "{{ delete_wait_timeout }}"
+- name: Save kube-burner metrics to results
+  ansible.builtin.copy:
+    src: "{{ e2e_path }}/workloads/kube-burner-ocp-wrapper/collected-metrics-{{ kube_burner_uuid }}/"
+    dest: "{{ kube_burner_results_dir }}/{{ kube_burner_workload.name }}-qps{{ kube_burner_workload.qps }}-{{ kube_burner_uuid }}/"
+    remote_src: true
+    mode: "0644"
+    directory_mode: "0755"
+  when: kube_burner_metrics_enabled | bool
 
 - name: Pause after running workload
   ansible.builtin.pause:

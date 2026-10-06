@@ -114,24 +114,12 @@
   register: network_end_epoch
   changed_when: false
 
+- name: Resolve prometheus endpoint
+  ansible.builtin.include_tasks: roles/common/tasks/prometheus-endpoint.yml
+  when: prometheus_logging | bool
+
 - name: Resolve prometheus network query settings
   ansible.builtin.set_fact:
-    prom_network_endpoint: >-
-      {{
-        prometheus_query_endpoint | default(
-          'http://' ~
-          (
-            (
-              hostvars[(groups['logging'] | default([]) | first)].ansible_host
-              | default((groups['logging'] | default([]) | first))
-            )
-            if (groups['logging'] | default([]) | length > 0)
-            else 'prometheus'
-          )
-          ~ ':' ~ (prometheus_port | default(9091) | string),
-          true
-        )
-      }}
     prom_network_device: "{{ network_device | default(ansible_facts.default_ipv4.interface | default('enp5s0'), true) }}"
     prom_network_instance: "{{ kubernetes_nodename }}"
   when: prometheus_logging | bool
@@ -142,7 +130,7 @@
     - name: Run prometheus network query
       ansible.builtin.command: >
         python3 roles/common/tasks/files/prom-network-query.py
-        --prometheus {{ prom_network_endpoint }}
+        --prometheus {{ prometheus_endpoint }}
         --instance {{ prom_network_instance }}
         --device {{ prom_network_device }}
         {{ network_start_epoch.stdout }}
