@@ -1,6 +1,0 @@
-- cluster-network-operator embedded-component 3b484353063fe95156373f7cf51c5ba13f501256 to 89c7f4d5c88bb8c8da7ba10d39709b192029de9b
-  - deb5cfb 2026-09-29T16:55:49-07:00 [release-5.0] OCPBUGS-127174: Fix issues when NetObserv fails to install
-
-- machine-config-operator embedded-component 639cdb819f5cc9b0f895e387a46a47135ae6a6b7 to d9b5986ca79e42c0d6d919e18737e4be829b4643
-  - ce743889 2026-10-01T15:39:36Z OCPBUGS-128659: Fix the IRI release lookup for a signed release payload
-
