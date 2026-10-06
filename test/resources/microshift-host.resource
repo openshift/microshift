@@ -13,12 +13,13 @@ Login MicroShift Host
     ...    This keyword is meant to be used at the suite level. This ensures
     ...    most tests already have an open connection. Any tests that will take
     ...    action that disrupt that connection are responsible for restoring it.
+    [Arguments]    ${timeout}=${None}
 
     Log    Host: ${USHIFT_HOST}
     IF    '${SSH_PORT}'
-        SSHLibrary.Open Connection    ${USHIFT_HOST}    port=${SSH_PORT}
+        SSHLibrary.Open Connection    ${USHIFT_HOST}    port=${SSH_PORT}    timeout=${timeout}
     ELSE
-        SSHLibrary.Open Connection    ${USHIFT_HOST}
+        SSHLibrary.Open Connection    ${USHIFT_HOST}    timeout=${timeout}
     END
     # If there is an ssh key set in the global configuration, use that to
     # login to the host. Otherwise assume that the ssh agent is running
@@ -35,11 +36,12 @@ Logout MicroShift Host
 
 Make New SSH Connection
     [Documentation]    Closes all SSH connections and makes a new one.
+    [Arguments]    ${timeout}=${None}
     # Staging deployments potentially introduces multiple reboots
     # which could break existing SSH connection
 
     Logout MicroShift Host
-    Login MicroShift Host
+    Login MicroShift Host    ${timeout}
 
 SSH Connection To MicroShift Host Should Be Functional
     [Documentation]    Creates new SSH connection and checks if is working

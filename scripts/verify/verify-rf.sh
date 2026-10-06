@@ -16,3 +16,8 @@ set -x
 "${RF_VENV}/bin/robocop" check
 
 "${RF_VENV}/bin/robocop" format --check --diff --no-overwrite
+
+"${RF_VENV}/bin/robot" \
+    --pythonpath "${ROOTDIR}/test/resources" \
+    --outputdir "${ROOTDIR}/_output/robot-unit" \
+    "${ROOTDIR}/test/unit"
