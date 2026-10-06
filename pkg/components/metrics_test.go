@@ -242,6 +242,112 @@ func TestWaitForMetricsServerServingCertRecoversMissingSecret(t *testing.T) {
 	}
 }
 
+func TestWaitForMetricsServerServingCertRetriesTimedOutRecovery(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newServiceCADeployment(), newMetricsServerService())
+
+	var deploymentGets atomic.Int32
+	clientset.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		if deploymentGets.Add(1) == 1 {
+			return true, nil, apierrors.NewNotFound(schema.GroupResource{Resource: "deployments"}, serviceCADeploymentName)
+		}
+		return false, nil, nil
+	})
+	clientset.PrependReactor("update", "services", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		updatedService := action.(k8stesting.UpdateAction).GetObject().(*corev1.Service)
+		if err := clientset.Tracker().Update(corev1.SchemeGroupVersion.WithResource("services"), updatedService, metricsNamespace); err != nil {
+			return true, nil, err
+		}
+		secret := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{Name: metricsServerTLSResourceName, Namespace: metricsNamespace},
+			Type:       corev1.SecretTypeTLS,
+			Data: map[string][]byte{
+				corev1.TLSCertKey:       []byte("service-ca-certificate"),
+				corev1.TLSPrivateKeyKey: []byte("service-ca-private-key"),
+			},
+		}
+		if err := clientset.Tracker().Create(corev1.SchemeGroupVersion.WithResource("secrets"), secret, metricsNamespace); err != nil {
+			return true, nil, err
+		}
+		return true, updatedService, nil
+	})
+
+	options := testMetricsServerServingCertWaitOptions()
+	options.recoveryRetryBackoff = wait.Backoff{Steps: 2}
+	if err := waitForMetricsServerServingCertWithOptions(context.Background(), clientset, options); err != nil {
+		t.Fatalf("waiting for serving cert after delayed service-ca startup: %v", err)
+	}
+	if got := deploymentGets.Load(); got != 2 {
+		t.Errorf("deployment gets = %d, want 2 across two recovery attempts", got)
+	}
+	if got := countServiceUpdates(clientset.Actions()); got != 1 {
+		t.Errorf("service updates = %d, want 1 after later recovery", got)
+	}
+}
+
+func TestWaitForMetricsServerServingCertCancellationStopsRetry(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newMetricsServerService())
+	ctx, cancel := context.WithCancel(context.Background())
+	var deploymentGets atomic.Int32
+	clientset.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		deploymentGets.Add(1)
+		cancel()
+		return true, nil, apierrors.NewNotFound(schema.GroupResource{Resource: "deployments"}, serviceCADeploymentName)
+	})
+
+	options := testMetricsServerServingCertWaitOptions()
+	options.timeout = time.Hour
+	options.totalTimeout = time.Hour
+	options.recoveryRetryBackoff = wait.Backoff{Duration: time.Hour, Steps: 3}
+	options.controllerRetryBackoff = wait.Backoff{Duration: time.Hour, Steps: 3}
+	started := time.Now()
+	err := waitForMetricsServerServingCertWithOptions(ctx, clientset, options)
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("waiting for serving cert after cancellation = %v, want context canceled", err)
+	}
+	if elapsed := time.Since(started); elapsed >= time.Second {
+		t.Errorf("canceled recovery took %v, want less than 1s", elapsed)
+	}
+	if got := deploymentGets.Load(); got != 1 {
+		t.Errorf("deployment gets = %d, want 1 before cancellation stopped retries", got)
+	}
+}
+
+func TestWaitForMetricsServerServingCertTerminalErrorStopsRetry(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newServiceCADeployment(), newMetricsServerService())
+	var deploymentGets atomic.Int32
+	clientset.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		deploymentGets.Add(1)
+		return true, nil, apierrors.NewForbidden(schema.GroupResource{Resource: "deployments"}, serviceCADeploymentName, errors.New("forbidden"))
+	})
+
+	options := testMetricsServerServingCertWaitOptions()
+	options.recoveryRetryBackoff = wait.Backoff{Steps: 3}
+	err := waitForMetricsServerServingCertWithOptions(context.Background(), clientset, options)
+	if !apierrors.IsForbidden(err) {
+		t.Fatalf("waiting for serving cert after terminal error = %v, want forbidden", err)
+	}
+	if got := deploymentGets.Load(); got != 1 {
+		t.Errorf("deployment gets = %d, want 1 for terminal error", got)
+	}
+	if got := countServiceUpdates(clientset.Actions()); got != 0 {
+		t.Errorf("service updates = %d, want 0 for terminal error", got)
+	}
+}
+
+func TestWaitForMetricsServerServingCertStopsAfterBoundedAttempts(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newMetricsServerService())
+	options := testMetricsServerServingCertWaitOptions()
+	options.recoveryRetryBackoff = wait.Backoff{Steps: 3}
+
+	err := waitForMetricsServerServingCertWithOptions(context.Background(), clientset, options)
+	if !errors.Is(err, wait.ErrWaitTimeout) {
+		t.Fatalf("waiting for serving cert without service-ca = %v, want wait timeout", err)
+	}
+	if got := countDeploymentGets(clientset.Actions()); got != 3 {
+		t.Errorf("deployment gets = %d, want 3 bounded recovery attempts", got)
+	}
+}
+
 func TestWaitForMetricsServerServingCertRetriesTransientSecretGet(t *testing.T) {
 	clientset := fake.NewSimpleClientset(newServiceCADeployment(), newMetricsServerService())
 
@@ -358,7 +464,9 @@ func TestTriggerMetricsServerServingCertReconciliationReturnsForbiddenUpdateErro
 func testMetricsServerServingCertWaitOptions() metricsServerServingCertWaitOptions {
 	return metricsServerServingCertWaitOptions{
 		timeout:                time.Second,
+		totalTimeout:           time.Second,
 		pollInterval:           time.Millisecond,
+		recoveryRetryBackoff:   wait.Backoff{Steps: 1},
 		controllerRetryBackoff: wait.Backoff{Steps: 1},
 		serviceRetryBackoff:    wait.Backoff{Steps: 1},
 	}
@@ -399,4 +507,14 @@ func countServiceUpdates(actions []k8stesting.Action) int {
 		}
 	}
 	return updates
+}
+
+func countDeploymentGets(actions []k8stesting.Action) int {
+	gets := 0
+	for _, action := range actions {
+		if action.GetVerb() == "get" && action.GetResource().Resource == "deployments" {
+			gets++
+		}
+	}
+	return gets
 }

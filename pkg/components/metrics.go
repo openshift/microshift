@@ -2,6 +2,7 @@ package components
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -48,14 +49,20 @@ const (
 
 type metricsServerServingCertWaitOptions struct {
 	timeout                time.Duration
+	totalTimeout           time.Duration
 	pollInterval           time.Duration
+	recoveryRetryBackoff   wait.Backoff
 	controllerRetryBackoff wait.Backoff
 	serviceRetryBackoff    wait.Backoff
 }
 
 var defaultMetricsServerServingCertWaitOptions = metricsServerServingCertWaitOptions{
 	timeout:      5 * time.Minute,
+	totalTimeout: 15 * time.Minute,
 	pollInterval: 2 * time.Second,
+	// A recovery attempt can finish before a delayed service-ca startup. Retry
+	// timed-out attempts, but cap both their count and total elapsed time.
+	recoveryRetryBackoff: wait.Backoff{Duration: 10 * time.Second, Factor: 2, Steps: 3, Cap: 30 * time.Second},
 	// These discovery waits only read resources. Once service-ca is ready and
 	// the Service exists, reconciliation retries are bounded by this backoff.
 	controllerRetryBackoff: wait.Backoff{Duration: time.Second, Factor: 2, Steps: 8, Cap: 30 * time.Second},
@@ -189,6 +196,28 @@ func waitForMetricsServerServingCert(ctx context.Context, clientset kubernetes.I
 }
 
 func waitForMetricsServerServingCertWithOptions(ctx context.Context, clientset kubernetes.Interface, options metricsServerServingCertWaitOptions) error {
+	retryCtx, cancel := context.WithTimeout(ctx, options.totalTimeout)
+	defer cancel()
+
+	reconciliationTriggered := false
+	return wait.ExponentialBackoffWithContext(retryCtx, options.recoveryRetryBackoff, func(ctx context.Context) (bool, error) {
+		err := waitForMetricsServerServingCertAttempt(ctx, clientset, options, &reconciliationTriggered)
+		if err == nil {
+			return true, nil
+		}
+		if ctx.Err() != nil {
+			return false, ctx.Err()
+		}
+		if !errors.Is(err, wait.ErrWaitTimeout) && !errors.Is(err, context.DeadlineExceeded) {
+			return false, err
+		}
+
+		klog.V(2).Infof("Retrying timed-out metrics-server serving certificate recovery: %v", err)
+		return false, nil
+	})
+}
+
+func waitForMetricsServerServingCertAttempt(ctx context.Context, clientset kubernetes.Interface, options metricsServerServingCertWaitOptions, reconciliationTriggered *bool) error {
 	secret, err := clientset.CoreV1().Secrets(metricsNamespace).Get(ctx, metricsServerTLSResourceName, metav1.GetOptions{})
 	if err == nil && metricsServerServingCertReady(secret) {
 		return nil
@@ -208,8 +237,11 @@ func waitForMetricsServerServingCertWithOptions(ctx context.Context, clientset k
 	if err := waitForMetricsServerService(waitCtx, clientset, options.serviceRetryBackoff); err != nil {
 		return fmt.Errorf("waiting for metrics-server Service: %w", err)
 	}
-	if err := triggerMetricsServerServingCertReconciliation(waitCtx, clientset, options.serviceRetryBackoff); err != nil {
-		return fmt.Errorf("triggering metrics-server serving cert reconciliation: %w", err)
+	if !*reconciliationTriggered {
+		if err := triggerMetricsServerServingCertReconciliation(waitCtx, clientset, options.serviceRetryBackoff); err != nil {
+			return fmt.Errorf("triggering metrics-server serving cert reconciliation: %w", err)
+		}
+		*reconciliationTriggered = true
 	}
 
 	return wait.PollUntilContextTimeout(waitCtx, options.pollInterval, options.timeout, true, func(ctx context.Context) (bool, error) {
