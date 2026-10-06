@@ -20,8 +20,10 @@ import (
 type CSRInfo interface{ GetMeta() CSRMeta }
 
 type CSRMeta struct {
-	Name     string
-	Validity time.Duration
+	Name           string
+	Service        string
+	Validity       time.Duration
+	RotationPolicy RotationPolicy
 }
 
 type ClientCertificateSigningRequestInfo struct {
@@ -51,6 +53,7 @@ func (i *PeerCertificateSigningRequestInfo) GetMeta() CSRMeta { return i.CSRMeta
 
 type CertificateSigner struct {
 	signerName     string
+	service        string
 	signerConfig   *crypto.CA
 	signerDir      string
 	signerValidity time.Duration
@@ -230,7 +233,7 @@ func (s *CertificateSigner) AddToBundles(bundlePaths ...string) error {
 }
 
 func (s *CertificateSigner) toBuilder() CertificateSignerBuilder {
-	signer := NewCertificateSigner(s.signerName, s.signerDir, s.signerValidity)
+	signer := NewCertificateSigner(s.signerName, s.signerDir, s.signerValidity).WithService(s.service)
 
 	for _, subCA := range s.subCAs {
 		signer = signer.WithSubCAs(subCA.toBuilder())
