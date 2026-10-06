@@ -15,11 +15,11 @@ Test Tags           restart
 
 
 *** Variables ***
-${KUBE_SCHEDULER_CLIENT_CERT}       /var/lib/microshift/certs/kube-control-plane-signer/kube-scheduler/client.crt
-${ETCD_SIGNER_CA}                   /var/lib/microshift/certs/etcd-signer/ca.crt
-${ETCD_PEER_CERT}                   /var/lib/microshift/certs/etcd-signer/etcd-peer/peer.crt
-${ETCD_SERVING_CERT}                /var/lib/microshift/certs/etcd-signer/etcd-serving/peer.crt
-${ETCD_APISERVER_CLIENT_CERT}       /var/lib/microshift/certs/etcd-signer/apiserver-etcd-client/client.crt
+${KUBE_SCHEDULER_CLIENT_CERT}       /var/lib/microshift/certs/client-ca/kube-scheduler/client.crt
+${ETCD_SIGNER_CA}                   /var/lib/microshift/certs/peer-ca/ca.crt
+${ETCD_PEER_CERT}                   /var/lib/microshift/certs/peer-ca/etcd-peer/peer.crt
+${ETCD_SERVING_CERT}                /var/lib/microshift/certs/peer-ca/etcd-serving/peer.crt
+${ETCD_APISERVER_CLIENT_CERT}       /var/lib/microshift/certs/peer-ca/apiserver-etcd-client/client.crt
 ${OSSL_CMD}                         openssl x509 -noout -dates -in
 ${OSSL_DATE_FORMAT}                 %b %d %Y
 ${TIMEDATECTL_DATE_FORMAT}          %Y-%m-%d %H:%M:%S
@@ -33,7 +33,7 @@ Manual Rotation Of Etcd Signer Certs
     [Tags]    etcd
     # Capture the original cert fingerprint before deletion
     ${original_fp}=    Get Cert Fingerprint    ${ETCD_SIGNER_CA}
-    Command Should Work    bash -c 'rm -rf /var/lib/microshift/certs/etcd-signer/*'
+    Command Should Work    bash -c 'rm -rf /var/lib/microshift/certs/peer-ca/*'
     Restart MicroShift
 
     VAR    @{cert_files}=
@@ -129,9 +129,9 @@ All Certificates Should Be Valid For Current Time
     ...    echo '${kubeconfig}' | grep client-certificate-data | cut -d: -f2 | tr -d ' ' | base64 -d > ${kubeconfig_cert_file}
 
     VAR    @{cert_files}=
-    ...    /var/lib/microshift/certs/kube-control-plane-signer/kube-scheduler/client.crt
-    ...    /var/lib/microshift/certs/kube-control-plane-signer/kube-controller-manager/client.crt
-    ...    /var/lib/microshift/certs/admin-kubeconfig-signer/admin-kubeconfig-client/client.crt
+    ...    /var/lib/microshift/certs/client-ca/kube-scheduler/client.crt
+    ...    /var/lib/microshift/certs/client-ca/kube-controller-manager/client.crt
+    ...    /var/lib/microshift/certs/client-ca/admin-kubeconfig-client/client.crt
     ...    ${kubeconfig_cert_file}
     FOR    ${cert_file}    IN    @{cert_files}
         Wait Until Keyword Succeeds    30x    5s

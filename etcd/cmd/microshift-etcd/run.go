@@ -70,7 +70,7 @@ func (s *EtcdService) configure(cfg *config.Config) {
 
 	etcdServingCertDir := cryptomaterial.EtcdServingCertDir(certsDir)
 	etcdPeerCertDir := cryptomaterial.EtcdPeerCertDir(certsDir)
-	etcdSignerCertPath := cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir))
+	etcdSignerCertPath := cryptomaterial.CACertPath(cryptomaterial.PeerCADir(certsDir))
 	dataDir := filepath.Join(config.DataDir, s.Name())
 
 	// based on https://github.com/openshift/cluster-etcd-operator/blob/master/bindata/bootkube/bootstrap-manifests/etcd-member-pod.yaml#L19

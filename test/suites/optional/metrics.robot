@@ -75,7 +75,7 @@ Teardown
 
 Extract Metrics Client Certs
     [Documentation]    Extract the admin kubeconfig client cert and key to temp files
-    ...    on the remote host. These are signed by the admin-kubeconfig-signer CA,
+    ...    on the remote host. These are signed by the client CA,
     ...    which the kube-rbac-proxy sidecars trust via the metrics-client-ca ConfigMap.
     ...    Uses SSH (Command Should Work) because the cert files must exist on the
     ...    remote host where curl runs, not locally.

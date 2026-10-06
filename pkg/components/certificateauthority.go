@@ -27,18 +27,18 @@ var (
 		Name string
 		Dir  string
 	}{
-		{Name: "kube-control-plane-signer", Dir: cryptomaterial.KubeControlPlaneSignerCertDir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-apiserver-to-kubelet-signer", Dir: cryptomaterial.KubeAPIServerToKubeletSignerCertDir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "admin-kubeconfig-signer", Dir: cryptomaterial.AdminKubeconfigSignerDir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kubelet-signer", Dir: cryptomaterial.KubeletCSRSignerSignerCertDir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-csr-signer", Dir: cryptomaterial.CSRSignerCertDir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "kube-control-plane-signer", Dir: cryptomaterial.ClientCADir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "kube-apiserver-to-kubelet-signer", Dir: cryptomaterial.ClientCADir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "admin-kubeconfig-signer", Dir: cryptomaterial.ClientCADir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "kubelet-signer", Dir: cryptomaterial.ClientCADir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "kube-csr-signer", Dir: cryptomaterial.ClientCADir(cryptomaterial.CertsDirectory(config.DataDir))},
 		{Name: "aggregator-signer", Dir: cryptomaterial.AggregatorSignerDir(cryptomaterial.CertsDirectory(config.DataDir))},
 		{Name: "service-ca", Dir: cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(config.DataDir))},
 		{Name: "ingress-ca", Dir: cryptomaterial.IngressCADir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-apiserver-external-signer", Dir: cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-apiserver-localhost-signer", Dir: cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-apiserver-service-network-signer", Dir: cryptomaterial.KubeAPIServerServiceNetworkSigner(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "etcd-signer", Dir: cryptomaterial.EtcdSignerDir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "kube-apiserver-external-signer", Dir: cryptomaterial.ServingCADir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "kube-apiserver-localhost-signer", Dir: cryptomaterial.ServingCADir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "kube-apiserver-service-network-signer", Dir: cryptomaterial.ServingCADir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "etcd-signer", Dir: cryptomaterial.PeerCADir(cryptomaterial.CertsDirectory(config.DataDir))},
 	}
 	ServiceAccountKeyResources = []struct {
 		Name string

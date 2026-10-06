@@ -49,7 +49,7 @@ ${LVMS_CSI_SNAPSHOT_DISABLED}       SEPARATOR=\n
 ...                                 storage:
 ...                                 \ \ driver: "none"
 ...                                 \ \ optionalCsiComponents: [ none ]
-${APISERVER_ETCD_CLIENT_CERT}       /var/lib/microshift/certs/etcd-signer/apiserver-etcd-client
+${APISERVER_ETCD_CLIENT_CERT}       /var/lib/microshift/certs/peer-ca/apiserver-etcd-client
 
 
 *** Test Cases ***

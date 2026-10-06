@@ -149,11 +149,11 @@ func ProvisionMetricsServerCerts(ctx context.Context, cfg *config.Config) error 
 	return nil
 }
 
-// ProvisionMetricsClientCA provisions the admin-kubeconfig-signer CA that
-// kube-rbac-proxy sidecars in kube-state-metrics and node-exporter use to
-// verify client certificates on incoming scrape requests. The CA cannot be
-// included in static manifests because it is generated at MicroShift startup
-// and may be rotated; this function ensures the ConfigMap reflects the current CA.
+// ProvisionMetricsClientCA provisions the client CA that kube-rbac-proxy
+// sidecars in kube-state-metrics and node-exporter use to verify client
+// certificates on incoming scrape requests. The CA cannot be included in
+// static manifests because it is generated at MicroShift startup and may be
+// rotated; this function ensures the ConfigMap reflects the current CA.
 func ProvisionMetricsClientCA(ctx context.Context, cfg *config.Config) error {
 	needed := false
 	for _, p := range metricsClientCAConsumerPaths {
@@ -182,10 +182,10 @@ func ProvisionMetricsClientCA(ctx context.Context, cfg *config.Config) error {
 	}
 
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
-	caCertPath := cryptomaterial.CACertPath(cryptomaterial.AdminKubeconfigSignerDir(certsDir))
+	caCertPath := cryptomaterial.CACertPath(cryptomaterial.ClientCADir(certsDir))
 	caPEM, err := os.ReadFile(caCertPath)
 	if err != nil {
-		return fmt.Errorf("reading admin-kubeconfig-signer CA: %w", err)
+		return fmt.Errorf("reading client CA: %w", err)
 	}
 
 	cm := &corev1.ConfigMap{
