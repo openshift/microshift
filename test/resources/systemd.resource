@@ -1,19 +1,9 @@
 *** Settings ***
 Documentation       Keywords for interacting with systemd
 
-Library             Collections
-Library             OperatingSystem
 Library             Process
 Library             String
-Library             libipv6.py
 Resource            ../resources/microshift-host.resource
-
-
-*** Variables ***
-${SYSTEMD_DIAGNOSTIC_REMOTE_TIMEOUT}        25s
-${SYSTEMD_DIAGNOSTIC_COMMAND_TIMEOUT}       30s
-${SYSTEMD_DIAGNOSTIC_TRANSFER_TIMEOUT}      60s
-${SYSTEMD_DIAGNOSTIC_CLEANUP_TIMEOUT}       10s
 
 
 *** Keywords ***
@@ -37,150 +27,12 @@ Systemctl Print Service Status And Logs
     [Documentation]    Dumps the status and latest logs for a specified service.
     [Arguments]    ${unit_name}
 
-    ${status_result}    ${status_text}=    Run Keyword And Ignore Error
-    ...    Systemctl Get Service Status    ${unit_name}
-    IF    '${status_result}' == 'PASS'
-        Log    ${status_text}
-    ELSE
-        Log    Unable to collect status for ${unit_name}: ${status_text}    WARN
-    END
-
-    ${journal_result}    ${journal_text}=    Run Keyword And Ignore Error
-    ...    Systemctl Get Service Journal Tail    ${unit_name}
-    IF    '${journal_result}' == 'PASS'
-        Log    ${journal_text}
-    ELSE
-        Log    Unable to collect journal for ${unit_name}: ${journal_text}    WARN
-    END
-
-Systemctl Get Service Status
-    [Documentation]    Return service status without asserting that the service is healthy.
-    [Arguments]    ${unit_name}
-
-    Validate Systemd Unit Name    ${unit_name}
-    ${command}=    Catenate    SEPARATOR=${SPACE}
-    ...    timeout --signal=TERM --kill-after=5s ${SYSTEMD_DIAGNOSTIC_REMOTE_TIMEOUT}
-    ...    systemctl status --no-pager --full ${unit_name}
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    ${command}
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    ...    timeout=${SYSTEMD_DIAGNOSTIC_COMMAND_TIMEOUT}
-    ${status_text}=    Catenate    SEPARATOR=${\n}
-    ...    systemctl status exit code: ${rc}
-    ...    ${stdout}
-    ...    ${stderr}
-    RETURN    ${status_text}
-
-Systemctl Get Service Journal Tail
-    [Documentation]    Return at most the last 32 KB of journal for a service.
-    [Arguments]    ${unit_name}
-
-    ${journal_text}=    Systemctl Get Service Journal Tail Using Keyword
-    ...    ${unit_name}    Execute Command
-    RETURN    ${journal_text}
-
-Systemctl Get Service Journal Tail Using Keyword
-    [Documentation]    Return bounded service journal output using the supplied command keyword.
-    [Arguments]    ${unit_name}    ${execute_keyword}
-
-    Validate Systemd Unit Name    ${unit_name}
-    ${command}=    Catenate    SEPARATOR=${SPACE}
-    ...    timeout --signal=TERM --kill-after=5s ${SYSTEMD_DIAGNOSTIC_REMOTE_TIMEOUT}
-    ...    bash -o pipefail -c 'journalctl --no-pager -u ${unit_name} -o short 2>&1 | tail -c 32000'
-    ${stdout}    ${stderr}    ${rc}=    Run Keyword
-    ...    ${execute_keyword}    ${command}
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    ...    timeout=${SYSTEMD_DIAGNOSTIC_COMMAND_TIMEOUT}
-    ${journal_text}=    Evaluate
-    ...    ($stdout + chr(10) + $stderr + chr(10) + "journal pipeline exit code: " + str($rc)).encode("utf-8")[-32000:].decode("utf-8", errors="ignore")
-    RETURN    ${journal_text}
-
-Systemctl Save Service Status And Logs
-    [Documentation]    Save full service status and journal output to a local diagnostic file.
-    [Arguments]    ${unit_name}    ${local_path}    ${diagnostic_id}
-
-    Systemctl Save Service Status And Logs Using Keyword
-    ...    ${unit_name}    ${local_path}    ${diagnostic_id}
-    ...    Download Systemd Diagnostic File
-
-Systemctl Save Service Status And Logs Using Keyword
-    [Documentation]    Save full service diagnostics using the supplied download keyword.
-    [Arguments]    ${unit_name}    ${local_path}    ${diagnostic_id}    ${download_keyword}
-
-    Validate Systemd Unit Name    ${unit_name}
-    Should Match Regexp    ${diagnostic_id}    ^[0-9a-f]{32}$
-    VAR    ${remote_path}=    /tmp/systemd-diagnostics-${diagnostic_id}.log
-    ${collect_command}=    Catenate    SEPARATOR=${SPACE}
-    ...    timeout --signal=TERM --kill-after=5s ${SYSTEMD_DIAGNOSTIC_REMOTE_TIMEOUT}
-    ...    bash -c 'umask 077; owner="$SUDO_USER"; group=$(id -gn -- "$owner") || exit;
-    ...    install -m 600 -o "$owner" -g "$group" /dev/null ${remote_path} || exit;
-    ...    {
-    ...    systemctl status --no-pager --full ${unit_name}; status_rc=$?;
-    ...    printf "\nsystemctl status exit code: %s\n" "$status_rc";
-    ...    journalctl --no-pager -u ${unit_name} -o short; journal_rc=$?;
-    ...    printf "\njournalctl exit code: %s\n" "$journal_rc";
-    ...    } >> ${remote_path} 2>&1;
-    ...    chmod 600 ${remote_path}'
-    TRY
-        ${stdout}    ${stderr}    ${rc}=    Execute Command
-        ...    ${collect_command}
-        ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-        ...    timeout=${SYSTEMD_DIAGNOSTIC_COMMAND_TIMEOUT}
-        IF    ${rc} != 0
-            Fail    Unable to prepare full diagnostics for ${unit_name} (rc=${rc}): ${stderr}
-        END
-        Run Keyword    ${download_keyword}    ${remote_path}    ${local_path}
-    FINALLY
-        Run Keyword And Ignore Error
-        ...    Execute Command    rm -f -- ${remote_path}
-        ...    return_rc=True    timeout=${SYSTEMD_DIAGNOSTIC_CLEANUP_TIMEOUT}
-    END
-
-Download Systemd Diagnostic File
-    [Documentation]    Download a systemd diagnostic file from the MicroShift host.
-    [Arguments]    ${remote_path}    ${local_path}
-
-    Download Systemd Diagnostic File Using Keyword
-    ...    ${remote_path}    ${local_path}    Process.Run Process
-
-Download Systemd Diagnostic File Using Keyword
-    [Documentation]    Download diagnostics with a hard process deadline using the supplied runner.
-    [Arguments]    ${remote_path}    ${local_path}    ${process_keyword}
-
-    VAR    @{scp_args}=
-    ...    -B    -q
-    ...    -o    ConnectTimeout=10
-    ...    -o    ConnectionAttempts=1
-    ...    -o    ServerAliveInterval=5
-    ...    -o    ServerAliveCountMax=1
-    ...    -o    StrictHostKeyChecking=accept-new
-    IF    '${SSH_PORT}'    Append To List    ${scp_args}    -P    ${SSH_PORT}
-    IF    '${SSH_PRIV_KEY}'
-        Append To List    ${scp_args}    -i    ${SSH_PRIV_KEY}
-    END
-    VAR    ${partial_path}=    ${local_path}.partial
-    ${scp_host}=    Add Brackets If Ipv6    ${USHIFT_HOST}
-    Append To List
-    ...    ${scp_args}
-    ...    --    ${USHIFT_USER}@${scp_host}:${remote_path}    ${partial_path}
-    TRY
-        ${result}=    Run Keyword
-        ...    ${process_keyword}    scp    @{scp_args}
-        ...    timeout=${SYSTEMD_DIAGNOSTIC_TRANSFER_TIMEOUT}
-        ...    on_timeout=kill    stdout=DEVNULL    stderr=DEVNULL
-        Should Be Equal As Integers
-        ...    ${result.rc}    0
-        ...    msg=Diagnostic transfer failed or timed out (rc=${result.rc})
-        OperatingSystem.Move File    ${partial_path}    ${local_path}
-    FINALLY
-        Run Keyword And Ignore Error    OperatingSystem.Remove File    ${partial_path}
-    END
-
-Validate Systemd Unit Name
-    [Documentation]    Reject values that are unsafe to interpolate into diagnostic shell commands.
-    [Arguments]    ${unit_name}
-
-    Should Match Regexp    ${unit_name}    ^[A-Za-z0-9_.@:][A-Za-z0-9_.@:-]*$
+    ${status_text}=    Execute Command
+    ...    systemctl status ${unit_name}
+    ...    sudo=True    return_stdout=True
+    ${log_text}=    Execute Command
+    ...    journalctl -u ${unit_name} -o short | tail -c 32000
+    ...    sudo=True    return_stdout=True
 
 Systemctl Check Service SubState
     [Documentation]    Check if the current sub-state of a service is the same
