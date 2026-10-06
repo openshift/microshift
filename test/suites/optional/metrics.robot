@@ -55,8 +55,8 @@ Metrics Server API Is Available
 
 Metrics Server Reports Node Metrics
     [Documentation]    oc adm top nodes should return resource usage data.
-    ${out}=    Run With Kubeconfig    oc adm top nodes --no-headers
-    Should Match Regexp    ${out}    \\d+m
+    Wait Until Keyword Succeeds    2m    5s
+    ...    Metrics Server Should Report Node Metrics
 
 Metrics Server Recovers After Restart Storm
     [Documentation]    Service-ca must recreate the deleted metrics-server serving Secret
@@ -161,6 +161,11 @@ Clear Metrics Server Serving Certificate Failure State
 Metrics Server API Should Be Available
     [Documentation]    Wait until the aggregated metrics API can route to metrics-server.
     Oc Wait    apiservice v1beta1.metrics.k8s.io    --for=condition=Available --timeout\\=120s
+
+Metrics Server Should Report Node Metrics
+    [Documentation]    Verify metrics-server has collected and serves node usage data.
+    ${out}=    Run With Kubeconfig    oc adm top nodes --no-headers
+    Should Match Regexp    ${out}    \\d+m
 
 Metrics Endpoint Should Contain
     [Documentation]    Scrape kube-state-metrics on the given port and assert the
