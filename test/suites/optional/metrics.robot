@@ -146,7 +146,7 @@ Metrics Server Serving Certificate Secret Should Be Recreated
     Run With Kubeconfig
     ...    test "$(oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.data.tls\\.key}' | base64 -d | wc -c)" -gt 0
     ${owner}=    Run With Kubeconfig
-    ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.metadata.annotations.service\\.beta\\.openshift\\.io/service-name}'
+    ...    oc get secret metrics-server-tls -n ${METRICS_NS} -o jsonpath\\='{.metadata.annotations.service\\.beta\\.openshift\\.io/originating-service-name}'
     Should Be Equal    ${owner}    metrics-server
 
 Clear Metrics Server Serving Certificate Failure State

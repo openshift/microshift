@@ -193,8 +193,7 @@ func TestWaitForMetricsServerServingCertRecoversMissingSecret(t *testing.T) {
 				Name:      metricsServerTLSResourceName,
 				Namespace: metricsNamespace,
 				Annotations: map[string]string{
-					"service.beta.openshift.io/service-name":                     metricsServerServiceName,
-					"service.beta.openshift.io/service-serving-cert-secret-name": metricsServerTLSResourceName,
+					"service.beta.openshift.io/originating-service-name": metricsServerServiceName,
 				},
 			},
 			Type: corev1.SecretTypeTLS,
@@ -240,6 +239,44 @@ func TestWaitForMetricsServerServingCertRecoversMissingSecret(t *testing.T) {
 	}
 	if got := updatedService.Annotations["service.beta.openshift.io/serving-cert-secret-name"]; got != metricsServerTLSResourceName {
 		t.Errorf("serving cert annotation = %q, want %q", got, metricsServerTLSResourceName)
+	}
+}
+
+func TestWaitForMetricsServerServingCertRetriesTransientSecretGet(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newServiceCADeployment(), newMetricsServerService())
+
+	var secretGets atomic.Int32
+	clientset.PrependReactor("get", "secrets", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		// The initial fast-path read hits a transient error; recovery must not abort.
+		if secretGets.Add(1) == 1 {
+			return true, nil, apierrors.NewServiceUnavailable("service unavailable")
+		}
+		return false, nil, nil
+	})
+	clientset.PrependReactor("update", "services", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		updatedService := action.(k8stesting.UpdateAction).GetObject().(*corev1.Service)
+		if err := clientset.Tracker().Update(corev1.SchemeGroupVersion.WithResource("services"), updatedService, metricsNamespace); err != nil {
+			return true, nil, err
+		}
+		secret := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{Name: metricsServerTLSResourceName, Namespace: metricsNamespace},
+			Type:       corev1.SecretTypeTLS,
+			Data: map[string][]byte{
+				corev1.TLSCertKey:       []byte("service-ca-certificate"),
+				corev1.TLSPrivateKeyKey: []byte("service-ca-private-key"),
+			},
+		}
+		if err := clientset.Tracker().Create(corev1.SchemeGroupVersion.WithResource("secrets"), secret, metricsNamespace); err != nil {
+			return true, nil, err
+		}
+		return true, updatedService, nil
+	})
+
+	if err := waitForMetricsServerServingCertWithOptions(context.Background(), clientset, testMetricsServerServingCertWaitOptions()); err != nil {
+		t.Fatalf("waiting for serving cert after transient secret get: %v", err)
+	}
+	if got := secretGets.Load(); got < 2 {
+		t.Errorf("secret gets = %d, want >= 2 (transient fast-path read retried)", got)
 	}
 }
 

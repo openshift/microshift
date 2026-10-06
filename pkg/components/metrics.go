@@ -193,7 +193,9 @@ func waitForMetricsServerServingCertWithOptions(ctx context.Context, clientset k
 	if err == nil && metricsServerServingCertReady(secret) {
 		return nil
 	}
-	if err != nil && !apierrors.IsNotFound(err) {
+	// A transient error here must not abort recovery: fall through to the
+	// bounded wait+poll below, consistent with every other API call in this flow.
+	if err != nil && !apierrors.IsNotFound(err) && !isTransientKubernetesAPIError(err) {
 		return fmt.Errorf("getting metrics-server serving cert secret: %w", err)
 	}
 
@@ -215,7 +217,7 @@ func waitForMetricsServerServingCertWithOptions(ctx context.Context, clientset k
 		if err == nil && metricsServerServingCertReady(secret) {
 			return true, nil
 		}
-		if err != nil && !apierrors.IsNotFound(err) {
+		if err != nil && !apierrors.IsNotFound(err) && !isTransientKubernetesAPIError(err) {
 			return false, fmt.Errorf("getting metrics-server serving cert secret: %w", err)
 		}
 
