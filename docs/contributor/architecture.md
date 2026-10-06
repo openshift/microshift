@@ -24,7 +24,7 @@ This document describes how MicroShift is built and how its components interact 
 
 | Package | Purpose |
 |---------|---------|
-| `pkg/cmd/` | Cobra CLI commands: `run`, `version`, `show-config`, `backup`, `restore`, `healthcheck`, `c2cc-probe` |
+| `pkg/cmd/` | Cobra CLI commands: `run`, `version`, `show-config`, `backup`, `restore`, `healthcheck`, `c2cc-probe`, `certs` |
 | `pkg/controllers/` | Kubernetes control plane service wrappers — etcd, kube-apiserver, kube-controller-manager, kube-scheduler, kubelet, OpenShift controllers |
 | `pkg/servicemanager/` | Dependency-aware service lifecycle manager with startup recording |
 | `pkg/admin/` | Backup/restore, data management, pre-run checks (version metadata, feature gates, health verification) |
