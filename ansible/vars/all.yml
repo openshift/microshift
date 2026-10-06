@@ -24,13 +24,6 @@ rhel_target_version: "9.8"
 # Service account
 sa_token_file: sa-token
 
-# pbench performance testing
-install_pbench: false
-pbench_configuration_environment: ec2
-pbench_key_url:
-pbench_config_url:
-pbench_record_duration: 360
-
 # NVIDIA GPU support
 enable_gpu: "{{ enable_gpu_arg | default('false') }}"
 deploy_gpu_test: "{{ deploy_gpu_test_arg | default('true') }}"
