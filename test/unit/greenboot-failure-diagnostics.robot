@@ -19,6 +19,18 @@ ${SSH_PRIV_KEY}         ${EMPTY}
 
 
 *** Test Cases ***
+Privacy Sentinel Uses Synthetic Default When Environment Is Absent
+    [Documentation]    Direct Robot runs have a synthetic sentinel without setup.
+
+    ${uses_default}=    DiagnosticSSH.Privacy Sentinel Uses Synthetic Default
+    Should Be True    ${uses_default}
+
+Privacy Sentinel Uses Custom Environment Value
+    [Documentation]    The verification script's exported sentinel takes precedence.
+
+    ${uses_environment}=    DiagnosticSSH.Privacy Sentinel Uses Environment Value
+    Should Be True    ${uses_environment}
+
 Direct Healthcheck Success Does Not Capture Output Or Diagnostics
     [Documentation]    Success keeps the 600s command default and captures no raw output.
 

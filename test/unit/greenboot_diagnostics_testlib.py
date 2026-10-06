@@ -6,6 +6,19 @@ import greenboot_diagnostics
 from robot.utils import is_truthy
 
 
+_PRIVACY_SENTINEL_ENV = "ROBOT_PRIVACY_SENTINEL"
+_SYNTHETIC_PRIVACY_SENTINEL = (
+    "synthetic-sensitive-output-must-not-be-published"
+)
+
+
+def _privacy_sentinel():
+    return os.environ.get(
+        _PRIVACY_SENTINEL_ENV,
+        _SYNTHETIC_PRIVACY_SENTINEL,
+    )
+
+
 class GreenbootDiagnosticsTestlib:
     ROBOT_LIBRARY_SCOPE = "SUITE"
 
@@ -51,11 +64,31 @@ class GreenbootDiagnosticsTestlib:
     def set_healthcheck_return_code(self, return_code):
         self.healthcheck_return_code = int(return_code)
 
+    def privacy_sentinel_uses_synthetic_default(self):
+        original = os.environ.pop(_PRIVACY_SENTINEL_ENV, None)
+        try:
+            return _privacy_sentinel() == _SYNTHETIC_PRIVACY_SENTINEL
+        finally:
+            if original is not None:
+                os.environ[_PRIVACY_SENTINEL_ENV] = original
+
+    def privacy_sentinel_uses_environment_value(self):
+        original = os.environ.get(_PRIVACY_SENTINEL_ENV)
+        custom = "custom-synthetic-privacy-sentinel"
+        os.environ[_PRIVACY_SENTINEL_ENV] = custom
+        try:
+            return _privacy_sentinel() == custom
+        finally:
+            if original is None:
+                os.environ.pop(_PRIVACY_SENTINEL_ENV, None)
+            else:
+                os.environ[_PRIVACY_SENTINEL_ENV] = original
+
     def execute_sensitive_healthcheck_command(self, command, **options):
         self.healthcheck_calls += 1
         self.healthcheck_command = command
         self.healthcheck_options = options
-        sentinel = os.environ["ROBOT_PRIVACY_SENTINEL"]
+        sentinel = _privacy_sentinel()
         stdout = f"stdout-{sentinel}"
         stderr = f"stderr-{sentinel}"
         result = []
@@ -92,7 +125,7 @@ class GreenbootDiagnosticsTestlib:
 
     def login(self, user, **_options):
         if self.mode == "reconnect-failure":
-            raise RuntimeError(os.environ["ROBOT_PRIVACY_SENTINEL"])
+            raise RuntimeError(_privacy_sentinel())
         self.authenticated_connections.add(self.current_connection)
         return None
 
@@ -105,7 +138,7 @@ class GreenbootDiagnosticsTestlib:
         self.command = command
         self.command_timeout = options.get("timeout")
         self.return_stderr = options.get("return_stderr")
-        sentinel = os.environ["ROBOT_PRIVACY_SENTINEL"]
+        sentinel = _privacy_sentinel()
         if self.mode == "query-exception":
             raise RuntimeError(sentinel)
         if self.mode == "elapsed-timeout":
@@ -138,11 +171,11 @@ class GreenbootDiagnosticsTestlib:
         )
 
     def raise_sensitive_diagnostic_exception(self, *_args, **_options):
-        raise RuntimeError(os.environ["ROBOT_PRIVACY_SENTINEL"])
+        raise RuntimeError(_privacy_sentinel())
 
     def return_sensitive_malformed_diagnostic_result(
             self, *_args, **_options):
-        sentinel = os.environ["ROBOT_PRIVACY_SENTINEL"]
+        sentinel = _privacy_sentinel()
         return {
             "saved": True,
             "filename": sentinel,
