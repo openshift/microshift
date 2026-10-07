@@ -54,6 +54,7 @@ func TestPendingGenerationRejectsUnsafeRecord(t *testing.T) {
 			_, err := tx.LoadPending()
 			require.Error(t, err)
 			require.Error(t, tx.Discard())
+			require.Error(t, tx.DiscardPending())
 			assertTransactionContents(t, tx, "old")
 		})
 	}
@@ -69,8 +70,34 @@ func TestPendingGenerationRejectsUnsafeRecord(t *testing.T) {
 			_, err := tx.LoadPending()
 			require.Error(t, err)
 			require.Error(t, tx.Discard())
+			require.Error(t, tx.DiscardPending())
 		})
 	}
+}
+
+func TestDiscardPendingGeneration(t *testing.T) {
+	tx := newTestTransaction(t)
+	require.NoError(t, tx.DiscardPending())
+	require.NoDirExists(t, tx.directory())
+	assertTransactionContents(t, tx, "old")
+	metadata, err := tx.LoadPending()
+	require.NoError(t, err)
+	require.Nil(t, metadata)
+	require.NoError(t, tx.DiscardPending(), "discarding is idempotent")
+}
+
+func TestDiscardPendingPreservesInterruptedActivation(t *testing.T) {
+	tx := newTestTransaction(t)
+	tx.rename = func(from, to string) error {
+		require.NoError(t, os.Rename(from, to))
+		panic("simulated process interruption")
+	}
+	require.Panics(t, func() { _ = tx.Commit(func() error { return nil }) })
+	require.ErrorContains(t, tx.DiscardPending(), "incomplete activation")
+	require.FileExists(t, filepath.Join(tx.directory(), "previous", "certs", "original"))
+	restarted := &Transaction{DataDir: tx.DataDir}
+	require.NoError(t, restarted.Recover())
+	assertTransactionContents(t, restarted, "old")
 }
 
 func TestPendingGenerationRefreshesResources(t *testing.T) {

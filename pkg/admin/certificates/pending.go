@@ -89,6 +89,32 @@ func (t *Transaction) Publish(metadata []byte) error {
 	return syncDirectory(t.DataDir)
 }
 
+// DiscardPending removes a stale published generation without touching active
+// material. Callers must hold the operation lock and recover interrupted commits
+// first; their backups must never be discarded.
+func (t *Transaction) DiscardPending() error {
+	committing, err := t.Pending()
+	if err != nil {
+		return err
+	}
+	if committing {
+		return fmt.Errorf("cannot discard pending certificates during an incomplete activation")
+	}
+	metadata, err := t.LoadPending()
+	if err != nil {
+		return err
+	}
+	if metadata != nil {
+		if err := os.Remove(t.readyPath()); err != nil {
+			return err
+		}
+		if err := syncDirectory(t.directory()); err != nil {
+			return err
+		}
+	}
+	return t.Discard()
+}
+
 func (t *Transaction) discardUnpublished() error {
 	// LoadPending changes Stage, so preserve the caller's working generation.
 	working := t.stage

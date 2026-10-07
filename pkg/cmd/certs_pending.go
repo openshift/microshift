@@ -3,9 +3,12 @@ package cmd
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"time"
+
+	"k8s.io/klog/v2"
 
 	"github.com/openshift/microshift/pkg/admin/certificates"
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
@@ -23,7 +26,23 @@ type pendingCertificateRenewal struct {
 }
 
 func certificateConfigHash(cfg *config.Config) (string, error) {
-	contents, err := json.Marshal(cfg)
+	// Only inputs used by certificateChainsSetup affect the prepared PKI.
+	// Kubeconfigs and unrelated resources are rebuilt at activation.
+	contents, err := json.Marshal(struct {
+		ServiceNetwork   []string
+		Hostname         string
+		NodeIP           string
+		BaseDomain       string
+		AdvertiseAddress string
+		SubjectAltNames  []string
+	}{
+		ServiceNetwork:   cfg.Network.ServiceNetwork,
+		Hostname:         cfg.Node.HostnameOverride,
+		NodeIP:           cfg.Node.NodeIP,
+		BaseDomain:       cfg.DNS.BaseDomain,
+		AdvertiseAddress: cfg.ApiServer.AdvertiseAddress,
+		SubjectAltNames:  cfg.ApiServer.SubjectAltNames,
+	})
 	if err != nil {
 		return "", invalidCertificateConfiguration()
 	}
@@ -90,66 +109,79 @@ func loadPendingCertificateRenewal(dataDir string) (*certificatesv1alpha1.Certif
 
 // activateCertificateRenewal runs only at startup, under both the runtime and
 // operation locks, after restore and before any component reads active PKI.
-func activateCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, etcdStopped func() error, now time.Time) error {
+// It reports whether a pending generation was activated, not merely present.
+func activateCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, etcdStopped func() error, now time.Time) (bool, error) {
 	state, err := readPendingCertificateRenewal(transaction)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if state == nil {
-		return transaction.Discard() // Remove abandoned, unpublished staging.
+		return false, transaction.Discard() // Remove abandoned, unpublished staging.
 	}
 	if err := etcdStopped(); err != nil {
-		return err
+		return false, err
 	}
 	current, err := newPendingCertificateRenewal(cfg, transaction.DataDir)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if current.ConfigHash != state.ConfigHash || current.OriginalHash != state.OriginalHash {
-		return fmt.Errorf("configuration or active PKI changed since renewal; run microshift certs renew again before starting")
+		return false, discardPendingCertificateRenewal(transaction, "certificate configuration or active PKI changed since renewal")
 	}
 	if err := validatePendingCertificateHash(transaction.Stage(), state.RenewedHash); err != nil {
-		return err
+		return false, err
 	}
 	renewCAs := state.Result.Mode == certificatesv1alpha1.RenewalModeCA
 	builder, err := certificateChainsSetup(cfg, transaction.Stage())
 	if err != nil {
-		return err
+		return false, err
 	}
 	// Recheck validity at activation, which may be much later than generation.
 	if _, err := builder.ValidateRenewal(renewCAs, now); err != nil {
-		return fmt.Errorf("pending certificates cannot be activated; run microshift certs renew again: %w", err)
+		if errors.Is(err, certchains.ErrCertificateExpired) {
+			return false, discardPendingCertificateRenewal(transaction, "pending certificates expired before activation")
+		}
+		return false, fmt.Errorf("pending certificates cannot be activated; run microshift certs renew again: %w", err)
 	}
 	activeBuilder, err := certificateChainsSetup(cfg, transaction.DataDir)
 	if err != nil {
-		return err
+		return false, err
 	}
 	before, err := activeBuilder.LoadInventory()
 	if err != nil {
-		return err
+		return false, err
 	}
 	if err := transaction.RefreshResources(); err != nil {
-		return err
+		return false, err
 	}
 	chains, err := builder.Load()
 	if err != nil {
-		return err
+		return false, err
 	}
 	if err := initKubeconfigs(cfg, chains, transaction.Stage()); err != nil {
-		return err
+		return false, err
 	}
 	if err := validatePendingCertificateHash(transaction.Stage(), state.RenewedHash); err != nil {
-		return err
+		return false, err
 	}
 	if _, err := validateCertificateRenewal(cfg, transaction.Stage(), before, renewCAs); err != nil {
-		return err
+		return false, err
 	}
-	return transaction.Commit(func() error {
+	err = transaction.Commit(func() error {
 		if _, err := validateCertificateRenewal(cfg, transaction.DataDir, before, renewCAs); err != nil {
 			return err
 		}
 		return validatePendingCertificateHash(transaction.DataDir, state.RenewedHash)
 	})
+	return err == nil, err
+}
+
+func discardPendingCertificateRenewal(transaction *certificates.Transaction, reason string) error {
+	if err := transaction.DiscardPending(); err != nil {
+		return fmt.Errorf("failed to discard pending certificate renewal: %w", err)
+	}
+	klog.Warningf("Discarded pending certificate renewal: %s; continuing normal certificate initialization. Run microshift certs renew again if needed", reason)
+	return nil
 }
 
 func validatePendingCertificateHash(dataDir, expected string) error {
