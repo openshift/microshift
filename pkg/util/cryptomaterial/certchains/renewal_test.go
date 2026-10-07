@@ -47,6 +47,7 @@ func TestPlanRenewal(t *testing.T) {
 	expiredTime := before[0].Certificate.NotAfter.Add(time.Hour)
 	_, err = builder.PlanRenewal(false, expiredTime)
 	require.ErrorContains(t, err, "use --ca")
+	require.ErrorIs(t, err, ErrCertificateExpired)
 	_, err = builder.PlanRenewal(true, expiredTime)
 	require.NoError(t, err, "CA renewal must support recovery from expired certificates")
 
@@ -57,6 +58,26 @@ func TestPlanRenewal(t *testing.T) {
 	require.NoError(t, os.Remove(keyPath))
 	_, err = builder.PlanRenewal(true, now)
 	require.EqualError(t, err, `cannot read private key for certificate "client"`)
+}
+
+func TestValidateRenewalDistinguishesExpiry(t *testing.T) {
+	builder := NewCertificateChains(NewCertificateSigner("root", t.TempDir(), 24*time.Hour).
+		WithService("test").WithClientCertificates(&ClientCertificateSigningRequestInfo{
+		CSRMeta:  CSRMeta{Name: "client", Service: "test", Validity: time.Hour},
+		UserInfo: &user.DefaultInfo{Name: "test-client"},
+	}))
+	chains, err := builder.Complete()
+	require.NoError(t, err)
+	inventory := chains.Inventory()
+	for _, entry := range inventory {
+		t.Run(string(entry.Role), func(t *testing.T) {
+			_, err := builder.ValidateRenewal(false, entry.Certificate.NotAfter)
+			require.ErrorIs(t, err, ErrCertificateExpired)
+			_, err = builder.ValidateRenewal(false, entry.Certificate.NotBefore.Add(-time.Second))
+			require.Error(t, err)
+			require.NotErrorIs(t, err, ErrCertificateExpired)
+		})
+	}
 }
 
 func TestRenewalBoundsDescendantsAndReloadsPeers(t *testing.T) {

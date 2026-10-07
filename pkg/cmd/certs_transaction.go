@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	"github.com/openshift/library-go/pkg/crypto"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/openshift/microshift/pkg/admin/certificates"
@@ -24,6 +26,27 @@ import (
 // Keep the lock outside DataDir, which startup may replace during restore.
 const certificateLockPath = config.BackupsDir + "/certs.lock"
 const certificateRuntimeLockPath = config.BackupsDir + "/certs-runtime.lock"
+
+// Leave time for normal startup within the service's four-minute timeout.
+const certificateStartupLockTimeout = 30 * time.Second
+
+// Only startup waits for an in-flight certificate operation. CLI access keeps
+// using the non-blocking certificates.Lock directly.
+func waitForCertificateStartupLock(path string, timeout time.Duration) (*os.File, error) {
+	var lock *os.File
+	err := wait.PollUntilContextTimeout(context.Background(), 250*time.Millisecond, timeout, true, func(context.Context) (bool, error) {
+		var err error
+		lock, err = certificates.Lock(path, true)
+		if errors.Is(err, certificates.ErrBusy) {
+			return false, nil
+		}
+		return err == nil, err
+	})
+	if errors.Is(err, context.DeadlineExceeded) {
+		return nil, fmt.Errorf("timed out after %s waiting for the certificate operation lock: %w", timeout, certificates.ErrBusy)
+	}
+	return lock, err
+}
 
 func recoverCertificateStartup(transaction *certificates.Transaction, etcdStopped func() error) error {
 	if pending, err := transaction.Pending(); err != nil {
