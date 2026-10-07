@@ -1,0 +1,72 @@
+- api embedded-component c1bf12f5d04823f92c88af6c9835890de13b3474 to 3063f49533e8e7b08a30bb68c45047c14a3b3822
+  - ff3205e7 2026-09-29T23:50:40Z Enable OLMLifecycleAndCompatibility by default in version 5+
+
+- cluster-csi-snapshot-controller-operator embedded-component 35ec0224eb0e5219d5eae012fb703223a6f3e1f7 to 6b40834f1fa1430c458734d396b39775f1232647
+  - 1bcdb37 2026-10-02T14:15:04+02:00 OCPBUGS-128798: Unresolved ${TLS_CIPHER_SUITES} for Custom TLS 1.3 profile
+
+- cluster-network-operator embedded-component 89c7f4d5c88bb8c8da7ba10d39709b192029de9b to f729b5d090ceeab5a2d7e3ad74387b1a1630fb89
+  - 6b5cfbd 2026-08-31T13:27:59Z Add ConfigMap hash annotation to networking console plugin deployment
+
+- kubernetes embedded-component 6e14e03bbd62c101525891f1d409ac6a9262cee1 to bf3ef614b88993576f8c76728496ed0f2d61db47
+  - af256e0a4 2026-10-05T13:30:17Z UPSTREAM: <carry>: Add needed labels to RHEL pause image
+  - 243d4ef20 2026-09-28T11:29:39Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - ad950d1cc 2026-09-23T17:07:00Z Release commit for Kubernetes v1.36.5
+  - 23cf3cf32 2026-09-17T14:46:58+02:00 Bump images and versions to go 1.26.8 and distroless iptables
+  - 8f3154cac 2026-09-16T16:46:50-07:00 Refuse UNC symlink targets in Windows subPath resolution
+  - 765ce89d2 2026-09-16T16:20:49-07:00 Restore only .spec part from ControllerRevision for any StatefulSet
+  - 77f9d4326 2026-09-08T10:30:07+08:00 DRA: avoid integer overflow in per-claim device-limit checks
+  - 71c9195aa 2026-09-02T09:39:05+08:00 fix job pod could not be removed while removing finalizer failed
+  - 12c0b5d2c 2026-08-31T14:47:34+05:30 [kube-proxy/winkernel] Guard against load balancers without port mappings
+  - cca604ed4 2026-08-29T15:59:10+05:30 Add copyright boilerplate to filespec_test.go
+  - 13eccb2c7 2026-08-29T15:59:09+05:30 Fix windows backslash escaping
+  - ae6f12fe3 2026-08-27T23:05:20+08:00 Avoid leaking node-specific kubelet config into the ConfigMap
+  - 825315e2b 2026-08-26T17:18:05Z conformance: demote guaranteed pod resize tests to e2e
+  - 95a47bfde 2026-08-26T14:59:03+02:00 [release-1.36] test(utils): bump agnhost image tag to 2.66.1
+  - ed15c2282 2026-08-20T03:19:08Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.4
+  - 737926ac0 2026-08-17T16:23:17Z Fix linter warnings
+  - 0aee6b096 2026-08-17T16:23:17Z Fix ObjectVal ConvertToNative for structpb and refine mutation tests
+  - 8a19c3184 2026-07-14T13:40:07-06:00 e2e: storage snapshot tests should read custom timeouts from manifest
+
+- machine-config-operator embedded-component d9b5986ca79e42c0d6d919e18737e4be829b4643 to 11f9273fb35d3d102fb62b261eb507abedf3c428
+  - cdc04492 2026-10-05T19:07:00Z bootimage: add fallback for non fd vsphere cases
+
+- kubernetes image-amd64 6e14e03bbd62c101525891f1d409ac6a9262cee1 to bf3ef614b88993576f8c76728496ed0f2d61db47
+  - af256e0a4 2026-10-05T13:30:17Z UPSTREAM: <carry>: Add needed labels to RHEL pause image
+  - 243d4ef20 2026-09-28T11:29:39Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - ad950d1cc 2026-09-23T17:07:00Z Release commit for Kubernetes v1.36.5
+  - 23cf3cf32 2026-09-17T14:46:58+02:00 Bump images and versions to go 1.26.8 and distroless iptables
+  - 8f3154cac 2026-09-16T16:46:50-07:00 Refuse UNC symlink targets in Windows subPath resolution
+  - 765ce89d2 2026-09-16T16:20:49-07:00 Restore only .spec part from ControllerRevision for any StatefulSet
+  - 77f9d4326 2026-09-08T10:30:07+08:00 DRA: avoid integer overflow in per-claim device-limit checks
+  - 71c9195aa 2026-09-02T09:39:05+08:00 fix job pod could not be removed while removing finalizer failed
+  - 12c0b5d2c 2026-08-31T14:47:34+05:30 [kube-proxy/winkernel] Guard against load balancers without port mappings
+  - cca604ed4 2026-08-29T15:59:10+05:30 Add copyright boilerplate to filespec_test.go
+  - 13eccb2c7 2026-08-29T15:59:09+05:30 Fix windows backslash escaping
+  - ae6f12fe3 2026-08-27T23:05:20+08:00 Avoid leaking node-specific kubelet config into the ConfigMap
+  - 825315e2b 2026-08-26T17:18:05Z conformance: demote guaranteed pod resize tests to e2e
+  - 95a47bfde 2026-08-26T14:59:03+02:00 [release-1.36] test(utils): bump agnhost image tag to 2.66.1
+  - ed15c2282 2026-08-20T03:19:08Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.4
+  - 737926ac0 2026-08-17T16:23:17Z Fix linter warnings
+  - 0aee6b096 2026-08-17T16:23:17Z Fix ObjectVal ConvertToNative for structpb and refine mutation tests
+  - 8a19c3184 2026-07-14T13:40:07-06:00 e2e: storage snapshot tests should read custom timeouts from manifest
+
+- kubernetes image-arm64 6e14e03bbd62c101525891f1d409ac6a9262cee1 to bf3ef614b88993576f8c76728496ed0f2d61db47
+  - af256e0a4 2026-10-05T13:30:17Z UPSTREAM: <carry>: Add needed labels to RHEL pause image
+  - 243d4ef20 2026-09-28T11:29:39Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - ad950d1cc 2026-09-23T17:07:00Z Release commit for Kubernetes v1.36.5
+  - 23cf3cf32 2026-09-17T14:46:58+02:00 Bump images and versions to go 1.26.8 and distroless iptables
+  - 8f3154cac 2026-09-16T16:46:50-07:00 Refuse UNC symlink targets in Windows subPath resolution
+  - 765ce89d2 2026-09-16T16:20:49-07:00 Restore only .spec part from ControllerRevision for any StatefulSet
+  - 77f9d4326 2026-09-08T10:30:07+08:00 DRA: avoid integer overflow in per-claim device-limit checks
+  - 71c9195aa 2026-09-02T09:39:05+08:00 fix job pod could not be removed while removing finalizer failed
+  - 12c0b5d2c 2026-08-31T14:47:34+05:30 [kube-proxy/winkernel] Guard against load balancers without port mappings
+  - cca604ed4 2026-08-29T15:59:10+05:30 Add copyright boilerplate to filespec_test.go
+  - 13eccb2c7 2026-08-29T15:59:09+05:30 Fix windows backslash escaping
+  - ae6f12fe3 2026-08-27T23:05:20+08:00 Avoid leaking node-specific kubelet config into the ConfigMap
+  - 825315e2b 2026-08-26T17:18:05Z conformance: demote guaranteed pod resize tests to e2e
+  - 95a47bfde 2026-08-26T14:59:03+02:00 [release-1.36] test(utils): bump agnhost image tag to 2.66.1
+  - ed15c2282 2026-08-20T03:19:08Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.4
+  - 737926ac0 2026-08-17T16:23:17Z Fix linter warnings
+  - 0aee6b096 2026-08-17T16:23:17Z Fix ObjectVal ConvertToNative for structpb and refine mutation tests
+  - 8a19c3184 2026-07-14T13:40:07-06:00 e2e: storage snapshot tests should read custom timeouts from manifest
+
