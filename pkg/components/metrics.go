@@ -62,11 +62,13 @@ var defaultMetricsServerServingCertWaitOptions = metricsServerServingCertWaitOpt
 	pollInterval: 2 * time.Second,
 	// A recovery attempt can finish before a delayed service-ca startup. Retry
 	// timed-out attempts, but cap both their count and total elapsed time.
-	recoveryRetryBackoff: wait.Backoff{Duration: 10 * time.Second, Factor: 2, Steps: 3, Cap: 30 * time.Second},
+	recoveryRetryBackoff: wait.Backoff{Duration: 10 * time.Second, Factor: 2, Steps: 3},
 	// These discovery waits only read resources. Once service-ca is ready and
-	// the Service exists, reconciliation retries are bounded by this backoff.
-	controllerRetryBackoff: wait.Backoff{Duration: time.Second, Factor: 2, Steps: 8, Cap: 30 * time.Second},
-	serviceRetryBackoff:    wait.Backoff{Duration: time.Second, Factor: 2, Steps: 8, Cap: 30 * time.Second},
+	// the Service exists, reconciliation retries are bounded by their step count.
+	// Backoff.Cap is intentionally omitted because reaching it also exhausts the
+	// remaining steps instead of keeping subsequent delays at the capped value.
+	controllerRetryBackoff: wait.Backoff{Duration: time.Second, Factor: 2, Steps: 8},
+	serviceRetryBackoff:    wait.Backoff{Duration: time.Second, Factor: 2, Steps: 8},
 }
 
 var metricsServerEventRecorder events.Recorder = events.NewLoggingEventRecorder("microshift-metrics-server", clock.RealClock{})

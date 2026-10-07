@@ -137,6 +137,31 @@ func TestWaitForServiceCAControllerReturnsUnauthorizedError(t *testing.T) {
 	}
 }
 
+func TestDefaultMetricsServerServingCertWaitsForDelayedServiceCA(t *testing.T) {
+	clientset := fake.NewSimpleClientset(newServiceCADeployment())
+	var gets atomic.Int32
+	clientset.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		if gets.Add(1) < 7 {
+			deployment := newServiceCADeployment()
+			deployment.Status.Conditions = nil
+			return true, deployment, nil
+		}
+		return false, nil, nil
+	})
+
+	backoff := defaultMetricsServerServingCertWaitOptions.controllerRetryBackoff
+	backoff.Duration = time.Millisecond
+	if backoff.Cap != 0 {
+		backoff.Cap = 30 * time.Millisecond
+	}
+	if err := waitForServiceCAController(context.Background(), clientset, backoff); err != nil {
+		t.Fatalf("waiting for delayed service-ca controller: %v", err)
+	}
+	if got := gets.Load(); got != 7 {
+		t.Errorf("deployment gets = %d, want 7 before service-ca became available", got)
+	}
+}
+
 func TestWaitForMetricsServerServiceRetriesTransientReadError(t *testing.T) {
 	clientset := fake.NewSimpleClientset(newMetricsServerService())
 	var gets atomic.Int32
@@ -336,8 +361,16 @@ func TestWaitForMetricsServerServingCertTerminalErrorStopsRetry(t *testing.T) {
 
 func TestWaitForMetricsServerServingCertStopsAfterBoundedAttempts(t *testing.T) {
 	clientset := fake.NewSimpleClientset(newMetricsServerService())
-	options := testMetricsServerServingCertWaitOptions()
-	options.recoveryRetryBackoff = wait.Backoff{Steps: 3}
+	options := defaultMetricsServerServingCertWaitOptions
+	options.timeout = time.Second
+	options.totalTimeout = time.Second
+	options.pollInterval = time.Millisecond
+	options.recoveryRetryBackoff.Duration = time.Millisecond
+	if options.recoveryRetryBackoff.Cap != 0 {
+		options.recoveryRetryBackoff.Cap = 3 * time.Millisecond
+	}
+	options.controllerRetryBackoff = wait.Backoff{Steps: 1}
+	options.serviceRetryBackoff = wait.Backoff{Steps: 1}
 
 	err := waitForMetricsServerServingCertWithOptions(context.Background(), clientset, options)
 	if !errors.Is(err, wait.ErrWaitTimeout) {
