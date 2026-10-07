@@ -174,8 +174,9 @@ Certificate Configuration Change Discards Pending Renewal
     [Documentation]    Stale renewal must not block startup or skip normal generation for new SANs.
     ${ca_before}=    CA Material Digest
     Renewal Document    ca    json
+    # Preserve the host SAN so Restart MicroShift can retrieve its kubeconfig.
     Drop In MicroShift Config
-    ...    apiServer:\n\ \ subjectAltNames:\n\ \ \ \ - renewal-config.example.test\n
+    ...    apiServer:\n\ \ subjectAltNames:\n\ \ \ \ - ${USHIFT_HOST}\n\ \ \ \ - renewal-config.example.test\n
     ...    99-cert-renew-test
     Restart MicroShift
     Renewal Activation Has Finished
@@ -268,8 +269,10 @@ Validate Renewal Items
     [Documentation]    Check exact inventory selection, deterministic ordering, and per-certificate state.
     [Arguments]    ${result}    ${mode}    ${dry_run}    ${before}
     ${identities}=    Evaluate    [(i['service'], i['name'], i['role']) for i in $result['items']]
+    VAR    &{namespace}=    mode=${mode}
     ${expected}=    Evaluate
-    ...    sorted((i['service'], i['name'], i['role']) for i in $before['items'] if $mode == 'ca' or i['role'] != 'ca')
+    ...    sorted((i['service'], i['name'], i['role']) for i in $before['items'] if mode == 'ca' or i['role'] != 'ca')
+    ...    namespace=${namespace}
     Should Be Equal    ${identities}    ${expected}
     Should Not Be Empty    ${result}[items]
     FOR    ${item}    IN    @{result}[items]
