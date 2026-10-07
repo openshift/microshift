@@ -11,11 +11,11 @@ require (
 	github.com/spf13/cobra v1.10.2
 	go.etcd.io/etcd/api/v3 v3.6.13
 	go.etcd.io/etcd/server/v3 v3.6.8
-	k8s.io/apimachinery v1.36.4
-	k8s.io/cli-runtime v1.36.4
-	k8s.io/component-base v1.36.4
+	k8s.io/apimachinery v1.36.5
+	k8s.io/cli-runtime v1.36.5
+	k8s.io/component-base v1.36.5
 	k8s.io/klog/v2 v2.140.0
-	k8s.io/kubectl v1.36.4
+	k8s.io/kubectl v1.36.5
 	sigs.k8s.io/yaml v1.6.0
 )
 
@@ -130,11 +130,11 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
-	k8s.io/api v1.36.4 // indirect
-	k8s.io/apiserver v1.36.4 // indirect
-	k8s.io/client-go v1.36.4 // indirect
+	k8s.io/api v1.36.5 // indirect
+	k8s.io/apiserver v1.36.5 // indirect
+	k8s.io/client-go v1.36.5 // indirect
 	k8s.io/kube-openapi v0.0.0-20260618221249-bc653b64f974 // indirect
-	k8s.io/kubelet v1.36.4 // indirect
+	k8s.io/kubelet v1.36.5 // indirect
 	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/kustomize/api v0.21.1 // indirect
