@@ -34,6 +34,7 @@ require (
 	github.com/go-kit/kit v0.9.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
+	github.com/opencontainers/selinux v1.13.1
 	github.com/openshift/cluster-policy-controller v0.0.0-20260902120314-c9e9a3482609
 	github.com/openshift/route-controller-manager v0.0.0-20260909174728-a158fff7ce38
 	github.com/prometheus/client_model v0.6.2
@@ -143,7 +144,6 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/opencontainers/runtime-spec v1.3.0 // indirect
-	github.com/opencontainers/selinux v1.13.1 // indirect
 	github.com/openshift/apiserver-library-go v0.0.0-20260715200723-42e5e402ca43 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
