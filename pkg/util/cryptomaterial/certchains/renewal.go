@@ -3,6 +3,7 @@ package certchains
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -12,6 +13,10 @@ import (
 	"github.com/openshift/library-go/pkg/crypto"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
+
+// ErrCertificateExpired distinguishes expiry from integrity and other validity
+// failures when revalidating a pending renewal at startup.
+var ErrCertificateExpired = errors.New("certificate has expired")
 
 // The existing library-go signer invokes Next after building a certificate
 // template and before signing it. Bounding the template here avoids rounding
@@ -142,7 +147,9 @@ func (s *certificateSigner) planRenewal(entries map[string]CertificateInventoryE
 			return fmt.Errorf("CA %q has no valid renewal interval", entry.Name)
 		}
 		*plan = append(*plan, CertificateRenewalPlanEntry{entry, expiry})
-	} else if now.Before(entry.Certificate.NotBefore) || !now.Before(expiry) {
+	} else if !now.Before(expiry) {
+		return fmt.Errorf("CA %q is not currently valid; use --ca to renew the CA chain: %w", entry.Name, ErrCertificateExpired)
+	} else if now.Before(entry.Certificate.NotBefore) {
 		return fmt.Errorf("CA %q is not currently valid; use --ca to renew the CA chain", entry.Name)
 	}
 	// Legacy intermediate CAs can outlive an ancestor. Leaf renewal leaves

@@ -37,7 +37,7 @@ func pendingRenewalFixture(t *testing.T) (*config.Config, string) {
 	return cfg, dataDir
 }
 
-func TestPendingRenewalRejectsChangedInputs(t *testing.T) {
+func TestPendingRenewalChangedInputs(t *testing.T) {
 	for _, changed := range []string{"configuration", "active", "pending"} {
 		t.Run(changed, func(t *testing.T) {
 			cfg, dir := pendingRenewalFixture(t)
@@ -53,11 +53,22 @@ func TestPendingRenewalRejectsChangedInputs(t *testing.T) {
 				require.NoError(t, os.WriteFile(filepath.Join(tx.Stage(), "certs", "external-change"), []byte("changed"), 0600))
 			}
 			before := activeCertificateFileDigests(t, dir)
-			require.ErrorContains(t, activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now()), "changed")
+			activated, err := activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now())
+			require.False(t, activated)
+			if changed == "pending" {
+				require.ErrorContains(t, err, "changed")
+			} else {
+				require.NoError(t, err)
+				require.NoDirExists(t, filepath.Join(dir, ".cert-renewal"))
+			}
 			require.Equal(t, before, activeCertificateFileDigests(t, dir))
 			pending, err := loadPendingCertificateRenewal(dir)
 			require.NoError(t, err)
-			require.NotNil(t, pending)
+			if changed == "pending" {
+				require.NotNil(t, pending, "corrupt material must remain available for troubleshooting")
+			} else {
+				require.Nil(t, pending)
+			}
 		})
 	}
 }
@@ -75,7 +86,9 @@ func TestPendingRenewalCanBeReplaced(t *testing.T) {
 	require.NotEqual(t, original.RenewedHash, replacement.RenewedHash)
 	require.Equal(t, certificatesv1alpha1.RenewalModeCA, replacement.Result.Mode)
 	require.Equal(t, before, activeCertificateFileDigests(t, dir))
-	require.NoError(t, activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now()))
+	activated, err := activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now())
+	require.NoError(t, err)
+	require.True(t, activated)
 	pend, err := loadPendingCertificateRenewal(dir)
 	require.NoError(t, err)
 	require.Nil(t, pend)
@@ -120,12 +133,73 @@ func TestPendingRenewalExpiredBeforeActivation(t *testing.T) {
 	cfg, dir := pendingRenewalFixture(t)
 	before := activeCertificateFileDigests(t, dir)
 	tx := &certificates.Transaction{DataDir: dir}
-	err := activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now().AddDate(20, 0, 0))
+	activated, err := activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now().AddDate(20, 0, 0))
+	require.NoError(t, err)
+	require.False(t, activated)
+	require.Equal(t, before, activeCertificateFileDigests(t, dir))
+	pending, err := loadPendingCertificateRenewal(dir)
+	require.NoError(t, err)
+	require.Nil(t, pending)
+	require.NoDirExists(t, filepath.Join(dir, ".cert-renewal"))
+}
+
+func TestPendingRenewalNotYetValidBeforeActivation(t *testing.T) {
+	cfg, dir := pendingRenewalFixture(t)
+	before := activeCertificateFileDigests(t, dir)
+	tx := &certificates.Transaction{DataDir: dir}
+	activated, err := activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now().AddDate(-20, 0, 0))
 	require.ErrorContains(t, err, "pending certificates cannot be activated")
+	require.False(t, activated)
 	require.Equal(t, before, activeCertificateFileDigests(t, dir))
 	pending, err := loadPendingCertificateRenewal(dir)
 	require.NoError(t, err)
 	require.NotNil(t, pending)
+}
+
+func TestPendingRenewalAllowsUnrelatedConfigurationChanges(t *testing.T) {
+	cfg, dir := pendingRenewalFixture(t)
+	cfg.Debugging.LogLevel = "Debug"
+	cfg.ApiServer.AuditLog.MaxFiles = 20
+	// This endpoint is embedded in kubeconfigs, which activation rebuilds.
+	cfg.ApiServer.URL = "https://127.0.0.1:7443"
+	cfg.ApiServer.Port = 7443
+	activated, err := activateCertificateRenewal(cfg, &certificates.Transaction{DataDir: dir}, func() error { return nil }, time.Now())
+	require.NoError(t, err)
+	require.True(t, activated)
+	kubeconfig, err := os.ReadFile(filepath.Join(dir, "resources", string(config.ObservabilityClient), "kubeconfig"))
+	require.NoError(t, err)
+	require.Contains(t, string(kubeconfig), cfg.ApiServer.URL)
+}
+
+func TestCertificateConfigHash(t *testing.T) {
+	for name, change := range map[string]func(*config.Config){
+		"service network":   func(cfg *config.Config) { cfg.Network.ServiceNetwork = []string{"10.44.0.0/16"} },
+		"hostname":          func(cfg *config.Config) { cfg.Node.HostnameOverride = "new-node" },
+		"node IP":           func(cfg *config.Config) { cfg.Node.NodeIP = "192.0.2.11" },
+		"base domain":       func(cfg *config.Config) { cfg.DNS.BaseDomain = "new.example.test" },
+		"advertise address": func(cfg *config.Config) { cfg.ApiServer.AdvertiseAddress = "192.0.2.12" },
+		"SANs":              func(cfg *config.Config) { cfg.ApiServer.SubjectAltNames = []string{"new.example.test"} },
+	} {
+		t.Run(name, func(t *testing.T) {
+			cfg := &config.Config{}
+			before, err := certificateConfigHash(cfg)
+			require.NoError(t, err)
+			change(cfg)
+			after, err := certificateConfigHash(cfg)
+			require.NoError(t, err)
+			require.NotEqual(t, before, after)
+		})
+	}
+}
+
+func TestCertificateActivationWithoutPendingRenewal(t *testing.T) {
+	tx := &certificates.Transaction{DataDir: t.TempDir()}
+	activated, err := activateCertificateRenewal(nil, tx, func() error {
+		t.Fatal("no pending renewal should not require an etcd check")
+		return nil
+	}, time.Now())
+	require.NoError(t, err)
+	require.False(t, activated)
 }
 
 func TestCertRenewPreservesRootHookAndChecksPrivileges(t *testing.T) {

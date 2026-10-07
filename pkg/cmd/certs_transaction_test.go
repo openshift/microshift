@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -13,6 +14,56 @@ import (
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
 	"github.com/openshift/microshift/pkg/config"
 )
+
+func TestCertificateStartupLockWaitsForOperation(t *testing.T) {
+	for _, exclusive := range []bool{false, true} {
+		t.Run(map[bool]string{false: "reader", true: "writer"}[exclusive], func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "lock")
+			operation, err := certificates.Lock(path, exclusive)
+			require.NoError(t, err)
+			defer func() { _ = operation.Close() }()
+			released := make(chan error, 1)
+			timer := time.AfterFunc(50*time.Millisecond, func() { released <- operation.Close() })
+			defer timer.Stop()
+			startup, err := waitForCertificateStartupLock(path, 5*time.Second)
+			require.NoError(t, err)
+			defer func() { _ = startup.Close() }()
+			require.NoError(t, <-released)
+			_, err = certificates.Lock(path, false)
+			require.ErrorIs(t, err, certificates.ErrBusy, "startup must hold an exclusive lock")
+			require.NoError(t, startup.Close())
+			next, err := certificates.Lock(path, true)
+			require.NoError(t, err, "startup cleanup must release the lock")
+			require.NoError(t, next.Close())
+		})
+	}
+}
+
+func TestCertificateStartupLockTimeout(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "lock")
+	operation, err := certificates.Lock(path, true)
+	require.NoError(t, err)
+	defer func() { _ = operation.Close() }()
+	startup, err := waitForCertificateStartupLock(path, 20*time.Millisecond)
+	require.Nil(t, startup)
+	require.ErrorIs(t, err, certificates.ErrBusy)
+	require.ErrorContains(t, err, "timed out after 20ms")
+	_, err = certificates.Lock(path, true)
+	require.ErrorIs(t, err, certificates.ErrBusy, "timeout must not release the other operation's lock")
+	require.NoError(t, operation.Close())
+	startup, err = waitForCertificateStartupLock(path, time.Second)
+	require.NoError(t, err)
+	require.NoError(t, startup.Close())
+}
+
+func TestCertificateStartupLockRejectsInvalidPath(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "not-a-directory")
+	require.NoError(t, os.WriteFile(path, nil, 0600))
+	startup, err := waitForCertificateStartupLock(filepath.Join(path, "lock"), time.Second)
+	require.Nil(t, startup)
+	require.ErrorContains(t, err, "cannot create certificate lock directory")
+	require.NotErrorIs(t, err, certificates.ErrBusy)
+}
 
 func TestCertificateLockSurvivesDataReplacement(t *testing.T) {
 	for _, replaced := range []string{filepath.Join(config.DataDir, "certs"), config.DataDir} {

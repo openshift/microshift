@@ -142,10 +142,16 @@ An atomically published record identifies the complete pending generation.
 Startup revalidates it after any data restore and before components read PKI.
 Activation requires the previous etcd scope to be stopped. If its state cannot be
 determined, activation fails without replacing active files.
-Configuration and active-PKI hashes must still match preparation; otherwise
-startup refuses activation and asks you to run renewal again. Unrelated resource
-files are refreshed from the current data tree before activation, not restored
-from an old preparation-time snapshot. No raw configuration is saved in metadata.
+Certificate-affecting configuration and active-PKI hashes must still match
+preparation. If either has changed, or pending certificates have expired, startup
+discards the pending generation, logs a warning, and continues with normal
+certificate initialization using the current configuration and active material.
+Run renewal again if still needed. Unrelated settings, such as logging, do not
+invalidate a pending renewal. Other validation failures, including corrupted or
+not-yet-valid pending material, still block activation and startup.
+Unrelated resource files are refreshed from the current data tree before
+activation, not restored from an old preparation-time snapshot. Kubeconfigs are
+rebuilt using the current configuration. No raw configuration is saved in metadata.
 Activation keeps recoverable originals until post-commit validation succeeds.
 The etcd database is not copied or replaced.
 Allow enough free space for staging the `certs` and `resources` trees.
@@ -176,6 +182,9 @@ exclude concurrent certificate operations. The running service instead holds
 without blocking preparation. Both files stay outside the data directory so
 backup restoration cannot replace them. Do not delete them: the files persist,
 but locks are released when the owning processes close them or exit.
+Startup waits up to 30 seconds for an existing certificate operation to release
+the operation lock. If it remains busy, startup fails with a timeout error.
+Certificate CLI commands continue to fail immediately when their lock is busy.
 
 ## Warnings and Errors
 

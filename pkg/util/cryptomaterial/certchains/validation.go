@@ -28,7 +28,10 @@ func (cs *certificateChains) ValidateRenewal(renewCAs bool, now time.Time) (Cert
 	// propagated through legacy CAs without requiring those CAs to be changed.
 	for _, entry := range inventory {
 		cert := entry.Certificate
-		if now.Before(cert.NotBefore) || !now.Before(cert.NotAfter) {
+		if !now.Before(cert.NotAfter) {
+			return nil, fmt.Errorf("renewed certificate %q is not currently valid: %w", entry.Name, ErrCertificateExpired)
+		}
+		if now.Before(cert.NotBefore) {
 			return nil, fmt.Errorf("renewed certificate %q is not currently valid", entry.Name)
 		}
 		expiry := cert.NotAfter

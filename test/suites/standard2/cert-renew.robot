@@ -2,6 +2,7 @@
 Documentation       Online certificate preparation, startup activation, and structured output.
 
 Resource            ../../resources/common.resource
+Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
 Library             Collections
@@ -46,6 +47,26 @@ Dry Run Validates Both Modes Without Changing Material
     ${after}=    Certificate Material Digest
     Should Be Equal    ${before}    ${after}
     MicroShift Service Is Active
+
+Startup Waits For An Existing Certificate Operation
+    [Documentation]    A busy operation lock delays startup without causing a process restart.
+    Stop MicroShift
+    Command Should Work
+    ...    systemd-run --quiet --collect --unit=microshift-cert-lock-test flock -x ${CERTIFICATE_LOCK} sleep 120
+    Wait Until Keyword Succeeds    10x    500ms    Certificate Lock Is Held    ${CERTIFICATE_LOCK}
+    Command Should Work    systemctl start --no-block microshift
+    Wait Until Keyword Succeeds    10x    500ms    Certificate Lock Is Held    ${RUNTIME_LOCK}
+    ${pid}=    Get Systemd Setting    microshift.service    MainPID
+    Should Not Be Equal As Integers    ${pid}    0
+    Command Should Work    systemctl stop microshift-cert-lock-test
+    Wait For MicroShift
+    ${current_pid}=    Get Systemd Setting    microshift.service    MainPID
+    Should Be Equal    ${pid}    ${current_pid}
+    Certificate Lock Is Stable
+    Command Should Work    flock -n -x ${CERTIFICATE_LOCK} true
+    [Teardown]    Run Keywords
+    ...    Execute Command    systemctl stop microshift-cert-lock-test    sudo=True
+    ...    AND    Restart MicroShift
 
 Renewal Can Replace Pending Material While Running
     [Documentation]    Both modes prepare successfully without touching active files or restarting the service.
@@ -138,6 +159,35 @@ Stopped Renewal Waits For Startup Too
     Renewal Activation Has Finished
     [Teardown]    Start And Wait For MicroShift
 
+Unrelated Configuration Change Still Activates Renewal
+    [Documentation]    Logging configuration does not invalidate prepared certificates.
+    ${result}=    Renewal Document    serving    json
+    Drop In MicroShift Config    debugging:\n\ \ logLevel: Debug\n    99-cert-renew-test
+    Restart MicroShift
+    Renewal Matches Current Status    ${result}
+    Renewal Activation Has Finished
+    [Teardown]    Run Keywords
+    ...    Remove Drop In MicroShift Config    99-cert-renew-test
+    ...    AND    Restart MicroShift
+
+Certificate Configuration Change Discards Pending Renewal
+    [Documentation]    Stale renewal must not block startup or skip normal generation for new SANs.
+    ${ca_before}=    CA Material Digest
+    Renewal Document    ca    json
+    Drop In MicroShift Config
+    ...    apiServer:\n\ \ subjectAltNames:\n\ \ \ \ - renewal-config.example.test\n
+    ...    99-cert-renew-test
+    Restart MicroShift
+    Renewal Activation Has Finished
+    ${ca_after}=    CA Material Digest
+    Should Be Equal    ${ca_before}    ${ca_after}
+    ${certificate}=    Command Should Work
+    ...    bash -c 'timeout 10 openssl s_client -connect 127.0.0.1:6443 -servername renewal-config.example.test </dev/null 2>/dev/null | openssl x509 -noout -checkhost renewal-config.example.test'
+    Should Contain    ${certificate}    does match certificate
+    [Teardown]    Run Keywords
+    ...    Remove Drop In MicroShift Config    99-cert-renew-test
+    ...    AND    Restart MicroShift
+
 
 *** Keywords ***
 Setup
@@ -163,6 +213,13 @@ Certificate Lock Is Stable
     [Documentation]    Renewal and service restarts must reuse the same lock inode outside the certificate tree.
     ${lock_id}=    Command Should Work    stat -c '%d:%i' ${CERTIFICATE_LOCK}
     Should Be Equal    ${lock_id}    ${CERTIFICATE_LOCK_ID}
+
+Certificate Lock Is Held
+    [Documentation]    Check contention without waiting for or changing the existing lock holder.
+    [Arguments]    ${path}
+    ${rc}=    Execute Command
+    ...    flock -n -x ${path} true    sudo=True    return_stdout=False    return_rc=True
+    Should Be Equal As Integers    ${rc}    1
 
 Certificate Status Document
     [Documentation]    Read the current inventory for comparison with renewal selection and results.

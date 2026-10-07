@@ -154,7 +154,7 @@ func RunMicroshift(cfg *config.Config) error {
 		return err
 	}
 	defer func() { _ = runtimeLock.Close() }()
-	certificateLock, err := certificates.Lock(certificateLockPath, true)
+	certificateLock, err := waitForCertificateStartupLock(certificateLockPath, certificateStartupLockTimeout)
 	if err != nil {
 		return err
 	}
@@ -227,18 +227,15 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
-	pendingRenewal, err := transaction.LoadPending()
+	activated, err := activateCertificateRenewal(cfg, &transaction, certificateEtcdStopped, time.Now())
 	if err != nil {
-		return err
-	}
-	if err := activateCertificateRenewal(cfg, &transaction, certificateEtcdStopped, time.Now()); err != nil {
 		return fmt.Errorf("failed to activate pending certificate renewal: %w", err)
 	}
 	var certChains *certchains.CertificateChains
-	if pendingRenewal == nil {
-		certChains, err = initCerts(cfg)
-	} else {
+	if activated {
 		certChains, err = loadActivatedCertificates(cfg, config.DataDir)
+	} else {
+		certChains, err = initCerts(cfg)
 	}
 	if err != nil {
 		klog.Fatalf("failed to retrieve the necessary certificates: %v", err)

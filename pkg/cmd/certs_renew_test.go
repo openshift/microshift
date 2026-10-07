@@ -61,8 +61,12 @@ func TestCertificateRenewalApply(t *testing.T) {
 			// Resources may change between preparation and activation.
 			require.NoError(t, os.WriteFile(filepath.Join(unrelated, "kubeconfig"), []byte("updated component data"), 0600))
 			tx := &certificates.Transaction{DataDir: dataDir}
-			require.ErrorContains(t, activateCertificateRenewal(cfg, tx, func() error { return errors.New("etcd running") }, time.Now()), "etcd running")
-			require.NoError(t, activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now()))
+			activated, err := activateCertificateRenewal(cfg, tx, func() error { return errors.New("etcd running") }, time.Now())
+			require.ErrorContains(t, err, "etcd running")
+			require.False(t, activated)
+			activated, err = activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now())
+			require.NoError(t, err)
+			require.True(t, activated)
 			activeFiles := activeCertificateFileDigests(t, dataDir)
 			loaded, err := loadActivatedCertificates(cfg, dataDir)
 			require.NoError(t, err)
