@@ -13,6 +13,7 @@ ${POLICY_JSON_PATH}             /etc/containers/policy.json
 ${ORIGINAL_POLICY_PATH}         /tmp/signed-image-pull-policy.json
 ${TEST_POLICY_PATH}             /tmp/signed-image-pull-test-policy.json
 ${SHIPPED_POLICY_PATH}          ${EMPTY}
+${POLICY_BACKUP_READY}          ${FALSE}
 ${SYSTEM_POLICY_PATH}           /usr/share/containers/policy.json
 ${PRESERVED_POLICY_PATH}        /etc/containers/policy.json.orig
 ${SIGNED_IMAGE}                 registry.access.redhat.com/ubi9/ubi-minimal:9.6
@@ -35,6 +36,7 @@ Setup
     [Documentation]    Save the default policy and log the runtime signature configuration
     Login MicroShift Host
     Command Should Work    cp --preserve ${POLICY_JSON_PATH} ${ORIGINAL_POLICY_PATH}
+    VAR    ${POLICY_BACKUP_READY}=    ${TRUE}    scope=SUITE
     Command Should Work    rpm -q containers-common cri-o
     Command Should Work    crio --version
     List Signature Discovery Configuration
@@ -43,26 +45,35 @@ Setup
 
 Teardown
     [Documentation]    Restore the default policy and remove the test image
-    ${restore_status}    ${restore_error}=    Run Keyword And Ignore Error
-    ...    Command Should Work    cp --preserve ${ORIGINAL_POLICY_PATH} ${POLICY_JSON_PATH}
+    VAR    ${restore_status}=    NOT RUN
+    VAR    ${restore_error}=    Policy backup was not completed
+    IF    ${POLICY_BACKUP_READY}
+        ${restore_status}    ${restore_error}=    Run Keyword And Ignore Error
+        ...    Command Should Work    cp --preserve ${ORIGINAL_POLICY_PATH} ${POLICY_JSON_PATH}
+    END
     Run Keyword And Ignore Error    Command Should Work    crictl rmi ${SIGNED_IMAGE}
     Run Keyword And Ignore Error
     ...    Command Should Work
-    ...    rm -f ${ORIGINAL_POLICY_PATH} ${TEST_POLICY_PATH}
+    ...    rm -f ${TEST_POLICY_PATH}
+    IF    ${POLICY_BACKUP_READY} and '${restore_status}' == 'PASS'
+        Run Keyword And Ignore Error    Command Should Work    rm -f ${ORIGINAL_POLICY_PATH}
+    END
     TRY
-        Should Be Equal    ${restore_status}    PASS
-        ...    msg=Failed to restore ${POLICY_JSON_PATH}: ${restore_error}
+        IF    ${POLICY_BACKUP_READY}
+            Should Be Equal    ${restore_status}    PASS
+            ...    msg=Failed to restore ${POLICY_JSON_PATH}: ${restore_error}
+        END
     FINALLY
         Logout MicroShift Host
     END
 
 List Signature Discovery Configuration
-    [Documentation]    Log registry discovery files in both system configuration locations
+    [Documentation]    Log registry discovery paths and filenames without exposing file contents
     ${command}=    Catenate
     ...    bash -c 'for path in /etc/containers/registries.d /usr/share/containers/registries.d;
     ...    do echo "### $path";
     ...    if test -d "$path";
-    ...    then find "$path" -maxdepth 1 -type f -name "*.yaml" -print -exec sed -n "1,120p" {} + || true;
+    ...    then find "$path" -maxdepth 1 -type f -name "*.yaml" -printf "%f\\n" | sort || true;
     ...    else echo "(missing)";
     ...    fi;
     ...    done'
