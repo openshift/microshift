@@ -13,5 +13,7 @@ FROM scratch
 COPY --from=builder /tree/ /
 LABEL io.k8s.display-name="OpenShift Pod" \
       io.k8s.description="This is a component of OpenShift and contains the binary that holds the pod namespaces." \
-      io.openshift.tags="openshift"
+      io.openshift.tags="openshift" \
+      distribution-scope="public" \
+      url="https://github.com/openshift/kubernetes"
 ENTRYPOINT [ "/pause" ]
