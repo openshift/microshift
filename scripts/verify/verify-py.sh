@@ -36,4 +36,12 @@ run_flake8() {
 
 }
 
+run_unit_tests() {
+    local vpython="${VENV}/bin/python3"
+    echo "Running temporary container configuration workaround unit tests..."
+    PYTHONDONTWRITEBYTECODE=1 "${vpython}" -m unittest -v \
+        test/suites/container-signature/test_temporary_container_config_workaround.py
+}
+
 run_flake8
+run_unit_tests
