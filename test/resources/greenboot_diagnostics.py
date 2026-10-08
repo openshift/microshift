@@ -8,6 +8,19 @@ from robot.libraries.BuiltIn import BuiltIn
 
 
 _UNIT_NAME = "greenboot-healthcheck.service"
+# The two triggers differ in how the collected service_* fields relate to the
+# failure that prompted collection:
+#   greenboot-final-wait - we were waiting on greenboot-healthcheck.service
+#       itself, so its live state (ActiveState/SubState/Result/ExecMainStatus)
+#       is the direct cause of the failure.
+#   direct-healthcheck - an ad-hoc `microshift healthcheck` CLI invocation just
+#       failed. greenboot-healthcheck.service runs the *same* check but at boot
+#       (packaging/greenboot/microshift-running-check.sh), so the service_*
+#       fields reflect that earlier boot-time run, NOT the invocation that just
+#       failed. Use primary_exit_code for the current failure; read service_*
+#       only as "was the same check healthy at boot" (i.e. is this a regression
+#       since boot). The raw -v=2 output naming the component is intentionally
+#       not published - there is no approved private artifact destination.
 _TRIGGERS = {"direct-healthcheck", "greenboot-final-wait"}
 _ACTIVE_STATES = {
     "active",

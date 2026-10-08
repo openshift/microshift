@@ -244,7 +244,11 @@ Elapsed Query Timeout Is Generic And Bounded
     ${started}=    Evaluate    time.monotonic()    modules=time
     Stub Diagnostic Collection    greenboot-final-wait
     ${elapsed}=    Evaluate    time.monotonic() - ${started}    modules=time
-    Should Be True    1 <= ${elapsed} < 3
+    # The fake sleeps command_timeout+0.01s (~1.01s) then raises, so >=1 proves the
+    # 1s override was consumed. The ceiling proves the 1s override reached the client
+    # instead of the 30s default (which would elapse ~30s); 10s keeps it well clear of
+    # that regression while leaving generous headroom for loaded-CI scheduling jitter.
+    Should Be True    1 <= ${elapsed} < 10
     Public Summary Should Contain
     ...    error_category=query_failed
     ...    collection_result=failed
@@ -280,6 +284,20 @@ Sensitive Mock Values Never Reach Public Summary
     Stub Diagnostic Collection    greenboot-final-wait
     ${artifacts}=    Find Public Summary Artifacts
     Length Should Be    ${artifacts}    6
+
+Login Banner Is Suppressed By The Log Level Guard
+    [Documentation]    SSHLibrary logs the server MOTD at INFO on login, so Set Log Level NONE
+    ...    is the only guard keeping sensitive login output out of the published Robot log.
+    ...    Exercise the collector directly (its own guard is the only one) and through the safe
+    ...    wrapper, and leave the login emissions for the sentinel scan so removing the guard
+    ...    makes verify-rf.sh fail instead of passing green.
+
+    # Direct public entry point: only the collector's own Set Log Level NONE applies.
+    DiagnosticSSH.Collect Stub Diagnostic Summary    greenboot-final-wait
+    # Safe wrapper path: leaks only if every log level guard is removed.
+    Stub Diagnostic Collection    greenboot-final-wait
+    ${artifacts}=    Find Public Summary Artifacts
+    Length Should Be    ${artifacts}    2
 
 
 *** Keywords ***

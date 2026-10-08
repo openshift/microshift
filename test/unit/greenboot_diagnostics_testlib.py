@@ -3,6 +3,7 @@ import time
 from types import SimpleNamespace
 
 import greenboot_diagnostics
+from robot.api import logger
 from robot.utils import is_truthy
 
 
@@ -127,6 +128,12 @@ class GreenbootDiagnosticsTestlib:
         if self.mode == "reconnect-failure":
             raise RuntimeError(_privacy_sentinel())
         self.authenticated_connections.add(self.current_connection)
+        # Real SSHLibrary logs the server MOTD/banner at INFO on a successful
+        # login. Mirror that so the collector's `Set Log Level NONE` is the only
+        # thing keeping sensitive login output out of the published Robot log:
+        # if that guard is removed, this sentinel reaches output.xml and the
+        # verify-rf.sh scan fails instead of passing green.
+        logger.info(f"motd-{_privacy_sentinel()}")
         return None
 
     def login_with_public_key(self, user, key, **_options):

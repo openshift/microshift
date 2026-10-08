@@ -102,6 +102,11 @@ Wait For MicroShift Healthcheck Success Using Keywords
     ...    ${command}
     ...    sudo=True    return_stdout=False    return_stderr=False    return_rc=True
     IF    ${rc} != 0
+        # ${rc} is the cause of this failure and is recorded as primary_exit_code.
+        # The diagnostics query greenboot-healthcheck.service, which runs the same
+        # check at boot, so its service_* fields reflect that boot-time run rather
+        # than this ad-hoc invocation (useful only to tell a regression-since-boot
+        # from a never-healthy boot). See greenboot_diagnostics.py _TRIGGERS.
         Collect Greenboot Health Check Failure Diagnostics Using Keywords
         ...    direct-healthcheck    ${rc}    ${diagnostics_keyword}
     END
