@@ -46,8 +46,8 @@ Verify KCM Runs With OpenShift Flavor Flags
     ...    --cert-dir\="/var/run/kubernetes"
     ...    --root-ca-file\="/var/lib/microshift/certs/ca-bundle/service-account-token-ca.crt"
     ...    --service-account-private-key-file\="/var/lib/microshift/resources/kube-apiserver/secrets/service-account-key/service-account.key"
-    ...    --cluster-signing-cert-file\="/var/lib/microshift/certs/kubelet-csr-signer-signer/csr-signer/ca.crt"
-    ...    --cluster-signing-key-file\="/var/lib/microshift/certs/kubelet-csr-signer-signer/csr-signer/ca.key"
+    ...    --cluster-signing-cert-file\="/var/lib/microshift/certs/client-ca/ca.crt"
+    ...    --cluster-signing-key-file\="/var/lib/microshift/certs/client-ca/ca.key"
     ...    --kube-api-qps\="150"
     ...    --kube-api-burst\="300"
         Should Contain    ${kcm_flags}    ${flag}

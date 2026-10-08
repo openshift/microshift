@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"k8s.io/apiserver/pkg/authentication/serviceaccount"
@@ -45,6 +46,11 @@ func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 
 	certChains, err := certSetup(cfg)
 	if err != nil {
+		// certSetup may leave a partial certs directory on first run. On the next
+		// restart certSetup will regenerate it from scratch because certchains
+		// writes atomically per-signer before updating the directory; any missing
+		// or corrupt signer is regenerated. The caller (run.go) fatals, so
+		// greenboot restarts the service and the retry completes cleanly.
 		return nil, err
 	}
 
@@ -68,6 +74,9 @@ func legacyKubeControlPlaneSignerDir(certsDir string) string {
 
 // migrateLegacyCertLayout detects the pre-consolidation cert layout and atomically
 // backs it up so certSetup can regenerate a fresh 6-CA hierarchy.
+// service-ca is copied back into the live directory after the rename so that
+// existing in-cluster service-serving Secrets remain trusted until they are
+// reissued by the service-ca controller.
 func migrateLegacyCertLayout(certsDir, gitVersion string) error {
 	if _, err := os.Stat(legacyKubeControlPlaneSignerDir(certsDir)); err != nil {
 		if os.IsNotExist(err) {
@@ -76,9 +85,23 @@ func migrateLegacyCertLayout(certsDir, gitVersion string) error {
 		return fmt.Errorf("failed to check legacy cert layout: %w", err)
 	}
 	ts := strconv.FormatInt(time.Now().Unix(), 10)
-	backupDir := certsDir + ".backup." + gitVersion + "." + ts
+	// gitVersion can contain '/' (e.g. from EMBEDDED_GIT_TAG); replace to avoid
+	// creating an unintended subdirectory in the backup path.
+	safeVer := strings.ReplaceAll(gitVersion, "/", "_")
+	backupDir := certsDir + ".backup." + safeVer + "." + ts
 	klog.Infof("Migrating cert layout: backing up %s → %s", certsDir, backupDir)
-	return os.Rename(certsDir, backupDir)
+	if err := os.Rename(certsDir, backupDir); err != nil {
+		return err
+	}
+	// Recreate the live directory and restore service-ca so that existing
+	// service-serving Secrets remain trusted through the CA transition.
+	if err := os.MkdirAll(certsDir, 0700); err != nil {
+		return fmt.Errorf("failed to recreate certs directory after migration: %w", err)
+	}
+	return os.CopyFS(
+		filepath.Join(certsDir, "service-ca"),
+		os.DirFS(filepath.Join(backupDir, "service-ca")),
+	)
 }
 
 func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
