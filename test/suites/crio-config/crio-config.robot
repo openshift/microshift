@@ -41,6 +41,10 @@ Validate Signed Pull Runtime
     [Documentation]    Require the existing VM container runtime packages
     Command Should Work    rpm -q containers-common cri-o
     Command Should Work    crio --version
+    ${crio_info_stdout}    ${crio_info_stderr}    ${crio_info_rc}=    Command Execution
+    ...    timeout 15s crictl info >/dev/null
+    Should Be Equal As Integers    ${crio_info_rc}    0
+    ...    msg=CRI-O daemon socket is not ready: ${crio_info_stderr}
 
 Teardown    # robocop: off=too-many-calls-in-keyword
     [Documentation]    Restore policy, clean temporary data, report errors, and log out
@@ -49,7 +53,7 @@ Teardown    # robocop: off=too-many-calls-in-keyword
         ${policy_status}    ${policy_error}=    Restore Policy For Teardown
         ${cleanup_status}    ${cleanup_error}=    Run Keyword And Ignore Error
         ...    Command Should Work    rm -f ${TEST_POLICY_PATH}
-        Clean Incomplete Policy Backup
+        Clean Incomplete Policy Backup    ${policy_status}
 
         IF    ${POLICY_BACKUP_READY}
             Should Be Equal    ${policy_status}    PASS
@@ -116,8 +120,11 @@ Restore Container Policy
 
 Clean Incomplete Policy Backup
     [Documentation]    Remove preparation debris, but retain a completed backup after restore failure
+    [Arguments]    ${restore_status}
     IF    '${POLICY_BACKUP_DIR}' != '' and not ${POLICY_BACKUP_READY}
         Command Should Work    rm -rf -- ${POLICY_BACKUP_DIR}
+    ELSE IF    ${POLICY_BACKUP_READY} and '${restore_status}' != 'PASS'
+        Log    Policy restore failed; retained backup for manual recovery: ${POLICY_BACKUP_DIR}    level=ERROR
     END
 
 Find Shipped Container Policy
@@ -135,10 +142,16 @@ Enforce Signed Policy For Test Image
     [Documentation]    Require a valid signature for the test repository and verify the installed policy
     Command Should Work
     ...    test ! -L ${POLICY_JSON_PATH} && test ! -e ${TEST_POLICY_PATH} && test ! -L ${TEST_POLICY_PATH}
+    ${requirements_command}=    Catenate
+    ...    jq -cer '.transports.docker["registry.access.redhat.com"]
+    ...    | if type == "array" and length > 0 then .
+    ...    else error("shipped policy registry.access.redhat.com requirements must be a non-empty array") end'
+    ...    ${SHIPPED_POLICY_PATH}
+    ${signature_requirements}=    Command Should Work    ${requirements_command}
     ${command}=    Catenate
-    ...    jq --arg repository '${SIGNED_IMAGE_REPOSITORY}'
+    ...    jq --arg repository '${SIGNED_IMAGE_REPOSITORY}' --argjson requirements '${signature_requirements}'
     ...    '{"default":[{"type":"insecureAcceptAnything"}],
-    ...    "transports":{"docker":{($repository):.transports.docker["registry.access.redhat.com"]}}}'
+    ...    "transports":{"docker":{($repository):$requirements}}}'
     ...    ${SHIPPED_POLICY_PATH} >${TEST_POLICY_PATH}
     Command Should Work    ${command}
     Command Should Work    install -o root -g root -m 0644 ${TEST_POLICY_PATH} ${POLICY_JSON_PATH}

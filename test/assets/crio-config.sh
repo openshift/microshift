@@ -70,11 +70,8 @@ copy_if_missing() {
     local -r source="$1"
     local -r destination="$2"
 
+    validate_destination_file "${destination}"
     if [[ -e "${destination}" || -L "${destination}" ]]; then
-        if [[ ! -f "${destination}" || -L "${destination}" ]]; then
-            echo "error: expected a regular local file: ${destination}" >&2
-            return 1
-        fi
         echo "Preserving local container configuration: ${destination}"
         return
     fi
@@ -106,7 +103,7 @@ fi
 
 registry_configs=()
 shopt -s lastpipe
-if ! find "${vendor_registries_dir}" -mindepth 1 -maxdepth 1 -print0 |
+if ! find "${vendor_registries_dir}" -mindepth 1 -maxdepth 1 -type f -print0 |
     mapfile -d '' -t registry_configs; then
     echo "error: failed to enumerate vendor registry configuration: ${vendor_registries_dir}" >&2
     exit 1
