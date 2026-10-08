@@ -65,7 +65,7 @@ Teardown    # robocop: off=too-many-calls-in-keyword
         Run Keyword And Ignore Error    Command Should Work    crictl rmi ${SIGNED_IMAGE}
         ${policy_status}    ${policy_error}=    Restore Policy For Teardown
         ${helper_status}    ${helper_error}=    Run Keyword And Ignore Error
-        ...    Command Should Work    rm -f ${WORKAROUND_REMOTE_PATH}
+        ...    Command Should Work    rm -f ${WORKAROUND_REMOTE_PATH} ${TEST_POLICY_PATH}
         Clean Incomplete Policy Backup
 
         IF    ${POLICY_BACKUP_READY}
