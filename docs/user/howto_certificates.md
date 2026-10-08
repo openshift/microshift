@@ -48,8 +48,9 @@ Both formats emit one `CertificateStatusList` document on stdout, with
 `apiVersion: microshift.openshift.io/v1alpha1`. They contain the same fields:
 
 - `generatedAt`: the timestamp used for the report's calculations.
-- `config`: the effective certificate policy, including
-  `forceRestartOnExpirationImminent` and default serving/CA validity durations.
+- `config`: the certificate policy resolved from the current configuration files,
+  including `forceRestartOnExpirationImminent` and serving/CA validity durations.
+  This is not a query of the running service's startup configuration.
 - `items`: certificates sorted by service and then name. Each item contains
   `service`, `name`, `role`, `rotationPolicy`, `status`, `notBefore`, `notAfter`,
   and `remainingSeconds`. The `status` field uses the same five state names as the
@@ -88,11 +89,10 @@ sudo microshift certs renew --ca --dry-run -o yaml
 
 Dry-run validates the existing certificate/key pairs and signing relationships,
 then reports current and proposed expiry times without generating keys or staging
-new material. Renewal uses the existing per-certificate validity periods and
+new material. Renewal uses the configured serving and CA validity periods and
 caps each descendant's expiry at the earliest expiry in its signing chain. If a
 CA is expired or not yet valid, leaf-only renewal is refused; use `--ca` to renew
 the chain.
-Configurable validity periods are not yet implemented by this command.
 
 Prepare renewal while MicroShift is running, then activate it by restarting
 MicroShift during your maintenance window:
@@ -185,6 +185,52 @@ but locks are released when the owning processes close them or exit.
 Startup waits up to 30 seconds for an existing certificate operation to release
 the operation lock. If it remains busy, startup fails with a timeout error.
 Certificate CLI commands continue to fail immediately when their lock is busy.
+
+## Configuring Certificate Lifetimes and Restart Policy
+
+Set these fields in `/etc/microshift/config.yaml` or a YAML drop-in under
+`/etc/microshift/config.d/`:
+
+```yaml
+certificates:
+  servingValidity: 1008h  # Six weeks; default is 8760h (365 days).
+  caValidity: 87600h      # Default is 3650 days.
+  forceRestartOnExpirationImminent: false  # Default is true.
+```
+
+Durations use Go syntax (`h`, `m`, `s`), not days or years. Both must be positive,
+and `caValidity` must be strictly greater than `servingValidity`. Validate the
+configuration with `sudo microshift show-config` before preparing renewal.
+
+The validity settings apply to newly issued managed serving certificates and
+CAs, including intermediate CAs. Client and peer certificates retain their
+existing issuance durations and explicit rotation policies. Every newly issued
+descendant is bounded by its signing chain. User-provided named certificates
+are not managed by these settings. As before, expiry is aligned to midnight on
+the next day plus the configured duration, so the issued lifetime can be up to
+one day longer than configured (or shorter when capped by an existing CA).
+
+Changing configuration does not rewrite existing certificates, activate pending
+renewal, or restart MicroShift. Each `certs status` or `certs renew` invocation
+reads the current configuration, so renewal can be prepared with new validity
+settings while MicroShift is running. Activation still requires a later service
+start. A validity change after preparation invalidates that pending generation;
+prepare renewal again before restarting.
+
+MicroShift does **not** hot-reload its main configuration or drop-ins. The running
+service's `forceRestartOnExpirationImminent` policy changes only on its next
+start. Setting it to `false` makes the critical certificate threshold warn-only;
+it does not extend certificate validity, disable other restart causes, or disable
+certificate regeneration on startup. Existing DNS/hosts file watchers are
+unaffected. The status table labels the restart policy as configured, not as a
+live service setting.
+
+Startup renewal and the running service's critical deadline use percentages of
+the validity encoded in each certificate, not fixed-month windows or the new
+configured lifetime. Short-lived custom certificates therefore do not immediately
+trigger renewal. Existing certificates keep their encoded dates until explicit
+renewal or normal startup regeneration is required. All CAs use the extended
+policy, including legacy CAs originally issued for one year.
 
 ## Warnings and Errors
 

@@ -35,6 +35,8 @@ func certificateConfigHash(cfg *config.Config) (string, error) {
 		BaseDomain       string
 		AdvertiseAddress string
 		SubjectAltNames  []string
+		ServingValidity  time.Duration
+		CAValidity       time.Duration
 	}{
 		ServiceNetwork:   cfg.Network.ServiceNetwork,
 		Hostname:         cfg.Node.HostnameOverride,
@@ -42,6 +44,8 @@ func certificateConfigHash(cfg *config.Config) (string, error) {
 		BaseDomain:       cfg.DNS.BaseDomain,
 		AdvertiseAddress: cfg.ApiServer.AdvertiseAddress,
 		SubjectAltNames:  cfg.ApiServer.SubjectAltNames,
+		ServingValidity:  cfg.Certificates.ServingDuration(),
+		CAValidity:       cfg.Certificates.CADuration(),
 	})
 	if err != nil {
 		return "", invalidCertificateConfiguration()

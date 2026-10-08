@@ -16,7 +16,6 @@ import (
 
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
 	"github.com/openshift/microshift/pkg/config"
-	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
 )
 
@@ -127,7 +126,7 @@ func (o *certStatusOptions) run() error {
 			fmt.Errorf("failed to load certificate inventory: %w", err)}
 	}
 
-	status, err := newCertificateStatusList(inventory, cfg.Warnings, o.now())
+	status, err := newCertificateStatusList(inventory, cfg, o.now())
 	if err != nil {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeCertificateInventoryFailed,
 			fmt.Errorf("failed to build certificate status: %w", err)}
@@ -171,7 +170,7 @@ func loadCertificateInventory(cfg *config.Config) (certchains.CertificateInvento
 	return builder.LoadInventory()
 }
 
-func newCertificateStatusList(inventory certchains.CertificateInventory, warnings []string, now time.Time) (certificatesv1alpha1.CertificateStatusList, error) {
+func newCertificateStatusList(inventory certchains.CertificateInventory, cfg *config.Config, now time.Time) (certificatesv1alpha1.CertificateStatusList, error) {
 	now = now.UTC().Truncate(time.Second)
 	// Sort a copy so the inventory retains its chain traversal order.
 	inventory = append(certchains.CertificateInventory(nil), inventory...)
@@ -215,7 +214,7 @@ func newCertificateStatusList(inventory certchains.CertificateInventory, warning
 		})
 	}
 
-	statusWarnings := append([]string(nil), warnings...)
+	statusWarnings := append([]string(nil), cfg.Warnings...)
 	if statusWarnings == nil {
 		statusWarnings = []string{}
 	}
@@ -226,9 +225,9 @@ func newCertificateStatusList(inventory certchains.CertificateInventory, warning
 		},
 		GeneratedAt: metav1.NewTime(now),
 		Config: certificatesv1alpha1.CertificateStatusConfig{
-			ForceRestartOnExpirationImminent: true,
-			ServingValidity:                  durationInHours(cryptomaterial.ShortLivedCertificateValidity),
-			CAValidity:                       durationInHours(cryptomaterial.LongLivedCertificateValidity),
+			ForceRestartOnExpirationImminent: cfg.Certificates.ForceRestartEnabled(),
+			ServingValidity:                  durationInHours(cfg.Certificates.ServingDuration()),
+			CAValidity:                       durationInHours(cfg.Certificates.CADuration()),
 		},
 		Items:    items,
 		Warnings: statusWarnings,
@@ -255,7 +254,11 @@ func writeCertificateStatusTable(out io.Writer, status certificatesv1alpha1.Cert
 			return err
 		}
 	}
-	return w.Flush()
+	if err := w.Flush(); err != nil {
+		return err
+	}
+	_, err := fmt.Fprintf(out, "\nForce restart on expiration imminent: %t (configured; applied at service start)\n", status.Config.ForceRestartOnExpirationImminent)
+	return err
 }
 
 func humanCertificateStatus(item certificatesv1alpha1.CertificateStatusItem, now time.Time) (string, error) {
@@ -290,5 +293,8 @@ func daysUntil(duration time.Duration) int64 {
 }
 
 func durationInHours(duration time.Duration) string {
+	if duration%time.Hour != 0 {
+		return duration.String()
+	}
 	return fmt.Sprintf("%dh", int64(duration.Hours()))
 }

@@ -287,23 +287,7 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("failed to determine when to rotate certificates: %v", err)
 	}
 
-	// Establish a deadline for restarting to rotate the certificates.
-	certCtx, certCancel := context.WithDeadline(context.Background(), rotationDate)
-
-	// Watch for the certificate deadline context to be done, log a
-	// message, and cancel the run context to propagate the shutdown.
-	go func() {
-		select {
-		case <-certCtx.Done():
-			klog.Info("Stopping services for certificate rotation")
-			runCancel()
-			return
-		case <-runCtx.Done():
-			klog.Info("Certificate watcher exiting")
-			certCancel()
-			return
-		}
-	}()
+	go watchCertificateRotation(runCtx, runCancel, rotationDate, cfg.Certificates.ForceRestartEnabled())
 
 	// Start everything up
 	ready, stopped := make(chan struct{}), make(chan struct{})

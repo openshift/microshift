@@ -27,7 +27,7 @@ func TestNewCertificateStatusList(t *testing.T) {
 		certificateInventoryEntry("service-a", "cert-a", certchains.CertificateRoleClient, certchains.RotationPolicyStandard, now.Add(-500*time.Hour), now.Add(500*time.Hour)),
 	}
 
-	status, err := newCertificateStatusList(inventory, nil, now)
+	status, err := newCertificateStatusList(inventory, &config.Config{}, now)
 	require.NoError(t, err)
 	require.Equal(t, certificatesv1alpha1.APIVersion, status.APIVersion)
 	require.Equal(t, "CertificateStatusList", status.Kind)
@@ -48,7 +48,7 @@ func TestCertStatusOutput(t *testing.T) {
 	now := time.Date(2026, time.September, 8, 10, 30, 0, 0, time.UTC)
 	status, err := newCertificateStatusList(certchains.CertificateInventory{
 		certificateInventoryEntry("etcd", "etcd-serving", certchains.CertificateRolePeer, certchains.RotationPolicyExtended, now.Add(-900*time.Hour), now.Add(100*time.Hour)),
-	}, []string{"configuration warning"}, now)
+	}, &config.Config{Warnings: []string{"configuration warning"}}, now)
 	require.NoError(t, err)
 
 	var jsonOutput bytes.Buffer
@@ -167,7 +167,9 @@ func TestCertStatusStates(t *testing.T) {
 				require.Empty(t, stderr.String())
 				if format == "" {
 					rows := strings.Split(strings.TrimSpace(stdout.String()), "\n")
-					require.Len(t, rows, 2)
+					require.Len(t, rows, 4)
+					require.Empty(t, rows[2])
+					require.Contains(t, rows[3], "Force restart on expiration imminent: true")
 					require.Equal(t, []string{"SERVICE", "CERTIFICATE", "STATUS", "EXPIRY", "MESSAGE"}, strings.Fields(rows[0]))
 					fields := strings.Fields(rows[1])
 					require.GreaterOrEqual(t, len(fields), 5)
@@ -251,7 +253,7 @@ func TestCertificateStatusThresholdMessages(t *testing.T) {
 			status, err := newCertificateStatusList(certchains.CertificateInventory{
 				certificateInventoryEntry("test", "test-certificate", certchains.CertificateRoleServing, tt.policy,
 					now.Add(tt.remaining-tt.validity), now.Add(tt.remaining)),
-			}, nil, now)
+			}, &config.Config{}, now)
 			require.NoError(t, err)
 			message, err := humanCertificateStatus(status.Items[0], now)
 			require.NoError(t, err)
@@ -272,7 +274,7 @@ func TestCertificateStatusThresholdMessages(t *testing.T) {
 
 func TestCertStatusOutputWriteFailure(t *testing.T) {
 	wantErr := errors.New("output unavailable")
-	status, err := newCertificateStatusList(nil, nil, time.Now())
+	status, err := newCertificateStatusList(nil, &config.Config{}, time.Now())
 	require.NoError(t, err)
 	require.ErrorIs(t, writeCertificateObject(failingCertificateWriter{wantErr}, &status, certificateOutputJSON), wantErr)
 	require.ErrorIs(t, writeCertificateObject(failingCertificateWriter{wantErr}, &status, certificateOutputYAML), wantErr)

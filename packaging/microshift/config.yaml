@@ -41,6 +41,27 @@ apiServer:
         # to serve from the API server. Allowed values: VersionTLS12, VersionTLS13.
         # Defaults to VersionTLS12.
         minVersion: VersionTLS12
+# Certificates configures issuance and automatic restart for managed certificates.
+certificates:
+    # CAValidity is the lifetime of newly issued managed CA certificates, expressed
+    # as a Go duration. It must be greater than ServingValidity; both must be positive.
+    # Expiration is aligned to the next midnight plus this duration. Intermediate
+    # CAs cannot outlive their signing chain. Existing certificates are unchanged.
+    # example:
+    #   10008h
+    caValidity: 87600h
+    # ForceRestartOnExpirationImminent restarts MicroShift when a managed certificate
+    # reaches its critical remaining-validity threshold. When false, only a warning
+    # is logged. This setting takes effect at service startup; it does not disable
+    # certificate regeneration during a later manual start.
+    forceRestartOnExpirationImminent: true
+    # ServingValidity is the lifetime of newly issued managed serving certificates,
+    # expressed as a Go duration. Existing certificates are not rewritten by a
+    # configuration change. Expiration is aligned to the next midnight plus this
+    # duration and capped at the signing CA's expiration.
+    # example:
+    #   1008h
+    servingValidity: 8760h
 clusterToCluster:
     # DNS cache settings for CoreDNS server blocks generated for remote clusters.
     dns:

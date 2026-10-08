@@ -159,7 +159,9 @@ func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) 
 	// command owns its output contract, so keep those internal diagnostics out
 	// of versioned results (the same convention used by Complete).
 	if err := quietCertificateGeneration(func() error {
-		chains, err := builder.Complete()
+		// Load without issuance: changed SANs or an expired CA must not trigger
+		// temporary certificates before the selected chains are regenerated.
+		chains, err := builder.Load()
 		if err != nil {
 			return err
 		}

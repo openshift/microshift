@@ -23,7 +23,8 @@ ${ETCD_APISERVER_CLIENT_CERT}       /var/lib/microshift/certs/etcd-signer/apiser
 ${OSSL_CMD}                         openssl x509 -noout -dates -in
 ${OSSL_DATE_FORMAT}                 %b %d %Y
 ${TIMEDATECTL_DATE_FORMAT}          %Y-%m-%d %H:%M:%S
-${FUTURE_DAYS}                      150
+# A one-year standard certificate enters ExpiresSoon after about 153 days.
+${FUTURE_DAYS}                      160
 
 
 *** Test Cases ***
