@@ -1,9 +1,8 @@
 *** Settings ***
-Documentation       Compare strict uncached signed CRI-O pulls before and after a temporary COS 10 workaround
+Documentation       Verify a strict uncached signed image pull through CRI-O
 
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-host.resource
-Resource            ../../resources/systemd.resource
 
 Suite Setup         Setup
 Suite Teardown      Teardown
@@ -18,62 +17,46 @@ ${POLICY_BACKUP_READY}          ${FALSE}
 ${POLICY_ORIGINAL_EXISTED}      ${FALSE}
 ${SYSTEM_POLICY_PATH}           /usr/share/containers/policy.json
 ${PRESERVED_POLICY_PATH}        /etc/containers/policy.json.orig
-${WORKAROUND_REMOTE_PATH}       /tmp/temporary_container_config_workaround.py
-${BASELINE_PULL_FAILED}         ${FALSE}
 ${SIGNED_IMAGE}                 registry.access.redhat.com/ubi9/ubi-minimal:9.6
 ${SIGNED_IMAGE_REPOSITORY}      registry.access.redhat.com/ubi9/ubi-minimal
 
 
 *** Test Cases ***
-Compare Signed Image Pull Before And After Temporary Workaround
-    [Documentation]    Compare the same enforced-policy, uncached pull around the temporary workaround for
-    ...    https://redhat.atlassian.net/browse/OCPBUGS-129494. Remove the workaround when that issue is resolved.
-    ...    A nonzero baseline is recorded without inferring its cause; the post-workaround pull must succeed.
+Pull Signed Image With Strict Policy
+    [Documentation]    Require one uncached pull under the shipped signature policy to succeed
     Enforce Signed Policy For Test Image
-    Pull Signed Image Before Workaround
-
-    Apply Temporary Container Configuration Workaround
-    Pull Signed Image After Workaround
-
-    IF    ${BASELINE_PULL_FAILED}
-        Log    Baseline pull failed without attributing a cause; the post-workaround pull passed
-    ELSE
-        Log    Baseline pull passed, so the reported failure was not reproduced; the post-workaround pull also passed
-    END
+    Pull Signed Image
 
 
 *** Keywords ***
 Setup
-    [Documentation]    Log in, validate the COS 10 VM runtime, and protect the original policy
+    [Documentation]    Log in, validate the VM runtime, and protect the original policy
     Login MicroShift Host
-    Validate Workaround Runtime
+    Validate Signed Pull Runtime
     Back Up Container Policy
-    List Container Configuration Layout
     ${shipped_policy_path}=    Find Shipped Container Policy
     VAR    ${SHIPPED_POLICY_PATH}=    ${shipped_policy_path}    scope=SUITE
 
-Validate Workaround Runtime
-    [Documentation]    Require the existing VM packages and Python 3.12 native TOML reader
-    Command Should Work    rpm -q containers-common cri-o python3
+Validate Signed Pull Runtime
+    [Documentation]    Require the existing VM container runtime packages
+    Command Should Work    rpm -q containers-common cri-o
     Command Should Work    crio --version
-    Command Should Work
-    ...    python3 -c 'import sys, tomllib; assert sys.version_info[:2] == (3, 12); assert tomllib.__name__ == "tomllib"'
 
 Teardown    # robocop: off=too-many-calls-in-keyword
-    [Documentation]    Restore policy and log out; the one-shot workaround VM is destroyed by the scenario
+    [Documentation]    Restore policy, clean temporary data, report errors, and log out
     TRY
         Run Keyword And Ignore Error    Command Should Work    crictl rmi ${SIGNED_IMAGE}
         ${policy_status}    ${policy_error}=    Restore Policy For Teardown
-        ${helper_status}    ${helper_error}=    Run Keyword And Ignore Error
-        ...    Command Should Work    rm -f ${WORKAROUND_REMOTE_PATH} ${TEST_POLICY_PATH}
+        ${cleanup_status}    ${cleanup_error}=    Run Keyword And Ignore Error
+        ...    Command Should Work    rm -f ${TEST_POLICY_PATH}
         Clean Incomplete Policy Backup
 
         IF    ${POLICY_BACKUP_READY}
             Should Be Equal    ${policy_status}    PASS
             ...    msg=Failed to restore ${POLICY_JSON_PATH}: ${policy_error}
         END
-        Should Be Equal    ${helper_status}    PASS
-        ...    msg=Failed to clean up the copied helper: ${helper_error}
+        Should Be Equal    ${cleanup_status}    PASS
+        ...    msg=Failed to clean temporary policy data: ${cleanup_error}
     FINALLY
         Logout MicroShift Host
     END
@@ -137,19 +120,6 @@ Clean Incomplete Policy Backup
         Command Should Work    rm -rf -- ${POLICY_BACKUP_DIR}
     END
 
-List Container Configuration Layout
-    [Documentation]    Log configuration filenames without exposing policy or key contents
-    ${command}=    Catenate
-    ...    bash -c 'for path in /etc/containers /usr/share/containers
-    ...    /etc/containers/registries.d /usr/share/containers/registries.d
-    ...    /etc/containers/storage.conf.d /usr/share/containers/storage.conf.d
-    ...    /etc/containers/storage.rootful.conf.d /usr/share/containers/storage.rootful.conf.d;
-    ...    do echo "### $path";
-    ...    if test -d "$path";
-    ...    then find "$path" -maxdepth 1 -type f -printf "%f\\n" | sort || true;
-    ...    else echo "(missing)"; fi; done'
-    Command Should Work    ${command}
-
 Find Shipped Container Policy
     [Documentation]    Select the containers-common policy used to build the strict test policy
     ${command}=    Catenate
@@ -175,7 +145,7 @@ Enforce Signed Policy For Test Image
     Verify Strict Test Policy Is Unchanged
 
 Verify Strict Test Policy Is Unchanged
-    [Documentation]    Ensure the helper never overwrote or weakened the enforced test policy
+    [Documentation]    Ensure the enforced test policy was not overwritten or weakened
     Command Should Work    cmp --silent ${TEST_POLICY_PATH} ${POLICY_JSON_PATH}
     ${policy_type}=    Command Should Work
     ...    jq -er '.transports.docker["${SIGNED_IMAGE_REPOSITORY}"][0].type' ${POLICY_JSON_PATH}
@@ -188,43 +158,11 @@ Remove Test Image From CRI-O Storage
     ${cached_image}=    Command Should Work    crictl images --quiet ${SIGNED_IMAGE}
     Should Be Empty    ${cached_image}
 
-Pull Signed Image Before Workaround
-    [Documentation]    Record the raw baseline result; any nonzero return code is an accepted baseline failure
+Pull Signed Image
+    [Documentation]    Require the enforced-policy, uncached CRI-O pull to return zero
     Remove Test Image From CRI-O Storage
     Verify Strict Test Policy Is Unchanged
     ${stdout}    ${stderr}    ${rc}=    Command Execution    crictl pull ${SIGNED_IMAGE}
-    Record Pull Artifact    before    ${stdout}    ${stderr}    ${rc}
-    IF    ${rc} == 0
-        Log    Baseline pull returned zero; the reported failure was not reproduced
-    ELSE
-        VAR    ${BASELINE_PULL_FAILED}=    ${TRUE}    scope=SUITE
-        Log    Baseline pull returned ${rc}; accepting the failure without attributing a cause
-    END
-
-Apply Temporary Container Configuration Workaround
-    [Documentation]    TEMPORARY until OCPBUGS-129494 is resolved; remove after https://redhat.atlassian.net/browse/OCPBUGS-129494
-    ${stdout}    ${stderr}    ${rc}=    Command Execution    python3 ${WORKAROUND_REMOTE_PATH}
     Log    ${stdout}
     Log    ${stderr}
     Should Be Equal As Integers    ${rc}    0
-    Verify Strict Test Policy Is Unchanged
-    Systemctl    restart    crio.service
-
-Pull Signed Image After Workaround
-    [Documentation]    Require the identical enforced-policy, uncached pull to return zero
-    Remove Test Image From CRI-O Storage
-    Verify Strict Test Policy Is Unchanged
-    ${stdout}    ${stderr}    ${rc}=    Command Execution    crictl pull ${SIGNED_IMAGE}
-    Record Pull Artifact    after    ${stdout}    ${stderr}    ${rc}
-    Should Be Equal As Integers    ${rc}    0
-
-Record Pull Artifact
-    [Documentation]    Preserve plain return code, stdout, and stderr for each A/B pull
-    [Arguments]    ${stage}    ${stdout}    ${stderr}    ${rc}
-    ${artifact}=    Catenate    SEPARATOR=\n
-    ...    return_code=${rc}
-    ...    --- stdout ---
-    ...    ${stdout}
-    ...    --- stderr ---
-    ...    ${stderr}
-    OperatingSystem.Create File    ${OUTPUTDIR}/signed-image-pull-${stage}.log    ${artifact}\n
