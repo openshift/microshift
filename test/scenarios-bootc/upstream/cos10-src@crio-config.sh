@@ -26,5 +26,5 @@ scenario_run_tests() {
     # TEMPORARY until OCPBUGS-129494 is resolved. The COS 9 image already
     # exposes its vendor signature configuration where CRI-O expects it.
     apply_crio_config
-    run_tests host1 suites/crio-config/crio-config.robot
+    run_tests host1 suites/crio-config/signed-image-pull.robot
 }
