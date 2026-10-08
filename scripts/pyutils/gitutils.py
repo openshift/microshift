@@ -71,11 +71,15 @@ class GitUtils():
             return
         self.remote.remove(self.git_repo, BOT_REMOTE_NAME)
 
-    def push(self, branch_name, base_branch, gh_repo):
+    def push(self, branch_name, base_branch, gh):
         """
         Replays local commits onto GitHub via the API so they are marked Verified.
         Commits created through the GitHub API are automatically signed by GitHub
         when using a GitHub App token, unlike commits created with git push.
+
+        `gh` is the GithubUtils helper (not a raw repo client) so the installation
+        token can be refreshed mid-push - a full push issues one API call per
+        changed file and can outlive the token's ~1h lifetime.
         """
         if self.dry_run:
             logging.info(f"[DRY RUN] Creating verified commits via GitHub API for branch {branch_name}")
@@ -90,6 +94,7 @@ class GitUtils():
             logging.info(f"No commits to push for branch {branch_name}")
             return
 
+        gh_repo = gh.refresh_client()
         parent_sha = gh_repo.get_branch(base_branch).commit.sha
 
         for local_commit in commits:
@@ -121,6 +126,8 @@ class GitUtils():
                         mode = "100644"
                     tree_elements.append(InputGitTreeElement(
                         path=diff.b_path, mode=mode, type="blob", sha=blob.sha))
+                    # One API call per file can outlive the ~1h token; keep it fresh.
+                    gh_repo = gh.refresh_client()
 
             parent_gh_commit = gh_repo.get_git_commit(parent_sha)
             new_tree = gh_repo.create_git_tree(tree_elements, parent_gh_commit.tree)
