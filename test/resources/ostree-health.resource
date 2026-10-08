@@ -59,14 +59,6 @@ Greenboot Health Check Exited
 
     Systemctl Check Service SubState    greenboot-healthcheck.service    exited
 
-Collect Greenboot Health Check Failure Diagnostics
-    [Documentation]    Save an allowlisted public summary after a health failure.
-    [Arguments]    ${trigger}    ${primary_exit_code}=${None}
-
-    Collect Greenboot Health Check Failure Diagnostics Using Keywords
-    ...    ${trigger}    ${primary_exit_code}
-    ...    GreenbootDiagnostics.Collect Public Greenboot Diagnostic Summary
-
 Collect Greenboot Health Check Failure Diagnostics Using Keywords
     [Documentation]    Save a public summary using the supplied collector keyword.
     [Arguments]    ${trigger}    ${primary_exit_code}    ${collector_keyword}
@@ -84,15 +76,20 @@ Wait For MicroShift Healthcheck Success
     [Arguments]    ${wait_timeout}=600s
     ...    ${execute_keyword}=Execute Command
     ...    ${diagnostics_keyword}=GreenbootDiagnostics.Collect Public Greenboot Diagnostic Summary
+    ...    ${collect_diagnostics}=${TRUE}
 
     Wait For MicroShift Healthcheck Success Using Keywords
     ...    ${wait_timeout}
     ...    ${execute_keyword}
     ...    ${diagnostics_keyword}
+    ...    ${collect_diagnostics}
 
 Wait For MicroShift Healthcheck Success Using Keywords
     [Documentation]    Run healthcheck and collect a public summary before asserting its result.
-    [Arguments]    ${wait_timeout}    ${execute_keyword}    ${diagnostics_keyword}
+    [Arguments]    ${wait_timeout}
+    ...    ${execute_keyword}
+    ...    ${diagnostics_keyword}
+    ...    ${collect_diagnostics}=${TRUE}
 
     # Raw command output is intentionally neither returned nor logged. There
     # is no approved private artifact destination for it.
@@ -101,7 +98,10 @@ Wait For MicroShift Healthcheck Success Using Keywords
     ...    ${execute_keyword}
     ...    ${command}
     ...    sudo=True    return_stdout=False    return_stderr=False    return_rc=True
-    IF    ${rc} != 0
+    # Skip collection when the caller expects this to fail (collect_diagnostics=
+    # ${FALSE}): the extra reconnect + remote systemctl show would only slow a
+    # deliberately fail-fast test and write a summary nobody needs.
+    IF    ${rc} != 0 and ${collect_diagnostics}
         # ${rc} is the cause of this failure and is recorded as primary_exit_code.
         # The diagnostics query greenboot-healthcheck.service, which runs the same
         # check at boot, so its service_* fields reflect that boot-time run rather

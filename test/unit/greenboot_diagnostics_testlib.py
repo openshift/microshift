@@ -24,22 +24,10 @@ class GreenbootDiagnosticsTestlib:
     ROBOT_LIBRARY_SCOPE = "SUITE"
 
     def __init__(self):
-        self.mode = "valid"
-        self.reconnect_timeout = None
-        self.command_timeout = None
-        self.command = None
-        self.return_stderr = None
-        self.healthcheck_calls = 0
-        self.healthcheck_command = None
-        self.healthcheck_options = None
-        self.healthcheck_return_code = 0
-        self.diagnostic_calls = 0
-        self.diagnostic_trigger = None
-        self.diagnostic_primary_rc = None
-        self.current_connection = 1
-        self.next_connection = 2
-        self.authenticated_connections = {1}
-        self.clock_restore_calls = 0
+        # Delegate to the reset keyword so the field list lives in one place;
+        # Test Setup's "Reset Diagnostic SSH" can then never drift from the
+        # initial construction and leak state between test cases.
+        self.reset_diagnostic_ssh()
 
     def reset_diagnostic_ssh(self):
         self.mode = "valid"
@@ -166,7 +154,7 @@ class GreenbootDiagnosticsTestlib:
         self.diagnostic_primary_rc = primary_exit_code
         collector = (
             greenboot_diagnostics.
-            collect_public_greenboot_diagnostic_summary_using_library
+            _collect_public_greenboot_diagnostic_summary_using_library
         )
         return collector(
             trigger,

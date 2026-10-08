@@ -44,7 +44,7 @@ Simulate Service Failure
     ...    Systemctl    start    microshift
     # Lower the default wait timeout to fail-fast tests
     Run Keyword And Expect Error    0 != 1
-    ...    Wait For MicroShift Healthcheck Success    ${WAIT_TIMEOUT}s
+    ...    Wait For MicroShift Healthcheck Success    ${WAIT_TIMEOUT}s    collect_diagnostics=${FALSE}
 
     [Teardown]    Run Keywords
     ...    Restore Service
@@ -57,7 +57,7 @@ Simulate Pod Failure
     Restart MicroShift
     # Lower the default wait timeout to fail-fast tests
     Run Keyword And Expect Error    0 != 1
-    ...    Wait For MicroShift Healthcheck Success    ${WAIT_TIMEOUT}s
+    ...    Wait For MicroShift Healthcheck Success    ${WAIT_TIMEOUT}s    collect_diagnostics=${FALSE}
 
     [Teardown]    Run Keywords
     ...    Remove Drop In MicroShift Config    10-svcNetwork

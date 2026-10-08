@@ -1,3 +1,18 @@
+"""Collect allowlisted, publish-safe greenboot health-check failure summaries.
+
+MicroShift CI strips output.xml / rf-debug.log from public PR artifacts and
+there is no approved private sink for raw health-check output, so this module
+deliberately trades generality for a hard privacy guarantee: it never returns,
+logs, or writes raw command output. Instead it opens an isolated SSH
+connection, runs a single `systemctl show` of fixed allowlisted properties,
+validates every value against an allowlist, and writes only a fixed-schema
+key=value summary.
+
+This per-keyword redaction is intentionally bespoke. A shared "publish-safe
+diagnostic" utility, or an approved private artifact destination, would be the
+more general fix; until one exists, keep new diagnostics inside this allowlist
+model rather than logging raw output elsewhere.
+"""
 import os
 import re
 import time
@@ -72,22 +87,16 @@ _RESULTS = {
     "timeout",
     "watchdog",
 }
-_PROPERTY_RULES = {
-    "ActiveEnterTimestampMonotonic": "unsigned",
-    "ActiveState": _ACTIVE_STATES,
-    "ExecMainStatus": "exit_code",
-    "InactiveEnterTimestampMonotonic": "unsigned",
-    "Result": _RESULTS,
-    "SubState": _SUB_STATES,
-}
-_PROPERTY_FIELDS = {
-    "ActiveEnterTimestampMonotonic": "active_enter_timestamp_monotonic_us",
-    "ActiveState": "service_active_state",
-    "ExecMainStatus": "exec_main_status",
-    "InactiveEnterTimestampMonotonic":
-        "inactive_enter_timestamp_monotonic_us",
-    "Result": "service_result",
-    "SubState": "service_sub_state",
+# systemd property name -> (validation rule, summary field name). Keeping the
+# rule and the emitted field in one entry removes the hand-sync hazard of two
+# dicts keyed by the same names.
+_PROPERTIES = {
+    "ActiveEnterTimestampMonotonic": ("unsigned", "active_enter_timestamp_monotonic_us"),
+    "ActiveState": (_ACTIVE_STATES, "service_active_state"),
+    "ExecMainStatus": ("exit_code", "exec_main_status"),
+    "InactiveEnterTimestampMonotonic": ("unsigned", "inactive_enter_timestamp_monotonic_us"),
+    "Result": (_RESULTS, "service_result"),
+    "SubState": (_SUB_STATES, "service_sub_state"),
 }
 _PUBLIC_COLLECTION_RESULTS = {"complete", "failed", "partial"}
 _PUBLIC_ERROR_CATEGORIES = {
@@ -138,10 +147,10 @@ def _parse_properties(output):
             invalid = True
             continue
         key, value = line.split("=", 1)
-        if key not in _PROPERTY_RULES or key in values:
+        if key not in _PROPERTIES or key in values:
             invalid = True
             continue
-        rule = _PROPERTY_RULES[key]
+        rule = _PROPERTIES[key][0]
         if rule == "unsigned":
             safe_value = _safe_integer(value)
         elif rule == "exit_code":
@@ -154,11 +163,11 @@ def _parse_properties(output):
         else:
             values[key] = safe_value
 
-    if set(values) != set(_PROPERTY_RULES):
+    if set(values) != set(_PROPERTIES):
         invalid = True
     fields = {
         field: values.get(prop, "unavailable")
-        for prop, field in _PROPERTY_FIELDS.items()
+        for prop, (_rule, field) in _PROPERTIES.items()
     }
     return fields, invalid
 
@@ -227,7 +236,7 @@ def _query_service_on_isolated_connection(
 
 def _query_service(ssh, remote_timeout, command_timeout):
     properties = " ".join(
-        f"--property={name}" for name in _PROPERTY_RULES
+        f"--property={name}" for name in _PROPERTIES
     )
     command = (
         "timeout --signal=TERM --kill-after=5s "
@@ -306,6 +315,10 @@ def run_public_greenboot_diagnostics_safely(
     old_level = None
     result = None
     try:
+        # Suppress logging around the collector call itself. This guards any
+        # collector keyword, including ones that do not set their own level
+        # (e.g. a stub that logs before failing). The production collector also
+        # sets NONE internally; the two layers are intentional defense in depth.
         old_level = built_in.set_log_level("NONE")
         collector = _resolve_library_keyword(built_in, collector_keyword)
         untrusted_result = collector(
@@ -323,7 +336,13 @@ def run_public_greenboot_diagnostics_safely(
             try:
                 built_in.set_log_level(old_level)
             except Exception:
+                # Never leave the suite stuck at NONE: fall back to a level that
+                # keeps logging on so later keywords stay diagnosable.
                 result = None
+                try:
+                    built_in.set_log_level("INFO")
+                except Exception:
+                    pass
 
     try:
         if result is not None and result["saved"]:
@@ -373,12 +392,22 @@ def _write_summary(output_dir, summary):
         )
         path = os.path.join(output_dir, filename)
         try:
-            with open(path, "x", encoding="utf-8") as stream:
-                stream.write(summary)
-            os.chmod(path, 0o600)
-            return filename
+            # Create at 0600 atomically: no window at the default umask, and no
+            # separate chmod that could fail after the file already exists.
+            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         except FileExistsError:
             continue
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as stream:
+                stream.write(summary)
+        except Exception:
+            # Keep saved=False consistent with no artifact on disk.
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+            raise
+        return filename
     raise OSError("unable to allocate diagnostic filename")
 
 
@@ -395,8 +424,12 @@ def _collect(trigger, primary_exit_code, ssh_library_name,
         "query_exit_code": "unavailable",
     }
     fields.update({field: "unavailable"
-                   for field in _PROPERTY_FIELDS.values()})
+                   for _rule, field in _PROPERTIES.values()})
 
+    # Suppress logging around the SSH login/exec, where SSHLibrary would log the
+    # server MOTD at INFO. This is the guard for callers that reach the collector
+    # directly (bypassing run_public_greenboot_diagnostics_safely); it is
+    # exercised by the "Login Banner Is Suppressed By The Log Level Guard" test.
     old_level = built_in.set_log_level("NONE")
     try:
         reconnect_timeout = _safe_timeout(reconnect_timeout)
@@ -483,11 +516,16 @@ def collect_public_greenboot_diagnostic_summary(
     )
 
 
-def collect_public_greenboot_diagnostic_summary_using_library(
+def _collect_public_greenboot_diagnostic_summary_using_library(
         trigger, ssh_library_name, primary_exit_code=None,
         reconnect_timeout="10s", remote_timeout="25s",
         command_timeout="30s"):
-    """Test seam for exercising the collector without a live host."""
+    """Test seam for exercising the collector without a live host.
+
+    Underscore-prefixed so Robot does not expose it as a keyword: it is a
+    Python-level injection point called only by the unit test library, not part
+    of this security-sensitive module's public keyword surface.
+    """
     return _collect(
         trigger,
         primary_exit_code,
