@@ -77,9 +77,9 @@ class GitUtils():
         Commits created through the GitHub API are automatically signed by GitHub
         when using a GitHub App token, unlike commits created with git push.
 
-        `gh` is the GithubUtils helper (not a raw repo client) so the installation
-        token can be refreshed mid-push - a full push issues one API call per
-        changed file and can outlive the token's ~1h lifetime.
+        The push issues one API call per changed file and can run longer than the
+        installation token's ~1h lifetime, so it takes the GithubUtils helper
+        (rather than a raw repo client) and refreshes the token as it goes.
         """
         if self.dry_run:
             logging.info(f"[DRY RUN] Creating verified commits via GitHub API for branch {branch_name}")
@@ -98,6 +98,10 @@ class GitUtils():
         parent_sha = gh_repo.get_branch(base_branch).commit.sha
 
         for local_commit in commits:
+            # Refresh up front so the tree/commit API calls are covered even for
+            # commits that create no blobs (e.g. deletion-only commits).
+            gh_repo = gh.refresh_client()
+
             # diff from parent → this commit: a=parent state, b=commit state
             diffs = (local_commit.parents[0].diff(local_commit)
                      if local_commit.parents else local_commit.diff(NULL_TREE))
