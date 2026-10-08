@@ -12,5 +12,5 @@ scenario_remove_vms() {
 }
 
 scenario_run_tests() {
-    run_tests host1 suites/container-signature/signed-image-pull.robot
+    run_tests host1 suites/crio-config/crio-config.robot
 }

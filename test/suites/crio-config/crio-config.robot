@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation       Verify a strict uncached signed image pull through CRI-O
+Documentation       Verify CRI-O signature configuration with one strict uncached signed image pull
 
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-host.resource
@@ -10,7 +10,7 @@ Suite Teardown      Teardown
 
 *** Variables ***
 ${POLICY_JSON_PATH}             /etc/containers/policy.json
-${TEST_POLICY_PATH}             /tmp/signed-image-pull-test-policy.json
+${TEST_POLICY_PATH}             /tmp/crio-config-signed-pull-policy.json
 ${SHIPPED_POLICY_PATH}          ${EMPTY}
 ${POLICY_BACKUP_DIR}            ${EMPTY}
 ${POLICY_BACKUP_READY}          ${FALSE}
@@ -72,7 +72,7 @@ Restore Policy For Teardown
 
 Back Up Container Policy    # robocop: off=too-many-calls-in-keyword
     [Documentation]    Back up the original policy or record its original absence before replacement
-    ${backup_dir}=    Command Should Work    mktemp --directory /var/tmp/signed-image-pull-policy.XXXXXX
+    ${backup_dir}=    Command Should Work    mktemp --directory /var/tmp/crio-config-policy.XXXXXX
     VAR    ${POLICY_BACKUP_DIR}=    ${backup_dir}    scope=SUITE
     ${exists_stdout}    ${exists_stderr}    ${exists_rc}=    Command Execution
     ...    test -e ${POLICY_JSON_PATH} || test -L ${POLICY_JSON_PATH}
@@ -99,7 +99,7 @@ Restore Container Policy
         ...    test "$(cat ${POLICY_BACKUP_DIR}/original-state)" = present;
         ...    test -f ${POLICY_BACKUP_DIR}/policy.json && test ! -L ${POLICY_BACKUP_DIR}/policy.json;
         ...    test ! -L ${POLICY_JSON_PATH};
-        ...    restore=${POLICY_JSON_PATH}.signed-image-pull-restore;
+        ...    restore=${POLICY_JSON_PATH}.crio-config-restore;
         ...    test ! -e "$restore" && test ! -L "$restore";
         ...    cp --archive --no-dereference ${POLICY_BACKUP_DIR}/policy.json "$restore";
         ...    test -f "$restore" && test ! -L "$restore";
