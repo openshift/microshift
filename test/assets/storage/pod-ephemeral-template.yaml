@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ${PODNAME}
+  labels:
+    workloadName: ${PODNAME}
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: ${PODNAME}
+    image: ${IMAGE}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+    volumeMounts:
+    - name: inline-volume
+      mountPath: ${MOUNTPATH}
+  volumes:
+  - name: inline-volume
+    ephemeral:
+      volumeClaimTemplate:
+        metadata:
+          labels:
+            workloadName: ${PODNAME}
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          storageClassName: ${SCNAME}
+          resources:
+            requests:
+              storage: ${PVCCAPACITY}
