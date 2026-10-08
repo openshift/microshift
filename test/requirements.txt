@@ -4,5 +4,4 @@ robotframework-scplibrary==1.2.0
 robotframework-sshlibrary==3.8.0
 pyyaml==6.0.2
 robotframework-robocop==6.5.2
-packaging==25.0
-tomli==2.2.1
+packaging==25.0 

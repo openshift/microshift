@@ -5,4 +5,3 @@ tabulate==0.8.10
 tqdm==4.64.1
 jira==3.2.0
 flake8<6.0.0
-tomli==2.2.1
