@@ -99,11 +99,11 @@ Back Up Container Policy    # robocop: off=too-many-calls-in-keyword
         ...    cp --archive --no-dereference ${POLICY_JSON_PATH} ${POLICY_BACKUP_DIR}/policy.json
         Command Should Work
         ...    test -f ${POLICY_BACKUP_DIR}/policy.json && test ! -L ${POLICY_BACKUP_DIR}/policy.json
-        Command Should Work    printf 'present\\n' >${POLICY_BACKUP_DIR}/original-state
+        Command Should Work    bash -c "printf 'present\\n' >${POLICY_BACKUP_DIR}/original-state"
         VAR    ${POLICY_ORIGINAL_EXISTED}=    ${TRUE}    scope=SUITE
     ELSE
         Command Should Work    test ! -e ${POLICY_JSON_PATH} && test ! -L ${POLICY_JSON_PATH}
-        Command Should Work    printf 'absent\\n' >${POLICY_BACKUP_DIR}/original-state
+        Command Should Work    bash -c "printf 'absent\\n' >${POLICY_BACKUP_DIR}/original-state"
     END
     Command Should Work    test -f ${POLICY_BACKUP_DIR}/original-state && test ! -L ${POLICY_BACKUP_DIR}/original-state
     VAR    ${POLICY_BACKUP_READY}=    ${TRUE}    scope=SUITE
