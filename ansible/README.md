@@ -127,8 +127,21 @@ The following text files are created for each run:
 - `disk2.txt` — disk usage with MicroShift fully running
 - `images.txt` — container image sizes (compressed and uncompressed)
 - `network.txt` — network transfer (RX/TX) via Prometheus when `prometheus_logging` is enabled
+- `kube-burner/<workload>-qps<N>-<uuid>/` — kube-burner-ocp metrics for each workload run when `run_workloads` is enabled and Prometheus is available
 
 When Prometheus is enabled, it runs on the logging host in a Podman container managed by Quadlet. Captured metrics can be queried through the Prometheus web UI at `http://<logging-host-ip>:9091`.
+
+### Workloads
+
+With `run_workloads: true`, the playbook runs kube-burner-ocp workloads through the e2e-benchmarking `kube-burner-ocp-wrapper`, the same entry point used by the MicroShift CI performance jobs. The default sweep runs `node-density` and `node-density-cni` at QPS 2 to 12; override `workloads_to_run` to change it, for example to add `network-policy`:
+
+```yaml
+workloads_to_run:
+  - { name: node-density, qps: 4, burst: 4 }
+  - { name: network-policy, qps: 4, burst: 4 }
+```
+
+Metrics are collected with the kube-burner-ocp `microshift-metrics.yml` profile from the Prometheus set up by `prometheus_logging`, or from an external one named by `prometheus_query_endpoint`. Without either, the workloads run without metrics collection. The profile expects the kubelet scrape jobs to be named `kubelet-microshift` and `kubelet-microshift-cadvisor`, which the playbook configures.
 
 ## Configuration Overview
 
@@ -157,12 +170,19 @@ Most of the following variables are defined in `vars/all.yml`. The source-build 
 | `microshift_install_optional_rpms` | Install every RPM produced by a source build, including optional components, instead of only the core packages | `false` |
 | `build_etcd_binary` | Build and deploy a separate etcd process | `false` |
 | `etcd_git_revision` | Git revision to check out when building etcd from source | `"main"` |
-| `e2e_git_revision` | Git revision to check out when cloning the e2e-benchmarking workloads | `"master"` |
+| `e2e_git_revision` | e2e-benchmarking release to run the workloads from | `"v2.10.4"` |
 | `microshift_version` | MicroShift version to install (supports EC/RC prereleases) | `"4.20"` |
 | `enable_gpu` | Install NVIDIA GPU drivers and container toolkit for GPU workloads | `false` |
 | `deploy_gpu_test` | Deploy a test GPU workload to validate GPU functionality | `true` |
 | `run_workloads` | Run kube-burner performance workloads | `false` |
-| `kube_burner_es_server` | Elasticsearch server that kube-burner indexes results to when indexing is enabled | `""` |
+| `kube_burner_version` | kube-burner-ocp release downloaded by the wrapper | `"1.12.6"` |
+| `kube_burner_url` | URL of a kube-burner-ocp tarball to use instead of the release | `""` |
+| `kube_burner_es_server` | Elasticsearch server for remote indexing of kube-burner results; results are indexed locally when metrics collection is enabled | `""` |
+| `kube_burner_pods_per_node` | Pods per node for the node-density workloads | `245` |
+| `kube_burner_pod_ready` | Pod ready latency threshold for node-density | `"180000ms"` |
+| `kube_burner_iterations` | Iterations for network-policy (ten pods each) | `1` |
+| `kube_burner_extra_flags` | Extra kube-burner-ocp flags appended to every workload | `""` |
+| `prometheus_query_endpoint` | External Prometheus URL for the network measurement and kube-burner metrics | `http://<logging-host>:9091` |
 | `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.8") | `undefined` |
 
 Source builds update the existing checkout in `microshift_dir` to `microshift_git_revision`. By default, the revision is the release branch derived from

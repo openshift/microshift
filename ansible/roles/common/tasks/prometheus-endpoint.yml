@@ -1,0 +1,30 @@
+---
+# Resolve the Prometheus endpoint used for metrics queries.
+# Override with prometheus_query_endpoint; otherwise the first host of the
+# logging group is used on prometheus_port.
+
+- name: Resolve prometheus endpoint
+  vars:
+    prometheus_address: >-
+      {{
+        (
+          hostvars[(groups['logging'] | default([]) | first)].ansible_host
+          | default((groups['logging'] | default([]) | first))
+        )
+        if (groups['logging'] | default([]) | length > 0)
+        else 'prometheus'
+      }}
+  ansible.builtin.set_fact:
+    prometheus_endpoint: >-
+      {{
+        prometheus_query_endpoint | default(
+          'http://' ~
+          (
+            '[' ~ prometheus_address ~ ']'
+            if ':' in prometheus_address and not prometheus_address.startswith('[')
+            else prometheus_address
+          )
+          ~ ':' ~ (prometheus_port | default(9091) | string),
+          true
+        )
+      }}

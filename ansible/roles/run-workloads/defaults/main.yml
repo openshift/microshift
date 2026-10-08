@@ -1,27 +1,36 @@
 ---
 # run-workloads default vars
 
-local_paths: []
 temp_dest: "/tmp"
-tarball_name: "kube-burner-0.14.2-Linux-x86_64.tar.gz"
-e2e_path: "{{ temp_dest }}/e2e-benchmarking"
 e2e_repo: "https://github.com/cloud-bulldozer/e2e-benchmarking.git"
-# Git revision to check out when cloning e2e-benchmarking; an existing
-# checkout is left as it is.
-e2e_git_revision: master
-local_tarball_path: "{{ temp_dest }}/{{ tarball_name }}"
-kube_burner_indexing: false
-# Elasticsearch server for kube-burner results. The e2e-benchmarking workload
-# templates require the variable to be set even when indexing is disabled.
+e2e_path: "{{ temp_dest }}/e2e-benchmarking"
+# e2e-benchmarking release to run; v2.9.18 or later is required for MicroShift.
+e2e_git_revision: v2.10.4
+# kube-burner-ocp release the wrapper downloads; 1.11.17 or later is required
+# for MicroShift. kube_burner_url points the wrapper at another binary tarball.
+kube_burner_version: "1.12.6"
+kube_burner_url: ""
+# Elasticsearch server for remote indexing. When metrics are collected the
+# results are also indexed locally and saved under the results directory.
 kube_burner_es_server: ""
-kube_burner_pod_ready: "10000ms"
-kube_burner_url: "https://github.com/cloud-bulldozer/kube-burner/releases/download/v0.14.2/{{ tarball_name }}"
-pre_delete_pause_duration: 60
+kube_burner_es_index: ripsaw-kube-burner
+kube_burner_pods_per_node: 245
+kube_burner_pod_ready: "180000ms"
+# network-policy creates ten pods per iteration.
+kube_burner_iterations: 1
+# Metrics are collected when the playbook manages Prometheus or when
+# prometheus_query_endpoint names an external one.
+kube_burner_metrics_enabled: "{{ (prometheus_logging | bool) or (prometheus_query_endpoint | default('', true) | length > 0) }}"
+kube_burner_metrics_flags: "--metrics-profile=microshift-metrics.yml --local-indexing --prometheus-url={{ prometheus_endpoint }}"
+kube_burner_workload_flags:
+  node-density: "--pods-per-node={{ kube_burner_pods_per_node }} --pod-ready-threshold={{ kube_burner_pod_ready }}"
+  node-density-cni: "--pods-per-node={{ kube_burner_pods_per_node }}"
+  network-policy: ""
+# Extra kube-burner-ocp flags appended to every workload.
+kube_burner_extra_flags: ""
+kube_burner_results_dir: "{{ hostvars[groups['microshift'] | first].results_dir }}/kube-burner"
+kube_burner_kubeconfig: "{{ hostvars[groups['microshift'] | first].kubeconfig_dest_file }}"
 post_run_pause_duration: 180
-delete_grace_period: 600
-delete_wait_timeout: 600
-delete_label_selectors:
-  - kube-burner-job
 
 workloads_to_run:
   - { name: node-density, qps: 2, burst: 2 }
@@ -36,9 +45,3 @@ workloads_to_run:
   - { name: node-density-cni, qps: 8, burst: 8 }
   - { name: node-density-cni, qps: 10, burst: 10 }
   - { name: node-density-cni, qps: 12, burst: 12 }
-  - { name: node-density-cni-networkpolicy, qps: 2, burst: 2 }
-  - { name: node-density-cni-networkpolicy, qps: 4, burst: 4 }
-  - { name: node-density-cni-networkpolicy, qps: 6, burst: 6 }
-  - { name: node-density-cni-networkpolicy, qps: 8, burst: 8 }
-  - { name: node-density-cni-networkpolicy, qps: 10, burst: 10 }
-  - { name: node-density-cni-networkpolicy, qps: 12, burst: 12 }

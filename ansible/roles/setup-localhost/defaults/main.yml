@@ -4,7 +4,4 @@
 known_hosts:
   - "^localhost"
   - "^microshift-"
-local_packages:
-  - rpm: python3-kubernetes
-    pip: kubernetes
 microshift_pass: microshift
