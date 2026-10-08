@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ${SCNAME}
+provisioner: ${PROVISIONER}
+reclaimPolicy: ${RECLAIMPOLICY}
+volumeBindingMode: ${BINDINGMODE}
+allowVolumeExpansion: ${ALLOWEXPANSION}
