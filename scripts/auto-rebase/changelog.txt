@@ -1,21 +1,19 @@
-- cluster-network-operator embedded-component 80ad6fc01b6a270e7584b4e44dbaff40e33d098f to 5c73d6fc312f0fee8b3f7bda2933d341001a2575
-  - 4c976c2 2026-08-24T11:12:20-03:00 ovn-kubernetes: Move MNP from ConfigMap to CLI flags
+- cluster-network-operator embedded-component 5c73d6fc312f0fee8b3f7bda2933d341001a2575 to a3fadab79ae2eadbfd7311b77904801ed062afe9
+  - 3dfd5ed 2026-09-10T12:35:42+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
 
-- router image-amd64 b70b28c0380056950793382f42b9b2eaf9330945 to 4160f9e04d27dc3a9419b0d2e0f873629b67cf40
-  - dca7076 2026-09-24T17:12:45Z OCPBUGS-99286: Lock DeleteFunc to stop SARCompleted overwriting rejection
-  - b6762e4 2026-09-24T17:12:36Z OCPBUGS-99286: Make external cert validation asynchronous (v3 — fix re-admission after secret deletion)
+- machine-config-operator embedded-component f1cb35589f1e61afc98b0cdef263592e92d460f7 to 188c6ebefd16670661e26d3d31def4a3ff7334ec
+  - ad8a805a 2026-10-05T20:28:07+02:00 Added logs in case of error exits
+  - 10a80a17 2026-10-02T10:13:04+02:00 MCO: remount sysroot before layered import
+  - 016b3d9a 2026-10-02T09:46:18+02:00 Fix read-only and bind-mount contraints
+  - fb8df64c 2026-10-01T23:18:58Z OCPBUGS-128659: Fix the IRI release lookup for a signed release payload
+  - 302da18b 2026-10-01T21:42:49+02:00 MCO: rebase imported layered image directly
+  - 8914fef7 2026-10-01T15:03:37+02:00 4.22_multi_layered_images_update
 
-- ovn-kubernetes image-amd64 645ed68e789fd885756d7dffb44df3c54b9e32fe to bd1f682a1fe5c5105b73bfcf716b6a13305a7a68
-  - 9a6f7b5d 2026-09-11T11:51:56+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - ddfe256c 2026-09-11T11:51:56+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - 25bb43c1 2026-09-11T11:51:56+02:00 egressip: set IFA_PROTO on EgressIP addresses
+- ovn-kubernetes image-amd64 bd1f682a1fe5c5105b73bfcf716b6a13305a7a68 to dc35130bb7d144854d80f4673493977ed26b56f1
+  - e4712052 2026-09-29T18:00:53+05:30 docs: add EgressIP design document
+  - 33cf5f82 2026-09-29T17:58:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
 
-- router image-arm64 b70b28c0380056950793382f42b9b2eaf9330945 to 4160f9e04d27dc3a9419b0d2e0f873629b67cf40
-  - dca7076 2026-09-24T17:12:45Z OCPBUGS-99286: Lock DeleteFunc to stop SARCompleted overwriting rejection
-  - b6762e4 2026-09-24T17:12:36Z OCPBUGS-99286: Make external cert validation asynchronous (v3 — fix re-admission after secret deletion)
-
-- ovn-kubernetes image-arm64 645ed68e789fd885756d7dffb44df3c54b9e32fe to bd1f682a1fe5c5105b73bfcf716b6a13305a7a68
-  - 9a6f7b5d 2026-09-11T11:51:56+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - ddfe256c 2026-09-11T11:51:56+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - 25bb43c1 2026-09-11T11:51:56+02:00 egressip: set IFA_PROTO on EgressIP addresses
+- ovn-kubernetes image-arm64 bd1f682a1fe5c5105b73bfcf716b6a13305a7a68 to dc35130bb7d144854d80f4673493977ed26b56f1
+  - e4712052 2026-09-29T18:00:53+05:30 docs: add EgressIP design document
+  - 33cf5f82 2026-09-29T17:58:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
 
