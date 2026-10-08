@@ -17,6 +17,11 @@ _DEFAULT_ORG = "openshift"
 REPO_ENV = "REPO"
 _DEFAULT_REPO = "microshift"
 
+# Re-mint the GitHub App installation token once it is within this many seconds
+# of expiry. Tokens live ~1h and a full rebase push can run longer, so the token
+# is refreshed mid-push. Larger value = refresh earlier / more often.
+_TOKEN_REFRESH_MARGIN_SECONDS = 10 * 60
+
 
 class GithubUtils:
     def __init__(self, dry_run=False):
@@ -70,7 +75,7 @@ class GithubUtils:
         """
         if self.dry_run or self._integration is None:
             return self.gh_repo
-        if time.time() < self._token_expires_at - 600:  # 10-min margin
+        if time.time() < self._token_expires_at - _TOKEN_REFRESH_MARGIN_SECONDS:
             return self.gh_repo
         logging.info("GitHub App installation token near expiry - refreshing")
         access = self._integration.get_access_token(self._installation_id)
