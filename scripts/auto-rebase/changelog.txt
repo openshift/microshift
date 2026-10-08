@@ -1,3 +1,27 @@
-- cluster-csi-snapshot-controller-operator embedded-component 6fe700087e8be6513285edd18f461790fecc65c3 to 54a9349e3d46979dd943c4b4b7eb4fd4e9b2b494
-  - b8abc4a 2026-09-01T15:02:23-05:00 OCPBUGS-103405: CVE-2026-33814 - replace golang.org/x/net with openshift-sustaining fork
+- csi-external-snapshotter embedded-component 70500bf5ddedfc38ce3010e8007e07ac98569c56 to 52fe79de01561a44b26cb3073a2ee5a698530b0e
+  - f3e49ec 2026-09-01T00:00:56+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- oc image-amd64 3da7a06927d28a77e2c772a62a19869e8b794db3 to a622623a766e65ea4855c15c711d4130b65a3438
+  - 77283471 2026-09-28T17:40:34+01:00 test(git): Replace IPv4-mapped IPv6 addresses with valid IPv6 in tests
+  - 6572d2f8 2026-09-24T06:05:18+00:00 OCPBUGS-103346,OCPBUGS-103383: Use patched x/net fork v0.35.0-sec.4
+
+- csi-external-snapshotter image-amd64 70500bf5ddedfc38ce3010e8007e07ac98569c56 to 52fe79de01561a44b26cb3073a2ee5a698530b0e
+  - f3e49ec 2026-09-01T00:00:56+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- ovn-kubernetes image-amd64 4d9da3c5b322101933fab50ce326b521a5d613d7 to 97019aa52cc0641ab084f17c7fec3c51c37a0ce3
+  - 078f8b55 2026-10-02T12:45:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
+  - b43b616c 2026-10-02T12:41:43+05:30 docs: add EgressIP design document
+  - ccf54566 2026-08-25T10:03:32-07:00 EgressIP: add route policies for east-west traffic between networks
+
+- oc image-arm64 3da7a06927d28a77e2c772a62a19869e8b794db3 to a622623a766e65ea4855c15c711d4130b65a3438
+  - 77283471 2026-09-28T17:40:34+01:00 test(git): Replace IPv4-mapped IPv6 addresses with valid IPv6 in tests
+  - 6572d2f8 2026-09-24T06:05:18+00:00 OCPBUGS-103346,OCPBUGS-103383: Use patched x/net fork v0.35.0-sec.4
+
+- csi-external-snapshotter image-arm64 70500bf5ddedfc38ce3010e8007e07ac98569c56 to 52fe79de01561a44b26cb3073a2ee5a698530b0e
+  - f3e49ec 2026-09-01T00:00:56+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- ovn-kubernetes image-arm64 4d9da3c5b322101933fab50ce326b521a5d613d7 to 97019aa52cc0641ab084f17c7fec3c51c37a0ce3
+  - 078f8b55 2026-10-02T12:45:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
+  - b43b616c 2026-10-02T12:41:43+05:30 docs: add EgressIP design document
+  - ccf54566 2026-08-25T10:03:32-07:00 EgressIP: add route policies for east-west traffic between networks
 
