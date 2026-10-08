@@ -10,7 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/utils/ptr"
 
 	"github.com/openshift/microshift/pkg/admin/certificates"
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
@@ -38,7 +40,7 @@ func pendingRenewalFixture(t *testing.T) (*config.Config, string) {
 }
 
 func TestPendingRenewalChangedInputs(t *testing.T) {
-	for _, changed := range []string{"configuration", "active", "pending"} {
+	for _, changed := range []string{"configuration", "serving validity", "CA validity", "active", "pending"} {
 		t.Run(changed, func(t *testing.T) {
 			cfg, dir := pendingRenewalFixture(t)
 			tx := &certificates.Transaction{DataDir: dir}
@@ -47,6 +49,10 @@ func TestPendingRenewalChangedInputs(t *testing.T) {
 			switch changed {
 			case "configuration":
 				cfg.ApiServer.SubjectAltNames = []string{"new.example.test"}
+			case "serving validity":
+				cfg.Certificates.ServingValidity = &metav1.Duration{Duration: 1008 * time.Hour}
+			case "CA validity":
+				cfg.Certificates.CAValidity = &metav1.Duration{Duration: 17520 * time.Hour}
 			case "active":
 				require.NoError(t, os.WriteFile(filepath.Join(dir, "certs", "external-change"), []byte("changed"), 0600))
 			case "pending":
@@ -159,6 +165,7 @@ func TestPendingRenewalNotYetValidBeforeActivation(t *testing.T) {
 func TestPendingRenewalAllowsUnrelatedConfigurationChanges(t *testing.T) {
 	cfg, dir := pendingRenewalFixture(t)
 	cfg.Debugging.LogLevel = "Debug"
+	cfg.Certificates.ForceRestartOnExpirationImminent = ptr.To(false)
 	cfg.ApiServer.AuditLog.MaxFiles = 20
 	// This endpoint is embedded in kubeconfigs, which activation rebuilds.
 	cfg.ApiServer.URL = "https://127.0.0.1:7443"
@@ -179,6 +186,10 @@ func TestCertificateConfigHash(t *testing.T) {
 		"base domain":       func(cfg *config.Config) { cfg.DNS.BaseDomain = "new.example.test" },
 		"advertise address": func(cfg *config.Config) { cfg.ApiServer.AdvertiseAddress = "192.0.2.12" },
 		"SANs":              func(cfg *config.Config) { cfg.ApiServer.SubjectAltNames = []string{"new.example.test"} },
+		"serving validity": func(cfg *config.Config) {
+			cfg.Certificates.ServingValidity = &metav1.Duration{Duration: 1008 * time.Hour}
+		},
+		"CA validity": func(cfg *config.Config) { cfg.Certificates.CAValidity = &metav1.Duration{Duration: 17520 * time.Hour} },
 	} {
 		t.Run(name, func(t *testing.T) {
 			cfg := &config.Config{}

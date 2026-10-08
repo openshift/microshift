@@ -18,7 +18,6 @@ package cmd
 import (
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -27,7 +26,6 @@ import (
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"k8s.io/apiserver/pkg/authentication/user"
 )
 
 func TestProductionCertificateInventory(t *testing.T) {
@@ -117,99 +115,31 @@ func TestProductionCertificateInventory(t *testing.T) {
 }
 
 func Test_certsToRegenerate(t *testing.T) {
-	tests := []struct {
-		name   string
-		chains *certchains.CertificateChains
-		want   [][]string
-	}{
-		{
-			name:   "empty chains",
-			chains: &certchains.CertificateChains{},
-			want:   [][]string{},
-		},
-		{
-			name: "no cert to regenerate",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 365*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 280 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				)),
-			want: [][]string{},
-		},
-		{
-			name: "signer needs regen",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 140*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 270 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				)),
-			want: [][]string{{"signer"}},
-		},
-		{
-			name: "leaf cert needs regen",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 270*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 150 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				),
-			),
-			want: [][]string{{"signer", "somename"}},
-		},
-		{
-			name: "leaf cert needs regen",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 270*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 150 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				),
-			),
-			want: [][]string{{"signer", "somename"}},
-		},
-		{
-			name: "both need regen",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 160*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 150 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				),
-			),
-			want: [][]string{{"signer"}, {"signer", "somename"}},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := certsToRegenerate(tt.chains)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("certsToRegenerate() = %v, want %v", got, tt.want)
+	now := time.Now().UTC().Truncate(time.Second)
+	for _, policy := range []certchains.RotationPolicy{certchains.RotationPolicyStandard, certchains.RotationPolicyExtended} {
+		for _, lifetime := range []time.Duration{1008 * time.Hour, 8760 * time.Hour, 87600 * time.Hour} {
+			warning, _, err := policy.StatusThresholds()
+			require.NoError(t, err)
+			boundary := time.Duration(float64(lifetime) * warning)
+			for _, remaining := range []time.Duration{lifetime, boundary + time.Second, boundary, boundary - time.Second, 0, -time.Second, lifetime + time.Second} {
+				entry := certificateInventoryEntry("test", "certificate", certchains.CertificateRoleClient, policy, now.Add(remaining-lifetime), now.Add(remaining))
+				entry.Path = []string{"signer", "certificate"}
+				got, err := certsToRegenerate(certchains.CertificateInventory{entry}, now)
+				require.NoError(t, err)
+				if remaining > boundary && remaining <= lifetime {
+					require.Empty(t, got)
+				} else {
+					require.Equal(t, [][]string{entry.Path}, got)
+				}
 			}
-		})
+		}
 	}
+	got, err := certsToRegenerate(nil, now)
+	require.NoError(t, err)
+	require.Empty(t, got)
+	unknown := certificateInventoryEntry("test", "unknown", certchains.CertificateRoleClient, certchains.RotationPolicyUnknown, now.Add(-time.Hour), now.Add(time.Hour))
+	_, err = certsToRegenerate(certchains.CertificateInventory{unknown}, now)
+	require.ErrorContains(t, err, "unknown rotation policy")
 }
 
 func Test_removeStaleKubeconfig(t *testing.T) {
@@ -249,10 +179,4 @@ func Test_removeStaleKubeconfig(t *testing.T) {
 			t.Fatalf("dir %s should remain: %v", d, err)
 		}
 	}
-}
-
-func mustComplete(t *testing.T, cs certchains.CertificateChainsBuilder) *certchains.CertificateChains {
-	ret, err := cs.Complete()
-	require.NoError(t, err)
-	return ret
 }
