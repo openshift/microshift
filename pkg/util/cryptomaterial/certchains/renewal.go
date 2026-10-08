@@ -52,6 +52,12 @@ func (s *CertificateSigner) boundIssuerValidity() {
 				generator.notAfter = issuer.NotAfter
 			}
 		}
+		// Complete can load an invalid legacy signer before startup replaces its
+		// entire subtree. Preserve that repair path; final renewal validation
+		// still rejects any invalid or unbounded replacement generation.
+		if now := time.Now(); now.Before(generator.notBefore) || !now.Before(generator.notAfter) {
+			return
+		}
 		s.signerConfig.SerialGenerator = generator
 	}
 }

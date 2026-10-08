@@ -52,6 +52,7 @@ func NewCertificateSigner(signerName, signerDir string, validity time.Duration) 
 		signerName:     signerName,
 		signerDir:      signerDir,
 		signerValidity: validity,
+		limitValidity:  true,
 	}
 }
 
