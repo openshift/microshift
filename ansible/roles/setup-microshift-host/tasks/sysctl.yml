@@ -1,0 +1,15 @@
+---
+# Kernel settings for the MicroShift host, kept as drop-ins under
+# /etc/sysctl.d so they also apply after the upgrade reboot. A file that
+# must win over /etc/sysctl.conf needs a name that sorts after
+# 99-sysctl.conf, which is how that file is applied at boot.
+
+- name: Write and apply host sysctls
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_file: "/etc/sysctl.d/{{ item.file }}"
+    reload: true
+  loop: "{{ host_sysctls }}"
+  loop_control:
+    label: "{{ item.name }}={{ item.value }}"

@@ -164,6 +164,8 @@ Most of the following variables are defined in `vars/all.yml`. The source-build 
 | `run_workloads` | Run kube-burner performance workloads | `false` |
 | `kube_burner_es_server` | Elasticsearch server that kube-burner indexes results to when indexing is enabled | `""` |
 | `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.8") | `undefined` |
+| `manage_host_sysctls` | Write the `host_sysctls` drop-ins under `/etc/sysctl.d` on the MicroShift host | `true` |
+| `host_sysctls` | Kernel settings written as drop-ins under `/etc/sysctl.d` on the MicroShift host (IPv6 loopback, inotify limits) | see role defaults |
 
 Source builds update the existing checkout in `microshift_dir` to `microshift_git_revision`. By default, the revision is the release branch derived from
 `microshift_version`; for example, both `4.21.0` and `latest-4.21` select `release-4.21`. Set it explicitly to build another branch, tag, or commit.

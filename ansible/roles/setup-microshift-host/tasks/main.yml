@@ -86,6 +86,10 @@
     - vg_name != default_vg_name
     - vg_exists.rc == 0
 
+- name: Configure host sysctls
+  ansible.builtin.include_tasks: sysctl.yml
+  when: manage_host_sysctls | bool
+
 - name: Pin RHEL version to prevent upgrading beyond supported release
   become: true
   ansible.builtin.copy:
