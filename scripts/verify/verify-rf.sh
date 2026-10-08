@@ -33,7 +33,7 @@ set +e
     --pythonpath "${ROOTDIR}/test/unit" \
     --outputdir "${ROBOT_OUTPUT_DIR}" \
     "${ROOTDIR}/test/unit" 2>&1 | tee "${ROBOT_OUTPUT_DIR}/robot-console.log"
-ROBOT_RC=${PIPESTATUS[0]}
+ROBOT_PIPE_STATUS=("${PIPESTATUS[@]}")
 set -e
 
 set +x
@@ -44,6 +44,13 @@ if grep --recursive --fixed-strings --quiet \
     exit 1
 fi
 
-if [[ "${ROBOT_RC}" -ne 0 ]]; then
-    exit "${ROBOT_RC}"
+# Fail closed if tee could not capture the console: an unscanned console could
+# hide a leak that prow still publishes.
+if [[ "${ROBOT_PIPE_STATUS[1]}" -ne 0 ]]; then
+    echo "Failed to capture ${ROBOT_OUTPUT_DIR}/robot-console.log for scanning" >&2
+    exit 1
+fi
+
+if [[ "${ROBOT_PIPE_STATUS[0]}" -ne 0 ]]; then
+    exit "${ROBOT_PIPE_STATUS[0]}"
 fi
