@@ -73,19 +73,6 @@ type Config struct {
 	// Internal-only fields
 	userSettings *Config `json:"-"` // the values read from the config file
 
-	// Image credential provider paths. These are kubelet flags, not
-	// KubeletConfiguration fields. The exported fields hold the canonical
-	// (symlink-resolved) paths computed by validateKubeletCredentialProvider();
-	// the kubelet component reads them through
-	// KubeletImageCredentialProviderPaths(). The raw fields hold the values read
-	// from the Kubelet map during updateComputedValues() and are the input to
-	// validation. Keeping the two separate means a later updateComputedValues()
-	// cannot revert a validated path back to the unresolved user value.
-	KubeletImageCredentialProviderConfigPath    string `json:"-"`
-	KubeletImageCredentialProviderBinDir        string `json:"-"`
-	kubeletImageCredentialProviderConfigPathRaw string `json:"-"`
-	kubeletImageCredentialProviderBinDirRaw     string `json:"-"`
-
 	MultiNode MultiNodeConfig `json:"-"` // the value read from commond line
 
 	Warnings []string `json:"-"` // Warnings that should not prevent the service from starting.
@@ -606,10 +593,6 @@ func (c *Config) updateComputedValues() error {
 	c.C2CC.stripEmptyRemoteClusters()
 	c.C2CC.resolveRoutingDefaults()
 
-	if err := c.readKubeletCredentialProviderKeys(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -768,9 +751,12 @@ func (c *Config) validate() error {
 			return fmt.Errorf("error validating clusterToCluster: %w", err)
 		}
 	}
-	if err := c.validateKubeletCredentialProvider(); err != nil {
-		return err
-	}
+	// The kubelet image credential-provider paths are validated by the kubelet
+	// component at launch (kubeletcredential.Validate, see pkg/node), not here:
+	// that validation needs the kubelet config scheme, whose transitive imports
+	// pull in the apiserver etcd client, and pkg/config must stay free of that so
+	// binaries that only read configuration (notably microshift-etcd) do not link
+	// it.
 	return nil
 }
 

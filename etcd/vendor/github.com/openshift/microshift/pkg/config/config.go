@@ -56,7 +56,13 @@ type Config struct {
 	Ingress   IngressConfig `json:"ingress"`
 	Storage   Storage       `json:"storage"`
 	Telemetry Telemetry     `json:"telemetry"`
-	// Settings specified in this section are transferred as-is into the Kubelet config.
+	// Settings specified in this section are transferred as-is into the Kubelet config,
+	// except imageCredentialProviderConfigPath and imageCredentialProviderBinDir, which
+	// enable the kubelet image credential provider and are applied as kubelet startup
+	// flags. Both must be set together, be absolute paths, and be owned by root and not
+	// writable by group or others, along with their parent directories, the provider
+	// configuration files kubelet reads, and the declared provider binaries. The
+	// provider configuration is also validated the way kubelet validates it.
 	// +kubebuilder:validation:Schemaless
 	Kubelet map[string]any `json:"kubelet"`
 
@@ -745,6 +751,12 @@ func (c *Config) validate() error {
 			return fmt.Errorf("error validating clusterToCluster: %w", err)
 		}
 	}
+	// The kubelet image credential-provider paths are validated by the kubelet
+	// component at launch (kubeletcredential.Validate, see pkg/node), not here:
+	// that validation needs the kubelet config scheme, whose transitive imports
+	// pull in the apiserver etcd client, and pkg/config must stay free of that so
+	// binaries that only read configuration (notably microshift-etcd) do not link
+	// it.
 	return nil
 }
 
