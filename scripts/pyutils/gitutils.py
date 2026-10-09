@@ -71,11 +71,15 @@ class GitUtils():
             return
         self.remote.remove(self.git_repo, BOT_REMOTE_NAME)
 
-    def push(self, branch_name, base_branch, gh_repo):
+    def push(self, branch_name, base_branch, gh):
         """
         Replays local commits onto GitHub via the API so they are marked Verified.
         Commits created through the GitHub API are automatically signed by GitHub
         when using a GitHub App token, unlike commits created with git push.
+
+        The push issues one API call per changed file and can run longer than the
+        installation token's ~1h lifetime, so it takes the GithubUtils helper
+        (rather than a raw repo client) and refreshes the token as it goes.
         """
         if self.dry_run:
             logging.info(f"[DRY RUN] Creating verified commits via GitHub API for branch {branch_name}")
@@ -90,9 +94,14 @@ class GitUtils():
             logging.info(f"No commits to push for branch {branch_name}")
             return
 
+        gh_repo = gh.refresh_client()
         parent_sha = gh_repo.get_branch(base_branch).commit.sha
 
         for local_commit in commits:
+            # Refresh up front so the tree/commit API calls are covered even for
+            # commits that create no blobs (e.g. deletion-only commits).
+            gh_repo = gh.refresh_client()
+
             # diff from parent → this commit: a=parent state, b=commit state
             diffs = (local_commit.parents[0].diff(local_commit)
                      if local_commit.parents else local_commit.diff(NULL_TREE))
@@ -121,6 +130,8 @@ class GitUtils():
                         mode = "100644"
                     tree_elements.append(InputGitTreeElement(
                         path=diff.b_path, mode=mode, type="blob", sha=blob.sha))
+                    # One API call per file can outlive the ~1h token; keep it fresh.
+                    gh_repo = gh.refresh_client()
 
             parent_gh_commit = gh_repo.get_git_commit(parent_sha)
             new_tree = gh_repo.create_git_tree(tree_elements, parent_gh_commit.tree)

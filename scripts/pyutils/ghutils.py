@@ -4,6 +4,7 @@ import os
 import logging
 import re
 import sys
+import time
 from pathlib import Path
 from github import GithubIntegration, Github
 
@@ -16,11 +17,19 @@ _DEFAULT_ORG = "openshift"
 REPO_ENV = "REPO"
 _DEFAULT_REPO = "microshift"
 
+# Re-mint the GitHub App installation token once it is within this many seconds
+# of expiry. Tokens live ~1h and a full rebase push can run longer, so the token
+# is refreshed mid-push. Larger value = refresh earlier / more often.
+_TOKEN_REFRESH_MARGIN_SECONDS = 10 * 60
+
 
 class GithubUtils:
     def __init__(self, dry_run=False):
         self.dry_run = dry_run
         self.org, self.repo = self._get_org_repo_from_env()
+        self._integration = None
+        self._installation_id = None
+        self._token_expires_at = 0.0
         self.token = self._get_gh_token_from_env()
         self.gh_repo = Github(self.token).get_repo(f"{self.org}/{self.repo}")
 
@@ -43,12 +52,37 @@ class GithubUtils:
 
         app_id = try_get_env(APP_ID_ENV, die=True)
         key_path = try_get_env(KEY_ENV, die=True)
-        integration = GithubIntegration(app_id, Path(key_path).read_text(encoding='utf-8'))
-        app_installation = integration.get_repo_installation(self.org, self.repo)
+        self._integration = GithubIntegration(app_id, Path(key_path).read_text(encoding='utf-8'))
+        app_installation = self._integration.get_repo_installation(self.org, self.repo)
         if app_installation is None:
             sys.exit(f"Failed to get app_installation for {self.org}/{self.repo}. " +
                      f"Response: {app_installation.raw_data}")
-        return integration.get_access_token(app_installation.id).token
+        self._installation_id = app_installation.id
+        access = self._integration.get_access_token(self._installation_id)
+        self._token_expires_at = access.expires_at.timestamp()
+        return access.token
+
+    def refresh_client(self):
+        """
+        Re-mints the GitHub App installation token and rebuilds the client when
+        the current token is close to expiring, returning the (possibly new)
+        gh_repo client.
+
+        Installation tokens are valid for ~1h, but a full rebase push issues one
+        API call per changed file and can run longer than that, so callers doing
+        long-running API work must call this periodically. No-op for Personal
+        Access Tokens (no integration) and dry runs.
+        """
+        if self.dry_run or self._integration is None:
+            return self.gh_repo
+        if time.time() < self._token_expires_at - _TOKEN_REFRESH_MARGIN_SECONDS:
+            return self.gh_repo
+        logging.info("GitHub App installation token near expiry - refreshing")
+        access = self._integration.get_access_token(self._installation_id)
+        self.token = access.token
+        self._token_expires_at = access.expires_at.timestamp()
+        self.gh_repo = Github(self.token).get_repo(f"{self.org}/{self.repo}")
+        return self.gh_repo
 
     def is_branch_under_active_development(self, branch):
         """
