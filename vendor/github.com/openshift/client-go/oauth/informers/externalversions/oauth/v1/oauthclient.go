@@ -18,11 +18,39 @@ import (
 )
 
 // OAuthClientInformer provides access to a shared informer and lister for
-// OAuthClients.
+// OAuthClients. Prefer using the type-safe variant (see [TypedOAuthClientInformer]).
 type OAuthClientInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() oauthv1.OAuthClientLister
 }
+
+// TypedOAuthClientInformer provides access to a shared informer and lister for
+// OAuthClients, including the type-safe TypedInformer variant.
+// It is a superset of OAuthClientInformer.
+type TypedOAuthClientInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() OAuthClientIndexInformer
+	Lister() oauthv1.OAuthClientLister
+}
+
+// OAuthClientIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type OAuthClientIndexInformer cache.TypedSharedIndexInformer[*apioauthv1.OAuthClient]
+
+// OAuthClientHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for OAuthClient.
+type OAuthClientHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apioauthv1.OAuthClient]
+
+// OAuthClientDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for OAuthClient.
+type OAuthClientDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apioauthv1.OAuthClient]
+
+// OAuthClientFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for OAuthClient.
+type OAuthClientFilteringHandler = cache.TypedFilteringResourceEventHandler[*apioauthv1.OAuthClient]
+
+// OAuthClientIndexers is a specialization of [cache.TypedIndexers] for OAuthClient.
+type OAuthClientIndexers = cache.TypedIndexers[*apioauthv1.OAuthClient]
+
+// DeletedOAuthClient is a specialization of [cache.DeletedObject] for OAuthClient.
+type DeletedOAuthClient = cache.DeletedObject[*apioauthv1.OAuthClient]
 
 type oAuthClientInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -32,25 +60,49 @@ type oAuthClientInformer struct {
 // NewOAuthClientInformer constructs a new informer for OAuthClient type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedOAuthClientInformer]).
 func NewOAuthClientInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewOAuthClientInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedOAuthClientInformer constructs a new informer for OAuthClient type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedOAuthClientInformer(client versioned.Interface, resyncPeriod time.Duration, indexers OAuthClientIndexers) OAuthClientIndexInformer {
+	return NewTypedOAuthClientInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredOAuthClientInformer constructs a new informer for OAuthClient type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredOAuthClientInformer]).
 func NewFilteredOAuthClientInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewOAuthClientInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedOAuthClientInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredOAuthClientInformer constructs a new informer for OAuthClient type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredOAuthClientInformer(client versioned.Interface, resyncPeriod time.Duration, indexers OAuthClientIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) OAuthClientIndexInformer {
+	return NewTypedOAuthClientInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewOAuthClientInformerWithOptions constructs a new informer for OAuthClient type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedOAuthClientInformerWithOptions]).
 func NewOAuthClientInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedOAuthClientInformerWithOptions(client, options)
+}
+
+// NewTypedOAuthClientInformerWithOptions constructs a new informer for OAuthClient type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedOAuthClientInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) OAuthClientIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "oauth.openshift.io", Version: "v1", Resource: "oauthclients"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apioauthv1.OAuthClient](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -83,17 +135,57 @@ func NewOAuthClientInformerWithOptions(client versioned.Interface, options inter
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *oAuthClientInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewOAuthClientInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedOAuthClientInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *oAuthClientInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apioauthv1.OAuthClient{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *oAuthClientInformer) TypedInformer() OAuthClientIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apioauthv1.OAuthClient](f.factory.InformerFor(&apioauthv1.OAuthClient{}, f.defaultInformer))
 }
 
 func (f *oAuthClientInformer) Lister() oauthv1.OAuthClientLister {
 	return oauthv1.NewOAuthClientLister(f.Informer().GetIndexer())
+}
+
+// ToTypedOAuthClientInformer converts an untyped informer into a TypedOAuthClientInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *OAuthClient. If that is not the case, calling type-safe methods of the returned
+// TypedOAuthClientInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedOAuthClientInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedOAuthClientInformer(informer OAuthClientInformer) TypedOAuthClientInformer {
+	if informer, ok := informer.(TypedOAuthClientInformer); ok {
+		return informer
+	}
+	return &oAuthClientTypedInformerAdapter{informer}
+}
+
+type oAuthClientTypedInformerAdapter struct {
+	OAuthClientInformer
+}
+
+func (a *oAuthClientTypedInformerAdapter) TypedInformer() OAuthClientIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apioauthv1.OAuthClient](a.Informer())
+}
+
+// ToOAuthClientIndexInformer converts an untyped informer into a OAuthClientIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *OAuthClient. If that is not the case, calling type-safe methods of the returned
+// OAuthClientIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a OAuthClientIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToOAuthClientIndexInformer(informer cache.SharedIndexInformer) OAuthClientIndexInformer {
+	if informer, ok := informer.(OAuthClientIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apioauthv1.OAuthClient](informer)
 }
