@@ -9,7 +9,7 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// RemoteClusters returns a RemoteClusterInformer.
-	RemoteClusters() RemoteClusterInformer
+	RemoteClusters() TypedRemoteClusterInformer
 }
 
 type version struct {
@@ -23,7 +23,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// RemoteClusters returns a RemoteClusterInformer.
-func (v *version) RemoteClusters() RemoteClusterInformer {
+// RemoteClusters returns a TypedRemoteClusterInformer.
+func (v *version) RemoteClusters() TypedRemoteClusterInformer {
 	return &remoteClusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
