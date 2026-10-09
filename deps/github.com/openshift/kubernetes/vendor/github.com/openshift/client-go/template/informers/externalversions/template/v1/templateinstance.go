@@ -18,11 +18,39 @@ import (
 )
 
 // TemplateInstanceInformer provides access to a shared informer and lister for
-// TemplateInstances.
+// TemplateInstances. Prefer using the type-safe variant (see [TypedTemplateInstanceInformer]).
 type TemplateInstanceInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() templatev1.TemplateInstanceLister
 }
+
+// TypedTemplateInstanceInformer provides access to a shared informer and lister for
+// TemplateInstances, including the type-safe TypedInformer variant.
+// It is a superset of TemplateInstanceInformer.
+type TypedTemplateInstanceInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() TemplateInstanceIndexInformer
+	Lister() templatev1.TemplateInstanceLister
+}
+
+// TemplateInstanceIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type TemplateInstanceIndexInformer cache.TypedSharedIndexInformer[*apitemplatev1.TemplateInstance]
+
+// TemplateInstanceHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for TemplateInstance.
+type TemplateInstanceHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apitemplatev1.TemplateInstance]
+
+// TemplateInstanceDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for TemplateInstance.
+type TemplateInstanceDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apitemplatev1.TemplateInstance]
+
+// TemplateInstanceFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for TemplateInstance.
+type TemplateInstanceFilteringHandler = cache.TypedFilteringResourceEventHandler[*apitemplatev1.TemplateInstance]
+
+// TemplateInstanceIndexers is a specialization of [cache.TypedIndexers] for TemplateInstance.
+type TemplateInstanceIndexers = cache.TypedIndexers[*apitemplatev1.TemplateInstance]
+
+// DeletedTemplateInstance is a specialization of [cache.DeletedObject] for TemplateInstance.
+type DeletedTemplateInstance = cache.DeletedObject[*apitemplatev1.TemplateInstance]
 
 type templateInstanceInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -33,25 +61,49 @@ type templateInstanceInformer struct {
 // NewTemplateInstanceInformer constructs a new informer for TemplateInstance type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedTemplateInstanceInformer]).
 func NewTemplateInstanceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewTemplateInstanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedTemplateInstanceInformer constructs a new informer for TemplateInstance type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedTemplateInstanceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers TemplateInstanceIndexers) TemplateInstanceIndexInformer {
+	return NewTypedTemplateInstanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredTemplateInstanceInformer constructs a new informer for TemplateInstance type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredTemplateInstanceInformer]).
 func NewFilteredTemplateInstanceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewTemplateInstanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedTemplateInstanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredTemplateInstanceInformer constructs a new informer for TemplateInstance type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredTemplateInstanceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers TemplateInstanceIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) TemplateInstanceIndexInformer {
+	return NewTypedTemplateInstanceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewTemplateInstanceInformerWithOptions constructs a new informer for TemplateInstance type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedTemplateInstanceInformerWithOptions]).
 func NewTemplateInstanceInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedTemplateInstanceInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedTemplateInstanceInformerWithOptions constructs a new informer for TemplateInstance type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedTemplateInstanceInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) TemplateInstanceIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "template.openshift.io", Version: "v1", Resource: "templateinstances"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apitemplatev1.TemplateInstance](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -84,17 +136,57 @@ func NewTemplateInstanceInformerWithOptions(client versioned.Interface, namespac
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *templateInstanceInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewTemplateInstanceInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedTemplateInstanceInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *templateInstanceInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apitemplatev1.TemplateInstance{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *templateInstanceInformer) TypedInformer() TemplateInstanceIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apitemplatev1.TemplateInstance](f.factory.InformerFor(&apitemplatev1.TemplateInstance{}, f.defaultInformer))
 }
 
 func (f *templateInstanceInformer) Lister() templatev1.TemplateInstanceLister {
 	return templatev1.NewTemplateInstanceLister(f.Informer().GetIndexer())
+}
+
+// ToTypedTemplateInstanceInformer converts an untyped informer into a TypedTemplateInstanceInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *TemplateInstance. If that is not the case, calling type-safe methods of the returned
+// TypedTemplateInstanceInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedTemplateInstanceInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedTemplateInstanceInformer(informer TemplateInstanceInformer) TypedTemplateInstanceInformer {
+	if informer, ok := informer.(TypedTemplateInstanceInformer); ok {
+		return informer
+	}
+	return &templateInstanceTypedInformerAdapter{informer}
+}
+
+type templateInstanceTypedInformerAdapter struct {
+	TemplateInstanceInformer
+}
+
+func (a *templateInstanceTypedInformerAdapter) TypedInformer() TemplateInstanceIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apitemplatev1.TemplateInstance](a.Informer())
+}
+
+// ToTemplateInstanceIndexInformer converts an untyped informer into a TemplateInstanceIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *TemplateInstance. If that is not the case, calling type-safe methods of the returned
+// TemplateInstanceIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a TemplateInstanceIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTemplateInstanceIndexInformer(informer cache.SharedIndexInformer) TemplateInstanceIndexInformer {
+	if informer, ok := informer.(TemplateInstanceIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apitemplatev1.TemplateInstance](informer)
 }

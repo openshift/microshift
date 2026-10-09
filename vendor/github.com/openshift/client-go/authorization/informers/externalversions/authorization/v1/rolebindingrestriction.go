@@ -18,11 +18,39 @@ import (
 )
 
 // RoleBindingRestrictionInformer provides access to a shared informer and lister for
-// RoleBindingRestrictions.
+// RoleBindingRestrictions. Prefer using the type-safe variant (see [TypedRoleBindingRestrictionInformer]).
 type RoleBindingRestrictionInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() authorizationv1.RoleBindingRestrictionLister
 }
+
+// TypedRoleBindingRestrictionInformer provides access to a shared informer and lister for
+// RoleBindingRestrictions, including the type-safe TypedInformer variant.
+// It is a superset of RoleBindingRestrictionInformer.
+type TypedRoleBindingRestrictionInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() RoleBindingRestrictionIndexInformer
+	Lister() authorizationv1.RoleBindingRestrictionLister
+}
+
+// RoleBindingRestrictionIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type RoleBindingRestrictionIndexInformer cache.TypedSharedIndexInformer[*apiauthorizationv1.RoleBindingRestriction]
+
+// RoleBindingRestrictionHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for RoleBindingRestriction.
+type RoleBindingRestrictionHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiauthorizationv1.RoleBindingRestriction]
+
+// RoleBindingRestrictionDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for RoleBindingRestriction.
+type RoleBindingRestrictionDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiauthorizationv1.RoleBindingRestriction]
+
+// RoleBindingRestrictionFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for RoleBindingRestriction.
+type RoleBindingRestrictionFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiauthorizationv1.RoleBindingRestriction]
+
+// RoleBindingRestrictionIndexers is a specialization of [cache.TypedIndexers] for RoleBindingRestriction.
+type RoleBindingRestrictionIndexers = cache.TypedIndexers[*apiauthorizationv1.RoleBindingRestriction]
+
+// DeletedRoleBindingRestriction is a specialization of [cache.DeletedObject] for RoleBindingRestriction.
+type DeletedRoleBindingRestriction = cache.DeletedObject[*apiauthorizationv1.RoleBindingRestriction]
 
 type roleBindingRestrictionInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -33,25 +61,49 @@ type roleBindingRestrictionInformer struct {
 // NewRoleBindingRestrictionInformer constructs a new informer for RoleBindingRestriction type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedRoleBindingRestrictionInformer]).
 func NewRoleBindingRestrictionInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewRoleBindingRestrictionInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedRoleBindingRestrictionInformer constructs a new informer for RoleBindingRestriction type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedRoleBindingRestrictionInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers RoleBindingRestrictionIndexers) RoleBindingRestrictionIndexInformer {
+	return NewTypedRoleBindingRestrictionInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredRoleBindingRestrictionInformer constructs a new informer for RoleBindingRestriction type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredRoleBindingRestrictionInformer]).
 func NewFilteredRoleBindingRestrictionInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewRoleBindingRestrictionInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedRoleBindingRestrictionInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredRoleBindingRestrictionInformer constructs a new informer for RoleBindingRestriction type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredRoleBindingRestrictionInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers RoleBindingRestrictionIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) RoleBindingRestrictionIndexInformer {
+	return NewTypedRoleBindingRestrictionInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewRoleBindingRestrictionInformerWithOptions constructs a new informer for RoleBindingRestriction type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedRoleBindingRestrictionInformerWithOptions]).
 func NewRoleBindingRestrictionInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedRoleBindingRestrictionInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedRoleBindingRestrictionInformerWithOptions constructs a new informer for RoleBindingRestriction type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedRoleBindingRestrictionInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) RoleBindingRestrictionIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "authorization.openshift.io", Version: "v1", Resource: "rolebindingrestrictions"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiauthorizationv1.RoleBindingRestriction](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -84,17 +136,57 @@ func NewRoleBindingRestrictionInformerWithOptions(client versioned.Interface, na
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *roleBindingRestrictionInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewRoleBindingRestrictionInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedRoleBindingRestrictionInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *roleBindingRestrictionInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiauthorizationv1.RoleBindingRestriction{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *roleBindingRestrictionInformer) TypedInformer() RoleBindingRestrictionIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiauthorizationv1.RoleBindingRestriction](f.factory.InformerFor(&apiauthorizationv1.RoleBindingRestriction{}, f.defaultInformer))
 }
 
 func (f *roleBindingRestrictionInformer) Lister() authorizationv1.RoleBindingRestrictionLister {
 	return authorizationv1.NewRoleBindingRestrictionLister(f.Informer().GetIndexer())
+}
+
+// ToTypedRoleBindingRestrictionInformer converts an untyped informer into a TypedRoleBindingRestrictionInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *RoleBindingRestriction. If that is not the case, calling type-safe methods of the returned
+// TypedRoleBindingRestrictionInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedRoleBindingRestrictionInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedRoleBindingRestrictionInformer(informer RoleBindingRestrictionInformer) TypedRoleBindingRestrictionInformer {
+	if informer, ok := informer.(TypedRoleBindingRestrictionInformer); ok {
+		return informer
+	}
+	return &roleBindingRestrictionTypedInformerAdapter{informer}
+}
+
+type roleBindingRestrictionTypedInformerAdapter struct {
+	RoleBindingRestrictionInformer
+}
+
+func (a *roleBindingRestrictionTypedInformerAdapter) TypedInformer() RoleBindingRestrictionIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiauthorizationv1.RoleBindingRestriction](a.Informer())
+}
+
+// ToRoleBindingRestrictionIndexInformer converts an untyped informer into a RoleBindingRestrictionIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *RoleBindingRestriction. If that is not the case, calling type-safe methods of the returned
+// RoleBindingRestrictionIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a RoleBindingRestrictionIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToRoleBindingRestrictionIndexInformer(informer cache.SharedIndexInformer) RoleBindingRestrictionIndexInformer {
+	if informer, ok := informer.(RoleBindingRestrictionIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiauthorizationv1.RoleBindingRestriction](informer)
 }

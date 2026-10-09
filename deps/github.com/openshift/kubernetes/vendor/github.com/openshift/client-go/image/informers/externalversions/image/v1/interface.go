@@ -9,9 +9,9 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// Images returns a ImageInformer.
-	Images() ImageInformer
+	Images() TypedImageInformer
 	// ImageStreams returns a ImageStreamInformer.
-	ImageStreams() ImageStreamInformer
+	ImageStreams() TypedImageStreamInformer
 }
 
 type version struct {
@@ -25,12 +25,12 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// Images returns a ImageInformer.
-func (v *version) Images() ImageInformer {
+// Images returns a TypedImageInformer.
+func (v *version) Images() TypedImageInformer {
 	return &imageInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// ImageStreams returns a ImageStreamInformer.
-func (v *version) ImageStreams() ImageStreamInformer {
+// ImageStreams returns a TypedImageStreamInformer.
+func (v *version) ImageStreams() TypedImageStreamInformer {
 	return &imageStreamInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

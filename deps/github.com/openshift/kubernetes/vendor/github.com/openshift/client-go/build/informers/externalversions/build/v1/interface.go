@@ -9,9 +9,9 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// Builds returns a BuildInformer.
-	Builds() BuildInformer
+	Builds() TypedBuildInformer
 	// BuildConfigs returns a BuildConfigInformer.
-	BuildConfigs() BuildConfigInformer
+	BuildConfigs() TypedBuildConfigInformer
 }
 
 type version struct {
@@ -25,12 +25,12 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// Builds returns a BuildInformer.
-func (v *version) Builds() BuildInformer {
+// Builds returns a TypedBuildInformer.
+func (v *version) Builds() TypedBuildInformer {
 	return &buildInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// BuildConfigs returns a BuildConfigInformer.
-func (v *version) BuildConfigs() BuildConfigInformer {
+// BuildConfigs returns a TypedBuildConfigInformer.
+func (v *version) BuildConfigs() TypedBuildConfigInformer {
 	return &buildConfigInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

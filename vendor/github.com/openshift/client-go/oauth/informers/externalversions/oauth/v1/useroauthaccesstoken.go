@@ -18,11 +18,39 @@ import (
 )
 
 // UserOAuthAccessTokenInformer provides access to a shared informer and lister for
-// UserOAuthAccessTokens.
+// UserOAuthAccessTokens. Prefer using the type-safe variant (see [TypedUserOAuthAccessTokenInformer]).
 type UserOAuthAccessTokenInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() oauthv1.UserOAuthAccessTokenLister
 }
+
+// TypedUserOAuthAccessTokenInformer provides access to a shared informer and lister for
+// UserOAuthAccessTokens, including the type-safe TypedInformer variant.
+// It is a superset of UserOAuthAccessTokenInformer.
+type TypedUserOAuthAccessTokenInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() UserOAuthAccessTokenIndexInformer
+	Lister() oauthv1.UserOAuthAccessTokenLister
+}
+
+// UserOAuthAccessTokenIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type UserOAuthAccessTokenIndexInformer cache.TypedSharedIndexInformer[*apioauthv1.UserOAuthAccessToken]
+
+// UserOAuthAccessTokenHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for UserOAuthAccessToken.
+type UserOAuthAccessTokenHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apioauthv1.UserOAuthAccessToken]
+
+// UserOAuthAccessTokenDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for UserOAuthAccessToken.
+type UserOAuthAccessTokenDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apioauthv1.UserOAuthAccessToken]
+
+// UserOAuthAccessTokenFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for UserOAuthAccessToken.
+type UserOAuthAccessTokenFilteringHandler = cache.TypedFilteringResourceEventHandler[*apioauthv1.UserOAuthAccessToken]
+
+// UserOAuthAccessTokenIndexers is a specialization of [cache.TypedIndexers] for UserOAuthAccessToken.
+type UserOAuthAccessTokenIndexers = cache.TypedIndexers[*apioauthv1.UserOAuthAccessToken]
+
+// DeletedUserOAuthAccessToken is a specialization of [cache.DeletedObject] for UserOAuthAccessToken.
+type DeletedUserOAuthAccessToken = cache.DeletedObject[*apioauthv1.UserOAuthAccessToken]
 
 type userOAuthAccessTokenInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -32,25 +60,49 @@ type userOAuthAccessTokenInformer struct {
 // NewUserOAuthAccessTokenInformer constructs a new informer for UserOAuthAccessToken type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedUserOAuthAccessTokenInformer]).
 func NewUserOAuthAccessTokenInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewUserOAuthAccessTokenInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedUserOAuthAccessTokenInformer constructs a new informer for UserOAuthAccessToken type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedUserOAuthAccessTokenInformer(client versioned.Interface, resyncPeriod time.Duration, indexers UserOAuthAccessTokenIndexers) UserOAuthAccessTokenIndexInformer {
+	return NewTypedUserOAuthAccessTokenInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredUserOAuthAccessTokenInformer constructs a new informer for UserOAuthAccessToken type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredUserOAuthAccessTokenInformer]).
 func NewFilteredUserOAuthAccessTokenInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewUserOAuthAccessTokenInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedUserOAuthAccessTokenInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredUserOAuthAccessTokenInformer constructs a new informer for UserOAuthAccessToken type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredUserOAuthAccessTokenInformer(client versioned.Interface, resyncPeriod time.Duration, indexers UserOAuthAccessTokenIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) UserOAuthAccessTokenIndexInformer {
+	return NewTypedUserOAuthAccessTokenInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewUserOAuthAccessTokenInformerWithOptions constructs a new informer for UserOAuthAccessToken type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedUserOAuthAccessTokenInformerWithOptions]).
 func NewUserOAuthAccessTokenInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedUserOAuthAccessTokenInformerWithOptions(client, options)
+}
+
+// NewTypedUserOAuthAccessTokenInformerWithOptions constructs a new informer for UserOAuthAccessToken type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedUserOAuthAccessTokenInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) UserOAuthAccessTokenIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "oauth.openshift.io", Version: "v1", Resource: "useroauthaccesstokens"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apioauthv1.UserOAuthAccessToken](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -83,17 +135,57 @@ func NewUserOAuthAccessTokenInformerWithOptions(client versioned.Interface, opti
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *userOAuthAccessTokenInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewUserOAuthAccessTokenInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedUserOAuthAccessTokenInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *userOAuthAccessTokenInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apioauthv1.UserOAuthAccessToken{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *userOAuthAccessTokenInformer) TypedInformer() UserOAuthAccessTokenIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apioauthv1.UserOAuthAccessToken](f.factory.InformerFor(&apioauthv1.UserOAuthAccessToken{}, f.defaultInformer))
 }
 
 func (f *userOAuthAccessTokenInformer) Lister() oauthv1.UserOAuthAccessTokenLister {
 	return oauthv1.NewUserOAuthAccessTokenLister(f.Informer().GetIndexer())
+}
+
+// ToTypedUserOAuthAccessTokenInformer converts an untyped informer into a TypedUserOAuthAccessTokenInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *UserOAuthAccessToken. If that is not the case, calling type-safe methods of the returned
+// TypedUserOAuthAccessTokenInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedUserOAuthAccessTokenInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedUserOAuthAccessTokenInformer(informer UserOAuthAccessTokenInformer) TypedUserOAuthAccessTokenInformer {
+	if informer, ok := informer.(TypedUserOAuthAccessTokenInformer); ok {
+		return informer
+	}
+	return &userOAuthAccessTokenTypedInformerAdapter{informer}
+}
+
+type userOAuthAccessTokenTypedInformerAdapter struct {
+	UserOAuthAccessTokenInformer
+}
+
+func (a *userOAuthAccessTokenTypedInformerAdapter) TypedInformer() UserOAuthAccessTokenIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apioauthv1.UserOAuthAccessToken](a.Informer())
+}
+
+// ToUserOAuthAccessTokenIndexInformer converts an untyped informer into a UserOAuthAccessTokenIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *UserOAuthAccessToken. If that is not the case, calling type-safe methods of the returned
+// UserOAuthAccessTokenIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a UserOAuthAccessTokenIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToUserOAuthAccessTokenIndexInformer(informer cache.SharedIndexInformer) UserOAuthAccessTokenIndexInformer {
+	if informer, ok := informer.(UserOAuthAccessTokenIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apioauthv1.UserOAuthAccessToken](informer)
 }

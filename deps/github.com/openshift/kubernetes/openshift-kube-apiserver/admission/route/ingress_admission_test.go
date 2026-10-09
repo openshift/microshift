@@ -23,6 +23,14 @@ func (a *fakeAuthorizer) Authorize(context.Context, authorizer.Attributes) (auth
 	return a.allow, "", a.err
 }
 
+func (a *fakeAuthorizer) ConditionsAwareAuthorize(ctx context.Context, attrs authorizer.Attributes) authorizer.ConditionsAwareDecision {
+	return authorizer.ConditionsAwareDecisionFromParts(a.Authorize(ctx, attrs))
+}
+
+func (a *fakeAuthorizer) EvaluateConditions(_ context.Context, _ authorizer.ConditionsAwareDecision, _ authorizer.ConditionsData) (authorizer.Decision, string, error) {
+	return authorizer.DecisionDeny, "", authorizer.ErrorConditionEvaluationNotSupported
+}
+
 func TestAdmission(t *testing.T) {
 	var newIngress *networking.Ingress
 	var oldIngress *networking.Ingress

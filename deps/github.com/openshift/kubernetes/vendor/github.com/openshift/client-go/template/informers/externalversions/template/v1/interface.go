@@ -9,11 +9,11 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// BrokerTemplateInstances returns a BrokerTemplateInstanceInformer.
-	BrokerTemplateInstances() BrokerTemplateInstanceInformer
+	BrokerTemplateInstances() TypedBrokerTemplateInstanceInformer
 	// Templates returns a TemplateInformer.
-	Templates() TemplateInformer
+	Templates() TypedTemplateInformer
 	// TemplateInstances returns a TemplateInstanceInformer.
-	TemplateInstances() TemplateInstanceInformer
+	TemplateInstances() TypedTemplateInstanceInformer
 }
 
 type version struct {
@@ -27,17 +27,17 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// BrokerTemplateInstances returns a BrokerTemplateInstanceInformer.
-func (v *version) BrokerTemplateInstances() BrokerTemplateInstanceInformer {
+// BrokerTemplateInstances returns a TypedBrokerTemplateInstanceInformer.
+func (v *version) BrokerTemplateInstances() TypedBrokerTemplateInstanceInformer {
 	return &brokerTemplateInstanceInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// Templates returns a TemplateInformer.
-func (v *version) Templates() TemplateInformer {
+// Templates returns a TypedTemplateInformer.
+func (v *version) Templates() TypedTemplateInformer {
 	return &templateInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// TemplateInstances returns a TemplateInstanceInformer.
-func (v *version) TemplateInstances() TemplateInstanceInformer {
+// TemplateInstances returns a TypedTemplateInstanceInformer.
+func (v *version) TemplateInstances() TypedTemplateInstanceInformer {
 	return &templateInstanceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

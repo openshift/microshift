@@ -78,3 +78,11 @@ func (t *recordingAuthorizer) Authorize(_ context.Context, a authorizer.Attribut
 	t.attributes = a
 	return authorizer.DecisionNoOpinion, "", nil
 }
+
+func (t *recordingAuthorizer) ConditionsAwareAuthorize(ctx context.Context, a authorizer.Attributes) authorizer.ConditionsAwareDecision {
+	return authorizer.ConditionsAwareDecisionFromParts(t.Authorize(ctx, a))
+}
+
+func (t *recordingAuthorizer) EvaluateConditions(_ context.Context, _ authorizer.ConditionsAwareDecision, _ authorizer.ConditionsData) (authorizer.Decision, string, error) {
+	return authorizer.DecisionDeny, "", authorizer.ErrorConditionEvaluationNotSupported
+}

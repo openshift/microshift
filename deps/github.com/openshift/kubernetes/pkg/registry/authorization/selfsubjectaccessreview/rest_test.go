@@ -14,7 +14,9 @@ import (
 	authorizationv1 "github.com/openshift/api/authorization/v1"
 	authorizationscope "github.com/openshift/apiserver-library-go/pkg/authorization/scope"
 
+	"k8s.io/kubernetes/pkg/api/legacyscheme"
 	authorizationapi "k8s.io/kubernetes/pkg/apis/authorization"
+	_ "k8s.io/kubernetes/pkg/apis/authorization/install"
 )
 
 type fakeAuthorizer struct {
@@ -117,12 +119,21 @@ func TestCreate(t *testing.T) {
 
 	for k, tc := range testcases {
 		auth := &fakeAuthorizer{}
-		storage := NewREST(auth)
+		storage := NewREST(auth, legacyscheme.Scheme)
 		spec := authorizationapi.SelfSubjectAccessReviewSpec{
 			NonResourceAttributes: &authorizationapi.NonResourceAttributes{Verb: "get", Path: "/mypath"},
 		}
 
-		ctx := genericapirequest.WithUser(genericapirequest.NewContext(), tc.user)
+		ctx := genericapirequest.WithRequestInfo(
+			genericapirequest.WithUser(genericapirequest.NewContext(), tc.user),
+			&genericapirequest.RequestInfo{
+				APIGroup:          "authorization.k8s.io",
+				APIVersion:        "v1",
+				Resource:          "selfsubjectaccessreviews",
+				IsResourceRequest: true,
+				Verb:              "create",
+			},
+		)
 		_, err := storage.Create(ctx, &authorizationapi.SelfSubjectAccessReview{Spec: spec}, rest.ValidateAllObjectFunc, &metav1.CreateOptions{})
 		if err != nil {
 			t.Errorf("%s: %v", k, err)

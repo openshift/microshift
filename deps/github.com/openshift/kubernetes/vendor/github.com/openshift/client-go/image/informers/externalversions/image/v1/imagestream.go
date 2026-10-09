@@ -18,11 +18,39 @@ import (
 )
 
 // ImageStreamInformer provides access to a shared informer and lister for
-// ImageStreams.
+// ImageStreams. Prefer using the type-safe variant (see [TypedImageStreamInformer]).
 type ImageStreamInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() imagev1.ImageStreamLister
 }
+
+// TypedImageStreamInformer provides access to a shared informer and lister for
+// ImageStreams, including the type-safe TypedInformer variant.
+// It is a superset of ImageStreamInformer.
+type TypedImageStreamInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() ImageStreamIndexInformer
+	Lister() imagev1.ImageStreamLister
+}
+
+// ImageStreamIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type ImageStreamIndexInformer cache.TypedSharedIndexInformer[*apiimagev1.ImageStream]
+
+// ImageStreamHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for ImageStream.
+type ImageStreamHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiimagev1.ImageStream]
+
+// ImageStreamDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for ImageStream.
+type ImageStreamDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiimagev1.ImageStream]
+
+// ImageStreamFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for ImageStream.
+type ImageStreamFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiimagev1.ImageStream]
+
+// ImageStreamIndexers is a specialization of [cache.TypedIndexers] for ImageStream.
+type ImageStreamIndexers = cache.TypedIndexers[*apiimagev1.ImageStream]
+
+// DeletedImageStream is a specialization of [cache.DeletedObject] for ImageStream.
+type DeletedImageStream = cache.DeletedObject[*apiimagev1.ImageStream]
 
 type imageStreamInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -33,25 +61,49 @@ type imageStreamInformer struct {
 // NewImageStreamInformer constructs a new informer for ImageStream type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedImageStreamInformer]).
 func NewImageStreamInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewImageStreamInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedImageStreamInformer constructs a new informer for ImageStream type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedImageStreamInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers ImageStreamIndexers) ImageStreamIndexInformer {
+	return NewTypedImageStreamInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredImageStreamInformer constructs a new informer for ImageStream type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredImageStreamInformer]).
 func NewFilteredImageStreamInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewImageStreamInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedImageStreamInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredImageStreamInformer constructs a new informer for ImageStream type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredImageStreamInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers ImageStreamIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) ImageStreamIndexInformer {
+	return NewTypedImageStreamInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewImageStreamInformerWithOptions constructs a new informer for ImageStream type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedImageStreamInformerWithOptions]).
 func NewImageStreamInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedImageStreamInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedImageStreamInformerWithOptions constructs a new informer for ImageStream type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedImageStreamInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) ImageStreamIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "image.openshift.io", Version: "v1", Resource: "imagestreams"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiimagev1.ImageStream](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -84,17 +136,57 @@ func NewImageStreamInformerWithOptions(client versioned.Interface, namespace str
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *imageStreamInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewImageStreamInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedImageStreamInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *imageStreamInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiimagev1.ImageStream{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *imageStreamInformer) TypedInformer() ImageStreamIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiimagev1.ImageStream](f.factory.InformerFor(&apiimagev1.ImageStream{}, f.defaultInformer))
 }
 
 func (f *imageStreamInformer) Lister() imagev1.ImageStreamLister {
 	return imagev1.NewImageStreamLister(f.Informer().GetIndexer())
+}
+
+// ToTypedImageStreamInformer converts an untyped informer into a TypedImageStreamInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ImageStream. If that is not the case, calling type-safe methods of the returned
+// TypedImageStreamInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedImageStreamInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedImageStreamInformer(informer ImageStreamInformer) TypedImageStreamInformer {
+	if informer, ok := informer.(TypedImageStreamInformer); ok {
+		return informer
+	}
+	return &imageStreamTypedInformerAdapter{informer}
+}
+
+type imageStreamTypedInformerAdapter struct {
+	ImageStreamInformer
+}
+
+func (a *imageStreamTypedInformerAdapter) TypedInformer() ImageStreamIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiimagev1.ImageStream](a.Informer())
+}
+
+// ToImageStreamIndexInformer converts an untyped informer into a ImageStreamIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ImageStream. If that is not the case, calling type-safe methods of the returned
+// ImageStreamIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a ImageStreamIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToImageStreamIndexInformer(informer cache.SharedIndexInformer) ImageStreamIndexInformer {
+	if informer, ok := informer.(ImageStreamIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiimagev1.ImageStream](informer)
 }

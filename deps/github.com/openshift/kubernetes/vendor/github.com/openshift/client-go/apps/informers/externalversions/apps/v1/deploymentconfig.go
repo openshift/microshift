@@ -18,11 +18,39 @@ import (
 )
 
 // DeploymentConfigInformer provides access to a shared informer and lister for
-// DeploymentConfigs.
+// DeploymentConfigs. Prefer using the type-safe variant (see [TypedDeploymentConfigInformer]).
 type DeploymentConfigInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() appsv1.DeploymentConfigLister
 }
+
+// TypedDeploymentConfigInformer provides access to a shared informer and lister for
+// DeploymentConfigs, including the type-safe TypedInformer variant.
+// It is a superset of DeploymentConfigInformer.
+type TypedDeploymentConfigInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() DeploymentConfigIndexInformer
+	Lister() appsv1.DeploymentConfigLister
+}
+
+// DeploymentConfigIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type DeploymentConfigIndexInformer cache.TypedSharedIndexInformer[*apiappsv1.DeploymentConfig]
+
+// DeploymentConfigHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for DeploymentConfig.
+type DeploymentConfigHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiappsv1.DeploymentConfig]
+
+// DeploymentConfigDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for DeploymentConfig.
+type DeploymentConfigDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiappsv1.DeploymentConfig]
+
+// DeploymentConfigFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for DeploymentConfig.
+type DeploymentConfigFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiappsv1.DeploymentConfig]
+
+// DeploymentConfigIndexers is a specialization of [cache.TypedIndexers] for DeploymentConfig.
+type DeploymentConfigIndexers = cache.TypedIndexers[*apiappsv1.DeploymentConfig]
+
+// DeletedDeploymentConfig is a specialization of [cache.DeletedObject] for DeploymentConfig.
+type DeletedDeploymentConfig = cache.DeletedObject[*apiappsv1.DeploymentConfig]
 
 type deploymentConfigInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -33,25 +61,49 @@ type deploymentConfigInformer struct {
 // NewDeploymentConfigInformer constructs a new informer for DeploymentConfig type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedDeploymentConfigInformer]).
 func NewDeploymentConfigInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewDeploymentConfigInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedDeploymentConfigInformer constructs a new informer for DeploymentConfig type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedDeploymentConfigInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers DeploymentConfigIndexers) DeploymentConfigIndexInformer {
+	return NewTypedDeploymentConfigInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredDeploymentConfigInformer constructs a new informer for DeploymentConfig type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredDeploymentConfigInformer]).
 func NewFilteredDeploymentConfigInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewDeploymentConfigInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedDeploymentConfigInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredDeploymentConfigInformer constructs a new informer for DeploymentConfig type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredDeploymentConfigInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers DeploymentConfigIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) DeploymentConfigIndexInformer {
+	return NewTypedDeploymentConfigInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewDeploymentConfigInformerWithOptions constructs a new informer for DeploymentConfig type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedDeploymentConfigInformerWithOptions]).
 func NewDeploymentConfigInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedDeploymentConfigInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedDeploymentConfigInformerWithOptions constructs a new informer for DeploymentConfig type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedDeploymentConfigInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) DeploymentConfigIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "apps.openshift.io", Version: "v1", Resource: "deploymentconfigs"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiappsv1.DeploymentConfig](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -84,17 +136,57 @@ func NewDeploymentConfigInformerWithOptions(client versioned.Interface, namespac
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *deploymentConfigInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewDeploymentConfigInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedDeploymentConfigInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *deploymentConfigInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiappsv1.DeploymentConfig{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *deploymentConfigInformer) TypedInformer() DeploymentConfigIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiappsv1.DeploymentConfig](f.factory.InformerFor(&apiappsv1.DeploymentConfig{}, f.defaultInformer))
 }
 
 func (f *deploymentConfigInformer) Lister() appsv1.DeploymentConfigLister {
 	return appsv1.NewDeploymentConfigLister(f.Informer().GetIndexer())
+}
+
+// ToTypedDeploymentConfigInformer converts an untyped informer into a TypedDeploymentConfigInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *DeploymentConfig. If that is not the case, calling type-safe methods of the returned
+// TypedDeploymentConfigInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedDeploymentConfigInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedDeploymentConfigInformer(informer DeploymentConfigInformer) TypedDeploymentConfigInformer {
+	if informer, ok := informer.(TypedDeploymentConfigInformer); ok {
+		return informer
+	}
+	return &deploymentConfigTypedInformerAdapter{informer}
+}
+
+type deploymentConfigTypedInformerAdapter struct {
+	DeploymentConfigInformer
+}
+
+func (a *deploymentConfigTypedInformerAdapter) TypedInformer() DeploymentConfigIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiappsv1.DeploymentConfig](a.Informer())
+}
+
+// ToDeploymentConfigIndexInformer converts an untyped informer into a DeploymentConfigIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *DeploymentConfig. If that is not the case, calling type-safe methods of the returned
+// DeploymentConfigIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a DeploymentConfigIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToDeploymentConfigIndexInformer(informer cache.SharedIndexInformer) DeploymentConfigIndexInformer {
+	if informer, ok := informer.(DeploymentConfigIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiappsv1.DeploymentConfig](informer)
 }
