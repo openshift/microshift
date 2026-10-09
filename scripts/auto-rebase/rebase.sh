@@ -41,6 +41,17 @@ LOADED_COMPONENTS="cluster-dns-operator cluster-ingress-operator service-ca-oper
 declare -a ARCHS=("amd64" "arm64")
 declare -A GOARCH_TO_UNAME_MAP=( ["amd64"]="x86_64" ["arm64"]="aarch64" )
 
+# cluster-monitoring-operator asset rebasing.
+# Maps the placeholder image name used in the metrics manifests to its OCP release
+# tag name. Needed because the names do not always match (e.g. node-exporter is
+# published as "prometheus-node-exporter"); also acts as an allowlist.
+declare -A CMO_IMAGE_MAP=(
+    ["quay.io/openshift/kube-metrics-server"]="kube-metrics-server"
+    ["quay.io/openshift/kube-state-metrics"]="kube-state-metrics"
+    ["quay.io/openshift/node-exporter"]="prometheus-node-exporter"
+    ["quay.io/openshift/kube-rbac-proxy"]="kube-rbac-proxy"
+)
+
 title() {
     echo -e "\E[34m$1\E[00m";
 }
@@ -206,6 +217,10 @@ download_release() {
             echo
         fi
     done < source-commits
+
+    # cluster-monitoring-operator is not an embedded/loaded component, so it is
+    # not cloned by the loop above; clone it here for the metrics asset rebase.
+    clone_cluster_monitoring_operator
 
     title "# Cloning ${release_image_amd64} image repos"
     download_image_state "${release_image_amd64}" "amd64"
@@ -661,6 +676,31 @@ copy_manifests() {
     fi
     title "Copying manifests"
     "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets.yaml"
+    "$REPOROOT/scripts/auto-rebase/handle_assets.py" "./scripts/auto-rebase/assets_cluster_monitoring_operator.yaml"
+}
+
+# Clones the cluster-monitoring-operator repo into the staging directory, reusing
+# the source-commits file already produced by download_release. The CMO is not an
+# embedded/loaded component, so download_release does not clone it on its own.
+clone_cluster_monitoring_operator() {
+    local source_commits="${STAGING_DIR}/source-commits"
+    if [ ! -f "${source_commits}" ]; then
+        >&2 echo "No source-commits found in ${STAGING_DIR}, you need to download a release first."
+        exit 1
+    fi
+
+    local cmo_line
+    cmo_line=$(grep '^cluster-monitoring-operator ' "${source_commits}") || {
+        >&2 echo "ERROR: cluster-monitoring-operator not found in release payload"
+        return 1
+    }
+
+    local repo commit
+    repo=$(echo "${cmo_line}" | cut -d ' ' -f 2)
+    commit=$(echo "${cmo_line}" | cut -d ' ' -f 3)
+
+    title "# Cloning cluster-monitoring-operator at ${commit}"
+    clone_repo "${repo}" "${commit}" "${STAGING_DIR}"
 }
 
 
@@ -935,6 +975,15 @@ EOF
 
     update_olm_images
     update_multus_images
+
+    #-- cluster-monitoring-operator -----------------------
+    # The metrics exporter manifests are copied by copy_manifests; apply the
+    # MicroShift-specific tweaks here and then rebase their image references
+    # (image refs are scraped from the manifests, so this must run last).
+    update_metrics_server_manifests
+    update_kube_state_metrics_manifests
+    update_node_exporter_manifests
+    update_cluster_monitoring_operator_images
 
     popd >/dev/null
 }
@@ -1251,11 +1300,157 @@ EOF
     done  # for goarch
 }
 
+update_metrics_server_manifests() {
+    [[ -d "${REPOROOT}/assets/optional/metrics-server" ]] || return 0
+
+    title "Rebasing metrics-server manifests"
+
+    local ms_crb="${REPOROOT}/assets/optional/metrics-server/01-cluster-role-binding.yaml"
+    yq -i '.subjects += [{"kind": "User", "name": "system:metrics-server"}]' "$ms_crb"
+
+    local ms_deploy="${REPOROOT}/assets/optional/metrics-server/03-deployment.yaml"
+    yq -i '.spec.replicas = 1' "$ms_deploy"
+    yq -i '.spec.strategy = {"type": "Recreate"}' "$ms_deploy"
+    yq -i 'del(.spec.template.spec.affinity)' "$ms_deploy"
+    yq -i '.spec.template.spec.containers[0].image = "quay.io/openshift/kube-metrics-server"' "$ms_deploy"
+    yq -i '.spec.template.spec.containers[0].securityContext.capabilities.drop = ["ALL"]' "$ms_deploy"
+}
+
+update_kube_state_metrics_manifests() {
+    [[ -d "${REPOROOT}/assets/optional/kube-state-metrics" ]] || return 0
+
+    title "Rebasing kube-state-metrics manifests"
+
+    local ksm_deploy="${REPOROOT}/assets/optional/kube-state-metrics/03-deployment.yaml"
+
+    yq -i '.spec.template.spec.containers[0].image = "quay.io/openshift/kube-state-metrics"' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[1].image = "quay.io/openshift/kube-rbac-proxy"' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[2].image = "quay.io/openshift/kube-rbac-proxy"' "$ksm_deploy"
+
+    yq -i '.spec.template.spec.containers[0].securityContext = {"allowPrivilegeEscalation": false, "readOnlyRootFilesystem": true, "runAsNonRoot": true}' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[1].securityContext = {"allowPrivilegeEscalation": false, "readOnlyRootFilesystem": true, "runAsNonRoot": true}' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[2].securityContext = {"allowPrivilegeEscalation": false, "readOnlyRootFilesystem": true, "runAsNonRoot": true}' "$ksm_deploy"
+    yq -i '.spec.template.spec.securityContext = {"runAsNonRoot": true}' "$ksm_deploy"
+
+    yq -i '.spec.template.spec.containers[0].resources.limits = {"cpu": "100m", "memory": "200Mi"}' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[1].resources.limits = {"cpu": "20m", "memory": "40Mi"}' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[2].resources.limits = {"cpu": "20m", "memory": "40Mi"}' "$ksm_deploy"
+
+    yq -i '(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "kube-state-metrics-tls")).readOnly = true' "$ksm_deploy"
+    yq -i '(.spec.template.spec.containers[2].volumeMounts[] | select(.name == "kube-state-metrics-tls")).readOnly = true' "$ksm_deploy"
+
+    yq -i '(.spec.template.spec.containers[1].args[] | select(test("--client-ca-file="))) |= "--client-ca-file=/etc/tls/client/client-ca.crt"' "$ksm_deploy"
+    yq -i '(.spec.template.spec.containers[2].args[] | select(test("--client-ca-file="))) |= "--client-ca-file=/etc/tls/client/client-ca.crt"' "$ksm_deploy"
+    yq -i 'del(.spec.template.spec.volumes[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ksm_deploy"
+    yq -i '.spec.template.spec.volumes += [{"configMap": {"name": "metrics-client-ca"}, "name": "metrics-client-ca"}]' "$ksm_deploy"
+    yq -i 'del(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ksm_deploy"
+    yq -i 'del(.spec.template.spec.containers[2].volumeMounts[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[1].volumeMounts += [{"mountPath": "/etc/tls/client", "name": "metrics-client-ca", "readOnly": true}]' "$ksm_deploy"
+    yq -i '.spec.template.spec.containers[2].volumeMounts += [{"mountPath": "/etc/tls/client", "name": "metrics-client-ca", "readOnly": true}]' "$ksm_deploy"
+
+    local ksm_secret="${REPOROOT}/assets/optional/kube-state-metrics/02-kube-rbac-proxy-secret.yaml"
+    sed -i '/"user":/,/"name":/d' "$ksm_secret"
+}
+
+update_node_exporter_manifests() {
+    [[ -d "${REPOROOT}/assets/optional/node-exporter" ]] || return 0
+
+    title "Rebasing node-exporter manifests"
+
+    local ne_ds="${REPOROOT}/assets/optional/node-exporter/03-daemonset.yaml"
+
+    yq -i '.spec.template.spec.containers[0].image = "quay.io/openshift/node-exporter"' "$ne_ds"
+    yq -i '.spec.template.spec.containers[1].image = "quay.io/openshift/kube-rbac-proxy"' "$ne_ds"
+    yq -i '.spec.template.spec.initContainers[0].image = "quay.io/openshift/node-exporter"' "$ne_ds"
+
+    yq -i '(.spec.template.spec.containers[1].args[] | select(test("--secure-listen-address="))) |= "--secure-listen-address=0.0.0.0:9100"' "$ne_ds"
+
+    yq -i '(.spec.template.spec.containers[1].args[] | select(test("--client-ca-file="))) |= "--client-ca-file=/etc/tls/client/client-ca.crt"' "$ne_ds"
+    yq -i 'del(.spec.template.spec.volumes[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ne_ds"
+    yq -i '.spec.template.spec.volumes += [{"configMap": {"name": "metrics-client-ca"}, "name": "metrics-client-ca"}]' "$ne_ds"
+    yq -i 'del(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "metrics-client-ca" or .name == "admin-kubeconfig-signer-ca"))' "$ne_ds"
+    yq -i '.spec.template.spec.containers[1].volumeMounts += [{"mountPath": "/etc/tls/client", "name": "metrics-client-ca", "readOnly": true}]' "$ne_ds"
+
+    yq -i '(.spec.template.spec.containers[1].volumeMounts[] | select(.name == "node-exporter-tls")).readOnly = true' "$ne_ds"
+
+    local ne_secret="${REPOROOT}/assets/optional/node-exporter/02-kube-rbac-proxy-secret.yaml"
+    sed -i '/"user":/,/"name":/d' "$ne_secret"
+}
+
+update_cluster_monitoring_operator_images() {
+    title "Rebasing metrics component images"
+
+    # The image recorded in each component's release-*.json is its "exporter":
+    # the one container image that is not the shared kube-rbac-proxy sidecar.
+    local -r rbac_proxy_image="quay.io/openshift/kube-rbac-proxy"
+
+    for goarch in amd64 arm64; do
+        local arch=${GOARCH_TO_UNAME_MAP["${goarch}"]:-noarch}
+        local release_file="${STAGING_DIR}/release_${goarch}.json"
+
+        local base_release
+        base_release=$(jq -r ".metadata.version" "${release_file}")
+
+        for component_dir in metrics-server kube-state-metrics node-exporter; do
+            [[ -d "${REPOROOT}/assets/optional/${component_dir}" ]] || continue
+
+            # The release JSON key mirrors the component dir (hyphens -> underscores).
+            local json_key="${component_dir//-/_}"
+
+            local kustomization_arch_file="${REPOROOT}/assets/optional/${component_dir}/kustomization.${arch}.yaml"
+            cat <<EOF > "${kustomization_arch_file}"
+images:
+EOF
+
+            local image_names
+            image_names=$(grep -h 'image:' "${REPOROOT}/assets/optional/${component_dir}/"*.yaml 2>/dev/null \
+                | sed 's/.*image: *//; s/"//g; s/:.*//; s/@.*//' | sort -u | grep -v '^$')
+
+            local exporter_image=""
+            for orig_image in ${image_names}; do
+                local release_tag="${CMO_IMAGE_MAP[$orig_image]:-}"
+                if [[ -z "${release_tag}" ]]; then
+                    >&2 echo "ERROR: Unknown metrics image '${orig_image}' in ${component_dir}"
+                    return 1
+                fi
+
+                local new_image
+                new_image=$(jq -r ".references.spec.tags[] | select(.name == \"${release_tag}\") | .from.name" "${release_file}")
+                if [[ -z "${new_image}" || "${new_image}" == "null" ]]; then
+                    >&2 echo "ERROR: Image for release tag '${release_tag}' not found in payload for ${component_dir}"
+                    return 1
+                fi
+                local new_image_name="${new_image%@*}"
+                local new_image_digest="${new_image#*@}"
+
+                cat <<EOF >> "${kustomization_arch_file}"
+  - name: ${orig_image}
+    newName: ${new_image_name}
+    digest: ${new_image_digest}
+EOF
+
+                if [[ "${orig_image}" != "${rbac_proxy_image}" ]]; then
+                    exporter_image="${new_image}"
+                fi
+            done
+
+            if [[ -z "${exporter_image}" ]]; then
+                >&2 echo "ERROR: No exporter image found for ${component_dir}"
+                return 1
+            fi
+
+            local component_release_json="${REPOROOT}/assets/optional/${component_dir}/release-${component_dir}-${arch}.json"
+            jq -n --arg base "$base_release" --arg img "${exporter_image}" \
+                "{\"release\": {\"base\": \$base}, \"images\": {\"${json_key}\": \$img}}" > "${component_release_json}"
+        done
+    done
+}
+
 check_for_manifests_changes() {
     # Changes to ignore:
-    # - `release-$ARCH.json` files
+    # - `release-$ARCH.json` and cluster-monitoring-operator `release-$COMPONENT-$ARCH.json` files
     # - OLM's image-references and kustomization.$ARCH.yaml files
-    local ignores="(release-(aarch64|x86_64).json|image-references|kustomization.(aarch64|x86_64).yaml)"
+    local ignores="(release-([a-z0-9-]+-)?(aarch64|x86_64).json|image-references|kustomization.(aarch64|x86_64).yaml)"
 
     title "Checking assets for unexpected changes"
     git status -s assets
@@ -1416,6 +1611,7 @@ case "$command" in
     generated-apis) regenerate_openapi;;
     images)
         update_images
+        update_cluster_monitoring_operator_images
         ;;
     images-to)
         to_just_images "$2" "$3"
