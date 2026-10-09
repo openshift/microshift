@@ -29,7 +29,6 @@ import (
 
 	// these are loading important global flags that we need to get and set
 	_ "k8s.io/kubernetes/test/e2e"
-	_ "k8s.io/kubernetes/test/e2e/lifecycle"
 )
 
 func init() {

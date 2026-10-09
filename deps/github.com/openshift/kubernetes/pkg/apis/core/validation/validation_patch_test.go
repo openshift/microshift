@@ -42,9 +42,10 @@ func TestOpenShiftValidateSecretUpdate(t *testing.T) {
 		}
 	}
 	invalidTypeErrFn := func(secretType core.SecretType) field.ErrorList {
-		return field.ErrorList{
-			field.Invalid(field.NewPath("type"), secretType, "field is immutable"),
-		}
+		e := field.Invalid(field.NewPath("type"), secretType, "field is immutable")
+		e.Origin = "immutable"
+		e.CoveredByDeclarative = true
+		return field.ErrorList{e}
 	}
 	tlsKeyRequiredErrFn := func() field.ErrorList {
 		return field.ErrorList{

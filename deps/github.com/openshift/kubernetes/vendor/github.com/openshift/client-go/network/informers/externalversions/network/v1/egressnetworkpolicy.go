@@ -18,11 +18,39 @@ import (
 )
 
 // EgressNetworkPolicyInformer provides access to a shared informer and lister for
-// EgressNetworkPolicies.
+// EgressNetworkPolicies. Prefer using the type-safe variant (see [TypedEgressNetworkPolicyInformer]).
 type EgressNetworkPolicyInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() networkv1.EgressNetworkPolicyLister
 }
+
+// TypedEgressNetworkPolicyInformer provides access to a shared informer and lister for
+// EgressNetworkPolicies, including the type-safe TypedInformer variant.
+// It is a superset of EgressNetworkPolicyInformer.
+type TypedEgressNetworkPolicyInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() EgressNetworkPolicyIndexInformer
+	Lister() networkv1.EgressNetworkPolicyLister
+}
+
+// EgressNetworkPolicyIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type EgressNetworkPolicyIndexInformer cache.TypedSharedIndexInformer[*apinetworkv1.EgressNetworkPolicy]
+
+// EgressNetworkPolicyHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for EgressNetworkPolicy.
+type EgressNetworkPolicyHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apinetworkv1.EgressNetworkPolicy]
+
+// EgressNetworkPolicyDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for EgressNetworkPolicy.
+type EgressNetworkPolicyDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apinetworkv1.EgressNetworkPolicy]
+
+// EgressNetworkPolicyFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for EgressNetworkPolicy.
+type EgressNetworkPolicyFilteringHandler = cache.TypedFilteringResourceEventHandler[*apinetworkv1.EgressNetworkPolicy]
+
+// EgressNetworkPolicyIndexers is a specialization of [cache.TypedIndexers] for EgressNetworkPolicy.
+type EgressNetworkPolicyIndexers = cache.TypedIndexers[*apinetworkv1.EgressNetworkPolicy]
+
+// DeletedEgressNetworkPolicy is a specialization of [cache.DeletedObject] for EgressNetworkPolicy.
+type DeletedEgressNetworkPolicy = cache.DeletedObject[*apinetworkv1.EgressNetworkPolicy]
 
 type egressNetworkPolicyInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -33,25 +61,49 @@ type egressNetworkPolicyInformer struct {
 // NewEgressNetworkPolicyInformer constructs a new informer for EgressNetworkPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedEgressNetworkPolicyInformer]).
 func NewEgressNetworkPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewEgressNetworkPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedEgressNetworkPolicyInformer constructs a new informer for EgressNetworkPolicy type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedEgressNetworkPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers EgressNetworkPolicyIndexers) EgressNetworkPolicyIndexInformer {
+	return NewTypedEgressNetworkPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredEgressNetworkPolicyInformer constructs a new informer for EgressNetworkPolicy type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredEgressNetworkPolicyInformer]).
 func NewFilteredEgressNetworkPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewEgressNetworkPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedEgressNetworkPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredEgressNetworkPolicyInformer constructs a new informer for EgressNetworkPolicy type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredEgressNetworkPolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers EgressNetworkPolicyIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) EgressNetworkPolicyIndexInformer {
+	return NewTypedEgressNetworkPolicyInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewEgressNetworkPolicyInformerWithOptions constructs a new informer for EgressNetworkPolicy type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedEgressNetworkPolicyInformerWithOptions]).
 func NewEgressNetworkPolicyInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedEgressNetworkPolicyInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedEgressNetworkPolicyInformerWithOptions constructs a new informer for EgressNetworkPolicy type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedEgressNetworkPolicyInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) EgressNetworkPolicyIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "network.openshift.io", Version: "v1", Resource: "egressnetworkpolicys"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apinetworkv1.EgressNetworkPolicy](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -84,17 +136,57 @@ func NewEgressNetworkPolicyInformerWithOptions(client versioned.Interface, names
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *egressNetworkPolicyInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewEgressNetworkPolicyInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedEgressNetworkPolicyInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *egressNetworkPolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apinetworkv1.EgressNetworkPolicy{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *egressNetworkPolicyInformer) TypedInformer() EgressNetworkPolicyIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apinetworkv1.EgressNetworkPolicy](f.factory.InformerFor(&apinetworkv1.EgressNetworkPolicy{}, f.defaultInformer))
 }
 
 func (f *egressNetworkPolicyInformer) Lister() networkv1.EgressNetworkPolicyLister {
 	return networkv1.NewEgressNetworkPolicyLister(f.Informer().GetIndexer())
+}
+
+// ToTypedEgressNetworkPolicyInformer converts an untyped informer into a TypedEgressNetworkPolicyInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *EgressNetworkPolicy. If that is not the case, calling type-safe methods of the returned
+// TypedEgressNetworkPolicyInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedEgressNetworkPolicyInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedEgressNetworkPolicyInformer(informer EgressNetworkPolicyInformer) TypedEgressNetworkPolicyInformer {
+	if informer, ok := informer.(TypedEgressNetworkPolicyInformer); ok {
+		return informer
+	}
+	return &egressNetworkPolicyTypedInformerAdapter{informer}
+}
+
+type egressNetworkPolicyTypedInformerAdapter struct {
+	EgressNetworkPolicyInformer
+}
+
+func (a *egressNetworkPolicyTypedInformerAdapter) TypedInformer() EgressNetworkPolicyIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apinetworkv1.EgressNetworkPolicy](a.Informer())
+}
+
+// ToEgressNetworkPolicyIndexInformer converts an untyped informer into a EgressNetworkPolicyIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *EgressNetworkPolicy. If that is not the case, calling type-safe methods of the returned
+// EgressNetworkPolicyIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a EgressNetworkPolicyIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToEgressNetworkPolicyIndexInformer(informer cache.SharedIndexInformer) EgressNetworkPolicyIndexInformer {
+	if informer, ok := informer.(EgressNetworkPolicyIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apinetworkv1.EgressNetworkPolicy](informer)
 }
