@@ -45,7 +45,10 @@ func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 	// we cannot just remove the certs dir and regenerate all the certificates
 	// because there are some long-lived certs and CAs that shouldn't be swapped
 	// - for example system:admin client certs, KAS serving CAs
-	regenCerts := certsToRegenerate(certChains)
+	regenCerts, err := certsToRegenerate(certChains.Inventory(), time.Now())
+	if err != nil {
+		return nil, err
+	}
 	for _, c := range regenCerts {
 		if err := certChains.Regenerate(c...); err != nil {
 			return nil, err
@@ -84,6 +87,9 @@ func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
 
 //nolint:ireturn // Callers choose read-only inventory loading or certificate creation.
 func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.CertificateChainsBuilder, error) {
+	if err := cfg.Certificates.Validate(); err != nil {
+		return nil, err
+	}
 	// Anchor certificate expiration to the next day. This forces
 	// homogenous expiry dates for all certificates with the same validity.
 	startTime := time.Now()
@@ -135,7 +141,7 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"kube-control-plane-signer",
 			cryptomaterial.KubeControlPlaneSignerCertDir(certsDir),
-			alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("control-plane").WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
@@ -178,7 +184,7 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"kube-apiserver-to-kubelet-signer",
 			cryptomaterial.KubeAPIServerToKubeletSignerCertDir(certsDir),
-			alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("kube-apiserver").WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
@@ -203,7 +209,7 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"admin-kubeconfig-signer",
 			cryptomaterial.AdminKubeconfigSignerDir(certsDir),
-			alignValidity(cryptomaterial.LongLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("authentication").WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
@@ -229,12 +235,12 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"kubelet-signer",
 			cryptomaterial.KubeletCSRSignerSignerCertDir(certsDir),
-			alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("kubelet").WithSubCAs(
 			certchains.NewCertificateSigner(
 				"kube-csr-signer",
 				cryptomaterial.CSRSignerCertDir(certsDir),
-				alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+				alignValidity(cfg.Certificates.CADuration()),
 			).WithService("kubelet").WithClientCertificates(
 				&certchains.ClientCertificateSigningRequestInfo{
 					CSRMeta: certchains.CSRMeta{
@@ -251,7 +257,7 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 					CSRMeta: certchains.CSRMeta{
 						Name:     "kubelet-server",
 						Service:  "kubelet",
-						Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+						Validity: alignValidity(cfg.Certificates.ServingDuration()),
 					},
 					Hostnames: []string{cfg.Node.HostnameOverride, cfg.Node.NodeIP},
 				},
@@ -260,7 +266,7 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"aggregator-signer",
 			cryptomaterial.AggregatorSignerDir(certsDir),
-			alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("kube-apiserver").WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
@@ -279,13 +285,13 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"service-ca",
 			cryptomaterial.ServiceCADir(certsDir),
-			alignValidity(cryptomaterial.LongLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("service-ca").WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "route-controller-manager-serving",
 					Service:  "route-controller-manager",
-					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+					Validity: alignValidity(cfg.Certificates.ServingDuration()),
 				},
 				Hostnames: []string{
 					"route-controller-manager.openshift-route-controller-manager.svc",
@@ -297,13 +303,13 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"ingress-ca",
 			cryptomaterial.IngressCADir(certsDir),
-			alignValidity(cryptomaterial.LongLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("ingress").WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "router-default-serving",
 					Service:  "ingress",
-					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+					Validity: alignValidity(cfg.Certificates.ServingDuration()),
 				},
 				Hostnames: []string{
 					"*.apps." + cfg.DNS.BaseDomain, // wildcard for any additional auto-generated domains
@@ -316,13 +322,13 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"kube-apiserver-external-signer",
 			cryptomaterial.KubeAPIServerExternalSigner(certsDir),
-			alignValidity(cryptomaterial.LongLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("kube-apiserver").WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "kube-external-serving",
 					Service:  "kube-apiserver",
-					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+					Validity: alignValidity(cfg.Certificates.ServingDuration()),
 				},
 				Hostnames: externalCertNames,
 			},
@@ -331,13 +337,13 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"kube-apiserver-localhost-signer",
 			cryptomaterial.KubeAPIServerLocalhostSigner(certsDir),
-			alignValidity(cryptomaterial.LongLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("kube-apiserver").WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "kube-apiserver-localhost-serving",
 					Service:  "kube-apiserver",
-					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+					Validity: alignValidity(cfg.Certificates.ServingDuration()),
 				},
 				Hostnames: []string{
 					"localhost",
@@ -348,13 +354,13 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"kube-apiserver-service-network-signer",
 			cryptomaterial.KubeAPIServerServiceNetworkSigner(certsDir),
-			alignValidity(cryptomaterial.LongLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("kube-apiserver").WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
 					Name:     "kube-apiserver-service-network-serving",
 					Service:  "kube-apiserver",
-					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
+					Validity: alignValidity(cfg.Certificates.ServingDuration()),
 				},
 				Hostnames: []string{
 					"kubernetes",
@@ -379,7 +385,7 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		certchains.NewCertificateSigner(
 			"etcd-signer",
 			cryptomaterial.EtcdSignerDir(certsDir),
-			alignValidity(cryptomaterial.LongLivedCertificateValidity),
+			alignValidity(cfg.Certificates.CADuration()),
 		).WithService("etcd").WithClientCertificates(
 			&certchains.ClientCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
@@ -443,12 +449,17 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 func initKubeconfigs(
 	cfg *config.Config,
 	certChains *certchains.CertificateChains,
+	dataDir string,
 ) error {
-	externalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(config.DataDir))))
+	kubeconfigPath := func(id config.KubeConfigID) string {
+		return filepath.Join(dataDir, "resources", string(id), "kubeconfig")
+	}
+	adminRoot := filepath.Join(dataDir, "resources", string(config.KubeAdmin))
+	externalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(dataDir))))
 	if err != nil {
 		return fmt.Errorf("failed to load the external trust signer: %v", err)
 	}
-	internalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(config.DataDir))))
+	internalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(dataDir))))
 	if err != nil {
 		return fmt.Errorf("failed to load the internal trust signer: %v", err)
 	}
@@ -465,9 +476,13 @@ func initKubeconfigs(
 
 	// Generate one kubeconfigs per name
 	for _, name := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
+		path, err := adminKubeconfigPath(adminRoot, name)
+		if err != nil {
+			return err
+		}
 		u.Host = net.JoinHostPort(name, strconv.Itoa(cfg.ApiServer.Port))
 		if err := util.KubeConfigWithClientCerts(
-			cfg.KubeConfigAdminPath(name),
+			path,
 			u.String(),
 			externalTrustPEM,
 			adminKubeconfigCertPEM,
@@ -477,7 +492,7 @@ func initKubeconfigs(
 		}
 	}
 
-	if err := cleanupStaleKubeconfigs(cfg, cfg.KubeConfigRootAdminPath()); err != nil {
+	if err := cleanupStaleKubeconfigs(cfg, adminRoot); err != nil {
 		klog.Warningf("Unable to remove stale kubeconfigs: %v", err)
 	}
 
@@ -523,8 +538,12 @@ func initKubeconfigs(
 				continue
 			}
 
+			path, err := adminKubeconfigPath(adminRoot, dns)
+			if err != nil {
+				return err
+			}
 			if err := util.KubeConfigWithClientCerts(
-				cfg.KubeConfigAdminPath(dns),
+				path,
 				ul.String(),
 				[]byte{},
 				adminKubeconfigCertPEM,
@@ -536,7 +555,7 @@ func initKubeconfigs(
 	}
 
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.KubeAdmin),
+		kubeconfigPath(config.KubeAdmin),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		adminKubeconfigCertPEM,
@@ -550,7 +569,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.KubeControllerManager),
+		kubeconfigPath(config.KubeControllerManager),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		kcmCertPEM,
@@ -564,7 +583,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.KubeScheduler),
+		kubeconfigPath(config.KubeScheduler),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		schedulerCertPEM, schedulerKeyPEM,
@@ -577,7 +596,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.Kubelet),
+		kubeconfigPath(config.Kubelet),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		kubeletCertPEM, kubeletKeyPEM,
@@ -589,7 +608,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.ClusterPolicyController),
+		kubeconfigPath(config.ClusterPolicyController),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		clusterPolicyControllerCertPEM, clusterPolicyControllerKeyPEM,
@@ -602,7 +621,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.RouteControllerManager),
+		kubeconfigPath(config.RouteControllerManager),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		routeControllerManagerCertPEM, routeControllerManagerKeyPEM,
@@ -614,7 +633,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.ObservabilityClient),
+		kubeconfigPath(config.ObservabilityClient),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		observabilityClientCertPEM, observabilityClientKeyPEM,
@@ -624,37 +643,29 @@ func initKubeconfigs(
 	return nil
 }
 
+// Names become directory components. Keep all writes within the configured
+// resource tree, particularly when that tree is a renewal staging directory.
+func adminKubeconfigPath(root, name string) (string, error) {
+	if name == "" || name == "." || name == ".." || filepath.Base(name) != name {
+		return "", fmt.Errorf("invalid name for generated administrator kubeconfig")
+	}
+	return filepath.Join(root, name, "kubeconfig"), nil
+}
+
 // certsToRegenerate returns paths to certificates in the given certificate chains
 // bundle that need to be regenerated
-func certsToRegenerate(cs *certchains.CertificateChains) [][]string {
+func certsToRegenerate(inventory certchains.CertificateInventory, now time.Time) ([][]string, error) {
 	regenCerts := [][]string{}
-	for _, entry := range cs.Inventory() {
-		certPath := entry.Path
-		c := entry.Certificate
-		if now := time.Now(); now.Before(c.NotBefore) || now.After(c.NotAfter) {
-			regenCerts = append(regenCerts, certPath)
+	for _, entry := range inventory {
+		status, err := entry.StatusAt(now)
+		if err != nil {
+			return nil, err
 		}
-
-		timeLeft := time.Until(c.NotAfter)
-
-		const month = 30 * time.Hour * 24
-
-		if cryptomaterial.IsCertShortLived(&c) {
-			// the cert has less than 7 months to live, just rotate
-			until := 7 * month
-			if timeLeft < until {
-				regenCerts = append(regenCerts, certPath)
-			}
-			continue
-		}
-
-		// long lived certs
-		if timeLeft < 18*month {
-			regenCerts = append(regenCerts, certPath)
+		if status != certchains.CertificateStatusHealthy {
+			regenCerts = append(regenCerts, entry.Path)
 		}
 	}
-
-	return regenCerts
+	return regenCerts, nil
 }
 
 func cleanupStaleKubeconfigs(cfg *config.Config, path string) error {

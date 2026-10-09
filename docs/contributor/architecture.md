@@ -29,6 +29,12 @@ This document describes how MicroShift is built and how its components interact 
 | `pkg/servicemanager/` | Dependency-aware service lifecycle manager with startup recording |
 | `pkg/admin/` | Backup/restore, data management, pre-run checks (version metadata, feature gates, health verification) |
 
+`certs status` reports active certificate files and any pending renewal.
+`certs renew --serving|--ca` prepares replacements while MicroShift runs;
+`--dry-run` validates without writing. Startup activates pending material before
+components start, using the recoverable transaction in `pkg/admin/certificates`.
+See [certificate administration](../user/howto_certificates.md).
+
 ### Post-Startup Components
 
 | Package | Purpose |
