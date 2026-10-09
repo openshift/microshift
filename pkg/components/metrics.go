@@ -36,7 +36,16 @@ var metricsClientCAConsumerPaths = []string{
 }
 
 func waitForNamespace(ctx context.Context, clientset kubernetes.Interface, namespace string) error {
-	return wait.PollUntilContextTimeout(ctx, 2*time.Second, 5*time.Minute, true, func(ctx context.Context) (bool, error) {
+	// Poll until the namespace exists or the run context is cancelled (i.e.
+	// MicroShift is shutting down) rather than giving up after a fixed timeout.
+	// Callers only reach this point when the owning component is actually
+	// installed, so the namespace is guaranteed to be created by kustomize
+	// eventually. A fixed timeout here is racy: an earlier, slow kustomization
+	// (e.g. one retrying on a not-yet-ready admission webhook) can delay this
+	// namespace's creation past the window, causing the one-shot provisioning
+	// to give up permanently and leaving dependent pods stuck on a missing
+	// ConfigMap until the next MicroShift restart.
+	return wait.PollUntilContextCancel(ctx, 2*time.Second, true, func(ctx context.Context) (bool, error) {
 		_, err := clientset.CoreV1().Namespaces().Get(ctx, namespace, metav1.GetOptions{})
 		if err == nil {
 			return true, nil
