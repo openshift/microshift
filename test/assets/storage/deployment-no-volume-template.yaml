@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${DNAME}
+spec:
+  replicas: ${REPLICAS}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ${DNAME}
+  template:
+    metadata:
+      labels:
+        app: ${DNAME}
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: ${DNAME}
+        image: ${IMAGE}
+        ports:
+        - containerPort: 80
