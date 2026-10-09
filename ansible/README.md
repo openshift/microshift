@@ -184,6 +184,8 @@ Most of the following variables are defined in `vars/all.yml`. The source-build 
 | `kube_burner_extra_flags` | Extra kube-burner-ocp flags appended to every workload | `""` |
 | `prometheus_query_endpoint` | External Prometheus URL for the network measurement and kube-burner metrics | `http://<logging-host>:9091` |
 | `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.8") | `undefined` |
+| `manage_host_sysctls` | Write the `host_sysctls` drop-ins under `/etc/sysctl.d` on the MicroShift host | `true` |
+| `host_sysctls` | Kernel settings written as drop-ins under `/etc/sysctl.d` on the MicroShift host (IPv6 loopback, inotify limits) | see role defaults |
 
 Source builds update the existing checkout in `microshift_dir` to `microshift_git_revision`. By default, the revision is the release branch derived from
 `microshift_version`; for example, both `4.21.0` and `latest-4.21` select `release-4.21`. Set it explicitly to build another branch, tag, or commit.
