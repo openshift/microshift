@@ -30,6 +30,10 @@ func TestRunCommandCertificateErrors(t *testing.T) {
 			{"certs", "status", "--invalid-status-flag"},
 			{"certs", "status", "--help", "--invalid-status-flag"},
 			{"certs", "status", "-h", "--invalid-status-flag"},
+			{"certs", "renew", "unexpected", "--serving"},
+			{"certs", "renew", "--ca", "--invalid-renew-flag"},
+			{"certs", "renew", "--help", "--invalid-renew-flag"},
+			{"certs", "renew", "-h", "--invalid-renew-flag"},
 		} {
 			t.Run(format+"/"+strings.Join(arguments, " "), func(t *testing.T) {
 				args := slices.Clone(arguments)
@@ -70,6 +74,12 @@ func TestRunCommandOtherCommands(t *testing.T) {
 	require.Zero(t, code)
 	require.Empty(t, stderr)
 	require.Contains(t, stdout, "Report the status of managed MicroShift certificates")
+	stdout, stderr, code = executeRunCommand(t, "certs", "renew", "--help")
+	require.Zero(t, code)
+	require.Empty(t, stderr)
+	require.Contains(t, stdout, "--dry-run")
+	require.Contains(t, stdout, "--serving")
+	require.Contains(t, stdout, "--ca")
 
 	stdout, stderr, code = executeRunCommand(t, "version", "--invalid-version-flag", "-o", "json")
 	require.Equal(t, 1, code)

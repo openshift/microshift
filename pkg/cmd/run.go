@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
+	"github.com/openshift/microshift/pkg/admin/certificates"
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/admin/prerun"
 	"github.com/openshift/microshift/pkg/components"
@@ -146,6 +147,22 @@ func RunMicroshift(cfg *config.Config) error {
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
 	}
+	// Keep activation/recovery exclusive to startup, but allow pending renewal
+	// while the service is running. The operation lock serializes CLI writers.
+	runtimeLock, err := certificates.Lock(certificateRuntimeLockPath, true)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = runtimeLock.Close() }()
+	certificateLock, err := waitForCertificateStartupLock(certificateLockPath, certificateStartupLockTimeout)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = certificateLock.Close() }()
+	transaction := certificates.Transaction{DataDir: config.DataDir}
+	if err := recoverCertificateStartup(&transaction, certificateEtcdStopped); err != nil {
+		return err
+	}
 
 	microshiftStart := time.Now()
 	startRec := startuprecorder.New()
@@ -165,6 +182,11 @@ func RunMicroshift(cfg *config.Config) error {
 
 	if err := prerunDataManagement(); err != nil {
 		writeLogFileError(preRunFailedLogPath, err)
+		return err
+	}
+	// Data management may have restored a different data tree. Do not use an
+	// incomplete transaction from a restored backup either.
+	if err := recoverCertificateStartup(&transaction, certificateEtcdStopped); err != nil {
 		return err
 	}
 
@@ -205,14 +227,26 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
-	certChains, err := initCerts(cfg)
+	activated, err := activateCertificateRenewal(cfg, &transaction, certificateEtcdStopped, time.Now())
+	if err != nil {
+		return fmt.Errorf("failed to activate pending certificate renewal: %w", err)
+	}
+	var certChains *certchains.CertificateChains
+	if activated {
+		certChains, err = loadActivatedCertificates(cfg, config.DataDir)
+	} else {
+		certChains, err = initCerts(cfg)
+	}
 	if err != nil {
 		klog.Fatalf("failed to retrieve the necessary certificates: %v", err)
 	}
 
 	// create kubeconfig for kube-scheduler, kubelet,controller-manager
-	if err := initKubeconfigs(cfg, certChains); err != nil {
+	if err := initKubeconfigs(cfg, certChains, config.DataDir); err != nil {
 		klog.Fatalf("failed to create the necessary kubeconfigs for internal components: %v", err)
+	}
+	if err := certificateLock.Close(); err != nil {
+		return fmt.Errorf("failed to release certificate operation lock: %w", err)
 	}
 
 	// Establish the context we will use to control execution

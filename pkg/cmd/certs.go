@@ -32,16 +32,37 @@ type certStatusOptions struct {
 	now           func() time.Time
 	loadConfig    func() (*config.Config, error)
 	loadInventory func(*config.Config) (certchains.CertificateInventory, error)
+	loadPending   func() (*certificatesv1alpha1.CertificateRenewalResult, error)
+	prepare       func(bool) (func(), error)
 }
 
 // NewCertsCommand creates the certificate administration command family.
 func NewCertsCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
-	return newCertsCommand(&certStatusOptions{
+	command := newCertsCommand(&certStatusOptions{
 		IOStreams:     ioStreams,
 		now:           time.Now,
 		loadConfig:    config.ActiveConfig,
 		loadInventory: loadCertificateInventory,
+		prepare:       prepareCertificateAccess,
+		loadPending: func() (*certificatesv1alpha1.CertificateRenewalResult, error) {
+			return loadPendingCertificateRenewal(config.DataDir)
+		},
 	}, shouldRunPrivileged)
+	command.AddCommand(newCertsRenewCommand(&certRenewOptions{
+		IOStreams: ioStreams, now: time.Now, loadConfig: config.ActiveConfig,
+		prepare: prepareCertificateAccess,
+		plan: func(cfg *config.Config, renewCAs bool, now time.Time) ([]certchains.CertificateRenewalPlanEntry, error) {
+			builder, err := certificateChainsSetup(cfg, config.DataDir)
+			if err != nil {
+				return nil, invalidCertificateConfiguration()
+			}
+			return builder.PlanRenewal(renewCAs, now)
+		},
+		apply: func(cfg *config.Config, renewCAs bool) (certchains.CertificateInventory, error) {
+			return applyCertificateRenewal(cfg, config.DataDir, renewCAs)
+		},
+	}, shouldRunPrivileged))
+	return command
 }
 
 func newCertsCommand(options *certStatusOptions, requirePrivileges func() error) *cobra.Command {
@@ -86,13 +107,19 @@ func (o *certStatusOptions) run() error {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidArguments,
 			fmt.Errorf("unsupported output format %q; supported formats: json, yaml", o.output)}
 	}
+	if o.prepare != nil {
+		release, err := o.prepare(false)
+		if err != nil {
+			return err
+		}
+		defer release()
+	}
 
 	cfg, err := o.loadConfig()
 	if err != nil {
 		// Loader errors can include raw configuration and credentials. Do not
 		// retain their contents in errors returned by certificate commands.
-		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidConfiguration,
-			errors.New("failed to load MicroShift configuration; check /etc/microshift/config.yaml and /etc/microshift/config.d")}
+		return invalidCertificateConfiguration()
 	}
 	inventory, err := o.loadInventory(cfg)
 	if err != nil {
@@ -104,6 +131,15 @@ func (o *certStatusOptions) run() error {
 	if err != nil {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeCertificateInventoryFailed,
 			fmt.Errorf("failed to build certificate status: %w", err)}
+	}
+	if o.loadPending != nil {
+		status.PendingRenewal, err = o.loadPending()
+		if err != nil {
+			return &certificateCommandError{certificatesv1alpha1.ErrorCodeCertificateInventoryFailed, err}
+		}
+		if status.PendingRenewal != nil {
+			status.Warnings = append(status.Warnings, "Renewed certificates are pending activation. Status items describe active files; restart MicroShift to activate the pending renewal.")
+		}
 	}
 	switch c := o.output; c {
 	case certificateOutputJSON, certificateOutputYAML:
@@ -120,6 +156,11 @@ func (o *certStatusOptions) run() error {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInternalError, err}
 	}
 	return nil
+}
+
+func invalidCertificateConfiguration() error {
+	return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidConfiguration,
+		errors.New("failed to load MicroShift configuration; check /etc/microshift/config.yaml and /etc/microshift/config.d")}
 }
 
 func loadCertificateInventory(cfg *config.Config) (certchains.CertificateInventory, error) {
