@@ -44,8 +44,8 @@ import (
 // pkg/config/kubelet.go, where the values are read from the configuration.
 const (
 	// These are configuration key names, not credentials.
-	configPathKey = "imageCredentialProviderConfigPath" //nolint:gosec // G101: not a credential
-	binDirKey     = "imageCredentialProviderBinDir"     //nolint:gosec // G101: not a credential
+	configPathKey = "imageCredentialProviderConfigPath"
+	binDirKey     = "imageCredentialProviderBinDir"
 )
 
 // credentialProviderAPIVersions is the set of provider exec API versions kubelet
