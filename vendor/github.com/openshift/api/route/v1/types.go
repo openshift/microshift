@@ -422,7 +422,7 @@ type RouterShard struct {
 // TLSConfig defines config used to secure a route and provide termination
 //
 // +kubebuilder:validation:XValidation:rule="has(self.termination) && has(self.insecureEdgeTerminationPolicy) ? !((self.termination=='passthrough') && (self.insecureEdgeTerminationPolicy=='Allow')) : true", message="cannot have both spec.tls.termination: passthrough and spec.tls.insecureEdgeTerminationPolicy: Allow"
-// +openshift:validation:FeatureGateAwareXValidation:featureGate=RouteExternalCertificate,rule="!(has(self.certificate) && has(self.externalCertificate))", message="cannot have both spec.tls.certificate and spec.tls.externalCertificate"
+// +kubebuilder:validation:XValidation:rule="!(has(self.certificate) && has(self.externalCertificate))", message="cannot have both spec.tls.certificate and spec.tls.externalCertificate"
 type TLSConfig struct {
 	// termination indicates the TLS termination type.
 	//
@@ -443,7 +443,8 @@ type TLSConfig struct {
 	// key provides key file contents
 	Key string `json:"key,omitempty" protobuf:"bytes,3,opt,name=key"`
 
-	// caCertificate provides the cert authority certificate contents
+	// caCertificate provides the cert authority certificate contents. Any needed
+	// intermediate certificates should be provided here.
 	CACertificate string `json:"caCertificate,omitempty" protobuf:"bytes,4,opt,name=caCertificate"`
 
 	// destinationCACertificate provides the contents of the ca certificate of the final destination.  When using reencrypt
@@ -468,14 +469,16 @@ type TLSConfig struct {
 	InsecureEdgeTerminationPolicy InsecureEdgeTerminationPolicyType `json:"insecureEdgeTerminationPolicy,omitempty" protobuf:"bytes,6,opt,name=insecureEdgeTerminationPolicy,casttype=InsecureEdgeTerminationPolicyType"`
 
 	// externalCertificate provides certificate contents as a secret reference.
-	// This should be a single serving certificate, not a certificate
-	// chain. Do not include a CA certificate. The secret referenced should
-	// be present in the same namespace as that of the Route.
+	// This should be the serving certificate, and may optionally include the
+	// full certificate chain, including any needed intermediate certificates.
+	// There is no separate field to provide a CA certificate when using
+	// externalCertificate, so any CA certificate needed must be included as
+	// part of this chain. The secret referenced should be present in the same
+	// namespace as that of the Route.
 	// Forbidden when `certificate` is set.
 	// The router service account needs to be granted with read-only access to this secret,
 	// please refer to openshift docs for additional details.
 	//
-	// +openshift:enable:FeatureGate=RouteExternalCertificate
 	// +optional
 	ExternalCertificate *LocalObjectReference `json:"externalCertificate,omitempty" protobuf:"bytes,7,opt,name=externalCertificate"`
 }
