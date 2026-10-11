@@ -239,6 +239,7 @@ var map_ServingInfo = map[string]string{
 	"namedCertificates": "namedCertificates is a list of certificates to use to secure requests to specific hostnames",
 	"minTLSVersion":     "minTLSVersion is the minimum TLS version supported. Values must match version names from https://golang.org/pkg/crypto/tls/#pkg-constants",
 	"cipherSuites":      "cipherSuites contains an overridden list of ciphers for the server to support. Values must match cipher suite IDs from https://golang.org/pkg/crypto/tls/#pkg-constants",
+	"curvePreferences":  "curvePreferences contains the allowed TLS key-exchange groups for the server. Values must match curve IDs from https://golang.org/pkg/crypto/tls/#pkg-constants. When omitted, the Go TLS implementation uses its default curve set.",
 }
 
 func (ServingInfo) SwaggerDoc() map[string]string {
@@ -2465,13 +2466,23 @@ func (Storage) SwaggerDoc() map[string]string {
 }
 
 var map_KMSPluginConfig = map[string]string{
-	"":      "KMSPluginConfig defines the configuration for the KMS instance that will be used with KMS encryption",
-	"type":  "type defines the kind of platform for the KMS provider. Allowed values are Vault. When set to Vault, the plugin connects to a HashiCorp Vault server for key management.",
-	"vault": "vault defines the configuration for the Vault KMS plugin. The plugin connects to a Vault Enterprise server that is managed by the user outside the purview of the control plane. This field must be set when type is Vault, and must be unset otherwise.",
+	"":             "KMSPluginConfig defines the configuration for the KMS instance that will be used with KMS encryption",
+	"pluginConfig": "pluginConfig is a required reference to a cluster-scoped resource with a status subresource that satisfies the OpenShift KMS plugin configuration status interface.",
 }
 
 func (KMSPluginConfig) SwaggerDoc() map[string]string {
 	return map_KMSPluginConfig
+}
+
+var map_KMSPluginConfigReference = map[string]string{
+	"":           "KMSPluginConfigReference identifies a cluster-scoped KMS plugin configuration custom resource.",
+	"apiVersion": "apiVersion is required and identifies the API version of the referenced KMS plugin configuration resource. The value must be in the format <group>/<version>, where group is a DNS subdomain and version is a Kubernetes API version (for example, v1 or v1alpha1). It must contain between 1 and 64 characters.",
+	"resource":   "resource is required and is the resource name of the referenced KMS plugin configuration custom resource. This is the plural name used in the Kubernetes API (for example, vaultkmsconfigs), not the Kind (for example, VaultKMSConfig). The value must be between 1 and 63 characters, contain only lowercase alphanumeric characters or '-', and start and end with an alphanumeric character.",
+	"name":       "name is required and is the metadata.name of the referenced KMS plugin configuration resource. The referenced resource must be cluster-scoped. The name must be a valid DNS subdomain name: it must contain between 1 and 253 characters, contain only lowercase alphanumeric characters, '-' or '.', and start and end with an alphanumeric character.",
+}
+
+func (KMSPluginConfigReference) SwaggerDoc() map[string]string {
+	return map_KMSPluginConfigReference
 }
 
 var map_VaultAppRoleAuthentication = map[string]string{
