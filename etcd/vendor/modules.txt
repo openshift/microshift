@@ -388,7 +388,7 @@ go.etcd.io/etcd/server/v3/storage/schema
 go.etcd.io/etcd/server/v3/storage/wal
 go.etcd.io/etcd/server/v3/storage/wal/walpb
 go.etcd.io/etcd/server/v3/verify
-# go.etcd.io/raft/v3 v3.6.0
+# go.etcd.io/raft/v3 v3.6.0 => go.etcd.io/raft/v3 v3.6.0
 ## explicit; go 1.23
 go.etcd.io/raft/v3
 go.etcd.io/raft/v3/confchange
@@ -1114,6 +1114,7 @@ sigs.k8s.io/yaml/kyaml
 # go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260903213007-24fb7ef2afe9
 # go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20260903213007-24fb7ef2afe9
 # go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20260903213007-24fb7ef2afe9
+# go.etcd.io/raft/v3 => go.etcd.io/raft/v3 v3.6.0
 # k8s.io/api => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/api
 # k8s.io/apiextensions-apiserver => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver
 # k8s.io/apimachinery => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery

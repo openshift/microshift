@@ -150,6 +150,7 @@ replace (
 	go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260903213007-24fb7ef2afe9 // from etcd
 	go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20260903213007-24fb7ef2afe9 // from etcd
 	go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20260903213007-24fb7ef2afe9 // from etcd
+	go.etcd.io/raft/v3 => go.etcd.io/raft/v3 v3.6.0 // override openshift/etcd server fork requires raft v3.6.0; k8s selects v3.7.0 (protobuf-incompatible) via stale indirect requires
 )
 
 replace (
