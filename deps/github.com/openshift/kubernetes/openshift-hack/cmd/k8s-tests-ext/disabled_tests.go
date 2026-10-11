@@ -11,7 +11,7 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 		"Alpha": { // alpha features that are not gated
 			"[Feature:StorageVersionAPI]",
 			"[Feature:ClusterTrustBundle]",
-			"[sig-cli] Kubectl client Kubectl prune with applyset should apply and prune objects", // Alpha feature since k8s 1.27
+			"[sig-cli] kubectl apply Kubectl prune with applyset should apply and prune objects", // Alpha feature since k8s 1.27
 			// 4.19
 			"[Feature:PodLogsQuerySplitStreams]",
 		},
@@ -57,6 +57,11 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 			// Given that we have existing oc and WMCO tests that cover this functionality, we can safely disable it.
 			"[Feature:NodeLogQuery]",
 
+			// Same issue as NodeLogQuery above - requires SSH to verify NFS mount/UID directory cleanup.
+			// The parallel suite does not configure a bastion host, so SSH key lookup fails.
+			// These tests were previously filtered by [Flaky] but upstream removed that tag in 1.37.
+			"[HostCleanup]",
+
 			// volumegroupsnapshot in csi-hostpath tests requires changes in the test yaml files,
 			// which are done by a script upstream. In OCP, we added a separate driver csi-hostpath-groupsnapshot,
 			// that will not be skipped by any rule here.
@@ -64,7 +69,7 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 
 			// https://issues.redhat.com/browse/OCPBUGS-77243
 			// Requires CRI-O be configured to accept insecure registries, which is not done OOTB and not typically recommended (though is possible to do).
-			"[sig-node] Container Runtime blackbox test when running a container with a new image [Serial] should be able to pull from private registry with secret [NodeConformance]",
+			"[sig-node] Container Runtime blackbox test when running a container with a new image should be able to pull from private registry with secret [NodeConformance] [Serial]",
 		},
 		// tests that are known broken and need to be fixed upstream or in openshift
 		// always add an issue here
@@ -164,7 +169,10 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 			"[sig-network] Connectivity Pod Lifecycle should be able to connect to other Pod from a terminating Pod",
 
 			// https://issues.redhat.com/browse/OCPBUGS-99058
-			"[sig-node] [DRA] [FeatureGate:DRAExtendedResource] [Beta] [Feature:DynamicResourceAllocation] must run pods with extended resource on dra nodes and device plugin nodes [Serial] [KubeletMinVersion:1.35]",
+			"[sig-node] [DRA] [FeatureGate:DRAExtendedResource] [Feature:DynamicResourceAllocation] must run pods with extended resource on dra nodes and device plugin nodes [KubeletMinVersion:1.35] [FeatureGate:DynamicResourceAllocation] [Serial]",
+
+			// https://redhat.atlassian.net/browse/CORENET-7172
+			"[sig-network] Netpol NetworkPolicy between server and client should not allow all ports if it cannot limit to the requested port [Feature:NetworkPolicy]",
 		},
 		// tests that need to be temporarily disabled while the rebase is in progress.
 		"RebaseInProgress": {

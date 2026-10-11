@@ -24,6 +24,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
+	validationmetrics "k8s.io/apiserver/pkg/validation"
 	"k8s.io/client-go/kubernetes"
 	apiservertesting "k8s.io/kubernetes/cmd/kube-apiserver/app/testing"
 	"k8s.io/kubernetes/test/integration/framework"
@@ -43,7 +44,10 @@ var immortalNamespaces = sets.NewString("openshift-config-managed")
 
 func TestOpenShiftValidateWhiteListedSecretTypeMutationUpdateAllowed(t *testing.T) {
 	ctx := context.Background()
-	server, err := apiservertesting.StartTestServer(t, apiservertesting.NewDefaultTestServerOptions(), nil, framework.SharedEtcd())
+	t.Cleanup(validationmetrics.ResetValidationMetricsInstance)
+	opts := apiservertesting.NewDefaultTestServerOptions()
+	opts.DisableInvariantChecks = true
+	server, err := apiservertesting.StartTestServer(t, opts, nil, framework.SharedEtcd())
 	if err != nil {
 		t.Fatal(err)
 	}

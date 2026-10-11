@@ -37,7 +37,7 @@ import (
 	kubeadmapi "k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm"
 	"k8s.io/kubernetes/cmd/kubeadm/app/constants"
 	"k8s.io/kubernetes/cmd/kubeadm/app/util/errors"
-	testresources "k8s.io/kubernetes/cmd/kubeadm/test/resources"
+	staticpodutil "k8s.io/kubernetes/cmd/kubeadm/app/util/staticpod"
 )
 
 var errNotImplemented = errors.New("not implemented")
@@ -189,7 +189,7 @@ func TestGetClientURLByIP(t *testing.T) {
 func TestGetEtcdEndpointsWithBackoff(t *testing.T) {
 	tests := []struct {
 		name              string
-		pods              []testresources.FakeStaticPod
+		pods              []staticpodutil.FakeStaticPod
 		expectedEndpoints []string
 		expectedErr       bool
 	}{
@@ -200,7 +200,7 @@ func TestGetEtcdEndpointsWithBackoff(t *testing.T) {
 		},
 		{
 			name: "ipv4 endpoint in pod annotation; port is preserved",
-			pods: []testresources.FakeStaticPod{
+			pods: []staticpodutil.FakeStaticPod{
 				{
 					Component: constants.Etcd,
 					Annotations: map[string]string{
@@ -240,14 +240,14 @@ func TestGetEtcdEndpointsWithBackoff(t *testing.T) {
 func TestGetRawEtcdEndpointsFromPodAnnotation(t *testing.T) {
 	tests := []struct {
 		name              string
-		pods              []testresources.FakeStaticPod
+		pods              []staticpodutil.FakeStaticPod
 		clientSetup       func(*clientsetfake.Clientset)
 		expectedEndpoints []string
 		expectedErr       bool
 	}{
 		{
 			name: "exactly one pod with annotation",
-			pods: []testresources.FakeStaticPod{
+			pods: []staticpodutil.FakeStaticPod{
 				{
 					NodeName:    "cp-0",
 					Component:   constants.Etcd,
@@ -258,7 +258,7 @@ func TestGetRawEtcdEndpointsFromPodAnnotation(t *testing.T) {
 		},
 		{
 			name: "two pods; one is missing annotation",
-			pods: []testresources.FakeStaticPod{
+			pods: []staticpodutil.FakeStaticPod{
 				{
 					NodeName:    "cp-0",
 					Component:   constants.Etcd,
@@ -278,7 +278,7 @@ func TestGetRawEtcdEndpointsFromPodAnnotation(t *testing.T) {
 		},
 		{
 			name: "exactly one pod with annotation; all requests fail",
-			pods: []testresources.FakeStaticPod{
+			pods: []staticpodutil.FakeStaticPod{
 				{
 					NodeName:    "cp-0",
 					Component:   constants.Etcd,
@@ -324,7 +324,7 @@ func TestGetRawEtcdEndpointsFromPodAnnotation(t *testing.T) {
 func TestGetRawEtcdEndpointsFromPodAnnotationWithoutRetry(t *testing.T) {
 	tests := []struct {
 		name              string
-		pods              []testresources.FakeStaticPod
+		pods              []staticpodutil.FakeStaticPod
 		clientSetup       func(*clientsetfake.Clientset)
 		expectedEndpoints []string
 		expectedErr       bool
@@ -335,7 +335,7 @@ func TestGetRawEtcdEndpointsFromPodAnnotationWithoutRetry(t *testing.T) {
 		},
 		{
 			name: "exactly one pod with annotation",
-			pods: []testresources.FakeStaticPod{
+			pods: []staticpodutil.FakeStaticPod{
 				{
 					NodeName:    "cp-0",
 					Component:   constants.Etcd,
@@ -346,7 +346,7 @@ func TestGetRawEtcdEndpointsFromPodAnnotationWithoutRetry(t *testing.T) {
 		},
 		{
 			name: "two pods; one is missing annotation",
-			pods: []testresources.FakeStaticPod{
+			pods: []staticpodutil.FakeStaticPod{
 				{
 					NodeName:    "cp-0",
 					Component:   constants.Etcd,
@@ -361,7 +361,7 @@ func TestGetRawEtcdEndpointsFromPodAnnotationWithoutRetry(t *testing.T) {
 		},
 		{
 			name: "two pods with annotation",
-			pods: []testresources.FakeStaticPod{
+			pods: []staticpodutil.FakeStaticPod{
 				{
 					NodeName:    "cp-0",
 					Component:   constants.Etcd,
@@ -377,7 +377,7 @@ func TestGetRawEtcdEndpointsFromPodAnnotationWithoutRetry(t *testing.T) {
 		},
 		{
 			name: "exactly one pod with annotation; request fails",
-			pods: []testresources.FakeStaticPod{
+			pods: []staticpodutil.FakeStaticPod{
 				{
 					NodeName:    "cp-0",
 					Component:   constants.Etcd,
@@ -976,6 +976,16 @@ func TestEvaluateClusterStatus(t *testing.T) {
 	}
 }
 
+type memberListResult struct {
+	members []*pb.Member
+	err     error
+}
+
+type memberPromoteResult struct {
+	resp *clientv3.MemberPromoteResponse
+	err  error
+}
+
 func TestMemberPromote(t *testing.T) {
 	learnerID := uint64(12345)
 
@@ -984,110 +994,167 @@ func TestMemberPromote(t *testing.T) {
 		promotedEndpoint = "https://192.168.10.200:2379"
 	)
 
-	member := func(isLearner bool) *pb.Member {
+	member := func(name string, isLearner bool) *pb.Member {
 		return &pb.Member{
 			ID:         learnerID,
-			Name:       "cp-1",
+			Name:       name,
 			PeerURLs:   []string{"https://192.168.10.200:2380"},
 			ClientURLs: []string{promotedEndpoint},
 			IsLearner:  isLearner,
 		}
 	}
 
-	type memberListResult struct {
-		members []*pb.Member
-		err     error
+	learner := func() *pb.Member {
+		return member("cp-1", true)
 	}
-
-	type memberPromoteResult struct {
-		resp *clientv3.MemberPromoteResponse
-		err  error
+	notStartedLearner := func() *pb.Member {
+		return member("", true)
+	}
+	votingMember := func() *pb.Member {
+		return member("cp-1", false)
+	}
+	promoteSuccess := memberPromoteResult{
+		resp: &clientv3.MemberPromoteResponse{
+			Members: []*pb.Member{votingMember()},
+		},
 	}
 
 	tests := []struct {
 		name                 string
+		initialEndpoints     []string
 		memberListResults    []memberListResult
 		memberPromoteResults []memberPromoteResult
 		wantErr              bool
 		wantEndpoint         string
+		wantEndpointCount    int
 		wantPromoteCalls     int
 		minMemberListCalls   int
 	}{
+		// Normal path: learner is started, promotion succeeds, and the new endpoint is added.
 		{
 			name: "successful promotion adds endpoint",
 			memberListResults: []memberListResult{
-				{members: []*pb.Member{member(true)}},
-				{members: []*pb.Member{member(true)}},
+				{members: []*pb.Member{learner()}},
+				{members: []*pb.Member{learner()}},
 			},
 			memberPromoteResults: []memberPromoteResult{
-				{
-					resp: &clientv3.MemberPromoteResponse{
-						Members: []*pb.Member{member(false)},
-					},
-				},
+				promoteSuccess,
 			},
 			wantEndpoint:       promotedEndpoint,
+			wantEndpointCount:  1,
 			wantPromoteCalls:   1,
 			minMemberListCalls: 2,
 		},
+		// The learner exists but has not started yet, so kubeadm should wait before promoting.
+		{
+			name: "learner not started yet and retried before promotion",
+			memberListResults: []memberListResult{
+				{members: []*pb.Member{notStartedLearner()}},
+				{members: []*pb.Member{learner()}},
+				{members: []*pb.Member{learner()}},
+			},
+			memberPromoteResults: []memberPromoteResult{
+				promoteSuccess,
+			},
+			wantEndpoint:       promotedEndpoint,
+			wantEndpointCount:  1,
+			wantPromoteCalls:   1,
+			minMemberListCalls: 3,
+		},
+		// A transient error of member listing while waiting for the learner to start should be retried.
+		{
+			name: "member list error while waiting for learner start",
+			memberListResults: []memberListResult{
+				{err: errNotImplemented},
+				{members: []*pb.Member{learner()}},
+				{members: []*pb.Member{learner()}},
+			},
+			memberPromoteResults: []memberPromoteResult{
+				promoteSuccess,
+			},
+			wantEndpoint:       promotedEndpoint,
+			wantEndpointCount:  1,
+			wantPromoteCalls:   1,
+			minMemberListCalls: 3,
+		},
+		// A transient error of member listing before promotion, and it should be retried before calling MemberPromote.
+		{
+			name: "member list error before promotion is retried",
+			memberListResults: []memberListResult{
+				{members: []*pb.Member{learner()}},
+				{err: errNotImplemented},
+				{members: []*pb.Member{learner()}},
+			},
+			memberPromoteResults: []memberPromoteResult{
+				promoteSuccess,
+			},
+			wantEndpoint:       promotedEndpoint,
+			wantEndpointCount:  1,
+			wantPromoteCalls:   1,
+			minMemberListCalls: 3,
+		},
+		// A transient promotion error should be retried then can succeed later.
+		{
+			name: "transient promote error is retried and then succeeds",
+			memberListResults: []memberListResult{
+				{members: []*pb.Member{learner()}},
+				{members: []*pb.Member{learner()}},
+				{members: []*pb.Member{learner()}},
+			},
+			memberPromoteResults: []memberPromoteResult{
+				{err: context.DeadlineExceeded},
+				promoteSuccess,
+			},
+			wantEndpoint:       promotedEndpoint,
+			wantEndpointCount:  1,
+			wantPromoteCalls:   2,
+			minMemberListCalls: 3,
+		},
+		// If promotion succeeded on the etcd side but the client saw an error,
+		// the next retry should treat an already promoted member as success.
 		{
 			name: "already promoted after transient promote failure adds endpoint",
 			memberListResults: []memberListResult{
-				{members: []*pb.Member{member(true)}},
-				{members: []*pb.Member{member(true)}},
-				{members: []*pb.Member{member(false)}},
+				{members: []*pb.Member{learner()}},
+				{members: []*pb.Member{learner()}},
+				{members: []*pb.Member{votingMember()}},
 			},
 			memberPromoteResults: []memberPromoteResult{
-				{
-					err: context.DeadlineExceeded,
-				},
+				{err: context.DeadlineExceeded},
 			},
 			wantEndpoint:       promotedEndpoint,
+			wantEndpointCount:  1,
 			wantPromoteCalls:   1,
 			minMemberListCalls: 3,
 		},
+		// If the member is already promoted before the promote attempt,
+		// kubeadm should not call MemberPromote again.
 		{
 			name: "already promoted before promote attempt adds endpoint",
 			memberListResults: []memberListResult{
-				{members: []*pb.Member{member(true)}},
-				{members: []*pb.Member{member(false)}},
+				{members: []*pb.Member{learner()}},
+				{members: []*pb.Member{votingMember()}},
 			},
 			wantEndpoint:       promotedEndpoint,
+			wantEndpointCount:  1,
 			wantPromoteCalls:   0,
 			minMemberListCalls: 2,
 		},
+		// If the endpoint is already present, promoting should still succeed without duplicating it.
 		{
-			name: "member list error before promote is retried",
+			name:             "endpoint is already present",
+			initialEndpoints: []string{initialEndpoint, promotedEndpoint},
 			memberListResults: []memberListResult{
-				{members: []*pb.Member{member(true)}},
-				{err: errNotImplemented},
-				{members: []*pb.Member{member(true)}},
+				{members: []*pb.Member{learner()}},
+				{members: []*pb.Member{learner()}},
 			},
 			memberPromoteResults: []memberPromoteResult{
-				{
-					resp: &clientv3.MemberPromoteResponse{
-						Members: []*pb.Member{member(false)},
-					},
-				},
+				promoteSuccess,
 			},
 			wantEndpoint:       promotedEndpoint,
+			wantEndpointCount:  1,
 			wantPromoteCalls:   1,
-			minMemberListCalls: 3,
-		},
-		{
-			name: "promotion keeps failing",
-			memberListResults: []memberListResult{
-				{members: []*pb.Member{member(true)}},
-				{members: []*pb.Member{member(true)}},
-			},
-			memberPromoteResults: []memberPromoteResult{
-				{
-					err: context.DeadlineExceeded,
-				},
-			},
-			wantErr:            true,
-			wantPromoteCalls:   -1,
-			minMemberListCalls: 1,
+			minMemberListCalls: 2,
 		},
 	}
 
@@ -1166,6 +1233,17 @@ func TestMemberPromote(t *testing.T) {
 
 			if tt.wantEndpoint != "" && !slices.Contains(c.Endpoints, tt.wantEndpoint) {
 				t.Fatalf("expected endpoint %q to be added, got %v", tt.wantEndpoint, c.Endpoints)
+			}
+			if tt.wantEndpointCount > 0 {
+				endpointCount := 0
+				for _, endpoint := range c.Endpoints {
+					if endpoint == tt.wantEndpoint {
+						endpointCount++
+					}
+				}
+				if endpointCount != tt.wantEndpointCount {
+					t.Fatalf("endpoint %q count = %d, want %d; endpoints = %v", tt.wantEndpoint, endpointCount, tt.wantEndpointCount, c.Endpoints)
+				}
 			}
 		})
 	}

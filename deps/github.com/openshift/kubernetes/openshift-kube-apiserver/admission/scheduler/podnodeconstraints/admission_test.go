@@ -258,6 +258,14 @@ func (a *fakeTestAuthorizer) Authorize(_ context.Context, attributes authorizer.
 	return authorizer.DecisionNoOpinion, "", nil
 }
 
+func (a *fakeTestAuthorizer) ConditionsAwareAuthorize(ctx context.Context, attrs authorizer.Attributes) authorizer.ConditionsAwareDecision {
+	return authorizer.ConditionsAwareDecisionFromParts(a.Authorize(ctx, attrs))
+}
+
+func (a *fakeTestAuthorizer) EvaluateConditions(_ context.Context, _ authorizer.ConditionsAwareDecision, _ authorizer.ConditionsData) (authorizer.Decision, string, error) {
+	return authorizer.DecisionDeny, "", authorizer.ErrorConditionEvaluationNotSupported
+}
+
 func reviewResponse(allowed bool, msg string) *authorizationv1.SubjectAccessReviewResponse {
 	return &authorizationv1.SubjectAccessReviewResponse{
 		Allowed: allowed,

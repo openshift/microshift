@@ -9,15 +9,15 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// OAuthAccessTokens returns a OAuthAccessTokenInformer.
-	OAuthAccessTokens() OAuthAccessTokenInformer
+	OAuthAccessTokens() TypedOAuthAccessTokenInformer
 	// OAuthAuthorizeTokens returns a OAuthAuthorizeTokenInformer.
-	OAuthAuthorizeTokens() OAuthAuthorizeTokenInformer
+	OAuthAuthorizeTokens() TypedOAuthAuthorizeTokenInformer
 	// OAuthClients returns a OAuthClientInformer.
-	OAuthClients() OAuthClientInformer
+	OAuthClients() TypedOAuthClientInformer
 	// OAuthClientAuthorizations returns a OAuthClientAuthorizationInformer.
-	OAuthClientAuthorizations() OAuthClientAuthorizationInformer
+	OAuthClientAuthorizations() TypedOAuthClientAuthorizationInformer
 	// UserOAuthAccessTokens returns a UserOAuthAccessTokenInformer.
-	UserOAuthAccessTokens() UserOAuthAccessTokenInformer
+	UserOAuthAccessTokens() TypedUserOAuthAccessTokenInformer
 }
 
 type version struct {
@@ -31,27 +31,27 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// OAuthAccessTokens returns a OAuthAccessTokenInformer.
-func (v *version) OAuthAccessTokens() OAuthAccessTokenInformer {
+// OAuthAccessTokens returns a TypedOAuthAccessTokenInformer.
+func (v *version) OAuthAccessTokens() TypedOAuthAccessTokenInformer {
 	return &oAuthAccessTokenInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// OAuthAuthorizeTokens returns a OAuthAuthorizeTokenInformer.
-func (v *version) OAuthAuthorizeTokens() OAuthAuthorizeTokenInformer {
+// OAuthAuthorizeTokens returns a TypedOAuthAuthorizeTokenInformer.
+func (v *version) OAuthAuthorizeTokens() TypedOAuthAuthorizeTokenInformer {
 	return &oAuthAuthorizeTokenInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// OAuthClients returns a OAuthClientInformer.
-func (v *version) OAuthClients() OAuthClientInformer {
+// OAuthClients returns a TypedOAuthClientInformer.
+func (v *version) OAuthClients() TypedOAuthClientInformer {
 	return &oAuthClientInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// OAuthClientAuthorizations returns a OAuthClientAuthorizationInformer.
-func (v *version) OAuthClientAuthorizations() OAuthClientAuthorizationInformer {
+// OAuthClientAuthorizations returns a TypedOAuthClientAuthorizationInformer.
+func (v *version) OAuthClientAuthorizations() TypedOAuthClientAuthorizationInformer {
 	return &oAuthClientAuthorizationInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// UserOAuthAccessTokens returns a UserOAuthAccessTokenInformer.
-func (v *version) UserOAuthAccessTokens() UserOAuthAccessTokenInformer {
+// UserOAuthAccessTokens returns a TypedUserOAuthAccessTokenInformer.
+func (v *version) UserOAuthAccessTokens() TypedUserOAuthAccessTokenInformer {
 	return &userOAuthAccessTokenInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

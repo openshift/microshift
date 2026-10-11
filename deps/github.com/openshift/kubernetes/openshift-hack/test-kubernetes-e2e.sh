@@ -27,6 +27,17 @@ esac
 # here.
 NETWORK_SKIPS="\[Skipped:Network/OVNKubernetes\]|\[Feature:Networking-IPv6\]|\[Feature:IPv6DualStack.*\]|\[Feature:SCTPConnectivity\]"
 
+NETWORK_PLUGIN="unknown"
+if NETWORK_PLUGIN="$(oc get network.config.openshift.io cluster \
+    -o jsonpath='{.status.networkType}' 2>/dev/null)"; then
+  NETWORK_PLUGIN="${NETWORK_PLUGIN:-unknown}"
+fi
+
+echo "Detected network plugin: ${NETWORK_PLUGIN}"
+if [[ "${NETWORK_PLUGIN}" == "OVNKubernetes" ]]; then
+  NETWORK_SKIPS="${NETWORK_SKIPS}|\[Feature:LocalhostNodePorts\]"
+fi
+
 # Support serial and parallel test suites
 TEST_SUITE="${TEST_SUITE:-parallel}"
 COMMON_SKIPS="\[Slow\]|\[Disruptive\]|\[Flaky\]|\[Disabled:.+\]|\[Skipped:${PLATFORM}\]|\[DedicatedJob\]|${NETWORK_SKIPS}"

@@ -27,6 +27,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+
 	"k8s.io/apimachinery/pkg/util/version"
 )
 
@@ -46,7 +47,7 @@ func TestVerifyAlphabeticOrder(t *testing.T) {
 		{
 			name: "ordered versioned specs",
 			keys: []string{
-				"SchedulerQueueingHints", "SELinuxMount", "ServiceAccountTokenJTI",
+				"SELinuxMount", "ServiceAccountTokenJTI",
 				"genericfeatures.AdmissionWebhookMatchConditions",
 				"genericfeatures.AggregatedDiscoveryEndpoint",
 			},
@@ -54,7 +55,7 @@ func TestVerifyAlphabeticOrder(t *testing.T) {
 		{
 			name: "unordered versioned specs",
 			keys: []string{
-				"SELinuxMount", "SchedulerQueueingHints", "ServiceAccountTokenJTI",
+				"ServiceAccountTokenJTI", "SELinuxMount",
 				"genericfeatures.AdmissionWebhookMatchConditions",
 				"genericfeatures.AggregatedDiscoveryEndpoint",
 			},
@@ -64,7 +65,7 @@ func TestVerifyAlphabeticOrder(t *testing.T) {
 			name: "unordered versioned specs with mixed pkg prefix",
 			keys: []string{
 				"genericfeatures.AdmissionWebhookMatchConditions",
-				"SchedulerQueueingHints", "SELinuxMount", "ServiceAccountTokenJTI",
+				"SELinuxMount", "ServiceAccountTokenJTI",
 				"genericfeatures.AggregatedDiscoveryEndpoint",
 			},
 			expectErr: true,
@@ -72,7 +73,7 @@ func TestVerifyAlphabeticOrder(t *testing.T) {
 		{
 			name: "unordered versioned specs with pkg prefix",
 			keys: []string{
-				"SchedulerQueueingHints", "SELinuxMount", "ServiceAccountTokenJTI",
+				"SELinuxMount", "ServiceAccountTokenJTI",
 				"genericfeatures.AggregatedDiscoveryEndpoint",
 				"genericfeatures.AdmissionWebhookMatchConditions",
 			},
@@ -484,6 +485,10 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 	CPUCFSQuotaPeriod: {
 		{Version: version.MustParse("1.29"), Default: false, PreRelease: featuregate.Alpha},
 	},
+	DRAFractionalCapacityRange: {
+		{Version: version.MustParse("1.37"), Default: false, PreRelease: featuregate.Beta},
+		{Version: version.MustParse("1.37"), Default: true, PreRelease: featuregate.Beta, MinCompatibilityVersion: version.MustParse("1.37")},
+	},
 	genericfeatures.AggregatedDiscoveryEndpoint: {
 		{Version: version.MustParse("1.30"), Default: false, PreRelease: featuregate.Alpha},
 	},
@@ -502,6 +507,14 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 					FullName: "CPUCFSQuotaPeriod",
 					VersionedSpecs: []featureSpec{
 						{Default: false, PreRelease: "Alpha", Version: "1.29"},
+					},
+				},
+				{
+					Name:     "DRAFractionalCapacityRange",
+					FullName: "DRAFractionalCapacityRange",
+					VersionedSpecs: []featureSpec{
+						{Default: false, PreRelease: "Beta", Version: "1.37"},
+						{Default: true, PreRelease: "Beta", Version: "1.37", MinCompatibilityVersion: "1.37"},
 					},
 				},
 				{
@@ -754,13 +767,12 @@ func TestParseFeatureSpec(t *testing.T) {
 }
 func TestVerifyFeatureRemoval(t *testing.T) {
 	tests := []struct {
-		name             string
-		featureList      []featureInfo
-		baseFeatureList  []featureInfo
-		currentVersion   *version.Version
-		thresholdVersion *version.Version
-		expectErr        bool
-		expectedErrMsg   string
+		name            string
+		featureList     []featureInfo
+		baseFeatureList []featureInfo
+		currentVersion  *version.Version
+		expectErr       bool
+		expectedErrMsg  string
 	}{
 		{
 			name: "no features removed",
@@ -877,23 +889,10 @@ func TestVerifyFeatureRemoval(t *testing.T) {
 			expectErr:      true,
 			expectedErrMsg: "feature FeatureD cannot be removed because it is in GA or Deprecated state and is not locked to default",
 		},
-		{
-			name: "GA feature removed at threshold version",
-			featureList: []featureInfo{
-				{Name: "FeatureA", VersionedSpecs: []featureSpec{{Version: "1.0", PreRelease: "Alpha"}}},
-			},
-			baseFeatureList: []featureInfo{
-				{Name: "FeatureA", VersionedSpecs: []featureSpec{{Version: "1.0", PreRelease: "Alpha"}}},
-				{Name: "FeatureC", VersionedSpecs: []featureSpec{{Version: "1.4", PreRelease: "GA", LockToDefault: true}}},
-			},
-			currentVersion:   version.MustParse("1.5"),
-			thresholdVersion: version.MustParse("1.4"),
-			expectErr:        false,
-		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := verifyFeatureRemoval(tc.featureList, tc.baseFeatureList, tc.currentVersion, tc.thresholdVersion)
+			err := verifyFeatureRemoval(tc.featureList, tc.baseFeatureList, tc.currentVersion)
 			if tc.expectErr {
 				if err == nil {
 					t.Fatalf("expected error, got nil")

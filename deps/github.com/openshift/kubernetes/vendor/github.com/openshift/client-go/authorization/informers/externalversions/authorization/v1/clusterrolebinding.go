@@ -18,11 +18,39 @@ import (
 )
 
 // ClusterRoleBindingInformer provides access to a shared informer and lister for
-// ClusterRoleBindings.
+// ClusterRoleBindings. Prefer using the type-safe variant (see [TypedClusterRoleBindingInformer]).
 type ClusterRoleBindingInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() authorizationv1.ClusterRoleBindingLister
 }
+
+// TypedClusterRoleBindingInformer provides access to a shared informer and lister for
+// ClusterRoleBindings, including the type-safe TypedInformer variant.
+// It is a superset of ClusterRoleBindingInformer.
+type TypedClusterRoleBindingInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() ClusterRoleBindingIndexInformer
+	Lister() authorizationv1.ClusterRoleBindingLister
+}
+
+// ClusterRoleBindingIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type ClusterRoleBindingIndexInformer cache.TypedSharedIndexInformer[*apiauthorizationv1.ClusterRoleBinding]
+
+// ClusterRoleBindingHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for ClusterRoleBinding.
+type ClusterRoleBindingHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiauthorizationv1.ClusterRoleBinding]
+
+// ClusterRoleBindingDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for ClusterRoleBinding.
+type ClusterRoleBindingDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiauthorizationv1.ClusterRoleBinding]
+
+// ClusterRoleBindingFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for ClusterRoleBinding.
+type ClusterRoleBindingFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiauthorizationv1.ClusterRoleBinding]
+
+// ClusterRoleBindingIndexers is a specialization of [cache.TypedIndexers] for ClusterRoleBinding.
+type ClusterRoleBindingIndexers = cache.TypedIndexers[*apiauthorizationv1.ClusterRoleBinding]
+
+// DeletedClusterRoleBinding is a specialization of [cache.DeletedObject] for ClusterRoleBinding.
+type DeletedClusterRoleBinding = cache.DeletedObject[*apiauthorizationv1.ClusterRoleBinding]
 
 type clusterRoleBindingInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -32,25 +60,49 @@ type clusterRoleBindingInformer struct {
 // NewClusterRoleBindingInformer constructs a new informer for ClusterRoleBinding type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedClusterRoleBindingInformer]).
 func NewClusterRoleBindingInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewClusterRoleBindingInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedClusterRoleBindingInformer constructs a new informer for ClusterRoleBinding type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedClusterRoleBindingInformer(client versioned.Interface, resyncPeriod time.Duration, indexers ClusterRoleBindingIndexers) ClusterRoleBindingIndexInformer {
+	return NewTypedClusterRoleBindingInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredClusterRoleBindingInformer constructs a new informer for ClusterRoleBinding type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredClusterRoleBindingInformer]).
 func NewFilteredClusterRoleBindingInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewClusterRoleBindingInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedClusterRoleBindingInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredClusterRoleBindingInformer constructs a new informer for ClusterRoleBinding type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredClusterRoleBindingInformer(client versioned.Interface, resyncPeriod time.Duration, indexers ClusterRoleBindingIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) ClusterRoleBindingIndexInformer {
+	return NewTypedClusterRoleBindingInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewClusterRoleBindingInformerWithOptions constructs a new informer for ClusterRoleBinding type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedClusterRoleBindingInformerWithOptions]).
 func NewClusterRoleBindingInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedClusterRoleBindingInformerWithOptions(client, options)
+}
+
+// NewTypedClusterRoleBindingInformerWithOptions constructs a new informer for ClusterRoleBinding type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedClusterRoleBindingInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) ClusterRoleBindingIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "authorization.openshift.io", Version: "v1", Resource: "clusterrolebindings"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiauthorizationv1.ClusterRoleBinding](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -83,17 +135,57 @@ func NewClusterRoleBindingInformerWithOptions(client versioned.Interface, option
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *clusterRoleBindingInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewClusterRoleBindingInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedClusterRoleBindingInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *clusterRoleBindingInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiauthorizationv1.ClusterRoleBinding{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *clusterRoleBindingInformer) TypedInformer() ClusterRoleBindingIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiauthorizationv1.ClusterRoleBinding](f.factory.InformerFor(&apiauthorizationv1.ClusterRoleBinding{}, f.defaultInformer))
 }
 
 func (f *clusterRoleBindingInformer) Lister() authorizationv1.ClusterRoleBindingLister {
 	return authorizationv1.NewClusterRoleBindingLister(f.Informer().GetIndexer())
+}
+
+// ToTypedClusterRoleBindingInformer converts an untyped informer into a TypedClusterRoleBindingInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ClusterRoleBinding. If that is not the case, calling type-safe methods of the returned
+// TypedClusterRoleBindingInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedClusterRoleBindingInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedClusterRoleBindingInformer(informer ClusterRoleBindingInformer) TypedClusterRoleBindingInformer {
+	if informer, ok := informer.(TypedClusterRoleBindingInformer); ok {
+		return informer
+	}
+	return &clusterRoleBindingTypedInformerAdapter{informer}
+}
+
+type clusterRoleBindingTypedInformerAdapter struct {
+	ClusterRoleBindingInformer
+}
+
+func (a *clusterRoleBindingTypedInformerAdapter) TypedInformer() ClusterRoleBindingIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiauthorizationv1.ClusterRoleBinding](a.Informer())
+}
+
+// ToClusterRoleBindingIndexInformer converts an untyped informer into a ClusterRoleBindingIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ClusterRoleBinding. If that is not the case, calling type-safe methods of the returned
+// ClusterRoleBindingIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a ClusterRoleBindingIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToClusterRoleBindingIndexInformer(informer cache.SharedIndexInformer) ClusterRoleBindingIndexInformer {
+	if informer, ok := informer.(ClusterRoleBindingIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiauthorizationv1.ClusterRoleBinding](informer)
 }

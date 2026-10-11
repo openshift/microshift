@@ -30,8 +30,8 @@ import (
 	cmdutil "k8s.io/kubernetes/cmd/kubeadm/app/cmd/util"
 	kubeadmconstants "k8s.io/kubernetes/cmd/kubeadm/app/constants"
 	certsphase "k8s.io/kubernetes/cmd/kubeadm/app/phases/certs"
-	kubeadmutil "k8s.io/kubernetes/cmd/kubeadm/app/util"
 	"k8s.io/kubernetes/cmd/kubeadm/app/util/errors"
+	filesutil "k8s.io/kubernetes/cmd/kubeadm/app/util/files"
 	"k8s.io/kubernetes/cmd/kubeadm/app/util/pkiutil"
 )
 
@@ -189,7 +189,7 @@ func runCertsSa(c workflow.RunData) error {
 	}
 
 	// create the new service account key (or use existing)
-	return certsphase.CreateServiceAccountKeyAndPublicKeyFiles(data.CertificateWriteDir(), data.Cfg().ClusterConfiguration.EncryptionAlgorithmType())
+	return certsphase.CreateServiceAccountKeyAndPublicKeyFiles(data.CertificateWriteDir(), data.Cfg().ClusterConfiguration.EncryptionAlgorithm)
 }
 
 func runCerts(c workflow.RunData) error {
@@ -225,7 +225,7 @@ func runCAPhase(ca *certsphase.KubeadmCert) func(c workflow.RunData) error {
 				if err := os.MkdirAll(filepath.Dir(dryRunCertPath), os.FileMode(0700)); err != nil {
 					return errors.Wrapf(err, "failed to create directory %s", filepath.Dir(dryRunCertPath))
 				}
-				err := kubeadmutil.CopyFile(srcCertPath, dryRunCertPath)
+				err := filesutil.CopyFile(srcCertPath, dryRunCertPath)
 				if err != nil {
 					return errors.Wrapf(err, "could not copy %s to dry run directory %s", fmt.Sprintf("%s.crt", ca.BaseName), data.CertificateWriteDir())
 				}
@@ -233,7 +233,7 @@ func runCAPhase(ca *certsphase.KubeadmCert) func(c workflow.RunData) error {
 			if _, err := pkiutil.TryLoadKeyFromDisk(data.CertificateDir(), ca.BaseName); err == nil {
 				// If CA Key existed while dryrun, copy CA Key to dryrun dir for later use
 				if data.DryRun() {
-					err := kubeadmutil.CopyFile(srcKeyPath, dryRunKeyPath)
+					err := filesutil.CopyFile(srcKeyPath, dryRunKeyPath)
 					if err != nil {
 						return errors.Wrapf(err, "could not copy %s to dry run directory %s", fmt.Sprintf("%s.key", ca.BaseName), data.CertificateWriteDir())
 					}

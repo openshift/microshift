@@ -9,7 +9,7 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// DeploymentConfigs returns a DeploymentConfigInformer.
-	DeploymentConfigs() DeploymentConfigInformer
+	DeploymentConfigs() TypedDeploymentConfigInformer
 }
 
 type version struct {
@@ -23,7 +23,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// DeploymentConfigs returns a DeploymentConfigInformer.
-func (v *version) DeploymentConfigs() DeploymentConfigInformer {
+// DeploymentConfigs returns a TypedDeploymentConfigInformer.
+func (v *version) DeploymentConfigs() TypedDeploymentConfigInformer {
 	return &deploymentConfigInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
