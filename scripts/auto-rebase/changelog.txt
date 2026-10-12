@@ -1,19 +1,16 @@
-- cluster-network-operator embedded-component 5c73d6fc312f0fee8b3f7bda2933d341001a2575 to a3fadab79ae2eadbfd7311b77904801ed062afe9
-  - 3dfd5ed 2026-09-10T12:35:42+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
+- api embedded-component 231177cd43bccd49bad2bfb4c3cd4cc8153288fb to 7e4a91f5566b5a31a8a3f4f0474b5403e011c692
+  - 37f637a3 2026-09-30T13:39:20-03:00 Promote Dynamic Configuration Manager to Default
 
-- machine-config-operator embedded-component f1cb35589f1e61afc98b0cdef263592e92d460f7 to 188c6ebefd16670661e26d3d31def4a3ff7334ec
-  - ad8a805a 2026-10-05T20:28:07+02:00 Added logs in case of error exits
-  - 10a80a17 2026-10-02T10:13:04+02:00 MCO: remount sysroot before layered import
-  - 016b3d9a 2026-10-02T09:46:18+02:00 Fix read-only and bind-mount contraints
-  - fb8df64c 2026-10-01T23:18:58Z OCPBUGS-128659: Fix the IRI release lookup for a signed release payload
-  - 302da18b 2026-10-01T21:42:49+02:00 MCO: rebase imported layered image directly
-  - 8914fef7 2026-10-01T15:03:37+02:00 4.22_multi_layered_images_update
+- cluster-kube-controller-manager-operator embedded-component b0509dae420643b9432921a158b3d219da3abd03 to 83b412f83f54e0b53dbead58fab77a830b136e48
+  - 186bacf 2026-08-31T15:59:00+05:30 Fix: updated golang.org/x/net pacakge to rectify CVE-2026-33814
 
-- ovn-kubernetes image-amd64 bd1f682a1fe5c5105b73bfcf716b6a13305a7a68 to dc35130bb7d144854d80f4673493977ed26b56f1
-  - e4712052 2026-09-29T18:00:53+05:30 docs: add EgressIP design document
-  - 33cf5f82 2026-09-29T17:58:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
+- cluster-kube-scheduler-operator embedded-component 497c7928d45d88396c5c1e204592811427cc256b to df837d2597c3415f262b33182546c1ab615bdff5
+  - 7105e12 2026-09-08T14:27:10+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
 
-- ovn-kubernetes image-arm64 bd1f682a1fe5c5105b73bfcf716b6a13305a7a68 to dc35130bb7d144854d80f4673493977ed26b56f1
-  - e4712052 2026-09-29T18:00:53+05:30 docs: add EgressIP design document
-  - 33cf5f82 2026-09-29T17:58:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
+- cluster-policy-controller embedded-component 2e306e143051492a84c5e47a7b3126e096fdf76a to 8fcea9019f04b65370b3aeb8bd8295b29c718b80
+  - f2d6c1e 2026-08-24T17:21:54+02:00 UPSTREAM: <carry>: OCPBUGS-101925: Bump golang.org/x/net to v0.55.0
+  - 120b217 2026-08-24T17:21:54+02:00 UPSTREAM: <drop>: OCPBUGS-101925: Bump golang.org/x/net to v0.55.0
+
+- machine-config-operator embedded-component 188c6ebefd16670661e26d3d31def4a3ff7334ec to 8c08161f6f454e11bf2d34a48b965a52f7ebcad6
+  - 6aa90584 2026-10-05T19:06:15Z bootimage: add fallback for non fd vsphere cases
 
