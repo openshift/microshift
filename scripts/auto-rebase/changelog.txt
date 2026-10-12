@@ -1,17 +1,9 @@
-- csi-external-snapshotter embedded-component d123f362cc13d9b14459af7b9e91eb2a9361d3cd to 3dd8a0f87f86529682b449a6b9e19e9ee8d2d5d4
-  - ca4f3d1 2026-09-23T11:06:08+05:30 UPSTREAM: 1421: Replace golang.org/x/net with github.com/openshift-sustaining/net v0.50.0-sec.3
+- machine-config-operator embedded-component be7823714722585bc304d1eee0704c933d1486b1 to 55a94a504b858fd1484d55def8191d327b6a16bf
+  - f00b3138 2026-09-24T11:53:19Z OCPBUGS-69681: limit ContainerRuntimeConfig status condition to 3
 
-- csi-external-snapshotter image-amd64 d123f362cc13d9b14459af7b9e91eb2a9361d3cd to 3dd8a0f87f86529682b449a6b9e19e9ee8d2d5d4
-  - ca4f3d1 2026-09-23T11:06:08+05:30 UPSTREAM: 1421: Replace golang.org/x/net with github.com/openshift-sustaining/net v0.50.0-sec.3
+- ovn-kubernetes image-amd64 68bc16303122d56ab1be14037d3fe7ed25316007 to c8595e7acc4f5334bd403e2700d905aaf4078d93
+  - d562aa70 2026-07-21T11:05:14-07:00 add ability to skip tests that require root
 
-- ovn-kubernetes image-amd64 a281044818c2362c39a7688f1081ca584ee34e42 to 68bc16303122d56ab1be14037d3fe7ed25316007
-  - 078f8b55 2026-10-02T12:45:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
-  - b43b616c 2026-10-02T12:41:43+05:30 docs: add EgressIP design document
-
-- csi-external-snapshotter image-arm64 d123f362cc13d9b14459af7b9e91eb2a9361d3cd to 3dd8a0f87f86529682b449a6b9e19e9ee8d2d5d4
-  - ca4f3d1 2026-09-23T11:06:08+05:30 UPSTREAM: 1421: Replace golang.org/x/net with github.com/openshift-sustaining/net v0.50.0-sec.3
-
-- ovn-kubernetes image-arm64 a281044818c2362c39a7688f1081ca584ee34e42 to 68bc16303122d56ab1be14037d3fe7ed25316007
-  - 078f8b55 2026-10-02T12:45:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
-  - b43b616c 2026-10-02T12:41:43+05:30 docs: add EgressIP design document
+- ovn-kubernetes image-arm64 68bc16303122d56ab1be14037d3fe7ed25316007 to c8595e7acc4f5334bd403e2700d905aaf4078d93
+  - d562aa70 2026-07-21T11:05:14-07:00 add ability to skip tests that require root
 
