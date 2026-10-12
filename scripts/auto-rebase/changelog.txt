@@ -1,27 +1,12 @@
-- csi-external-snapshotter embedded-component 70500bf5ddedfc38ce3010e8007e07ac98569c56 to 52fe79de01561a44b26cb3073a2ee5a698530b0e
-  - f3e49ec 2026-09-01T00:00:56+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+- csi-external-snapshotter embedded-component 52fe79de01561a44b26cb3073a2ee5a698530b0e to df7707f06925800ea55ff8038665a3191867c163
+  - 4249778 2026-09-24T14:05:36+02:00 UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
 
-- oc image-amd64 3da7a06927d28a77e2c772a62a19869e8b794db3 to a622623a766e65ea4855c15c711d4130b65a3438
-  - 77283471 2026-09-28T17:40:34+01:00 test(git): Replace IPv4-mapped IPv6 addresses with valid IPv6 in tests
-  - 6572d2f8 2026-09-24T06:05:18+00:00 OCPBUGS-103346,OCPBUGS-103383: Use patched x/net fork v0.35.0-sec.4
+- machine-config-operator embedded-component 3e6ad43708c45c144e2f3835d61e9db21c03e631 to 39cec53493313d04fba61fea6966cb579fe7679f
+  - e534914b 2026-10-05T08:57:02+00:00 Merge pull request #6603 from openshift-cherrypick-robot/cherry-pick-6599-to-release-4.20
 
-- csi-external-snapshotter image-amd64 70500bf5ddedfc38ce3010e8007e07ac98569c56 to 52fe79de01561a44b26cb3073a2ee5a698530b0e
-  - f3e49ec 2026-09-01T00:00:56+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+- csi-external-snapshotter image-amd64 52fe79de01561a44b26cb3073a2ee5a698530b0e to df7707f06925800ea55ff8038665a3191867c163
+  - 4249778 2026-09-24T14:05:36+02:00 UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
 
-- ovn-kubernetes image-amd64 4d9da3c5b322101933fab50ce326b521a5d613d7 to 97019aa52cc0641ab084f17c7fec3c51c37a0ce3
-  - 078f8b55 2026-10-02T12:45:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
-  - b43b616c 2026-10-02T12:41:43+05:30 docs: add EgressIP design document
-  - ccf54566 2026-08-25T10:03:32-07:00 EgressIP: add route policies for east-west traffic between networks
-
-- oc image-arm64 3da7a06927d28a77e2c772a62a19869e8b794db3 to a622623a766e65ea4855c15c711d4130b65a3438
-  - 77283471 2026-09-28T17:40:34+01:00 test(git): Replace IPv4-mapped IPv6 addresses with valid IPv6 in tests
-  - 6572d2f8 2026-09-24T06:05:18+00:00 OCPBUGS-103346,OCPBUGS-103383: Use patched x/net fork v0.35.0-sec.4
-
-- csi-external-snapshotter image-arm64 70500bf5ddedfc38ce3010e8007e07ac98569c56 to 52fe79de01561a44b26cb3073a2ee5a698530b0e
-  - f3e49ec 2026-09-01T00:00:56+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
-
-- ovn-kubernetes image-arm64 4d9da3c5b322101933fab50ce326b521a5d613d7 to 97019aa52cc0641ab084f17c7fec3c51c37a0ce3
-  - 078f8b55 2026-10-02T12:45:18+05:30 Prevent duplicate MAC responses during egress IP failover with nftables
-  - b43b616c 2026-10-02T12:41:43+05:30 docs: add EgressIP design document
-  - ccf54566 2026-08-25T10:03:32-07:00 EgressIP: add route policies for east-west traffic between networks
+- csi-external-snapshotter image-arm64 52fe79de01561a44b26cb3073a2ee5a698530b0e to df7707f06925800ea55ff8038665a3191867c163
+  - 4249778 2026-09-24T14:05:36+02:00 UPSTREAM: 1392: Fix VolumeSnapshotContent deletion
 
