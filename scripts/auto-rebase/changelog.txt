@@ -1,0 +1,13 @@
+- machine-config-operator embedded-component 11f9273fb35d3d102fb62b261eb507abedf3c428 to e3f6479a979898937cce9cbebf428823dae249fb
+  - dd1ccd06 2026-10-07T21:39:56Z Remove reverse (rhel10 to rhel9) OSStreams upgrade tests
+  - 2f345ef7 2026-10-06T23:29:38Z bootimage: logout vCenter clients after use
+  - 59333d2f 2026-10-06T18:12:57Z OCPBUGS-128457: Fix layered OS updates on older nodes
+
+- kube-rbac-proxy image-amd64 43c114bc124f59e2fc3223dea8e0a8f4cdeed18d to 9e0e3be4126af4cbe904765988ea2e52c6aed9ae
+  - 93b8120 2026-10-06T19:34:22Z Address CVE-2026-29181
+  - a31503c 2026-10-06T19:34:22Z Address CVE-2026-29181 (vendor changes)
+
+- kube-rbac-proxy image-arm64 43c114bc124f59e2fc3223dea8e0a8f4cdeed18d to 9e0e3be4126af4cbe904765988ea2e52c6aed9ae
+  - 93b8120 2026-10-06T19:34:22Z Address CVE-2026-29181
+  - a31503c 2026-10-06T19:34:22Z Address CVE-2026-29181 (vendor changes)
+
