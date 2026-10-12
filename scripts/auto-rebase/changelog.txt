@@ -1,0 +1,13 @@
+- cluster-kube-apiserver-operator embedded-component 1c840109b6f83880e73b5d12bd58f3b902438afe to 58a7dcc50c07c532f97d1114201bedd4a15cc435
+  - bb42c51 2026-09-29T17:51:19-05:00 UPSTREAM: <drop>: vendor
+  - 152395d 2026-09-29T17:51:19-05:00 UPSTREAM: <carry>: [release-4.21] OCPBUGS-104074: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.50.0-sec.4 to address CVE-2026-33814
+
+- cluster-kube-controller-manager-operator embedded-component 395de96705749de9c6a5f25747b9d5c3d5f65a8f to 938fd690c4ed9fbecdf1f712b37481689ca92961
+  - 41ae1da 2026-08-27T00:22:31+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+
+- coredns image-amd64 7486e9e4330c1e41d9a91e4673b7f2782efc112c to c3f32d7d058c93b17a5ba5d3a82245db7820bfc7
+  - 2119f80 2026-08-26T13:32:09+05:30 Fix: added patched version of golang.org/x/net pacakge to rectify CVE-2026-33814
+
+- coredns image-arm64 7486e9e4330c1e41d9a91e4673b7f2782efc112c to c3f32d7d058c93b17a5ba5d3a82245db7820bfc7
+  - 2119f80 2026-08-26T13:32:09+05:30 Fix: added patched version of golang.org/x/net pacakge to rectify CVE-2026-33814
+
