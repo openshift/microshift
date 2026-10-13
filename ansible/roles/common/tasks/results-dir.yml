@@ -18,6 +18,11 @@
     results_dir: "{{ results_base_dir }}/{{ microshift_version }}/{{ results_timestamp }}"
   when: results_dir is not defined
 
+- name: Set performance run identity
+  ansible.builtin.set_fact:
+    perf_run_id: "{{ inventory_hostname }}:{{ results_dir | basename }}"
+  when: perf_run_id is not defined
+
 - name: Ensure results directory exists on localhost
   ansible.builtin.file:
     path: "{{ results_dir }}"

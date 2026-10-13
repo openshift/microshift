@@ -1,0 +1,8 @@
+---
+- name: Write measurement archive
+  become: false
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/roles/common/templates/measurements.ndjson.j2"
+    dest: "{{ results_dir }}/measurements.ndjson"
+    mode: "0644"
+  delegate_to: localhost

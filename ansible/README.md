@@ -327,3 +327,75 @@ build_etcd_binary: false
 enable_gpu: true
 deploy_gpu_test: true  # Optional, defaults to true when enable_gpu is true
 ```
+
+### Structured performance measurements
+
+Startup, disk, image storage and startup network captures also write
+`measurements.ndjson` in the run's `results_dir`. Existing text files are unchanged.
+Each line is a schema-version-1 document with a deterministic `measurement_id`,
+`run_id`, measurement key/type, UTC timestamp, installed MicroShift version and
+RPM NEVRA, host/nodename, kernel, RHEL release, CPU model, and result directory
+basename. The `data` object contains seconds or integer byte values with units
+in field names. Disk records contain the same threshold-filtered paths as the
+text report, with absent/incomplete traversal flags. Startup, images and network
+also retain producer JSON sidecars. Network bytes are truncated Prometheus
+`increase()` estimates, not packet counters; unavailable values are null.
+
+There is one document for each snapshot (`disk0.txt`, `disk1.txt`, `disk2.txt`),
+boot (`boot0.txt`, `boot1.txt`), image inventory and network window. Disk0 is
+written before installation with null RPM identity, then enriched from the
+installed RPM when installation finishes. If installation fails, that local
+baseline remains available. The archive is rewritten atomically as measurements
+arrive, replacing the same measurement key rather than appending duplicates.
+The run ID is the inventory hostname plus the result directory basename; reuse
+that directory only when resuming the same run. Use distinct result directories
+for different hosts when capturing more than one host concurrently.
+
+Optional ES/OpenSearch indexing runs on the controller after installation and
+cold/warm capture. It is disabled by default and independent of kube-burner's
+indexing settings. No endpoint is contacted unless `perf_es_url` is set.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `perf_extra_metadata` | `{}` | Optional dictionary copied into every document under `labels`; never overrides envelope fields. |
+| `perf_es_url` | empty (disabled) | Base HTTP(S) URL without credentials; HTTPS validates certificates. |
+| `perf_es_index` | `microshift-perf-v1` | Destination index, using the bulk API and document IDs from the archive. |
+| `perf_es_credentials_file` | empty | Controller-side JSON file containing `username` and `password`; protect with mode 0600. |
+| `perf_es_allow_http` | `false` | Allow sending credentials over plain HTTP. Only for local test instances: credentials are then sent unencrypted. |
+
+For example, pass cycle and iteration context in the playbook variables or an
+extra-vars file:
+
+```yaml
+perf_extra_metadata:
+  cycle_id: microshift-5.0-20261013
+  iteration: "1"
+  rc: 5.0.0-rc.1
+  kube_burner_uuid: density-run-uuid
+  netperf_uuid: network-run-uuid
+```
+
+Metadata values retain their JSON types and default to an empty `labels` object.
+These labels are included in the local archive and bulk uploads, independently
+of whether indexing is enabled. Use consistent field types across runs: the index
+mapping of each label is fixed by the first document that carries it, and a later
+value of another type is rejected. Pass identifiers such as `iteration` as strings.
+Labels are archived in plaintext, so do not include credentials or other secrets.
+
+When no credentials file is supplied, `PERF_ES_USERNAME` and `PERF_ES_PASSWORD`
+are read from the controller environment. Neither is required for a local
+security-disabled test instance. Credentials are only sent over HTTPS unless
+`perf_es_allow_http` is true, and a URL that contains credentials or uses another
+scheme is refused; a refusal is handled like an upload failure below. Credential loading, request construction,
+upload and response validation use `no_log`. Redirects and `.netrc` auth are
+disabled. Each upload has a five-second socket timeout and no retries. HTTP,
+authentication and per-item bulk errors produce a warning with the HTTP status and
+the number of rejected documents when the response is a well-formed bulk response (never the response body) and disable further
+uploads for that run; local capture continues. The whole archive is uploaded after
+installation, after the cold start and after the warm start; deterministic IDs make
+the repeats idempotent, so the last upload is the final state. The destination must
+already exist or permit automatic index creation. This does not configure
+index mappings or retention. Keep the local archive even after upload succeeds;
+it can be replayed with the same deterministic IDs. There is no standalone replay
+entry point in these roles yet; the cycle orchestrator in `microshift-perf-tools`
+will own replay of `measurements.ndjson` after an ES outage.

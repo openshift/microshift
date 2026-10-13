@@ -1,0 +1,17 @@
+{% for key, measurement in perf_measurements | dictsort %}
+{{ measurement | combine({
+  'schema_version': 1,
+  'labels': perf_extra_metadata | default({}) | combine({}),
+  'measurement_id': (perf_run_id ~ ':' ~ key) | hash('sha256'),
+  'run_id': perf_run_id,
+  'measurement_key': key,
+  'microshift_version': perf_microshift_version | default(none),
+  'microshift_rpm_nevra': perf_microshift_nevra | default(none),
+  'host': inventory_hostname,
+  'nodename': kubernetes_nodename | default(ansible_facts.hostname),
+  'kernel': ansible_facts.kernel,
+  'rhel_release': ansible_facts.distribution_version,
+  'cpu_model': (ansible_facts.processor | default([]) | reject('match', '^[0-9]+$|^GenuineIntel$|^AuthenticAMD$') | first) | default('unknown'),
+  'results_dir': results_dir | basename
+}) | to_json }}
+{% endfor %}

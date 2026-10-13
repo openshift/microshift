@@ -1,0 +1,4 @@
+{% for line in lookup('ansible.builtin.file', results_dir ~ '/measurements.ndjson').splitlines() %}
+{{ {'index': {'_id': (line | from_json).measurement_id}} | to_json }}
+{{ line }}
+{% endfor %}

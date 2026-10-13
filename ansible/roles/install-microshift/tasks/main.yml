@@ -244,3 +244,9 @@
     group: root
     mode: "0644"
   when: not crio_metrics.stat.exists
+
+- name: Read installed performance metadata
+  ansible.builtin.include_tasks: roles/common/tasks/perf-metadata.yml
+
+- name: Index installation measurements
+  ansible.builtin.include_tasks: roles/common/tasks/perf-index.yml

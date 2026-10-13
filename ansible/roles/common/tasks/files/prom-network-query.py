@@ -155,6 +155,7 @@ def parse_window_args(argv):
         default=DEFAULT_STEP,
         help=f"Range query step for raw series output (default: {DEFAULT_STEP})",
     )
+    parser.add_argument("--json-output", help="Write structured measurement alongside the text output")
     args = parser.parse_args(argv)
 
     if len(args.window) == 2:
@@ -346,6 +347,18 @@ def main():
     except PromQueryError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
+
+    if args.json_output:
+        resets_count = sum(float(values[i][1]) < float(values[i - 1][1]) for i in range(1, len(values)))
+        with open(args.json_output, "w") as output:
+            json.dump({
+                "start_epoch": start, "end_epoch": end, "duration_seconds": duration,
+                "device": args.device, "instance": args.instance,
+                "rx_bytes": int(rx_increase) if rx_increase is not None else None,
+                "tx_bytes": int(tx_increase) if tx_increase is not None else None,
+                "counter_resets": resets_count, "samples": len(values),
+            }, output)
+            output.write("\n")
 
     if not values:
         print("No time series data available.")

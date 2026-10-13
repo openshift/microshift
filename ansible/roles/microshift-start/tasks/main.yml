@@ -96,11 +96,47 @@
         dest: /tmp/crio-df.py
         mode: "0755"
 
-    - name: Run crio-df script
-      become: true
-      ansible.builtin.command: python3 /tmp/crio-df.py -v
-      register: crio_df
-      changed_when: false
+    - name: Capture images with structured output
+      block:
+        - name: Allocate images sidecar
+          ansible.builtin.tempfile:
+            state: file
+            suffix: .json
+          register: perf_sidecar
+
+        - name: Run images producer
+          become: true
+          ansible.builtin.command:
+            argv:
+              - python3
+              - /tmp/crio-df.py
+              - -v
+              - --json-output
+              - "{{ perf_sidecar.path }}"
+          changed_when: false
+          register: crio_df
+
+        - name: Read images sidecar
+          become: true
+          ansible.builtin.slurp:
+            src: "{{ perf_sidecar.path }}"
+          register: perf_sidecar_content
+
+        - name: Save images sidecar locally
+          become: false
+          ansible.builtin.copy:
+            content: "{{ perf_sidecar_content.content | b64decode }}"
+            dest: "{{ results_dir }}/images.json"
+            mode: "0644"
+          delegate_to: localhost
+
+      always:
+        - name: Remove images temporary sidecar
+          become: true
+          ansible.builtin.file:
+            path: "{{ perf_sidecar.path }}"
+            state: absent
+          when: perf_sidecar.path is defined
 
     - name: Save container image sizes to results
       ansible.builtin.copy:
@@ -108,6 +144,14 @@
         dest: "{{ results_dir }}/images.txt"
         mode: "0644"
       delegate_to: localhost
+
+- name: Archive images measurement
+  vars:
+    perf_measurement_key: images.txt
+    perf_measurement_type: images
+    perf_measurement_timestamp: "{{ (perf_sidecar_content.content | b64decode | from_json).timestamp }}"
+    perf_measurement_data: "{{ perf_sidecar_content.content | b64decode | from_json }}"
+  ansible.builtin.include_tasks: roles/common/tasks/perf-record.yml
 
 - name: Record network measurement end epoch
   ansible.builtin.command: date +%s
@@ -133,6 +177,7 @@
         --prometheus {{ prometheus_endpoint }}
         --instance {{ prom_network_instance }}
         --device {{ prom_network_device }}
+        --json-output {{ (results_dir ~ '/network.json') | quote }}
         {{ network_start_epoch.stdout }}
         {{ network_end_epoch.stdout }}
       register: prom_network
@@ -145,3 +190,14 @@
         dest: "{{ results_dir }}/network.txt"
         mode: "0644"
       delegate_to: localhost
+
+    - name: Archive network measurement
+      vars:
+        perf_measurement_key: network.txt
+        perf_measurement_type: startup_network
+        perf_measurement_timestamp: "{{ '%Y-%m-%dT%H:%M:%SZ' | strftime(network_end_epoch.stdout | int, utc=true) }}"
+        perf_measurement_data: "{{ lookup('ansible.builtin.file', results_dir ~ '/network.json') | from_json }}"
+      ansible.builtin.include_tasks: roles/common/tasks/perf-record.yml
+
+- name: Index cold start measurements
+  ansible.builtin.include_tasks: roles/common/tasks/perf-index.yml

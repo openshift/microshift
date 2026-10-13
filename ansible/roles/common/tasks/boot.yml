@@ -62,13 +62,47 @@
     expected_pods: "{{ microshift_versions[microshift_major_version].expected_pods }}"
     all_pods: "{{ microshift_versions[microshift_major_version].all_pods }}"
 
-- name: Run the microshift boot script
-  ansible.builtin.script:
-    cmd: >
-      ready.sh
-      {{ expected_pods }}
-      {{ all_pods }}
-  register: script_output
+- name: Read performance metadata
+  ansible.builtin.include_tasks: roles/common/tasks/perf-metadata.yml
+
+- name: Capture startup with structured output
+  block:
+    - name: Allocate startup sidecar
+      ansible.builtin.tempfile:
+        state: file
+        suffix: .json
+      register: perf_sidecar
+
+    - name: Run startup producer
+      ansible.builtin.script:
+        cmd: >
+          ready.sh
+          {{ expected_pods }}
+          {{ all_pods }}
+      register: script_output
+      environment:
+        PERF_JSON_OUTPUT: "{{ perf_sidecar.path }}"
+    - name: Read startup sidecar
+      become: true
+      ansible.builtin.slurp:
+        src: "{{ perf_sidecar.path }}"
+      register: perf_sidecar_content
+
+    - name: Save startup sidecar locally
+      become: false
+      ansible.builtin.copy:
+        content: "{{ perf_sidecar_content.content | b64decode }}"
+        dest: "{{ results_dir }}/{{ boot_output_filename | default('boot_quick.txt') | splitext | first }}.json"
+        mode: "0644"
+      delegate_to: localhost
+
+  always:
+    - name: Remove startup temporary sidecar
+      become: true
+      ansible.builtin.file:
+        path: "{{ perf_sidecar.path }}"
+        state: absent
+      when: perf_sidecar.path is defined
 
 - name: Display script output
   ansible.builtin.debug:
@@ -80,3 +114,15 @@
     dest: "{{ results_dir }}/{{ boot_output_filename | default('boot_quick.txt') }}"
     mode: "0644"
   delegate_to: localhost
+
+- name: Archive startup measurement
+  vars:
+    perf_measurement_key: "{{ boot_output_filename | default('boot_quick.txt') }}"
+    perf_measurement_type: startup
+    perf_measurement_timestamp: "{{ '%Y-%m-%dT%H:%M:%SZ' | strftime((perf_sidecar_content.content | b64decode | from_json).end_epoch, utc=true) }}"
+    perf_measurement_data: "{{ perf_sidecar_content.content | b64decode | from_json }}"
+  ansible.builtin.include_tasks: roles/common/tasks/perf-record.yml
+
+- name: Index warm start measurements
+  ansible.builtin.include_tasks: roles/common/tasks/perf-index.yml
+  when: boot_output_filename | default('boot_quick.txt') != 'boot0.txt'

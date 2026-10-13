@@ -1,0 +1,23 @@
+---
+# MicroShift installed outside RPM (source or binary installs, development VMs) has no RPM
+# identity; record null rather than failing the playbook.
+- name: Read installed MicroShift RPM identity
+  ansible.builtin.command:
+    argv:
+      - rpm
+      - -q
+      - --queryformat
+      - '%{VERSION}\n%{NAME}-%{EPOCHNUM}:%{VERSION}-%{RELEASE}.%{ARCH}\n'
+      - microshift
+  register: perf_rpm
+  changed_when: false
+  failed_when: false
+
+- name: Record installed MicroShift identity
+  ansible.builtin.set_fact:
+    perf_microshift_version: "{{ perf_rpm.stdout_lines[0] if perf_rpm.rc == 0 else none }}"
+    perf_microshift_nevra: "{{ perf_rpm.stdout_lines[1] if perf_rpm.rc == 0 else none }}"
+
+- name: Enrich previously captured measurements
+  ansible.builtin.include_tasks: roles/common/tasks/perf-persist.yml
+  when: perf_measurements is defined

@@ -5,6 +5,7 @@ A replacement for 'podman system df -v' that correctly calculates SharedSize for
 Also calculates compressed (download) sizes from locally stored registry manifests.
 """
 
+import argparse
 import json
 import os
 import sys
@@ -182,7 +183,7 @@ def get_compressed_sizes(images):
     return all_layers, layer_usage, shared_digests, per_image
 
 
-def main(verbose=False):
+def main(verbose=False, json_output=None):
     """Main function to display CRI-O storage disk usage."""
 
     # Check if running as root
@@ -197,6 +198,8 @@ def main(verbose=False):
 
     if not images:
         print("No images found in CRI-O storage")
+        if json_output:
+            write_summary(json_output, 0, 0, 0, 0, 0, 0, 0, [])
         return
 
     # Create layer lookup map
@@ -287,6 +290,12 @@ def main(verbose=False):
     comp_layers, _, comp_shared, comp_per_image = get_compressed_sizes(images)
     comp_deduplicated = sum(comp_layers.values())
 
+    if json_output:
+        write_summary(json_output, len(images), len(layer_count),
+                      len([c for c in layer_count.values() if c > 1]),
+                      total_size, total_reclaimable, comp_deduplicated,
+                      len(comp_per_image), image_data)
+
     if verbose:
         # Detailed output similar to 'podman system df -v'
         print("Images space usage:\n")
@@ -341,7 +350,26 @@ def main(verbose=False):
         print(f"  Compression ratio: {total_size / comp_deduplicated:.1f}:1" if comp_deduplicated > 0 else "")
 
 
+def write_summary(path, count, layers, shared, storage, reclaimable, compressed, manifests, images):
+    summary = {
+        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "image_count": count, "unique_layers": layers, "shared_layers": shared,
+        "storage_bytes": storage, "reclaimable_bytes": reclaimable,
+        "compressed_download_bytes": compressed,
+        "compressed_manifests_found": manifests,
+        "images": [{"id": image["id"], "repository": image["repository"],
+                    "tag": image["tag"], "size_bytes": image["size"],
+                    "shared_bytes": image["shared_size"], "unique_bytes": image["unique_size"],
+                    "containers": image["containers"]} for image in images],
+    }
+    with open(path, "w") as output:
+        json.dump(summary, output)
+        output.write("\n")
+
+
 if __name__ == "__main__":
-    # Check for verbose flag
-    verbose = "-v" in sys.argv or "--verbose" in sys.argv
-    main(verbose)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("--json-output")
+    args = parser.parse_args()
+    main(args.verbose, args.json_output)

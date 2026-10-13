@@ -1,0 +1,12 @@
+---
+- name: Retain structured measurement
+  ansible.builtin.set_fact:
+    perf_measurements: >-
+      {{ perf_measurements | default({}) | combine({perf_measurement_key: {
+           'measurement_type': perf_measurement_type,
+           'timestamp': perf_measurement_timestamp,
+           'data': perf_measurement_data
+         }}) }}
+
+- name: Save structured measurements locally
+  ansible.builtin.include_tasks: roles/common/tasks/perf-persist.yml
