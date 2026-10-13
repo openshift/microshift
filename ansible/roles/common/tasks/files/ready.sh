@@ -46,8 +46,57 @@ echo "Waiting for MicroShift to start with ${EXPECTED_PODS} expected non-storage
 # Start the timer
 START_TIME=$(date +%s)
 
-# Start the microshift service
-sudo systemctl start microshift.service
+show_service_failure() {
+  echo "Service status:"
+  systemctl status microshift.service --no-pager
+  echo ""
+  echo "Recent journal logs:"
+  sudo journalctl -u microshift.service --no-pager -n 50
+}
+
+# Start the microshift service. The unit is Type=notify, so this returns
+# once MicroShift reports ready or the start attempt fails; Restart=always
+# then retries in the background, which must not count as a successful boot.
+if ! sudo systemctl start microshift.service; then
+  echo "ERROR: systemctl start microshift.service failed"
+  show_service_failure
+  exit 1
+fi
+
+# Wait for the unit to be active rather than trusting the kubeconfig and pod
+# counts, which an attempt that is about to stop itself also satisfies.
+while ! systemctl is-active --quiet microshift.service; do
+  if systemctl is-failed --quiet microshift.service; then
+    echo "ERROR: microshift.service failed to start"
+    show_service_failure
+    exit 1
+  fi
+
+  elapsed=$(( $(date +%s) - START_TIME ))
+  if [[ ${elapsed} -gt ${TIMEOUT} ]]; then
+    echo "ERROR: Timed out after ${elapsed}s waiting for microshift.service to be active"
+    show_service_failure
+    exit 1
+  fi
+
+  sleep 1
+done
+
+# Automatic restarts of the unit, or null when systemd does not answer
+# with a number. A restart before the unit became active usually means an
+# earlier attempt failed.
+restart_count() {
+  local count
+  if count=$(systemctl show microshift.service -p NRestarts --value) && [[ ${count} =~ ^[0-9]+$ ]]; then
+    echo "${count}"
+  else
+    echo "WARNING: could not read NRestarts from systemd: '${count}'" >&2
+    echo "null"
+  fi
+}
+
+NRESTARTS=$(restart_count)
+echo "NRestarts: ${NRESTARTS}"
 
 # Check to see how long microshift.service took to start
 SYSTEMD_BLAME=$(systemd-analyze blame | grep microshift.service)
@@ -58,11 +107,7 @@ while ! sudo [ -e "${KUBECONFIG}" ]; do
   # Check if service has failed
   if systemctl is-failed --quiet microshift.service; then
     echo "ERROR: microshift.service failed to start"
-    echo "Service status:"
-    systemctl status microshift.service --no-pager
-    echo ""
-    echo "Recent journal logs:"
-    journalctl -u microshift.service --no-pager -n 50
+    show_service_failure
     exit 1
   fi
 
@@ -160,4 +205,5 @@ wait_for_ready "Non-storage pods" "${EXPECTED_PODS}" count_ready_nostorage READY
 wait_for_ready "All pods" "${ALL_PODS}" count_ready_all READY_SECONDS_ALL
 
 END_TIME=$(date +%s)
-echo "{\"ready_seconds_non_storage\":${READY_SECONDS_NON_STORAGE},\"ready_seconds_all\":${READY_SECONDS_ALL},\"start_epoch\":${START_TIME},\"end_epoch\":${END_TIME}}"
+NRESTARTS=$(restart_count)
+echo "{\"ready_seconds_non_storage\":${READY_SECONDS_NON_STORAGE},\"ready_seconds_all\":${READY_SECONDS_ALL},\"nrestarts\":${NRESTARTS},\"start_epoch\":${START_TIME},\"end_epoch\":${END_TIME}}"

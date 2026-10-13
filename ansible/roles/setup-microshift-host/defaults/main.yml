@@ -29,6 +29,27 @@ install_packages:
   - tar
   - vnstat
 
+# Kernel settings written as drop-ins under /etc/sysctl.d. Set
+# manage_host_sysctls to false to skip them, or override the list to
+# change or omit an entry; a drop-in already written on a host is not
+# removed by either.
+manage_host_sysctls: true
+host_sysctls:
+  # Keep ::1 on lo even where the image disables IPv6 globally. Without
+  # ::1 on lo a connect to it can stall if ::1 routes through a NIC, and
+  # the kubelet readiness probe in MicroShift then waits out its budget.
+  - name: net.ipv6.conf.lo.disable_ipv6
+    value: "0"
+    file: 99-zz-microshift-ipv6-loopback.conf
+  # The RHEL defaults exhaust inotify under node-density load and crash
+  # loop the kubelet (inotify_init: too many open files).
+  - name: fs.inotify.max_user_watches
+    value: "1048576"
+    file: 99-microshift-inotify.conf
+  - name: fs.inotify.max_user_instances
+    value: "8192"
+    file: 99-microshift-inotify.conf
+
 default_vg_name: rhel_microshift
 vg_name: "{{ default_vg_name }}"
 lvm_disk: /dev/xvdb
