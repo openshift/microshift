@@ -112,3 +112,19 @@ Delete Hello MicroShift Pod And Service
     [Arguments]    ${ns}=${NAMESPACE}
     Oc Delete    service/hello-microshift -n ${ns}
     Oc Delete    -f ${HELLO_USHIFT} -n ${ns}
+
+Skip If Service Network Has No IPv4
+    [Documentation]    Skip the test when MicroShift's service network has no IPv4 family.
+    ...    MicroShift only computes and configures the IPv4 KAS advertise address (e.g.
+    ...    10.44.0.0) when the service network includes an IPv4 CIDR, so IPv4-literal checks
+    ...    cannot pass on an IPv6 single stack deployment. The service network family, not the
+    ...    host NIC addresses, is the correct signal: an IPv6 single stack VM still carries
+    ...    IPv4 management addresses, so a host-level IPv4 check would fail to skip.
+    ${families}=    Run With Kubeconfig
+    ...    oc get service kubernetes -n default -o jsonpath={.spec.ipFamilies[*]}
+    # Resolve the membership test with a keyword so the raw command output is never
+    # substituted into the Skip If Python expression; ${has_ipv4} is a boolean.
+    ${has_ipv4}=    Run Keyword And Return Status
+    ...    Should Contain    ${families}    IPv4
+    Skip If    not ${has_ipv4}
+    ...    MicroShift service network has no IPv4 family (IPv6 single stack); skipping IPv4-only test
