@@ -39,7 +39,7 @@ func addEnvironmentSelectors(specs et.ExtensionTestSpecs) {
 
 // filterByPlatform is a helper function to do, simple, "NameContains" filtering on tests by platform
 func filterByPlatform(specs et.ExtensionTestSpecs) {
-	var platformExclusions = map[string][]string{
+	platformExclusions := map[string][]string{
 		"alibabacloud": {
 			// LoadBalancer tests in 1.31 require explicit platform-specific skips
 			// https://issues.redhat.com/browse/OCPBUGS-38840
@@ -49,8 +49,8 @@ func filterByPlatform(specs et.ExtensionTestSpecs) {
 			"Networking should provide Internet connection for containers", // Azure does not allow ICMP traffic to internet.
 			// Azure CSI migration changed how we treat regions without zones.
 			// See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=2066865
-			"[sig-storage] In-tree Volumes [Driver: azure-disk] [Testpattern: Dynamic PV (immediate binding)] topology should provision a volume and schedule a pod with AllowedTopologies",
-			"[sig-storage] In-tree Volumes [Driver: azure-disk] [Testpattern: Dynamic PV (delayed binding)] topology should provision a volume and schedule a pod with AllowedTopologies",
+			"[sig-storage] In-tree Volumes [Driver: azure-disk] [Provider:azure] [Testpattern: Dynamic PV (immediate binding)] topology should provision a volume and schedule a pod with AllowedTopologies",
+			"[sig-storage] In-tree Volumes [Driver: azure-disk] [Provider:azure] [Testpattern: Dynamic PV (delayed binding)] topology should provision a volume and schedule a pod with AllowedTopologies",
 		},
 		"baremetal": {
 			// LoadBalancer tests in 1.31 require explicit platform-specific skips
@@ -62,7 +62,7 @@ func filterByPlatform(specs et.ExtensionTestSpecs) {
 			"[sig-storage] Multi-AZ Cluster Volumes should only be allowed to provision PDs in zones where nodes exist",
 			// The following tests try to ssh directly to a node. None of our nodes have external IPs
 			"[k8s.io] [sig-node] crictl should be able to run crictl on the node",
-			"[sig-storage] Flexvolumes should be mountable",
+			"[sig-storage] Flexvolumes [Provider:gce,local] should be mountable",
 			"[sig-storage] Detaching volumes should not work when mount is in progress",
 			// We are using ovn-kubernetes to conceal metadata
 			"[sig-auth] Metadata Concealment should run a check-metadata-concealment job to completion",
@@ -155,7 +155,7 @@ func filterByPlatform(specs et.ExtensionTestSpecs) {
 
 // filterByExternalConnectivity is a helper function to do, simple, "NameContains" filtering on tests by external connectivity
 func filterByExternalConnectivity(specs et.ExtensionTestSpecs) {
-	var externalConnectivityExclusions = map[string][]string{
+	externalConnectivityExclusions := map[string][]string{
 		// Tests that don't pass on disconnected, either due to requiring
 		// internet access for GitHub (e.g. many of the s2i builds), or
 		// because of pullthrough not supporting ICSP (https://bugzilla.redhat.com/show_bug.cgi?id=1918376)
@@ -211,7 +211,7 @@ func filterByExternalConnectivity(specs et.ExtensionTestSpecs) {
 
 // filterByTopology is a helper function to do, simple, "NameContains" filtering on tests by topology
 func filterByTopology(specs et.ExtensionTestSpecs) {
-	var topologyExclusions = map[string][]string{
+	topologyExclusions := map[string][]string{
 		"SingleReplica": {
 			"[sig-apps] Daemon set [Serial] should rollback without unnecessary restarts [Conformance]",
 			"[sig-node] NoExecuteTaintManager Single Pod [Serial] doesn't evict pod with tolerations from tainted nodes",
@@ -243,7 +243,7 @@ func filterByTopology(specs et.ExtensionTestSpecs) {
 // filterByNoOptionalCapabilities is a helper function to facilitate adding environment selectors for tests which can't
 // be run/don't make sense to run against a cluster with all optional capabilities disabled
 func filterByNoOptionalCapabilities(specs et.ExtensionTestSpecs) {
-	var exclusions = []string{
+	exclusions := []string{
 		// Requires CSISnapshot capability
 		"[Feature:VolumeSnapshotDataSource]",
 		// Requires Storage capability
@@ -262,7 +262,12 @@ func filterByNoOptionalCapabilities(specs et.ExtensionTestSpecs) {
 
 // filterByNetwork is a helper function to do, simple, "NameContains" filtering on tests by network
 func filterByNetwork(specs et.ExtensionTestSpecs) {
-	var networkExclusions = map[string][]string{}
+	networkExclusions := map[string][]string{
+		"OVNKubernetes": {
+			// OVN-K does not implement the optional localhost nodeports feature.
+			"[Feature:LocalhostNodePorts]",
+		},
+	}
 
 	for network, exclusions := range networkExclusions {
 		var selectFunctions []et.SelectFunction

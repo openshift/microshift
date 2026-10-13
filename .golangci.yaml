@@ -143,6 +143,7 @@ linters:
         - controllers
         - data
         - healthcheck
+        - kubeletcredential
         - lvmd
         - mdns
         - node

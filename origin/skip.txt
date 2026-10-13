@@ -16,6 +16,7 @@
 "[sig-autoscaling] [Feature:HPA] Horizontal pod autoscaling (scale resource: CPU) ReplicationController light Should scale from 1 pod to 2 pods"
 "[sig-apps] Daemon set [Serial] should rollback without unnecessary restarts [Conformance] [Skipped:SingleReplicaTopology] [Suite:openshift/conformance/serial/minimal] [Suite:k8s]"
 "[sig-apps] Daemon set [Serial] should rollback without unnecessary restarts [Conformance] [Skipped:SingleReplicaTopology]"
+"[sig-apps] Daemon set should rollback without unnecessary restarts [Conformance] [Serial]"
 "[sig-autoscaling] [Feature:HPA] Horizontal pod autoscaling (scale resource: CPU) CustomResourceDefinition Should scale with a CRD targetRef [Suite:openshift/conformance/parallel] [Suite:k8s]"
 "[sig-autoscaling] [Feature:HPA] Horizontal pod autoscaling (scale resource: CPU) CustomResourceDefinition Should scale with a CRD targetRef"
 "[sig-network] Netpol NetworkPolicy between server and client should allow egress access on one named port [Feature:NetworkPolicy] [Skipped:Network/OVNKubernetes] [Skipped:Network/OpenShiftSDN/Multitenant] [Skipped:Network/OpenShiftSDN] [Suite:openshift/conformance/parallel] [Suite:k8s]"

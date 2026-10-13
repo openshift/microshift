@@ -30,6 +30,7 @@ import (
 
 	embedded "github.com/openshift/microshift/assets"
 	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/config/kubeletcredential"
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 
@@ -93,7 +94,9 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 		kubeletFlags.NodeLabels["node.microshift.io/role"] = "primary"
 	}
 
-	setImageCredentialProviderFlags(kubeletFlags, cfg)
+	if err := setImageCredentialProviderFlags(kubeletFlags, cfg); err != nil {
+		klog.Fatalf("Invalid kubelet image credential provider configuration: %v", err)
+	}
 
 	kubeletConfig, err := loadConfigFile(filepath.Join(config.DataDir, "/resources/kubelet/config/config.yaml"))
 
@@ -105,13 +108,29 @@ func (s *KubeletServer) configure(cfg *config.Config) {
 	s.kubeletflags = kubeletFlags
 }
 
-// setImageCredentialProviderFlags copies the (already validated and
-// canonicalized) image credential provider paths onto the kubelet flags. When
-// the feature is not configured the flags are left at their defaults.
-func setImageCredentialProviderFlags(kubeletFlags *kubeletoptions.KubeletFlags, cfg *config.Config) {
-	configPath, binDir, enabled := cfg.KubeletImageCredentialProviderPaths()
+// setImageCredentialProviderFlags validates the configured image credential
+// provider paths and, when the feature is active, sets the canonical
+// (symlink-resolved) paths onto the kubelet flags. When it is not configured the
+// flags are left at their defaults. An invalid configuration is reported as an
+// error here - mirroring the in-process kubelet's own validation - so startup
+// fails fast with a clear message instead of letting kubelet call os.Exit(1) at
+// provider registration and crash MicroShift (OCPEDGE-2973).
+//
+// The validation lives in pkg/config/kubeletcredential rather than pkg/config so
+// that the kubelet config scheme it requires - and its transitive apiserver
+// etcd-client imports - are linked only by binaries that run kubelet, not by
+// every reader of MicroShift configuration (notably microshift-etcd).
+func setImageCredentialProviderFlags(kubeletFlags *kubeletoptions.KubeletFlags, cfg *config.Config) error {
+	rawConfigPath, rawBinDir, err := cfg.KubeletImageCredentialProviderRawPaths()
+	if err != nil {
+		return err
+	}
+	configPath, binDir, enabled, err := kubeletcredential.Validate(rawConfigPath, rawBinDir)
+	if err != nil {
+		return err
+	}
 	if !enabled {
-		return
+		return nil
 	}
 
 	kubeletFlags.ImageCredentialProviderConfigPath = configPath
@@ -123,6 +142,7 @@ func setImageCredentialProviderFlags(kubeletFlags *kubeletoptions.KubeletFlags, 
 	klog.InfoS("Kubelet image credential provider configured",
 		"configPath", configPath,
 		"binDir", binDir)
+	return nil
 }
 
 func (s *KubeletServer) writeConfig(cfg *config.Config) error {

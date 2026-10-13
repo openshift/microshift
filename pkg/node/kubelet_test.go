@@ -7,6 +7,7 @@ import (
 	kubeletoptions "k8s.io/kubernetes/cmd/kubelet/app/options"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_GenerateConfig(t *testing.T) {
@@ -79,22 +80,29 @@ func Test_GenerateConfig_EmptyKubelet(t *testing.T) {
 }
 
 func Test_setImageCredentialProviderFlags(t *testing.T) {
-	t.Run("sets both flags to the canonical values when configured", func(t *testing.T) {
-		cfg := &config.Config{
-			KubeletImageCredentialProviderConfigPath: "/etc/microshift/credential-providers.yaml",
-			KubeletImageCredentialProviderBinDir:     "/usr/libexec/microshift/credential-providers",
-		}
+	// The full validation (decode, semantics, trusted-path/ownership) is covered by
+	// pkg/config/kubeletcredential, which can inject a fake root-ownership hook.
+	// setImageCredentialProviderFlags calls the real Validate, so these cases only
+	// exercise the wiring that needs no privileged filesystem: the inactive case
+	// and error propagation.
+	t.Run("leaves flags empty and returns no error when not configured", func(t *testing.T) {
+		cfg := config.NewDefault()
 		flags := kubeletoptions.NewKubeletFlags()
-		setImageCredentialProviderFlags(flags, cfg)
-		assert.Equal(t, "/etc/microshift/credential-providers.yaml", flags.ImageCredentialProviderConfigPath)
-		assert.Equal(t, "/usr/libexec/microshift/credential-providers", flags.ImageCredentialProviderBinDir)
-	})
-
-	t.Run("leaves flags empty when not configured", func(t *testing.T) {
-		cfg := &config.Config{}
-		flags := kubeletoptions.NewKubeletFlags()
-		setImageCredentialProviderFlags(flags, cfg)
+		require.NoError(t, setImageCredentialProviderFlags(flags, cfg))
 		assert.Empty(t, flags.ImageCredentialProviderConfigPath)
 		assert.Empty(t, flags.ImageCredentialProviderBinDir)
+	})
+
+	t.Run("returns an error for an invalid configuration", func(t *testing.T) {
+		cfg := config.NewDefault()
+		// Only one of the two keys set: validation rejects it ("must be set
+		// together") without touching the filesystem, so it fails as non-root.
+		cfg.Kubelet = map[string]any{
+			"imageCredentialProviderConfigPath": "/etc/microshift/cp.yaml",
+		}
+		flags := kubeletoptions.NewKubeletFlags()
+		err := setImageCredentialProviderFlags(flags, cfg)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "must be set together")
 	})
 }

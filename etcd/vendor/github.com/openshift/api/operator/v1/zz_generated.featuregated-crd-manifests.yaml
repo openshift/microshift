@@ -311,7 +311,6 @@ machineconfigurations.operator.openshift.io:
   Capability: ""
   Category: ""
   FeatureGates:
-  - BootImageSkewEnforcement
   - IrreconcilableMachineConfig
   - ManagedBootImagesAWSCAPI
   - ManagedBootImagesCPMS
@@ -338,6 +337,7 @@ networks.operator.openshift.io:
   Category: ""
   FeatureGates:
   - NoOverlayMode
+  - OVNKubernetesUplinkMode
   FilenameOperatorName: network
   FilenameOperatorOrdering: "01"
   FilenameRunLevel: "0000_70"
