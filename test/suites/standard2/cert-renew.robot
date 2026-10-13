@@ -173,7 +173,8 @@ Unrelated Configuration Change Still Activates Renewal
 Certificate Configuration Change Discards Pending Renewal
     [Documentation]    Stale renewal must not block startup or skip normal generation for new SANs.
     ${ca_before}=    CA Material Digest
-    Renewal Document    ca    json
+    ${result}=    Renewal Document    ca    json
+    Pending Renewal Matches Result    ${result}
     # Preserve the host SAN so Restart MicroShift can retrieve its kubeconfig.
     Drop In MicroShift Config
     ...    apiServer:\n\ \ subjectAltNames:\n\ \ \ \ - ${USHIFT_HOST}\n\ \ \ \ - renewal-config.example.test\n
