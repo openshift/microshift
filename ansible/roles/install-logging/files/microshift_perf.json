@@ -618,7 +618,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (irate(namedprocess_namegroup_cpu_seconds_total{groupname=~\"csi.*|topo.*|lvmd|livenessprobe\"}[$interval]))",
+          "expr": "sum by(job) (irate(namedprocess_namegroup_cpu_seconds_total{groupname=~\"csi.*|topo.*|lvmd|lvms|livenessprobe|snapshot.*\"}[$interval]))",
           "hide": false,
           "legendFormat": "csi",
           "range": true,
@@ -630,7 +630,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (irate(namedprocess_namegroup_cpu_seconds_total{groupname=~\"haproxy|openshift-route\"}[$interval]))",
+          "expr": "sum by(job) (irate(namedprocess_namegroup_cpu_seconds_total{groupname=~\"haproxy|openshift-route|start-haproxy\"}[$interval]))",
           "hide": false,
           "legendFormat": "ingress",
           "range": true,
@@ -666,7 +666,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (irate(namedprocess_namegroup_cpu_seconds_total{groupname=~\"microshift\"}[$interval]))",
+          "expr": "sum by(job) (irate(namedprocess_namegroup_cpu_seconds_total{groupname=~\"microshift.*\"}[$interval]))",
           "hide": false,
           "legendFormat": "microshift",
           "range": true,
@@ -678,7 +678,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (rate(namedprocess_namegroup_cpu_seconds_total{groupname=~\"crio|conmon\"}[$interval]))",
+          "expr": "sum by(job) (irate(namedprocess_namegroup_cpu_seconds_total{groupname=~\"crio|conmon\"}[$interval]))",
           "hide": false,
           "legendFormat": "runtime",
           "range": true,
@@ -789,7 +789,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (namedprocess_namegroup_memory_bytes{groupname=~\"csi.*|topo.*|lvmd|livenessprobe\",memtype=\"resident\"} / 1024 / 1024)",
+          "expr": "sum by(job) (namedprocess_namegroup_memory_bytes{groupname=~\"csi.*|topo.*|lvmd|lvms|livenessprobe|snapshot.*\",memtype=\"resident\"} / 1024 / 1024)",
           "hide": false,
           "legendFormat": "csi",
           "range": true,
@@ -801,7 +801,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum by(job) (namedprocess_namegroup_memory_bytes{groupname=~\"haproxy|openshift-route\", memtype=\"resident\"}) / 1024 / 1024",
+          "expr": "sum by(job) (namedprocess_namegroup_memory_bytes{groupname=~\"haproxy|openshift-route|start-haproxy\", memtype=\"resident\"}) / 1024 / 1024",
           "hide": false,
           "legendFormat": "ingress",
           "range": true,
@@ -825,7 +825,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "(namedprocess_namegroup_memory_bytes{groupname=~\"service-ca-oper\", memtype=\"resident\"}) / 1024 / 1024",
+          "expr": "sum by(job) (namedprocess_namegroup_memory_bytes{groupname=~\"service-ca-oper\", memtype=\"resident\"}) / 1024 / 1024",
           "hide": false,
           "legendFormat": "service-ca",
           "range": true,
@@ -837,7 +837,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "(namedprocess_namegroup_memory_bytes{groupname=~\"microshift\", memtype=\"resident\"}) / 1024 / 1024",
+          "expr": "sum by(job) (namedprocess_namegroup_memory_bytes{groupname=~\"microshift.*\", memtype=\"resident\"}) / 1024 / 1024",
           "hide": false,
           "legendFormat": "microshift",
           "range": true,
@@ -1048,7 +1048,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "builder",
-          "expr": "sum by(groupname) (namedprocess_namegroup_memory_bytes{groupname=~\"csi.*|topo.*|lvmd|livenessprobe\", memtype=\"resident\"}) / 1024 / 1024",
+          "expr": "sum by(groupname) (namedprocess_namegroup_memory_bytes{groupname=~\"csi.*|topo.*|lvmd|lvms|livenessprobe|snapshot.*\", memtype=\"resident\"}) / 1024 / 1024",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"

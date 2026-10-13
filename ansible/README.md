@@ -115,6 +115,26 @@ time ansible-playbook -v \
     -i inventory/inventory setup-node.yml
 ```
 
+#### Running Selected Plays
+
+Every play in `setup-node.yml` carries a tag: `localhost`, `repos`, `host`, `install`,
+`nodename`, `logging`, `start`, `warm`, `gpu`, `kubeconfig` and `workloads`. Use
+`--skip-tags` or `--tags` to rerun parts of the playbook without editing it. For example, to
+reinstall MicroShift and repeat the startup measurements on a host whose subscription,
+repositories, packages and firewall are already set up:
+```bash
+time ansible-playbook -v \
+    -i inventory/inventory setup-node.yml \
+    --skip-tags localhost,repos,host,gpu,workloads
+```
+This replaces the MicroShift on that host: the `install` play stops MicroShift, removes its
+data and packages and installs it again, and the `start` play reboots the host before the cold
+start measurement. Adding `install` to `--skip-tags` measures the MicroShift that is already
+installed instead. In that case `start` removes the MicroShift data if MicroShift has run since
+the last boot (unless `cleanup_microshift` is false) and still reboots the host, and the
+pre-installation disk baseline (`disk0.txt`) is not captured, so the run is not a complete
+fresh-install measurement.
+
 ## Output
 
 The playbook stores results on the Ansible control node under `results/<microshift_version>/<timestamp>/`.
@@ -246,7 +266,7 @@ If the user has a fresh RHEL host to be used for running MicroShift performance 
 As we can read from the following configuration, we have selected to `manage_subscription` and this requires the subsequent `rhel_*` vars to be set.
 The other initial configuration steps are toggled with the `setup_microshift_host` variable, which we have set to `true` for this configuration.
 
-On a clean system, the playbook will also copy the user-provided `pull-secret` from `roles/install-microshift/files/pull-secret.txt` to the correct location on the host.
+On a clean system, the playbook will also copy the user-provided `pull-secret` from `roles/install-microshift/files/pull-secret.txt` to the correct location on the host. Set `pull_secret_file` to an absolute path (for example `-e pull_secret_file=$HOME/.pull-secret.json`) to keep the secret outside the repository.
 
 **Sample vars/all.yml File**
 ```

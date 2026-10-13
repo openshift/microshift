@@ -222,7 +222,7 @@
 - name: Copy pull-secret to node
   become: true
   ansible.builtin.copy:
-    src: pull-secret.txt
+    src: "{{ pull_secret_file }}"
     dest: /etc/crio/openshift-pull-secret
     owner: root
     group: root
