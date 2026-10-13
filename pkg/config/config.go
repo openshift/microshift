@@ -89,6 +89,8 @@ type Config struct {
 	MultiNode MultiNodeConfig `json:"-"` // the value read from commond line
 
 	Warnings []string `json:"-"` // Warnings that should not prevent the service from starting.
+
+	Certificates Certificates `json:"certificates"`
 }
 
 // NewDefault creates a new Config struct populated with the
@@ -128,6 +130,7 @@ func (c *Config) fillDefaults() error {
 	c.Debugging = Debugging{
 		LogLevel: "Normal",
 	}
+	c.Certificates = certificateDefaults()
 	c.ApiServer = ApiServer{
 		SubjectAltNames: subjectAltNames,
 		URL:             "https://localhost:6443",
@@ -231,6 +234,15 @@ func (c *Config) fillDefaults() error {
 // (usually the defaults).
 func (c *Config) incorporateUserSettings(u *Config) {
 	c.userSettings = u
+	if u.Certificates.ForceRestartOnExpirationImminent != nil {
+		c.Certificates.ForceRestartOnExpirationImminent = ptr.To(*u.Certificates.ForceRestartOnExpirationImminent)
+	}
+	if u.Certificates.ServingValidity != nil {
+		c.Certificates.ServingValidity = ptr.To(*u.Certificates.ServingValidity)
+	}
+	if u.Certificates.CAValidity != nil {
+		c.Certificates.CAValidity = ptr.To(*u.Certificates.CAValidity)
+	}
 
 	if u.DNS.BaseDomain != "" {
 		c.DNS.BaseDomain = u.DNS.BaseDomain
@@ -759,6 +771,9 @@ func (c *Config) validate() error {
 
 	if err := c.DNS.validate(); err != nil {
 		return fmt.Errorf("error validating DNS: %v", err)
+	}
+	if err := c.Certificates.Validate(); err != nil {
+		return err
 	}
 	if err := c.Network.Multus.Validate(); err != nil {
 		return fmt.Errorf("error validating multus configuration: %v", err)
