@@ -53,6 +53,7 @@ Simulate Service Failure
 
 Simulate Pod Failure
     [Documentation]    Simulate pod network failure
+    Wait Until Greenboot Health Check Exited
     Wait For MicroShift Healthcheck Success
     Disrupt Pod Network
     Restart MicroShift
