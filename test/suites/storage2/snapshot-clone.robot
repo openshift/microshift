@@ -237,6 +237,11 @@ Snapshot Content Delete Teardown
 Snapshot Retain Teardown
     [Documentation]    Clean up VolumeSnapshotContent, VolumeSnapshotClass, LogicalVolume, and namespace.
     [Arguments]    ${vsc_name}    ${content_name}
+    # With deletionPolicy Retain, deleting the VolumeSnapshotContent leaves the backing
+    # TopoLVM LogicalVolume behind, so we must delete it explicitly or it leaks and the
+    # No Topolvm LogicalVolumes Should Exist check fails. K8s names the content
+    # snapcontent-<uid> and TopoLVM names the LV snapshot-<uid>, so replacing the
+    # "content" substring with "shot" maps snapcontent-<uid> -> snapshot-<uid>.
     ${lv_name}=    Replace String    ${content_name}    content    shot
     Run Keyword And Ignore Error
     ...    Delete VolumeSnapshotContent    ${content_name}

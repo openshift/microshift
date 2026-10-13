@@ -113,6 +113,16 @@ Named Deployment Should Be Available
     [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
     Oc Wait    -n ${ns} deploy ${name}    --for=condition=Available --timeout=${timeout}
 
+Named Deployment Rollout Should Be Complete
+    [Documentation]    Wait for a deployment's rollout to finish. Unlike the Available
+    ...    condition, which the previous ReplicaSet can still satisfy mid-rollout, this
+    ...    waits for the new generation to be fully rolled out.
+    ...    ${name}    Name of deployment to wait for
+    ...    ${ns}    Namespace of named deployment. Defaults to NAMESPACE suite variable
+    ...    ${timeout}    Period of time to wait for the rollout to complete.
+    [Arguments]    ${name}    ${ns}=${NAMESPACE}    ${timeout}=${DEFAULT_WAIT_TIMEOUT}
+    Run With Kubeconfig    oc rollout status deployment/${name} -n ${ns} --timeout\=${timeout}
+
 Named Daemonset Should Be Available
     [Documentation]    Wait for a given daemonset's Available condition to be true
     ...    ${name}    Name of daemonset to wait for

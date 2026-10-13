@@ -14,7 +14,6 @@ Suite Teardown      Teardown Suite
 
 *** Variables ***
 ${SC_NAME}          topolvm-provisioner
-${TOPOLVM_PROV}     topolvm.io
 ${MOUNT_PATH}       /mnt/storage
 
 
@@ -192,12 +191,14 @@ OCP-59662 Pod Mounts Multiple PVCs
     Named Deployment Should Be Available    ${dep}
 
     # Add PVCs to deployment via oc set volumes
+    # oc set volumes triggers a rollout; wait for the new generation to roll out
+    # rather than the Available condition, which the old ReplicaSet can still satisfy.
     Run With Kubeconfig
     ...    oc set volumes deployment ${dep} --add --name\=vol1 -t pvc --claim-name\=${pvc1} -m /mnt/storage1 --overwrite -n ${NAMESPACE}
-    Named Deployment Should Be Available    ${dep}    timeout=120s
+    Named Deployment Rollout Should Be Complete    ${dep}    timeout=120s
     Run With Kubeconfig
     ...    oc set volumes deployment ${dep} --add --name\=vol2 -t pvc --claim-name\=${pvc2} -m /mnt/storage2 --overwrite -n ${NAMESPACE}
-    Named Deployment Should Be Available    ${dep}    timeout=120s
+    Named Deployment Rollout Should Be Complete    ${dep}    timeout=120s
 
     # Verify both mounts show xfs
     ${pod}=    Get Deployment Pod Name    ${dep}
