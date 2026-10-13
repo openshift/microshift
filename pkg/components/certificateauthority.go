@@ -57,7 +57,7 @@ func startCertificateAuthorityController(ctx context.Context, kubeconfigPath str
 	}
 
 	for i, resource := range ServiceAccountKeyResources {
-		resourceNames[i] = resource.Name
+		resourceNames[len(CertificateAuthorityResources)+i] = resource.Name
 		if err := exposeServiceAccountKey(ctx, client, resource.Dir, resource.Name); err != nil {
 			return fmt.Errorf("failed to expose service account key %s: %w", resource.Name, err)
 		}
@@ -94,9 +94,18 @@ func createClusterRole(ctx context.Context, client kubernetes.Interface, resourc
 		},
 	}
 
-	_, err := client.RbacV1().Roles(caResourceNamespace).Create(ctx, role, metav1.CreateOptions{})
-	if err != nil && !apierrors.IsAlreadyExists(err) {
-		return fmt.Errorf("failed to create etcd CA admin Role: %w", err)
+	roles := client.RbacV1().Roles(caResourceNamespace)
+	_, err := roles.Create(ctx, role, metav1.CreateOptions{})
+	if apierrors.IsAlreadyExists(err) {
+		existing, getErr := roles.Get(ctx, role.Name, metav1.GetOptions{})
+		if getErr != nil {
+			return fmt.Errorf("failed to get existing CA admin Role: %w", getErr)
+		}
+		existing.Rules = role.Rules
+		_, err = roles.Update(ctx, existing, metav1.UpdateOptions{})
+	}
+	if err != nil {
+		return fmt.Errorf("failed to create or update etcd CA admin Role: %w", err)
 	}
 
 	roleBinding := &rbacv1.RoleBinding{

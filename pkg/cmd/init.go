@@ -77,6 +77,8 @@ func legacyKubeControlPlaneSignerDir(certsDir string) string {
 // service-ca is copied back into the live directory after the rename so that
 // existing in-cluster service-serving Secrets remain trusted until they are
 // reissued by the service-ca controller.
+// MicroShift is always a single-node deployment with a single embedded etcd member,
+// so peer-CA rotation during migration requires no cross-member coordination.
 func migrateLegacyCertLayout(certsDir, gitVersion string) error {
 	if _, err := os.Stat(legacyKubeControlPlaneSignerDir(certsDir)); err != nil {
 		if os.IsNotExist(err) {
@@ -98,10 +100,18 @@ func migrateLegacyCertLayout(certsDir, gitVersion string) error {
 	if err := os.MkdirAll(certsDir, 0700); err != nil {
 		return fmt.Errorf("failed to recreate certs directory after migration: %w", err)
 	}
-	return os.CopyFS(
+	if err := os.CopyFS(
 		filepath.Join(certsDir, "service-ca"),
 		os.DirFS(filepath.Join(backupDir, "service-ca")),
-	)
+	); err != nil {
+		return fmt.Errorf("failed to restore service-ca after migration: %w", err)
+	}
+	// os.CopyFS does not preserve file permissions; restrict the CA private key.
+	caKeyPath := filepath.Join(certsDir, "service-ca", "ca.key")
+	if err := os.Chmod(caKeyPath, 0600); err != nil {
+		return fmt.Errorf("failed to set permissions on restored service-ca key: %w", err)
+	}
+	return nil
 }
 
 func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {
