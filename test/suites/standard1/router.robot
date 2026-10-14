@@ -111,7 +111,10 @@ Router Disabled
 
 Router Exposure Configuration
     [Documentation]    Test custom ports and custom listening addresses.
+    ...    Skipped on IPv6 single stack hosts, where the IPv4 advertise address (10.44.0.0)
+    ...    is never configured. IPv6 router coverage lives in suites/ipv6/.
     [Setup]    Run Keywords
+    ...    Skip If Service Network Has No IPv4
     ...    Configure Router Exposure
     ...    Add Fake IP To NIC
 
@@ -124,8 +127,7 @@ Router Exposure Configuration
     Wait Until Keyword Succeeds    60x    2s
     ...    Internal Router Port Should Be Open    ${FAKE_LISTEN_IP}    ${ALTERNATIVE_HTTP_PORT}    http
 
-    [Teardown]    Run Keywords
-    ...    Remove Fake IP From NIC
+    [Teardown]    Remove Fake IP Unless Test Skipped
 
 Router Verify Tuning Configuration
     [Documentation]    Test ingress tuning configuration.
@@ -246,6 +248,12 @@ Add Fake IP To NIC
     ...    sudo=True    return_rc=True    return_stderr=True    return_stdout=True
     Log Many    ${stdout}    ${stderr}
     Should Be Equal As Integers    0    ${rc}
+
+Remove Fake IP Unless Test Skipped
+    [Documentation]    Teardown for Router Exposure Configuration. Only remove the fake IP when
+    ...    the test actually ran: on an IPv6 single stack host the test is skipped in setup
+    ...    before the IP is added, and deleting an absent address would fail the teardown.
+    IF    '${TEST_STATUS}' != 'SKIP'    Remove Fake IP From NIC
 
 Remove Fake IP From NIC
     [Documentation]    Remove the given IP from the given NIC.
