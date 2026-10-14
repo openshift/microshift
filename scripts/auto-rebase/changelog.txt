@@ -1,13 +1,9 @@
-- machine-config-operator embedded-component 11f9273fb35d3d102fb62b261eb507abedf3c428 to e3f6479a979898937cce9cbebf428823dae249fb
-  - dd1ccd06 2026-10-07T21:39:56Z Remove reverse (rhel10 to rhel9) OSStreams upgrade tests
-  - 2f345ef7 2026-10-06T23:29:38Z bootimage: logout vCenter clients after use
-  - 59333d2f 2026-10-06T18:12:57Z OCPBUGS-128457: Fix layered OS updates on older nodes
+- machine-config-operator embedded-component e3f6479a979898937cce9cbebf428823dae249fb to 41e607f33cb8bc13228789905550b9401b594d1f
+  - cf2b8c5f 2026-09-30T22:57:20-04:00 Revert "OCPBUGS-91746: temporarily remove sandboxed-containers from extensions test"
 
-- kube-rbac-proxy image-amd64 43c114bc124f59e2fc3223dea8e0a8f4cdeed18d to 9e0e3be4126af4cbe904765988ea2e52c6aed9ae
-  - 93b8120 2026-10-06T19:34:22Z Address CVE-2026-29181
-  - a31503c 2026-10-06T19:34:22Z Address CVE-2026-29181 (vendor changes)
+- kube-rbac-proxy image-amd64 9e0e3be4126af4cbe904765988ea2e52c6aed9ae to 2f8a556d09638faeb09b366e95ecb75279ce7c8a
+  - c0251f8 2026-09-29T21:25:47+05:30 Bump golang.org/x/net from v0.52.0 to v0.58.0 to resolve CVE-2026-39821
 
-- kube-rbac-proxy image-arm64 43c114bc124f59e2fc3223dea8e0a8f4cdeed18d to 9e0e3be4126af4cbe904765988ea2e52c6aed9ae
-  - 93b8120 2026-10-06T19:34:22Z Address CVE-2026-29181
-  - a31503c 2026-10-06T19:34:22Z Address CVE-2026-29181 (vendor changes)
+- kube-rbac-proxy image-arm64 9e0e3be4126af4cbe904765988ea2e52c6aed9ae to 2f8a556d09638faeb09b366e95ecb75279ce7c8a
+  - c0251f8 2026-09-29T21:25:47+05:30 Bump golang.org/x/net from v0.52.0 to v0.58.0 to resolve CVE-2026-39821
 
