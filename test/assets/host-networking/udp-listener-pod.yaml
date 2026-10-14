@@ -1,0 +1,26 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: udp-pod
+  labels:
+    app: udp-pod
+spec:
+  terminationGracePeriodSeconds: 0
+  containers:
+  - name: udp-listener
+    image: quay.io/microshift/busybox:1.36
+    command: ["/bin/sh"]
+    args: ["-c", "nc -u -l -p 8080 -e /bin/cat; sleep infinity"]
+    ports:
+    - containerPort: 8080
+      protocol: UDP
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1001
+      runAsGroup: 1001
+      seccompProfile:
+        type: RuntimeDefault
