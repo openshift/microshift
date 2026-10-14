@@ -16,6 +16,9 @@ import (
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
 )
 
+const invalidPendingRenewalWarning = "Pending certificate renewal metadata is invalid; the pending certificates will not be activated. Restart MicroShift to quarantine this renewal, then run microshift certs renew again."
+const rejectedPendingRenewalWarning = "A pending certificate renewal was rejected because its metadata was invalid. The rejected certificates were not activated; normal certificate startup policy applies. Check active certificate status, then prepare and activate a replacement renewal to clear this warning."
+
 // This private on-disk record contains hashes, never configuration or key data.
 type pendingCertificateRenewal struct {
 	Version      int                                            `json:"version"`
@@ -89,12 +92,15 @@ func readPendingCertificateRenewal(transaction *certificates.Transaction) (*pend
 	}
 	var state pendingCertificateRenewal
 	if err := json.Unmarshal(contents, &state); err != nil {
-		return nil, fmt.Errorf("invalid pending certificate renewal record")
+		return nil, certificates.ErrInvalidPendingMetadata
+	}
+	if state.Version > 1 {
+		return nil, fmt.Errorf("unsupported pending certificate renewal version %d", state.Version)
 	}
 	if state.Version != 1 || state.ConfigHash == "" || state.OriginalHash == "" || state.RenewedHash == "" || state.Result == nil ||
 		state.Result.Status != certificatesv1alpha1.RenewalStatusPending ||
 		(state.Result.Mode != certificatesv1alpha1.RenewalModeServing && state.Result.Mode != certificatesv1alpha1.RenewalModeCA) {
-		return nil, fmt.Errorf("invalid or unsupported pending certificate renewal record")
+		return nil, certificates.ErrInvalidPendingMetadata
 	}
 	return &state, nil
 }
@@ -107,17 +113,48 @@ func loadPendingCertificateRenewal(dataDir string) (*certificatesv1alpha1.Certif
 	return state.Result, nil
 }
 
+// loadCertificateRenewalStatus keeps active inventory available when only the
+// pending JSON is corrupt. It is read-only, including before startup quarantine.
+func loadCertificateRenewalStatus(dataDir string) (*certificatesv1alpha1.CertificateRenewalResult, []string, error) {
+	pending, err := loadPendingCertificateRenewal(dataDir)
+	if errors.Is(err, certificates.ErrInvalidPendingMetadata) {
+		return nil, []string{invalidPendingRenewalWarning}, nil
+	}
+	if err != nil {
+		return nil, nil, err
+	}
+	rejected, err := (&certificates.Transaction{DataDir: dataDir}).HasRejected()
+	if err != nil {
+		return nil, nil, err
+	}
+	if rejected {
+		return pending, []string{rejectedPendingRenewalWarning}, nil
+	}
+	return pending, nil, nil
+}
+
 // activateCertificateRenewal runs only at startup, under both the runtime and
 // operation locks, after restore and before any component reads active PKI.
 // It reports whether a pending generation was activated, not merely present.
 func activateCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, etcdStopped func() error, now time.Time) (bool, error) {
 	state, err := readPendingCertificateRenewal(transaction)
+	if errors.Is(err, certificates.ErrInvalidPendingMetadata) {
+		if err := transaction.QuarantinePending(); err != nil {
+			return false, fmt.Errorf("failed to quarantine invalid pending certificate renewal: %w", err)
+		}
+		klog.Warningf("%s Rejected files were quarantined under %s/.cert-renewal-rejected; continuing normal certificate initialization", rejectedPendingRenewalWarning, transaction.DataDir)
+		return false, nil
+	}
 	if err != nil {
 		return false, err
 	}
 	if state == nil {
 		return false, transaction.Discard() // Remove abandoned, unpublished staging.
 	}
+	return activatePendingCertificateRenewal(cfg, transaction, state, etcdStopped, now)
+}
+
+func activatePendingCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, state *pendingCertificateRenewal, etcdStopped func() error, now time.Time) (bool, error) {
 	if err := etcdStopped(); err != nil {
 		return false, err
 	}
@@ -173,6 +210,12 @@ func activateCertificateRenewal(cfg *config.Config, transaction *certificates.Tr
 		}
 		return validatePendingCertificateHash(transaction.DataDir, state.RenewedHash)
 	})
+	if err == nil {
+		if cleanupErr := transaction.ClearRejected(); cleanupErr != nil {
+			// Activation succeeded. A stale warning must not fail startup.
+			klog.Warningf("Certificate renewal activated, but rejected renewal cleanup failed; the status warning may remain: %v", cleanupErr)
+		}
+	}
 	return err == nil, err
 }
 

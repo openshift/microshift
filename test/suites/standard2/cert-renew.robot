@@ -190,6 +190,30 @@ Certificate Configuration Change Discards Pending Renewal
     ...    Remove Drop In MicroShift Config    99-cert-renew-test
     ...    AND    Restart MicroShift
 
+Corrupt Pending Metadata Does Not Block Startup
+    [Documentation]    Reject corrupt metadata, retain a visible warning, and clear it only after replacement activation.
+    ${ca_before}=    CA Material Digest
+    Corrupt Pending Certificate Metadata
+    Certificate Renewal Warning Is Reported    Pending certificate renewal metadata is invalid
+    Restart MicroShift
+    Certificate Renewal Warning Is Reported    A pending certificate renewal was rejected
+    ${ca_after}=    CA Material Digest
+    Should Be Equal    ${ca_before}    ${ca_after}
+    ${message}=    Command Should Work
+    ...    journalctl -u microshift -b --no-pager | grep -F 'A pending certificate renewal was rejected' | tail -n 1
+    Should Contain    ${message}    continuing normal certificate initialization
+    Command Should Work    test -d /var/lib/microshift/.cert-renewal-rejected
+    Restart MicroShift
+    Certificate Renewal Warning Is Reported    A pending certificate renewal was rejected
+    ${result}=    Renewal Document    serving    json
+    Pending Renewal Matches Result    ${result}
+    Certificate Renewal Warning Is Reported    A pending certificate renewal was rejected
+    Restart MicroShift
+    Renewal Matches Current Status    ${result}
+    Renewal Activation Has Finished
+    Rejected Renewal Warning Has Cleared
+    [Teardown]    Run Keyword If Test Failed    Replace Rejected Renewal
+
 
 *** Keywords ***
 Setup
@@ -251,6 +275,46 @@ Renewal Document
     Should Be Empty    ${stderr}
     ${document}=    Yaml Parse    ${stdout}
     RETURN    ${document}
+
+Corrupt Pending Certificate Metadata
+    [Documentation]    Corrupt only published test metadata, never active certificate files.
+    ${result}=    Renewal Document    ca    json
+    Pending Renewal Matches Result    ${result}
+    Command Should Work    truncate -s 0 /var/lib/microshift/.cert-renewal/pending.json
+
+Certificate Renewal Warning Is Reported
+    [Documentation]    Table warnings go to stderr; JSON and YAML keep warnings inside the status document.
+    [Arguments]    ${message}
+    FOR    ${format}    IN    json    yaml
+        ${stdout}    ${stderr}    ${rc}=    Execute Command
+        ...    microshift certs status -o ${format}
+        ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+        Should Be Equal As Integers    ${rc}    0
+        Should Be Empty    ${stderr}
+        ${document}=    Yaml Parse    ${stdout}
+        Should Not Be Empty    ${document}[items]
+        Should Be True    $message in str($document['warnings'])
+    END
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    microshift certs status
+    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${stdout}    CERTIFICATE
+    Should Contain    ${stderr}    ${message}
+
+Rejected Renewal Warning Has Cleared
+    [Documentation]    Successful activation removes rejected files and their persistent warning.
+    ${status}=    Certificate Status Document
+    FOR    ${warning}    IN    @{status}[warnings]
+        Should Not Contain    ${warning}    A pending certificate renewal was rejected
+    END
+    Command Should Work    test ! -e /var/lib/microshift/.cert-renewal-rejected
+
+Replace Rejected Renewal
+    [Documentation]    Leave a failed corruption test with a usable service and no rejected-renewal warning.
+    Restart MicroShift
+    Renewal Document    serving    json
+    Restart MicroShift
 
 Validate Renewal Document
     [Documentation]    Check the versioned contract and inventory-derived selection, without assuming certificate counts.

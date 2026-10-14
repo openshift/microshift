@@ -59,7 +59,7 @@ func (t *Transaction) validatePaths() error {
 	if !filepath.IsAbs(t.DataDir) || filepath.Clean(t.DataDir) != t.DataDir || t.DataDir == string(filepath.Separator) {
 		return fmt.Errorf("certificate transaction requires an absolute data directory, not the filesystem root")
 	}
-	for _, path := range []string{t.DataDir, t.directory(), filepath.Join(t.directory(), "previous")} {
+	for _, path := range []string{t.DataDir, t.directory(), filepath.Join(t.directory(), "previous"), t.rejectedDirectory()} {
 		info, err := os.Lstat(path)
 		if errors.Is(err, os.ErrNotExist) {
 			continue

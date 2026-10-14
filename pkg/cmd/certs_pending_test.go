@@ -107,8 +107,8 @@ func TestCertStatusShowsActiveAndPendingSeparately(t *testing.T) {
 				loadInventory: func(*config.Config) (certchains.CertificateInventory, error) {
 					return certchains.CertificateInventory{entry}, nil
 				},
-				loadPending: func() (*certificatesv1alpha1.CertificateRenewalResult, error) {
-					return &certificatesv1alpha1.CertificateRenewalResult{Status: certificatesv1alpha1.RenewalStatusPending}, nil
+				loadPending: func() (*certificatesv1alpha1.CertificateRenewalResult, []string, error) {
+					return &certificatesv1alpha1.CertificateRenewalResult{Status: certificatesv1alpha1.RenewalStatusPending}, nil, nil
 				},
 			}
 			require.NoError(t, options.run())
