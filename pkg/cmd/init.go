@@ -46,11 +46,11 @@ func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 
 	certChains, err := certSetup(cfg)
 	if err != nil {
-		// certSetup may leave a partial certs directory on first run. On the next
-		// restart certSetup will regenerate it from scratch because certchains
-		// writes atomically per-signer before updating the directory; any missing
-		// or corrupt signer is regenerated. The caller (run.go) fatals, so
-		// greenboot restarts the service and the retry completes cleanly.
+		// certSetup may leave a partial certs/ directory if it fails mid-way.
+		// certchains writes each signer atomically and idempotently: on the next
+		// run it skips already-written signers and generates only the missing ones.
+		// The caller (run.go) fatals here; greenboot restarts the service and the
+		// retry completes cleanly without removing the partial directory.
 		return nil, err
 	}
 
