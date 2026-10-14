@@ -12,6 +12,10 @@ import (
 	"strings"
 )
 
+// ErrInvalidPendingMetadata identifies corrupt JSON or an invalid pending record,
+// not an I/O failure or an interrupted activation.
+var ErrInvalidPendingMetadata = errors.New("invalid pending certificate renewal metadata")
+
 type pendingGeneration struct {
 	Directory string          `json:"directory"`
 	Metadata  json.RawMessage `json:"metadata"`
@@ -41,10 +45,10 @@ func (t *Transaction) LoadPending() ([]byte, error) {
 	}
 	var pending pendingGeneration
 	if err := json.Unmarshal(contents, &pending); err != nil {
-		return nil, fmt.Errorf("invalid pending certificate record")
+		return nil, ErrInvalidPendingMetadata
 	}
 	if !strings.HasPrefix(pending.Directory, "stage-") || filepath.Base(pending.Directory) != pending.Directory || len(pending.Metadata) == 0 {
-		return nil, fmt.Errorf("invalid pending certificate generation")
+		return nil, ErrInvalidPendingMetadata
 	}
 	t.stage = filepath.Join(t.directory(), pending.Directory)
 	if err := regularTree(t.Stage()); err != nil {

@@ -147,8 +147,24 @@ preparation. If either has changed, or pending certificates have expired, startu
 discards the pending generation, logs a warning, and continues with normal
 certificate initialization using the current configuration and active material.
 Run renewal again if still needed. Unrelated settings, such as logging, do not
-invalidate a pending renewal. Other validation failures, including corrupted or
-not-yet-valid pending material, still block activation and startup.
+invalidate a pending renewal.
+
+Malformed or incomplete pending-renewal JSON does not block startup. MicroShift
+quarantines the rejected transaction under
+`/var/lib/microshift/.cert-renewal-rejected`, logs a warning, and continues normal
+certificate initialization. This does not force a CA renewal; the existing
+startup rotation policy still applies. Rejected certificates are never activated.
+`microshift certs status` continues to report active certificates, with a warning
+on stderr for table output or in `warnings` for JSON/YAML. Before startup has
+quarantined corrupt metadata, status also reports the problem without changing
+any files and directs the administrator to restart and prepare renewal again.
+The rejection warning and quarantined files survive restarts and new renewal
+preparation. They are removed after a replacement renewal is successfully
+activated. Quarantined files include private keys and remain root-only.
+
+Filesystem errors, unsupported pending-record versions, invalid certificate
+material, and failed interrupted-activation recovery still block startup. This
+includes not-yet-valid pending certificates; check clock synchronization first.
 Unrelated resource files are refreshed from the current data tree before
 activation, not restored from an old preparation-time snapshot. Kubeconfigs are
 rebuilt using the current configuration. No raw configuration is saved in metadata.
