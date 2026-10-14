@@ -273,8 +273,8 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		).WithService("kube-apiserver").WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
-					Name:    "kube-apiserver-serving",
-					Service: "kube-apiserver",
+					Name:     "kube-apiserver-serving",
+					Service:  "kube-apiserver",
 					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				Hostnames: append([]string{
@@ -293,8 +293,8 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 			},
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
-					Name:    "kubelet-server",
-					Service: "kubelet",
+					Name:     "kubelet-server",
+					Service:  "kubelet",
 					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				Hostnames: []string{cfg.Node.HostnameOverride, cfg.Node.NodeIP},
@@ -367,8 +367,8 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		).WithService("service-ca").WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
-					Name:    "route-controller-manager-serving",
-					Service: "route-controller-manager",
+					Name:     "route-controller-manager-serving",
+					Service:  "route-controller-manager",
 					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				Hostnames: []string{
@@ -385,8 +385,8 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 		).WithService("ingress").WithServingCertificates(
 			&certchains.ServingCertificateSigningRequestInfo{
 				CSRMeta: certchains.CSRMeta{
-					Name:    "router-default-serving",
-					Service: "ingress",
+					Name:     "router-default-serving",
+					Service:  "ingress",
 					Validity: alignValidity(cryptomaterial.ShortLivedCertificateValidity),
 				},
 				Hostnames: []string{
