@@ -211,6 +211,13 @@ sos_report() {
 sos_report_for_vm() {
     local -r vmdir="${1}"
     local -r vmname="${2}"
+
+    local -r vm_ip=$(get_vm_property "${vmname}" ip)
+    wait_for_ssh "${vm_ip}" 120 || {
+        echo "WARNING: SSH not available, skipping SOS collection for ${vmname}"
+        return
+    }
+
     # Some scenarios do not start with MicroShift installed, so we
     # can't rely on the wrapper being there or working if it
     # is. Copy the script to the host, just in case, along with a
@@ -598,11 +605,12 @@ function get_vm_ip {
 # Try to login to the host via ssh until the connection is accepted
 wait_for_ssh() {
     local -r ip="${1}"
+    local -r timeout="${2:-${VM_BOOT_TIMEOUT}}"
 
-    echo "Waiting ${VM_BOOT_TIMEOUT} for ssh access to ${ip}"
+    echo "Waiting ${timeout} for ssh access to ${ip}"
 
     local -r start_time=$(date +%s)
-    while [ $(( $(date +%s) - start_time )) -lt "${VM_BOOT_TIMEOUT}" ] ; do
+    while [ $(( $(date +%s) - start_time )) -lt "${timeout}" ] ; do
         if ssh -oConnectTimeout=10 -oBatchMode=yes -oStrictHostKeyChecking=accept-new "redhat@${ip}" "echo host is up" ; then
             return 0
         fi
