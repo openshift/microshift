@@ -88,14 +88,6 @@
         src: "{{ perf_sidecar.path }}"
       register: perf_sidecar_content
 
-    - name: Save startup sidecar locally
-      become: false
-      ansible.builtin.copy:
-        content: "{{ perf_sidecar_content.content | b64decode }}"
-        dest: "{{ results_dir }}/{{ boot_output_filename | default('boot_quick.txt') | splitext | first }}.json"
-        mode: "0644"
-      delegate_to: localhost
-
   always:
     - name: Remove startup temporary sidecar
       become: true

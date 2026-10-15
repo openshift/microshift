@@ -1,4 +1,38 @@
 ---
+# The archive is rewritten from perf_measurements, which starts empty in every playbook
+# invocation. A run resumed into its existing results_dir first takes back what that run
+# already archived, so a rewrite never drops an earlier measurement. An archive that
+# belongs to another run is refused rather than overwritten.
+- name: Resume measurements already archived for this run
+  when: perf_measurements is not defined
+  block:
+    - name: Check for an existing measurement archive
+      become: false
+      ansible.builtin.stat:
+        path: "{{ results_dir }}/measurements.ndjson"
+      register: perf_existing_archive
+      delegate_to: localhost
+
+    - name: Load existing measurement archive
+      when: perf_existing_archive.stat.exists
+      vars:
+        perf_existing_documents: >-
+          {{ lookup('ansible.builtin.file', results_dir ~ '/measurements.ndjson', rstrip=false).splitlines()
+             | select | map('from_json') | list }}
+      block:
+        - name: Check that the archive belongs to this run
+          ansible.builtin.assert:
+            that: perf_existing_documents | map(attribute='run_id') | reject('equalto', perf_run_id) | list | length == 0
+            fail_msg: >-
+              {{ results_dir }}/measurements.ndjson holds measurements of another run;
+              use a new results_dir or the run's own perf_run_id
+            quiet: true
+
+        - name: Take back archived measurements
+          ansible.builtin.set_fact:
+            perf_measurements: >-
+              {{ dict(perf_existing_documents | map(attribute='measurement_key') | zip(perf_existing_documents)) }}
+
 - name: Retain structured measurement
   ansible.builtin.set_fact:
     perf_measurements: >-

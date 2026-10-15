@@ -1,4 +1,13 @@
 ---
+# hardware/platform are declared, never inferred: unset or empty means unknown (null).
+- name: Validate declared hardware and platform
+  ansible.builtin.assert:
+    that:
+      - perf_hardware | default(none) is none or perf_hardware is string
+      - perf_platform | default(none) is none or perf_platform is string
+    fail_msg: perf_hardware and perf_platform must be strings when set
+    quiet: true
+
 - name: Write measurement archive
   become: false
   ansible.builtin.template:

@@ -6,6 +6,8 @@ Also calculates compressed (download) sizes from locally stored registry manifes
 """
 
 import argparse
+import contextlib
+import io
 import json
 import os
 import sys
@@ -183,8 +185,8 @@ def get_compressed_sizes(images):
     return all_layers, layer_usage, shared_digests, per_image
 
 
-def main(verbose=False, json_output=None):
-    """Main function to display CRI-O storage disk usage."""
+def main(verbose=False):
+    """Display CRI-O storage disk usage and return it as a structured summary."""
 
     # Check if running as root
     if os.geteuid() != 0:
@@ -198,9 +200,7 @@ def main(verbose=False, json_output=None):
 
     if not images:
         print("No images found in CRI-O storage")
-        if json_output:
-            write_summary(json_output, 0, 0, 0, 0, 0, 0, 0, [])
-        return
+        return build_summary(0, 0, 0, 0, 0, 0, 0, [])
 
     # Create layer lookup map
     layers_by_id = {layer["id"]: layer for layer in layers}
@@ -290,11 +290,10 @@ def main(verbose=False, json_output=None):
     comp_layers, _, comp_shared, comp_per_image = get_compressed_sizes(images)
     comp_deduplicated = sum(comp_layers.values())
 
-    if json_output:
-        write_summary(json_output, len(images), len(layer_count),
-                      len([c for c in layer_count.values() if c > 1]),
-                      total_size, total_reclaimable, comp_deduplicated,
-                      len(comp_per_image), image_data)
+    summary = build_summary(len(images), len(layer_count),
+                            len([c for c in layer_count.values() if c > 1]),
+                            total_size, total_reclaimable, comp_deduplicated,
+                            len(comp_per_image), image_data)
 
     if verbose:
         # Detailed output similar to 'podman system df -v'
@@ -349,9 +348,11 @@ def main(verbose=False, json_output=None):
         print(f"  Compressed download size: {format_size(comp_deduplicated)}")
         print(f"  Compression ratio: {total_size / comp_deduplicated:.1f}:1" if comp_deduplicated > 0 else "")
 
+    return summary
 
-def write_summary(path, count, layers, shared, storage, reclaimable, compressed, manifests, images):
-    summary = {
+
+def build_summary(count, layers, shared, storage, reclaimable, compressed, manifests, images):
+    return {
         "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "image_count": count, "unique_layers": layers, "shared_layers": shared,
         "storage_bytes": storage, "reclaimable_bytes": reclaimable,
@@ -362,14 +363,22 @@ def write_summary(path, count, layers, shared, storage, reclaimable, compressed,
                     "shared_bytes": image["shared_size"], "unique_bytes": image["unique_size"],
                     "containers": image["containers"]} for image in images],
     }
-    with open(path, "w") as output:
-        json.dump(summary, output)
-        output.write("\n")
+
+
+def run(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("--json", action="store_true",
+                        help="Print one JSON object holding the text report and the structured summary")
+    args = parser.parse_args(argv)
+    if not args.json:
+        main(args.verbose)
+        return
+    report = io.StringIO()
+    with contextlib.redirect_stdout(report):
+        data = main(args.verbose)
+    print(json.dumps({"report": report.getvalue(), "data": data}))
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("-v", "--verbose", action="store_true")
-    parser.add_argument("--json-output")
-    args = parser.parse_args()
-    main(args.verbose, args.json_output)
+    run()

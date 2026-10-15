@@ -87,64 +87,208 @@ class Producers(unittest.TestCase):
             self.assertEqual(missing["paths"], [])
 
     def test_images_use_unrounded_deduplicated_bytes(self):
-        images = load("crio-df")
-        fixtures = {
-            images.IMAGES_JSON: [
-                {"id": "a", "layer": "one", "names": ["registry/image:a"]},
-                {"id": "b", "layer": "two", "names": ["registry/image:b"]},
-            ],
-            images.LAYERS_JSON: [
-                {"id": "base", "diff-size": 1200001},
-                {"id": "one", "parent": "base", "diff-size": 2000003},
-                {"id": "two", "parent": "base", "diff-size": 3000007},
-            ],
-            images.VOLATILE_LAYERS_JSON: [{"parent": "one"}],
-        }
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "images.json"
-            with patch.object(images.os, "geteuid", return_value=0), \
-                 patch.object(images, "load_json_file", side_effect=lambda path: fixtures.get(path, [])), \
-                 patch.object(images, "get_compressed_sizes", return_value=({"digest": 1234567}, {}, set(), [{"id": "a", "compressed": 1234567, "name": "image", "layers": []}])):
-                old_text, new_text = io.StringIO(), io.StringIO()
-                with contextlib.redirect_stdout(old_text):
-                    images.main(True)
-                with contextlib.redirect_stdout(new_text):
-                    images.main(True, output)
-            self.assertEqual(old_text.getvalue(), new_text.getvalue())
-            data = json.loads(output.read_text())
-            self.assertEqual(data["storage_bytes"], 6200011)
-            self.assertEqual(data["compressed_download_bytes"], 1234567)
-            self.assertEqual(data["reclaimable_bytes"], 3000007)
-            self.assertEqual(data["shared_layers"], 1)
+        for verbose, compressed in ((True, 1234567), (False, 1234567), (True, 0)):
+            with self.subTest(verbose=verbose, compressed=compressed):
+                text, result = images_run(verbose, compressed)
+                self.assertEqual(result["report"], text)
+                data = result["data"]
+                self.assertEqual(data["storage_bytes"], 6200011)
+                self.assertEqual(data["compressed_download_bytes"], compressed)
+                self.assertEqual(data["reclaimable_bytes"], 3000007)
+                self.assertEqual(data["shared_layers"], 1)
+                self.assertEqual([image["size_bytes"] for image in data["images"]], [3200004, 4200008])
 
-    def test_network_sidecar_preserves_text_and_missing_values(self):
-        network = load("prom-network-query")
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "network.json"
-            for values, increases in [([[100, "100"], [110, "10"]], [1040562641.9, 5070460.2]), ([], [None, None])]:
-                old_text, new_text = io.StringIO(), io.StringIO()
-                for destination, extra in [(old_text, []), (new_text, ["--json-output", str(output)])]:
-                    with patch.object(sys, "argv", ["query", "--prometheus", "http://127.0.0.1:9091", "100", "120", *extra]), \
-                         patch.object(network, "get_increase", side_effect=increases), \
-                         patch.object(network, "get_time_series", return_value=values), \
-                         contextlib.redirect_stdout(destination):
-                        self.assertEqual(network.main(), 0)
-                self.assertEqual(old_text.getvalue(), new_text.getvalue())
-                data = json.loads(output.read_text())
+    def test_images_without_storage(self):
+        text, result = images_run(True, 0, fixtures={})
+        self.assertEqual(text, "No images found in CRI-O storage\n")
+        self.assertEqual(result["report"], text)
+        self.assertEqual(result["data"]["image_count"], 0)
+        self.assertEqual(result["data"]["images"], [])
+
+    def test_network_preserves_text_and_missing_values(self):
+        for values, increases in NETWORK_CASES:
+            with self.subTest(values=values):
+                text, result, rc = network_run(values, increases)
+                self.assertEqual(rc, 0)
+                self.assertEqual(result["report"], text)
+                data = result["data"]
                 self.assertEqual(data["rx_bytes"], int(increases[0]) if increases[0] is not None else None)
+                self.assertEqual(data["tx_bytes"], int(increases[1]) if increases[1] is not None else None)
+                self.assertEqual(data["instance"], "fixture")
                 self.assertEqual(data["samples"], len(values))
                 self.assertEqual(data["counter_resets"], 1 if values else 0)
+
+    def test_network_query_failure_prints_no_result(self):
+        network = load("prom-network-query")
+        error = network.PromQueryError("unreachable")
+        for extra, printed in (([], True), (["--json"], False)):
+            with self.subTest(extra=extra):
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with patch.object(sys, "argv", ["query", "--prometheus", "http://127.0.0.1:9091", "100", "120", *extra]), \
+                     patch.object(network, "get_increase", side_effect=error), \
+                     contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    self.assertEqual(network.main(), 1)
+                self.assertEqual(bool(stdout.getvalue()), printed)
+                self.assertIn("ERROR: unreachable", stderr.getvalue())
+
+    def test_producers_take_no_output_path(self):
+        # Ansible writes every artifact; the producers only print.
+        for name in ("crio-df", "prom-network-query"):
+            source = (FILES / f"{name}.py").read_text()
+            self.assertNotIn("json-output", source)
+            self.assertNotRegex(source, r"open\([^)]*['\"]w")
+
+    def test_saved_files_match_legacy_capture(self):
+        """The saved .txt is byte-identical to the old command stdout + copy, and only the data is archived."""
+        cases = {"images": images_run(True, 1234567), "images_uncompressed": images_run(True, 0)}
+        for index, (values, increases) in enumerate(NETWORK_CASES):
+            text, result, _ = network_run(values, increases)
+            cases[f"network{index}"] = (text, result)
+        for index, text in enumerate(("  indented  \n\n\n", "crlf\r\n\r\n", "", "no newline")):
+            cases[f"synthetic{index}"] = (text, {"report": text, "data": {"timestamp": "2026-10-12T00:00:00Z"}})
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "roles").symlink_to(FILES.parents[2])
+            output = root / "results"
+            output.mkdir()
+            (root / "legacy").mkdir()
+            for name, (text, result) in cases.items():
+                (root / f"{name}.text").write_bytes(text.encode())
+                (root / f"{name}.result").write_text(json.dumps(result) + "\n")
+            variables = {
+                "ansible_python_interpreter": sys.executable,
+                "results_dir": str(output), "perf_run_id": "fixture-run", "perf_es_url": "",
+                "perf_microshift_version": "4.22.0~rc.5",
+                "perf_microshift_nevra": "microshift-0:4.22.0~rc.5-1.el9.x86_64",
+                "ansible_facts": {"hostname": "fixture", "kernel": "test-kernel",
+                                  "distribution_version": "9.8", "processor": ["0", "AuthenticAMD", "Test CPU"]},
+                "cases": list(cases), "fixtures": str(root),
+            }
+            (root / "variables.json").write_text(json.dumps(variables))
+            (root / "test.yml").write_text("""---
+- name: Local report save test
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Capture legacy stdout
+      ansible.builtin.command: cat {{ fixtures }}/{{ item }}.text
+      register: legacy
+      loop: "{{ cases }}"
+    - name: Save legacy text the old way
+      ansible.builtin.copy:
+        content: "{{ item.stdout }}"
+        dest: "{{ fixtures }}/legacy/{{ item.item }}.txt"
+        mode: "0644"
+      loop: "{{ legacy.results }}"
+    - name: Capture producer result
+      ansible.builtin.command: cat {{ fixtures }}/{{ item }}.result
+      register: produced
+      loop: "{{ cases }}"
+    - name: Save through the shared task file with the producer timestamp
+      ansible.builtin.include_tasks: roles/common/tasks/perf-report.yml
+      loop: "{{ produced.results | rejectattr('item', 'match', 'network') }}"
+      vars:
+        perf_report_name: "{{ item.item }}"
+        perf_report_stdout: "{{ item.stdout }}"
+        perf_measurement_type: images
+    - name: Save through the shared task file with a caller timestamp
+      ansible.builtin.include_tasks: roles/common/tasks/perf-report.yml
+      loop: "{{ produced.results | selectattr('item', 'match', 'network') }}"
+      vars:
+        perf_report_name: "{{ item.item }}"
+        perf_report_stdout: "{{ item.stdout }}"
+        perf_measurement_type: startup_network
+        perf_report_timestamp: '2026-10-12T00:00:01Z'
+""")
+            result = subprocess.run(
+                ["ansible-playbook", "-i", "localhost,", str(root / "test.yml"), "-e", "@" + str(root / "variables.json")],
+                env={**os.environ, "ANSIBLE_HOME": str(root / "ansible-home"),
+                     "ANSIBLE_LOCAL_TEMP": str(root / "ansible-tmp")},
+                capture_output=True, text=True, timeout=120,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(sorted(path.name for path in output.iterdir()),
+                             sorted(["measurements.ndjson", *(f"{name}.txt" for name in cases)]))
+            docs = {doc["measurement_key"]: doc for doc in
+                    (json.loads(line) for line in (output / "measurements.ndjson").read_text().splitlines())}
+            for name, (text, produced) in cases.items():
+                with self.subTest(name=name):
+                    self.assertEqual((output / f"{name}.txt").read_bytes(), (root / "legacy" / f"{name}.txt").read_bytes())
+                    self.assertEqual(docs[f"{name}.txt"]["data"], produced["data"])
+                    self.assertNotIn("report", docs[f"{name}.txt"]["data"])
+                    network = name.startswith("network")
+                    self.assertEqual(docs[f"{name}.txt"]["measurement_type"], "startup_network" if network else "images")
+                    self.assertEqual(docs[f"{name}.txt"]["timestamp"],
+                                     "2026-10-12T00:00:01Z" if network else produced["data"]["timestamp"])
+
+
+IMAGE_FIXTURES = {
+    "IMAGES_JSON": [
+        {"id": "a", "layer": "one", "names": ["registry/image:a"]},
+        {"id": "b", "layer": "two", "names": ["registry/image:b"]},
+    ],
+    "LAYERS_JSON": [
+        {"id": "base", "diff-size": 1200001},
+        {"id": "one", "parent": "base", "diff-size": 2000003},
+        {"id": "two", "parent": "base", "diff-size": 3000007},
+    ],
+    "VOLATILE_LAYERS_JSON": [{"parent": "one"}],
+}
+
+NETWORK_CASES = [([[100, "100"], [110, "10"]], [1040562641.9, 5070460.2]), ([], [None, None])]
+
+
+def images_run(verbose, compressed, fixtures=None):
+    """Return the default text output and the decoded --json result for one storage fixture."""
+    images = load("crio-df")
+    fixtures = IMAGE_FIXTURES if fixtures is None else fixtures
+    paths = {getattr(images, name): value for name, value in fixtures.items()}
+    per_image = [{"id": "a", "compressed": compressed, "name": "image", "layers": []}] if compressed else []
+    text, result = io.StringIO(), io.StringIO()
+    with patch.object(images.os, "geteuid", return_value=0), \
+         patch.object(images, "load_json_file", side_effect=lambda path: paths.get(path, [])), \
+         patch.object(images, "get_compressed_sizes",
+                      return_value=({"digest": compressed} if compressed else {}, {}, set(), per_image)):
+        with contextlib.redirect_stdout(text):
+            images.run(["-v"] if verbose else [])
+        with contextlib.redirect_stdout(result):
+            images.run((["-v"] if verbose else []) + ["--json"])
+    lines = result.getvalue().splitlines()
+    assert len(lines) == 1, lines
+    return text.getvalue(), json.loads(lines[0])
+
+
+def network_run(values, increases):
+    """Return the default text output, the decoded --json result and its exit status."""
+    network = load("prom-network-query")
+    outputs = []
+    for extra in ([], ["--json"]):
+        stdout = io.StringIO()
+        with patch.object(sys, "argv", ["query", "--prometheus", "http://127.0.0.1:9091",
+                                        "--instance", "fixture", "100", "120", *extra]), \
+             patch.object(network, "get_increase", side_effect=increases), \
+             patch.object(network, "get_time_series", return_value=values), \
+             contextlib.redirect_stdout(stdout):
+            rc = network.main()
+        outputs.append(stdout.getvalue())
+    lines = outputs[1].splitlines()
+    assert len(lines) == 1, lines
+    return outputs[0], json.loads(lines[0]), rc
 
 
 class ArchiveAndIndex(unittest.TestCase):
     def exercise(self, response_status=200, item_error=False, enabled=True, metadata=None,
                  body=None, credentials="generated", url=None, allow_http=True,
-                 requests=None, failure=None, message=None):
+                 requests=None, failure=None, message=None, extra=None, expected_dimensions=None,
+                 invalid=False):
         """Archive four measurements, upload twice, then archive one more.
 
         credentials: "generated" (random password), "password-only", a dict, "missing", "malformed" or None
         (no file and no environment credentials). url: format string with {port}.
         requests/failure default to what an ordinary upload with this response would do.
+        extra: further playbook variables; expected_dimensions: hardware/platform every document
+        must carry (default null); invalid: the playbook must stop before archiving anything.
         """
         received = []
         secret = secrets.token_urlsafe(16)
@@ -209,6 +353,7 @@ class ArchiveAndIndex(unittest.TestCase):
                 }
                 if metadata is not None:
                     variables["perf_extra_metadata"] = metadata
+                variables.update(extra or {})
                 (root / "variables.json").write_text(json.dumps(variables))
                 (root / "test.yml").write_text("""---
 - name: Local archive and upload test
@@ -251,6 +396,12 @@ class ArchiveAndIndex(unittest.TestCase):
                     capture_output=True, text=True, timeout=90,
                 )
                 logs = result.stdout + result.stderr
+                if invalid:
+                    self.assertNotEqual(result.returncode, 0, logs)
+                    self.assertIn("must be strings when set", logs)
+                    self.assertFalse((output / "measurements.ndjson").exists())
+                    self.assertEqual(received, [])
+                    return
                 self.assertEqual(result.returncode, 0, logs)
                 self.assertNotIn(secret, logs)
                 self.assertEqual("WARNING: Performance indexing failed" in result.stdout, failure, logs)
@@ -262,8 +413,11 @@ class ArchiveAndIndex(unittest.TestCase):
                 self.assertTrue(all(doc["cpu_model"] == "Test CPU" for doc in docs))
                 self.assertTrue(all(doc["labels"] == (metadata or {}) for doc in docs))
                 self.assertTrue(all(doc["run_id"] == "fixture-run" for doc in docs))
+                dimensions = expected_dimensions or {"hardware": None, "platform": None}
+                self.assertTrue(all({k: doc[k] for k in dimensions} == dimensions for doc in docs))
                 for batch in received:
                     self.assertTrue(all(doc["labels"] == (metadata or {}) for doc in batch[1::2]))
+                    self.assertTrue(all({k: doc[k] for k in dimensions} == dimensions for doc in batch[1::2]))
                 self.assertEqual(len(received), requests)
                 if requests == 2:
                     self.assertEqual(received[0], received[1])
@@ -275,6 +429,57 @@ class ArchiveAndIndex(unittest.TestCase):
     def test_offline_archive(self):
         self.exercise(enabled=False)
 
+    def test_resumed_run_keeps_archived_measurements(self):
+        """A second playbook run into the same results_dir keeps what the first one archived."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "roles").symlink_to(FILES.parents[2])
+            output = root / "results"
+            output.mkdir()
+            archive = output / "measurements.ndjson"
+            (root / "test.yml").write_text("""---
+- name: Record one measurement
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Archive
+      ansible.builtin.include_tasks: roles/common/tasks/perf-record.yml
+      vars:
+        perf_measurement_type: disk
+        perf_measurement_timestamp: '2026-10-12T00:00:00Z'
+        perf_measurement_data: {value_bytes: "{{ value | int }}"}
+""")
+
+            def record(key, value, run_id="fixture-run"):
+                variables = {
+                    "ansible_python_interpreter": sys.executable, "results_dir": str(output),
+                    "perf_run_id": run_id, "perf_es_url": "", "perf_measurement_key": key, "value": value,
+                    "ansible_facts": {"hostname": "fixture", "kernel": "test-kernel",
+                                      "distribution_version": "9.8", "processor": ["0", "AuthenticAMD", "Test CPU"]},
+                }
+                (root / "variables.json").write_text(json.dumps(variables))
+                return subprocess.run(
+                    ["ansible-playbook", "-i", "localhost,", str(root / "test.yml"), "-e", "@" + str(root / "variables.json")],
+                    env={**os.environ, "ANSIBLE_HOME": str(root / "ansible-home"),
+                         "ANSIBLE_LOCAL_TEMP": str(root / "ansible-tmp")},
+                    capture_output=True, text=True, timeout=90,
+                )
+
+            def archived():
+                return {doc["measurement_key"]: doc["data"]["value_bytes"]
+                        for doc in map(json.loads, archive.read_text().splitlines())}
+
+            for key, value in (("boot0.txt", 1), ("boot1.txt", 2), ("boot0.txt", 3)):
+                result = record(key, value)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(archived(), {"boot0.txt": 3, "boot1.txt": 2})
+            before = archive.read_bytes()
+            result = record("disk0.txt", 4, run_id="other-run")
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("holds measurements of another run", result.stdout + result.stderr)
+            self.assertEqual(archive.read_bytes(), before)
+
     def test_disabled_indexing_ignores_missing_credentials(self):
         self.exercise(enabled=False, credentials="missing")
 
@@ -284,6 +489,18 @@ class ArchiveAndIndex(unittest.TestCase):
             "kube_burner_uuid": "density-uuid", "netperf_uuid": "network-uuid",
             "run_id": "label-does-not-override-envelope",
         })
+
+    def test_declared_hardware_and_platform(self):
+        self.exercise(extra={"perf_hardware": " 9800X3D ", "perf_platform": " BareMetal "},
+                      expected_dimensions={"hardware": "9800x3d", "platform": "BareMetal"})
+
+    def test_empty_hardware_and_platform_are_unknown(self):
+        self.exercise(extra={"perf_hardware": " ", "perf_platform": ""})
+
+    def test_non_string_hardware_stops_before_capture(self):
+        for extra in ({"perf_hardware": 9800}, {"perf_platform": ["BareMetal"]}):
+            with self.subTest(extra=extra):
+                self.exercise(extra=extra, invalid=True, enabled=False)
 
     def test_bulk_replay(self):
         self.exercise()

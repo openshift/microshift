@@ -337,9 +337,12 @@ Each line is a schema-version-1 document with a deterministic `measurement_id`,
 RPM NEVRA, host/nodename, kernel, RHEL release, CPU model, and result directory
 basename. The `data` object contains seconds or integer byte values with units
 in field names. Disk records contain the same threshold-filtered paths as the
-text report, with absent/incomplete traversal flags. Startup, images and network
-also retain producer JSON sidecars. Network bytes are truncated Prometheus
-`increase()` estimates, not packet counters; unavailable values are null.
+text report, with absent/incomplete traversal flags. With `--json`,
+`crio-df.py` and `prom-network-query.py` print one JSON object holding both the
+text report and the measurement, and Ansible saves the text file and archives
+the measurement; without it they print the text report as before. Network
+bytes are truncated Prometheus `increase()` estimates, not packet counters;
+unavailable values are null.
 
 There is one document for each snapshot (`disk0.txt`, `disk1.txt`, `disk2.txt`),
 boot (`boot0.txt`, `boot1.txt`), image inventory and network window. Disk0 is
@@ -348,7 +351,12 @@ installed RPM when installation finishes. If installation fails, that local
 baseline remains available. The archive is rewritten atomically as measurements
 arrive, replacing the same measurement key rather than appending duplicates.
 The run ID is the inventory hostname plus the result directory basename; reuse
-that directory only when resuming the same run. Use distinct result directories
+that directory only when resuming the same run. A resumed playbook run first
+loads the measurements already archived there, so their data and timestamps
+are kept, and it stops if the archive belongs to a different run ID. The
+metadata of every document is written again from the resumed run, so resume
+with the same inventory and variables, including `perf_extra_metadata`,
+`perf_hardware` and `perf_platform`. Use distinct result directories
 for different hosts when capturing more than one host concurrently.
 
 Optional ES/OpenSearch indexing runs on the controller after installation and
@@ -357,6 +365,8 @@ indexing settings. No endpoint is contacted unless `perf_es_url` is set.
 
 | Variable | Default | Description |
 | --- | --- | --- |
+| `perf_hardware` | unset (null) | Machine class written as top-level `hardware` on every document, trimmed and lowercased: a QUADS model such as `r640`, or a CPU class for a lab host such as `9800x3d`. Unset or empty means unknown; it is never inferred from `cpu_model`. |
+| `perf_platform` | unset (null) | Written as top-level `platform`, using the cloud-bulldozer go-commons value other perf-scale indexes use, for example `BareMetal`. Unset or empty means unknown. |
 | `perf_extra_metadata` | `{}` | Optional dictionary copied into every document under `labels`; never overrides envelope fields. |
 | `perf_es_url` | empty (disabled) | Base HTTP(S) URL without credentials; HTTPS validates certificates. |
 | `perf_es_index` | `microshift-perf-v1` | Destination index, using the bulk API and document IDs from the archive. |
@@ -377,9 +387,10 @@ perf_extra_metadata:
 
 Metadata values retain their JSON types and default to an empty `labels` object.
 These labels are included in the local archive and bulk uploads, independently
-of whether indexing is enabled. Use consistent field types across runs: the index
-mapping of each label is fixed by the first document that carries it, and a later
-value of another type is rejected. Pass identifiers such as `iteration` as strings.
+of whether indexing is enabled. The default `microshift-perf-v1` index stores
+`labels` without indexing them, so they are not searchable there; selection uses
+the indexed envelope fields such as `run_id`. Pass identifiers such as `iteration`
+as strings.
 Labels are archived in plaintext, so do not include credentials or other secrets.
 
 When no credentials file is supplied, `PERF_ES_USERNAME` and `PERF_ES_PASSWORD`

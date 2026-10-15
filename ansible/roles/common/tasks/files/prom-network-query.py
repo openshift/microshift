@@ -11,13 +11,16 @@ Options:
   --instance LABEL        Prometheus instance label to filter by (e.g. node hostname)
   --device IFACE          Network device (default: enp5s0)
   --step STEP             Range query step (default: 15s)
+  --json                  Print one JSON object holding the text report and the structured measurement
 
 Uses increase() to get accurate totals that handle counter resets natively.
 Also shows raw counter time series for visibility into resets.
 """
 
 import argparse
+import contextlib
 import http.client
+import io
 import ipaddress
 import json
 import socket
@@ -155,7 +158,11 @@ def parse_window_args(argv):
         default=DEFAULT_STEP,
         help=f"Range query step for raw series output (default: {DEFAULT_STEP})",
     )
-    parser.add_argument("--json-output", help="Write structured measurement alongside the text output")
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print one JSON object holding the text report and the structured measurement",
+    )
     args = parser.parse_args(argv)
 
     if len(args.window) == 2:
@@ -304,7 +311,18 @@ def get_time_series(start, end, prometheus, device, step, instance=None):
 
 def main():
     args, start, end = parse_window_args(sys.argv[1:])
+    if not args.json:
+        return measure(args, start, end)[0]
+    report = io.StringIO()
+    with contextlib.redirect_stdout(report):
+        rc, data = measure(args, start, end)
+    if rc == 0:
+        print(json.dumps({"report": report.getvalue(), "data": data}))
+    return rc
 
+
+def measure(args, start, end):
+    """Print the text report and return (exit status, structured measurement)."""
     duration = end - start
     print(f"Measurement window: {fmt_ts(start)} -> {fmt_ts(end)} ({duration}s)")
     print(f"Prometheus: {args.prometheus.base_url}")
@@ -324,7 +342,7 @@ def main():
         )
     except PromQueryError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
-        return 1
+        return 1, None
 
     print("=== Network transfer (Prometheus increase) ===")
     if rx_increase is not None:
@@ -346,23 +364,20 @@ def main():
         )
     except PromQueryError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
-        return 1
+        return 1, None
 
-    if args.json_output:
-        resets_count = sum(float(values[i][1]) < float(values[i - 1][1]) for i in range(1, len(values)))
-        with open(args.json_output, "w") as output:
-            json.dump({
-                "start_epoch": start, "end_epoch": end, "duration_seconds": duration,
-                "device": args.device, "instance": args.instance,
-                "rx_bytes": int(rx_increase) if rx_increase is not None else None,
-                "tx_bytes": int(tx_increase) if tx_increase is not None else None,
-                "counter_resets": resets_count, "samples": len(values),
-            }, output)
-            output.write("\n")
+    measurement = {
+        "start_epoch": start, "end_epoch": end, "duration_seconds": duration,
+        "device": args.device, "instance": args.instance,
+        "rx_bytes": int(rx_increase) if rx_increase is not None else None,
+        "tx_bytes": int(tx_increase) if tx_increase is not None else None,
+        "counter_resets": sum(float(values[i][1]) < float(values[i - 1][1]) for i in range(1, len(values))),
+        "samples": len(values),
+    }
 
     if not values:
         print("No time series data available.")
-        return 0
+        return 0, measurement
 
     print(f"=== Raw counter time series ({len(values)} samples, step={args.step}) ===")
     print(f"{'timestamp':<24} {'rx_bytes':>16} {'rx_MB':>10} {'delta_MB':>10}")
@@ -404,7 +419,7 @@ def main():
         "samples": len(values),
     }
     print(json.dumps(summary))
-    return 0
+    return 0, measurement
 
 
 if __name__ == "__main__":

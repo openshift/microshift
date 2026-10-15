@@ -1,0 +1,24 @@
+---
+# Save the result of a producer run with --json: the text report becomes
+# <perf_report_name>.txt, written by Ansible on the controller, and the
+# structured measurement is archived.
+- name: Read producer result for {{ perf_report_name }}
+  ansible.builtin.set_fact:
+    perf_report: "{{ perf_report_stdout | from_json }}"
+
+- name: Save text report for {{ perf_report_name }}
+  become: false
+  ansible.builtin.copy:
+    # Registered command stdout loses its trailing newlines, and the text
+    # reports have always been saved that way.
+    content: "{{ perf_report.report | regex_replace('[\\r\\n]+$', '') }}"
+    dest: "{{ results_dir }}/{{ perf_report_name }}.txt"
+    mode: "0644"
+  delegate_to: localhost
+
+- name: Archive measurement for {{ perf_report_name }}
+  vars:
+    perf_measurement_key: "{{ perf_report_name }}.txt"
+    perf_measurement_timestamp: "{{ perf_report_timestamp | default(perf_report.data.timestamp) }}"
+    perf_measurement_data: "{{ perf_report.data }}"
+  ansible.builtin.include_tasks: roles/common/tasks/perf-record.yml
