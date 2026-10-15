@@ -137,6 +137,8 @@ CA Renewal Updates The Whole Chain
     Renewal Has Not Changed Active Material    ${files_before}    ${served_before}
     Pending Renewal Matches Result    ${result}
     Restart MicroShift
+    ${restarts}=    Get Systemd Setting    microshift.service    NRestarts
+    Should Be Equal As Integers    ${restarts}    0    msg=CA activation must not require an automatic startup retry
     ${ca_after}=    CA Material Digest
     Should Not Be Equal    ${ca_before}    ${ca_after}
     Renewal Matches Current Status    ${result}

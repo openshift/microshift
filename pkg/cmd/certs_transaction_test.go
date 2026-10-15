@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -63,6 +64,86 @@ func TestCertificateStartupLockRejectsInvalidPath(t *testing.T) {
 	require.Nil(t, startup)
 	require.ErrorContains(t, err, "cannot create certificate lock directory")
 	require.NotErrorIs(t, err, certificates.ErrBusy)
+}
+
+func TestStopCertificateStartupEtcd(t *testing.T) {
+	for _, tc := range []struct {
+		name       string
+		state      string
+		stopScript string
+		wantStop   bool
+		wantErr    string
+	}{
+		{name: "inactive", state: "inactive"},
+		{name: "failed", state: "failed"},
+		{name: "active", state: "active", stopScript: `printf 'inactive\n' > "$CERTIFICATE_TEST_STATE_FILE"`, wantStop: true},
+		{name: "deactivating", state: "deactivating", stopScript: `sleep 0.05; printf 'inactive\n' > "$CERTIFICATE_TEST_STATE_FILE"`, wantStop: true},
+		{name: "scope disappeared", state: "active", stopScript: `printf 'inactive\n' > "$CERTIFICATE_TEST_STATE_FILE"; exit 5`, wantStop: true},
+		{name: "query failure", state: "query-error", wantErr: "cannot determine whether microshift-etcd.scope is stopped"},
+		{name: "stop failure", state: "active", stopScript: "exit 1", wantStop: true, wantErr: "state: active"},
+		{name: "still active", state: "active", stopScript: "exit 0", wantStop: true, wantErr: "state: active"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			stopFile := fakeCertificateSystemctl(t, tc.state, tc.stopScript)
+			err := stopCertificateStartupEtcd(time.Second)
+			if tc.wantErr == "" {
+				require.NoError(t, err)
+			} else {
+				require.ErrorContains(t, err, tc.wantErr)
+			}
+			if tc.wantStop {
+				require.FileExists(t, stopFile)
+			} else {
+				require.NoFileExists(t, stopFile)
+			}
+		})
+	}
+}
+
+func TestStopCertificateStartupEtcdTimeout(t *testing.T) {
+	fakeCertificateSystemctl(t, "active", "exec sleep 10")
+	err := stopCertificateStartupEtcd(100 * time.Millisecond)
+	require.ErrorIs(t, err, context.DeadlineExceeded)
+	require.ErrorContains(t, err, "timed out after 100ms waiting for microshift-etcd.scope to stop")
+	require.ErrorContains(t, certificateUnitsStopped("microshift-etcd.scope"), "state: active")
+}
+
+func TestCertificateCLIRecoveryDoesNotStopEtcd(t *testing.T) {
+	stopFile := fakeCertificateSystemctl(t, "active", "exit 0")
+	require.ErrorContains(t, certificateServicesStopped(), "microshift-etcd.scope to be stopped (state: active)")
+	require.NoFileExists(t, stopFile)
+}
+
+func fakeCertificateSystemctl(t *testing.T, state, stopScript string) string {
+	t.Helper()
+	dir := t.TempDir()
+	stateFile := filepath.Join(dir, "state")
+	stopFile := filepath.Join(dir, "stopped")
+	require.NoError(t, os.WriteFile(stateFile, []byte(state), 0600))
+	script := `#!/bin/sh
+case "$1" in
+show)
+    if [ "$5" = microshift.service ]; then
+        printf 'inactive\n'
+        exit 0
+    fi
+    state=$(cat "$CERTIFICATE_TEST_STATE_FILE") || exit 1
+    [ "$state" != query-error ] || exit 1
+    printf '%s\n' "$state"
+    ;;
+stop)
+    [ "$#" -eq 2 ] && [ "$2" = microshift-etcd.scope ] || exit 2
+    touch "$CERTIFICATE_TEST_STOP_FILE"
+    ` + stopScript + `
+    ;;
+*) exit 1 ;;
+esac
+`
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "systemctl"), []byte(script), 0700))
+	t.Setenv("PATH", dir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	t.Setenv("CERTIFICATE_TEST_STATE_FILE", stateFile)
+	t.Setenv("CERTIFICATE_TEST_STOP_FILE", stopFile)
+	return stopFile
 }
 
 func TestCertificateLockSurvivesDataReplacement(t *testing.T) {

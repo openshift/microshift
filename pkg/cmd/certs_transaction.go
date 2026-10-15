@@ -29,6 +29,7 @@ const certificateRuntimeLockPath = config.BackupsDir + "/certs-runtime.lock"
 
 // Leave time for normal startup within the service's four-minute timeout.
 const certificateStartupLockTimeout = 30 * time.Second
+const certificateStartupEtcdTimeout = 30 * time.Second
 
 // Only startup waits for an in-flight certificate operation. CLI access keeps
 // using the non-blocking certificates.Lock directly.
@@ -109,8 +110,33 @@ func certificateServicesStopped() error {
 	return certificateUnitsStopped("microshift.service", "microshift-etcd.scope")
 }
 
-func certificateEtcdStopped() error {
-	return certificateUnitsStopped("microshift-etcd.scope")
+// Startup must finish stopping the previous etcd before replacing its PKI.
+// The etcd controller's normal leftover-scope cleanup runs after activation.
+// CLI recovery keeps using certificateServicesStopped without stopping services.
+func stopCertificateStartupEtcd(timeout time.Duration) error {
+	const unit = "microshift-etcd.scope"
+	err := certificateUnitsStopped(unit)
+	if err == nil {
+		return nil
+	}
+	var commandError *certificateCommandError
+	if !errors.As(err, &commandError) || commandError.code != certificatesv1alpha1.ErrorCodeMicroShiftRunning {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	// Unlike shutdown's --no-block request, wait for the stop job to finish.
+	stopErr := exec.CommandContext(ctx, "systemctl", "stop", unit).Run()
+	if ctx.Err() != nil {
+		return fmt.Errorf("timed out after %s waiting for %s to stop: %w", timeout, unit, ctx.Err())
+	}
+	// A transient scope may disappear between the initial check and the stop
+	// request. Accept that race only after confirming it is no longer active.
+	if err := certificateUnitsStopped(unit); err != nil {
+		return fmt.Errorf("failed to stop %s before certificate activation or recovery: %w", unit, errors.Join(stopErr, err))
+	}
+	return nil
 }
 
 func certificateUnitsStopped(services ...string) error {
