@@ -2,10 +2,10 @@ https://github.com/openshift/api embedded-component b32f49f8a70985c6ad9abb2dc579
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component 8b96b8d58079376b3e56062e724581d1714e2a50
 https://github.com/openshift/cluster-dns-operator embedded-component 82578923164636746e0d74d594ab32d83a660c0b
 https://github.com/openshift/cluster-ingress-operator embedded-component 8e4c40f161d8341d640659ca2779a4294960c183
-https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 37d84f7e47f675f3a785f66c20dd2972d3289dbe
-https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 438c9dba80ddadeabe9efe4a654297a7b550b2b8
+https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 91b9bf68d7dd8c81b19f120bc4ac73956ecd850e
+https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component da4be9f7565b625c60ceb7a95b1e14ada78fbd1f
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component 84eb8c5a73a730d6d08794e51da9c20013ca4304
-https://github.com/openshift/cluster-network-operator embedded-component 8e06ca47f7dceae831760686b68f9d909a6e46d6
+https://github.com/openshift/cluster-network-operator embedded-component 5a60886d1e93a65bc7359ed1de4d7d2d47007d3d
 https://github.com/openshift/cluster-openshift-controller-manager-operator embedded-component aa455c043152123595c2b4f72e02279aad9dd48a
 https://github.com/openshift/cluster-policy-controller embedded-component 67083fab6cea4dde724efd5be5a22bda1f8437d1
 https://github.com/openshift/csi-external-snapshotter embedded-component 3dd8a0f87f86529682b449a6b9e19e9ee8d2d5d4
