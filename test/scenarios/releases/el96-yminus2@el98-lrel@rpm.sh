@@ -17,7 +17,7 @@ scenario_create_vms() {
     exit_if_brew_rpms_not_found
 
     prepare_kickstart host1 kickstart-liveimg.ks.template ""
-    launch_vm rhel-9.8
+    launch_vm rhel-9.6
 
     # Open the firewall ports. Other scenarios get this behavior by
     # embedding settings in the blueprint, but there is no blueprint
