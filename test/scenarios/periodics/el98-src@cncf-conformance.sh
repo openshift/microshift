@@ -69,7 +69,6 @@ run_sonobuoy() {
 	    --sonobuoy-image "docker.io/sonobuoy/sonobuoy:${CNCF_SONOBUOY_VERSION}" \
         --systemd-logs-image "docker.io/sonobuoy/systemd-logs:${CNCF_SYSTEMD_LOGS_VERSION}" \
         --mode=certified-conformance \
-        --plugin-env=e2e.E2E_SKIP=".*Services should be able to switch session affinity for NodePort service.*" \
         --dns-namespace=openshift-dns \
         --dns-pod-labels=dns.operator.openshift.io/daemonset-dns=default || rc=$?
     if [ ${rc} -ne 0 ] ; then
