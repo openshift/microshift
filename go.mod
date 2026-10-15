@@ -9,7 +9,7 @@ require (
 	github.com/miekg/dns v1.1.63 // microshift
 	github.com/openshift/api v0.0.0-20260817165856-9fda5179a7f7
 	github.com/openshift/build-machinery-go v0.0.0-20260902143904-520f675c892b
-	github.com/openshift/client-go v0.0.0-20260818144019-860af65a7cbc
+	github.com/openshift/client-go v0.0.0-20261014230554-789886cb6f51
 	github.com/openshift/library-go v0.0.0-20260303171201-5d9eb6295ff6
 	github.com/ovn-kubernetes/libovsdb v0.8.2-0.20260302130604-c07ce22366ac
 	github.com/pkg/errors v0.9.1 // indirect
@@ -233,7 +233,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260226221140-a57be14db171 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
 	google.golang.org/grpc v1.81.1 // indirect
-	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af // indirect
+	google.golang.org/protobuf v1.36.12 // indirect
 	k8s.io/gengo/v2 v2.0.0-20250922181213-ec3ebc5fd46b // indirect
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/kubernetes v1.35.8
