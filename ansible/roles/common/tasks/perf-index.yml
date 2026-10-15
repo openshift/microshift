@@ -1,0 +1,114 @@
+---
+- name: Index archived performance measurements
+  when:
+    - perf_es_url | default('') | length > 0
+    - not (perf_es_unavailable | default(false) | bool)
+  block:
+    # Forget the outcome of an earlier upload in this run so a failure below reports its own.
+    - name: Reset performance indexing state
+      ansible.builtin.set_fact:
+        perf_es_result: {}
+        perf_es_refusal: ""
+
+    - name: Load performance indexing credentials
+      ansible.builtin.set_fact:
+        perf_es_credentials: >-
+          {{ (lookup('ansible.builtin.file', perf_es_credentials_file) | from_json)
+             if perf_es_credentials_file | default('') | length > 0
+             else {'username': lookup('ansible.builtin.env', 'PERF_ES_USERNAME'),
+                   'password': lookup('ansible.builtin.env', 'PERF_ES_PASSWORD')} }}
+      no_log: true
+
+    # Credentials are sent with basic auth, so refuse to send them without TLS unless the
+    # caller explicitly allows it (local test instances). Credentials embedded in the URL are
+    # never accepted. The URL itself is never printed.
+    - name: Check performance indexing transport
+      vars:
+        perf_es_url_parts: "{{ perf_es_url | ansible.builtin.urlsplit }}"
+        perf_es_has_credentials: >-
+          {{ (perf_es_credentials.username | default('', true) | string | length > 0)
+             or (perf_es_credentials.password | default('', true) | string | length > 0) }}
+      ansible.builtin.set_fact:
+        perf_es_refusal: >-
+          {{ 'perf_es_url must use http or https'
+               if (perf_es_url_parts.scheme | lower) not in ['http', 'https']
+             else 'perf_es_url must not contain credentials'
+               if perf_es_url_parts.username or perf_es_url_parts.password
+             else 'perf_es_url is not HTTPS; refusing to send credentials (set perf_es_allow_http to override)'
+               if (perf_es_url_parts.scheme | lower) == 'http' and perf_es_has_credentials | bool
+                  and not (perf_es_allow_http | default(false) | bool)
+             else '' }}
+      no_log: true
+
+    - name: Refuse unsafe performance indexing transport
+      ansible.builtin.fail:
+        msg: "{{ perf_es_refusal }}"
+      when: perf_es_refusal | length > 0
+
+    - name: Build bulk request from local archive
+      ansible.builtin.set_fact:
+        perf_es_bulk: "{{ lookup('ansible.builtin.template', playbook_dir ~ '/roles/common/templates/perf-bulk.ndjson.j2') }}"
+      no_log: true
+
+    - name: Upload performance measurements
+      become: false
+      ansible.builtin.uri:
+        url: "{{ perf_es_url | regex_replace('/$', '') }}/{{ perf_es_index | default('microshift-perf-v1') }}/_bulk"
+        method: POST
+        body: "{{ perf_es_bulk }}"
+        headers:
+          Content-Type: application/x-ndjson
+        url_username: "{{ perf_es_credentials.username | default(omit, true) }}"
+        url_password: "{{ perf_es_credentials.password | default(omit, true) }}"
+        force_basic_auth: true
+        use_netrc: false
+        follow_redirects: none
+        timeout: 5
+        return_content: true
+        status_code: 200
+      register: perf_es_result
+      delegate_to: localhost
+      no_log: true
+
+    - name: Check every bulk result
+      ansible.builtin.assert:
+        that:
+          - perf_es_result.json is mapping
+          - perf_es_result.json.errors is defined
+          - not (perf_es_result.json.errors | bool)
+          - perf_es_result.json['items'] | length == perf_measurements | length
+          - perf_es_result.json['items'] | map(attribute='index.status') | reject('in', [200, 201]) | list | length == 0
+      no_log: true
+
+  rescue:
+    # Report only the refusal reason, the HTTP status and the number of rejected documents,
+    # never the URL or the response body, so a misconfiguration (401, 404) can be told apart
+    # from an outage (no response). The rejected count is only derived from a well-formed bulk
+    # response; anything else reports it as unavailable. Rescue tasks inherit the block's
+    # condition, so warn before disabling indexing, and never let the warning stop that.
+    - name: Warn about unavailable performance indexing
+      vars:
+        perf_es_rejected: >-
+          {%- set body = perf_es_result.json | default(none) -%}
+          {%- set ns = namespace(count=0, valid=body is mapping and body.get('items') is sequence
+                                                and body.get('items') is not string
+                                                and body.get('items') is not mapping) -%}
+          {%- if ns.valid -%}
+            {%- for item in body['items'] -%}
+              {%- if item is mapping and item.get('index') is mapping and item['index'].get('status') is number -%}
+                {%- if item['index']['status'] not in [200, 201] -%}{%- set ns.count = ns.count + 1 -%}{%- endif -%}
+              {%- else -%}{%- set ns.valid = false -%}{%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+          {{ ns.count if ns.valid else 'unavailable' }}
+      ignore_errors: true  # noqa: ignore-errors
+      ansible.builtin.debug:
+        msg: >-
+          WARNING: Performance indexing failed ({{ perf_es_refusal | default('', true) or 'upload failed' }};
+          HTTP status: {{ perf_es_result.status | default('no request') }},
+          rejected documents: {{ perf_es_rejected }}); continuing with the local
+          measurements.ndjson archive. No further uploads will be attempted this run.
+
+    - name: Disable indexing for the rest of this run
+      ansible.builtin.set_fact:
+        perf_es_unavailable: true

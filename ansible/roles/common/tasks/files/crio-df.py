@@ -5,6 +5,9 @@ A replacement for 'podman system df -v' that correctly calculates SharedSize for
 Also calculates compressed (download) sizes from locally stored registry manifests.
 """
 
+import argparse
+import contextlib
+import io
 import json
 import os
 import sys
@@ -183,7 +186,7 @@ def get_compressed_sizes(images):
 
 
 def main(verbose=False):
-    """Main function to display CRI-O storage disk usage."""
+    """Display CRI-O storage disk usage and return it as a structured summary."""
 
     # Check if running as root
     if os.geteuid() != 0:
@@ -197,7 +200,7 @@ def main(verbose=False):
 
     if not images:
         print("No images found in CRI-O storage")
-        return
+        return build_summary(0, 0, 0, 0, 0, 0, 0, [])
 
     # Create layer lookup map
     layers_by_id = {layer["id"]: layer for layer in layers}
@@ -287,6 +290,11 @@ def main(verbose=False):
     comp_layers, _, comp_shared, comp_per_image = get_compressed_sizes(images)
     comp_deduplicated = sum(comp_layers.values())
 
+    summary = build_summary(len(images), len(layer_count),
+                            len([c for c in layer_count.values() if c > 1]),
+                            total_size, total_reclaimable, comp_deduplicated,
+                            len(comp_per_image), image_data)
+
     if verbose:
         # Detailed output similar to 'podman system df -v'
         print("Images space usage:\n")
@@ -340,8 +348,37 @@ def main(verbose=False):
         print(f"  Compressed download size: {format_size(comp_deduplicated)}")
         print(f"  Compression ratio: {total_size / comp_deduplicated:.1f}:1" if comp_deduplicated > 0 else "")
 
+    return summary
+
+
+def build_summary(count, layers, shared, storage, reclaimable, compressed, manifests, images):
+    return {
+        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "image_count": count, "unique_layers": layers, "shared_layers": shared,
+        "storage_bytes": storage, "reclaimable_bytes": reclaimable,
+        "compressed_download_bytes": compressed,
+        "compressed_manifests_found": manifests,
+        "images": [{"id": image["id"], "repository": image["repository"],
+                    "tag": image["tag"], "size_bytes": image["size"],
+                    "shared_bytes": image["shared_size"], "unique_bytes": image["unique_size"],
+                    "containers": image["containers"]} for image in images],
+    }
+
+
+def run(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("--json", action="store_true",
+                        help="Print one JSON object holding the text report and the structured summary")
+    args = parser.parse_args(argv)
+    if not args.json:
+        main(args.verbose)
+        return
+    report = io.StringIO()
+    with contextlib.redirect_stdout(report):
+        data = main(args.verbose)
+    print(json.dumps({"report": report.getvalue(), "data": data}))
+
 
 if __name__ == "__main__":
-    # Check for verbose flag
-    verbose = "-v" in sys.argv or "--verbose" in sys.argv
-    main(verbose)
+    run()

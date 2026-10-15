@@ -66,4 +66,9 @@ fi
 
 cd "${ROOTDIR}"
 
-exec "${VENV}/bin/ansible-lint" --strict ansible/
+"${VENV}/bin/ansible-lint" --strict ansible/
+
+# Integration tests must invoke the same pinned Ansible as the lint checks.
+export PATH="${VENV}/bin:${PATH}"
+export PYTHONDONTWRITEBYTECODE=1
+exec "${VENV}/bin/python3" -m unittest discover -s ansible/tests -v

@@ -207,3 +207,18 @@ wait_for_ready "All pods" "${ALL_PODS}" count_ready_all READY_SECONDS_ALL
 END_TIME=$(date +%s)
 NRESTARTS=$(restart_count)
 echo "{\"ready_seconds_non_storage\":${READY_SECONDS_NON_STORAGE},\"ready_seconds_all\":${READY_SECONDS_ALL},\"nrestarts\":${NRESTARTS},\"start_epoch\":${START_TIME},\"end_epoch\":${END_TIME}}"
+
+if [[ -n ${PERF_JSON_OUTPUT:-} ]]; then
+  SERVICE_ENTER=$(systemctl show microshift.service --property=ActiveEnterTimestampMonotonic --value)
+  SERVICE_EXIT=$(systemctl show microshift.service --property=InactiveExitTimestampMonotonic --value)
+  jq -n \
+    --argjson start_epoch "${START_TIME}" --argjson end_epoch "${END_TIME}" \
+    --argjson non_storage "${READY_SECONDS_NON_STORAGE}" --argjson total "${READY_SECONDS_ALL}" \
+    --argjson kubeconfig "${DURATION}" \
+    --argjson service_enter "${SERVICE_ENTER}" --argjson service_exit "${SERVICE_EXIT}" \
+    --argjson nrestarts "${NRESTARTS}" \
+    '{start_epoch: $start_epoch, end_epoch: $end_epoch, ready_seconds_non_storage: $non_storage,
+      ready_seconds_all: $total, kubeconfig_seconds: $kubeconfig,
+      service_seconds: (($service_enter - $service_exit) / 1000000),
+      nrestarts: $nrestarts}' > "${PERF_JSON_OUTPUT}"
+fi

@@ -98,16 +98,16 @@
 
     - name: Run crio-df script
       become: true
-      ansible.builtin.command: python3 /tmp/crio-df.py -v
+      ansible.builtin.command: python3 /tmp/crio-df.py -v --json
       register: crio_df
       changed_when: false
 
     - name: Save container image sizes to results
-      ansible.builtin.copy:
-        content: "{{ crio_df.stdout }}"
-        dest: "{{ results_dir }}/images.txt"
-        mode: "0644"
-      delegate_to: localhost
+      vars:
+        perf_report_name: images
+        perf_report_stdout: "{{ crio_df.stdout }}"
+        perf_measurement_type: images
+      ansible.builtin.include_tasks: roles/common/tasks/perf-report.yml
 
 - name: Record network measurement end epoch
   ansible.builtin.command: date +%s
@@ -133,6 +133,7 @@
         --prometheus {{ prometheus_endpoint }}
         --instance {{ prom_network_instance }}
         --device {{ prom_network_device }}
+        --json
         {{ network_start_epoch.stdout }}
         {{ network_end_epoch.stdout }}
       register: prom_network
@@ -140,8 +141,12 @@
       delegate_to: localhost
 
     - name: Save network data to results
-      ansible.builtin.copy:
-        content: "{{ prom_network.stdout }}"
-        dest: "{{ results_dir }}/network.txt"
-        mode: "0644"
-      delegate_to: localhost
+      vars:
+        perf_report_name: network
+        perf_report_stdout: "{{ prom_network.stdout }}"
+        perf_measurement_type: startup_network
+        perf_report_timestamp: "{{ '%Y-%m-%dT%H:%M:%SZ' | strftime(network_end_epoch.stdout | int, utc=true) }}"
+      ansible.builtin.include_tasks: roles/common/tasks/perf-report.yml
+
+- name: Index cold start measurements
+  ansible.builtin.include_tasks: roles/common/tasks/perf-index.yml

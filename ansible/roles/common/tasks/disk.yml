@@ -24,12 +24,17 @@
          and disk_missing_paths | length > 0
          and disk_missing_paths | length == disk_usage.stderr_lines | length }}
   block:
-    # A shell is needed because du_dirs entries may be globs such as /usr/bin/*.
-    - name: Find disk usage # noqa: command-instead-of-shell
+    - name: Capture disk usage in bytes
       become: true
-      ansible.builtin.shell: du -BM -t 1M --max-depth=1 {{ item }}
-      register: disk_usage
+      ansible.builtin.script:
+        cmd: "{{ playbook_dir }}/roles/common/tasks/files/disk-usage.py {{ item | quote }}"
+        executable: python3
+      register: disk_capture
       changed_when: false
+
+    - name: Read disk measurement
+      ansible.builtin.set_fact:
+        disk_usage: "{{ disk_capture.stdout | from_json }}"
       # du exits 1 when it could not read part of a tree, for example the
       # overlay mounts of running containers, and still reports the rest.
       # That is tolerated and reported below, as is a requested path that
@@ -78,3 +83,23 @@
         - "{{ disk_usage_sorted.stdout_lines | default([]) }}"
       loop_control:
         loop_var: disk_item
+
+    - name: Retain disk paths for this snapshot
+      ansible.builtin.set_fact:
+        perf_disk_snapshots: >-
+          {{ perf_disk_snapshots | default({}) | combine({filename:
+               (perf_disk_snapshots | default({})).get(filename, {}) | combine({item: {
+                 'request': item, 'paths': disk_usage.paths,
+                 'absent': disk_path_absent | bool, 'incomplete': disk_usage.rc != 0 and not (disk_path_absent | bool)
+               }})
+             }) }}
+
+    - name: Archive disk measurement
+      vars:
+        perf_measurement_key: "{{ filename }}"
+        perf_measurement_type: disk
+        perf_measurement_timestamp: "{{ disk_usage.timestamp }}"
+        perf_measurement_data:
+          stage: "{{ filename | splitext | first }}"
+          requests: "{{ perf_disk_snapshots[filename] | dict2items | map(attribute='value') | list }}"
+      ansible.builtin.include_tasks: roles/common/tasks/perf-record.yml
