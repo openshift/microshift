@@ -8,6 +8,7 @@
 
 - name: Create vm and set up localhost
   hosts: localhost
+  tags: [localhost]
   become: false
   vars:
     ansible_connection: local
@@ -20,6 +21,7 @@
 
 - name: Entitle host and manage repos
   hosts: microshift
+  tags: [repos]
   become: true
   vars_files:
     - vars/all.yml
@@ -29,6 +31,7 @@
 
 - name: Install packages, configure services & firewall
   hosts: microshift
+  tags: [host]
   become: true
   vars_files:
     - vars/all.yml
@@ -42,6 +45,7 @@
 
 - name: Install microshift
   hosts: microshift
+  tags: [install]
   vars_files:
     - vars/all.yml
   roles:
@@ -50,6 +54,7 @@
 
 - name: Resolve microshift nodename
   hosts: microshift
+  tags: [nodename]
   vars_files:
     - vars/all.yml
   tasks:
@@ -58,6 +63,7 @@
 
 - name: Set up logging node
   hosts: logging
+  tags: [logging]
   vars_files:
     - vars/all.yml
   roles:
@@ -66,6 +72,7 @@
 
 - name: Capture microshift metrics
   hosts: microshift
+  tags: [start]
   vars_files:
     - vars/all.yml
   roles:
@@ -73,6 +80,7 @@
 
 - name: Add kubelet endpoint to prometheus
   hosts: logging
+  tags: [logging]
   gather_facts: false
   vars_files:
     - vars/all.yml
@@ -82,6 +90,7 @@
 
 - name: Capture microshift metrics (warm)
   hosts: microshift
+  tags: [warm]
   vars_files:
     - vars/all.yml
   roles:
@@ -89,6 +98,7 @@
 
 - name: Setup NVIDIA GPU support
   hosts: microshift
+  tags: [gpu]
   become: true
   vars_files:
     - vars/all.yml
@@ -98,6 +108,7 @@
 
 - name: Pull kubeconfig from microshift host
   hosts: microshift
+  tags: [kubeconfig]
   vars_files:
     - vars/all.yml
   roles:
@@ -105,6 +116,7 @@
 
 - name: Deploy GPU test workload
   hosts: microshift
+  tags: [gpu]
   become: true
   vars_files:
     - vars/all.yml
@@ -114,6 +126,7 @@
 
 - name: Run performance workloads
   hosts: localhost
+  tags: [workloads]
   become: false
   vars:
     ansible_connection: local

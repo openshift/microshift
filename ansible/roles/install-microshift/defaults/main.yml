@@ -3,6 +3,10 @@
 
 crio_metrics_conf: 01-crio-metrics.conf
 crio_metrics_path: "/etc/crio/crio.conf.d/{{ crio_metrics_conf }}"
+# Pull secret copied to /etc/crio/openshift-pull-secret on a clean host. A relative
+# path resolves to this role's files/ directory; use an absolute path to keep the
+# secret outside the repository.
+pull_secret_file: pull-secret.txt
 etcd_dir: "{{ ansible_facts.env.HOME }}/etcd"
 etcd_repo: https://github.com/openshift/etcd.git
 # Git revision to check out when building etcd from source.
