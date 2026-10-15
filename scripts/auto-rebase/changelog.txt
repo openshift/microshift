@@ -1,13 +1,53 @@
-- oc image-arm64 0bdef3b8f60b5122e7a5488e86c654172729d225 to 758dbfa96d00a3e7a1baef5d05f01a1ef620f661
-  - 758dbfa9 2026-10-13T08:14:56Z OCPBUGS-84974: Show all machine-os versions in release info for dual-stream payloads (#2406)
-  - 21c51a1d 2026-10-08T15:21:15+02:00 fix(set volumes): mention configmap in invalid volume type error
+- ovn-kubernetes image-arm64 117e2a41c4c3e5255dbbb196cbb6fed68966903c to 0de3886bb79aa0db71e17ddc42898f934e43359e
+  - 959d68d5 2026-10-08T08:06:48Z sync test annotations with upstream changes
+  - a7d573b6 2026-10-08T08:05:07Z sync openshift/go.mod with upstream dependencies
+  - 500fa4ed 2026-10-07T11:44:21-04:00 coderabbit: exempt website changes from test requirements
+  - 0cce0d39 2026-10-07T17:31:29+02:00 docs: describe the DPU-mode exit on host Node deletion
+  - a5c9738d 2026-10-07T11:22:26-04:00 Fix missing DPU support feature link on website
+  - 4890ab82 2026-10-07T09:02:17-04:00 udn: narrow NAD creation lock scope
+  - 5200416c 2026-10-07T10:20:06+02:00 docs: document mac-security mode
+  - 6d702ec4 2026-10-07T10:20:06+02:00 test/e2e: Add MACSecurity feature label
+  - 037f7dab 2026-10-07T10:20:06+02:00 test/e2e,kubevirt: add spoofed source MAC connectivity test
+  - beef9183 2026-10-07T10:20:06+02:00 test/e2e: add spoofed source MAC connectivity tests
+  - 092df3bb 2026-10-07T10:20:06+02:00 test/e2e: add API validation tests for mac-security
+  - 743a42c1 2026-10-07T10:20:06+02:00 clustermanager,udn: render mac-security settings
+  - 6c278e62 2026-10-07T10:20:06+02:00 ovn: set unknown in addrs on live-migration source LSPs
+  - 5551f93f 2026-10-07T10:20:06+02:00 ovn: disable MAC spoof protection on LSP when mac-security is disabled
+  - 44edb945 2026-10-07T10:20:06+02:00 api, (c)udn: add mac-security config
+  - f5d42c69 2026-10-07T10:20:06+02:00 api, netconf: introduce MAC security settings
+  - 6ec0bc69 2026-10-06T23:24:46-07:00 ovn: separate namespace port-group lifecycle from pod membership
+  - 547bcf77 2026-10-07T06:46:26+02:00 layer2: remove mixed-topology upgrade machinery
+  - 33fa67ca 2026-10-06T09:32:30-04:00 udn: reconcile NAD annotations with SSA
+  - f676a4b0 2026-10-05T09:51:06+02:00 node: prioritize default network before primary UDN fan-out
+  - 62cf6153 2026-10-04T14:20:28+03:00 kind: install KubeVirt with server-side apply
+  - 9e33367c 2026-10-02T10:21:10+02:00 e2e: defer EVPN image resolution until execution
+  - 7dc7caa5 2026-10-01T10:55:29-07:00 ci: remind developers to update metrics documentation
+  - dedcc622 2026-10-01T10:43:26-03:00 go-controller: bump grpc-go to v1.84.0
+  - c485232f 2026-10-01T14:54:18+02:00 kind: raise multus thin plugin memory limit to 200Mi
+  - 4342ec64 2026-10-01T14:03:44+02:00 ci: only install linux-modules-extra when vrf module is missing
+  - 04d44665 2026-09-30T01:02:15-07:00 docs: add component metrics reference pages
+  - cfce5eef 2026-09-30T08:09:43+02:00 dist: Do not attempt to remove the OVN docker files.
+  - bb2a8d09 2026-09-28T13:47:22+01:00 GH CI efficiency: merge linting and generated code steps
+  - 87c17701 2026-09-28T11:34:48+02:00 egressip: prioritize node IP bypass before egress service rules
+  - a1afc5f4 2026-09-28T11:34:48+02:00 e2e: verify EgressService backend ClusterIP connectivity
+  - 4d06f050 2026-09-26T02:56:08-07:00 node: disable netlink VF info collection explicitly
+  - f6d3017b 2026-09-23T06:37:59-07:00 routeimport: regenerate netlink mock imports
+  - 9c74543c 2026-09-23T06:37:58-07:00 routeimport: batch missing static route creation
+  - f4750701 2026-09-22T20:15:22-07:00 routeimport: stream BGP route dumps
+  - 1e723630 2026-09-22T21:34:08+02:00 e2e: cover DPU host node deletion
+  - 97141056 2026-09-22T17:49:29+02:00 node: exit in DPU mode when the Node object ovnkube-node manages is deleted
+  - 9fd22dee 2026-09-22T17:11:17+02:00 e2e: assert a single localnet port after an Uplink bridge change
+  - ae995d48 2026-09-22T17:11:17+02:00 gateway: replace stale localnet port when the interface ID changes
+  - 8918f4c5 2026-09-22T16:30:27+03:00 okep,3926: Omit using of force_fdb_lookup LSP option
+  - 93c51366 2026-09-17T11:46:05-04:00 networkqos: release informer handlers on controller shutdown
+  - e53948e2 2026-09-15T14:26:18-04:00 networkqos: skip host-network pod events
+  - f60e68af 2026-09-15T14:03:34-04:00 networkqos: handle deletion tombstones and missing namespaces
+  - 1c677030 2026-09-15T17:53:30+02:00 test: verify and retry tool downloads in install-kind.sh
+  - 431bc556 2026-09-15T11:48:46-04:00 networkqos: skip pod and namespace events without policies
+  - 2bc2ab4d 2026-09-15T15:32:00+05:30 kubevirt: correct IPv6 gateway log message
 
-- router image-arm64 6c5868c9670b2fa17e30f9416fe5de1156198d22 to 01bee8da2387d0cfbd7a1acd934bb92a8c320527
-  - cd87049 2026-09-17T14:15:15Z Add pedjak to OWNERS
-
-- router image-arm64 6c5868c9670b2fa17e30f9416fe5de1156198d22 to 01bee8da2387d0cfbd7a1acd934bb92a8c320527
-  - cd87049 2026-09-17T14:15:15Z Add pedjak to OWNERS
-
-- kubernetes image-arm64 421570e76c5fd58e26ca93b4bef504d9378ccdcf to 3b69139c9bfa9de9ace884228c3487b12c5b7879
-  - 0a248aa8d 2026-10-07T17:22:07-07:00 UPSTREAM: <carry>: Daemonset test has changed names -> needs corrected env selector
+- kubernetes image-arm64 3b69139c9bfa9de9ace884228c3487b12c5b7879 to fdad2f1ea07ff4b37cad0f64281368776c5e47d5
+  - 1c20d1ff3 2026-10-12T12:32:00-05:00 UPSTREAM: <carry>: bump cadvisor for statseq fix
+  - 64c65ff98 2026-10-06T13:17:17-04:00 UPSTREAM: 141662: deflake pod resize deferred tests
+  - ec761b985 2026-10-02T13:50:09-04:00 UPSTREAM: 142106: e2e: check pod resized in WaitForPodResizeActuation
 
