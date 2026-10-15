@@ -160,7 +160,8 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 	defer func() { _ = certificateLock.Close() }()
 	transaction := certificates.Transaction{DataDir: config.DataDir}
-	if err := recoverCertificateStartup(&transaction, certificateEtcdStopped); err != nil {
+	stopEtcd := func() error { return stopCertificateStartupEtcd(certificateStartupEtcdTimeout) }
+	if err := recoverCertificateStartup(&transaction, stopEtcd); err != nil {
 		return err
 	}
 
@@ -186,7 +187,7 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 	// Data management may have restored a different data tree. Do not use an
 	// incomplete transaction from a restored backup either.
-	if err := recoverCertificateStartup(&transaction, certificateEtcdStopped); err != nil {
+	if err := recoverCertificateStartup(&transaction, stopEtcd); err != nil {
 		return err
 	}
 
@@ -227,7 +228,7 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
-	activated, err := activateCertificateRenewal(cfg, &transaction, certificateEtcdStopped, time.Now())
+	activated, err := activateCertificateRenewal(cfg, &transaction, stopEtcd, time.Now())
 	if err != nil {
 		return fmt.Errorf("failed to activate pending certificate renewal: %w", err)
 	}
