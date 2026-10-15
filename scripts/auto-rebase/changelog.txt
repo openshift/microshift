@@ -1,16 +1,20 @@
-- api embedded-component 231177cd43bccd49bad2bfb4c3cd4cc8153288fb to 7e4a91f5566b5a31a8a3f4f0474b5403e011c692
-  - 37f637a3 2026-09-30T13:39:20-03:00 Promote Dynamic Configuration Manager to Default
+- cluster-ingress-operator embedded-component ab5f68632a64486c295c84301600f630c6693976 to f4c871b3579e7b747b0f15beef511c4068ae478a
+  - ceff06b 2026-10-07T12:46:23-03:00 Promote Dynamic Configuration Manager to Default
 
-- cluster-kube-controller-manager-operator embedded-component b0509dae420643b9432921a158b3d219da3abd03 to 83b412f83f54e0b53dbead58fab77a830b136e48
-  - 186bacf 2026-08-31T15:59:00+05:30 Fix: updated golang.org/x/net pacakge to rectify CVE-2026-33814
+- cluster-network-operator embedded-component a3fadab79ae2eadbfd7311b77904801ed062afe9 to 093a47793d1db5de8b257bcff3dfc47605980133
+  - dc8e876 2026-10-12T13:39:11Z Added global overrides for OVN-Kubernetes
+  - 5386dda 2026-10-01T08:33:42-03:00 Adds rendering of enable-multi-network-policy in ovnkube-node
 
-- cluster-kube-scheduler-operator embedded-component 497c7928d45d88396c5c1e204592811427cc256b to df837d2597c3415f262b33182546c1ab615bdff5
-  - 7105e12 2026-09-08T14:27:10+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
+- machine-config-operator embedded-component 8c08161f6f454e11bf2d34a48b965a52f7ebcad6 to 5aad76497d69dd30f5b7c5a269ee1f5ca173469d
+  - 17ae1eb5 2026-10-01T00:07:18Z Update nmstatectl format comment to clarify what it does
+  - 7076c77e 2026-10-01T00:07:18Z OCPBUGS-90502: Run nmstatectl format in nmstate-configuration
 
-- cluster-policy-controller embedded-component 2e306e143051492a84c5e47a7b3126e096fdf76a to 8fcea9019f04b65370b3aeb8bd8295b29c718b80
-  - f2d6c1e 2026-08-24T17:21:54+02:00 UPSTREAM: <carry>: OCPBUGS-101925: Bump golang.org/x/net to v0.55.0
-  - 120b217 2026-08-24T17:21:54+02:00 UPSTREAM: <drop>: OCPBUGS-101925: Bump golang.org/x/net to v0.55.0
+- openshift-controller-manager embedded-component 26d20feae8892f648f5b06ed3f5492fe6ffb4532 to 079a76c3f53787b813a00e80e97ecb80d0e4803c
+  - d1eabe1 2026-09-24T06:25:53Z OCPBUGS-102001: Bump golang.org/x/net to v0.53.0
 
-- machine-config-operator embedded-component 188c6ebefd16670661e26d3d31def4a3ff7334ec to 8c08161f6f454e11bf2d34a48b965a52f7ebcad6
-  - 6aa90584 2026-10-05T19:06:15Z bootimage: add fallback for non fd vsphere cases
+- kube-rbac-proxy image-arm64 d12e274605248f6c59373240a7eae7a7a357dcb3 to 0be240ab6d347785e2ebe91fd726b5da34a8e6b7
+  - c7096d0 2026-09-29T21:27:39+05:30 Bump golang.org/x/net from v0.52.0 to v0.58.0 to resolve CVE-2026-39821
+
+- ovn-kubernetes image-arm64 dc35130bb7d144854d80f4673493977ed26b56f1 to 1b05d926fc98aec3f9897488bcda59d7d7726789
+  - 0b2f80b8 2026-10-12T11:28:59+02:00 Add pperiyasamy to release-4.22 branch
 
