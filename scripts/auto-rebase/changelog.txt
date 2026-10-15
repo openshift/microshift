@@ -1,9 +1,9 @@
-- machine-config-operator embedded-component be7823714722585bc304d1eee0704c933d1486b1 to 55a94a504b858fd1484d55def8191d327b6a16bf
-  - f00b3138 2026-09-24T11:53:19Z OCPBUGS-69681: limit ContainerRuntimeConfig status condition to 3
+- cluster-kube-apiserver-operator embedded-component 37d84f7e47f675f3a785f66c20dd2972d3289dbe to 91b9bf68d7dd8c81b19f120bc4ac73956ecd850e
+  - 6660353 2026-10-12T17:00:38+05:30 OCPBUGS-127411: Bump of library-go
 
-- ovn-kubernetes image-amd64 68bc16303122d56ab1be14037d3fe7ed25316007 to c8595e7acc4f5334bd403e2700d905aaf4078d93
-  - d562aa70 2026-07-21T11:05:14-07:00 add ability to skip tests that require root
+- cluster-kube-controller-manager-operator embedded-component 438c9dba80ddadeabe9efe4a654297a7b550b2b8 to da4be9f7565b625c60ceb7a95b1e14ada78fbd1f
+  - a39fe8f 2026-08-27T11:56:52+05:30 Fix: added patch for golang.org/x/net package to rectify CVE-2026-33814
 
-- ovn-kubernetes image-arm64 68bc16303122d56ab1be14037d3fe7ed25316007 to c8595e7acc4f5334bd403e2700d905aaf4078d93
-  - d562aa70 2026-07-21T11:05:14-07:00 add ability to skip tests that require root
+- cluster-network-operator embedded-component 8e06ca47f7dceae831760686b68f9d909a6e46d6 to 5a60886d1e93a65bc7359ed1de4d7d2d47007d3d
+  - d6b733f 2026-09-29T14:45:18Z Allow per-node OVN encap IP override via env-overrides
 
