@@ -1,0 +1,1 @@
+rhel-9.8-microshift-{{ .Env.PREVIOUS_MAJOR_VERSION }}.{{ .Env.PREVIOUS_MINOR_VERSION }}
