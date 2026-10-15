@@ -1,9 +1,21 @@
-- machine-config-operator embedded-component e3f6479a979898937cce9cbebf428823dae249fb to 41e607f33cb8bc13228789905550b9401b594d1f
-  - cf2b8c5f 2026-09-30T22:57:20-04:00 Revert "OCPBUGS-91746: temporarily remove sandboxed-containers from extensions test"
+- api embedded-component 3063f49533e8e7b08a30bb68c45047c14a3b3822 to 0b9ac96a7763d55f50670f0f2484d932cfd0ec39
+  - 1066f7f1 2026-10-09T10:01:34-03:00 Rename console ingress helper type
 
-- kube-rbac-proxy image-amd64 9e0e3be4126af4cbe904765988ea2e52c6aed9ae to 2f8a556d09638faeb09b366e95ecb75279ce7c8a
-  - c0251f8 2026-09-29T21:25:47+05:30 Bump golang.org/x/net from v0.52.0 to v0.58.0 to resolve CVE-2026-39821
+- cluster-network-operator embedded-component f729b5d090ceeab5a2d7e3ad74387b1a1630fb89 to 7e02bed52e6d6c7a92a73538cfb45944678cf637
+  - a30ed98 2026-10-12T13:39:54Z Added global overrides for OVN-Kubernetes
 
-- kube-rbac-proxy image-arm64 9e0e3be4126af4cbe904765988ea2e52c6aed9ae to 2f8a556d09638faeb09b366e95ecb75279ce7c8a
-  - c0251f8 2026-09-29T21:25:47+05:30 Bump golang.org/x/net from v0.52.0 to v0.58.0 to resolve CVE-2026-39821
+- kubernetes embedded-component bf3ef614b88993576f8c76728496ed0f2d61db47 to 8482edcf1236367d26adefd1e89505d528adade9
+  - 22fcd364a 2026-10-12T12:23:23-04:00 UPSTREAM: 141662: deflake pod resize deferred tests
+  - 492bc5dbe 2026-10-12T12:23:19-04:00 UPSTREAM: 142106: e2e: check pod resized in WaitForPodResizeActuation
+  - 787d36831 2026-10-12T12:22:38-04:00 UPSTREAM: 134950: Address review comments by using 2 pods instead of 3 pods and simlify the logic.
+
+- kubernetes image-amd64 bf3ef614b88993576f8c76728496ed0f2d61db47 to 8482edcf1236367d26adefd1e89505d528adade9
+  - 22fcd364a 2026-10-12T12:23:23-04:00 UPSTREAM: 141662: deflake pod resize deferred tests
+  - 492bc5dbe 2026-10-12T12:23:19-04:00 UPSTREAM: 142106: e2e: check pod resized in WaitForPodResizeActuation
+  - 787d36831 2026-10-12T12:22:38-04:00 UPSTREAM: 134950: Address review comments by using 2 pods instead of 3 pods and simlify the logic.
+
+- kubernetes image-arm64 bf3ef614b88993576f8c76728496ed0f2d61db47 to 8482edcf1236367d26adefd1e89505d528adade9
+  - 22fcd364a 2026-10-12T12:23:23-04:00 UPSTREAM: 141662: deflake pod resize deferred tests
+  - 492bc5dbe 2026-10-12T12:23:19-04:00 UPSTREAM: 142106: e2e: check pod resized in WaitForPodResizeActuation
+  - 787d36831 2026-10-12T12:22:38-04:00 UPSTREAM: 134950: Address review comments by using 2 pods instead of 3 pods and simlify the logic.
 
