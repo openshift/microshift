@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component f331b9031b24850c6651b603c49031376fc8235a to 725b0f0df6b353683550c008e232a3012f6b8024
+  - 74a2ad26 2026-09-07T17:11:09+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+
