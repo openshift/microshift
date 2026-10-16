@@ -23,8 +23,8 @@ receivers:
   kubeletstats:
     auth_type: tls
     ca_file: /var/lib/microshift/certs/ca-bundle/client-ca.crt
-    key_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.key
-    cert_file: /var/lib/microshift/certs/admin-kubeconfig-signer/openshift-observability-client/client.crt
+    key_file: /var/lib/microshift/certs/client-ca/openshift-observability-client/client.key
+    cert_file: /var/lib/microshift/certs/client-ca/openshift-observability-client/client.crt
     insecure_skip_verify: true
     collection_interval: 20s
     endpoint: "{{NODE_IP}}:10250"

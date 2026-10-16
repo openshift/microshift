@@ -27,18 +27,12 @@ var (
 		Name string
 		Dir  string
 	}{
-		{Name: "kube-control-plane-signer", Dir: cryptomaterial.KubeControlPlaneSignerCertDir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-apiserver-to-kubelet-signer", Dir: cryptomaterial.KubeAPIServerToKubeletSignerCertDir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "admin-kubeconfig-signer", Dir: cryptomaterial.AdminKubeconfigSignerDir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kubelet-signer", Dir: cryptomaterial.KubeletCSRSignerSignerCertDir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-csr-signer", Dir: cryptomaterial.CSRSignerCertDir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "client-ca", Dir: cryptomaterial.ClientCADir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "serving-ca", Dir: cryptomaterial.ServingCADir(cryptomaterial.CertsDirectory(config.DataDir))},
+		{Name: "peer-ca", Dir: cryptomaterial.PeerCADir(cryptomaterial.CertsDirectory(config.DataDir))},
 		{Name: "aggregator-signer", Dir: cryptomaterial.AggregatorSignerDir(cryptomaterial.CertsDirectory(config.DataDir))},
 		{Name: "service-ca", Dir: cryptomaterial.ServiceCADir(cryptomaterial.CertsDirectory(config.DataDir))},
 		{Name: "ingress-ca", Dir: cryptomaterial.IngressCADir(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-apiserver-external-signer", Dir: cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-apiserver-localhost-signer", Dir: cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "kube-apiserver-service-network-signer", Dir: cryptomaterial.KubeAPIServerServiceNetworkSigner(cryptomaterial.CertsDirectory(config.DataDir))},
-		{Name: "etcd-signer", Dir: cryptomaterial.EtcdSignerDir(cryptomaterial.CertsDirectory(config.DataDir))},
 	}
 	ServiceAccountKeyResources = []struct {
 		Name string
@@ -63,7 +57,7 @@ func startCertificateAuthorityController(ctx context.Context, kubeconfigPath str
 	}
 
 	for i, resource := range ServiceAccountKeyResources {
-		resourceNames[i] = resource.Name
+		resourceNames[len(CertificateAuthorityResources)+i] = resource.Name
 		if err := exposeServiceAccountKey(ctx, client, resource.Dir, resource.Name); err != nil {
 			return fmt.Errorf("failed to expose service account key %s: %w", resource.Name, err)
 		}
@@ -100,9 +94,18 @@ func createClusterRole(ctx context.Context, client kubernetes.Interface, resourc
 		},
 	}
 
-	_, err := client.RbacV1().Roles(caResourceNamespace).Create(ctx, role, metav1.CreateOptions{})
-	if err != nil && !apierrors.IsAlreadyExists(err) {
-		return fmt.Errorf("failed to create etcd CA admin Role: %w", err)
+	roles := client.RbacV1().Roles(caResourceNamespace)
+	_, err := roles.Create(ctx, role, metav1.CreateOptions{})
+	if apierrors.IsAlreadyExists(err) {
+		existing, getErr := roles.Get(ctx, role.Name, metav1.GetOptions{})
+		if getErr != nil {
+			return fmt.Errorf("failed to get existing CA admin Role: %w", getErr)
+		}
+		existing.Rules = role.Rules
+		_, err = roles.Update(ctx, existing, metav1.UpdateOptions{})
+	}
+	if err != nil {
+		return fmt.Errorf("failed to create or update etcd CA admin Role: %w", err)
 	}
 
 	roleBinding := &rbacv1.RoleBinding{
@@ -172,9 +175,19 @@ func exposeCertificateAuthority(ctx context.Context, client kubernetes.Interface
 		secret.Data["ca-bundle.crt"] = caBundle
 	}
 
-	_, err = client.CoreV1().Secrets(caResourceNamespace).Create(ctx, secret, metav1.CreateOptions{})
-	if err != nil && !apierrors.IsAlreadyExists(err) {
-		return fmt.Errorf("failed to create CA secret %s: %w", name, err)
+	secrets := client.CoreV1().Secrets(caResourceNamespace)
+	_, err = secrets.Create(ctx, secret, metav1.CreateOptions{})
+	if apierrors.IsAlreadyExists(err) {
+		existing, getErr := secrets.Get(ctx, name, metav1.GetOptions{})
+		if getErr != nil {
+			return fmt.Errorf("failed to get existing CA secret %s: %w", name, getErr)
+		}
+		existing.Type = secret.Type
+		existing.Data = secret.Data
+		_, err = secrets.Update(ctx, existing, metav1.UpdateOptions{})
+	}
+	if err != nil {
+		return fmt.Errorf("failed to create or update CA secret %s: %w", name, err)
 	}
 	return nil
 }
