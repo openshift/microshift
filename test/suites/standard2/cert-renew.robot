@@ -2,6 +2,7 @@
 Documentation       Online certificate preparation, startup activation, and structured output.
 
 Resource            ../../resources/common.resource
+Resource            ../../resources/dns.resource
 Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/microshift-process.resource
@@ -108,6 +109,7 @@ Unprivileged Dry Run Is Refused
 
 Leaf Renewal Keeps CAs Unchanged
     [Documentation]    Prepare leaves online, preserve active TLS and CA bytes, and activate only on restart.
+    ${pods_before}=    Certificate Consumer Pod UIDs
     ${before}=    Certificate Status Document
     ${files_before}=    Certificate Material Digest
     ${served_before}=    Served Certificate Fingerprints
@@ -118,6 +120,7 @@ Leaf Renewal Keeps CAs Unchanged
     Should Be Equal    ${ca_before}    ${ca_after}
     Renewal Has Not Changed Active Material    ${files_before}    ${served_before}
     Pending Renewal Matches Result    ${result}
+    Certificate Consumers Have Not Restarted    ${pods_before}
     Restart MicroShift
     Renewal Matches Current Status    ${result}
     ${ca_after}=    CA Material Digest
@@ -125,9 +128,11 @@ Leaf Renewal Keeps CAs Unchanged
     ${served_after}=    Served Certificate Fingerprints
     Should Not Be Equal    ${served_before}    ${served_after}
     Renewal Activation Has Finished
+    Certificate Consumers Use Renewed Material    ${pods_before}    ${False}
 
 CA Renewal Updates The Whole Chain
     [Documentation]    Prepare all CAs online with old credentials still usable; activate the new chain on restart.
+    ${pods_before}=    Certificate Consumer Pod UIDs
     ${before}=    Certificate Status Document
     ${files_before}=    Certificate Material Digest
     ${served_before}=    Served Certificate Fingerprints
@@ -136,6 +141,7 @@ CA Renewal Updates The Whole Chain
     Validate Renewal Document    ${result}    ca    ${False}    ${before}
     Renewal Has Not Changed Active Material    ${files_before}    ${served_before}
     Pending Renewal Matches Result    ${result}
+    Certificate Consumers Have Not Restarted    ${pods_before}
     Restart MicroShift
     ${restarts}=    Get Systemd Setting    microshift.service    NRestarts
     Should Be Equal As Integers    ${restarts}    0    msg=CA activation must not require an automatic startup retry
@@ -143,6 +149,14 @@ CA Renewal Updates The Whole Chain
     Should Not Be Equal    ${ca_before}    ${ca_after}
     Renewal Matches Current Status    ${result}
     Renewal Activation Has Finished
+    Certificate Consumers Use Renewed Material    ${pods_before}    ${True}
+
+Unchanged Certificates Do Not Restart Managed Pods
+    [Documentation]    Reapplying managed manifests must preserve the certificate generation across ordinary starts.
+    ${before}=    Certificate Consumer Pod UIDs
+    Restart MicroShift
+    Certificate Consumers Have Not Restarted    ${before}
+    Certificate Consumers Can Reach The API
 
 Stopped Renewal Waits For Startup Too
     [Documentation]    Preparation while stopped has the same pending contract and does not start the service.
@@ -365,6 +379,68 @@ Renewal Activation Has Finished
     Command Should Work    test ! -e /var/lib/microshift/.cert-renewal
     Certificate Lock Is Stable
     Command Should Work    flock -n -x ${CERTIFICATE_LOCK} true
+
+Wait For Certificate Consumers
+    [Documentation]    Wait for updated pods, not the stale Ready status of the old generation.
+    Run With Kubeconfig    oc rollout status daemonset/ovnkube-master -n openshift-ovn-kubernetes --timeout=180s
+    Run With Kubeconfig    oc rollout status daemonset/dns-default -n openshift-dns --timeout=180s
+    Run With Kubeconfig    oc rollout status deployment/router-default -n openshift-ingress --timeout=180s
+
+Certificate Consumer Pod UIDs
+    [Documentation]    Identify current managed pods without including terminating pods from a rollout.
+    Wait For Certificate Consumers
+    ${ovn}=    Current Pod UIDs    openshift-ovn-kubernetes    app=ovnkube-master
+    ${dns}=    Current Pod UIDs    openshift-dns    dns.operator.openshift.io/daemonset-dns=default
+    ${router}=    Current Pod UIDs
+    ...    openshift-ingress    ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default
+    VAR    &{uids}=    ovn=${ovn}    dns=${dns}    router=${router}
+    RETURN    ${uids}
+
+Certificate Consumers Have Not Restarted
+    [Documentation]    Preparation and ordinary starts must not request certificate-driven pod replacements.
+    [Arguments]    ${before}
+    ${after}=    Certificate Consumer Pod UIDs
+    Should Be Equal    ${before}    ${after}
+
+Certificate Consumers Use Renewed Material
+    [Documentation]    Leaf renewal replaces OVN; CA renewal also replaces service-account consumers.
+    [Arguments]    ${before}    ${renew_ca}
+    ${after}=    Certificate Consumer Pod UIDs
+    Should Not Be Equal    ${before}[ovn]    ${after}[ovn]
+    IF    ${renew_ca}
+        Should Not Be Equal    ${before}[dns]    ${after}[dns]
+        Should Not Be Equal    ${before}[router]    ${after}[router]
+    ELSE
+        Should Be Equal    ${before}[dns]    ${after}[dns]
+    END
+    Certificate Consumers Can Reach The API
+
+Current Pod UIDs
+    [Documentation]    Require at least one non-terminating pod matching the controller selector.
+    [Arguments]    ${namespace}    ${selector}
+    ${output}=    Run With Kubeconfig    oc get pods -n ${namespace} -l ${selector} -o json
+    ${pods}=    Json Parse    ${output}
+    ${uids}=    Evaluate
+    ...    sorted(p['metadata']['uid'] for p in $pods['items'] if not p['metadata'].get('deletionTimestamp'))
+    Should Not Be Empty    ${uids}
+    RETURN    ${uids}
+
+Certificate Consumers Can Reach The API
+    [Documentation]    Verify DNS and authenticated API Service TLS from a pod after activation.
+    Resolve Host From Pod    kubernetes.default.svc.cluster.local
+    Wait Until Keyword Succeeds    60s    5s    Router Can Reach The API Service
+
+Router Can Reach The API Service
+    [Documentation]    Use the pod's mounted CA and token, never disable TLS verification.
+    ${command}=    Catenate    SEPARATOR=${SPACE}
+    ...    curl --fail --silent --show-error --max-time 10
+    ...    --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    ...    --header "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+    ...    https://kubernetes.default.svc/api
+    ${output}=    Run With Kubeconfig
+    ...    oc exec -n openshift-ingress deployment/router-default -c router -- /bin/sh -c '${command}'
+    ${document}=    Json Parse    ${output}
+    Should Be Equal    ${document}[kind]    APIVersions
 
 Pending Renewal Matches Result
     [Documentation]    Status distinguishes active expiry dates from the prepared replacement dates.

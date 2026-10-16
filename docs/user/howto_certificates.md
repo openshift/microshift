@@ -124,6 +124,26 @@ kubeconfigs remain trusted after leaf-only renewal until their own certificates
 expire. Applications that cache certificates or CA bundles may need a reload or
 restart after either operation.
 
+At startup, MicroShift updates the pod templates of its directly deployed
+API-consuming components when their active certificate generation changes.
+OVN is reconciled first so that it remounts the renewed admin kubeconfig. After
+CA renewal, DNS, ingress, service-ca, the LVMS operator, the CSI snapshot
+controller, and Multus (when enabled) also receive updated pod templates.
+MicroShift waits for the current service-account CA bundle before requesting
+these replacements. Kubernetes recreates the pods using each controller's
+existing update strategy; this can temporarily interrupt networking and ingress
+during the maintenance window.
+
+On an existing installation, startup waits up to two minutes for OVN's updated
+pods. If they are still unavailable, MicroShift logs a warning and continues
+deploying the other components while Kubernetes keeps reconciling the rollout.
+
+Preparing renewal does not change pod templates. An ordinary restart with
+unchanged certificates does not request another certificate rollout, and an
+interrupted rollout is reconciled again on the next startup. MicroShift does not
+restart customer workloads or workloads deployed by other operators; their
+owners remain responsible for reloading cached certificates and CA bundles.
+
 Both modes accept `-o json` and `-o yaml`. A successful command emits one versioned
 `CertificateRenewalResult` with deterministically ordered `items` and an `impact`
 summary. Dry-run reports `status: validated`, `dryRun: true`, and `changed: false`

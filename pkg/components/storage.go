@@ -177,7 +177,7 @@ func setupPluginResources(ctx context.Context, cfg *config.Config, kubeconfigPat
 		klog.Warningf("Failed to apply service %v: %v", svc, err)
 		return err
 	}
-	if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+	if err := applyDeploymentsWithCertificates(ctx, deploy, renderParamsFromConfig(cfg, nil), kubeconfigPath, "openshift-storage"); err != nil {
 		klog.Warningf("Failed to apply deployment %v: %v", deploy, err)
 		return err
 	}
