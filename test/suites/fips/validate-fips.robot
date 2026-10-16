@@ -81,20 +81,47 @@ Check Payload Tool Must Pass
     Should Be Equal As Integers    0    ${rc}
 
 Check Container Images In Release Must Pass
-    [Documentation]    Run check-paylod Tool for Release containers
+    [Documentation]    Run check-payload Tool for Release containers
     VAR    ${podman_pull_secret}=    /root/.config/containers/auth.json
     VAR    ${podman_mounts}=    -v ${PULL_SECRET_PATH}:${podman_pull_secret}
     VAR    ${podman_args}=    --rm --authfile ${PULL_SECRET_PATH} --privileged ${podman_mounts}
     ${path}=    Create Random Temp File
     VAR    ${CHECK_PAYLOAD_REL_OUTPUT_FILE}=    ${path}    scope=GLOBAL
+    ${pod_image}=    Get Pod Image From Release File
     @{images}=    Get Images From Release File
     FOR    ${image}    IN    @{images}
-        VAR    ${scan_command}=    scan operator --spec ${image}
-        ${rc}=    Execute Command
-        ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${scan_command} >>${CHECK_PAYLOAD_REL_OUTPUT_FILE} 2>&1
-        ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
-        Should Be Equal As Integers    0    ${rc}
+        Scan Release Image For FIPS    ${image}    ${pod_image}    ${podman_args}
     END
+
+Scan Release Image For FIPS
+    [Documentation]    Scan a single release image with check-payload and fail on
+    ...    any FIPS finding, except the pause (pod) container's known-benign
+    ...    findings (see Count Pod Scan Failures). The pause container ships a
+    ...    statically-linked /pause binary on a "FROM scratch" image
+    ...    (OCPBUGS-123651); check-payload flags the static binary and the missing
+    ...    /etc/redhat-release, but neither is a cryptographic concern and OpenShift
+    ...    waives them (ART-23962). The ci/check-payload:latest image is currently
+    ...    stale and lacks that waiver, so tolerate ONLY those findings and ONLY for
+    ...    the pod image. Remove this once the check-payload image is refreshed.
+    [Arguments]    ${image}    ${pod_image}    ${podman_args}
+    ${image_log}=    Create Random Temp File
+    VAR    ${scan_command}=    scan operator --spec ${image}
+    ${rc}=    Execute Command
+    ...    podman run ${podman_args} ${CHECK_PAYLOAD_IMAGE} ${scan_command} >${image_log} 2>&1
+    ...    sudo=True    return_rc=True    return_stdout=False    return_stderr=False
+    # Keep the aggregated report for the artifacts (downloaded in Teardown).
+    Execute Command    cat ${image_log} >>${CHECK_PAYLOAD_REL_OUTPUT_FILE}    sudo=True
+    IF    ${rc} == 0    RETURN
+    IF    "${image}" != "${pod_image}"
+        Fail    check-payload scan reported FIPS failures for ${image}
+    END
+    # Accept the pod image's non-zero scan ONLY when the known waived findings are
+    # actually present and nothing else failed. A tool crash or pull error produces
+    # no Failure Report (waived == 0), so it is still treated as a failure.
+    ${waived}    ${others}=    Count Pod Scan Failures    ${image_log}
+    Should Be True
+    ...    ${waived} > 0 and ${others} == 0
+    ...    msg=check-payload scan for pod image ${image} failed with non-waived findings (waived=${waived}, others=${others})
 
 Microshift Binary Should Dynamically Link FIPS Ossl Module
     [Documentation]    Check if Microshift binary is FIPS compliant.
@@ -142,3 +169,36 @@ Get Images From Release File
 
     @{images}=    Split String    ${stdout}    \n
     RETURN    @{images}
+
+Get Pod Image From Release File
+    [Documentation]    Return the 'pod' (pause) container image pullspec from the
+    ...    MicroShift release metadata.
+    ${stdout}    ${stderr}    ${rc}=    Execute Command
+    ...    jq -r '.images.pod' /usr/share/microshift/release/release-$(uname -m).json
+    ...    return_stdout=True    return_stderr=True    return_rc=True
+    Should Be Equal As Integers    0    ${rc}
+    RETURN    ${stdout.strip()}
+
+Count Pod Scan Failures
+    [Documentation]    Return two counts from the check-payload "Failure Report"
+    ...    in ${scan_output}: waived findings and all other (non-waived) findings.
+    ...    OpenShift waives two findings for the pause (pod) container (ART-23962):
+    ...    the statically linked /pause or /usr/bin/pod binary, and the missing
+    ...    /etc/redhat-release on its "FROM scratch" image (OCPBUGS-123651). Each
+    ...    binary path is bracketed by the table's column pipes, so a similarly
+    ...    named binary (e.g. /pause-helper) is not matched.
+    [Arguments]    ${scan_output}
+    VAR    ${not_dyn}=
+    ...    openshift-enterprise-pod-container *[|] *(/pause|/usr/bin/pod) *[|] *executable is not dynamically linked
+    VAR    ${no_distro}=
+    ...    openshift-enterprise-pod-container *[|] */etc/redhat-release *[|] *could not find distribution file
+    # Failure Report table rows: the section runs from the "---- Failure Report"
+    # header to the next "---- " header; its rows start with "|" (border rows
+    # start with "+"). Drop the column header row.
+    VAR    ${rows}=
+    ...    awk '/---- Failure Report/{f=1;next} /^---- /{f=0} f' ${scan_output} | grep '^|' | grep -v 'OPERATOR NAME'
+    ${waived}=    Execute Command    ${rows} | grep -cE '${not_dyn}|${no_distro}'
+    ...    sudo=True    return_stdout=True
+    ${others}=    Execute Command    ${rows} | grep -vE '${not_dyn}|${no_distro}' | grep -c '^|'
+    ...    sudo=True    return_stdout=True
+    RETURN    ${waived.strip()}    ${others.strip()}
