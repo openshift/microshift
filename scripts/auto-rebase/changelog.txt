@@ -1,20 +1,71 @@
-- cluster-ingress-operator embedded-component ab5f68632a64486c295c84301600f630c6693976 to f4c871b3579e7b747b0f15beef511c4068ae478a
-  - ceff06b 2026-10-07T12:46:23-03:00 Promote Dynamic Configuration Manager to Default
+- api embedded-component 7e4a91f5566b5a31a8a3f4f0474b5403e011c692 to f94a02c852f17a74216c277542c391b2c851d6ce
+  - 7458eddf 2026-10-12T15:25:17-04:00 OCPBUGS-63219: Add protocol to AWS NLB parameters
+  - 67a3671d 2026-10-07T07:26:04Z UPSTREAM<drop>: OCPBUGS-123142: Regenerate vendor for protobuf v1.36.12
+  - e05230a4 2026-10-07T07:26:04Z UPSTREAM<carry>: OCPBUGS-123142: Bump Go builder to 1.26 and protobuf to v1.36.12
 
-- cluster-network-operator embedded-component a3fadab79ae2eadbfd7311b77904801ed062afe9 to 093a47793d1db5de8b257bcff3dfc47605980133
-  - dc8e876 2026-10-12T13:39:11Z Added global overrides for OVN-Kubernetes
-  - 5386dda 2026-10-01T08:33:42-03:00 Adds rendering of enable-multi-network-policy in ovnkube-node
+- cluster-dns-operator embedded-component 3d2141182243cde1ec6417bd005c76d29aa88a01 to dd2e29dd7570f7d9b6198d1ce941b106ae9d1d9e
+  - 4b9edfc 2026-10-09T11:28:01Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
 
-- machine-config-operator embedded-component 8c08161f6f454e11bf2d34a48b965a52f7ebcad6 to 5aad76497d69dd30f5b7c5a269ee1f5ca173469d
-  - 17ae1eb5 2026-10-01T00:07:18Z Update nmstatectl format comment to clarify what it does
-  - 7076c77e 2026-10-01T00:07:18Z OCPBUGS-90502: Run nmstatectl format in nmstate-configuration
+- cluster-ingress-operator embedded-component f4c871b3579e7b747b0f15beef511c4068ae478a to e237385c0fed7d9a27cf4c903a149a07ae3efbbb
+  - 9246d4a 2026-10-14T14:37:24Z OCPBUGS-63219: Use status instead of old service for desired state during auto-delete
+  - 04db944 2026-10-14T14:37:24Z OCPBUGS-63219: Improve NLB hairpin risk alert description
+  - 4c2784e 2026-10-14T14:37:24Z OCPBUGS-63219: Address code review feedback
+  - 6991673 2026-10-14T14:37:23Z OCPBUGS-63219: Use isNewIngressController instead of !alreadyAdmitted for NLB protocol defaulting
+  - 01a2ff6 2026-10-14T14:37:23Z OCPBUGS-63219: Add NLB hairpin risk alert for existing IngressControllers
+  - 624552c 2026-10-14T14:37:23Z OCPBUGS-63219: Add E2E tests for NLB protocol and LB type transition safety
+  - 8a0c804 2026-10-14T14:37:23Z OCPBUGS-63219: Support NLB protocol for AWS
+  - c585c62 2026-10-14T14:37:23Z OCPBUGS-130606: Vendor release-4.22 NLB API
 
-- openshift-controller-manager embedded-component 26d20feae8892f648f5b06ed3f5492fe6ffb4532 to 079a76c3f53787b813a00e80e97ecb80d0e4803c
-  - d1eabe1 2026-09-24T06:25:53Z OCPBUGS-102001: Bump golang.org/x/net to v0.53.0
+- cluster-kube-scheduler-operator embedded-component df837d2597c3415f262b33182546c1ab615bdff5 to 5ab7becc03a10e7b19bcd9f544dbe88940157dc7
+  - 8bf8854 2026-10-09T17:35:55Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
 
-- kube-rbac-proxy image-arm64 d12e274605248f6c59373240a7eae7a7a357dcb3 to 0be240ab6d347785e2ebe91fd726b5da34a8e6b7
+- cluster-openshift-controller-manager-operator embedded-component 2d2699e4f3fabc80e402f4c090c8cf80c4517977 to 923f6b0c2e1efd74b98e1f3d6500361fa4e03fbf
+  - 9344a97 2026-08-09T05:03:52Z Address CVE-2026-42502
+  - 3babfbe 2026-08-09T05:03:52Z Address CVE-2026-42502 (vendor changes)
+
+- kubernetes-kube-storage-version-migrator embedded-component 5f86c7d2bace76cacd57770e2de0e1525cd4be15 to a67afb9b9fea72316591666c207b3a32e9e07835
+  - 0e31d23 2026-10-14T15:51:52Z UPSTREAM: <drop>: OCPBUGS-123142: bump protobuf to v1.36.12
+  - 7d31f44 2026-10-14T15:51:52Z UPSTREAM: <carry>: OCPBUGS-123142: Bump Go to 1.26
+
+- machine-config-operator embedded-component 5aad76497d69dd30f5b7c5a269ee1f5ca173469d to 92e253c13422774d42865cbfe9f637ab05bfe3d5
+  - ab01efd8 2026-10-06T23:30:22Z bootimage: logout vCenter clients after use
+
+- route-controller-manager embedded-component 55f77ca4cf0328b7c4fd7736bce79ebe171a9b6b to c2021f0df34b60ddbfb51bc64aae5ee01ca8cbc9
+  - e6fdf32 2026-10-14T18:53:19Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+
+- service-ca-operator embedded-component de05110fb2993491ff7f40455deb2f70cb95423b to 4ece83101d3f1422273979aaa7d15bc225530b7a
+  - 055b22b 2026-10-14T15:51:39Z vendor: bump(*)
+  - db6d287 2026-10-14T15:51:39Z OCPBUGS-123142: Bump Go to 1.26
+
+- oc image-amd64 d0f23b14fbf35493e5b713e25ecf662ec239e76c to a726d94391e468525cc5282067cadc1215b1fb5e
+  - d924e768 2026-10-14T16:25:07Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+
+- coredns image-amd64 9a71d9a6b788437e755b5ed3bfad78c63fa7c6f4 to c085be2d42c3e7113cd4fb79e4e877a18c02c4ec
+  - 4486ac6 2026-10-14T01:28:31Z UPSTREAM: <drop>: OCPBUGS-123142: Bump protobuf to v1.36.12 and update vendor
+  - 1e0130d 2026-10-14T01:28:23Z UPSTREAM: <carry>: OCPBUGS-123142: Bump Go builder to 1.26 for OpenShift 4.22
+
+- kube-rbac-proxy image-amd64 d12e274605248f6c59373240a7eae7a7a357dcb3 to cd28f2710ec8c800d64e8eca846cb4b426247d27
+  - 252c2c5 2026-10-14T16:10:43Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
   - c7096d0 2026-09-29T21:27:39+05:30 Bump golang.org/x/net from v0.52.0 to v0.58.0 to resolve CVE-2026-39821
 
-- ovn-kubernetes image-arm64 dc35130bb7d144854d80f4673493977ed26b56f1 to 1b05d926fc98aec3f9897488bcda59d7d7726789
+- ovn-kubernetes image-amd64 dc35130bb7d144854d80f4673493977ed26b56f1 to 1b05d926fc98aec3f9897488bcda59d7d7726789
   - 0b2f80b8 2026-10-12T11:28:59+02:00 Add pperiyasamy to release-4.22 branch
+
+- service-ca-operator image-amd64 de05110fb2993491ff7f40455deb2f70cb95423b to 4ece83101d3f1422273979aaa7d15bc225530b7a
+  - 055b22b 2026-10-14T15:51:39Z vendor: bump(*)
+  - db6d287 2026-10-14T15:51:39Z OCPBUGS-123142: Bump Go to 1.26
+
+- oc image-arm64 d0f23b14fbf35493e5b713e25ecf662ec239e76c to a726d94391e468525cc5282067cadc1215b1fb5e
+  - d924e768 2026-10-14T16:25:07Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+
+- coredns image-arm64 9a71d9a6b788437e755b5ed3bfad78c63fa7c6f4 to c085be2d42c3e7113cd4fb79e4e877a18c02c4ec
+  - 4486ac6 2026-10-14T01:28:31Z UPSTREAM: <drop>: OCPBUGS-123142: Bump protobuf to v1.36.12 and update vendor
+  - 1e0130d 2026-10-14T01:28:23Z UPSTREAM: <carry>: OCPBUGS-123142: Bump Go builder to 1.26 for OpenShift 4.22
+
+- kube-rbac-proxy image-arm64 0be240ab6d347785e2ebe91fd726b5da34a8e6b7 to cd28f2710ec8c800d64e8eca846cb4b426247d27
+  - 252c2c5 2026-10-14T16:10:43Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+
+- service-ca-operator image-arm64 de05110fb2993491ff7f40455deb2f70cb95423b to 4ece83101d3f1422273979aaa7d15bc225530b7a
+  - 055b22b 2026-10-14T15:51:39Z vendor: bump(*)
+  - db6d287 2026-10-14T15:51:39Z OCPBUGS-123142: Bump Go to 1.26
 
