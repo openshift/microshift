@@ -1,3 +1,6 @@
-- machine-config-operator embedded-component f331b9031b24850c6651b603c49031376fc8235a to 725b0f0df6b353683550c008e232a3012f6b8024
-  - 74a2ad26 2026-09-07T17:11:09+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+- cluster-kube-controller-manager-operator embedded-component 7c4e44698b6004e52c59e03dd0c89611fbbfa999 to a2d1efd88a01dc62807371850d7bef40e6d0d296
+  - 25adbb7 2026-08-27T11:57:17+05:30 Fix: added patch for golang.org/x/net package to rectify CVE-2026-33814
+
+- route-controller-manager embedded-component 6068e2c71fc1efb67324a91f48c1470c647f1344 to d169cd1731a15639fc10d1e4faa0fba52f1b033e
+  - f69c2c8 2026-09-07T18:21:42+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
 
