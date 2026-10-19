@@ -300,7 +300,7 @@ func TestMigrateLegacyCertLayout(t *testing.T) {
 		require.Contains(t, name, "v5.1.0-alpha_dev+build")
 	})
 
-	t.Run("error when service-ca is missing from old layout", func(t *testing.T) {
+	t.Run("rolls back when service-ca is missing from old layout", func(t *testing.T) {
 		certsDir := t.TempDir()
 		// Legacy marker present but no service-ca to copy back.
 		require.NoError(t, os.MkdirAll(filepath.Join(certsDir, "kube-control-plane-signer"), 0700))
@@ -308,6 +308,12 @@ func TestMigrateLegacyCertLayout(t *testing.T) {
 		err := migrateLegacyCertLayout(certsDir, "v5.1.0")
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "failed to restore service-ca")
+
+		// Rollback must have restored certsDir with the original legacy marker.
+		_, statErr := os.Stat(filepath.Join(certsDir, "kube-control-plane-signer"))
+		require.NoError(t, statErr, "rollback must restore the original certs dir")
+		// No backup dir should remain after successful rollback.
+		require.Empty(t, backupDirsFor(t, certsDir), "rollback must remove the backup dir")
 	})
 
 	t.Run("idempotent after successful migration", func(t *testing.T) {

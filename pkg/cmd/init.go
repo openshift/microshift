@@ -95,16 +95,27 @@ func migrateLegacyCertLayout(certsDir, gitVersion string) error {
 	if err := os.Rename(certsDir, backupDir); err != nil {
 		return err
 	}
+	// rollback removes the partial certsDir and renames backupDir back so the
+	// next startup sees the original layout intact and retries the migration.
+	rollback := func(cause error) error {
+		if rmErr := os.RemoveAll(certsDir); rmErr != nil {
+			return fmt.Errorf("%w (rollback cleanup failed: %v)", cause, rmErr)
+		}
+		if rbErr := os.Rename(backupDir, certsDir); rbErr != nil {
+			return fmt.Errorf("%w (rollback rename failed: %v)", cause, rbErr)
+		}
+		return cause
+	}
 	// Recreate the live directory and restore service-ca so that existing
 	// service-serving Secrets remain trusted through the CA transition.
 	if err := os.MkdirAll(certsDir, 0700); err != nil {
-		return fmt.Errorf("failed to recreate certs directory after migration: %w", err)
+		return rollback(fmt.Errorf("failed to recreate certs directory after migration: %w", err))
 	}
 	if err := os.CopyFS(
 		filepath.Join(certsDir, "service-ca"),
 		os.DirFS(filepath.Join(backupDir, "service-ca")),
 	); err != nil {
-		return fmt.Errorf("failed to restore service-ca after migration: %w", err)
+		return rollback(fmt.Errorf("failed to restore service-ca after migration: %w", err))
 	}
 	// os.CopyFS does not preserve file permissions; restrict the CA private key.
 	caKeyPath := filepath.Join(certsDir, "service-ca", "ca.key")
