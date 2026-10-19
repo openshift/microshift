@@ -265,7 +265,7 @@ github.com/golang/protobuf/proto
 # github.com/google/btree v1.1.3
 ## explicit; go 1.18
 github.com/google/btree
-# github.com/google/cadvisor/lib v0.60.5
+# github.com/google/cadvisor/lib v0.60.5 => github.com/openshift/google-cadvisor/lib v0.60.5-openshift-5.1-fix
 ## explicit; go 1.25.0
 github.com/google/cadvisor/lib/cache/memory
 github.com/google/cadvisor/lib/cadvisorflags
@@ -1608,4 +1608,5 @@ sigs.k8s.io/yaml/kyaml
 # tags.cncf.io/container-device-interface/specs-go v1.1.0
 ## explicit; go 1.19
 tags.cncf.io/container-device-interface/specs-go
+# github.com/google/cadvisor/lib => github.com/openshift/google-cadvisor/lib v0.60.5-openshift-5.1-fix
 # github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260807173042-3ac00363bb14

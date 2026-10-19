@@ -235,6 +235,7 @@ require (
 )
 
 replace (
+	github.com/google/cadvisor/lib => github.com/openshift/google-cadvisor/lib v0.60.5-openshift-5.1-fix
 	github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260807173042-3ac00363bb14
 	k8s.io/api => ./staging/src/k8s.io/api
 	k8s.io/apiextensions-apiserver => ./staging/src/k8s.io/apiextensions-apiserver
