@@ -213,17 +213,17 @@ func filterByExternalConnectivity(specs et.ExtensionTestSpecs) {
 func filterByTopology(specs et.ExtensionTestSpecs) {
 	topologyExclusions := map[string][]string{
 		"SingleReplica": {
-			"[sig-apps] Daemon set [Serial] should rollback without unnecessary restarts [Conformance]",
-			"[sig-node] NoExecuteTaintManager Single Pod [Serial] doesn't evict pod with tolerations from tainted nodes",
-			"[sig-node] NoExecuteTaintManager Single Pod [Serial] eventually evict pod with finite tolerations from tainted nodes",
-			"[sig-node] NoExecuteTaintManager Single Pod [Serial] evicts pods from tainted nodes",
-			"[sig-node] NoExecuteTaintManager Single Pod [Serial] removing taint cancels eviction [Disruptive] [Conformance]",
-			"[sig-node] NoExecuteTaintManager Single Pod [Serial] pods evicted from tainted nodes have pod disruption condition",
-			"[sig-node] NoExecuteTaintManager Multiple Pods [Serial] evicts pods with minTolerationSeconds [Disruptive] [Conformance]",
-			"[sig-node] NoExecuteTaintManager Multiple Pods [Serial] only evicts pods without tolerations from tainted nodes",
-			"[sig-cli] Kubectl client Kubectl taint [Serial] should remove all the taints with the same key off a node",
-			"[sig-network] LoadBalancers should be able to preserve UDP traffic when server pod cycles for a LoadBalancer service on different nodes",
-			"[sig-network] LoadBalancers should be able to preserve UDP traffic when server pod cycles for a LoadBalancer service on the same nodes",
+			"[sig-apps] Daemon set should rollback without unnecessary restarts [Conformance] [Serial]",
+			"[sig-node] NoExecuteTaintManager Single Pod doesn't evict pod with tolerations from tainted nodes [Serial]",
+			"[sig-node] NoExecuteTaintManager Single Pod eventually evict pod with finite tolerations from tainted nodes [Serial]",
+			"[sig-node] NoExecuteTaintManager Single Pod evicts pods from tainted nodes [Serial]",
+			"[sig-node] NoExecuteTaintManager Single Pod removing taint cancels eviction [Conformance] [Disruptive] [Serial]",
+			"[sig-node] NoExecuteTaintManager Single Pod pods evicted from tainted nodes have pod disruption condition [Serial]",
+			"[sig-node] NoExecuteTaintManager Multiple Pods evicts pods with minTolerationSeconds [Conformance] [Disruptive] [Serial]",
+			"[sig-node] NoExecuteTaintManager Multiple Pods only evicts pods without tolerations from tainted nodes [Serial]",
+			"[sig-cli] Kubectl client Kubectl taint should remove all the taints with the same key off a node [Serial]",
+			"[sig-network] LoadBalancers [Feature:LoadBalancer] should be able to preserve UDP traffic when server pod cycles for a LoadBalancer service on different nodes",
+			"[sig-network] LoadBalancers [Feature:LoadBalancer] should be able to preserve UDP traffic when server pod cycles for a LoadBalancer service on the same nodes",
 			"[sig-architecture] Conformance Tests should have at least two untainted nodes",
 		},
 	}

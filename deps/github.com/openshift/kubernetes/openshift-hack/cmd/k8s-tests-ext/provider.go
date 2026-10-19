@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
@@ -14,6 +15,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kclientset "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kubernetes/openshift-hack/e2e"
 	conformancetestdata "k8s.io/kubernetes/test/conformance/testdata"
@@ -88,7 +90,7 @@ func initializeCommonTestFramework() error {
 // Finish test context initialization. This is called before a real test is going to run.
 // It parses the cloud provider and file other parameters that are needed for running
 // already generated tests.
-func updateTestFrameworkForTests(provider string) error {
+func updateTestFrameworkForTests(ctx context.Context, provider string) error {
 	providerInfo := &ClusterConfiguration{}
 	if err := json.Unmarshal([]byte(provider), &providerInfo); err != nil {
 		return fmt.Errorf("provider must be a JSON object with the 'type' key at a minimum: %v", err)
@@ -123,21 +125,10 @@ func updateTestFrameworkForTests(provider string) error {
 	}
 	testContext.Host = cfg.Host
 
-	// Detect the cluster's primary IP family by checking the kubernetes.default service ClusterIP.
-	// This is the same approach used in upstream test/e2e/e2e.go's getDefaultClusterIPFamily().
 	// For dual-stack clusters, the primary IP family is determined by the ClusterIP of the kubernetes service.
-	testContext.IPFamily = "ipv4" // default
-	c, err := kclientset.NewForConfig(cfg)
+	testContext.IPFamily, err = probeClusterIPFamily(ctx, cfg, newKubernetesClientForConfig)
 	if err != nil {
-		return fmt.Errorf("failed to create kubernetes client: %v", err)
-	}
-	ctx := context.Background()
-	svc, err := c.CoreV1().Services("default").Get(ctx, "kubernetes", metav1.GetOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to get kubernetes.default service: %v", err)
-	}
-	if utilnet.IsIPv6String(svc.Spec.ClusterIP) {
-		testContext.IPFamily = "ipv6"
+		return err
 	}
 
 	// Ensure that Kube tests run privileged (like they do upstream)
@@ -162,6 +153,38 @@ func updateTestFrameworkForTests(provider string) error {
 	}
 
 	return nil
+}
+
+type kubernetesClientFactory func(*rest.Config) (kclientset.Interface, error)
+
+const clusterIPFamilyProbeTimeout = 30 * time.Second
+
+func newKubernetesClientForConfig(config *rest.Config) (kclientset.Interface, error) {
+	return kclientset.NewForConfig(config)
+}
+
+// probeClusterIPFamily detects the cluster's primary IP family using the same
+// approach as upstream test/e2e/e2e.go's getDefaultClusterIPFamily.
+func probeClusterIPFamily(ctx context.Context, config *rest.Config, newClient kubernetesClientFactory) (string, error) {
+	client, err := newClient(config)
+	if err != nil {
+		return "", fmt.Errorf("failed to create kubernetes client: %w", err)
+	}
+
+	lookupCtx, cancel := context.WithTimeout(ctx, clusterIPFamilyProbeTimeout)
+	defer cancel()
+	svc, err := client.CoreV1().Services(metav1.NamespaceDefault).Get(lookupCtx, "kubernetes", metav1.GetOptions{})
+	if err != nil {
+		return "", fmt.Errorf("failed to get kubernetes.default service: %w", err)
+	}
+
+	if utilnet.IsIPv6String(svc.Spec.ClusterIP) {
+		return "ipv6", nil
+	}
+	if utilnet.IsIPv4String(svc.Spec.ClusterIP) {
+		return "ipv4", nil
+	}
+	return "", fmt.Errorf("kubernetes.default service has invalid ClusterIP %q", svc.Spec.ClusterIP)
 }
 
 const (

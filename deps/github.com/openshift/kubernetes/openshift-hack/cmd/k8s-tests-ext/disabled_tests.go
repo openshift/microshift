@@ -177,13 +177,13 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 		// tests that need to be temporarily disabled while the rebase is in progress.
 		"RebaseInProgress": {
 			// https://issues.redhat.com/browse/OCPBUGS-61515
-			"[sig-scheduling] SchedulerPreemption [Serial] validates various priority Pods preempt expectedly with the async preemption [Feature:SchedulerAsyncPreemption] [FeatureGate:SchedulerAsyncPreemption] [Beta]",
+			"[sig-scheduling] SchedulerPreemption validates various priority Pods preempt expectedly with the async preemption [Feature:SchedulerAsyncPreemption] [FeatureGate:SchedulerAsyncPreemption] [Beta] [Serial]",
 
 			// https://issues.redhat.com/browse/OCPBUGS-61378
 			"[sig-network] Conntrack should be able to cleanup conntrack entries when UDP service target port changes for a NodePort service",
 
 			// https://redhat.atlassian.net/browse/OCPBUGS-64847
-			"[sig-node] [Serial] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-2",
+			"[sig-node] Pod InPlace Resize Container (deferred-resizes) [FeatureGate:InPlacePodVerticalScaling] pod-resize-retry-deferred-test-2 [Serial]",
 		},
 		// tests that may work, but we don't support them
 		"Unsupported": {
@@ -194,10 +194,10 @@ func filterOutDisabledSpecs(specs et.ExtensionTestSpecs) et.ExtensionTestSpecs {
 			"GlusterDynamicProvisioner", // OpenShift 4.x does not support Gluster
 
 			// Also, our CI doesn't support topology, so disable those tests
-			"[sig-storage] In-tree Volumes [Driver: vsphere] [Testpattern: Dynamic PV (delayed binding)] topology should fail to schedule a pod which has topologies that conflict with AllowedTopologies",
-			"[sig-storage] In-tree Volumes [Driver: vsphere] [Testpattern: Dynamic PV (delayed binding)] topology should provision a volume and schedule a pod with AllowedTopologies",
-			"[sig-storage] In-tree Volumes [Driver: vsphere] [Testpattern: Dynamic PV (immediate binding)] topology should fail to schedule a pod which has topologies that conflict with AllowedTopologies",
-			"[sig-storage] In-tree Volumes [Driver: vsphere] [Testpattern: Dynamic PV (immediate binding)] topology should provision a volume and schedule a pod with AllowedTopologies",
+			"[sig-storage] In-tree Volumes [Driver: vsphere] [Provider:vsphere] [Testpattern: Dynamic PV (delayed binding)] topology should fail to schedule a pod which has topologies that conflict with AllowedTopologies",
+			"[sig-storage] In-tree Volumes [Driver: vsphere] [Provider:vsphere] [Testpattern: Dynamic PV (delayed binding)] topology should provision a volume and schedule a pod with AllowedTopologies",
+			"[sig-storage] In-tree Volumes [Driver: vsphere] [Provider:vsphere] [Testpattern: Dynamic PV (immediate binding)] topology should fail to schedule a pod which has topologies that conflict with AllowedTopologies",
+			"[sig-storage] In-tree Volumes [Driver: vsphere] [Provider:vsphere] [Testpattern: Dynamic PV (immediate binding)] topology should provision a volume and schedule a pod with AllowedTopologies",
 
 			// May become conformance in 4.22+, will need to revisit per https://issues.redhat.com/browse/OCPBUGS-61380
 			"[sig-network] Services should support named targetPorts that resolve to different ports on different endpoints",
