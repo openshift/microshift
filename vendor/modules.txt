@@ -796,7 +796,7 @@ github.com/openshift/library-go/pkg/route/validation
 github.com/openshift/library-go/pkg/security/ldaputil
 github.com/openshift/library-go/pkg/security/uid
 github.com/openshift/library-go/pkg/serviceability
-# github.com/openshift/route-controller-manager v0.0.0-20260519230436-55f77ca4cf03
+# github.com/openshift/route-controller-manager v0.0.0-20261016220149-c2021f0df34b
 ## explicit; go 1.25.0
 github.com/openshift/route-controller-manager/pkg/cmd/controller
 github.com/openshift/route-controller-manager/pkg/cmd/route-controller-manager
@@ -3252,7 +3252,7 @@ sigs.k8s.io/json/internal/golang/encoding/json
 # sigs.k8s.io/knftables v0.0.21
 ## explicit; go 1.20
 sigs.k8s.io/knftables
-# sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96 => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260914143516-5f86c7d2bace
+# sigs.k8s.io/kube-storage-version-migrator v0.0.6-0.20230721195810-5c8923c5ff96 => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20261016193955-a67afb9b9fea
 ## explicit; go 1.24.0
 sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1
 sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset
@@ -3360,7 +3360,7 @@ sigs.k8s.io/yaml/kyaml
 # github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20251120221002-696928a6a0d7
 # k8s.io/klog/v2 => ./deps/k8s.io/klog
 # k8s.io/kubernetes => ./deps/github.com/openshift/kubernetes
-# sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20260914143516-5f86c7d2bace
+# sigs.k8s.io/kube-storage-version-migrator => github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20261016193955-a67afb9b9fea
 # k8s.io/api => ./deps/github.com/openshift/kubernetes/staging/src/k8s.io/api
 # k8s.io/apiextensions-apiserver => ./deps/github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver
 # k8s.io/apimachinery => ./deps/github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery
