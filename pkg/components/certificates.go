@@ -90,6 +90,41 @@ func applyDaemonSetsWithCertificates(ctx context.Context, apps []string, params 
 	return assets.ApplyDaemonSets(ctx, apps, renderTemplate, params, kubeconfigPath, annotations)
 }
 
+func ovnCertificateRolloutRequired(ctx context.Context, client kubernetes.Interface, generation string, multiNode bool) (bool, error) {
+	names := []string{"ovnkube-master"}
+	if multiNode {
+		names = append(names, "ovnkube-node")
+	}
+	for _, name := range names {
+		ds, err := client.AppsV1().DaemonSets("openshift-ovn-kubernetes").Get(ctx, name, metav1.GetOptions{})
+		if apierrors.IsNotFound(err) {
+			continue // Initial bootstrap has no old credentials to replace.
+		}
+		if err != nil {
+			return false, err
+		}
+		if ds.Spec.Template.Annotations[certificateGenerationAnnotation] != generation {
+			return true, nil
+		}
+		// A previous startup may have updated the template but exited before
+		// replacing all pods. Check credentials, not general pod readiness.
+		selector, err := metav1.LabelSelectorAsSelector(ds.Spec.Selector)
+		if err != nil {
+			return false, err
+		}
+		pods, err := client.CoreV1().Pods(ds.Namespace).List(ctx, metav1.ListOptions{LabelSelector: selector.String()})
+		if err != nil {
+			return false, err
+		}
+		for _, pod := range pods.Items {
+			if metav1.IsControlledBy(&pod, ds) && pod.Annotations[certificateGenerationAnnotation] != generation {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
 func waitForOVNCertificateRollout(ctx context.Context, client kubernetes.Interface) error {
 	klog.Info("Waiting for OVN pod rollout before starting API-dependent components")
 	err := wait.PollUntilContextTimeout(ctx, time.Second, 2*time.Minute, true, func(ctx context.Context) (bool, error) {
