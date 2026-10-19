@@ -15,6 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/fake"
 	clienttesting "k8s.io/client-go/testing"
 )
@@ -115,6 +116,75 @@ func TestDaemonSetRolledOut(t *testing.T) {
 			tc.change(ds)
 			if daemonSetRolledOut(ds) {
 				t.Fatal("incomplete rollout reported ready")
+			}
+		})
+	}
+}
+
+func TestOVNCertificateRolloutRequired(t *testing.T) {
+	daemonSet := func(name, generation string) *appsv1.DaemonSet {
+		return &appsv1.DaemonSet{
+			ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "openshift-ovn-kubernetes", UID: types.UID(name)},
+			Spec: appsv1.DaemonSetSpec{
+				Selector: &metav1.LabelSelector{MatchLabels: map[string]string{"app": name}},
+				Template: corev1.PodTemplateSpec{ObjectMeta: metav1.ObjectMeta{
+					Annotations: map[string]string{certificateGenerationAnnotation: generation},
+				}},
+			},
+		}
+	}
+	pod := func(ds *appsv1.DaemonSet, generation string) *corev1.Pod {
+		return &corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+			Name: ds.Name + "-pod", Namespace: ds.Namespace,
+			Labels:          ds.Spec.Selector.MatchLabels,
+			Annotations:     map[string]string{certificateGenerationAnnotation: generation},
+			OwnerReferences: []metav1.OwnerReference{*metav1.NewControllerRef(ds, appsv1.SchemeGroupVersion.WithKind("DaemonSet"))},
+		}}
+	}
+	master := daemonSet("ovnkube-master", "current")
+	node := daemonSet("ovnkube-node", "current")
+	unownedPod := pod(master, "old")
+	unownedPod.OwnerReferences = nil
+	for _, tc := range []struct {
+		name      string
+		objects   []runtime.Object
+		multiNode bool
+		wantWait  bool
+	}{
+		{name: "initial bootstrap"},
+		{name: "unchanged certificates without pods", objects: []runtime.Object{master}},
+		{name: "unchanged certificates with unready pods", objects: []runtime.Object{master, pod(master, "current")}},
+		{name: "changed master certificates", objects: []runtime.Object{daemonSet(master.Name, "old")}, wantWait: true},
+		{name: "existing unannotated template", objects: []runtime.Object{daemonSet(master.Name, "")}, wantWait: true},
+		{name: "interrupted master rollout", objects: []runtime.Object{master, pod(master, "old")}, wantWait: true},
+		{name: "existing unannotated pod", objects: []runtime.Object{master, pod(master, "")}, wantWait: true},
+		{name: "unowned stale pod", objects: []runtime.Object{master, unownedPod}},
+		{name: "single node ignores node credentials", objects: []runtime.Object{master, daemonSet(node.Name, "old")}},
+		{name: "multi node unchanged certificates", objects: []runtime.Object{master, node, pod(node, "current")}, multiNode: true},
+		{name: "multi node changed node certificates", objects: []runtime.Object{master, daemonSet(node.Name, "old")}, multiNode: true, wantWait: true},
+		{name: "multi node interrupted node rollout", objects: []runtime.Object{master, node, pod(node, "old")}, multiNode: true, wantWait: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			client := fake.NewClientset(tc.objects...)
+			got, err := ovnCertificateRolloutRequired(context.Background(), client, "current", tc.multiNode)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got != tc.wantWait {
+				t.Fatalf("wait for certificate rollout = %t, want %t", got, tc.wantWait)
+			}
+		})
+	}
+	for _, resource := range []string{"daemonsets", "pods"} {
+		t.Run(resource+" API error", func(t *testing.T) {
+			client := fake.NewClientset(master)
+			apiError := errors.New("API unavailable")
+			client.PrependReactor("*", resource, func(clienttesting.Action) (bool, runtime.Object, error) {
+				return true, nil, apiError
+			})
+			_, err := ovnCertificateRolloutRequired(context.Background(), client, "current", false)
+			if !errors.Is(err, apiError) {
+				t.Fatalf("expected API error, got %v", err)
 			}
 		})
 	}

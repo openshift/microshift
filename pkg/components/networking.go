@@ -15,8 +15,6 @@ import (
 	"github.com/openshift/microshift/pkg/util"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	"github.com/vishvananda/netlink"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 )
 
@@ -133,27 +131,30 @@ func applyOVNDaemonSets(ctx context.Context, apps []string, params assets.Render
 	if err != nil {
 		return err
 	}
-	_, err = client.AppsV1().DaemonSets("openshift-ovn-kubernetes").Get(ctx, "ovnkube-master", metav1.GetOptions{})
-	if err != nil && !apierrors.IsNotFound(err) {
+	adminCertificate := cryptomaterial.ClientCertPath(cryptomaterial.AdminKubeconfigClientCertDir(cryptomaterial.CertsDirectory(config.DataDir)))
+	annotations, err := certificatePodAnnotations(ctx, kubeconfigPath, "openshift-ovn-kubernetes", adminCertificate)
+	if err != nil {
 		return err
 	}
-	waitForRollout := err == nil
-	adminCertificate := cryptomaterial.ClientCertPath(cryptomaterial.AdminKubeconfigClientCertDir(cryptomaterial.CertsDirectory(config.DataDir)))
-	if err := applyDaemonSetsWithCertificates(ctx, apps[:1], params, kubeconfigPath, "openshift-ovn-kubernetes", adminCertificate); err != nil {
+	waitForRollout, err := ovnCertificateRolloutRequired(ctx, client, annotations[certificateGenerationAnnotation], multiNode)
+	if err != nil {
+		return err
+	}
+	if err := assets.ApplyDaemonSets(ctx, apps[:1], renderTemplate, params, kubeconfigPath, annotations); err != nil {
 		klog.Warningf("Failed to apply apps %v %v", apps, err)
 		return err
 	}
 	// Single-node ovn-controller uses local OVSDB sockets, not API credentials.
 	// The multi-node node agent also consumes Kubernetes API credentials.
 	if multiNode {
-		if err := applyDaemonSetsWithCertificates(ctx, apps[1:], params, kubeconfigPath, "openshift-ovn-kubernetes", adminCertificate); err != nil {
+		if err := assets.ApplyDaemonSets(ctx, apps[1:], renderTemplate, params, kubeconfigPath, annotations); err != nil {
 			return err
 		}
 	} else if err := assets.ApplyDaemonSets(ctx, apps[1:], renderTemplate, params, kubeconfigPath, nil); err != nil {
 		return err
 	}
-	// Do not extend initial bootstrap to include image pulls. On subsequent
-	// starts give OVN time to pick up credentials before replacing its clients.
+	// Only wait when OVN needs to pick up changed credentials. Ordinary startup
+	// and backup recovery must not wait for unrelated pod readiness problems.
 	if waitForRollout {
 		if err := waitForOVNCertificateRollout(ctx, client); err != nil {
 			// A slow pod rollout must not cause a MicroShift restart loop. The

@@ -152,9 +152,12 @@ CA Renewal Updates The Whole Chain
     Certificate Consumers Use Renewed Material    ${pods_before}    ${True}
 
 Unchanged Certificates Do Not Restart Managed Pods
-    [Documentation]    Reapplying managed manifests must preserve the certificate generation across ordinary starts.
+    [Documentation]    Ordinary starts preserve certificate generations and do not wait for a certificate rollout.
     ${before}=    Certificate Consumer Pod UIDs
     Restart MicroShift
+    ${logs}=    Command Should Work
+    ...    journalctl -u microshift --no-pager _SYSTEMD_INVOCATION_ID="$(systemctl show -p InvocationID --value microshift)"
+    Should Not Contain    ${logs}    Waiting for OVN pod rollout
     Certificate Consumers Have Not Restarted    ${before}
     Certificate Consumers Can Reach The API
 
