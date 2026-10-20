@@ -1,17 +1,3 @@
-- api embedded-component 0b9ac96a7763d55f50670f0f2484d932cfd0ec39 to 70586205d5fa77e2a47a0373d1ea712c9a3e0b6a
-  - cac9e1af 2026-10-12T17:14:18-04:00 fix payload CRD verification with pipefail
-  - 8f2b7059 2026-10-12T17:09:36-04:00 enable DRADeviceTaintRules feature gate in TPNU/DevPreview
-
-- kubernetes-kube-storage-version-migrator embedded-component 236d1d76ab05fe757b53e722d10a0a920c1d49fd to 87fa52c72bb3245c90ba1dc3b0e3c02224c6b27b
-  - 699af0e 2026-10-14T08:25:17-05:00 UPSTREAM: <drop>: vendor
-  - 630d196 2026-10-14T08:25:17-05:00 UPSTREAM: <carry>: [release-5.0] OCPBUGS-104371: Bump golang.org/x/net to v0.55.0 to address CVE-2026-33814
-
-- machine-config-operator embedded-component 41e607f33cb8bc13228789905550b9401b594d1f to 1413b762f9413a5ea99d8c8c941220ae2dea6b5b
-  - b3f2bf14 2026-10-14T03:07:12Z test: update cleanup for PolarionID:84219 to wait for node to be removed
-
-- ovn-kubernetes image-amd64 42d40a0557e403ca93f7ae90b63dd3827c513f0b to 4e410990a3440be5b727f9314d6f376450c0c2cd
-  - 0a523185 2026-10-14T17:26:22+02:00 node: prioritize default network before primary UDN fan-out
-
-- ovn-kubernetes image-arm64 42d40a0557e403ca93f7ae90b63dd3827c513f0b to 4e410990a3440be5b727f9314d6f376450c0c2cd
-  - 0a523185 2026-10-14T17:26:22+02:00 node: prioritize default network before primary UDN fan-out
+- machine-config-operator embedded-component 1413b762f9413a5ea99d8c8c941220ae2dea6b5b to ddd94381334d055ed8cbbac3355fa405a8b17743
+  - ee9a70f0 2026-10-16T09:42:57-04:00 tests: bump timeout for ImagePulledFromRegistry=Unknown transition
 
