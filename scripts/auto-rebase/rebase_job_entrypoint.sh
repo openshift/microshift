@@ -83,11 +83,6 @@ ARM64_RELEASE=${PULLSPEC_RELEASE_ARM64} \
 RHOAI_RELEASE=${rhoai_release} \
 ./scripts/auto-rebase/rebase.py
 
-# LVMS is not tracked in the OCP release image. Instead, rely on the
-# latest z-stream for a given X.Y version. Only the X.Y needs manual
-# updating between releases.
-./scripts/auto-rebase/rebase_lvms.sh latest "registry.redhat.io/lvms4/lvms-operator-bundle" "4.19"
-
 if [[ "${JOB_TYPE}" == "presubmit" ]]; then
     # Verify the assets after the rebase to make sure
     # nightly job will not fail on assets verification.
