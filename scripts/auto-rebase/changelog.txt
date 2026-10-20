@@ -1,233 +1,66 @@
-- api embedded-component f8795cdde518111fddb944aa6118f93ebb632381 to 24b2699a9b327b3ab54962520e809745f8adf96c
-  - c7ac841c 2026-10-16T21:25:39Z Revert "Merge pull request #3102 from sairameshv/was"
-  - 0b0aada8 2026-10-15T12:34:30+05:30 OCPNODE-4730: Enable workload scheduling feature gates in Dev/TechPreview
-  - a7040714 2026-10-13T09:23:35-04:00 Remove topology transition immutability validation
-  - 9a86f4fa 2026-10-13T11:40:25+02:00 authentication: AuthenticationConfiguration: Add trustedCAFilePath
-  - 13b0c31d 2026-10-13T13:12:39+05:30 Register workload scheduling feature gates without enabling them
-  - 645614a0 2026-10-13T12:57:53+05:30 OCPNODE-4730: Add workload scheduling feature gates
-  - e478338d 2026-10-12T12:12:32-04:00 OCPEDGE-2989: Document topology transition values
-  - cd14a537 2026-10-09T14:46:18+02:00 operator/v1: Add Console.Spec.AuthProxy
-  - f60f43f6 2026-10-09T11:32:01+02:00 Add AuthenticationComponentProxyExternalOIDC feature gate
-  - 7650b96b 2026-10-09T05:36:00Z fix(api): restore ingress v1 payload promotion
-  - 232d4578 2026-10-08T16:19:22+02:00 feat: add spec.infrastructureTopology to Infrastructure API
-  - fe592ec9 2026-10-07T18:35:40Z fix(api): defer ingress v1 payload promotion
-  - 891b8418 2026-10-07T15:03:57+02:00 NO-JIRA: change KMS preflight result validation
-  - f2449fdd 2026-10-07T13:09:06+02:00 machineconfiguration/v1alpha1: add BGPVIPConfig CRD
-  - 63885597 2026-10-07T12:37:38+02:00 chore(envtest): add Kubernetes v1.37.1 tools release
-  - 5112a65d 2026-10-07T12:37:38+02:00 fix(tools): default publisher pull secret and select Quay payload
-  - b13284a1 2026-10-07T12:37:38+02:00 feat(publish-kubebuilder-tools): support Quay CI payloads and verify versions
-  - eff95936 2026-10-07T12:25:22+02:00 test(publish-kubebuilder-tools): cover legacy publishing behavior
-  - aefec85e 2026-10-06T13:42:57-04:00 Add +kubebuilder:validation:MinProperties=1 to TopologyTransitionStatus
-  - 44064020 2026-10-06T13:10:56-04:00 enable DRADeviceTaintRules feature gate in TPNU/DevPreview
-  - dece4ed2 2026-10-06T16:36:29Z payload: handle omitted CustomNoUpgrade feature gates
-  - b0e0f75b 2026-10-06T16:17:51Z fix(api): address ingress v1 review feedback
-  - 782a871d 2026-10-06T15:09:42Z Promote Ingress operator API to v1
-  - c88be9cc 2026-10-05T22:38:34-04:00 OCPEDGE-2989: Add topology transition status to Infrastructure
-  - b4c655db 2026-10-05T13:00:34-04:00 mco: loosen capi skew validations
-  - c45f32df 2026-10-05T16:54:43+02:00 feat(AuthenticationComponentProxy): promoting feature gate to Default feature set
-  - 9b3772ec 2026-10-05T10:15:26Z docs(operator): document HAProxy version lifecycle
-  - 1c6829e4 2026-10-02T17:15:16-06:00 STOR-2859: rework forceDetachOnTimeout field into volumeForceDetach enum
-  - cdbb851e 2026-10-02T13:39:58-06:00 STOR-2859: drop DisableForceDetachOnTimeout field-level feature gate
-  - 1d6379e9 2026-10-01T15:32:40-06:00 STOR-2859: Add APIs for disabling force detach in KCM operator
-  - 505a3f0e 2026-09-30T20:03:31Z Rename console ingress helper type
-  - 8f55fa66 2026-09-30T13:54:49Z feat(operator): add HAProxy 3.4 version option
+- csi-external-snapshotter image-arm64 a019d1a9d9e1d26ffd0b2e0d911733180fa608b2 to a570de6a368dab9532e540d7f1ce10c3b03c6d1a
+  - 8f2c6ee 2026-10-14T14:40:31+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - d57944f 2026-10-12T13:38:26-04:00 Add changelog to release-8.7 branch
+  - 9c43be8 2026-10-11T09:07:12Z Squashed 'release-tools/' changes from 7c58653f..7bacb813
+  - e4e4f5a 2026-10-09T11:12:03-04:00 feat: add regression test
+  - 278e31b 2026-10-09T11:12:03-04:00 fix: shutdown broadcaster when Run returns
+  - 756a409 2026-10-08T22:53:07-04:00 Fix unit test after updating deps
+  - 822794c 2026-10-08T22:04:33-04:00 Update K8s deps to 1.37
+  - 73c720a 2026-10-08T21:57:31-04:00 Update deps
+  - f956292 2026-10-08T21:47:46-04:00 Ignore sidecar-owned VolumeGroupSnapshotContent updates to honor requeue backoff
+  - 01dc519 2026-08-20T13:49:06-04:00 Enable VGS feature gate
+  - 4799cee 2026-08-14T09:37:58Z fix: data race in scheduleOpsInFlightMetric
+  - 121c2a2 2026-08-14T09:07:51Z Squashed 'release-tools/' changes from 3472c3ffc..7c58653f2
+  - 47f0b3d 2026-08-11T11:50:06Z fix: GHSA-hrxh-6v49-42gf
+  - 12d5cbf 2026-08-11T09:27:32Z Squashed 'release-tools/' changes from 34632b81..3472c3ff
+  - 280ec96 2026-08-04T17:54:31-04:00 Requeue VolumeGroupSnapshotContent with backoff when not ready to use
+  - 72fcb26 2026-07-28T15:23:41+02:00 Skip NotFound errors when deleting snapshot content objects
+  - 9b03820 2026-07-16T11:22:43Z Bump actions/setup-go from 6.5.0 to 7.0.0
+  - 4dce899 2026-07-15T14:57:09Z Bump the github-dependencies group across 1 directory with 26 updates
+  - 7ed8205 2026-07-09T16:29:16+05:30 Squashed 'release-tools/' changes from 0d7d9d495..34632b812
+  - 32e3774 2026-07-06T11:24:03Z Bump github.com/go-openapi/swag/jsonname from 0.26.1 to 0.27.0
+  - e31226c 2026-06-29T14:00:27Z Bump the k8s-dependencies group across 1 directory with 7 updates
+  - 41694a5 2026-06-29T11:23:32Z Bump the github-dependencies group across 1 directory with 10 updates
+  - 6a31dcb 2026-06-24T11:22:42Z Bump actions/setup-go from 6.4.0 to 6.5.0
+  - 8dc7e07 2026-06-19T11:22:25Z Bump actions/checkout from 6.0.2 to 7.0.0
+  - 1d996ef 2026-06-09T14:13:02+05:30 deploy: update sidecar image versions
+  - a7b6be6 2026-06-09T03:36:49Z Squashed 'release-tools/' changes from 31186bf0a..0d7d9d495
+  - e5b78e7 2026-06-08T11:24:28Z Bump the github-dependencies group across 1 directory with 28 updates
+  - 43d4672 2026-06-08T11:23:00Z Bump sigs.k8s.io/apiserver-network-proxy/konnectivity-client
+  - 9519baf 2026-05-28T17:16:23-04:00 Update deps in client
 
-- cluster-csi-snapshot-controller-operator embedded-component 19c0d080de213d3c3760d7bad469e7b873bb4656 to 41e9a6ccf361de2b37c0e91c2e03fb7fec31a634
-  - 5ea1a82 2026-10-13T16:04:48+02:00 Bump all libraries
-
-- cluster-dns-operator embedded-component c480e21c16d3383a7c09752f8dea61743c765cfa to 9d18bdd71092bd9eaad426c6ec42b719c3a992e9
-  - 9497da0b 2026-10-15T17:35:58+05:30 NE-2126: Ship tests-ext binary as raw gzip instead of tar.gz
-  - 5b6c3b4f 2026-10-09T14:29:06-04:00 OCPBUGS-87970: Stop using legacy topology-aware hints for DNS
-  - 64b2fc7c 2026-10-01T23:46:19+05:30 NE-2126: Migrating DNS test cases from QE repo
-  - 6c294218 2026-09-17T14:15:12Z Add pedjak to OWNERS
-  - 90ae65cf 2026-09-08T09:09:23-04:00 Update code reference to use the default branch name 'main'
-
-- cluster-ingress-operator embedded-component 6fc0402022e307f5108db2281cfad8a22423febf to 45007ca6932ce7159ee5120084bde0a4d33c4b83
-  - e8f39bb9 2026-10-15T12:38:40Z TRT-3022: Revert #1556 "NE-2126: Migrating Ingress operator test cases from QE repo"
-  - 4fad0539 2026-10-11T23:35:10+05:30 NE-2126: Migrating Ingress operator test cases from QE repo
-  - c518a8a0 2026-10-09T17:46:29+02:00 OCPBUGS-129612: Rebuild fake DNS provider when DNS zones are added
-  - 89a973fe 2026-10-08T15:46:36-04:00 Update sail-rbac with latest istio versions
-  - 7138b312 2026-10-08T15:13:30-04:00 Bump to ossm 3.4.3 and Istio v1.30.5 for TLS fixes
-  - 5974df13 2026-10-08T12:36:56Z fix: handle generated CRD verifier output errors
-  - 3b698228 2026-10-08T11:59:04Z Remove duplicate operator Ingress CRD
-  - b5a6aec9 2026-10-07T19:53:02-04:00 OCPBUGS-126999: Support ambient AWS credentials in tests
-  - d3dd057f 2026-09-29T14:21:58Z OCPBUGS-105442: improve Sail RBAC verification
-  - 13b896b0 2026-09-03T14:58:39Z NE-2879: Update issue template links
-  - 866fcaa5 2026-07-30T03:08:13Z Replace deprecated math/rand.Read in e2e test
-
-- cluster-kube-apiserver-operator embedded-component 3a666f500e5df49b63f5eecd3b9ccd21a5d1e69b to 5f22e9c7b00f1cd914e9938ef56899684ee8ac5a
-  - bcc2467 2026-10-16T10:03:49+03:00 Update library-go
-  - 9198a5a 2026-10-15T12:48:43+05:30 Remove KMS encryption rotation placeholder
-  - 6bcf124 2026-10-15T12:48:42+05:30 Add KMS encryption rotation e2e
-  - fe40b5d 2026-10-15T12:48:20+05:30 Add KMS preflight lifecycle e2e
-  - 293977f 2026-10-15T12:48:08+05:30 Bump library-go
-  - 54d4926 2026-10-14T19:27:19+02:00 NO-JIRA: Update library-go
-  - 2c1e4a8 2026-10-14T09:05:03+03:00 Update library-go
-  - 7dff28d 2026-10-14T00:08:19Z Revert "Use 300s shutdown delay on AWS"
-  - c2d1181 2026-10-09T09:33:38+05:30 bump openshift/api
-  - 53e80b5 2026-10-08T14:44:33+05:30 bump library-go
-  - 1d59b07 2026-10-07T13:02:00+02:00 Update deprecated API usage alerts for Kubernetes 1.37
-  - a7c92c2 2026-10-06T16:49:32+05:30 Enable workload API versions for feature gates
-  - af56b83 2026-10-02T15:23:42+02:00 configobservation/auth: support the ExternalOIDCAsWebhook gate
-  - 8a4c30a 2026-08-26T11:02:21-07:00 Use 300s shutdown delay on AWS
-
-- cluster-network-operator embedded-component b89004c72b55bafa206902e7a838b98ac5710249 to fc66cef8b3724a5d724fc8f8d9ef5c7bac755916
-  - d853701 2026-10-07T08:25:23+05:30 multus: Refresh ignored namespaces on namespace changes
-  - b8d2407 2026-10-05T16:16:28+02:00 network: BGP VIP peer port and bare-seconds timer contract
-  - 2e58e92 2026-10-05T16:16:13+02:00 network: metrics for the frr-k8s static pods
-  - 4681108 2026-10-05T16:16:13+02:00 network: RBAC for the frr-k8s static pod node credentials
-  - 6bdac06 2026-10-05T16:16:13+02:00 network: frr-k8s DaemonSet avoids control plane nodes under BGP VIP management
-  - 572395b 2026-10-05T16:16:13+02:00 network: render FRRConfiguration for BGP-based VIP management
-  - 0fd83e6 2026-02-10T11:25:32+01:00 Added global overrides for OVN-Kubernetes
-
-- kubernetes embedded-component 421570e76c5fd58e26ca93b4bef504d9378ccdcf to 8e30e543958ab5d408a337a5957663e5fd9aea12
-  - affac48c6 2026-10-15T01:29:51Z UPSTREAM: <carry>: Fix disabled test exclusions
-  - 937e849a2 2026-10-15T01:29:51Z UPSTREAM: <carry>: Fix SingleReplica test exclusions
-  - 7494188a1 2026-10-13T16:22:50-04:00 UPSTREAM: <carry>: Fix disabled tests for newer test names
-  - a64fb32a2 2026-10-13T16:02:11Z UPSTREAM: <carry>: Remove added vSphere topology unit tests
-  - 1c20d1ff3 2026-10-12T12:32:00-05:00 UPSTREAM: <carry>: bump cadvisor for statseq fix
-  - e2cc52bed 2026-10-10T14:32:28Z UPSTREAM: <carry>: Fix vSphere topology test exclusions
-  - f3172ad60 2026-10-08T22:07:59Z UPSTREAM: <carry>: OCPBUGS-128829: Handle k8s-tests-ext IP family probe failures
-  - 0a248aa8d 2026-10-07T17:22:07-07:00 UPSTREAM: <carry>: Daemonset test has changed names -> needs corrected env selector
-  - 64c65ff98 2026-10-06T13:17:17-04:00 UPSTREAM: 141662: deflake pod resize deferred tests
-  - ec761b985 2026-10-02T13:50:09-04:00 UPSTREAM: 142106: e2e: check pod resized in WaitForPodResizeActuation
-
-- kubernetes-kube-storage-version-migrator embedded-component 3f74baced64e1be5ec9ca16e3a682cd4eca67c06 to c67b43a2519e63f02e4be27ae6c8d4edcbc75950
-  - 184f976 2026-10-02T16:57:27Z UPSTREAM: <carry>: [release-5.1] OCPBUGS-126583: Bump golang.org/x/net to v0.55.0 to address CVE-2026-33814
-  - af8c94c 2026-10-02T16:55:55Z UPSTREAM: <carry>: Bump Go builder and CI images from 1.24 to 1.26 for openshift-5.1
-
-- machine-config-operator embedded-component 6920eccea9ab97b58d4b1bf13ffda95e08aefb47 to 64f25ad7893fe24b5774235375f9d03c5a46d36f
-  - 90816030 2026-10-15T13:27:19Z OCPBUGS-131830: stabilise TestAPIServerCiphers unit test
-  - 1398c266 2026-10-14T15:18:24+02:00 MCO-2475: Removed redundant json check
-  - 039cc07b 2026-10-13T17:42:17+02:00 MCO-2475: applied code review suggestions
-  - 17533e4f 2026-10-13T08:46:15-04:00 test: update cleanup for PolarionID:84219 to wait for node to be removed
-  - e87cc93b 2026-10-13T07:45:19Z Only checking that the release is in the official repo should be enough to know if it is signed
-  - ab0e8f95 2026-10-13T07:45:14Z OCPBUGS-128286: only enable signed policy when testing signed payloads
-  - b6df957d 2026-10-12T22:18:36+02:00 OCPBUGS-130604: test/extended: accept the data/by-lun Azure disk path
-  - 8c6e2b45 2026-10-12T10:39:23-04:00 OCPBUGS-99751: Verify MOSC existence via API before serving layered image
-  - 6d8e33f2 2026-10-12T11:38:48+02:00 MCO-2475: Simplified the Irreconcilable Differences test to only fetch Ignition contents
-  - 621c7fed 2026-10-09T17:27:13Z MCO: use component-scoped vSphere credentials for boot image updates
-  - 7d4ebf4e 2026-10-07T14:21:13-04:00 Remove reverse (rhel10 to rhel9) OSStreams upgrade tests
-  - fa298079 2026-10-06T14:22:35-04:00 packages: bump version of google.golang.org/grpc
-  - b1dc9006 2026-10-06T09:46:04-05:00 MCD: Fix OCL rollback failure when extensions are installed
-  - 8c4b356a 2026-10-06T16:19:52+02:00 OCPBUGS-128457: Fix layered OS updates on older nodes
-  - e21010f6 2026-10-06T09:46:51-04:00 bootimage: skip GCP reconcile for unknown arch
-  - 6c693d31 2026-10-06T11:04:34Z Fix review comments
-  - 634218a2 2026-10-05T15:28:39-04:00 bootimage: logout vCenter clients after use
-  - ca7d1b76 2026-10-02T11:35:57-04:00 Use BaseDomain already fetched by getImageRegistryPullSecrets
-  - 9aedb350 2026-10-02T08:58:30-04:00 Handle deletion of the IRI Secret
-  - 1acf9a50 2026-10-02T08:58:30-04:00 Addressing code review comments
-  - a6c1e8ee 2026-10-02T08:58:30-04:00 Reducing failues due to timing issues during unit tests
-  - ec9cf5b2 2026-10-02T08:58:30-04:00 Optional: Re-organize IRI methods outside the template controller
-  - 7e1e618d 2026-10-02T08:58:30-04:00 OCPBUGS-85519: Add Agent IRI credentials to global pull secret
-  - ef0c19b0 2026-10-02T10:23:45Z MCO-2522: Adapt all extended e2e test cases to use the ManagedMachineResource
-  - 02d80cc4 2026-09-30T16:30:16-04:00 Revert "OCPBUGS-91746: Remove sandboxed-containers (kata-containers) from extended-priv tests"
-  - 48f622bc 2026-09-28T08:32:12-04:00 AGENT-1454: Wait for the master pool to settle in the IRI TLS e2e test
-  - e24546dc 2026-09-25T16:06:44-04:00 AGENT-1454: Requeue the IRI sync when APIServer/cluster is deleted
-  - a2f532fe 2026-09-25T15:39:49-04:00 AGENT-1454: Wait for the full end state in the IRI TLS e2e test
-  - 604b3883 2026-09-25T15:23:55-04:00 AGENT-1454: Set the TLS profile sub-struct in the IRI e2e test
-  - ab3243c8 2026-09-25T12:36:22-04:00 AGENT-1454: Normalize the TLS profile in the IRI e2e test
-  - 89dcde25 2026-09-25T12:14:00-04:00 AGENT-1454: Render only TLS values the IRI registry accepts
-  - f90c605a 2026-09-25T10:51:54-04:00 AGENT-1454: Enforce APIServer TLS profile on IRI registry
-  - 209a70ab 2026-09-21T15:45:23-04:00 machine-config-operator: enable readOnlyRootFilesystem for container
-  - 2e33c38f 2026-09-09T10:12:31-05:00 MCD: Make RHEL binary version selection dynamic and future-proof
-  - c9114220 2026-09-08T12:19:42-05:00 MCD: Make NIC name persistence unconditional for all RHEL versions
-
-- openshift-controller-manager embedded-component 5235418de7c86e6fae1004f84e55a2fbc1d3ac1c to 72964318318f2a65e66b766a288b2241e6a6c51e
-  - c2d71e1 2026-10-06T15:06:01+02:00 bump(k8s.io): 1.37.1
-
-- oc image-amd64 0bdef3b8f60b5122e7a5488e86c654172729d225 to 586088c46cba2cd87e1a128a304fe484cf678cd5
-  - 76f4530b 2026-10-15T14:30:37-04:00 Add DS_Store to gitignore file
-  - 758dbfa9 2026-10-13T08:14:56Z OCPBUGS-84974: Show all machine-os versions in release info for dual-stream payloads (#2406)
-  - 21c51a1d 2026-10-08T15:21:15+02:00 fix(set volumes): mention configmap in invalid volume type error
-
-- router image-amd64 6c5868c9670b2fa17e30f9416fe5de1156198d22 to 01bee8da2387d0cfbd7a1acd934bb92a8c320527
-  - cd87049 2026-09-17T14:15:15Z Add pedjak to OWNERS
-
-- router image-amd64 6c5868c9670b2fa17e30f9416fe5de1156198d22 to 01bee8da2387d0cfbd7a1acd934bb92a8c320527
-  - cd87049 2026-09-17T14:15:15Z Add pedjak to OWNERS
-
-- ovn-kubernetes image-amd64 00e4e2b2a3e27293aec55aacd0af2fa8f1b2ca29 to 0de3886bb79aa0db71e17ddc42898f934e43359e
-  - 959d68d5 2026-10-08T08:06:48Z sync test annotations with upstream changes
-  - a7d573b6 2026-10-08T08:05:07Z sync openshift/go.mod with upstream dependencies
-  - 500fa4ed 2026-10-07T11:44:21-04:00 coderabbit: exempt website changes from test requirements
-  - 0cce0d39 2026-10-07T17:31:29+02:00 docs: describe the DPU-mode exit on host Node deletion
-  - a5c9738d 2026-10-07T11:22:26-04:00 Fix missing DPU support feature link on website
-  - 4890ab82 2026-10-07T09:02:17-04:00 udn: narrow NAD creation lock scope
-  - 5200416c 2026-10-07T10:20:06+02:00 docs: document mac-security mode
-  - 6d702ec4 2026-10-07T10:20:06+02:00 test/e2e: Add MACSecurity feature label
-  - 037f7dab 2026-10-07T10:20:06+02:00 test/e2e,kubevirt: add spoofed source MAC connectivity test
-  - beef9183 2026-10-07T10:20:06+02:00 test/e2e: add spoofed source MAC connectivity tests
-  - 092df3bb 2026-10-07T10:20:06+02:00 test/e2e: add API validation tests for mac-security
-  - 743a42c1 2026-10-07T10:20:06+02:00 clustermanager,udn: render mac-security settings
-  - 6c278e62 2026-10-07T10:20:06+02:00 ovn: set unknown in addrs on live-migration source LSPs
-  - 5551f93f 2026-10-07T10:20:06+02:00 ovn: disable MAC spoof protection on LSP when mac-security is disabled
-  - 44edb945 2026-10-07T10:20:06+02:00 api, (c)udn: add mac-security config
-  - f5d42c69 2026-10-07T10:20:06+02:00 api, netconf: introduce MAC security settings
-  - 6ec0bc69 2026-10-06T23:24:46-07:00 ovn: separate namespace port-group lifecycle from pod membership
-  - 547bcf77 2026-10-07T06:46:26+02:00 layer2: remove mixed-topology upgrade machinery
-  - 33fa67ca 2026-10-06T09:32:30-04:00 udn: reconcile NAD annotations with SSA
-  - f676a4b0 2026-10-05T09:51:06+02:00 node: prioritize default network before primary UDN fan-out
-  - 62cf6153 2026-10-04T14:20:28+03:00 kind: install KubeVirt with server-side apply
-  - 9e33367c 2026-10-02T10:21:10+02:00 e2e: defer EVPN image resolution until execution
-  - 7dc7caa5 2026-10-01T10:55:29-07:00 ci: remind developers to update metrics documentation
-  - dedcc622 2026-10-01T10:43:26-03:00 go-controller: bump grpc-go to v1.84.0
-  - c485232f 2026-10-01T14:54:18+02:00 kind: raise multus thin plugin memory limit to 200Mi
-  - 4342ec64 2026-10-01T14:03:44+02:00 ci: only install linux-modules-extra when vrf module is missing
-  - 04d44665 2026-09-30T01:02:15-07:00 docs: add component metrics reference pages
-  - cfce5eef 2026-09-30T08:09:43+02:00 dist: Do not attempt to remove the OVN docker files.
-  - 859b436a 2026-09-28T13:06:25Z sync test annotations with upstream changes
-  - bb2a8d09 2026-09-28T13:47:22+01:00 GH CI efficiency: merge linting and generated code steps
-  - 87c17701 2026-09-28T11:34:48+02:00 egressip: prioritize node IP bypass before egress service rules
-  - a1afc5f4 2026-09-28T11:34:48+02:00 e2e: verify EgressService backend ClusterIP connectivity
-  - 4d06f050 2026-09-26T02:56:08-07:00 node: disable netlink VF info collection explicitly
-  - 8ace8a65 2026-09-25T21:33:45+02:00 ovn: Bump OVN image to 26.03.2-122.fc44.
-  - 1fcee577 2026-09-24T15:00:14+02:00 treewide: Use Fedora 44.
-  - 5dab16e5 2026-09-24T10:48:34+02:00 vtep: fix VTEP reconcile lost when EVPN CUDN create/delete coalesce
-  - 5e8eca8e 2026-09-24T10:48:34+02:00 controller: add optional OnDelete hook to shared controller framework
-  - f6d3017b 2026-09-23T06:37:59-07:00 routeimport: regenerate netlink mock imports
-  - 9c74543c 2026-09-23T06:37:58-07:00 routeimport: batch missing static route creation
-  - ac141b39 2026-09-23T11:42:33+02:00 e2e: fix the missing-vfID error message in the host-function bridge test
-  - 59aed34e 2026-09-23T11:42:33+02:00 cni: restore the global mocks after each helper_linux test
-  - 054d3ce4 2026-09-23T11:42:33+02:00 node: resolve management port netdevices through their link alias
-  - c6f43b12 2026-09-23T11:42:33+02:00 e2e: verify simulated VF netdevices return to the host on pod deletion
-  - 26566809 2026-09-23T11:42:33+02:00 cni: return primary UDN netdevice to host on CNI DEL in DPU-host mode
-  - f4750701 2026-09-22T20:15:22-07:00 routeimport: stream BGP route dumps
-  - 1e723630 2026-09-22T21:34:08+02:00 e2e: cover DPU host node deletion
-  - 97141056 2026-09-22T17:49:29+02:00 node: exit in DPU mode when the Node object ovnkube-node manages is deleted
-  - 9fd22dee 2026-09-22T17:11:17+02:00 e2e: assert a single localnet port after an Uplink bridge change
-  - ae995d48 2026-09-22T17:11:17+02:00 gateway: replace stale localnet port when the interface ID changes
-  - 9859176f 2026-09-22T07:45:31-07:00 kube: reject stale pod annotation updates
-  - 8918f4c5 2026-09-22T16:30:27+03:00 okep,3926: Omit using of force_fdb_lookup LSP option
-  - 9dbc83aa 2026-09-17T11:46:07-04:00 factory: clean deleted queue mappings without subscribers
-  - 93c51366 2026-09-17T11:46:05-04:00 networkqos: release informer handlers on controller shutdown
-  - 32fbd92b 2026-09-16T09:43:43+02:00 contrib: require the dpu-sim reserved uplink interface
-  - e53948e2 2026-09-15T14:26:18-04:00 networkqos: skip host-network pod events
-  - f60e68af 2026-09-15T14:03:34-04:00 networkqos: handle deletion tombstones and missing namespaces
-  - 1c677030 2026-09-15T17:53:30+02:00 test: verify and retry tool downloads in install-kind.sh
-  - 431bc556 2026-09-15T11:48:46-04:00 networkqos: skip pod and namespace events without policies
-  - 2bc2ab4d 2026-09-15T15:32:00+05:30 kubevirt: correct IPv6 gateway log message
-
-- kubernetes image-amd64 421570e76c5fd58e26ca93b4bef504d9378ccdcf to 8e30e543958ab5d408a337a5957663e5fd9aea12
-  - affac48c6 2026-10-15T01:29:51Z UPSTREAM: <carry>: Fix disabled test exclusions
-  - 937e849a2 2026-10-15T01:29:51Z UPSTREAM: <carry>: Fix SingleReplica test exclusions
-  - 7494188a1 2026-10-13T16:22:50-04:00 UPSTREAM: <carry>: Fix disabled tests for newer test names
-  - a64fb32a2 2026-10-13T16:02:11Z UPSTREAM: <carry>: Remove added vSphere topology unit tests
-  - 1c20d1ff3 2026-10-12T12:32:00-05:00 UPSTREAM: <carry>: bump cadvisor for statseq fix
-  - e2cc52bed 2026-10-10T14:32:28Z UPSTREAM: <carry>: Fix vSphere topology test exclusions
-  - f3172ad60 2026-10-08T22:07:59Z UPSTREAM: <carry>: OCPBUGS-128829: Handle k8s-tests-ext IP family probe failures
-  - 0a248aa8d 2026-10-07T17:22:07-07:00 UPSTREAM: <carry>: Daemonset test has changed names -> needs corrected env selector
-  - 64c65ff98 2026-10-06T13:17:17-04:00 UPSTREAM: 141662: deflake pod resize deferred tests
-  - ec761b985 2026-10-02T13:50:09-04:00 UPSTREAM: 142106: e2e: check pod resized in WaitForPodResizeActuation
-
-- oc image-arm64 758dbfa96d00a3e7a1baef5d05f01a1ef620f661 to 586088c46cba2cd87e1a128a304fe484cf678cd5
-  - 76f4530b 2026-10-15T14:30:37-04:00 Add DS_Store to gitignore file
-
-- kubernetes image-arm64 fdad2f1ea07ff4b37cad0f64281368776c5e47d5 to 8e30e543958ab5d408a337a5957663e5fd9aea12
-  - affac48c6 2026-10-15T01:29:51Z UPSTREAM: <carry>: Fix disabled test exclusions
-  - 937e849a2 2026-10-15T01:29:51Z UPSTREAM: <carry>: Fix SingleReplica test exclusions
-  - 7494188a1 2026-10-13T16:22:50-04:00 UPSTREAM: <carry>: Fix disabled tests for newer test names
-  - a64fb32a2 2026-10-13T16:02:11Z UPSTREAM: <carry>: Remove added vSphere topology unit tests
-  - e2cc52bed 2026-10-10T14:32:28Z UPSTREAM: <carry>: Fix vSphere topology test exclusions
-  - f3172ad60 2026-10-08T22:07:59Z UPSTREAM: <carry>: OCPBUGS-128829: Handle k8s-tests-ext IP family probe failures
+- ovn-kubernetes image-arm64 0de3886bb79aa0db71e17ddc42898f934e43359e to 0d60766d732f5d158ab77ab915a3fbceb13cdf50
+  - aa1cad3b 2026-10-15T13:19:32+05:30 Keep the OVN bindings on the version we ship
+  - 8986384d 2026-10-15T13:18:17+05:30 e2e: register openshift extension images from DeploymentConfig
+  - 3ef2999d 2026-10-13T12:37:03+02:00 e2e: remove obsolete KubeVirt image cleanup
+  - 6eac5131 2026-10-13T12:36:19+02:00 e2e: register Fedora disk in the image registry
+  - 37e0ff3c 2026-10-12T16:53:37-04:00 Synchronize OVS pinning tests with feature state changes
+  - ba143151 2026-10-12T16:53:37-04:00 Fix OVS CPU affinity reconciliation for process threads
+  - 376b234a 2026-10-12T12:49:44-04:00 ci: skip build jobs for documentation-only pull requests
+  - c1fd5d7b 2026-10-12T12:27:42-04:00 ci: move affected runners to Ubuntu 26.04
+  - 0be5f6c2 2026-10-12T12:37:38+05:30 Added content to pod creation
+  - 78d61c14 2026-10-10T11:03:40-07:00 docs: update links for the versioned documentation site
+  - 18b5d708 2026-10-09T09:52:40-07:00 docs: fix broken MkDocs nav and section index links
+  - 38b67b42 2026-10-09T09:42:36-07:00 docs: link Code of Conduct and add enforcement contact
+  - 7af18194 2026-10-09T12:30:29+02:00 kind: only sudo in disable_bridge_netfilter when needed
+  - fe4a8ef0 2026-10-08T20:11:25+02:00 node: update Uplink default gateways without rebuilding the gateway
+  - dc016044 2026-10-08T20:10:41+02:00 vrfmanager: replace same-key tracked routes instead of accumulating them
+  - b323dec3 2026-10-08T10:09:57-04:00 Bump Ubuntu to 26.09
+  - 1a434f4c 2026-10-08T13:49:06+02:00 ovn: bump OVN image to ovn-26.09.0-33.fc44
+  - 8d7614f0 2026-10-08T10:17:27+02:00 e2e: poll network readiness on the spec context
+  - 5aaf7877 2026-10-08T09:31:11+02:00 kubevirt: refresh IPv4 gateways after default network migration
+  - 6e5e8225 2026-10-08T09:31:11+02:00 kubevirt: isolate layer2 gateway reconciliation
+  - f7a083ce 2026-10-08T09:31:11+02:00 kubevirt: introduce default-network reconciliation entry point
+  - 5498b82e 2026-10-07T19:50:54+02:00 factory test: count handler calls after the callback returns
+  - 545fa2e8 2026-10-07T13:47:23-04:00 e2e: centralize test image IDs in DeploymentConfig
+  - 9bddc29e 2026-10-07T13:43:32-04:00 docs: exempt test infrastructure from unit test requirements
+  - c8e641be 2026-10-07T19:26:27+02:00 factory: fix flaky serialized add/update ordering test
+  - f35f7200 2026-10-07T18:36:37+02:00 e2e: run the Uplink specs on the spec context
+  - 30bcd128 2026-10-07T08:39:52-07:00 node: configure a recovered DPU representor again
+  - 533e86fa 2026-10-07T11:56:49+05:30 tests,e2e: fix orphan node egressip test flake
+  - c93b2d49 2026-10-06T09:25:29-07:00 node: requeue DPU pods for a NAD from an index
+  - 79396b89 2026-10-06T09:07:23-07:00 node: level-driven single DPU pod controller for all networks
+  - 174b4e1e 2026-10-06T14:06:39+01:00 E2E "pod connected to UserDefinedNetwork cannot be deleted when being used" flake fix
+  - 5ff6a2d8 2026-10-01T16:55:29-07:00 Add libovsdb helpers to delete OVS ports from a bridge
+  - 327fa844 2026-08-20T14:31:17+05:30 Add gateway mode content
 
