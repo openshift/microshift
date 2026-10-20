@@ -27,6 +27,7 @@ REPO_ENV = "REPO"
 AMD64_RELEASE_ENV = "AMD64_RELEASE"
 ARM64_RELEASE_ENV = "ARM64_RELEASE"
 RHOAI_RELEASE_ENV = "RHOAI_RELEASE"
+LVMS_RELEASE_ENV = "LVMS_RELEASE"
 JOB_NAME_ENV = "JOB_NAME"
 BUILD_ID_ENV = "BUILD_ID"
 DRY_RUN_ENV = "DRY_RUN"
@@ -102,12 +103,11 @@ def run_rebase_ai_model_serving_sh(release):
     return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
 
 
-def run_rebase_lvms_sh():
-    """Run the 'rebase_lvms.sh' script and return the script's output."""
+def run_rebase_lvms_sh(release):
+    """Run the 'rebase_lvms.sh' script with the given release stream and return the script's output."""
     script_dir = os.path.abspath(os.path.dirname(__file__))
-    # LVMS is not tracked in the OCP release image. Use the latest z-stream
-    # for this X.Y version, which needs manual updating between releases.
-    args = [f"{script_dir}/rebase_lvms.sh", "latest", "registry.redhat.io/lvms4/lvms-operator-bundle", "4.19"]
+    registry, version = release.rsplit(":", 1)
+    args = [f"{script_dir}/rebase_lvms.sh", "latest", registry, version.lstrip("v")]
     logging.info(f"Running: '{' '.join(args)}'")
     start = timer()
     result = subprocess.run(
@@ -495,6 +495,7 @@ def main():
     release_amd = try_get_env(AMD64_RELEASE_ENV)
     release_arm = try_get_env(ARM64_RELEASE_ENV)
     rhoai_release = try_get_env(RHOAI_RELEASE_ENV)
+    lvms_release = try_get_env(LVMS_RELEASE_ENV)
     base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
     global REMOTE_DRY_RUN
@@ -513,7 +514,7 @@ def main():
 
     rebase_result = run_rebase_sh(release_amd, release_arm)
     ai_rebase_result = run_rebase_ai_model_serving_sh(rhoai_release)
-    lvms_rebase_result = run_rebase_lvms_sh()
+    lvms_rebase_result = run_rebase_lvms_sh(lvms_release)
 
     rebases_succeeded = rebase_result.success and ai_rebase_result.success and lvms_rebase_result.success
 
