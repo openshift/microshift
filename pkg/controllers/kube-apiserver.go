@@ -113,14 +113,7 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 	s.servingCAPath = cryptomaterial.ServiceAccountTokenCABundlePath(certsDir)
 	s.advertiseAddress = cfg.ApiServer.AdvertiseAddresses[0]
 
-	namedCerts := []configv1.NamedCertificate{
-		{
-			CertInfo: configv1.CertInfo{
-				CertFile: cryptomaterial.ServingCertPath(kasServingCertDir),
-				KeyFile:  cryptomaterial.ServingKeyPath(kasServingCertDir),
-			},
-		},
-	}
+	namedCerts := []configv1.NamedCertificate{}
 	if len(cfg.ApiServer.NamedCertificates) > 0 {
 		for _, namedCertsCfg := range cfg.ApiServer.NamedCertificates {
 			//Validate the cert is non-destructive

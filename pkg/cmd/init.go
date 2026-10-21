@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"io/fs"
 	"net"
 	"net/url"
 	"os"
@@ -40,7 +41,8 @@ import (
 
 func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
-	if err := migrateLegacyCertLayout(certsDir, version.Get().GitVersion); err != nil {
+	backupDir, err := migrateLegacyCertLayout(certsDir, version.Get().GitVersion)
+	if err != nil {
 		return nil, fmt.Errorf("cert layout migration failed: %w", err)
 	}
 
@@ -52,6 +54,13 @@ func initCerts(cfg *config.Config) (*certchains.CertificateChains, error) {
 		// The caller (run.go) fatals here; greenboot restarts the service and the
 		// retry completes cleanly without removing the partial directory.
 		return nil, err
+	}
+	if backupDir != "" {
+		if err := os.RemoveAll(backupDir); err != nil {
+			klog.Warningf("Failed to remove cert migration backup dir %s: %v", backupDir, err)
+		} else {
+			klog.Infof("Removed cert migration backup dir %s", backupDir)
+		}
 	}
 
 	// we cannot just remove the certs dir and regenerate all the certificates
@@ -79,12 +88,12 @@ func legacyKubeControlPlaneSignerDir(certsDir string) string {
 // reissued by the service-ca controller.
 // MicroShift is always a single-node deployment with a single embedded etcd member,
 // so peer-CA rotation during migration requires no cross-member coordination.
-func migrateLegacyCertLayout(certsDir, gitVersion string) error {
+func migrateLegacyCertLayout(certsDir, gitVersion string) (string, error) {
 	if _, err := os.Stat(legacyKubeControlPlaneSignerDir(certsDir)); err != nil {
 		if os.IsNotExist(err) {
-			return nil // fresh install or already migrated
+			return "", nil // fresh install or already migrated
 		}
-		return fmt.Errorf("failed to check legacy cert layout: %w", err)
+		return "", fmt.Errorf("failed to check legacy cert layout: %w", err)
 	}
 	ts := strconv.FormatInt(time.Now().Unix(), 10)
 	// gitVersion can contain '/' (e.g. from EMBEDDED_GIT_TAG); replace to avoid
@@ -93,7 +102,7 @@ func migrateLegacyCertLayout(certsDir, gitVersion string) error {
 	backupDir := certsDir + ".backup." + safeVer + "." + ts
 	klog.Infof("Migrating cert layout: backing up %s → %s", certsDir, backupDir)
 	if err := os.Rename(certsDir, backupDir); err != nil {
-		return err
+		return "", err
 	}
 	// rollback removes the partial certsDir and renames backupDir back so the
 	// next startup sees the original layout intact and retries the migration.
@@ -109,20 +118,27 @@ func migrateLegacyCertLayout(certsDir, gitVersion string) error {
 	// Recreate the live directory and restore service-ca so that existing
 	// service-serving Secrets remain trusted through the CA transition.
 	if err := os.MkdirAll(certsDir, 0700); err != nil {
-		return rollback(fmt.Errorf("failed to recreate certs directory after migration: %w", err))
+		return "", rollback(fmt.Errorf("failed to recreate certs directory after migration: %w", err))
 	}
 	if err := os.CopyFS(
 		filepath.Join(certsDir, "service-ca"),
 		os.DirFS(filepath.Join(backupDir, "service-ca")),
 	); err != nil {
-		return rollback(fmt.Errorf("failed to restore service-ca after migration: %w", err))
+		return "", rollback(fmt.Errorf("failed to restore service-ca after migration: %w", err))
 	}
-	// os.CopyFS does not preserve file permissions; restrict the CA private key.
-	caKeyPath := filepath.Join(certsDir, "service-ca", "ca.key")
-	if err := os.Chmod(caKeyPath, 0600); err != nil {
-		return fmt.Errorf("failed to set permissions on restored service-ca key: %w", err)
+	// os.CopyFS does not preserve file permissions; restrict all CA private keys.
+	if err := filepath.WalkDir(filepath.Join(certsDir, "service-ca"), func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.IsDir() && strings.HasSuffix(path, ".key") {
+			return os.Chmod(path, 0600)
+		}
+		return nil
+	}); err != nil {
+		return "", rollback(fmt.Errorf("failed to set permissions on restored service-ca keys: %w", err))
 	}
-	return nil
+	return backupDir, nil
 }
 
 func certSetup(cfg *config.Config) (*certchains.CertificateChains, error) {

@@ -12,6 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog/v2"
 
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
@@ -21,6 +22,20 @@ const (
 	// Resource namespace
 	caResourceNamespace = "kube-system"
 )
+
+// legacyCASecretNames lists the kube-system Secrets that existed before the
+// 6-CA consolidation and must be removed after a successful migration.
+var legacyCASecretNames = []string{
+	"kube-control-plane-signer",
+	"kube-apiserver-to-kubelet-signer",
+	"admin-kubeconfig-signer",
+	"kubelet-signer",
+	"kube-csr-signer",
+	"kube-apiserver-external-signer",
+	"kube-apiserver-localhost-signer",
+	"kube-apiserver-service-network-signer",
+	"etcd-signer",
+}
 
 var (
 	CertificateAuthorityResources = []struct {
@@ -67,7 +82,22 @@ func startCertificateAuthorityController(ctx context.Context, kubeconfigPath str
 	if err != nil {
 		return fmt.Errorf("failed to create etcd CA admin Role: %w", err)
 	}
+
+	cleanupLegacyCASecrets(ctx, client)
 	return nil
+}
+
+func cleanupLegacyCASecrets(ctx context.Context, client kubernetes.Interface) {
+	secrets := client.CoreV1().Secrets(caResourceNamespace)
+	for _, name := range legacyCASecretNames {
+		if err := secrets.Delete(ctx, name, metav1.DeleteOptions{}); err != nil {
+			if !apierrors.IsNotFound(err) {
+				klog.Warningf("Failed to delete legacy CA secret %s: %v", name, err)
+			}
+			continue
+		}
+		klog.Infof("Deleted legacy CA secret %s/%s", caResourceNamespace, name)
+	}
 }
 
 func getKubernetesClient(kubeconfigPath string) (*kubernetes.Clientset, error) {
