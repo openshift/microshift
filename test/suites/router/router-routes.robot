@@ -163,6 +163,22 @@ Default Listening IPs And Ports
     ...    AND    Oc Delete    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${NAMESPACE} --ignore-not-found
     ...    AND    Oc Delete    -f ${TEST_CLIENT_POD} -n ${NAMESPACE} --ignore-not-found
 
+Hostless Route Gets Default Host
+    [Documentation]    A Route created without spec.host is admitted and gets the
+    ...    default <name>-<namespace>.${BASE_DOMAIN} host, confirming MicroShift's
+    ...    default base-domain wiring in the Route API.
+    ...    OCP-56229
+    [Setup]    Deploy Web Server
+
+    Create OC Route And Admit    ${NAMESPACE}    http    route-ocp56229    service-unsecure
+    ${host}=    Run With Kubeconfig
+    ...    oc get route route-ocp56229 -n ${NAMESPACE} -o jsonpath='{.spec.host}'
+    Should Be Equal As Strings    ${host}    route-ocp56229-${NAMESPACE}.${BASE_DOMAIN}
+
+    [Teardown]    Run Keywords
+    ...    Oc Delete    route/route-ocp56229 -n ${NAMESPACE} --ignore-not-found
+    ...    AND    Oc Delete    -f ${WEB_SERVER_DEPLOY} -n ${NAMESPACE} --ignore-not-found
+
 
 *** Keywords ***
 Setup Reencrypt Ingress Test
