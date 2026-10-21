@@ -1,3 +1,4 @@
-- machine-config-operator embedded-component 1413b762f9413a5ea99d8c8c941220ae2dea6b5b to ddd94381334d055ed8cbbac3355fa405a8b17743
-  - ee9a70f0 2026-10-16T09:42:57-04:00 tests: bump timeout for ImagePulledFromRegistry=Unknown transition
+- kube-rbac-proxy image-arm64 2f8a556d09638faeb09b366e95ecb75279ce7c8a to 14b6905aa3accb8bb16cd92f3438a9868597bd52
+  - bb3586d 2026-10-16T17:29:59+05:30 Address CVE-2026-84304
+  - bdeb151 2026-10-16T17:29:24+05:30 Address CVE-2026-84304 (vendor changes)
 
