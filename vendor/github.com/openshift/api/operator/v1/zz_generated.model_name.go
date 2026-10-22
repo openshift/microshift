@@ -251,6 +251,11 @@ func (in ConsoleCustomization) OpenAPIModelName() string {
 }
 
 // OpenAPIModelName returns the OpenAPI model name for this type.
+func (in ConsoleIngress) OpenAPIModelName() string {
+	return "com.github.openshift.api.operator.v1.ConsoleIngress"
+}
+
+// OpenAPIModelName returns the OpenAPI model name for this type.
 func (in ConsoleList) OpenAPIModelName() string {
 	return "com.github.openshift.api.operator.v1.ConsoleList"
 }
@@ -498,11 +503,6 @@ func (in IPv6GatewayConfig) OpenAPIModelName() string {
 // OpenAPIModelName returns the OpenAPI model name for this type.
 func (in IPv6OVNKubernetesConfig) OpenAPIModelName() string {
 	return "com.github.openshift.api.operator.v1.IPv6OVNKubernetesConfig"
-}
-
-// OpenAPIModelName returns the OpenAPI model name for this type.
-func (in Ingress) OpenAPIModelName() string {
-	return "com.github.openshift.api.operator.v1.Ingress"
 }
 
 // OpenAPIModelName returns the OpenAPI model name for this type.
