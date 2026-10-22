@@ -257,7 +257,8 @@ func mustComplete(t *testing.T, cs certchains.CertificateChainsBuilder) *certcha
 func TestMigrateLegacyCertLayout(t *testing.T) {
 	t.Run("no-op on fresh install", func(t *testing.T) {
 		certsDir := t.TempDir()
-		require.NoError(t, migrateLegacyCertLayout(certsDir, "v5.1.0"))
+		_, migrateErr := migrateLegacyCertLayout(certsDir, "v5.1.0")
+		require.NoError(t, migrateErr)
 		_, err := os.Stat(certsDir)
 		require.NoError(t, err, "certs dir must survive a no-op migration")
 		require.Empty(t, backupDirsFor(t, certsDir))
@@ -266,7 +267,8 @@ func TestMigrateLegacyCertLayout(t *testing.T) {
 	t.Run("migrates old layout and preserves service-ca", func(t *testing.T) {
 		certsDir := setupLegacyCertLayout(t)
 
-		require.NoError(t, migrateLegacyCertLayout(certsDir, "v5.1.0"))
+		_, migrateErr := migrateLegacyCertLayout(certsDir, "v5.1.0")
+		require.NoError(t, migrateErr)
 
 		// Legacy marker must not exist in the live dir.
 		_, err := os.Stat(filepath.Join(certsDir, "kube-control-plane-signer"))
@@ -291,7 +293,8 @@ func TestMigrateLegacyCertLayout(t *testing.T) {
 	t.Run("version slashes are sanitized in backup name", func(t *testing.T) {
 		certsDir := setupLegacyCertLayout(t)
 
-		require.NoError(t, migrateLegacyCertLayout(certsDir, "v5.1.0-alpha/dev+build"))
+		_, err := migrateLegacyCertLayout(certsDir, "v5.1.0-alpha/dev+build")
+		require.NoError(t, err)
 
 		backups := backupDirsFor(t, certsDir)
 		require.Len(t, backups, 1)
@@ -305,7 +308,7 @@ func TestMigrateLegacyCertLayout(t *testing.T) {
 		// Legacy marker present but no service-ca to copy back.
 		require.NoError(t, os.MkdirAll(filepath.Join(certsDir, "kube-control-plane-signer"), 0700))
 
-		err := migrateLegacyCertLayout(certsDir, "v5.1.0")
+		_, err := migrateLegacyCertLayout(certsDir, "v5.1.0")
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "failed to restore service-ca")
 
@@ -318,10 +321,12 @@ func TestMigrateLegacyCertLayout(t *testing.T) {
 
 	t.Run("idempotent after successful migration", func(t *testing.T) {
 		certsDir := setupLegacyCertLayout(t)
-		require.NoError(t, migrateLegacyCertLayout(certsDir, "v5.1.0"))
+		_, err := migrateLegacyCertLayout(certsDir, "v5.1.0")
+		require.NoError(t, err)
 		// Calling again must be a no-op: the legacy marker is gone.
 		backupsBefore := backupDirsFor(t, certsDir)
-		require.NoError(t, migrateLegacyCertLayout(certsDir, "v5.1.0"))
+		_, err = migrateLegacyCertLayout(certsDir, "v5.1.0")
+		require.NoError(t, err)
 		require.Equal(t, backupsBefore, backupDirsFor(t, certsDir), "second call must not create another backup")
 	})
 }
