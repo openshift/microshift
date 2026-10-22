@@ -199,7 +199,5 @@ assets:
         src: ovms-kserve-template.yaml
       - file: vllm-cuda.yaml
         src: vllm-cuda-template.yaml
-      - file: vllm-gaudi.yaml
-        src: vllm-gaudi-template.yaml
       - file: vllm-rocm.yaml
         src: vllm-rocm-template.yaml
