@@ -1,60 +1,78 @@
-apiVersion: serving.kserve.io/v1alpha1
-kind: ServingRuntime
+apiVersion: template.openshift.io/v1
+kind: Template
 metadata:
-  name: caikit-standalone-runtime
-  annotations:
-    openshift.io/display-name: Caikit Standalone ServingRuntime for KServe
-    opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
   labels:
     opendatahub.io/dashboard: 'true'
-spec:
+    opendatahub.io/ootb: 'true'
   annotations:
-    opendatahub.io/kserve-runtime: 'caikit'
-    prometheus.io/port: '8086'
-    prometheus.io/path: /metrics
-  multiModel: false
-  supportedModelFormats:
-    - autoSelect: true
-      name: caikit
-  containers:
-    - name: kserve-container
-      image: caikit-standalone-image
-      command:
-        - python
-        - '-m'
-        - caikit.runtime
-      env:
-        - name: RUNTIME_LOCAL_MODELS_DIR
-          value: /mnt/models
-        - name: HF_HOME
-          value: /tmp/hf_home
-        - name: RUNTIME_GRPC_ENABLED
-          value: 'false'
-        - name: RUNTIME_HTTP_ENABLED
-          value: 'true'
-      ports:
-        - containerPort: 8080
-          protocol: TCP
-      readinessProbe:
-        exec:
+    description: Caikit is an AI toolkit that enables users to manage models through a set of developer friendly APIs. It provides a consistent format for creating and using AI models against a wide variety of data domains and tasks.
+    openshift.io/provider-display-name: Red Hat, Inc.
+    tags: rhods,rhoai,kserve,servingruntime
+    template.openshift.io/documentation-url: https://github.com/opendatahub-io/caikit-nlp
+    template.openshift.io/long-description: This template defines resources needed to deploy caikit-standalone-serving servingruntime with Red Hat Data Science KServe for LLM model
+    template.openshift.io/support-url: https://access.redhat.com
+    opendatahub.io/modelServingSupport: '["single"]'
+    opendatahub.io/apiProtocol: 'REST'
+    opendatahub.io/model-type: '["predictive"]'
+  name: caikit-standalone-serving-template
+objects:
+  - apiVersion: serving.kserve.io/v1alpha1
+    kind: ServingRuntime
+    metadata:
+      name: caikit-standalone-runtime
+      annotations:
+        openshift.io/display-name: Caikit Standalone ServingRuntime for KServe
+        opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+      labels:
+        opendatahub.io/dashboard: 'true'
+    spec:
+      annotations:
+        opendatahub.io/kserve-runtime: 'caikit'
+        prometheus.io/port: '8086'
+        prometheus.io/path: /metrics
+      multiModel: false
+      supportedModelFormats:
+        - autoSelect: true
+          name: caikit
+      containers:
+        - name: kserve-container
+          image: $(caikit-standalone-image)
           command:
             - python
-            - -m
-            - caikit_health_probe
-            - readiness
-        initialDelaySeconds: 5
-      livenessProbe:
-        exec:
-          command:
-            - python
-            - -m
-            - caikit_health_probe
-            - liveness
-        initialDelaySeconds: 5
-      startupProbe:
-        httpGet:
-          port: 8080
-          path: /health
-        # Allow 12 mins to start
-        failureThreshold: 24
-        periodSeconds: 30
+            - '-m'
+            - caikit.runtime
+          env:
+            - name: RUNTIME_LOCAL_MODELS_DIR
+              value: /mnt/models
+            - name: HF_HOME
+              value: /tmp/hf_home
+            - name: RUNTIME_GRPC_ENABLED
+              value: 'false'
+            - name: RUNTIME_HTTP_ENABLED
+              value: 'true'
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - python
+                - -m
+                - caikit_health_probe
+                - readiness
+            initialDelaySeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - python
+                - -m
+                - caikit_health_probe
+                - liveness
+            initialDelaySeconds: 5
+          startupProbe:
+            httpGet:
+              port: 8080
+              path: /health
+            # Allow 12 mins to start
+            failureThreshold: 24
+            periodSeconds: 30

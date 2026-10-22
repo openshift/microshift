@@ -4,9 +4,9 @@ metadata:
   name: cert-manager-images
   namespace: cert-manager
 data:
-  cert-manager-webhook: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b
-  cert-manager-ca-injector: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b
-  cert-manager-controller: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:40b47054e42363a365b491ccfe0d86f109e19fc317058ba834ffe0f5c733880b
-  cert-manager-acmesolver: registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:3a40eb434e032fb2135f369b6fc65266ae0f409db92fd65d12cf13c7f32b5020
-  cert-manager-istiocsr: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:0f20d178f980a3fa4527bc1613b8639385e36c367e30c93b4cbb4c4a434d3405
-  controller: registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:8eecb53c8c81c0fa8f198260acb273759c0d12b5c01642a128923c5716df19d2
+  cert-manager-webhook: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:d5e31002f72b74edfd91e09b72c4c37eb3bbbeb7ddbc69202f5d82b8f61c8ab4
+  cert-manager-ca-injector: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:d5e31002f72b74edfd91e09b72c4c37eb3bbbeb7ddbc69202f5d82b8f61c8ab4
+  cert-manager-controller: registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:d5e31002f72b74edfd91e09b72c4c37eb3bbbeb7ddbc69202f5d82b8f61c8ab4
+  cert-manager-acmesolver: registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:6df582e555424ab8a71758b228e72d1649206002fe2293398bcedd5001c8b11d
+  cert-manager-istiocsr: registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:0329f6bd8b196ecd1fb76dde04b8f3b9b2e64a1064db05b7d5211b50d8353a95
+  controller: registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:403674a15e95ce09e0823b49c961f09a070e36c33d051c8a97e9cafc260da397
