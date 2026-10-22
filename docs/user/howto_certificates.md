@@ -94,6 +94,34 @@ CA is expired or not yet valid, leaf-only renewal is refused; use `--ca` to rene
 the chain.
 Configurable validity periods are not yet implemented by this command.
 
+### Optional Pre-Renewal Backup
+
+Renewal retains recoverable originals during activation, but removes them after
+successful completion. This is not a permanent backup of MicroShift data.
+
+If you need a full pre-renewal backup, schedule a separate maintenance window
+**before preparing renewal**. Unlike renewal preparation, `microshift backup`
+requires both `microshift.service` and `microshift-etcd.scope` to be stopped.
+Choose a backup destination that does not already exist:
+
+```bash
+sudo systemctl stop microshift
+sudo microshift backup /var/lib/microshift-backups/before-certificate-renewal
+```
+
+The backup command checks that both units are stopped. If etcd is still stopping,
+wait for it to stop before retrying. After the backup succeeds, start MicroShift
+again:
+
+```bash
+sudo systemctl start microshift
+```
+
+You can then prepare renewal online and choose a later activation window. A
+backup is optional, it is not a prerequisite for the online workflow below.
+
+### Prepare and Activate Renewal
+
 Prepare renewal while MicroShift is running, then activate it by restarting
 MicroShift during your maintenance window:
 
@@ -117,7 +145,7 @@ Preparation does not extend active certificate lifetimes or reset the running
 service's automatic rotation deadline. Restart before the active certificates
 expire; the pending certificates' validity also starts at generation, not activation.
 
-Generated kubeconfigs under `/var/lib/microshift/resources` are updated in the
+Generated kubeconfigs under `/var/lib/microshift/resources/kubeadmin` are updated in the
 same transaction at activation. After **CA activation**, redistribute those kubeconfigs to any
 external locations where you previously copied them. Existing external
 kubeconfigs remain trusted after leaf-only renewal until their own certificates
@@ -145,8 +173,10 @@ restart customer workloads or workloads deployed by other operators; their
 owners remain responsible for reloading cached certificates and CA bundles.
 
 Both modes accept `-o json` and `-o yaml`. A successful command emits one versioned
-`CertificateRenewalResult` with deterministically ordered `items` and an `impact`
-summary. Dry-run reports `status: validated`, `dryRun: true`, and `changed: false`
+`CertificateRenewalResult` with `items` sorted lexicographically by service, then
+certificate name, with inventory path as a tie-breaker, and an `impact` summary.
+This is presentation order, not the order in which certificates are regenerated.
+Dry-run reports `status: validated`, `dryRun: true`, and `changed: false`
 for every item. Prepared renewal reports `status: pending`, `dryRun: false`, and
 `changed: true`, with expiry dates read back from the pending certificates.
 `changed` refers to the prepared material, not active files. Running renewal again
@@ -154,14 +184,103 @@ prepares a fresh replacement for the pending generation, using the active PKI as
 its base. A generation or validation failure preserves the previous pending set.
 Dry-run likewise plans against active files and does not change a pending renewal.
 
+### Example Output
+
+These excerpts use illustrative timestamps and show one certificate. Actual
+reports include all selected certificates; additional table rows and table-mode
+warnings on stderr are omitted here.
+
+`sudo microshift certs renew --serving --dry-run` previews the expiry change:
+
+```text
+DRY RUN: Validated certificate renewal; no certificates or kubeconfigs were changed.
+SERVICE         ROLE     PARENT CA                        CERTIFICATE                       CURRENT EXPIRY        PROPOSED EXPIRY
+kube-apiserver  serving  kube-apiserver-localhost-signer  kube-apiserver-localhost-serving  2027-01-01T00:00:00Z  2027-10-23T00:00:00Z
+...
+```
+
+After `sudo microshift certs renew --serving`, the table describes the prepared
+certificates, not those currently active. Excerpt:
+
+```text
+SERVICE         CERTIFICATE                       STATUS   EXPIRY                MESSAGE
+kube-apiserver  kube-apiserver-localhost-serving  Healthy  2027-10-23T00:00:00Z  Valid for 366 days
+...
+CA certificates are unchanged by leaf renewal.
+Active certificates and kubeconfigs are unchanged. Start or restart microshift.service to activate a pending renewal.
+```
+
+Before restarting, `sudo microshift certs status -o yaml` still shows the old
+expiry in `items`. The new expiry appears only in `pendingRenewal`, alongside
+`status: pending`, `changed: true`, and the restart impact. The same fields are
+available with `-o json`:
+
+```yaml
+apiVersion: microshift.openshift.io/v1alpha1
+config:
+  caValidity: 87600h
+  forceRestartOnExpirationImminent: true
+  servingValidity: 8760h
+generatedAt: "2026-10-22T12:00:00Z"
+items:
+- name: kube-apiserver-localhost-serving
+  notAfter: "2027-01-01T00:00:00Z"
+  notBefore: "2026-01-01T00:00:00Z"
+  remainingSeconds: 6091200
+  role: serving
+  rotationPolicy: standard
+  service: kube-apiserver
+  status: ExpirationImminent
+kind: CertificateStatusList
+pendingRenewal:
+  apiVersion: microshift.openshift.io/v1alpha1
+  dryRun: false
+  generatedAt: "2026-10-22T12:00:00Z"
+  impact:
+    applicationReloadMayBeRequired: true
+    kubeconfigRedistributionRequired: false
+    serviceRestartRequired: true
+  items:
+  - changed: true
+    currentNotAfter: "2027-01-01T00:00:00Z"
+    name: kube-apiserver-localhost-serving
+    newNotAfter: "2027-10-23T00:00:00Z"
+    parentCA: kube-apiserver-localhost-signer
+    role: serving
+    service: kube-apiserver
+  kind: CertificateRenewalResult
+  mode: serving
+  status: pending
+  warnings:
+  - Applications that cache certificates or CA bundles may need to be reloaded or
+    restarted after activation.
+  - Pending renewal does not extend the lifetime of active certificates or change
+    the running service's automatic rotation deadline.
+warnings:
+- Renewed certificates are pending activation. Status items describe active files;
+  restart MicroShift to activate the pending renewal.
+```
+
 ### Recovery
 
-Renewal stages certificates, keys, bundles, and generated resources under
-`/var/lib/microshift/.cert-renewal`, on the same filesystem as the active data.
-An atomically published record identifies the complete pending generation.
-Startup revalidates it after any data restore and before components read PKI.
-Activation requires the previous etcd scope to be stopped. If its state cannot be
-determined, activation fails without replacing active files.
+Renewal stages certificates, keys, bundles, and generated resources in the
+root-only transaction directory `/var/lib/microshift/.cert-renewal/`. Active
+files remain under `/var/lib/microshift/certs/` and
+`/var/lib/microshift/resources/` until activation. The private
+`.cert-renewal/pending.json` file identifies the complete prepared generation so
+startup can validate it before activation. Do not edit this file manually.
+
+Allow enough free space on the data filesystem to stage `certs/` and `resources/`.
+Renewal rejects symlinks and special files in these directories instead of
+following them outside staging. It does not copy or replace the etcd database.
+For the internal layout, metadata, and resource-refresh behavior, see
+[Certificate Renewal Transactions](../contributor/architecture.md#certificate-renewal-transactions).
+
+#### Startup Validation
+
+Startup revalidates pending material after any data restore and before components
+read certificates. Activation requires the previous etcd scope to be stopped.
+If its state cannot be determined, activation fails without replacing active files.
 Certificate-affecting configuration and active-PKI hashes must still match
 preparation. If either has changed, or pending certificates have expired, startup
 discards the pending generation, logs a warning, and continues with normal
@@ -169,9 +288,11 @@ certificate initialization using the current configuration and active material.
 Run renewal again if still needed. Unrelated settings, such as logging, do not
 invalidate a pending renewal.
 
-Malformed or incomplete pending-renewal JSON does not block startup. MicroShift
-quarantines the rejected transaction under
-`/var/lib/microshift/.cert-renewal-rejected`, logs a warning, and continues normal
+#### Corrupt Renewal Metadata
+
+Malformed or incomplete `pending.json` does not block startup if MicroShift can
+quarantine it safely. MicroShift moves the rejected transaction into the directory
+`/var/lib/microshift/.cert-renewal-rejected/`, logs a warning, and continues normal
 certificate initialization. This does not force a CA renewal; the existing
 startup rotation policy still applies. Rejected certificates are never activated.
 `microshift certs status` continues to report active certificates, with a warning
@@ -183,23 +304,25 @@ preparation. They are removed after a replacement renewal is successfully
 activated. Quarantined files include private keys and remain root-only.
 
 Filesystem errors, unsupported pending-record versions, invalid certificate
-material, and failed interrupted-activation recovery still block startup. This
-includes not-yet-valid pending certificates; check clock synchronization first.
-Unrelated resource files are refreshed from the current data tree before
-activation, not restored from an old preparation-time snapshot. Kubeconfigs are
-rebuilt using the current configuration. No raw configuration is saved in metadata.
-Activation keeps recoverable originals until post-commit validation succeeds.
-The etcd database is not copied or replaced.
-Allow enough free space for staging the `certs` and `resources` trees.
-Renewal rejects symlinks and special files in these trees instead of following
-them outside staging.
+material, and failed interrupted-activation recovery still block startup.
 
-Failures before replacement leave active material untouched. Failed replacement
-or validation restores the originals. If the process or host is interrupted
-during activation or rollback, the next startup restores the originals before
-using the data. The next `certs status` or `certs renew` can also recover an
-interrupted activation while MicroShift is stopped. This recovery also applies
-to a subsequent dry-run:
+#### Pending Certificates Are Not Yet Valid
+
+Startup refuses to activate a pending certificate when the host's current time
+is earlier than its `notBefore` timestamp. For this specific failure, check host
+clock synchronization and certificate issuance timestamps; a backward clock
+adjustment after preparation can make a previously valid certificate appear
+not yet valid. The pending generation is retained. This differs from expired
+pending certificates, which startup discards as described above.
+
+#### Interrupted Activation
+
+Failures before active certificates and resources are replaced leave them
+untouched. Failed replacement or validation triggers restoration of the originals.
+If the process or host is interrupted during activation or rollback, the next
+startup restores the originals before using the data. The next `certs status` or
+`certs renew` can also recover an interrupted activation while MicroShift is
+stopped. This recovery also applies to a subsequent dry-run:
 
 ```bash
 sudo systemctl stop microshift

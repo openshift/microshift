@@ -43,7 +43,8 @@ func Lock(path string, exclusive bool) (*os.File, error) {
 	if exclusive {
 		mode = unix.LOCK_EX
 	}
-	if err := flock(file, mode); err != nil {
+	//nolint:gosec // An open OS file descriptor fits the syscall's signed int argument.
+	if err := unix.Flock(int(file.Fd()), mode|unix.LOCK_NB); err != nil {
 		_ = file.Close()
 		if errors.Is(err, unix.EWOULDBLOCK) {
 			return nil, ErrBusy
@@ -67,9 +68,4 @@ func labelLockPath(path string) error {
 		return nil
 	}
 	return exec.Command("restorecon", "--", path).Run()
-}
-
-func flock(file *os.File, mode int) error {
-	//nolint:gosec // An open OS file descriptor fits the syscall's signed int argument.
-	return unix.Flock(int(file.Fd()), mode|unix.LOCK_NB)
 }
