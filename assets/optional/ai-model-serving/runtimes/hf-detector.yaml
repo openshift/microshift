@@ -1,36 +1,54 @@
-apiVersion: serving.kserve.io/v1alpha1
-kind: ServingRuntime
+apiVersion: template.openshift.io/v1
+kind: Template
 metadata:
-  name: guardrails-detector-huggingface-runtime
-  annotations:
-    openshift.io/display-name: Hugging Face Detector ServingRuntime for KServe
-    opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
   labels:
     opendatahub.io/dashboard: 'true'
-spec:
+    opendatahub.io/ootb: 'true'
   annotations:
-    prometheus.io/port: '8080'
-    prometheus.io/path: '/metrics'
-  multiModel: false
-  supportedModelFormats:
-    - autoSelect: true
-      name: guardrails-detector-hf-runtime
-  containers:
-    - name: kserve-container
-      image: guardrails-detector-huggingface-runtime-image
-      command:
-        - uvicorn
-        - app:app
-      args:
-        - "--workers=1"
-        - "--host=0.0.0.0"
-        - "--port=8000"
-        - "--log-config=/common/log_conf.yaml"
-      env:
-        - name: MODEL_DIR
-          value: /mnt/models
-        - name: HF_HOME
-          value: /tmp/hf_home
-      ports:
-        - containerPort: 8000
-          protocol: TCP
+    description: Guardrails detector Hugging Face serving runtime for KServe
+    openshift.io/provider-display-name: Red Hat, Inc.
+    tags: rhods,rhoai,kserve,servingruntime
+    template.openshift.io/documentation-url: https://github.com/trustyai-explainability/guardrails-detectors
+    template.openshift.io/long-description: This template defines resources needed to deploy guardrails-detector-huggingface-runtime with KServe in Red Hat Openshift AI. The guardrails-detector-huggingface-runtime is a serving runtime for Hugging Face models that are used to detect and mitigate certain types of risks in text data, such as hateful speech. This runtime is intended to be compatible with most Hugging Face AutoModelsForSequenceClassification models.
+    template.openshift.io/support-url: https://access.redhat.com
+    opendatahub.io/modelServingSupport: '["single"]'
+    opendatahub.io/apiProtocol: 'REST'
+    opendatahub.io/model-type: '["predictive"]'
+  name: guardrails-detector-huggingface-serving-template
+objects:
+  - apiVersion: serving.kserve.io/v1alpha1
+    kind: ServingRuntime
+    metadata:
+      name: guardrails-detector-huggingface-runtime
+      annotations:
+        openshift.io/display-name: Hugging Face Detector ServingRuntime for KServe
+        opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+      labels:
+        opendatahub.io/dashboard: 'true'
+    spec:
+      annotations:
+        prometheus.io/port: '8080'
+        prometheus.io/path: '/metrics'
+      multiModel: false
+      supportedModelFormats:
+        - autoSelect: true
+          name: guardrails-detector-hf-runtime
+      containers:
+        - name: kserve-container
+          image: $(guardrails-detector-huggingface-runtime-image) 
+          command:
+            - uvicorn
+            - app:app
+          args:
+            - "--workers=1"
+            - "--host=0.0.0.0"
+            - "--port=8000"
+            - "--log-config=/common/log_conf.yaml"
+          env:
+            - name: MODEL_DIR
+              value: /mnt/models
+            - name: HF_HOME
+              value: /tmp/hf_home
+          ports:
+            - containerPort: 8000
+              protocol: TCP
