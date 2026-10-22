@@ -1,6 +1,4 @@
-- cluster-kube-controller-manager-operator embedded-component 7c4e44698b6004e52c59e03dd0c89611fbbfa999 to a2d1efd88a01dc62807371850d7bef40e6d0d296
-  - 25adbb7 2026-08-27T11:57:17+05:30 Fix: added patch for golang.org/x/net package to rectify CVE-2026-33814
-
-- route-controller-manager embedded-component 6068e2c71fc1efb67324a91f48c1470c647f1344 to d169cd1731a15639fc10d1e4faa0fba52f1b033e
-  - f69c2c8 2026-09-07T18:21:42+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+- cluster-kube-apiserver-operator embedded-component d9337a500419d77ac4ffae75a894ae6e5910509b to db80a3e83b79045aabd78589d37e17e3548f6a37
+  - d47a6a0 2026-09-30T18:47:35-05:00 UPSTREAM: <drop>: vendor
+  - 60e2118 2026-09-30T18:47:35-05:00 UPSTREAM: <carry>: [release-4.19] OCPBUGS-103624: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.43.0-sec.4 to address CVE-2026-33814
 
