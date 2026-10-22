@@ -27,6 +27,7 @@ REPO_ENV = "REPO"
 AMD64_RELEASE_ENV = "AMD64_RELEASE"
 ARM64_RELEASE_ENV = "ARM64_RELEASE"
 RHOAI_RELEASE_ENV = "RHOAI_RELEASE"
+LVMS_RELEASE_ENV = "LVMS_RELEASE"
 JOB_NAME_ENV = "JOB_NAME"
 BUILD_ID_ENV = "BUILD_ID"
 DRY_RUN_ENV = "DRY_RUN"
@@ -93,6 +94,24 @@ def run_rebase_ai_model_serving_sh(release):
     result = subprocess.run(
         args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False,
         env=env)
+    logging.info(f"Return code: {result.returncode}. Output:\n" +
+                 "==================================================\n" +
+                 f"{result.stdout}" +
+                 "==================================================\n")
+    end = timer() - start
+    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
+    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
+
+
+def run_rebase_lvms_sh(release):
+    """Run the 'rebase_lvms.sh' script with the given release stream and return the script's output."""
+    script_dir = os.path.abspath(os.path.dirname(__file__))
+    registry, version = release.rsplit(":", 1)
+    args = [f"{script_dir}/rebase_lvms.sh", "latest", registry, version.lstrip("v")]
+    logging.info(f"Running: '{' '.join(args)}'")
+    start = timer()
+    result = subprocess.run(
+        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False)
     logging.info(f"Return code: {result.returncode}. Output:\n" +
                  "==================================================\n" +
                  f"{result.stdout}" +
@@ -292,7 +311,7 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
     """)
     base = template.format(**locals())
     return (base if rebase_script_succeded
-            else "# rebase.sh failed - check committed rebase_sh.log\n\n" + base)
+            else "# Rebase failed - check committed rebase.log\n\n" + base)
 
 
 def create_pr(gh_repo, base_branch, branch_name, title, desc):
@@ -476,6 +495,7 @@ def main():
     release_amd = try_get_env(AMD64_RELEASE_ENV)
     release_arm = try_get_env(ARM64_RELEASE_ENV)
     rhoai_release = try_get_env(RHOAI_RELEASE_ENV)
+    lvms_release = try_get_env(LVMS_RELEASE_ENV)
     base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
 
     global REMOTE_DRY_RUN
@@ -494,8 +514,9 @@ def main():
 
     rebase_result = run_rebase_sh(release_amd, release_arm)
     ai_rebase_result = run_rebase_ai_model_serving_sh(rhoai_release)
+    lvms_rebase_result = run_rebase_lvms_sh(lvms_release)
 
-    rebases_succeeded = rebase_result.success and ai_rebase_result.success
+    rebases_succeeded = rebase_result.success and ai_rebase_result.success and lvms_rebase_result.success
 
     if rebases_succeeded:
         # TODO How can we inform team that rebase job ran successfully just there was nothing new?
@@ -512,7 +533,10 @@ def main():
                       f"{rebase_result.output}" +
                       "==================================================\n" +
                       "rebase_ai_model_serving.sh:\n" +
-                      f"{ai_rebase_result.output}")
+                      f"{ai_rebase_result.output}" +
+                      "==================================================\n" +
+                      "rebase_lvms.sh:\n" +
+                      f"{lvms_rebase_result.output}")
             writer.write(output)
         if git_repo.active_branch.name == base_branch:
             # rebase.sh didn't reach the step that would create a branch
@@ -535,8 +559,8 @@ def main():
         push_branch_or_die(git_remote, rebase_branch_name)
 
     prow_job_url = try_create_prow_job_url()
-    pr_title = create_pr_title(rebase_branch_name, rebase_result.success)
-    desc = generate_pr_description(get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebase_result.success)
+    pr_title = create_pr_title(rebase_branch_name, rebases_succeeded)
+    desc = generate_pr_description(get_release_tag(release_amd), get_release_tag(release_arm), prow_job_url, rebases_succeeded)
 
     comment = ""
     pull_req = try_get_pr(gh_repo, org, base_branch, rebase_branch_name)
