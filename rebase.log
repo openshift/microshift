@@ -1,0 +1,1275 @@
+rebase.sh:
+[34m# Rebasing to registry.ci.openshift.org/ocp/release-5:5.1.0-0.nightly-2026-10-21-040310 and registry.ci.openshift.org/ocp-arm64/release-5-arm64:5.1.0-0.nightly-arm64-2026-10-23-010349[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp/release-5:5.1.0-0.nightly-2026-10-21-040310 (amd64)[00m
+[34m# Fetching release info for registry.ci.openshift.org/ocp-arm64/release-5-arm64:5.1.0-0.nightly-arm64-2026-10-23-010349 (arm64)[00m
+[34m# Extracting registry.ci.openshift.org/ocp/release-5:5.1.0-0.nightly-2026-10-21-040310 manifest content[00m
+[34m# Cloning registry.ci.openshift.org/ocp/release-5:5.1.0-0.nightly-2026-10-21-040310 component repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/api/.git/
+HEAD is now at 24b2699a Merge pull request #3107 from redhat-chai-bot/revert-3102-trt-3027
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-csi-snapshot-controller-operator/.git/
+HEAD is now at 41e9a6c Merge pull request #302 from jsafrane/bump-libs-5.1
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-dns-operator/.git/
+HEAD is now at 9d18bdd7 Merge pull request #503 from melvinjoseph86/NE-2126-tests-ext-raw-gzip
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-ingress-operator/.git/
+HEAD is now at 2bb2799f Merge pull request #1630 from redhat-chai-bot/revert-1607-ocpbugs-121851
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-apiserver-operator/.git/
+HEAD is now at 5f22e9c Merge pull request #2354 from ardaguclu/update-library-go
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-controller-manager-operator/.git/
+HEAD is now at 8935774 Merge pull request #975 from dobsonj/STOR-2875
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-kube-scheduler-operator/.git/
+HEAD is now at ab8cbfb Merge pull request #660 from jubittajohn/rebase-1.37
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-network-operator/.git/
+HEAD is now at 089066d Merge pull request #3195 from mkowalski/align-frr-k8s-5.1-crds
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-openshift-controller-manager-operator/.git/
+HEAD is now at 8da2f1f Merge pull request #444 from ingvagabund/release-5.0
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-policy-controller/.git/
+HEAD is now at 81e2220 Merge pull request #211 from vincentdephily/vdp-bump-k8s-1.37
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/csi-external-snapshotter/.git/
+HEAD is now at a570de6 Merge pull request #260 from jsafrane/rebase-v8.7.0
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/etcd/.git/
+HEAD is now at 8480451b Merge pull request #415 from redhat-chai-bot/bot/ocpbugs-114428-protobuf-v1.36.12
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes/.git/
+HEAD is now at 8e30e5439 Merge pull request #2815 from redhat-chai-bot/fix-single-replica-exclusions
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/kubernetes-kube-storage-version-migrator/.git/
+HEAD is now at c67b43a Merge pull request #266 from redhat-chai-bot/main_CVE-2026-33814
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/machine-config-operator/.git/
+HEAD is now at 70901039 Merge pull request #6666 from sergiordlr/make_66436_stable_weak_cipher
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/openshift-controller-manager/.git/
+HEAD is now at 7296431 Merge pull request #462 from ingvagabund/k8s-1.37
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/operator-framework-olm/.git/
+HEAD is now at 14f999ff Merge pull request #1382 from tmshort/bump-test-extension-grpc-v1-84
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/route-controller-manager/.git/
+HEAD is now at a158fff Merge pull request #102 from jcmoraisjr/OCPBUGS-104856-clear-missing-route
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/service-ca-operator/.git/
+HEAD is now at ed872ba Merge pull request #366 from oceanc80/bump-1.36.2
+
+[34m# Cloning cluster-monitoring-operator at 8a14c3e2fd80a9bf481f65df36976895479cf60f[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cluster-monitoring-operator/.git/
+HEAD is now at 8a14c3e2 Merge pull request #2926 from machine424/res-net
+[34m# Cloning registry.ci.openshift.org/ocp/release-5:5.1.0-0.nightly-2026-10-21-040310 image repos[00m
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/oc/.git/
+HEAD is now at 586088c4 Merge pull request #2441 from SamPlaysKeys/feature/add-DS_Store
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/coredns/.git/
+HEAD is now at 83aefed Merge pull request #215 from redhat-chai-bot/bot/ocpbugs-114428-protobuf-v1.36.12
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/csi-external-snapshotter/.git/
+HEAD is now at a570de6 Merge pull request #260 from jsafrane/rebase-v8.7.0
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/router/.git/
+HEAD is now at 01bee8d Merge pull request #847 from redhat-chai-bot/add-pedjak-to-owners
+
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kube-rbac-proxy/.git/
+HEAD is now at 75554a0 Merge pull request #162 from ibihim/merge-v0.23.0-downstream
+
+lvms_operator not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/ovn-kubernetes/.git/
+HEAD is now at 0d60766d Merge pull request #3543 from arkadeepsen/ds-merge-10-14-2026
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/kubernetes/.git/
+HEAD is now at 8e30e5439 Merge pull request #2815 from redhat-chai-bot/fix-single-replica-exclusions
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/amd64/service-ca-operator/.git/
+HEAD is now at ed872ba Merge pull request #366 from oceanc80/bump-1.36.2
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/oc/.git/
+HEAD is now at 586088c4 Merge pull request #2441 from SamPlaysKeys/feature/add-DS_Store
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/coredns/.git/
+HEAD is now at 83aefed Merge pull request #215 from redhat-chai-bot/bot/ocpbugs-114428-protobuf-v1.36.12
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/csi-external-snapshotter/.git/
+HEAD is now at a570de6 Merge pull request #260 from jsafrane/rebase-v8.7.0
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/router/.git/
+HEAD is now at 01bee8d Merge pull request #847 from redhat-chai-bot/add-pedjak-to-owners
+
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kube-rbac-proxy/.git/
+HEAD is now at 75554a0 Merge pull request #162 from ibihim/merge-v0.23.0-downstream
+
+lvms_operator not from release payload, skipping
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/ovn-kubernetes/.git/
+HEAD is now at baff7a3f Merge pull request #3570 from arkadeepsen/add-aurko-to-owners
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/kubernetes/.git/
+HEAD is now at 8e30e5439 Merge pull request #2815 from redhat-chai-bot/fix-single-replica-exclusions
+
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/arm64/service-ca-operator/.git/
+HEAD is now at ed872ba Merge pull request #366 from oceanc80/bump-1.36.2
+
+Warning: env var PULL_BASE_REF not found or empty, falling back to local active branch.
+error: branch 'rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23' not found
+Switched to a new branch 'rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23'
+[34m## Updating last_rebase.sh[00m
+[34m## Committing changes to last_rebase.sh[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 536b397fd] update last_rebase.sh
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+api embedded-component no change
+
+cluster-csi-snapshot-controller-operator embedded-component no change
+
+cluster-dns-operator embedded-component no change
+
+cluster-kube-apiserver-operator embedded-component no change
+
+cluster-kube-scheduler-operator embedded-component no change
+
+cluster-openshift-controller-manager-operator embedded-component no change
+
+etcd embedded-component no change
+
+kubernetes embedded-component no change
+
+kubernetes-kube-storage-version-migrator embedded-component no change
+
+openshift-controller-manager embedded-component no change
+
+operator-framework-olm embedded-component no change
+
+route-controller-manager embedded-component no change
+
+service-ca-operator embedded-component no change
+
+oc image-amd64 no change
+
+coredns image-amd64 no change
+
+router image-amd64 no change
+
+router image-amd64 no change
+
+kube-rbac-proxy image-amd64 no change
+
+kubernetes image-amd64 no change
+
+service-ca-operator image-amd64 no change
+
+oc image-arm64 no change
+
+coredns image-arm64 no change
+
+csi-external-snapshotter image-arm64 no change
+
+router image-arm64 no change
+
+router image-arm64 no change
+
+kube-rbac-proxy image-arm64 no change
+
+kubernetes image-arm64 no change
+
+service-ca-operator image-arm64 no change
+
+[34m## Committing changes to changelog[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 2b45eec55] update changelog
+ 2 files changed, 138 insertions(+), 11 deletions(-)
+[34m# Updating microshift/go.mod[00m
+go mod edit -require github.com/openshift/cluster-policy-controller@81e222007c2ceec48a908877eb71fb135a2c2453
+go: downloading github.com/stretchr/testify v1.12.1
+go: downloading github.com/spf13/cobra v1.10.2
+go: downloading sigs.k8s.io/yaml v1.6.0
+go: downloading github.com/spf13/pflag v1.0.10
+go: downloading github.com/openshift/build-machinery-go v0.0.0-20260902143904-520f675c892b
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading github.com/openshift/api v0.0.0-20261001152744-764bd4c566f9
+go: downloading github.com/openshift/client-go v0.0.0-20261001003915-dcaad1dc7fe8
+go: downloading github.com/openshift/library-go v0.0.0-20261001144932-192662696fc7
+go: downloading github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e
+go: downloading github.com/fsnotify/fsnotify v1.9.0
+go: downloading github.com/apparentlymart/go-cidr v1.1.0
+go: downloading github.com/evanphx/json-patch v4.12.0+incompatible
+go: downloading github.com/vishvananda/netlink v1.3.1
+go: downloading github.com/squat/generic-device-plugin v0.0.0-20251019101956-043a51e18f31
+go: downloading sigs.k8s.io/kustomize/kyaml v0.21.1
+go: downloading go.etcd.io/etcd/client/pkg/v3 v3.7.0
+go: downloading github.com/cenkalti/backoff/v4 v4.3.0
+go: downloading k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3
+go: downloading go.etcd.io/etcd/client/v3 v3.7.0
+go: downloading github.com/ovn-kubernetes/libovsdb v0.8.2-0.20260302130604-c07ce22366ac
+go: downloading github.com/go-kit/kit v0.9.0
+go: downloading github.com/openshift/cluster-policy-controller v0.0.0-20261019223900-81e222007c2c
+go: downloading sigs.k8s.io/kustomize/api v0.21.1
+go: downloading github.com/openshift/route-controller-manager v0.0.0-20260909174728-a158fff7ce38
+go: downloading golang.org/x/sys v0.47.0
+go: downloading sigs.k8s.io/knftables v0.0.22
+go: downloading github.com/coreos/go-systemd/v22 v22.7.0
+go: downloading github.com/miekg/dns v1.1.63
+go: downloading github.com/openshift/kubernetes-kube-storage-version-migrator v0.0.3-0.20261008231247-c67b43a2519e
+go: downloading github.com/google/go-cmp v0.7.0
+go: downloading gopkg.in/yaml.v2 v2.4.0
+go: downloading sigs.k8s.io/randfill v1.0.0
+go: downloading k8s.io/kube-openapi v0.0.0-20260721132016-d427ff9ee9ad
+go: downloading sigs.k8s.io/structured-merge-diff/v6 v6.4.2
+go: downloading github.com/go-logr/logr v1.4.3
+go: downloading github.com/google/uuid v1.6.0
+go: downloading gopkg.in/evanphx/json-patch.v4 v4.13.0
+go: downloading go.yaml.in/yaml/v2 v2.4.4
+go: downloading go.yaml.in/yaml/v3 v3.0.5
+go: downloading github.com/gogo/protobuf v1.3.2
+go: downloading github.com/golang/snappy v0.0.4
+go: downloading github.com/prometheus/client_model v0.6.2
+go: downloading github.com/prometheus/common v0.70.0
+go: downloading github.com/prometheus/prometheus v0.302.1
+go: downloading github.com/inconshreveable/mousetrap v1.1.0
+go: downloading github.com/fxamacker/cbor/v2 v2.9.2
+go: downloading github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
+go: downloading github.com/pkg/errors v0.9.1
+go: downloading github.com/go-kit/log v0.2.1
+go: downloading github.com/oklog/run v1.2.0
+go: downloading github.com/prometheus/client_golang v1.24.0
+go: downloading google.golang.org/grpc v1.82.1
+go: downloading gopkg.in/inf.v0 v0.9.1
+go: downloading github.com/vishvananda/netns v0.0.5
+go: downloading go.uber.org/zap v1.27.1
+go: downloading github.com/coreos/go-semver v0.3.1
+go: downloading github.com/golang/protobuf v1.5.4
+go: downloading go.etcd.io/etcd/api/v3 v3.7.0
+go: downloading gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
+go: downloading github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.74.0
+go: downloading google.golang.org/protobuf v1.36.12
+go: downloading github.com/cenkalti/rpc2 v1.0.5
+go: downloading github.com/go-playground/validator/v10 v10.28.0
+go: downloading github.com/go-logr/stdr v1.2.2
+go: downloading github.com/go-logfmt/logfmt v0.5.1
+go: downloading github.com/go-stack/stack v1.8.1
+go: downloading github.com/google/gnostic-models v0.7.1
+go: downloading golang.org/x/term v0.45.0
+go: downloading sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730
+go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+go: downloading golang.org/x/net v0.57.0
+go: downloading golang.org/x/time v0.15.0
+go: downloading go.opentelemetry.io/otel/trace v1.44.0
+go: downloading go.opentelemetry.io/otel v1.44.0
+go: downloading go.uber.org/goleak v1.3.0
+go: downloading github.com/blang/semver/v4 v4.0.0
+go: downloading github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de
+go: downloading github.com/moby/term v0.5.2
+go: downloading github.com/jonboulle/clockwork v0.5.0
+go: downloading github.com/MakeNowJust/heredoc v1.0.0
+go: downloading github.com/mitchellh/go-wordwrap v1.0.1
+go: downloading github.com/godbus/dbus/v5 v5.2.2
+go: downloading github.com/russross/blackfriday/v2 v2.1.0
+go: downloading golang.org/x/tools v0.47.0
+go: downloading golang.org/x/sync v0.22.0
+go: downloading github.com/google/nftables v0.3.0
+go: downloading github.com/lithammer/dedent v1.1.0
+go: downloading github.com/mdlayher/netlink v1.11.2
+go: downloading github.com/google/cadvisor/lib v0.60.5
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.44.0
+go: downloading go.opentelemetry.io/otel/metric v1.44.0
+go: downloading go.opentelemetry.io/otel/sdk v1.44.0
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.44.0
+go: downloading github.com/Microsoft/go-winio v0.6.2
+go: downloading github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
+go: downloading github.com/peterbourgon/diskv v2.0.1+incompatible
+go: downloading golang.org/x/text v0.40.0
+go: downloading github.com/json-iterator/go v1.1.12
+go: downloading github.com/x448/float16 v0.8.4
+go: downloading github.com/prometheus/procfs v0.21.1
+go: downloading k8s.io/gengo/v2 v2.0.0-20260408192533-25e2208e0dc3
+go: downloading github.com/beorn7/perks v1.0.1
+go: downloading github.com/cespare/xxhash/v2 v2.3.0
+go: downloading go.uber.org/multierr v1.11.0
+go: downloading github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0
+go: downloading google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa
+go: downloading github.com/kr/pretty v0.3.1
+go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa
+go: downloading github.com/go-openapi/jsonreference v1.0.0
+go: downloading github.com/go-errors/errors v1.4.2
+go: downloading github.com/go-openapi/swag v0.27.1
+go: downloading github.com/cenkalti/hub v1.0.2
+go: downloading github.com/gabriel-vasile/mimetype v1.4.10
+go: downloading github.com/go-playground/universal-translator v0.18.1
+go: downloading github.com/leodido/go-urn v1.4.0
+go: downloading golang.org/x/crypto v0.54.0
+go: downloading github.com/go-playground/assert/v2 v2.2.0
+go: downloading github.com/go-playground/locales v0.14.1
+go: downloading github.com/pkg/profile v1.7.0
+go: downloading github.com/sirupsen/logrus v1.9.4
+go: downloading github.com/emicklei/go-restful/v3 v3.13.0
+go: downloading go.uber.org/atomic v1.12.0
+go: downloading github.com/chai2010/gettext-go v1.0.2
+go: downloading github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260807173042-3ac00363bb14
+go: downloading github.com/onsi/gomega v1.40.0
+go: downloading github.com/exponent-io/jsonpath v0.0.0-20210407135951-1de76d718b3f
+go: downloading golang.org/x/oauth2 v0.36.0
+go: downloading github.com/stretchr/objx v0.5.3
+go: downloading gopkg.in/natefinch/lumberjack.v2 v2.2.1
+go: downloading gopkg.in/go-jose/go-jose.v2 v2.6.3
+go: downloading github.com/google/cel-go v0.29.2
+go: downloading go.etcd.io/etcd/server/v3 v3.7.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.69.0
+go: downloading sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.36.0
+go: downloading github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
+go: downloading github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f
+go: downloading github.com/openshift/apiserver-library-go v0.0.0-20261001145254-218f2c488d90
+go: downloading github.com/onsi/ginkgo v1.16.5
+go: downloading github.com/robfig/cron/v3 v3.0.1
+go: downloading github.com/robfig/cron v1.2.0
+go: downloading github.com/container-storage-interface/spec v1.12.1-0.20260720052920-cd9e7ad1ae09
+go: downloading github.com/opencontainers/selinux v1.15.1
+go: downloading github.com/creack/pty v1.1.18
+go: downloading github.com/mdlayher/socket v0.6.1
+go: downloading go.opentelemetry.io/proto/otlp v1.10.0
+go: downloading go.opentelemetry.io/otel/sdk/metric v1.44.0
+go: downloading github.com/opencontainers/cgroups v0.0.7
+go: downloading github.com/cyphar/filepath-securejoin v0.7.0
+go: downloading github.com/moby/sys/userns v0.1.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/github.com/emicklei/go-restful/otelrestful v0.69.0
+go: downloading github.com/docker/go-units v0.5.0
+go: downloading github.com/moby/sys/mountinfo v0.7.2
+go: downloading github.com/google/btree v1.1.3
+go: downloading github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+go: downloading github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee
+go: downloading github.com/klauspost/compress v1.19.0
+go: downloading github.com/kylelemons/godebug v1.1.0
+go: downloading golang.org/x/tools/go/packages/packagestest v0.1.1-deprecated
+go: downloading github.com/go-logr/zapr v1.3.0
+go: downloading github.com/kr/text v0.2.0
+go: downloading github.com/rogpeppe/go-internal v1.14.1
+go: downloading github.com/go-openapi/jsonpointer v1.0.0
+go: downloading github.com/go-openapi/testify/v2 v2.6.0
+go: downloading github.com/go-openapi/swag/cmdutils v0.27.1
+go: downloading github.com/go-openapi/swag/conv v0.27.1
+go: downloading github.com/go-openapi/swag/fileutils v0.27.1
+go: downloading github.com/go-openapi/swag/jsonutils v0.27.1
+go: downloading github.com/go-openapi/swag/loading v0.27.1
+go: downloading github.com/go-openapi/swag/mangling v0.27.1
+go: downloading github.com/go-openapi/swag/netutils v0.27.1
+go: downloading github.com/go-openapi/swag/stringutils v0.27.1
+go: downloading github.com/go-openapi/swag/typeutils v0.27.1
+go: downloading github.com/go-openapi/swag/yamlutils v0.27.1
+go: downloading github.com/felixge/fgprof v0.9.4
+go: downloading github.com/NYTimes/gziphandler v1.1.1
+go: downloading github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.68.0
+go: downloading github.com/coreos/go-oidc v2.5.0+incompatible
+go: downloading cel.dev/expr v0.25.1
+go: downloading github.com/distribution/reference v0.6.0
+go: downloading github.com/felixge/httpsnoop v1.0.4
+go: downloading github.com/moby/spdystream v0.5.1
+go: downloading github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
+go: downloading github.com/soheilhy/cmux v0.1.5
+go: downloading github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75
+go: downloading go.etcd.io/bbolt v1.5.0
+go: downloading go.etcd.io/etcd/pkg/v3 v3.7.0
+go: downloading github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc
+go: downloading github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c
+go: downloading go.opentelemetry.io/auto/sdk v1.2.1
+go: downloading github.com/cenkalti/backoff/v5 v5.0.3
+go: downloading github.com/JeffAshton/win_pdh v0.0.0-20161109143554-76bb4ee9f0ab
+go: downloading github.com/Microsoft/hnslib v0.1.3
+go: downloading github.com/sergi/go-diff v1.4.0
+go: downloading golang.org/x/mod v0.37.0
+go: downloading github.com/containerd/containerd/api v1.11.1
+go: downloading github.com/opencontainers/runtime-spec v1.3.0
+go: downloading github.com/containerd/typeurl/v2 v2.3.0
+go: downloading golang.org/x/tools/go/expect v0.1.1-deprecated
+go: downloading github.com/go-openapi/testify/enable/yaml/v2 v2.6.0
+go: downloading github.com/go-openapi/swag/jsonutils/fixtures_test v0.27.1
+go: downloading github.com/google/pprof v0.0.0-20260402051712-545e8a4df936
+go: downloading go.opentelemetry.io/contrib/propagators/b3 v1.44.0
+go: downloading go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.44.0
+go: downloading github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
+go: downloading github.com/pquerna/cachecontrol v0.1.0
+go: downloading github.com/opencontainers/go-digest v1.0.0
+go: downloading github.com/dustin/go-humanize v1.0.1
+go: downloading go.etcd.io/raft/v3 v3.7.0
+go: downloading github.com/xiang90/probing v0.0.0-20221125231312-a49e3df8f510
+go: downloading github.com/Masterminds/semver/v3 v3.4.0
+go: downloading github.com/antlr4-go/antlr/v4 v4.13.1
+go: downloading cyphar.com/go-pathrs v0.2.5
+go: downloading github.com/fatih/camelcase v1.0.0
+go: downloading github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00
+go: downloading github.com/xlab/treeprint v1.2.0
+go: downloading gonum.org/v1/gonum v0.17.0
+go: downloading github.com/containerd/ttrpc v1.2.9
+go: downloading github.com/golang-jwt/jwt/v5 v5.3.1
+go: downloading github.com/go-task/slim-sprig/v3 v3.0.0
+go: downloading github.com/go-ldap/ldap/v3 v3.4.11
+go: downloading github.com/go-openapi/swag/pools v0.27.1
+go: downloading github.com/opencontainers/image-spec v1.1.1
+go: downloading golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
+go: downloading github.com/containerd/log v0.1.0
+go: downloading github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358
+go: downloading github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667
+go: downloading github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa
+go: downloading github.com/jcmturner/gokrb5/v8 v8.4.4
+go: downloading github.com/jcmturner/gofork v1.7.6
+go: downloading github.com/jcmturner/goidentity/v6 v6.0.1
+go: downloading github.com/jcmturner/dnsutils/v2 v2.0.0
+go: downloading github.com/hashicorp/go-uuid v1.0.3
+go: downloading github.com/jcmturner/rpc/v2 v2.0.3
+go: downloading github.com/jcmturner/aescts/v2 v2.0.0
+go: downloading github.com/openshift/api v0.0.0-20261009034342-f9511d3fcb26
+go: downloading github.com/openshift/client-go v0.0.0-20261006222332-348fc1ca8bb1
+go: downloading github.com/openshift/library-go v0.0.0-20261012084302-f23ec502bed4
+go mod edit -replace github.com/onsi/ginkgo/v2=github.com/openshift/onsi-ginkgo/v2@v2.6.1-0.20260807173042-3ac00363bb14
+Handling 'k8s.io/klog/v2' dep: cloning 'https://github.com/kubernetes/klog' @ 'v2.140.0' to /go/src/github.com/openshift/microshift/./deps/k8s.io/klog
+Cloning into '/go/src/github.com/openshift/microshift/./deps/k8s.io/klog'...
+Handling 'k8s.io/kubernetes' dep: copying /go/src/github.com/openshift/microshift/_output/staging/kubernetes -> /go/src/github.com/openshift/microshift/./deps/github.com/openshift/kubernetes
+go mod edit -replace sigs.k8s.io/kube-storage-version-migrator=github.com/openshift/kubernetes-kube-storage-version-migrator@c67b43a2519e63f02e4be27ae6c8d4edcbc75950
+Handling 'k8s.io/api' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/apiextensions-apiserver' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/apimachinery' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/apiserver' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/cli-runtime' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/client-go' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/cloud-provider' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/cluster-bootstrap' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/code-generator' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/component-base' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/component-helpers' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/controller-manager' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/cri-api' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/cri-client' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/csi-translation-lib' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/dynamic-resource-allocation' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/endpointslice' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/externaljwt' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/kms' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/kube-aggregator' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/kube-controller-manager' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/kube-proxy' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/kube-scheduler' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/kubectl' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/kubelet' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/metrics' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/mount-utils' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/pod-security-admission' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/sample-apiserver' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/sample-cli-plugin' dep: updating required version to '1.37.1' (for information purposes)
+Handling 'k8s.io/sample-controller' dep: updating required version to '1.37.1' (for information purposes)
+skipping modulepath k8s.io/cri-streaming: no or unknown command []
+skipping modulepath k8s.io/streaming: no or unknown command []
+go mod edit -require github.com/openshift/route-controller-manager@a158fff7ce3826058bd2d7338b206cdd600d0d40
+go mod edit -require github.com/openshift/cluster-policy-controller@81e222007c2ceec48a908877eb71fb135a2c2453
+go: inconsistent vendoring in /go/src/github.com/openshift/microshift:
+	github.com/openshift/api@v0.0.0-20261009034342-f9511d3fcb26: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/client-go@v0.0.0-20261006222332-348fc1ca8bb1: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/library-go@v0.0.0-20261012084302-f23ec502bed4: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/cluster-policy-controller@v0.0.0-20261019223900-81e222007c2c: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/api@v0.0.0-20261001152744-764bd4c566f9: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/client-go@v0.0.0-20261001003915-dcaad1dc7fe8: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/cluster-policy-controller@v0.0.0-20260902120314-c9e9a3482609: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/library-go@v0.0.0-20261001144932-192662696fc7: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+
+	To ignore the vendor directory, use -mod=readonly or -mod=mod.
+	To sync the vendor directory, run:
+		go mod vendor
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x10 pc=0x9cebac]
+
+goroutine 1 [running]:
+cmd/go/internal/doc.findCodeRoots()
+	cmd/go/internal/doc/dirs.go:234 +0x74c
+cmd/go/internal/doc.codeRoots.func1()
+	cmd/go/internal/doc/dirs.go:175 +0xf
+sync.(*Once).doSlow(0xb75680?, 0x1f0d14b9e001?)
+	sync/once.go:78 +0xac
+sync.(*Once).Do(...)
+	sync/once.go:69
+cmd/go/internal/doc.codeRoots()
+	cmd/go/internal/doc/dirs.go:174 +0x2c
+cmd/go/internal/doc.dirsInit({0x0, 0x0, 0x1f0d14c5a000?})
+	cmd/go/internal/doc/dirs.go:58 +0x305
+cmd/go/internal/doc.runDoc({0xc4f2e0?, 0x11b3da0?}, 0x1f0d14ad8930?, {0x1f0d14ad4290, 0x1, 0x1})
+	cmd/go/internal/doc/doc.go:152 +0x72
+main.invoke(0x1182520, {0x1f0d14ad4280, 0x2, 0x2})
+	cmd/go/main.go:340 +0x8f9
+main.main()
+	cmd/go/main.go:219 +0xed6
+Running `gofmt -s -l -w` on 927 file(s).
+./deps/github.com/openshift/kubernetes/staging/src/k8s.io/code-generator/third_party/forked/golang/reflect/type.go
+./deps/github.com/openshift/kubernetes/staging/src/k8s.io/client-go/third_party/forked/golang/template/exec.go
+./deps/github.com/openshift/kubernetes/staging/src/k8s.io/client-go/third_party/forked/golang/template/funcs.go
+./deps/github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery/third_party/forked/golang/json/fields.go
+./deps/k8s.io/klog/klog.go
+go: inconsistent vendoring in /go/src/github.com/openshift/microshift:
+	github.com/openshift/api@v0.0.0-20261009034342-f9511d3fcb26: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/client-go@v0.0.0-20261006222332-348fc1ca8bb1: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/library-go@v0.0.0-20261012084302-f23ec502bed4: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/cluster-policy-controller@v0.0.0-20261019223900-81e222007c2c: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/api@v0.0.0-20261001152744-764bd4c566f9: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/client-go@v0.0.0-20261001003915-dcaad1dc7fe8: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/cluster-policy-controller@v0.0.0-20260902120314-c9e9a3482609: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/library-go@v0.0.0-20261001144932-192662696fc7: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+
+	To ignore the vendor directory, use -mod=readonly or -mod=mod.
+	To sync the vendor directory, run:
+		go mod vendor
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x10 pc=0x9cebac]
+
+goroutine 1 [running]:
+cmd/go/internal/doc.findCodeRoots()
+	cmd/go/internal/doc/dirs.go:234 +0x74c
+cmd/go/internal/doc.codeRoots.func1()
+	cmd/go/internal/doc/dirs.go:175 +0xf
+sync.(*Once).doSlow(0xb75680?, 0x56fecc14101?)
+	sync/once.go:78 +0xac
+sync.(*Once).Do(...)
+	sync/once.go:69
+cmd/go/internal/doc.codeRoots()
+	cmd/go/internal/doc/dirs.go:174 +0x2c
+cmd/go/internal/doc.dirsInit({0x0, 0x0, 0x56fecdce000?})
+	cmd/go/internal/doc/dirs.go:58 +0x305
+cmd/go/internal/doc.runDoc({0xc4f2e0?, 0x11b3da0?}, 0x56fecd68738?, {0x56fecd24260, 0x1, 0x1})
+	cmd/go/internal/doc/doc.go:152 +0x72
+main.invoke(0x1182520, {0x56fecd24250, 0x2, 0x2})
+	cmd/go/main.go:340 +0x8f9
+main.main()
+	cmd/go/main.go:219 +0xed6
+for p in scripts/auto-rebase/rebase_patches/0001-Fix-CSI-initialization-conflict.patch scripts/auto-rebase/rebase_patches/0002-disable-APIrequestcount-controller.patch scripts/auto-rebase/rebase_patches/0003-disable-clusterQuotaMapping-controller.patch scripts/auto-rebase/rebase_patches/0004-remove-config-informer-and-cpu-partitioning-admission-plugin.patch scripts/auto-rebase/rebase_patches/0005-remove-user-informer.patch scripts/auto-rebase/rebase_patches/0020-klog-component-names.patch scripts/auto-rebase/rebase_patches/0030-kube-controller-manager-command-context.patch scripts/auto-rebase/rebase_patches/0040-rbac-bootstrap-hook-context-threading.patch; do \
+	echo "Applying patch $p"; \
+	git mailinfo /dev/null /dev/stderr 2<&1- < $p | git apply --reject || exit 1; \
+done
+Applying patch scripts/auto-rebase/rebase_patches/0001-Fix-CSI-initialization-conflict.patch
+Checking patch deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go...
+Hunk #1 succeeded at 347 (offset 2 lines).
+Applied patch deps/github.com/openshift/kubernetes/pkg/volume/csi/csi_plugin.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0002-disable-APIrequestcount-controller.patch
+Checking patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go...
+Hunk #2 succeeded at 33 (offset 1 line).
+Hunk #3 succeeded at 92 (offset 8 lines).
+Applied patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0003-disable-clusterQuotaMapping-controller.patch
+Checking patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go...
+Hunk #2 succeeded at 26 (offset 1 line).
+Hunk #3 succeeded at 50 (offset 1 line).
+Hunk #4 succeeded at 109 (offset 2 lines).
+Hunk #5 succeeded at 127 (offset 2 lines).
+Hunk #6 succeeded at 141 (offset 2 lines).
+Hunk #7 succeeded at 157 (offset 2 lines).
+Applied patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0004-remove-config-informer-and-cpu-partitioning-admission-plugin.patch
+Checking patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go...
+Checking patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go...
+Hunk #3 succeeded at 32 (offset 1 line).
+Hunk #5 succeeded at 76 (offset 3 lines).
+Applied patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go cleanly.
+Applied patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/admission/admissionenablement/register.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0005-remove-user-informer.patch
+Checking patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go...
+Applied patch deps/github.com/openshift/kubernetes/openshift-kube-apiserver/openshiftkubeapiserver/patch.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0020-klog-component-names.patch
+Checking patch deps/k8s.io/klog/goroutine_labels.go...
+Checking patch deps/k8s.io/klog/internal/buffer/buffer.go...
+Hunk #1 succeeded at 144 (offset -5 lines).
+Checking patch deps/k8s.io/klog/internal/buffer/goroutine_labels.go...
+Applied patch deps/k8s.io/klog/goroutine_labels.go cleanly.
+Applied patch deps/k8s.io/klog/internal/buffer/buffer.go cleanly.
+Applied patch deps/k8s.io/klog/internal/buffer/goroutine_labels.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0030-kube-controller-manager-command-context.patch
+Checking patch deps/github.com/openshift/kubernetes/cmd/kube-controller-manager/app/controllermanager.go...
+Hunk #1 succeeded at 41 (offset 3 lines).
+Hunk #2 succeeded at 166 (offset 1 line).
+Applied patch deps/github.com/openshift/kubernetes/cmd/kube-controller-manager/app/controllermanager.go cleanly.
+Applying patch scripts/auto-rebase/rebase_patches/0040-rbac-bootstrap-hook-context-threading.patch
+Checking patch deps/github.com/openshift/kubernetes/pkg/registry/rbac/rest/storage_rbac.go...
+Applied patch deps/github.com/openshift/kubernetes/pkg/registry/rbac/rest/storage_rbac.go cleanly.
+[34m# Updating etcd/go.mod[00m
+go mod edit -require github.com/openshift/cluster-policy-controller@81e222007c2ceec48a908877eb71fb135a2c2453
+go: downloading github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20260924184947-8480451b19d3
+go: downloading github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20260924184947-8480451b19d3
+go: downloading k8s.io/klog/v2 v2.140.0
+go: downloading github.com/openshift/etcd/client/pkg/v3 v3.0.0-20260924184947-8480451b19d3
+go: downloading github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260924184947-8480451b19d3
+go: downloading github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20260924184947-8480451b19d3
+go: downloading go.etcd.io/raft/v3 v3.6.0
+go: downloading github.com/cockroachdb/datadriven v1.0.2
+skipping modulepath github.com/openshift/microshift: no or unknown command []
+go mod edit -replace github.com/onsi/ginkgo/v2=github.com/openshift/onsi-ginkgo/v2@v2.6.1-0.20260807173042-3ac00363bb14
+go mod edit -replace go.etcd.io/etcd/api/v3=github.com/openshift/etcd/api/v3@8480451b19d39e15760c32e773521a295920eaa9
+go mod edit -replace go.etcd.io/etcd/client/pkg/v3=github.com/openshift/etcd/client/pkg/v3@8480451b19d39e15760c32e773521a295920eaa9
+go mod edit -replace go.etcd.io/etcd/client/v3=github.com/openshift/etcd/client/v3@8480451b19d39e15760c32e773521a295920eaa9
+go mod edit -replace go.etcd.io/etcd/pkg/v3=github.com/openshift/etcd/pkg/v3@8480451b19d39e15760c32e773521a295920eaa9
+go mod edit -replace go.etcd.io/etcd/server/v3=github.com/openshift/etcd/server/v3@8480451b19d39e15760c32e773521a295920eaa9
+skipping modulepath go.etcd.io/raft/v3: override [openshift/etcd server fork requires raft v3.6.0; k8s selects v3.7.0 (protobuf-incompatible) via stale indirect requires]
+skipping modulepath k8s.io/api: no or unknown command []
+skipping modulepath k8s.io/apiextensions-apiserver: no or unknown command []
+skipping modulepath k8s.io/apimachinery: no or unknown command []
+skipping modulepath k8s.io/apiserver: no or unknown command []
+skipping modulepath k8s.io/cli-runtime: no or unknown command []
+skipping modulepath k8s.io/client-go: no or unknown command []
+skipping modulepath k8s.io/cloud-provider: no or unknown command []
+skipping modulepath k8s.io/cluster-bootstrap: no or unknown command []
+skipping modulepath k8s.io/code-generator: no or unknown command []
+skipping modulepath k8s.io/component-base: no or unknown command []
+skipping modulepath k8s.io/component-helpers: no or unknown command []
+skipping modulepath k8s.io/controller-manager: no or unknown command []
+skipping modulepath k8s.io/cri-api: no or unknown command []
+skipping modulepath k8s.io/cri-client: no or unknown command []
+skipping modulepath k8s.io/csi-translation-lib: no or unknown command []
+skipping modulepath k8s.io/dynamic-resource-allocation: no or unknown command []
+skipping modulepath k8s.io/endpointslice: no or unknown command []
+skipping modulepath k8s.io/externaljwt: no or unknown command []
+skipping modulepath k8s.io/kms: no or unknown command []
+skipping modulepath k8s.io/kube-aggregator: no or unknown command []
+skipping modulepath k8s.io/kube-controller-manager: no or unknown command []
+skipping modulepath k8s.io/kube-proxy: no or unknown command []
+skipping modulepath k8s.io/kube-scheduler: no or unknown command []
+skipping modulepath k8s.io/kubectl: no or unknown command []
+skipping modulepath k8s.io/kubelet: no or unknown command []
+skipping modulepath k8s.io/legacy-cloud-providers: no or unknown command []
+skipping modulepath k8s.io/metrics: no or unknown command []
+skipping modulepath k8s.io/mount-utils: no or unknown command []
+skipping modulepath k8s.io/pod-security-admission: no or unknown command []
+skipping modulepath k8s.io/sample-apiserver: no or unknown command []
+skipping modulepath k8s.io/sample-cli-plugin: no or unknown command []
+skipping modulepath k8s.io/sample-controller: no or unknown command []
+skipping modulepath k8s.io/cri-streaming: no or unknown command []
+skipping modulepath k8s.io/streaming: no or unknown command []
+go mod edit -require github.com/openshift/route-controller-manager@a158fff7ce3826058bd2d7338b206cdd600d0d40
+go mod edit -require github.com/openshift/cluster-policy-controller@81e222007c2ceec48a908877eb71fb135a2c2453
+Running `gofmt -s -l -w` on 4 file(s).
+[34m## Committing changes to microshift/go.mod[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 114e3380c] update microshift/go.mod
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+[34m## Updating microshift/vendor directory[00m
+/go/src/github.com/openshift/microshift /go/src/github.com/openshift/microshift
+go: inconsistent vendoring in /go/src/github.com/openshift/microshift:
+	github.com/openshift/api@v0.0.0-20261009034342-f9511d3fcb26: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/client-go@v0.0.0-20261006222332-348fc1ca8bb1: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/library-go@v0.0.0-20261012084302-f23ec502bed4: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/cluster-policy-controller@v0.0.0-20261019223900-81e222007c2c: is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt
+	github.com/openshift/api@v0.0.0-20261001152744-764bd4c566f9: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/client-go@v0.0.0-20261001003915-dcaad1dc7fe8: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/cluster-policy-controller@v0.0.0-20260902120314-c9e9a3482609: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+	github.com/openshift/library-go@v0.0.0-20261001144932-192662696fc7: is marked as explicit in vendor/modules.txt, but not explicitly required in go.mod
+
+	To ignore the vendor directory, use -mod=readonly or -mod=mod.
+	To sync the vendor directory, run:
+		go mod vendor
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x10 pc=0x9cebac]
+
+goroutine 1 [running]:
+cmd/go/internal/doc.findCodeRoots()
+	cmd/go/internal/doc/dirs.go:234 +0x74c
+cmd/go/internal/doc.codeRoots.func1()
+	cmd/go/internal/doc/dirs.go:175 +0xf
+sync.(*Once).doSlow(0xb75680?, 0x2a23a2cced01?)
+	sync/once.go:78 +0xac
+sync.(*Once).Do(...)
+	sync/once.go:69
+cmd/go/internal/doc.codeRoots()
+	cmd/go/internal/doc/dirs.go:174 +0x2c
+cmd/go/internal/doc.dirsInit({0x0, 0x0, 0x2a23a2e64000?})
+	cmd/go/internal/doc/dirs.go:58 +0x305
+cmd/go/internal/doc.runDoc({0xc4f2e0?, 0x11b3da0?}, 0x2a23a2ce2930?, {0x2a23a2cde290, 0x1, 0x1})
+	cmd/go/internal/doc/doc.go:152 +0x72
+main.invoke(0x1182520, {0x2a23a2cde280, 0x2, 0x2})
+	cmd/go/main.go:340 +0x8f9
+main.main()
+	cmd/go/main.go:219 +0xed6
+go mod vendor
+/go/src/github.com/openshift/microshift
+[34m## Commiting changes to microshift/vendor directory[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 e0e3040fc] update microshift/vendor
+ 38 files changed, 2123 insertions(+), 65 deletions(-)
+ create mode 100644 vendor/github.com/openshift/api/authentication/install.go
+ create mode 100644 vendor/github.com/openshift/api/authentication/v1alpha1/doc.go
+ create mode 100644 vendor/github.com/openshift/api/authentication/v1alpha1/register.go
+ create mode 100644 vendor/github.com/openshift/api/authentication/v1alpha1/types_authentication_configuration.go
+ create mode 100644 vendor/github.com/openshift/api/authentication/v1alpha1/zz_generated.deepcopy.go
+ create mode 100644 vendor/github.com/openshift/api/authentication/v1alpha1/zz_generated.model_name.go
+ create mode 100644 vendor/github.com/openshift/api/authentication/v1alpha1/zz_generated.swagger_doc_generated.go
+ create mode 100644 vendor/github.com/openshift/api/config/v1alpha1/types_controllermanager.go
+ create mode 100644 vendor/github.com/openshift/client-go/config/applyconfigurations/config/v1alpha1/controllermanager.go
+ create mode 100644 vendor/github.com/openshift/client-go/config/applyconfigurations/config/v1alpha1/controllermanagerspec.go
+ create mode 100644 vendor/github.com/openshift/client-go/config/clientset/versioned/typed/config/v1alpha1/controllermanager.go
+ create mode 100644 vendor/github.com/openshift/client-go/config/listers/config/v1alpha1/controllermanager.go
+ rename vendor/github.com/openshift/client-go/operator/applyconfigurations/operator/v1/{ingress.go => consoleingress.go} (75%)
+[34m## Committing changes to etcd/go.mod[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 185c30138] update etcd/go.mod
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+[34m## Updating etcd/vendor directory[00m
+/go/src/github.com/openshift/microshift/etcd /go/src/github.com/openshift/microshift
+go mod vendor
+/go/src/github.com/openshift/microshift
+[34m## Commiting changes to etcd/vendor directory[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 69eaa1dbe] update etcd/vendor
+ 7 files changed, 44 insertions(+), 40 deletions(-)
+[34mRebasing release_*.json[00m
+[34m## Committing changes to pkg/release[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 92f983474] update component images
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+[34mCopying manifests[00m
+2026-10-23 04:27:50,981     INFO       Clearing directory assets/components/openshift-dns/dns/
+2026-10-23 04:27:50,982     DEBUG      Copying assets/components/openshift-dns/dns/cluster-role-binding.yaml <- _output/staging/cluster-dns-operator/pkg/manifests/assets/dns/cluster-role-binding.yaml
+2026-10-23 04:27:50,982     DEBUG      Copying assets/components/openshift-dns/dns/cluster-role.yaml <- _output/staging/cluster-dns-operator/pkg/manifests/assets/dns/cluster-role.yaml
+2026-10-23 04:27:50,982     INFO       Restoring assets/components/openshift-dns/dns/configmap.yaml
+2026-10-23 04:27:50,982     DEBUG      Executing 'git restore assets/components/openshift-dns/dns/configmap.yaml'
+2026-10-23 04:27:51,031     DEBUG      Copying assets/components/openshift-dns/dns/daemonset.yaml <- _output/staging/cluster-dns-operator/pkg/manifests/assets/dns/daemonset.yaml
+2026-10-23 04:27:51,031     DEBUG      Copying assets/components/openshift-dns/dns/namespace.yaml <- _output/staging/cluster-dns-operator/pkg/manifests/assets/dns/namespace.yaml
+2026-10-23 04:27:51,031     DEBUG      Copying assets/components/openshift-dns/dns/service-account.yaml <- _output/staging/cluster-dns-operator/pkg/manifests/assets/dns/service-account.yaml
+2026-10-23 04:27:51,032     DEBUG      Copying assets/components/openshift-dns/dns/service.yaml <- _output/staging/cluster-dns-operator/pkg/manifests/assets/dns/service.yaml
+2026-10-23 04:27:51,032     WARNING    Ignoring components/openshift-dns/dns/hosts-configmap-rolebinding.yaml because RBAC rules for hosts customization
+2026-10-23 04:27:51,032     WARNING    Ignoring components/openshift-dns/dns/hosts-configmap-role.yaml because RBAC rules for hosts customization
+2026-10-23 04:27:51,032     INFO       Clearing directory assets/components/openshift-dns/node-resolver
+2026-10-23 04:27:51,032     WARNING    Ignoring components/openshift-dns/node-resolver/daemonset.yaml because it's created by processing daemonset.yaml.tmpl
+2026-10-23 04:27:51,032     INFO       Restoring assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl
+2026-10-23 04:27:51,032     DEBUG      Executing 'git restore assets/components/openshift-dns/node-resolver/daemonset.yaml.tmpl'
+2026-10-23 04:27:51,080     DEBUG      Copying assets/components/openshift-dns/node-resolver/service-account.yaml <- _output/staging/cluster-dns-operator/pkg/manifests/assets/node-resolver/service-account.yaml
+2026-10-23 04:27:51,081     DEBUG      Copying assets/components/openshift-dns/node-resolver/update-node-resolver.sh <- _output/staging/cluster-dns-operator/pkg/manifests/assets/node-resolver/update-node-resolver.sh
+2026-10-23 04:27:51,081     INFO       Clearing directory assets/components/openshift-router/
+2026-10-23 04:27:51,082     DEBUG      Copying assets/components/openshift-router/cluster-role-binding.yaml <- _output/staging/cluster-ingress-operator/pkg/manifests/assets/router/cluster-role-binding.yaml
+2026-10-23 04:27:51,082     DEBUG      Copying assets/components/openshift-router/cluster-role.yaml <- _output/staging/cluster-ingress-operator/pkg/manifests/assets/router/cluster-role.yaml
+2026-10-23 04:27:51,082     INFO       Restoring assets/components/openshift-router/cluster-role-system-router.yaml
+2026-10-23 04:27:51,082     DEBUG      Executing 'git restore assets/components/openshift-router/cluster-role-system-router.yaml'
+2026-10-23 04:27:51,129     INFO       Restoring assets/components/openshift-router/configmap.yaml
+2026-10-23 04:27:51,129     DEBUG      Executing 'git restore assets/components/openshift-router/configmap.yaml'
+2026-10-23 04:27:51,177     INFO       Restoring assets/components/openshift-router/configmap-accesslog.yaml
+2026-10-23 04:27:51,177     DEBUG      Executing 'git restore assets/components/openshift-router/configmap-accesslog.yaml'
+2026-10-23 04:27:51,225     DEBUG      Copying assets/components/openshift-router/deployment.yaml <- _output/staging/cluster-ingress-operator/pkg/manifests/assets/router/deployment.yaml
+2026-10-23 04:27:51,225     DEBUG      Copying assets/components/openshift-router/namespace.yaml <- _output/staging/cluster-ingress-operator/pkg/manifests/assets/router/namespace.yaml
+2026-10-23 04:27:51,226     DEBUG      Copying assets/components/openshift-router/service-account.yaml <- _output/staging/cluster-ingress-operator/pkg/manifests/assets/router/service-account.yaml
+2026-10-23 04:27:51,226     DEBUG      Copying assets/components/openshift-router/service-internal.yaml <- _output/staging/cluster-ingress-operator/pkg/manifests/assets/router/service-internal.yaml
+2026-10-23 04:27:51,226     DEBUG      Copying assets/components/openshift-router/service-cloud.yaml <- _output/staging/cluster-ingress-operator/pkg/manifests/assets/router/service-cloud.yaml
+2026-10-23 04:27:51,226     INFO       Restoring assets/components/openshift-router/serving-certificate.yaml
+2026-10-23 04:27:51,226     DEBUG      Executing 'git restore assets/components/openshift-router/serving-certificate.yaml'
+2026-10-23 04:27:51,273     INFO       Restoring assets/components/openshift-router/cluster-role-aggregate-edit-route.yaml
+2026-10-23 04:27:51,273     DEBUG      Executing 'git restore assets/components/openshift-router/cluster-role-aggregate-edit-route.yaml'
+2026-10-23 04:27:51,320     INFO       Restoring assets/components/openshift-router/cluster-role-aggregate-admin-route.yaml
+2026-10-23 04:27:51,321     DEBUG      Executing 'git restore assets/components/openshift-router/cluster-role-aggregate-admin-route.yaml'
+2026-10-23 04:27:51,368     WARNING    Ignoring components/openshift-router/ingress-class.yaml because gets generated during image rebase
+2026-10-23 04:27:51,369     WARNING    Ignoring components/ovn/ because it's not covered by rebase script yet
+2026-10-23 04:27:51,369     INFO       Clearing directory assets/components/service-ca/
+2026-10-23 04:27:51,369     DEBUG      Copying assets/components/service-ca/clusterrole.yaml <- _output/staging/service-ca-operator/bindata/assets/clusterrole.yaml
+2026-10-23 04:27:51,370     DEBUG      Copying assets/components/service-ca/clusterrolebinding.yaml <- _output/staging/service-ca-operator/bindata/assets/clusterrolebinding.yaml
+2026-10-23 04:27:51,370     DEBUG      Copying assets/components/service-ca/controller-config.yaml <- _output/staging/service-ca-operator/bindata/assets/controller-config.yaml
+2026-10-23 04:27:51,370     DEBUG      Copying assets/components/service-ca/deployment.yaml <- _output/staging/service-ca-operator/bindata/assets/deployment.yaml
+2026-10-23 04:27:51,370     DEBUG      Copying assets/components/service-ca/ns.yaml <- _output/staging/service-ca-operator/bindata/assets/ns.yaml
+2026-10-23 04:27:51,370     DEBUG      Copying assets/components/service-ca/role.yaml <- _output/staging/service-ca-operator/bindata/assets/role.yaml
+2026-10-23 04:27:51,371     DEBUG      Copying assets/components/service-ca/rolebinding.yaml <- _output/staging/service-ca-operator/bindata/assets/rolebinding.yaml
+2026-10-23 04:27:51,371     DEBUG      Copying assets/components/service-ca/sa.yaml <- _output/staging/service-ca-operator/bindata/assets/sa.yaml
+2026-10-23 04:27:51,371     DEBUG      Copying assets/components/service-ca/signing-cabundle.yaml <- _output/staging/service-ca-operator/bindata/assets/signing-cabundle.yaml
+2026-10-23 04:27:51,371     DEBUG      Copying assets/components/service-ca/signing-secret.yaml <- _output/staging/service-ca-operator/bindata/assets/signing-secret.yaml
+2026-10-23 04:27:51,371     INFO       Not clearing dir components/csi-snapshot-controller/
+2026-10-23 04:27:51,371     DEBUG      Copying assets/components/csi-snapshot-controller/csi_controller_deployment.yaml <- _output/staging/cluster-csi-snapshot-controller-operator/assets/csi_controller_deployment.yaml
+2026-10-23 04:27:51,372     DEBUG      Copying assets/components/csi-snapshot-controller/serviceaccount.yaml <- _output/staging/cluster-csi-snapshot-controller-operator/assets/serviceaccount.yaml
+2026-10-23 04:27:51,373     DEBUG      Copying assets/components/csi-snapshot-controller/volumegroupsnapshotclasses.yaml <- _output/staging/cluster-csi-snapshot-controller-operator/assets/volumegroupsnapshotclasses.yaml
+2026-10-23 04:27:51,374     DEBUG      Copying assets/components/csi-snapshot-controller/volumegroupsnapshotcontents.yaml <- _output/staging/cluster-csi-snapshot-controller-operator/assets/volumegroupsnapshotcontents.yaml
+2026-10-23 04:27:51,375     DEBUG      Copying assets/components/csi-snapshot-controller/volumegroupsnapshots.yaml <- _output/staging/cluster-csi-snapshot-controller-operator/assets/volumegroupsnapshots.yaml
+2026-10-23 04:27:51,376     DEBUG      Copying assets/components/csi-snapshot-controller/volumesnapshotclasses.yaml <- _output/staging/cluster-csi-snapshot-controller-operator/assets/volumesnapshotclasses.yaml
+2026-10-23 04:27:51,377     DEBUG      Copying assets/components/csi-snapshot-controller/volumesnapshotcontents.yaml <- _output/staging/cluster-csi-snapshot-controller-operator/assets/volumesnapshotcontents.yaml
+2026-10-23 04:27:51,378     DEBUG      Copying assets/components/csi-snapshot-controller/volumesnapshots.yaml <- _output/staging/cluster-csi-snapshot-controller-operator/assets/volumesnapshots.yaml
+2026-10-23 04:27:51,379     DEBUG      Copying assets/components/csi-snapshot-controller/05_operand_rbac.yaml <- _output/staging/cluster-csi-snapshot-controller-operator/assets/../manifests/05_operand_rbac.yaml
+2026-10-23 04:27:51,380     WARNING    Ignoring components/csi-snapshot-controller/clusterrole.yaml because extracted automatically from 05_operand_rbac.yaml
+2026-10-23 04:27:51,380     WARNING    Ignoring components/csi-snapshot-controller/clusterrolebinding.yaml because extracted automatically from 05_operand_rbac.yaml
+2026-10-23 04:27:51,380     WARNING    Ignoring components/csi-snapshot-controller/role.yaml because extracted automatically from 05_operand_rbac.yaml
+2026-10-23 04:27:51,380     WARNING    Ignoring components/csi-snapshot-controller/rolebinding.yaml because extracted automatically from 05_operand_rbac.yaml
+2026-10-23 04:27:51,380     INFO       Clearing directory assets/controllers/cluster-policy-controller/
+2026-10-23 04:27:51,381     DEBUG      Copying assets/controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrole.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrole.yaml
+2026-10-23 04:27:51,382     DEBUG      Copying assets/controllers/cluster-policy-controller/namespace-security-allocation-controller-clusterrolebinding.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-security-allocation-controller-clusterrolebinding.yaml
+2026-10-23 04:27:51,383     DEBUG      Copying assets/controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrole.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrole.yaml
+2026-10-23 04:27:51,384     DEBUG      Copying assets/controllers/cluster-policy-controller/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-syncer-controller-clusterrolebinding.yaml
+2026-10-23 04:27:51,385     DEBUG      Copying assets/controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrole.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrole.yaml
+2026-10-23 04:27:51,386     DEBUG      Copying assets/controllers/cluster-policy-controller/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrolebinding.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/podsecurity-admission-label-privileged-namespaces-syncer-controller-clusterrolebinding.yaml
+2026-10-23 04:27:51,387     INFO       Clearing directory assets/controllers/kube-apiserver/
+2026-10-23 04:27:51,388     DEBUG      Copying assets/controllers/kube-apiserver/config-overrides.yaml <- _output/staging/cluster-kube-apiserver-operator/bindata/assets/config/config-overrides.yaml
+2026-10-23 04:27:51,388     DEBUG      Copying assets/controllers/kube-apiserver/defaultconfig.yaml <- _output/staging/cluster-kube-apiserver-operator/bindata/assets/config/defaultconfig.yaml
+2026-10-23 04:27:51,388     INFO       Clearing directory assets/controllers/kube-controller-manager/
+2026-10-23 04:27:51,389     DEBUG      Copying assets/controllers/kube-controller-manager/defaultconfig.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/../config/defaultconfig.yaml
+2026-10-23 04:27:51,389     DEBUG      Copying assets/controllers/kube-controller-manager/csr_approver_clusterrole.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrole.yaml
+2026-10-23 04:27:51,390     DEBUG      Copying assets/controllers/kube-controller-manager/csr_approver_clusterrolebinding.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/csr_approver_clusterrolebinding.yaml
+2026-10-23 04:27:51,391     DEBUG      Copying assets/controllers/kube-controller-manager/namespace-openshift-kube-controller-manager.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/ns.yaml
+2026-10-23 04:27:51,392     INFO       Clearing directory assets/controllers/openshift-default-scc-manager/
+2026-10-23 04:27:51,393     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-anyuid.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-anyuid.yaml
+2026-10-23 04:27:51,394     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-hostaccess.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-hostaccess.yaml
+2026-10-23 04:27:51,395     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-hostmount-anyuid.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-hostmount-anyuid.yaml
+2026-10-23 04:27:51,395     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork-v2.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork-v2.yaml
+2026-10-23 04:27:51,396     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-hostnetwork.yaml
+2026-10-23 04:27:51,397     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-nonroot-v2.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-nonroot-v2.yaml
+2026-10-23 04:27:51,398     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-nonroot.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-nonroot.yaml
+2026-10-23 04:27:51,399     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-privileged.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-privileged.yaml
+2026-10-23 04:27:51,399     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-restricted-v2.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-restricted-v2.yaml
+2026-10-23 04:27:51,400     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-restricted-v3.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-restricted-v3.yaml
+2026-10-23 04:27:51,401     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_cr-scc-restricted.yaml
+2026-10-23 04:27:51,402     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v2.yaml
+2026-10-23 04:27:51,402     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v3.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_crb-systemauthenticated-scc-restricted-v3.yaml
+2026-10-23 04:27:51,403     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-anyuid.yaml
+2026-10-23 04:27:51,404     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-hostaccess.yaml
+2026-10-23 04:27:51,405     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-hostmount-anyuid.yaml
+2026-10-23 04:27:51,406     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-hostnetwork-v2.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-hostnetwork-v2.yaml
+2026-10-23 04:27:51,407     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-hostnetwork.yaml
+2026-10-23 04:27:51,407     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-nonroot-v2.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-nonroot-v2.yaml
+2026-10-23 04:27:51,408     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-nonroot.yaml
+2026-10-23 04:27:51,409     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-privileged.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-privileged.yaml
+2026-10-23 04:27:51,410     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-restricted-v2.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-restricted-v2.yaml
+2026-10-23 04:27:51,411     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-restricted-v3.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-restricted-v3.yaml
+2026-10-23 04:27:51,411     DEBUG      Copying assets/controllers/openshift-default-scc-manager/0000_20_kube-apiserver-operator_00_scc-restricted.yaml <- _output/staging/release-manifests/0000_20_kube-apiserver-operator_00_scc-restricted.yaml
+2026-10-23 04:27:51,412     INFO       Clearing directory assets/controllers/route-controller-manager/
+2026-10-23 04:27:51,413     DEBUG      Copying assets/controllers/route-controller-manager/ns.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/ns.yaml
+2026-10-23 04:27:51,413     DEBUG      Copying assets/controllers/route-controller-manager/sa.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/sa.yaml
+2026-10-23 04:27:51,413     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-clusterrole.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-clusterrole.yaml
+2026-10-23 04:27:51,414     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-clusterrolebinding.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-clusterrolebinding.yaml
+2026-10-23 04:27:51,414     DEBUG      Copying assets/controllers/route-controller-manager/informer-clusterrolebinding.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/informer-clusterrolebinding.yaml
+2026-10-23 04:27:51,414     DEBUG      Copying assets/controllers/route-controller-manager/informer-clusterrole.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/informer-clusterrole.yaml
+2026-10-23 04:27:51,414     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrolebinding.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrolebinding.yaml
+2026-10-23 04:27:51,414     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrole.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-ingress-to-route-controller-clusterrole.yaml
+2026-10-23 04:27:51,414     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-ns.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-ns.yaml
+2026-10-23 04:27:51,415     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-sa.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-sa.yaml
+2026-10-23 04:27:51,415     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-separate-sa-rolebinding.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-separate-sa-rolebinding.yaml
+2026-10-23 04:27:51,415     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-separate-sa-role.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-separate-sa-role.yaml
+2026-10-23 04:27:51,415     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-tokenreview-clusterrolebinding.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-tokenreview-clusterrolebinding.yaml
+2026-10-23 04:27:51,415     DEBUG      Copying assets/controllers/route-controller-manager/route-controller-manager-tokenreview-clusterrole.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/route-controller-manager-tokenreview-clusterrole.yaml
+2026-10-23 04:27:51,416     INFO       Restoring assets/controllers/route-controller-manager/route-controller-manager-authentication-reader-rolebinding.yaml
+2026-10-23 04:27:51,416     DEBUG      Executing 'git restore assets/controllers/route-controller-manager/route-controller-manager-authentication-reader-rolebinding.yaml'
+2026-10-23 04:27:51,463     INFO       Not clearing dir core/
+2026-10-23 04:27:51,463     DEBUG      Copying assets/core/0000_50_cluster-openshift-controller-manager_00_namespace.yaml <- _output/staging/cluster-openshift-controller-manager-operator/bindata/assets/openshift-controller-manager/ns.yaml
+2026-10-23 04:27:51,464     DEBUG      Copying assets/core/namespace-openshift-infra.yaml <- _output/staging/cluster-kube-controller-manager-operator/bindata/assets/kube-controller-manager/namespace-openshift-infra.yaml
+2026-10-23 04:27:51,465     WARNING    Ignoring core/priority-class-openshift-user-critical.yaml because it's a priority class needed for oc debug node command - not available in any repo that rebase is using
+2026-10-23 04:27:51,465     WARNING    Ignoring core/securityv1-local-apiservice.yaml because it's a local API service for security API group, needed if OpenShift API server is not present
+2026-10-23 04:27:51,465     DEBUG      Copying assets/core/kubelet.yaml <- _output/staging/machine-config-operator/templates/master/01-master-kubelet/_base/files/kubelet.yaml
+2026-10-23 04:27:51,466     WARNING    Ignoring core/kubelet-client-ca.yaml because it's a template for ConfigMap processed during runtime
+2026-10-23 04:27:51,466     INFO       Clearing directory assets/crd/
+2026-10-23 04:27:51,466     DEBUG      Copying assets/crd/0000_03_config-operator_01_securitycontextconstraints.crd.yaml <- _output/staging/release-manifests/0000_03_config-operator_01_securitycontextconstraints.crd.yaml
+2026-10-23 04:27:51,467     DEBUG      Copying assets/crd/0000_03_config-operator_02_rangeallocations.crd.yaml <- _output/staging/release-manifests/0000_03_config-operator_02_rangeallocations.crd.yaml
+2026-10-23 04:27:51,468     DEBUG      Copying assets/crd/storage_version_migration.crd.yaml <- _output/staging/release-manifests/0000_50_cluster-kube-storage-version-migrator-operator_01_storage_migration_crd.yaml
+2026-10-23 04:27:51,469     INFO       Restoring assets/crd/microshift.io_remoteclusters.yaml
+2026-10-23 04:27:51,469     DEBUG      Executing 'git restore assets/crd/microshift.io_remoteclusters.yaml'
+2026-10-23 04:27:51,516     DEBUG      Copying assets/crd/route.crd.yaml <- _output/staging/api/route/v1/zz_generated.crd-manifests/routes.crd.yaml
+2026-10-23 04:27:51,518     WARNING    Ignoring release/ because it contains files generated during rebase procedure
+2026-10-23 04:27:51,518     INFO       Not clearing dir version/
+2026-10-23 04:27:51,518     WARNING    Ignoring version/microshift-version.yaml because it's a template for ConfigMap processed during runtime
+2026-10-23 04:27:51,518     WARNING    Ignoring embed.go because it's a MicroShift specific Go file that embeds into a binary
+2026-10-23 04:27:51,518     INFO       Clearing directory assets/optional/operator-lifecycle-manager/
+2026-10-23 04:27:51,520     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-catalogsources.crd.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-catalogsources.crd.yaml
+2026-10-23 04:27:51,520     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-clusterserviceversions.crd.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-clusterserviceversions.crd.yaml
+2026-10-23 04:27:51,521     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-installplans.crd.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-installplans.crd.yaml
+2026-10-23 04:27:51,521     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-namespace.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-namespace.yaml
+2026-10-23 04:27:51,521     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-olmconfigs.crd.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-olmconfigs.crd.yaml
+2026-10-23 04:27:51,521     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-operatorconditions.crd.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-operatorconditions.crd.yaml
+2026-10-23 04:27:51,521     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-operatorgroups.crd.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-operatorgroups.crd.yaml
+2026-10-23 04:27:51,522     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-operators.crd.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-operators.crd.yaml
+2026-10-23 04:27:51,522     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-packageserver.pdb.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-packageserver.pdb.yaml
+2026-10-23 04:27:51,522     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_00-subscriptions.crd.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_00-subscriptions.crd.yaml
+2026-10-23 04:27:51,522     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_01-networkpolicies.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_01-networkpolicies.yaml
+2026-10-23 04:27:51,522     INFO       Restoring assets/optional/operator-lifecycle-manager/0000_50_olm_01-marketplace-networkpolicy.yaml
+2026-10-23 04:27:51,522     DEBUG      Executing 'git restore assets/optional/operator-lifecycle-manager/0000_50_olm_01-marketplace-networkpolicy.yaml'
+2026-10-23 04:27:51,569     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_02-olm-operator.serviceaccount.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_02-olm-operator.serviceaccount.yaml
+2026-10-23 04:27:51,570     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_03-olmconfig.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_03-olmconfig.yaml
+2026-10-23 04:27:51,570     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_03-services.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_03-services.yaml
+2026-10-23 04:27:51,570     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_07-olm-operator.deployment.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_07-olm-operator.deployment.yaml
+2026-10-23 04:27:51,570     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_08-catalog-operator.deployment.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_08-catalog-operator.deployment.yaml
+2026-10-23 04:27:51,570     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_09-aggregated.clusterrole.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_09-aggregated.clusterrole.yaml
+2026-10-23 04:27:51,570     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_13-operatorgroup-default.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_13-operatorgroup-default.yaml
+2026-10-23 04:27:51,571     DEBUG      Copying assets/optional/operator-lifecycle-manager/0000_50_olm_15-csv-viewer.rbac.yaml <- _output/staging/operator-framework-olm/microshift-manifests/0000_50_olm_15-csv-viewer.rbac.yaml
+2026-10-23 04:27:51,571     DEBUG      Copying assets/optional/operator-lifecycle-manager/image-references <- _output/staging/operator-framework-olm/microshift-manifests/image-references
+2026-10-23 04:27:51,571     DEBUG      Copying assets/optional/operator-lifecycle-manager/kustomization.yaml <- _output/staging/operator-framework-olm/microshift-manifests/kustomization.yaml
+2026-10-23 04:27:51,571     WARNING    Ignoring optional/operator-lifecycle-manager/kustomization.x86_64.yaml because gets generated during image rebase
+2026-10-23 04:27:51,571     WARNING    Ignoring optional/operator-lifecycle-manager/kustomization.aarch64.yaml because gets generated during image rebase
+2026-10-23 04:27:51,571     WARNING    Ignoring optional/operator-lifecycle-manager/release-olm-aarch64.json because gets generated during image rebase
+2026-10-23 04:27:51,571     WARNING    Ignoring optional/operator-lifecycle-manager/release-olm-x86_64.json because gets generated during image rebase
+2026-10-23 04:27:51,571     WARNING    Ignoring components/multus/ because they don't exist in upstream repository - only in microshift
+2026-10-23 04:27:51,571     WARNING    Ignoring components/c2cc/ because C2CC probe pod assets - MicroShift specific
+2026-10-23 04:27:51,571     WARNING    Ignoring optional/observability/ because they don't exist in upstream repository - only in microshift
+2026-10-23 04:27:51,624     INFO       Not clearing dir optional/metrics-server/
+2026-10-23 04:27:51,624     WARNING    Ignoring optional/metrics-server/00-namespace.yaml because MicroShift-specific, no upstream equivalent
+2026-10-23 04:27:51,624     DEBUG      Copying assets/optional/metrics-server/01-service-account.yaml <- _output/staging/cluster-monitoring-operator/assets/metrics-server/service-account.yaml
+2026-10-23 04:27:51,624     DEBUG      Copying assets/optional/metrics-server/01-cluster-role.yaml <- _output/staging/cluster-monitoring-operator/assets/metrics-server/cluster-role.yaml
+2026-10-23 04:27:51,624     DEBUG      Copying assets/optional/metrics-server/01-cluster-role-binding.yaml <- _output/staging/cluster-monitoring-operator/assets/metrics-server/cluster-role-binding.yaml
+2026-10-23 04:27:51,624     DEBUG      Copying assets/optional/metrics-server/01-cluster-role-binding-auth-delegator.yaml <- _output/staging/cluster-monitoring-operator/assets/metrics-server/cluster-role-binding-auth-delegator.yaml
+2026-10-23 04:27:51,625     DEBUG      Copying assets/optional/metrics-server/01-role-binding-auth-reader.yaml <- _output/staging/cluster-monitoring-operator/assets/metrics-server/role-binding-auth-reader.yaml
+2026-10-23 04:27:51,625     DEBUG      Copying assets/optional/metrics-server/02-configmap-audit-profiles.yaml <- _output/staging/cluster-monitoring-operator/assets/metrics-server/configmap-audit-profiles.yaml
+2026-10-23 04:27:51,625     DEBUG      Copying assets/optional/metrics-server/03-deployment.yaml <- _output/staging/cluster-monitoring-operator/assets/metrics-server/deployment.yaml
+2026-10-23 04:27:51,625     DEBUG      Copying assets/optional/metrics-server/04-service.yaml <- _output/staging/cluster-monitoring-operator/assets/metrics-server/service.yaml
+2026-10-23 04:27:51,625     DEBUG      Copying assets/optional/metrics-server/04-api-service.yaml <- _output/staging/cluster-monitoring-operator/assets/metrics-server/api-service.yaml
+2026-10-23 04:27:51,626     WARNING    Ignoring optional/metrics-server/kustomization.yaml because MicroShift-specific kustomization
+2026-10-23 04:27:51,626     WARNING    Ignoring optional/metrics-server/kustomization.x86_64.yaml because gets generated during image rebase
+2026-10-23 04:27:51,626     WARNING    Ignoring optional/metrics-server/kustomization.aarch64.yaml because gets generated during image rebase
+2026-10-23 04:27:51,626     WARNING    Ignoring optional/metrics-server/release-metrics-server-x86_64.json because gets generated during image rebase
+2026-10-23 04:27:51,626     WARNING    Ignoring optional/metrics-server/release-metrics-server-aarch64.json because gets generated during image rebase
+2026-10-23 04:27:51,626     INFO       Not clearing dir optional/kube-state-metrics/
+2026-10-23 04:27:51,626     WARNING    Ignoring optional/kube-state-metrics/00-namespace.yaml because MicroShift-specific, no upstream equivalent
+2026-10-23 04:27:51,626     DEBUG      Copying assets/optional/kube-state-metrics/01-cluster-role.yaml <- _output/staging/cluster-monitoring-operator/assets/kube-state-metrics/cluster-role.yaml
+2026-10-23 04:27:51,626     DEBUG      Copying assets/optional/kube-state-metrics/01-cluster-role-binding.yaml <- _output/staging/cluster-monitoring-operator/assets/kube-state-metrics/cluster-role-binding.yaml
+2026-10-23 04:27:51,626     DEBUG      Copying assets/optional/kube-state-metrics/01-service-account.yaml <- _output/staging/cluster-monitoring-operator/assets/kube-state-metrics/service-account.yaml
+2026-10-23 04:27:51,627     DEBUG      Copying assets/optional/kube-state-metrics/02-custom-resource-state-configmap.yaml <- _output/staging/cluster-monitoring-operator/assets/kube-state-metrics/custom-resource-state-configmap.yaml
+2026-10-23 04:27:51,627     DEBUG      Copying assets/optional/kube-state-metrics/02-kube-rbac-proxy-secret.yaml <- _output/staging/cluster-monitoring-operator/assets/kube-state-metrics/kube-rbac-proxy-secret.yaml
+2026-10-23 04:27:51,627     DEBUG      Copying assets/optional/kube-state-metrics/03-deployment.yaml <- _output/staging/cluster-monitoring-operator/assets/kube-state-metrics/deployment.yaml
+2026-10-23 04:27:51,627     DEBUG      Copying assets/optional/kube-state-metrics/04-service.yaml <- _output/staging/cluster-monitoring-operator/assets/kube-state-metrics/service.yaml
+2026-10-23 04:27:51,627     WARNING    Ignoring optional/kube-state-metrics/kustomization.yaml because MicroShift-specific kustomization
+2026-10-23 04:27:51,627     WARNING    Ignoring optional/kube-state-metrics/kustomization.x86_64.yaml because gets generated during image rebase
+2026-10-23 04:27:51,627     WARNING    Ignoring optional/kube-state-metrics/kustomization.aarch64.yaml because gets generated during image rebase
+2026-10-23 04:27:51,627     WARNING    Ignoring optional/kube-state-metrics/release-kube-state-metrics-x86_64.json because gets generated during image rebase
+2026-10-23 04:27:51,627     WARNING    Ignoring optional/kube-state-metrics/release-kube-state-metrics-aarch64.json because gets generated during image rebase
+2026-10-23 04:27:51,628     INFO       Not clearing dir optional/node-exporter/
+2026-10-23 04:27:51,628     WARNING    Ignoring optional/node-exporter/00-namespace.yaml because MicroShift-specific, no upstream equivalent
+2026-10-23 04:27:51,628     DEBUG      Copying assets/optional/node-exporter/01-cluster-role.yaml <- _output/staging/cluster-monitoring-operator/assets/node-exporter/cluster-role.yaml
+2026-10-23 04:27:51,628     DEBUG      Copying assets/optional/node-exporter/01-cluster-role-binding.yaml <- _output/staging/cluster-monitoring-operator/assets/node-exporter/cluster-role-binding.yaml
+2026-10-23 04:27:51,628     DEBUG      Copying assets/optional/node-exporter/01-service-account.yaml <- _output/staging/cluster-monitoring-operator/assets/node-exporter/service-account.yaml
+2026-10-23 04:27:51,628     DEBUG      Copying assets/optional/node-exporter/01-security-context-constraints.yaml <- _output/staging/cluster-monitoring-operator/assets/node-exporter/security-context-constraints.yaml
+2026-10-23 04:27:51,628     DEBUG      Copying assets/optional/node-exporter/02-accelerators-collector-configmap.yaml <- _output/staging/cluster-monitoring-operator/assets/node-exporter/accelerators-collector-configmap.yaml
+2026-10-23 04:27:51,629     DEBUG      Copying assets/optional/node-exporter/02-kube-rbac-proxy-secret.yaml <- _output/staging/cluster-monitoring-operator/assets/node-exporter/kube-rbac-proxy-secret.yaml
+2026-10-23 04:27:51,629     DEBUG      Copying assets/optional/node-exporter/03-daemonset.yaml <- _output/staging/cluster-monitoring-operator/assets/node-exporter/daemonset.yaml
+2026-10-23 04:27:51,629     DEBUG      Copying assets/optional/node-exporter/04-service.yaml <- _output/staging/cluster-monitoring-operator/assets/node-exporter/service.yaml
+2026-10-23 04:27:51,629     WARNING    Ignoring optional/node-exporter/kustomization.yaml because MicroShift-specific kustomization
+2026-10-23 04:27:51,629     WARNING    Ignoring optional/node-exporter/kustomization.x86_64.yaml because gets generated during image rebase
+2026-10-23 04:27:51,629     WARNING    Ignoring optional/node-exporter/kustomization.aarch64.yaml because gets generated during image rebase
+2026-10-23 04:27:51,629     WARNING    Ignoring optional/node-exporter/release-node-exporter-x86_64.json because gets generated during image rebase
+2026-10-23 04:27:51,629     WARNING    Ignoring optional/node-exporter/release-node-exporter-aarch64.json because gets generated during image rebase
+[34mModifying OpenShift manifests[00m
+/go/src/github.com/openshift/microshift /go/src/github.com/openshift/microshift/_output/staging /go/src/github.com/openshift/microshift
+Checking patch /go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/010-ingress-deployment-clientCA.patch
+/go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/010-ingress-deployment-clientCA.patch - Patch applied
+Checking patch /go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/011-ingress-deployment-access-logging.patch
+/go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/011-ingress-deployment-access-logging.patch - Patch applied
+Checking patch /go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/012-ingress-class.patch
+/go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/012-ingress-class.patch - Patch applied
+Checking patch /go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-configmap.patch
+/go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-configmap.patch - Patch was already applied
+Checking patch /go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-daemonset-resources.patch
+/go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-daemonset-resources.patch - Patch applied
+Checking patch /go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-daemonset.patch
+/go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-daemonset.patch - Patch applied
+Checking patch /go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-hosts-configmap-role.patch
+/go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-hosts-configmap-role.patch - Patch applied
+Checking patch /go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-hosts-configmap-rolebinding.patch
+/go/src/github.com/openshift/microshift/scripts/auto-rebase/manifests_patches/020-dns-hosts-configmap-rolebinding.patch - Patch applied
+/go/src/github.com/openshift/microshift/_output/staging /go/src/github.com/openshift/microshift
+[34mRebasing operator-lifecycle-manager manifests[00m
+[34mRebasing Multus images[00m
+[34mRebasing metrics-server manifests[00m
+[34mRebasing kube-state-metrics manifests[00m
+[34mRebasing node-exporter manifests[00m
+[34mRebasing metrics component images[00m
+[34m## Committing changes to assets and pkg/assets[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 8d5c692ac] update manifests
+ 22 files changed, 66 insertions(+), 66 deletions(-)
+[34mRebasing Makefile[00m
+[34m## Committing changes to buildfiles[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 c47af63d0] update buildfiles
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+[34m## Generating CBOM (Cryptographic Bill of Materials)[00m
+Running crypto scanner against MicroShift source...
+Scanner image: images.paas.redhat.com/exd-sp-guild-security/rh-crypto-scanner-image:latest
+Source directory: /go/src/github.com/openshift/microshift
+Trying to pull images.paas.redhat.com/exd-sp-guild-security/rh-crypto-scanner-image:latest...
+Getting image source signatures
+Copying blob sha256:89d0a070bc293dcc5eddd8b030136e97e1b74c4dee08c7b03d91ad14ff204eb2
+Copying blob sha256:c8fb2f748d0518200c41845a3bbb526397078028e42feaddaf7208534fc575b4
+Copying config sha256:db6ef75ac0306e7d59153da245ce267dfa211e47d4d0e5952b2baf1cf5ebd262
+Writing manifest to image destination
+db6ef75ac0306e7d59153da245ce267dfa211e47d4d0e5952b2baf1cf5ebd262
+2026/10/23 04:32:08 inference: stats origin_counts=map[] join_failed=0 suppressed=0
+2026/10/23 04:32:09 inference: stats origin_counts=map[] join_failed=0 suppressed=4
+2026/10/23 04:32:09 inference: stats origin_counts=map[] join_failed=0 suppressed=0
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mbcrypt [36malgorithmName=[0mbcrypt [36mmode=[0m [36mparameterSet=[0m
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mbcrypt [36malgorithmName=[0mbcrypt [36mmode=[0m [36mparameterSet=[0m
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mbcrypt [36malgorithmName=[0mbcrypt [36mmode=[0m [36mparameterSet=[0m
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mbcrypt [36malgorithmName=[0mbcrypt [36mmode=[0m [36mparameterSet=[0m
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mBlowfish [36malgorithmName=[0mBlowfish [36mmode=[0m [36mparameterSet=[0m
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mBlowfish [36malgorithmName=[0mBlowfish [36mmode=[0m [36mparameterSet=[0m
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mBlowfish [36malgorithmName=[0mBlowfish [36mmode=[0m [36mparameterSet=[0m
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mBlowfish [36malgorithmName=[0mBlowfish [36mmode=[0m [36mparameterSet=[0m
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mHKDF [36malgorithmName=[0mHKDF- [36mmode=[0m [36mparameterSet=[0mHKDF-
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mHSalsa20 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mSalsa20 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mSalsa20 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mSalsa20 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mSalsa20 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mHKDF [36malgorithmName=[0mHKDF- [36mmode=[0m [36mparameterSet=[0mHKDF-
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mXSalsa20-Poly1305 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mXSalsa20-Poly1305 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mXSalsa20-Poly1305 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mXSalsa20-Poly1305 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mBlowfish [36malgorithmName=[0mBlowfish [36mmode=[0m [36mparameterSet=[0m
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mHKDF [36malgorithmName=[0mHKDF- [36mmode=[0m [36mparameterSet=[0mHKDF-
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mHSalsa20 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mSalsa20 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mSalsa20 [36malgorithmName=[0mXSalsa20-Poly1305 [36mmode=[0m [36mparameterSet=[0m256
+[90m4:33AM[0m [33mWRN[0m [1mUnknown algorithm detected, no OID assigned[0m [36malgorithmFamily=[0mbcrypt [36malgorithmName=[0mbcrypt [36mmode=[0m [36mparameterSet=[0m
+
+# Scan Summary
+
+ • Files with findings: 257
+ • Total crypto assets: 1084
+ • Output: <stdout>
+
+CBOM generated: 
+-rw-rw-r--. 1 root root 542K Oct 23 04:33 /go/src/github.com/openshift/microshift/cbom-microshift.json
+SPDX generated: 
+-rw-rw-r--. 1 root root 360K Oct 23 04:33 /go/src/github.com/openshift/microshift/sbom-microshift-crypto.spdx.json
+Updating CBOM
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 e2f1593d5] update cbom
+ 1 file changed, 507 insertions(+), 507 deletions(-)
+[34m# Removing staging directory[00m
+==================================================
+rebase_ai_model_serving.sh:
+[34mRebasing AI Model Serving for MicroShift to registry.redhat.io/rhoai/odh-operator-bundle:v2.25[00m
+[34mFetching RHOAI CSV[00m
+[34mFetching RHOAI manifests[00m
+[34mUpdating last_rebase_ai_model_serving.sh[00m
+[34mUpdating rebase_job_entrypoint.sh[00m
+[34mCopying manifests from staging dir to assets/[00m
+2026-10-23 04:34:22,330     INFO       Not clearing dir optional/ai-model-serving/
+2026-10-23 04:34:22,330     WARNING    Ignoring optional/ai-model-serving/release-ai-model-serving-x86_64.json because Release info file
+2026-10-23 04:34:22,330     INFO       Not clearing dir optional/ai-model-serving/kserve/
+2026-10-23 04:34:22,330     WARNING    Ignoring optional/ai-model-serving/kserve/kustomization.yaml because MicroShift specific overrides
+2026-10-23 04:34:22,330     WARNING    Ignoring optional/ai-model-serving/kserve/inferenceservice-config-microshift-patch.yaml because MicroShift specific overrides
+2026-10-23 04:34:22,330     WARNING    Ignoring optional/ai-model-serving/kserve/namespace.yaml because MicroShift specific overrides
+2026-10-23 04:34:22,330     INFO       Clearing directory assets/optional/ai-model-serving/kserve/overlays/odh/
+2026-10-23 04:34:22,332     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/kustomization.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/kustomization.yaml
+2026-10-23 04:34:22,332     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/llm-svc-scc.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/llm-svc-scc.yaml
+2026-10-23 04:34:22,332     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/network-policies.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/network-policies.yaml
+2026-10-23 04:34:22,332     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/params.env <- _output/staging/rhoai/operator/kserve/overlays/odh/params.env
+2026-10-23 04:34:22,332     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/params.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/params.yaml
+2026-10-23 04:34:22,332     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/user-cluster-roles.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/user-cluster-roles.yaml
+2026-10-23 04:34:22,333     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/patch-inferenceservice-config.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/patch-inferenceservice-config.yaml
+2026-10-23 04:34:22,333     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/patch-set-resources-manager.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/patch-set-resources-manager.yaml
+2026-10-23 04:34:22,333     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/patch-webhook-svc-openshift-cert-injection.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/patch-webhook-svc-openshift-cert-injection.yaml
+2026-10-23 04:34:22,333     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/remove-cert-manager.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/remove-cert-manager.yaml
+2026-10-23 04:34:22,333     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/remove-clusterservingruntime.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/remove-clusterservingruntime.yaml
+2026-10-23 04:34:22,334     DEBUG      Copying assets/optional/ai-model-serving/kserve/overlays/odh/patches/remove-local-model.yaml <- _output/staging/rhoai/operator/kserve/overlays/odh/patches/remove-local-model.yaml
+2026-10-23 04:34:22,334     INFO       Clearing directory assets/optional/ai-model-serving/kserve/default/
+2026-10-23 04:34:22,335     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/cainjection_conversion_webhook.yaml <- _output/staging/rhoai/operator/kserve/default/cainjection_conversion_webhook.yaml
+2026-10-23 04:34:22,335     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/clusterservingruntime_validatingwebhook_cainjection_patch.yaml
+2026-10-23 04:34:22,335     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/inferencegraph_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/inferencegraph_validatingwebhook_cainjection_patch.yaml
+2026-10-23 04:34:22,335     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/isvc_mutatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/isvc_mutatingwebhook_cainjection_patch.yaml
+2026-10-23 04:34:22,336     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/isvc_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/isvc_validatingwebhook_cainjection_patch.yaml
+2026-10-23 04:34:22,336     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/kustomization.yaml <- _output/staging/rhoai/operator/kserve/default/kustomization.yaml
+2026-10-23 04:34:22,336     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/llmisvcconfig_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/llmisvcconfig_validatingwebhook_cainjection_patch.yaml
+2026-10-23 04:34:22,336     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/llmisvc_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/llmisvc_validatingwebhook_cainjection_patch.yaml
+2026-10-23 04:34:22,336     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/localmodelcache_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/localmodelcache_validatingwebhook_cainjection_patch.yaml
+2026-10-23 04:34:22,337     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/localmodel_manager_image_patch.yaml <- _output/staging/rhoai/operator/kserve/default/localmodel_manager_image_patch.yaml
+2026-10-23 04:34:22,337     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/localmodelnode_agent_image_patch.yaml <- _output/staging/rhoai/operator/kserve/default/localmodelnode_agent_image_patch.yaml
+2026-10-23 04:34:22,337     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_auth_proxy_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_auth_proxy_patch.yaml
+2026-10-23 04:34:22,337     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_image_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_image_patch.yaml
+2026-10-23 04:34:22,337     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_prometheus_metrics_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_prometheus_metrics_patch.yaml
+2026-10-23 04:34:22,337     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/manager_resources_patch.yaml <- _output/staging/rhoai/operator/kserve/default/manager_resources_patch.yaml
+2026-10-23 04:34:22,338     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/servingruntime_validationwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/servingruntime_validationwebhook_cainjection_patch.yaml
+2026-10-23 04:34:22,338     DEBUG      Copying assets/optional/ai-model-serving/kserve/default/trainedmodel_validatingwebhook_cainjection_patch.yaml <- _output/staging/rhoai/operator/kserve/default/trainedmodel_validatingwebhook_cainjection_patch.yaml
+2026-10-23 04:34:22,338     INFO       Clearing directory assets/optional/ai-model-serving/kserve/crd/
+2026-10-23 04:34:22,340     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/kustomization.yaml <- _output/staging/rhoai/operator/kserve/crd/kustomization.yaml
+2026-10-23 04:34:22,340     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/gateway-inference-extension/kustomization.yaml <- _output/staging/rhoai/operator/kserve/crd/external/gateway-inference-extension/kustomization.yaml
+2026-10-23 04:34:22,340     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/gateway-inference-extension/gateway-inference-extension.yaml <- _output/staging/rhoai/operator/kserve/crd/external/gateway-inference-extension/gateway-inference-extension.yaml
+2026-10-23 04:34:22,341     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/opendatahub-operator/kustomization.yaml <- _output/staging/rhoai/operator/kserve/crd/external/opendatahub-operator/kustomization.yaml
+2026-10-23 04:34:22,341     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/opendatahub-operator/datasciencecluster.opendatahub.io_datascienceclusters.yaml <- _output/staging/rhoai/operator/kserve/crd/external/opendatahub-operator/datasciencecluster.opendatahub.io_datascienceclusters.yaml
+2026-10-23 04:34:22,341     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/external/opendatahub-operator/dscinitialization.opendatahub.io_dscinitializations.yaml <- _output/staging/rhoai/operator/kserve/crd/external/opendatahub-operator/dscinitialization.opendatahub.io_dscinitializations.yaml
+2026-10-23 04:34:22,341     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/kustomization.yaml <- _output/staging/rhoai/operator/kserve/crd/full/kustomization.yaml
+2026-10-23 04:34:22,342     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_clusterservingruntimes.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_clusterservingruntimes.yaml
+2026-10-23 04:34:22,342     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_clusterstoragecontainers.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_clusterstoragecontainers.yaml
+2026-10-23 04:34:22,342     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_inferencegraphs.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_inferencegraphs.yaml
+2026-10-23 04:34:22,342     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_inferenceservices.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_inferenceservices.yaml
+2026-10-23 04:34:22,343     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_llminferenceserviceconfigs.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_llminferenceserviceconfigs.yaml
+2026-10-23 04:34:22,344     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_llminferenceservices.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_llminferenceservices.yaml
+2026-10-23 04:34:22,344     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_localmodelcaches.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_localmodelcaches.yaml
+2026-10-23 04:34:22,345     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_localmodelnodegroups.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_localmodelnodegroups.yaml
+2026-10-23 04:34:22,345     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_localmodelnodes.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_localmodelnodes.yaml
+2026-10-23 04:34:22,345     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_servingruntimes.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_servingruntimes.yaml
+2026-10-23 04:34:22,345     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/full/serving.kserve.io_trainedmodels.yaml <- _output/staging/rhoai/operator/kserve/crd/full/serving.kserve.io_trainedmodels.yaml
+2026-10-23 04:34:22,346     DEBUG      Copying assets/optional/ai-model-serving/kserve/crd/patches/protocol.yaml <- _output/staging/rhoai/operator/kserve/crd/patches/protocol.yaml
+2026-10-23 04:34:22,346     INFO       Clearing directory assets/optional/ai-model-serving/kserve/configmap/
+2026-10-23 04:34:22,346     DEBUG      Copying assets/optional/ai-model-serving/kserve/configmap/kustomization.yaml <- _output/staging/rhoai/operator/kserve/configmap/kustomization.yaml
+2026-10-23 04:34:22,346     DEBUG      Copying assets/optional/ai-model-serving/kserve/configmap/inferenceservice.yaml <- _output/staging/rhoai/operator/kserve/configmap/inferenceservice.yaml
+2026-10-23 04:34:22,347     INFO       Clearing directory assets/optional/ai-model-serving/kserve/rbac/
+2026-10-23 04:34:22,348     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/auth_proxy_role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/auth_proxy_role_binding.yaml
+2026-10-23 04:34:22,348     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/auth_proxy_role.yaml <- _output/staging/rhoai/operator/kserve/rbac/auth_proxy_role.yaml
+2026-10-23 04:34:22,348     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/auth_proxy_service.yaml <- _output/staging/rhoai/operator/kserve/rbac/auth_proxy_service.yaml
+2026-10-23 04:34:22,348     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/kustomization.yaml <- _output/staging/rhoai/operator/kserve/rbac/kustomization.yaml
+2026-10-23 04:34:22,348     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/leader_election_role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/leader_election_role_binding.yaml
+2026-10-23 04:34:22,349     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/leader_election_role.yaml <- _output/staging/rhoai/operator/kserve/rbac/leader_election_role.yaml
+2026-10-23 04:34:22,349     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/role_binding.yaml
+2026-10-23 04:34:22,349     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/role.yaml <- _output/staging/rhoai/operator/kserve/rbac/role.yaml
+2026-10-23 04:34:22,349     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/service_account.yaml <- _output/staging/rhoai/operator/kserve/rbac/service_account.yaml
+2026-10-23 04:34:22,350     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodel/role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodel/role_binding.yaml
+2026-10-23 04:34:22,350     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodel/role.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodel/role.yaml
+2026-10-23 04:34:22,350     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodel/service_account.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodel/service_account.yaml
+2026-10-23 04:34:22,350     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodelnode/role_binding.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodelnode/role_binding.yaml
+2026-10-23 04:34:22,350     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodelnode/role.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodelnode/role.yaml
+2026-10-23 04:34:22,351     DEBUG      Copying assets/optional/ai-model-serving/kserve/rbac/localmodelnode/service_account.yaml <- _output/staging/rhoai/operator/kserve/rbac/localmodelnode/service_account.yaml
+2026-10-23 04:34:22,351     INFO       Clearing directory assets/optional/ai-model-serving/kserve/manager/
+2026-10-23 04:34:22,351     DEBUG      Copying assets/optional/ai-model-serving/kserve/manager/kustomization.yaml <- _output/staging/rhoai/operator/kserve/manager/kustomization.yaml
+2026-10-23 04:34:22,351     DEBUG      Copying assets/optional/ai-model-serving/kserve/manager/manager.yaml <- _output/staging/rhoai/operator/kserve/manager/manager.yaml
+2026-10-23 04:34:22,352     DEBUG      Copying assets/optional/ai-model-serving/kserve/manager/service.yaml <- _output/staging/rhoai/operator/kserve/manager/service.yaml
+2026-10-23 04:34:22,352     INFO       Clearing directory assets/optional/ai-model-serving/kserve/webhook/
+2026-10-23 04:34:22,352     DEBUG      Copying assets/optional/ai-model-serving/kserve/webhook/kustomization.yaml <- _output/staging/rhoai/operator/kserve/webhook/kustomization.yaml
+2026-10-23 04:34:22,352     DEBUG      Copying assets/optional/ai-model-serving/kserve/webhook/manifests.yaml <- _output/staging/rhoai/operator/kserve/webhook/manifests.yaml
+2026-10-23 04:34:22,352     DEBUG      Copying assets/optional/ai-model-serving/kserve/webhook/service.yaml <- _output/staging/rhoai/operator/kserve/webhook/service.yaml
+2026-10-23 04:34:22,353     INFO       Clearing directory assets/optional/ai-model-serving/kserve/localmodels/
+2026-10-23 04:34:22,353     DEBUG      Copying assets/optional/ai-model-serving/kserve/localmodels/kustomization.yaml <- _output/staging/rhoai/operator/kserve/localmodels/kustomization.yaml
+2026-10-23 04:34:22,353     DEBUG      Copying assets/optional/ai-model-serving/kserve/localmodels/manager.yaml <- _output/staging/rhoai/operator/kserve/localmodels/manager.yaml
+2026-10-23 04:34:22,353     INFO       Clearing directory assets/optional/ai-model-serving/kserve/localmodelnodes/
+2026-10-23 04:34:22,354     DEBUG      Copying assets/optional/ai-model-serving/kserve/localmodelnodes/kustomization.yaml <- _output/staging/rhoai/operator/kserve/localmodelnodes/kustomization.yaml
+2026-10-23 04:34:22,354     DEBUG      Copying assets/optional/ai-model-serving/kserve/localmodelnodes/manager.yaml <- _output/staging/rhoai/operator/kserve/localmodelnodes/manager.yaml
+2026-10-23 04:34:22,354     INFO       Clearing directory assets/optional/ai-model-serving/kserve/llmisvc/
+2026-10-23 04:34:22,355     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-decode-template.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-decode-template.yaml
+2026-10-23 04:34:22,355     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-decode-worker-data-parallel.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-decode-worker-data-parallel.yaml
+2026-10-23 04:34:22,355     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-prefill-template.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-prefill-template.yaml
+2026-10-23 04:34:22,355     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-prefill-worker-data-parallel.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-prefill-worker-data-parallel.yaml
+2026-10-23 04:34:22,356     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-router-route.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-router-route.yaml
+2026-10-23 04:34:22,356     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-scheduler.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-scheduler.yaml
+2026-10-23 04:34:22,356     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-template.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-template.yaml
+2026-10-23 04:34:22,356     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/config-llm-worker-data-parallel.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/config-llm-worker-data-parallel.yaml
+2026-10-23 04:34:22,356     DEBUG      Copying assets/optional/ai-model-serving/kserve/llmisvc/kustomization.yaml <- _output/staging/rhoai/operator/kserve/llmisvc/kustomization.yaml
+2026-10-23 04:34:22,357     INFO       Clearing directory assets/optional/ai-model-serving/kserve/certmanager/
+2026-10-23 04:34:22,357     DEBUG      Copying assets/optional/ai-model-serving/kserve/certmanager/certificate.yaml <- _output/staging/rhoai/operator/kserve/certmanager/certificate.yaml
+2026-10-23 04:34:22,357     DEBUG      Copying assets/optional/ai-model-serving/kserve/certmanager/kustomization.yaml <- _output/staging/rhoai/operator/kserve/certmanager/kustomization.yaml
+2026-10-23 04:34:22,357     INFO       Clearing directory assets/optional/ai-model-serving/kserve/monitoring/llmisvc/
+2026-10-23 04:34:22,358     DEBUG      Copying assets/optional/ai-model-serving/kserve/monitoring/llmisvc/kustomization.yaml <- _output/staging/rhoai/operator/kserve/monitoring/llmisvc/kustomization.yaml
+2026-10-23 04:34:22,358     DEBUG      Copying assets/optional/ai-model-serving/kserve/monitoring/llmisvc/rbac.yaml <- _output/staging/rhoai/operator/kserve/monitoring/llmisvc/rbac.yaml
+2026-10-23 04:34:22,358     DEBUG      Copying assets/optional/ai-model-serving/kserve/monitoring/llmisvc/istio_gateway_monitor.yaml <- _output/staging/rhoai/operator/kserve/monitoring/llmisvc/istio_gateway_monitor.yaml
+2026-10-23 04:34:22,358     INFO       Clearing directory assets/optional/ai-model-serving/runtimes/
+2026-10-23 04:34:22,359     INFO       Restoring assets/optional/ai-model-serving/runtimes/kustomization.yaml
+2026-10-23 04:34:22,359     DEBUG      Executing 'git restore assets/optional/ai-model-serving/runtimes/kustomization.yaml'
+2026-10-23 04:34:22,403     WARNING    Ignoring optional/ai-model-serving/runtimes/kustomization.x86_64.yaml because Generated during rebase
+2026-10-23 04:34:22,403     DEBUG      Copying assets/optional/ai-model-serving/runtimes/caikit-standalone.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/caikit-standalone-template.yaml
+2026-10-23 04:34:22,404     DEBUG      Copying assets/optional/ai-model-serving/runtimes/caikit-tgis.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/caikit-tgis-template.yaml
+2026-10-23 04:34:22,404     DEBUG      Copying assets/optional/ai-model-serving/runtimes/hf-detector.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/hf-detector-template.yaml
+2026-10-23 04:34:22,404     DEBUG      Copying assets/optional/ai-model-serving/runtimes/ovms-kserve.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/ovms-kserve-template.yaml
+2026-10-23 04:34:22,404     DEBUG      Copying assets/optional/ai-model-serving/runtimes/vllm-cuda.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/vllm-cuda-template.yaml
+2026-10-23 04:34:22,404     DEBUG      Copying assets/optional/ai-model-serving/runtimes/vllm-gaudi.yaml <- _output/staging/rhoai/operator/modelcontroller/runtimes/vllm-gaudi-template.yaml
+Traceback (most recent call last):
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 162, in <module>
+    main()
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 155, in main
+    handle_dir(asset)
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 129, in handle_dir
+    handle_file(file, dst, new_src_prefix)
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 112, in handle_file
+    copy(src, dst)
+  File "/go/src/github.com/openshift/microshift/scripts/auto-rebase/handle_assets.py", line 71, in copy
+    shutil.copyfile(src, dst)
+  File "/usr/lib64/python3.9/shutil.py", line 264, in copyfile
+    with open(src, 'rb') as fsrc:
+FileNotFoundError: [Errno 2] No such file or directory: '_output/staging/rhoai/operator/modelcontroller/runtimes/vllm-gaudi-template.yaml'
+==================================================
+rebase_sriov.sh:
+[34mRebasing SR-IOV for MicroShift to registry.redhat.io/openshift4/ose-sriov-network-operator-bundle:v4.21[00m
+[34mdownloading SRIOV bundle registry.redhat.io/openshift4/ose-sriov-network-operator-bundle:v4.21[00m
+[34mextracting sriov clusterserviceversion.yaml into separate RBAC[00m
+extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName sriov-network-config-daemon
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/clusterrole.yaml
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/clusterrolebinding.yaml
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/serviceaccount.yaml
+extracting bundle .spec.install.spec.clusterPermissions by serviceAccountName sriov-network-operator
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/clusterrole.yaml
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/clusterrolebinding.yaml
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/serviceaccount.yaml
+extracting bundle .spec.install.spec.permissions by serviceAccountName sriov-network-config-daemon
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/role.yaml
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/rolebinding.yaml
+extracting bundle .spec.install.spec.permissions by serviceAccountName sriov-network-operator
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/role.yaml
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/rolebinding.yaml
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/operator.yaml
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/namespace.yaml
+generating /go/src/github.com/openshift/microshift/_output/staging/sriov/sriovoperatorconfig.yaml
+[34mCopying manifests[00m
+2026-10-23 04:34:23,026     INFO       Not clearing dir optional/sriov/
+2026-10-23 04:34:23,026     WARNING    Ignoring optional/sriov/release-sriov-aarch64.json because Provided by MicroShift
+2026-10-23 04:34:23,026     WARNING    Ignoring optional/sriov/release-sriov-x86_64.json because Provided by MicroShift
+2026-10-23 04:34:23,026     WARNING    Ignoring optional/sriov/kustomization.yaml because Provided by MicroShift
+2026-10-23 04:34:23,026     WARNING    Ignoring optional/sriov/kustomization.x86_64.yaml because Provided by MicroShift
+2026-10-23 04:34:23,026     WARNING    Ignoring optional/sriov/kustomization.aarch64.yaml because Provided by MicroShift
+2026-10-23 04:34:23,026     INFO       Clearing directory assets/optional/sriov/crd/
+2026-10-23 04:34:23,027     DEBUG      Copying assets/optional/sriov/crd/sriovnetwork.openshift.io_ovsnetworks.yaml <- _output/staging/sriov/sriovnetwork.openshift.io_ovsnetworks.yaml
+2026-10-23 04:34:23,027     DEBUG      Copying assets/optional/sriov/crd/sriovnetwork.openshift.io_sriovibnetworks.yaml <- _output/staging/sriov/sriovnetwork.openshift.io_sriovibnetworks.yaml
+2026-10-23 04:34:23,027     DEBUG      Copying assets/optional/sriov/crd/sriovnetwork.openshift.io_sriovnetworknodepolicies.yaml <- _output/staging/sriov/sriovnetwork.openshift.io_sriovnetworknodepolicies.yaml
+2026-10-23 04:34:23,028     DEBUG      Copying assets/optional/sriov/crd/sriovnetwork.openshift.io_sriovnetworknodestates.yaml <- _output/staging/sriov/sriovnetwork.openshift.io_sriovnetworknodestates.yaml
+2026-10-23 04:34:23,028     DEBUG      Copying assets/optional/sriov/crd/sriovnetwork.openshift.io_sriovnetworkpoolconfigs.yaml <- _output/staging/sriov/sriovnetwork.openshift.io_sriovnetworkpoolconfigs.yaml
+2026-10-23 04:34:23,028     DEBUG      Copying assets/optional/sriov/crd/sriovnetwork.openshift.io_sriovnetworks.yaml <- _output/staging/sriov/sriovnetwork.openshift.io_sriovnetworks.yaml
+2026-10-23 04:34:23,028     DEBUG      Copying assets/optional/sriov/crd/sriovnetwork.openshift.io_sriovoperatorconfigs.yaml <- _output/staging/sriov/sriovnetwork.openshift.io_sriovoperatorconfigs.yaml
+2026-10-23 04:34:23,028     INFO       Clearing directory assets/optional/sriov/deploy/
+2026-10-23 04:34:23,029     DEBUG      Copying assets/optional/sriov/deploy/clusterrolebinding.yaml <- _output/staging/sriov/clusterrolebinding.yaml
+2026-10-23 04:34:23,029     DEBUG      Copying assets/optional/sriov/deploy/clusterrole.yaml <- _output/staging/sriov/clusterrole.yaml
+2026-10-23 04:34:23,029     DEBUG      Copying assets/optional/sriov/deploy/namespace.yaml <- _output/staging/sriov/namespace.yaml
+2026-10-23 04:34:23,030     DEBUG      Copying assets/optional/sriov/deploy/operator.yaml <- _output/staging/sriov/operator.yaml
+2026-10-23 04:34:23,030     DEBUG      Copying assets/optional/sriov/deploy/role.yaml <- _output/staging/sriov/role.yaml
+2026-10-23 04:34:23,030     DEBUG      Copying assets/optional/sriov/deploy/rolebinding.yaml <- _output/staging/sriov/rolebinding.yaml
+2026-10-23 04:34:23,030     DEBUG      Copying assets/optional/sriov/deploy/serviceaccount.yaml <- _output/staging/sriov/serviceaccount.yaml
+2026-10-23 04:34:23,030     DEBUG      Copying assets/optional/sriov/deploy/sriovoperatorconfig.yaml <- _output/staging/sriov/sriovoperatorconfig.yaml
+2026-10-23 04:34:23,030     DEBUG      Copying assets/optional/sriov/deploy/supported-nic-ids_v1_configmap.yaml <- _output/staging/sriov/supported-nic-ids_v1_configmap.yaml
+[34mPreparing operator.yaml for per-arch image injection[00m
+[34mUpdating SR-IOV images[00m
+[34mResolving SR-IOV images for amd64[00m
+[34mResolving SR-IOV images for arm64[00m
+[34mUpdating last_rebase_sriov.sh[00m
+[34mUpdating rebase_job_entrypoint.sh[00m
+[34mDetected changes to assets/ or last_rebase_sriov.sh[00m
+[34mCommitting changes[00m
+[rebase-release-5.1-5.1.0-0.nightly-2026-10-21-040310_amd64-2026-10-21_arm64-2026-10-23 6ec834c75] Update SR-IOV for MicroShift
+ 13 files changed, 344 insertions(+), 358 deletions(-)
+ delete mode 100644 assets/optional/ai-model-serving/runtimes/kustomization.x86_64.yaml
+ delete mode 100644 assets/optional/ai-model-serving/runtimes/vllm-gaudi.yaml
+ delete mode 100644 assets/optional/ai-model-serving/runtimes/vllm-rocm.yaml
+==================================================
+rebase_cert_manager.sh:
+/go/src/github.com/openshift/microshift/scripts/auto-rebase/rebase_cert_manager.sh: line 55: hash: opm: not found
+[34mInstalling opm[00m
+opm-rhel9
+found operator version cert-manager-operator.v1.20.1
+Initialized empty Git repository in /go/src/github.com/openshift/microshift/_output/staging/cert-manager-operator/.git/
+Switched to a new branch 'cert-manager-1.20'
+branch 'cert-manager-1.20' set up to track 'origin/cert-manager-1.20'.
+/go/src/github.com/openshift/microshift
+[34mCopying manifests[00m
+2026-10-23 04:35:03,236     INFO       Not clearing dir optional/cert-manager/
+2026-10-23 04:35:03,236     WARNING    Ignoring optional/cert-manager/kustomization.yaml because Provided by MicroShift
+2026-10-23 04:35:03,236     WARNING    Ignoring optional/cert-manager/release-cert-manager-aarch64.json because Provided by MicroShift
+2026-10-23 04:35:03,236     WARNING    Ignoring optional/cert-manager/release-cert-manager-x86_64.json because Provided by MicroShift
+2026-10-23 04:35:03,236     INFO       Clearing directory assets/optional/cert-manager/crd/
+2026-10-23 04:35:03,238     DEBUG      Copying assets/optional/cert-manager/crd/kustomization.yaml <- _output/staging/cert-manager-operator/config/crd/kustomization.yaml
+2026-10-23 04:35:03,238     DEBUG      Copying assets/optional/cert-manager/crd/kustomizeconfig.yaml <- _output/staging/cert-manager-operator/config/crd/kustomizeconfig.yaml
+2026-10-23 04:35:03,238     DEBUG      Copying assets/optional/cert-manager/crd/bases/certificaterequests.cert-manager.io-crd.yaml <- _output/staging/cert-manager-operator/config/crd/bases/certificaterequests.cert-manager.io-crd.yaml
+2026-10-23 04:35:03,238     DEBUG      Copying assets/optional/cert-manager/crd/bases/certificates.cert-manager.io-crd.yaml <- _output/staging/cert-manager-operator/config/crd/bases/certificates.cert-manager.io-crd.yaml
+2026-10-23 04:35:03,238     DEBUG      Copying assets/optional/cert-manager/crd/bases/challenges.acme.cert-manager.io-crd.yaml <- _output/staging/cert-manager-operator/config/crd/bases/challenges.acme.cert-manager.io-crd.yaml
+2026-10-23 04:35:03,239     DEBUG      Copying assets/optional/cert-manager/crd/bases/clusterissuers.cert-manager.io-crd.yaml <- _output/staging/cert-manager-operator/config/crd/bases/clusterissuers.cert-manager.io-crd.yaml
+2026-10-23 04:35:03,239     DEBUG      Copying assets/optional/cert-manager/crd/bases/config.openshift.io_certmanagers.yaml <- _output/staging/cert-manager-operator/config/crd/bases/config.openshift.io_certmanagers.yaml
+2026-10-23 04:35:03,239     DEBUG      Copying assets/optional/cert-manager/crd/bases/issuers.cert-manager.io-crd.yaml <- _output/staging/cert-manager-operator/config/crd/bases/issuers.cert-manager.io-crd.yaml
+2026-10-23 04:35:03,240     DEBUG      Copying assets/optional/cert-manager/crd/bases/operator.openshift.io_certmanagers.yaml <- _output/staging/cert-manager-operator/config/crd/bases/operator.openshift.io_certmanagers.yaml
+2026-10-23 04:35:03,240     DEBUG      Copying assets/optional/cert-manager/crd/bases/operator.openshift.io_istiocsrs.yaml <- _output/staging/cert-manager-operator/config/crd/bases/operator.openshift.io_istiocsrs.yaml
+2026-10-23 04:35:03,240     DEBUG      Copying assets/optional/cert-manager/crd/bases/orders.acme.cert-manager.io-crd.yaml <- _output/staging/cert-manager-operator/config/crd/bases/orders.acme.cert-manager.io-crd.yaml
+2026-10-23 04:35:03,240     DEBUG      Copying assets/optional/cert-manager/crd/bases/customresourcedefinition_bundles.trust.cert-manager.io.yml <- _output/staging/cert-manager-operator/config/crd/bases/customresourcedefinition_bundles.trust.cert-manager.io.yml
+2026-10-23 04:35:03,241     DEBUG      Copying assets/optional/cert-manager/crd/bases/operator.openshift.io_trustmanagers.yaml <- _output/staging/cert-manager-operator/config/crd/bases/operator.openshift.io_trustmanagers.yaml
+2026-10-23 04:35:03,241     DEBUG      Copying assets/optional/cert-manager/crd/patches/cainjection_in_certmanagers.yaml <- _output/staging/cert-manager-operator/config/crd/patches/cainjection_in_certmanagers.yaml
+2026-10-23 04:35:03,241     DEBUG      Copying assets/optional/cert-manager/crd/patches/webhook_in_certmanagers.yaml <- _output/staging/cert-manager-operator/config/crd/patches/webhook_in_certmanagers.yaml
+2026-10-23 04:35:03,241     INFO       Not clearing dir optional/cert-manager/manager/
+2026-10-23 04:35:03,241     DEBUG      Copying assets/optional/cert-manager/manager/manager.yaml <- _output/staging/cert-manager-operator/config/manager/manager.yaml
+2026-10-23 04:35:03,241     WARNING    Ignoring optional/cert-manager/manager/kustomization.yaml because Provided by MicroShift
+2026-10-23 04:35:03,242     WARNING    Ignoring optional/cert-manager/manager/images-aarch64.yaml because Provided by MicroShift
+2026-10-23 04:35:03,242     WARNING    Ignoring optional/cert-manager/manager/images-x86_64.yaml because Provided by MicroShift
+2026-10-23 04:35:03,242     INFO       Clearing directory assets/optional/cert-manager/rbac/
+2026-10-23 04:35:03,242     DEBUG      Copying assets/optional/cert-manager/rbac/auth_proxy_client_clusterrole.yaml <- _output/staging/cert-manager-operator/config/rbac/auth_proxy_client_clusterrole.yaml
+2026-10-23 04:35:03,243     DEBUG      Copying assets/optional/cert-manager/rbac/auth_proxy_role.yaml <- _output/staging/cert-manager-operator/config/rbac/auth_proxy_role.yaml
+2026-10-23 04:35:03,243     DEBUG      Copying assets/optional/cert-manager/rbac/auth_proxy_role_binding.yaml <- _output/staging/cert-manager-operator/config/rbac/auth_proxy_role_binding.yaml
+2026-10-23 04:35:03,243     DEBUG      Copying assets/optional/cert-manager/rbac/auth_proxy_service.yaml <- _output/staging/cert-manager-operator/config/rbac/auth_proxy_service.yaml
+2026-10-23 04:35:03,243     DEBUG      Copying assets/optional/cert-manager/rbac/certmanager_editor_role.yaml <- _output/staging/cert-manager-operator/config/rbac/certmanager_editor_role.yaml
+2026-10-23 04:35:03,243     DEBUG      Copying assets/optional/cert-manager/rbac/certmanager_viewer_role.yaml <- _output/staging/cert-manager-operator/config/rbac/certmanager_viewer_role.yaml
+2026-10-23 04:35:03,243     DEBUG      Copying assets/optional/cert-manager/rbac/kustomization.yaml <- _output/staging/cert-manager-operator/config/rbac/kustomization.yaml
+2026-10-23 04:35:03,244     DEBUG      Copying assets/optional/cert-manager/rbac/leader_election_role.yaml <- _output/staging/cert-manager-operator/config/rbac/leader_election_role.yaml
+2026-10-23 04:35:03,244     DEBUG      Copying assets/optional/cert-manager/rbac/leader_election_role_binding.yaml <- _output/staging/cert-manager-operator/config/rbac/leader_election_role_binding.yaml
+2026-10-23 04:35:03,244     DEBUG      Copying assets/optional/cert-manager/rbac/role.yaml <- _output/staging/cert-manager-operator/config/rbac/role.yaml
+2026-10-23 04:35:03,244     DEBUG      Copying assets/optional/cert-manager/rbac/role_binding.yaml <- _output/staging/cert-manager-operator/config/rbac/role_binding.yaml
+2026-10-23 04:35:03,244     DEBUG      Copying assets/optional/cert-manager/rbac/featuregate_clusterrole.yaml <- _output/staging/cert-manager-operator/config/rbac/featuregate_clusterrole.yaml
+2026-10-23 04:35:03,245     DEBUG      Copying assets/optional/cert-manager/rbac/featuregate_clusterrole_binding.yaml <- _output/staging/cert-manager-operator/config/rbac/featuregate_clusterrole_binding.yaml
+2026-10-23 04:35:03,245     DEBUG      Copying assets/optional/cert-manager/rbac/service_account.yaml <- _output/staging/cert-manager-operator/config/rbac/service_account.yaml
+[34mUpdating cert_manager images[00m
+[34mUpdating images for amd64[00m
+[34mUpdating images for arm64[00m
+[34m## Updating last_rebase_cert_manager.sh[00m
