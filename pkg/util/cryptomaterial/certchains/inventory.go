@@ -114,6 +114,16 @@ func (entry CertificateInventoryEntry) StatusAt(now time.Time) (CertificateStatu
 	}
 }
 
+// RotationDeadline is the existing automatic shutdown deadline, distinct from
+// the percentage thresholds used to report certificate status.
+func (entry CertificateInventoryEntry) RotationDeadline() time.Time {
+	const month = 30 * 24 * time.Hour
+	if cryptomaterial.IsCertShortLived(&entry.Certificate) {
+		return entry.Certificate.NotAfter.Add(-4 * month)
+	}
+	return entry.Certificate.NotAfter.Add(-12 * month)
+}
+
 // Inventory returns a deterministic snapshot of all certificates managed by
 // the chain. Signers are listed before their sub-CAs and leaf certificates.
 func (cs *CertificateChains) Inventory() CertificateInventory {

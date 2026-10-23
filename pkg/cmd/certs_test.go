@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"os"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"sigs.k8s.io/yaml"
@@ -158,7 +160,10 @@ func TestCertStatusStates(t *testing.T) {
 						}, nil
 					},
 				}
-				command := newCertsCommand(options, func() error { return nil })
+				command := newCertsCommand(options)
+				statusCommand, _, err := command.Find([]string{"status"})
+				require.NoError(t, err)
+				statusCommand.PreRunE = nil // Exercise output independently of the test runner's UID.
 				args := []string{"status"}
 				if format != "" {
 					args = append(args, "-o", format)
@@ -205,7 +210,10 @@ func TestCertStatusStructuredOutputFlags(t *testing.T) {
 					return certchains.CertificateInventory{}, nil
 				},
 			}
-			command := newCertsCommand(options, func() error { return nil })
+			command := newCertsCommand(options)
+			statusCommand, _, err := command.Find([]string{"status"})
+			require.NoError(t, err)
+			statusCommand.PreRunE = nil // Exercise output independently of the test runner's UID.
 			require.Equal(t, 0, RunCertsCommand(command, append([]string{"status"}, args...)))
 			require.Empty(t, stderr.String())
 			var status certificatesv1alpha1.CertificateStatusList
@@ -287,15 +295,44 @@ func (w failingCertificateWriter) Write(_ []byte) (int, error) {
 }
 
 func TestCertsCommandRequiresPrivileges(t *testing.T) {
-	wantErr := errors.New("privileges required")
-	command := newCertsCommand(&certStatusOptions{}, func() error { return wantErr })
-	command.SetArgs([]string{"status"})
-	require.ErrorIs(t, command.Execute(), wantErr)
-
-	statusCommand, _, err := command.Find([]string{"status"})
-	require.NoError(t, err)
-	require.NotNil(t, statusCommand.Flags().Lookup("output"))
-	require.Equal(t, "o", statusCommand.Flags().Lookup("output").Shorthand)
+	for _, args := range [][]string{{"status"}, {"renew", "--serving", "--dry-run"}, {"renew", "--ca"}} {
+		for _, format := range []string{"", certificateOutputJSON, certificateOutputYAML} {
+			t.Run(strings.Join(args, " ")+"/"+format, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				rootRan, commandRan := false, false
+				command := NewCertsCommand(genericclioptions.IOStreams{Out: &stdout, ErrOut: &stderr})
+				command.PersistentPreRun = func(*cobra.Command, []string) { rootRan = true }
+				leaf, _, err := command.Find(args)
+				require.NoError(t, err)
+				require.NotNil(t, leaf.PreRunE)
+				require.Equal(t, "o", leaf.Flags().Lookup("output").Shorthand)
+				// Keep the real privilege check, but never access the host's PKI.
+				leaf.RunE = func(*cobra.Command, []string) error { commandRan = true; return nil }
+				arguments := append([]string{}, args...)
+				if format != "" {
+					arguments = append(arguments, "-o", format)
+				}
+				code := RunCertsCommand(command, arguments)
+				require.True(t, rootRan, "the privilege check must not shadow root initialization")
+				require.Equal(t, os.Geteuid() == 0, commandRan)
+				require.Empty(t, stdout.String())
+				if os.Geteuid() == 0 {
+					require.Zero(t, code)
+					require.Empty(t, stderr.String())
+					return
+				}
+				require.Equal(t, 1, code)
+				if format == "" {
+					require.Equal(t, "Error: command requires root privileges\n", stderr.String())
+					return
+				}
+				var failure certificatesv1alpha1.Error
+				require.NoError(t, yaml.UnmarshalStrict(stderr.Bytes(), &failure))
+				require.Equal(t, certificatesv1alpha1.ErrorCodeInsufficientPrivileges, failure.Code)
+				require.Equal(t, "command requires root privileges", failure.Message)
+			})
+		}
+	}
 }
 
 func certificateInventoryEntry(service, name string, role certchains.CertificateRole, policy certchains.RotationPolicy, notBefore, notAfter time.Time) certchains.CertificateInventoryEntry {
