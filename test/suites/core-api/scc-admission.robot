@@ -58,3 +58,19 @@ Different Namespaces Get Different SCC Ranges
     ...    Oc Delete    -f ${POD_NO_USER} -n ${ns2} --ignore-not-found
     ...    AND
     ...    Remove Namespace    ${ns2}
+
+New Namespace Gets SCC Annotation From Cluster Policy Controller
+    [Documentation]    The cluster policy controller integration annotates new
+    ...    namespaces with openshift.io/sa.scc.* so SCC UID ranges are allocated.
+    ...    OCP-53972
+    Wait Until Keyword Succeeds    5m    5s
+    ...    Namespace Should Have SCC Annotation    ${NAMESPACE}
+
+
+*** Keywords ***
+Namespace Should Have SCC Annotation
+    [Documentation]    Verify the namespace carries the openshift.io/sa.scc annotation.
+    [Arguments]    ${namespace}
+    ${annotations}=    Run With Kubeconfig
+    ...    oc get namespace ${namespace} -o jsonpath='{.metadata.annotations}'
+    Should Contain    ${annotations}    openshift.io/sa.scc
