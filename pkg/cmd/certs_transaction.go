@@ -157,7 +157,11 @@ func certificateUnitsStopped(services ...string) error {
 
 func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) (inventory certchains.CertificateInventory, retErr error) {
 	transaction := &certificates.Transaction{DataDir: dataDir}
-	defer func() { retErr = errors.Join(retErr, transaction.Discard()) }()
+	defer func() {
+		if retErr != nil {
+			retErr = errors.Join(retErr, transaction.Discard())
+		}
+	}()
 	if err := transaction.Prepare(); err != nil {
 		return nil, err
 	}
@@ -170,7 +174,7 @@ func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) 
 	if err != nil {
 		return nil, err
 	}
-	plan, err := builder.PlanRenewal(renewCAs, time.Now())
+	plan, err := planCertificateRenewal(builder, renewCAs, time.Now())
 	if err != nil {
 		return nil, err
 	}
@@ -212,6 +216,8 @@ func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) 
 	if err := publishCertificateRenewal(transaction, state); err != nil {
 		return nil, err
 	}
+	// Publication is the success boundary. The next preparation or activation
+	// cleans obsolete stages; cleanup must not turn a published result into failure.
 	return staged, nil
 }
 

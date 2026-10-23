@@ -58,17 +58,15 @@ func (o *certRenewOptions) run() error {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidArguments,
 			fmt.Errorf("unsupported output format %q; supported formats: json, yaml", o.output)}
 	}
-	if o.prepare != nil {
-		release, err := o.prepare(!o.dryRun)
-		if err != nil {
-			return err
-		}
-		defer release()
-	}
 	cfg, err := o.loadConfig()
 	if err != nil {
 		return invalidCertificateConfiguration()
 	}
+	release, err := o.prepare(!o.dryRun)
+	if err != nil {
+		return err
+	}
+	defer release()
 	plan, err := o.plan(cfg, o.ca, o.now())
 	if err != nil {
 		return certificateRenewalError(err)
@@ -100,6 +98,30 @@ func (o *certRenewOptions) run() error {
 	}
 	if err != nil {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInternalError, err}
+	}
+	return nil
+}
+
+func planCertificateRenewal(builder certchains.CertificateChainsBuilder, renewCAs bool, now time.Time) ([]certchains.CertificateRenewalPlanEntry, error) {
+	plan, err := builder.PlanRenewal(renewCAs, now)
+	if err != nil || renewCAs {
+		return plan, err
+	}
+	inventory, err := builder.LoadInventory()
+	if err != nil {
+		return nil, &certchains.InventoryReadError{Err: err}
+	}
+	if err := checkCertificateRotationDeadline(inventory.ByRole(certchains.CertificateRoleCA), now); err != nil {
+		return nil, fmt.Errorf("%w; use --ca to renew the CA chain", err)
+	}
+	return plan, nil
+}
+
+func checkCertificateRotationDeadline(inventory certchains.CertificateInventory, now time.Time) error {
+	for _, entry := range inventory {
+		if !now.Before(entry.RotationDeadline()) {
+			return fmt.Errorf("certificate %q has reached its automatic rotation deadline", entry.Name)
+		}
 	}
 	return nil
 }

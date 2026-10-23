@@ -79,8 +79,10 @@ func TestPendingRenewalCanBeReplaced(t *testing.T) {
 	tx := &certificates.Transaction{DataDir: dir}
 	original, err := readPendingCertificateRenewal(tx)
 	require.NoError(t, err)
+	originalStage := tx.Stage()
 	_, err = applyCertificateRenewal(cfg, dir, true)
 	require.NoError(t, err)
+	require.DirExists(t, originalStage, "successful publication must not run fallible cleanup")
 	replacement, err := readPendingCertificateRenewal(tx)
 	require.NoError(t, err)
 	require.NotEqual(t, original.RenewedHash, replacement.RenewedHash)
@@ -89,6 +91,7 @@ func TestPendingRenewalCanBeReplaced(t *testing.T) {
 	activated, err := activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now())
 	require.NoError(t, err)
 	require.True(t, activated)
+	require.NoDirExists(t, originalStage, "activation cleans obsolete generations")
 	pend, err := loadPendingCertificateRenewal(dir)
 	require.NoError(t, err)
 	require.Nil(t, pend)
@@ -154,6 +157,34 @@ func TestPendingRenewalNotYetValidBeforeActivation(t *testing.T) {
 	pending, err := loadPendingCertificateRenewal(dir)
 	require.NoError(t, err)
 	require.NotNil(t, pending)
+}
+
+func TestPendingRenewalRotationDeadline(t *testing.T) {
+	for _, offset := range []time.Duration{-time.Second, 0, time.Second} {
+		t.Run(offset.String(), func(t *testing.T) {
+			cfg, dir := pendingRenewalFixture(t)
+			before := activeCertificateFileDigests(t, dir)
+			tx := &certificates.Transaction{DataDir: dir}
+			_, err := tx.LoadPending()
+			require.NoError(t, err)
+			builder, err := certificateChainsSetup(cfg, tx.Stage())
+			require.NoError(t, err)
+			chains, err := builder.Load()
+			require.NoError(t, err)
+			_, deadline, err := certchains.WhenToRotateAtEarliest(chains)
+			require.NoError(t, err)
+			// The generation is still valid when its automatic rotation is due.
+			_, err = builder.ValidateRenewal(false, deadline.Add(offset))
+			require.NoError(t, err)
+			activated, err := activateCertificateRenewal(cfg, tx, func() error { return nil }, deadline.Add(offset))
+			require.NoError(t, err)
+			require.Equal(t, offset < 0, activated)
+			if !activated {
+				require.Equal(t, before, activeCertificateFileDigests(t, dir), "discard must precede active replacement")
+			}
+			require.NoDirExists(t, filepath.Join(dir, ".cert-renewal"))
+		})
+	}
 }
 
 func TestPendingRenewalAllowsUnrelatedConfigurationChanges(t *testing.T) {

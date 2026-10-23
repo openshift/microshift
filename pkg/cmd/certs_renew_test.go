@@ -101,12 +101,16 @@ func TestCertRenewCommand(t *testing.T) {
 				entry.ParentCA = "test-ca"
 				plan := []certchains.CertificateRenewalPlanEntry{{CertificateInventoryEntry: entry, NewNotAfter: now.Add(24 * time.Hour)}}
 				var stdout, stderr bytes.Buffer
-				applied, released := false, false
+				applied, released, configLoaded := false, false, false
 				options := &certRenewOptions{
-					IOStreams:  genericclioptions.IOStreams{Out: &stdout, ErrOut: &stderr},
-					now:        func() time.Time { return now },
-					loadConfig: func() (*config.Config, error) { return &config.Config{}, nil },
+					IOStreams: genericclioptions.IOStreams{Out: &stdout, ErrOut: &stderr},
+					now:       func() time.Time { return now },
+					loadConfig: func() (*config.Config, error) {
+						configLoaded = true
+						return &config.Config{}, nil
+					},
 					prepare: func(writing bool) (func(), error) {
+						require.True(t, configLoaded, "validate configuration before transaction access")
 						require.Equal(t, !dryRun, writing)
 						return func() { released = true }, nil
 					},
@@ -191,6 +195,7 @@ func TestCertRenewErrors(t *testing.T) {
 						return &config.Config{}, nil
 					},
 					prepare: func(bool) (func(), error) {
+						require.NotEqual(t, "configuration", tt.name, "invalid configuration must not prepare or recover a transaction")
 						if tt.name == "recovery" {
 							return nil, &certificateCommandError{tt.code, errors.New("operation refused")}
 						}
@@ -231,6 +236,52 @@ func TestCertRenewErrors(t *testing.T) {
 				require.Equal(t, tt.code, failure.Code)
 			})
 		}
+	}
+}
+
+func TestCertificateRenewalPlanRejectsCADueForRotation(t *testing.T) {
+	cfg, dir := pendingRenewalFixture(t)
+	builder, err := certificateChainsSetup(cfg, dir)
+	require.NoError(t, err)
+	inventory, err := builder.LoadInventory()
+	require.NoError(t, err)
+	var now time.Time
+	for _, entry := range inventory.ByRole(certchains.CertificateRoleCA) {
+		candidate := entry.Certificate.NotAfter.Add(-90 * 24 * time.Hour)
+		if now.IsZero() || candidate.Before(now) {
+			now = candidate
+		}
+	}
+	before := certificateFileDigests(t, dir)
+	_, err = builder.PlanRenewal(false, now)
+	require.NoError(t, err, "cryptographic validity alone permits renewal")
+	_, err = planCertificateRenewal(builder, false, now)
+	require.ErrorContains(t, err, "automatic rotation deadline")
+	require.ErrorContains(t, err, "use --ca")
+	_, err = planCertificateRenewal(builder, true, now)
+	require.NoError(t, err, "CA renewal can replace the due signers")
+	require.Equal(t, before, certificateFileDigests(t, dir), "planning must not modify active or pending material")
+}
+
+func TestCertificateRotationDeadline(t *testing.T) {
+	now := time.Now().UTC().Truncate(time.Second)
+	for _, tt := range []struct {
+		name     string
+		validity time.Duration
+		advance  time.Duration
+	}{
+		{"short-lived", 365 * 24 * time.Hour, 120 * 24 * time.Hour},
+		{"long-lived", 10 * 365 * 24 * time.Hour, 360 * 24 * time.Hour},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			entry := certificateInventoryEntry("test", "ca", certchains.CertificateRoleCA, certchains.RotationPolicyExtended, now.Add(-tt.validity), now)
+			deadline := now.Add(-tt.advance)
+			require.Equal(t, deadline, entry.RotationDeadline())
+			inventory := certchains.CertificateInventory{entry}
+			require.NoError(t, checkCertificateRotationDeadline(inventory, deadline.Add(-time.Second)))
+			require.ErrorContains(t, checkCertificateRotationDeadline(inventory, deadline), "automatic rotation deadline")
+			require.Error(t, checkCertificateRotationDeadline(inventory, deadline.Add(time.Second)))
+		})
 	}
 }
 

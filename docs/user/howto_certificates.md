@@ -90,8 +90,8 @@ Dry-run validates the existing certificate/key pairs and signing relationships,
 then reports current and proposed expiry times without generating keys or staging
 new material. Renewal uses the existing per-certificate validity periods and
 caps each descendant's expiry at the earliest expiry in its signing chain. If a
-CA is expired or not yet valid, leaf-only renewal is refused; use `--ca` to renew
-the chain.
+CA is expired, not yet valid, or already due for automatic rotation, leaf-only
+renewal is refused; use `--ca` to renew the chain.
 Configurable validity periods are not yet implemented by this command.
 
 ### Optional Pre-Renewal Backup
@@ -274,7 +274,7 @@ Allow enough free space on the data filesystem to stage `certs/` and `resources/
 Renewal rejects symlinks and special files in these directories instead of
 following them outside staging. It does not copy or replace the etcd database.
 For the internal layout, metadata, and resource-refresh behavior, see
-[Certificate Renewal Transactions](../contributor/architecture.md#certificate-renewal-transactions).
+[Certificate Renewal Transactions](../contributor/certificates.md).
 
 #### Startup Validation
 
@@ -287,6 +287,13 @@ discards the pending generation, logs a warning, and continues with normal
 certificate initialization using the current configuration and active material.
 Run renewal again if still needed. Unrelated settings, such as logging, do not
 invalidate a pending renewal.
+
+Startup also checks the pending generation's automatic rotation deadline. If that
+deadline has already arrived, it discards the generation and uses normal
+certificate initialization instead of activating it and immediately restarting.
+The warning notes that normal startup may rotate CAs, even if the discarded
+renewal selected only `--serving`. Prepare and activate renewal before the
+deadline; a pending generation does not postpone automatic rotation.
 
 #### Corrupt Renewal Metadata
 

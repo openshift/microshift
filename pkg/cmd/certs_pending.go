@@ -174,11 +174,15 @@ func activatePendingCertificateRenewal(cfg *config.Config, transaction *certific
 		return false, err
 	}
 	// Recheck validity at activation, which may be much later than generation.
-	if _, err := builder.ValidateRenewal(renewCAs, now); err != nil {
+	pending, err := builder.ValidateRenewal(renewCAs, now)
+	if err != nil {
 		if errors.Is(err, certchains.ErrCertificateExpired) {
 			return false, discardPendingCertificateRenewal(transaction, "pending certificates expired before activation")
 		}
 		return false, fmt.Errorf("pending certificates cannot be activated; run microshift certs renew again: %w", err)
+	}
+	if err := checkCertificateRotationDeadline(pending, now); err != nil {
+		return false, discardPendingCertificateRenewal(transaction, err.Error()+"; normal startup may rotate CAs")
 	}
 	activeBuilder, err := certificateChainsSetup(cfg, transaction.DataDir)
 	if err != nil {
