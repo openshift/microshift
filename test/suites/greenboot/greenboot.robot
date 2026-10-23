@@ -36,6 +36,7 @@ Run with User Workload
 
 Simulate Service Failure
     [Documentation]    Simulate Service failure
+    Wait Until Greenboot Health Check Exited
     Wait For MicroShift Healthcheck Success
     Disrupt Service
     Cleanup MicroShift    --all    --keep-images
@@ -52,6 +53,7 @@ Simulate Service Failure
 
 Simulate Pod Failure
     [Documentation]    Simulate pod network failure
+    Wait Until Greenboot Health Check Exited
     Wait For MicroShift Healthcheck Success
     Disrupt Pod Network
     Restart MicroShift
