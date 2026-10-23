@@ -125,3 +125,15 @@ Create Usr Directory Overlay
     ...    sudo=True    return_rc=True
     ...    return_stdout=True    return_stderr=True
     Should Be Equal As Integers    0    ${rc}
+
+Make Usr Writable If Needed
+    [Documentation]    /usr is read-only on ostree and bootc hosts. Create a transient overlay
+    ...    (lost on reboot) unless /usr is already writable, e.g. because another suite on this host
+    ...    already created one.
+    ${is_ostree}=    Is System OSTree
+    IF    ${is_ostree}
+        ${rc}=    Execute Command
+        ...    touch /usr/libexec/.cp-rf-probe && rm -f /usr/libexec/.cp-rf-probe
+        ...    sudo=True    return_rc=True    return_stdout=False
+        IF    ${rc} != 0    Create Usr Directory Overlay
+    END
