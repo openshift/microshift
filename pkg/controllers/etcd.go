@@ -233,7 +233,7 @@ func getEtcdClient(ctx context.Context) (*clientv3.Client, error) {
 	tlsInfo := transport.TLSInfo{
 		CertFile:      cryptomaterial.ClientCertPath(etcdAPIServerClientCertDir),
 		KeyFile:       cryptomaterial.ClientKeyPath(etcdAPIServerClientCertDir),
-		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
+		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.PeerCADir(certsDir)),
 	}
 	tlsConfig, err := tlsInfo.ClientConfig()
 	if err != nil {
