@@ -4618,6 +4618,28 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: request
       type:
         namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+- name: com.github.openshift.api.config.v1alpha1.ControllerManager
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: com.github.openshift.api.config.v1alpha1.ControllerManagerSpec
+- name: com.github.openshift.api.config.v1alpha1.ControllerManagerSpec
+  map:
+    fields:
+    - name: volumeForceDetach
+      type:
+        scalar: string
 - name: com.github.openshift.api.config.v1alpha1.CustomPKIPolicy
   map:
     fields:
