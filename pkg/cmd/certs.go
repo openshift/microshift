@@ -56,7 +56,7 @@ func NewCertsCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 			if err != nil {
 				return nil, invalidCertificateConfiguration()
 			}
-			return builder.PlanRenewal(renewCAs, now)
+			return planCertificateRenewal(builder, renewCAs, now)
 		},
 		apply: func(cfg *config.Config, renewCAs bool) (certchains.CertificateInventory, error) {
 			return applyCertificateRenewal(cfg, config.DataDir, renewCAs)

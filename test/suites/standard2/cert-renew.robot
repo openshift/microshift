@@ -107,6 +107,19 @@ Unprivileged Dry Run Is Refused
         ...    ${format}    InsufficientPrivileges
     END
 
+Invalid Configuration Is Rejected Before Lock Acquisition
+    [Documentation]    Invalid configuration fails before preparing or recovering a transaction, even with a busy lock.
+    ${before}=    Certificate Material Digest
+    Drop In MicroShift Config    debugging: [\n    99-cert-renew-test
+    FOR    ${format}    IN    json    yaml
+        Renewal Error Should Be Reported
+        ...    flock -x ${CERTIFICATE_LOCK} microshift certs renew --serving --dry-run -o ${format}
+        ...    ${format}    InvalidConfiguration
+    END
+    ${after}=    Certificate Material Digest
+    Should Be Equal    ${before}    ${after}
+    [Teardown]    Remove Drop In MicroShift Config    99-cert-renew-test
+
 Leaf Renewal Keeps CAs Unchanged
     [Documentation]    Prepare leaves online, preserve active TLS and CA bytes, and activate only on restart.
     ${pods_before}=    Certificate Consumer Pod UIDs
