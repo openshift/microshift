@@ -27,7 +27,7 @@ func pendingRenewalFixture(t *testing.T) (*config.Config, string) {
 		ApiServer: config.ApiServer{AdvertiseAddress: "10.44.0.0", URL: "https://127.0.0.1:6443", Port: 6443},
 	}
 	dataDir := t.TempDir()
-	builder, err := certificateChainsSetup(cfg, dataDir)
+	builder, err := certificates.NewChains(cfg, dataDir)
 	require.NoError(t, err)
 	chains, err := builder.Complete()
 	require.NoError(t, err)
@@ -182,7 +182,7 @@ func TestPendingRenewalRotationDeadline(t *testing.T) {
 			tx := &certificates.Transaction{DataDir: dir}
 			_, err := tx.LoadPending()
 			require.NoError(t, err)
-			builder, err := certificateChainsSetup(cfg, tx.Stage())
+			builder, err := certificates.NewChains(cfg, tx.Stage())
 			require.NoError(t, err)
 			chains, err := builder.Load()
 			require.NoError(t, err)

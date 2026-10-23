@@ -14,6 +14,29 @@ import (
 
 var ErrBusy = errors.New("MicroShift startup or another certificate operation is using the PKI")
 
+// ReadLock takes a non-blocking shared lock on an existing operation lock file.
+// Unlike Lock, observation must not create directories, files, or SELinux labels.
+func ReadLock(path string) (*os.File, error) {
+	file, err := os.OpenFile(path, os.O_RDONLY|unix.O_NOFOLLOW|unix.O_NONBLOCK, 0)
+	if err != nil {
+		return nil, err
+	}
+	info, err := file.Stat()
+	if err != nil || !info.Mode().IsRegular() {
+		_ = file.Close()
+		return nil, fmt.Errorf("certificate lock must be a regular file")
+	}
+	//nolint:gosec // An open OS file descriptor fits the syscall's signed int argument.
+	if err := unix.Flock(int(file.Fd()), unix.LOCK_SH|unix.LOCK_NB); err != nil {
+		_ = file.Close()
+		if errors.Is(err, unix.EWOULDBLOCK) {
+			return nil, ErrBusy
+		}
+		return nil, err
+	}
+	return file, nil
+}
+
 // Lock uses a stable file shared by run, status, and renewal.
 // Readers hold shared locks; startup and pending renewal require an exclusive
 // operation lock. A separate runtime lock prevents recovery while running.
