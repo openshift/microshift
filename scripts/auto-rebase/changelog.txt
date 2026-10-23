@@ -1,4 +1,8 @@
-- kube-rbac-proxy image-arm64 2f8a556d09638faeb09b366e95ecb75279ce7c8a to 14b6905aa3accb8bb16cd92f3438a9868597bd52
+- machine-config-operator embedded-component ddd94381334d055ed8cbbac3355fa405a8b17743 to 1061245400852b64e4af5328e30207be094ebd47
+  - d23533c0 2026-10-20T09:48:06Z [release-5.0] OCPBUGS-132359: only enable signed policy when testing signed payloads
+  - ca2cb8ff 2026-09-24T11:04:24Z Split wait-for-ipsec-connect into two services to avoid ipsec restart
+
+- kube-rbac-proxy image-amd64 2f8a556d09638faeb09b366e95ecb75279ce7c8a to 14b6905aa3accb8bb16cd92f3438a9868597bd52
   - bb3586d 2026-10-16T17:29:59+05:30 Address CVE-2026-84304
   - bdeb151 2026-10-16T17:29:24+05:30 Address CVE-2026-84304 (vendor changes)
 
