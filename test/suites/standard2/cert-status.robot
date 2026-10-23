@@ -31,8 +31,11 @@ Table Reports Descriptive Certificate States
     ${stdout}=    Command Should Work    microshift certs status
     ${rows}=    Evaluate    $stdout.splitlines()
     Should Be True    $rows[0].split() == ['SERVICE', 'CERTIFICATE', 'STATUS', 'EXPIRY', 'MESSAGE']
-    Should Be True    len($rows) > 1
-    FOR    ${row}    IN    @{rows}[1:]
+    Should Be True    len($rows) > 3
+    Should Match Regexp
+    ...    ${rows}[-1]
+    ...    ^Force restart on expiration imminent: (true|false) \\(configured; applied at service start\\)$
+    FOR    ${row}    IN    @{rows}[1:-2]
         Validate Certificate Table Message    ${row}
     END
 

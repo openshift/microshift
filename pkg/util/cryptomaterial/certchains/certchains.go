@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"k8s.io/klog/v2"
-
-	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 )
 
 type CertificateChains struct {
@@ -68,13 +66,12 @@ func WhenToRotateAtEarliest(cs *CertificateChains) ([]string, time.Time, error) 
 	for _, entry := range cs.Inventory() {
 		currentPath := entry.Path
 		c := entry.Certificate
-		const month = 30 * time.Hour * 24
-
-		rotateAt := c.NotAfter.Add(-4 * month)
-		if !cryptomaterial.IsCertShortLived(&c) {
-			rotateAt = c.NotAfter.Add(-12 * month)
+		_, critical, err := entry.RotationPolicy.StatusThresholds()
+		if err != nil {
+			return nil, time.Time{}, fmt.Errorf("certificate %q: %w", entry.Name, err)
 		}
-		klog.Warningf("%v rotate at: %s", currentPath, rotateAt.String())
+		rotateAt := c.NotAfter.Add(-time.Duration(float64(c.NotAfter.Sub(c.NotBefore)) * critical))
+		klog.Infof("%v reaches ExpirationImminent at: %s", currentPath, rotateAt.String())
 
 		if rotationDate.IsZero() {
 			rotationDate = rotateAt

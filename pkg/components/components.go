@@ -10,6 +10,13 @@ import (
 func StartComponents(cfg *config.Config, ctx context.Context) error {
 	kubeAdminConfig := cfg.KubeConfigPath(config.KubeAdmin)
 
+	// OVN uses a host-mounted admin kubeconfig and must remount renewed
+	// credentials before the other components can reach the API Service.
+	if err := startCNIPlugin(ctx, cfg, kubeAdminConfig); err != nil {
+		klog.Warningf("Failed to start CNI plugin: %v", err)
+		return err
+	}
+
 	if err := startServiceCAController(ctx, cfg, kubeAdminConfig); err != nil {
 		klog.Warningf("Failed to start service-ca controller: %v", err)
 		return err
@@ -31,11 +38,6 @@ func StartComponents(cfg *config.Config, ctx context.Context) error {
 	}
 	if err := startDNSController(ctx, cfg, kubeAdminConfig); err != nil {
 		klog.Warningf("Failed to start DNS controller: %v", err)
-		return err
-	}
-
-	if err := startCNIPlugin(ctx, cfg, kubeAdminConfig); err != nil {
-		klog.Warningf("Failed to start CNI plugin: %v", err)
 		return err
 	}
 
