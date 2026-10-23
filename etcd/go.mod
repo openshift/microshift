@@ -5,7 +5,7 @@ go 1.26.3
 replace github.com/openshift/microshift => ../
 
 require (
-	github.com/openshift/api v0.0.0-20261001152744-764bd4c566f9
+	github.com/openshift/api v0.0.0-20261022144628-c3d7aef33fc1
 	github.com/openshift/build-machinery-go v0.0.0-20260902143904-520f675c892b
 	github.com/openshift/microshift v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.2
@@ -19,10 +19,7 @@ require (
 	sigs.k8s.io/yaml v1.6.0
 )
 
-require (
-	github.com/go-openapi/swag/pools v0.27.1 // indirect
-	go.yaml.in/yaml/v2 v2.4.4 // indirect
-)
+require go.yaml.in/yaml/v2 v2.4.4 // indirect
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
@@ -56,6 +53,7 @@ require (
 	github.com/go-openapi/swag/loading v0.27.1 // indirect
 	github.com/go-openapi/swag/mangling v0.27.1 // indirect
 	github.com/go-openapi/swag/netutils v0.27.1 // indirect
+	github.com/go-openapi/swag/pools v0.27.1 // indirect
 	github.com/go-openapi/swag/stringutils v0.27.1 // indirect
 	github.com/go-openapi/swag/typeutils v0.27.1 // indirect
 	github.com/go-openapi/swag/yamlutils v0.27.1 // indirect
@@ -81,7 +79,7 @@ require (
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oklog/run v1.2.0 // indirect
-	github.com/openshift/library-go v0.0.0-20261001144932-192662696fc7 // indirect
+	github.com/openshift/library-go v0.0.0-20261012084302-f23ec502bed4 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect

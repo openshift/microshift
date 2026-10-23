@@ -7,10 +7,10 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // openshift-controller-manager
 	github.com/google/go-cmp v0.7.0
 	github.com/miekg/dns v1.1.63 // microshift
-	github.com/openshift/api v0.0.0-20261001152744-764bd4c566f9
+	github.com/openshift/api v0.0.0-20261009034342-f9511d3fcb26
 	github.com/openshift/build-machinery-go v0.0.0-20260902143904-520f675c892b
-	github.com/openshift/client-go v0.0.0-20261001003915-dcaad1dc7fe8
-	github.com/openshift/library-go v0.0.0-20261001144932-192662696fc7
+	github.com/openshift/client-go v0.0.0-20261006222332-348fc1ca8bb1
+	github.com/openshift/library-go v0.0.0-20261012084302-f23ec502bed4
 	github.com/ovn-kubernetes/libovsdb v0.8.2-0.20260302130604-c07ce22366ac
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.10.2
@@ -34,7 +34,7 @@ require (
 	github.com/go-kit/kit v0.9.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
-	github.com/openshift/cluster-policy-controller v0.0.0-20260902120314-c9e9a3482609
+	github.com/openshift/cluster-policy-controller v0.0.0-20261019223900-81e222007c2c
 	github.com/openshift/route-controller-manager v0.0.0-20260909174728-a158fff7ce38
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/common v0.70.0
