@@ -9,5 +9,4 @@ resources:
 - hf-detector.yaml
 - ovms-kserve.yaml
 - vllm-cuda.yaml
-- vllm-gaudi.yaml
 - vllm-rocm.yaml
