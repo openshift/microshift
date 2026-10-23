@@ -48,7 +48,7 @@ Disabled APIs Are Not Served
     ...    absent. operator.openshift.io is expected only when cert-manager is
     ...    installed.
     [Arguments]    ${api_resources}
-    VAR    @{disabled_apis}
+    VAR    @{disabled_apis}=
     ...    build    apps    image    imageregistry    config    user    template
     IF    "certmanager" not in """${api_resources}"""
         Append To List    ${disabled_apis}    operator
