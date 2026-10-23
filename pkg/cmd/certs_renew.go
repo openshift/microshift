@@ -31,7 +31,7 @@ type certRenewOptions struct {
 	prepare             func(bool) (func(), error)
 }
 
-func newCertsRenewCommand(options *certRenewOptions, requirePrivileges func() error) *cobra.Command {
+func newCertsRenewCommand(options *certRenewOptions) *cobra.Command {
 	command := &cobra.Command{
 		Use:   "renew",
 		Short: "Prepare renewed certificates for the next MicroShift start",
@@ -39,7 +39,7 @@ func newCertsRenewCommand(options *certRenewOptions, requirePrivileges func() er
 			"Active certificates and kubeconfigs remain unchanged until the next start. Renewal is safe while MicroShift is running. " +
 			"Use --dry-run to validate and preview renewal without changing files.",
 		Args:    cobra.NoArgs,
-		PreRunE: certificatePreRun(requirePrivileges),
+		PreRunE: certificatePreRun,
 		RunE:    func(_ *cobra.Command, _ []string) error { return options.run() },
 	}
 	command.Flags().BoolVar(&options.serving, "serving", false, "Renew all serving, client, and peer certificates without changing CAs")
