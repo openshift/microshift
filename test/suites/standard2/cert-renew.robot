@@ -96,11 +96,14 @@ Exactly One Renewal Mode Is Required
         ...    microshift certs renew --serving --ca --dry-run -o ${format}    ${format}    InvalidArguments
     END
 
-Unprivileged Dry Run Is Refused
-    [Documentation]    Read-only planning still requires root privileges.
+Unprivileged Renewal Is Refused
+    [Documentation]    Both renewal modes and read-only planning require root privileges.
     FOR    ${format}    IN    json    yaml
         Renewal Error Should Be Reported
         ...    runuser -u nobody -- microshift certs renew --serving --dry-run -o ${format}
+        ...    ${format}    InsufficientPrivileges
+        Renewal Error Should Be Reported
+        ...    runuser -u nobody -- microshift certs renew --serving -o ${format}
         ...    ${format}    InsufficientPrivileges
         Renewal Error Should Be Reported
         ...    runuser -u nobody -- microshift certs renew --ca -o ${format}

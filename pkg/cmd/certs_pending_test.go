@@ -2,13 +2,11 @@ package cmd
 
 import (
 	"bytes"
-	"errors"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 
@@ -231,16 +229,4 @@ func TestCertificateActivationWithoutPendingRenewal(t *testing.T) {
 	}, time.Now())
 	require.NoError(t, err)
 	require.False(t, activated)
-}
-
-func TestCertRenewPreservesRootHookAndChecksPrivileges(t *testing.T) {
-	var out, errOut bytes.Buffer
-	rootRan := false
-	root := newCertsCommand(&certStatusOptions{IOStreams: genericclioptions.IOStreams{Out: &out, ErrOut: &errOut}}, func() error { return nil })
-	root.PersistentPreRun = func(_ *cobra.Command, _ []string) { rootRan = true }
-	root.AddCommand(newCertsRenewCommand(&certRenewOptions{}, func() error { return errors.New("requires root") }))
-	require.Equal(t, 1, RunCertsCommand(root, []string{"renew", "--ca", "-o", "json"}))
-	require.True(t, rootRan)
-	require.Empty(t, out.String())
-	require.Contains(t, errOut.String(), "InsufficientPrivileges")
 }

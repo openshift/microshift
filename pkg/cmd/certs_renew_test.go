@@ -123,8 +123,10 @@ func TestCertRenewCommand(t *testing.T) {
 						return certchains.CertificateInventory{entry}, nil
 					},
 				}
-				root := newCertsCommand(&certStatusOptions{IOStreams: options.IOStreams}, func() error { return nil })
-				root.AddCommand(newCertsRenewCommand(options, func() error { return nil }))
+				root := newCertsCommand(&certStatusOptions{IOStreams: options.IOStreams})
+				renew := newCertsRenewCommand(options)
+				renew.PreRunE = nil // Exercise output independently of the test runner's UID.
+				root.AddCommand(renew)
 				args := []string{"renew", "--serving"}
 				if dryRun {
 					args = append(args, "--dry-run")
@@ -217,8 +219,10 @@ func TestCertRenewErrors(t *testing.T) {
 						return nil, errors.New("cannot stage certificates")
 					},
 				}
-				root := newCertsCommand(&certStatusOptions{IOStreams: options.IOStreams}, func() error { return nil })
-				root.AddCommand(newCertsRenewCommand(options, func() error { return nil }))
+				root := newCertsCommand(&certStatusOptions{IOStreams: options.IOStreams})
+				renew := newCertsRenewCommand(options)
+				renew.PreRunE = nil // Exercise operation errors independently of the test runner's UID.
+				root.AddCommand(renew)
 				args := append([]string{"renew", "-o", output}, tt.args...)
 				require.Equal(t, 1, RunCertsCommand(root, args))
 				require.Empty(t, stdout.String())

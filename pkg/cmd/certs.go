@@ -47,7 +47,7 @@ func NewCertsCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 		loadPending: func() (*certificatesv1alpha1.CertificateRenewalResult, []string, error) {
 			return loadCertificateRenewalStatus(config.DataDir)
 		},
-	}, shouldRunPrivileged)
+	})
 	command.AddCommand(newCertsRenewCommand(&certRenewOptions{
 		IOStreams: ioStreams, now: time.Now, loadConfig: config.ActiveConfig,
 		prepare: prepareCertificateAccess,
@@ -61,11 +61,11 @@ func NewCertsCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 		apply: func(cfg *config.Config, renewCAs bool) (certchains.CertificateInventory, error) {
 			return applyCertificateRenewal(cfg, config.DataDir, renewCAs)
 		},
-	}, shouldRunPrivileged))
+	}))
 	return command
 }
 
-func newCertsCommand(options *certStatusOptions, requirePrivileges func() error) *cobra.Command {
+func newCertsCommand(options *certStatusOptions) *cobra.Command {
 	command := &cobra.Command{
 		Use:   "certs",
 		Short: "Inspect and manage MicroShift certificates",
@@ -73,27 +73,25 @@ func newCertsCommand(options *certStatusOptions, requirePrivileges func() error)
 	}
 	command.SetOut(options.Out)
 	command.SetErr(options.ErrOut)
-	command.AddCommand(newCertsStatusCommand(options, requirePrivileges))
+	command.AddCommand(newCertsStatusCommand(options))
 	return command
 }
 
 // certificatePreRun checks privileges without shadowing root initialization.
 // Attach it to each executable certificate subcommand as PreRunE.
-func certificatePreRun(requirePrivileges func() error) func(*cobra.Command, []string) error {
-	return func(_ *cobra.Command, _ []string) error {
-		if err := requirePrivileges(); err != nil {
-			return &certificateCommandError{certificatesv1alpha1.ErrorCodeInsufficientPrivileges, err}
-		}
-		return nil
+func certificatePreRun(_ *cobra.Command, _ []string) error {
+	if err := shouldRunPrivileged(); err != nil {
+		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInsufficientPrivileges, err}
 	}
+	return nil
 }
 
-func newCertsStatusCommand(options *certStatusOptions, requirePrivileges func() error) *cobra.Command {
+func newCertsStatusCommand(options *certStatusOptions) *cobra.Command {
 	command := &cobra.Command{
 		Use:     "status",
 		Short:   "Report the status of managed MicroShift certificates",
 		Args:    cobra.NoArgs,
-		PreRunE: certificatePreRun(requirePrivileges),
+		PreRunE: certificatePreRun,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return options.run()
 		},
