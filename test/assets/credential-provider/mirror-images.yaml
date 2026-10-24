@@ -1,0 +1,8 @@
+# Not applied by any test. Exists solely so test/bin/mirror_registry.sh seeds these
+# into the CI mirror (it greps test/assets/ for "image:" lines). Keep in sync with
+# CP_REGISTRY_IMAGE / CP_TEST_IMAGE in kubelet-mock-credential-provider-test.robot.
+#   registry:2 is run via podman to stand up the local authenticated registries
+#   busybox is pushed into them and pulled by the test pods (pins the tag this suite needs)
+images:
+  - image: quay.io/libpod/registry:2.8.2
+  - image: quay.io/microshift/busybox:1.36
