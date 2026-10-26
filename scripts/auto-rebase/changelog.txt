@@ -1,4 +1,26 @@
-- csi-external-snapshotter image-arm64 a019d1a9d9e1d26ffd0b2e0d911733180fa608b2 to a570de6a368dab9532e540d7f1ce10c3b03c6d1a
+- cluster-ingress-operator embedded-component 45007ca6932ce7159ee5120084bde0a4d33c4b83 to 2bb2799f289338c4f3c16fa46d15ad1b7ef2cae6
+  - 862a9df1 2026-10-20T13:36:15Z TRT-3032: Revert #1607 "OCPBUGS-121851: Report ingress Available=True on zero-worker HyperShift startup"
+  - 1db933fc 2026-10-19T20:16:24Z NE-2901: Document commit conventions
+  - 96770a98 2026-10-15T23:16:27Z Remove obsolete hardcoded replicas
+  - 557f9299 2026-10-07T16:06:02-03:00 Allow disabling endpoint address validation
+  - 892b47b1 2026-10-07T21:03:51+02:00 OCPBUGS-121851: Test Available=True/AwaitingNodes through node arrival and loss
+  - 57a6e938 2026-10-07T15:19:25+02:00 OCPBUGS-121851: Report ingress Progressing=False on zero-worker HyperShift startup
+  - 21a33c93 2026-10-07T12:16:43+02:00 OCPBUGS-121851: Add node-wait scenario tests and extract availability helper
+  - cfba2b5e 2026-10-06T12:15:52+02:00 OCPBUGS-121851: Report ingress Available=True on zero-worker HyperShift startup
+
+- cluster-kube-controller-manager-operator embedded-component c4854ad5ad5d1f9b2dfef3f721f96632334acde7 to 8935774b925a368067e112b15554534a85b87718
+  - 7955edd 2026-10-16T14:45:46-06:00 STOR-2875: wire volumeForceDetach config observer for KCM
+  - f624d80 2026-10-16T14:39:04-06:00 Bump library-go to get ObserveVolumeForceDetach
+
+- cluster-network-operator embedded-component fc66cef8b3724a5d724fc8f8d9ef5c7bac755916 to 089066d165506791a70df51c6b546a9377e865c7
+  - c60a139 2026-10-15T09:21:40+02:00 Align frr-k8s 5.1 CRDs
+
+- cluster-policy-controller embedded-component c9e9a348260921c9e788e33a51e904502cbe2d13 to 81e222007c2ceec48a908877eb71fb135a2c2453
+  - 8a858a8 2026-10-19T11:44:21+01:00 OCPSTRAT-3618: go mod vendor
+  - e299ba8 2026-10-19T11:44:21+01:00 OCPSTRAT-3618: Bump ci/docker images
+  - 9cd10ee 2026-10-12T11:48:29+01:00 OCPSTRAT-3618: Rebase kube v1.37.1
+
+- csi-external-snapshotter embedded-component a019d1a9d9e1d26ffd0b2e0d911733180fa608b2 to a570de6a368dab9532e540d7f1ce10c3b03c6d1a
   - 8f2c6ee 2026-10-14T14:40:31+02:00 UPSTREAM: <carry>: Add OpenShift files
   - d57944f 2026-10-12T13:38:26-04:00 Add changelog to release-8.7 branch
   - 9c43be8 2026-10-11T09:07:12Z Squashed 'release-tools/' changes from 7c58653f..7bacb813
@@ -29,7 +51,41 @@
   - 43d4672 2026-06-08T11:23:00Z Bump sigs.k8s.io/apiserver-network-proxy/konnectivity-client
   - 9519baf 2026-05-28T17:16:23-04:00 Update deps in client
 
-- ovn-kubernetes image-arm64 0de3886bb79aa0db71e17ddc42898f934e43359e to 0d60766d732f5d158ab77ab915a3fbceb13cdf50
+- machine-config-operator embedded-component 64f25ad7893fe24b5774235375f9d03c5a46d36f to 7090103994904d03eb6467387c86c0ad5eb80a71
+  - eb9ca7c9 2026-10-19T15:14:25Z OCPBUGS-132308: stabilize test 66436 - disable weak SSH cipher suites
+
+- csi-external-snapshotter image-amd64 a019d1a9d9e1d26ffd0b2e0d911733180fa608b2 to a570de6a368dab9532e540d7f1ce10c3b03c6d1a
+  - 8f2c6ee 2026-10-14T14:40:31+02:00 UPSTREAM: <carry>: Add OpenShift files
+  - d57944f 2026-10-12T13:38:26-04:00 Add changelog to release-8.7 branch
+  - 9c43be8 2026-10-11T09:07:12Z Squashed 'release-tools/' changes from 7c58653f..7bacb813
+  - e4e4f5a 2026-10-09T11:12:03-04:00 feat: add regression test
+  - 278e31b 2026-10-09T11:12:03-04:00 fix: shutdown broadcaster when Run returns
+  - 756a409 2026-10-08T22:53:07-04:00 Fix unit test after updating deps
+  - 822794c 2026-10-08T22:04:33-04:00 Update K8s deps to 1.37
+  - 73c720a 2026-10-08T21:57:31-04:00 Update deps
+  - f956292 2026-10-08T21:47:46-04:00 Ignore sidecar-owned VolumeGroupSnapshotContent updates to honor requeue backoff
+  - 01dc519 2026-08-20T13:49:06-04:00 Enable VGS feature gate
+  - 4799cee 2026-08-14T09:37:58Z fix: data race in scheduleOpsInFlightMetric
+  - 121c2a2 2026-08-14T09:07:51Z Squashed 'release-tools/' changes from 3472c3ffc..7c58653f2
+  - 47f0b3d 2026-08-11T11:50:06Z fix: GHSA-hrxh-6v49-42gf
+  - 12d5cbf 2026-08-11T09:27:32Z Squashed 'release-tools/' changes from 34632b81..3472c3ff
+  - 280ec96 2026-08-04T17:54:31-04:00 Requeue VolumeGroupSnapshotContent with backoff when not ready to use
+  - 72fcb26 2026-07-28T15:23:41+02:00 Skip NotFound errors when deleting snapshot content objects
+  - 9b03820 2026-07-16T11:22:43Z Bump actions/setup-go from 6.5.0 to 7.0.0
+  - 4dce899 2026-07-15T14:57:09Z Bump the github-dependencies group across 1 directory with 26 updates
+  - 7ed8205 2026-07-09T16:29:16+05:30 Squashed 'release-tools/' changes from 0d7d9d495..34632b812
+  - 32e3774 2026-07-06T11:24:03Z Bump github.com/go-openapi/swag/jsonname from 0.26.1 to 0.27.0
+  - e31226c 2026-06-29T14:00:27Z Bump the k8s-dependencies group across 1 directory with 7 updates
+  - 41694a5 2026-06-29T11:23:32Z Bump the github-dependencies group across 1 directory with 10 updates
+  - 6a31dcb 2026-06-24T11:22:42Z Bump actions/setup-go from 6.4.0 to 6.5.0
+  - 8dc7e07 2026-06-19T11:22:25Z Bump actions/checkout from 6.0.2 to 7.0.0
+  - 1d996ef 2026-06-09T14:13:02+05:30 deploy: update sidecar image versions
+  - a7b6be6 2026-06-09T03:36:49Z Squashed 'release-tools/' changes from 31186bf0a..0d7d9d495
+  - e5b78e7 2026-06-08T11:24:28Z Bump the github-dependencies group across 1 directory with 28 updates
+  - 43d4672 2026-06-08T11:23:00Z Bump sigs.k8s.io/apiserver-network-proxy/konnectivity-client
+  - 9519baf 2026-05-28T17:16:23-04:00 Update deps in client
+
+- ovn-kubernetes image-amd64 0de3886bb79aa0db71e17ddc42898f934e43359e to 0d60766d732f5d158ab77ab915a3fbceb13cdf50
   - aa1cad3b 2026-10-15T13:19:32+05:30 Keep the OVN bindings on the version we ship
   - 8986384d 2026-10-15T13:18:17+05:30 e2e: register openshift extension images from DeploymentConfig
   - 3ef2999d 2026-10-13T12:37:03+02:00 e2e: remove obsolete KubeVirt image cleanup
@@ -63,4 +119,75 @@
   - 174b4e1e 2026-10-06T14:06:39+01:00 E2E "pod connected to UserDefinedNetwork cannot be deleted when being used" flake fix
   - 5ff6a2d8 2026-10-01T16:55:29-07:00 Add libovsdb helpers to delete OVS ports from a bridge
   - 327fa844 2026-08-20T14:31:17+05:30 Add gateway mode content
+
+- ovn-kubernetes image-arm64 0d60766d732f5d158ab77ab915a3fbceb13cdf50 to baff7a3fb039209599691f57b01bf46d8c3a2466
+  - 2b0866cd 2026-10-22T18:33:26+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
+  - f2e99ce5 2026-10-21T13:27:18+02:00 OTE: promote CI-validated E2Es to blocking, defer untested ones
+  - 753e847a 2026-10-21T13:27:18+02:00 OTE: Add license headers and license-check tooling
+  - e01d0bd6 2026-10-21T13:27:18+02:00 OTE: Add unit tests for infraprovider package
+  - 33ed99ac 2026-10-21T13:27:18+02:00 OTE: add AGENT.md README.md files
+  - ba9dadb2 2026-10-21T13:27:18+02:00 OTE: skip EgressIP E2Es affected by GCP /32 node address
+  - 13221fff 2026-10-21T13:27:18+02:00 OTE: skip EgressIP GRPC health check E2Es
+  - 7a026a47 2026-10-21T13:27:18+02:00 OTE: skip EgressIP legacy health check E2Es
+  - 661ba56b 2026-10-21T13:27:17+02:00 OTE: skip EgressIP host-net-pod E2Es on bastion platforms
+  - ee37d6ea 2026-10-21T13:27:17+02:00 OTE: Skip Egress firewall E2Es
+  - c031b478 2026-10-21T13:27:17+02:00 OTE: skip EgressIP node readiness E2Es
+  - 15b4ab1b 2026-10-21T13:27:17+02:00 OTE: run podman with sudo on bastion hosts
+  - 55bfb962 2026-10-21T13:27:17+02:00 OTE: enable network segmentation env for EgressIP E2Es
+  - 69b589df 2026-10-21T13:27:17+02:00 OTE: skip EgressIP MTU fragmentation E2Es
+  - f7c1b6c8 2026-10-21T13:27:17+02:00 OTE: enable IP forwarding on node secondary interfaces
+  - 778fbf00 2026-10-21T13:27:17+02:00 OTE baremetal: enable secondary-host-eip tests
+  - 7f138c86 2026-10-21T13:27:17+02:00 OTE: add cloud platform support with shared baseInfra
+  - 9abb92db 2026-10-21T13:27:17+02:00 OTE baremetal: open external container port range at init
+  - 7704bfaa 2026-10-21T13:27:17+02:00 OTE: Initialize node primary IP allocator
+  - 6eb1a64c 2026-10-21T13:27:17+02:00 OTE: enable EgressIP E2E tests as serial, disable secondary-host-eip
+  - 3f6672c9 2026-10-21T13:27:17+02:00 baremetal: cache host-networked external containers for EgressIP E2Es
+  - 64728773 2026-10-19T17:54:36+02:00 sync test annotations with upstream changes
+  - a44516c9 2026-10-19T17:54:27+02:00 OTE: Adapt to InfrastructureNetworkExclusions API
+  - d74dd87f 2026-10-19T12:50:59+02:00 OTE: Adapt to new GetProviderNodeSubnets deploymentconfig API
+  - e5b1bbc2 2026-10-16T10:34:40-04:00 clustermanager: test invalid NAD dynamic tunnel keys
+  - f68b1db9 2026-10-16T10:34:40-04:00 clustermanager: test invalid node IDs during synchronization
+  - 1ba7bf30 2026-10-16T10:34:40-04:00 networkmanager: test invalid NAD network IDs
+  - d905d61f 2026-10-16T14:37:06+01:00 okep, qos: reject unsupported destination selectors
+  - 964e8f32 2026-10-16T09:11:26-04:00 cni: preserve default-network conntrack during VM migration
+  - d0434b71 2026-10-16T11:04:04+01:00 okep, qos: use discoverable pod IPs for destination matching
+  - 26a6120b 2026-10-16T11:04:04+01:00 okep, qos: single source matching approach using port groups
+  - 55de60d5 2026-10-16T11:04:04+01:00 okep, qos: add level-driven refactor as a prerequisite
+  - 47e0b45a 2026-10-16T11:04:04+01:00 okep: use port groups exclusively for source matching
+  - 035cff0e 2026-10-16T11:04:04+01:00 okep: signal unsupported ipamless configs via status condition
+  - cbd5d10a 2026-10-16T11:04:04+01:00 okep: complete NetworkQoS ipamless OKEP per template
+  - 14398976 2026-10-16T11:04:04+01:00 okep: NetworkQoS support for ipamless localnet networks
+  - baf7378c 2026-10-15T15:33:18-04:00 clustermanager: test invalid layer2 node tunnel IDs
+  - fa474d0d 2026-10-15T15:33:18-04:00 allocator: reject out-of-range bitmap offsets
+  - bf0349ef 2026-10-15T14:19:18+02:00 layer2: remove synthetic gateway migration notifications
+  - 4f9b5e77 2026-10-15T13:27:42+02:00 e2e: Implement InfrastructureNetworkExclusions API
+  - 078cee8c 2026-10-15T13:20:26+02:00 e2e: use provider-aware subnets for primary IP allocation
+  - a4a24977 2026-10-15T12:49:33+02:00 e2e: track the specific failed VM migration attempt
+  - 91fce521 2026-10-14T16:57:40+02:00 docs: describe RouteAdvertisements input validation
+  - 735e98de 2026-10-14T16:57:40+02:00 routeadvertisements: delete FRR config rejected by validation
+  - 45b7fa85 2026-10-14T16:33:08+02:00 routeadvertisements: validate the target VRF written to FRR config
+  - 447cd878 2026-10-14T16:33:08+02:00 routeadvertisements: validate neighbor keys written to FRR config
+  - 66f1b39e 2026-10-14T16:33:08+02:00 routeadvertisements: validate network values written to FRR config
+  - cd844b2d 2026-10-14T10:49:28+02:00 e2e: cover dynamic CUDN reactivation with reallocated node subnets
+  - 9d8bb297 2026-10-14T10:49:27+02:00 e2e: share Uplink provisioning between Dynamic UDN specs
+  - f5ed3a25 2026-10-14T10:27:27+02:00 networkmanager: delete dynamic UDN once its last NAD goes inactive
+  - 0e4ef97a 2026-10-14T10:17:00+03:00 images: prefer IPv4 for koji RPM download in Fedora Dockerfile
+  - 3c0643f8 2026-10-13T16:58:05+02:00 config: redact the bearer token from the parsed-config log line
+  - 28e0178d 2026-10-13T03:36:31-07:00 ovn: track pod IP allocation ownership
+  - 788a7944 2026-10-13T03:33:15-07:00 ovn: protect pod IP reservations across cleanup retries
+  - 97dea27d 2026-10-12T17:18:04-04:00 e2e: harden duplicate-primary UDN/CUDN test assertions
+  - 03893956 2026-10-12T17:18:04-04:00 e2e: wait for CUDN active namespaces in duplicate-primary test
+  - 22957897 2026-10-12T16:42:35-04:00 e2e: add tests for duplicate primary UDN/CUDN in same namespace
+  - 5ae56a65 2026-10-12T19:25:22+02:00 factory: remove duplicate pod informer init and dead selector
+  - 0b604da5 2026-10-12T16:19:48+02:00 unit: ensure pod informer cache is updated for UDN delete events
+  - fb3feea5 2026-10-12T12:41:23+02:00 e2e: make default RouteAdvertisements name configurable
+  - 61a58304 2026-10-12T12:41:23+02:00 e2e: restore original RouteAdvertisements spec after toggle
+  - cca571b2 2026-10-12T11:46:52+02:00 e2e: cover an Uplink bridge deleted under an active CUDN
+  - 77164768 2026-10-09T19:29:15+02:00 uplink: rediscover on OVS bridge additions and deletions
+  - e49ee125 2026-10-09T19:29:15+02:00 node: tolerate a missing link when deleting UDN masquerade neighbors
+  - 3d75bade 2026-10-09T19:29:15+02:00 node: never exit on a deleted Uplink bridge
+  - 48eaa7ac 2026-10-09T19:29:15+02:00 node: drop a vanished Uplink bridge on network cleanup
+  - 014c9532 2026-10-09T09:59:33-04:00 e2e: wait for EgressIP SNAT programming after reassignment
+  - 693ba00d 2026-10-09T09:59:33-04:00 e2e: bound KubeVirt guest curl commands
+  - cd4dfcf5 2026-09-16T10:32:44-07:00 e2e: clean up external container on post-create failure
 

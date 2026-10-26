@@ -306,6 +306,16 @@ func (ConsoleCustomization) SwaggerDoc() map[string]string {
 	return map_ConsoleCustomization
 }
 
+var map_ConsoleIngress = map[string]string{
+	"":                   "Ingress allows cluster admin to configure alternative ingress for the console.",
+	"consoleURL":         "consoleURL is a URL to be used as the base console address. If not specified, the console route hostname will be used. This field is required for clusters without ingress capability, where access to routes is not possible. Make sure that appropriate ingress is set up at this URL. The console operator will monitor the URL and may go degraded if it's unreachable for an extended period. Must use the HTTPS scheme.",
+	"clientDownloadsURL": "clientDownloadsURL is a URL to be used as the address to download client binaries. If not specified, the downloads route hostname will be used. This field is required for clusters without ingress capability, where access to routes is not possible. The console operator will monitor the URL and may go degraded if it's unreachable for an extended period. Must use the HTTPS scheme.",
+}
+
+func (ConsoleIngress) SwaggerDoc() map[string]string {
+	return map_ConsoleIngress
+}
+
 var map_ConsoleList = map[string]string{
 	"":         "Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).",
 	"metadata": "metadata is the standard list's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
@@ -394,16 +404,6 @@ var map_FileReferenceSource = map[string]string{
 
 func (FileReferenceSource) SwaggerDoc() map[string]string {
 	return map_FileReferenceSource
-}
-
-var map_Ingress = map[string]string{
-	"":                   "Ingress allows cluster admin to configure alternative ingress for the console.",
-	"consoleURL":         "consoleURL is a URL to be used as the base console address. If not specified, the console route hostname will be used. This field is required for clusters without ingress capability, where access to routes is not possible. Make sure that appropriate ingress is set up at this URL. The console operator will monitor the URL and may go degraded if it's unreachable for an extended period. Must use the HTTPS scheme.",
-	"clientDownloadsURL": "clientDownloadsURL is a URL to be used as the address to download client binaries. If not specified, the downloads route hostname will be used. This field is required for clusters without ingress capability, where access to routes is not possible. The console operator will monitor the URL and may go degraded if it's unreachable for an extended period. Must use the HTTPS scheme.",
-}
-
-func (Ingress) SwaggerDoc() map[string]string {
-	return map_Ingress
 }
 
 var map_Logo = map[string]string{
@@ -1426,7 +1426,7 @@ var map_KMSPreflightResult = map[string]string{
 	"":            "KMSPreflightResult contains the outcome of a preflight validation.",
 	"status":      "status indicates the outcome of the preflight check. Succeeded means the KMS plugin responded to Status, Encrypt, and Decrypt calls successfully. Failed means the validation did not pass.",
 	"configHash":  "configHash is the hash of the configuration that was validated. This is compared against observedConfigHash to confirm the result corresponds to the current configuration. The value must be exactly 8 characters.",
-	"remoteKeyID": "remoteKeyID is the remote key encryption key identifier from KMS v2 StatusResponse.key_id. This is not a cryptographic key, but a unique representation of the remote key used to encrypt data. The value must be between 1 and 1024 characters.",
+	"remoteKeyID": "remoteKeyID is the remote key encryption key identifier from KMS v2 StatusResponse.key_id. This is not a cryptographic key, but a unique representation of the remote key used to encrypt data. When omitted, no remote key identifier is available. This is expected when status is Failed, for example when the KMS provider could not be reached. When status is Succeeded, remoteKeyID is required. When set, the value must be between 1 and 1024 characters.",
 }
 
 func (KMSPreflightResult) SwaggerDoc() map[string]string {
