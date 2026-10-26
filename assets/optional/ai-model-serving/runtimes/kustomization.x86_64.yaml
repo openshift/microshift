@@ -21,9 +21,6 @@ images:
   - name: vllm-cpu-image
     newName: quay.io/opendatahub/vllm:fast-cpu
     digest: quay.io/opendatahub/vllm:fast-cpu
-  - name: vllm-gaudi-image
-    newName: quay.io/opendatahub/vllm:fast-gaudi
-    digest: quay.io/opendatahub/vllm:fast-gaudi
   - name: vllm-rocm-image
     newName: quay.io/opendatahub/vllm:fast-rocm
     digest: quay.io/opendatahub/vllm:fast-rocm
