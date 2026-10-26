@@ -5,7 +5,7 @@ go 1.26.3
 replace github.com/openshift/microshift => ../
 
 require (
-	github.com/openshift/api v0.0.0-20261001152744-764bd4c566f9
+	github.com/openshift/api v0.0.0-20261009034342-f9511d3fcb26
 	github.com/openshift/build-machinery-go v0.0.0-20260902143904-520f675c892b
 	github.com/openshift/microshift v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.2
@@ -81,7 +81,7 @@ require (
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oklog/run v1.2.0 // indirect
-	github.com/openshift/library-go v0.0.0-20261001144932-192662696fc7 // indirect
+	github.com/openshift/library-go v0.0.0-20261012084302-f23ec502bed4 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
