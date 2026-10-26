@@ -1,6 +1,6 @@
 {
   "release": {
-    "base": "2.25.11"
+    "base": "2.25.12"
   },
   "images": {
     "ray-tls-generator-image": "registry.redhat.io/ubi9/ubi-minimal:latest",
@@ -10,7 +10,6 @@
     "ovms-image": "quay.io/opendatahub/openvino_model_server:2025.1-release",
     "vllm-cuda-image": "quay.io/opendatahub/vllm:fast",
     "vllm-cpu-image": "quay.io/opendatahub/vllm:fast-cpu",
-    "vllm-gaudi-image": "quay.io/opendatahub/vllm:fast-gaudi",
     "vllm-rocm-image": "quay.io/opendatahub/vllm:fast-rocm",
     "vllm-spyre-image": "registry.redhat.io/rhaiis/vllm-spyre-rhel9@sha256:f36864ec0d7a18a3143296ba2e624eca1fa6ba0af87a7196b325384785bbcf4b",
     "guardrails-detector-huggingface-runtime-image": "quay.io/trustyai/guardrails-detector-huggingface-runtime:latest",
