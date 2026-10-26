@@ -1010,6 +1010,17 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: com.github.openshift.api.operator.v1.QuickStarts
       default: {}
+- name: com.github.openshift.api.operator.v1.ConsoleIngress
+  map:
+    fields:
+    - name: clientDownloadsURL
+      type:
+        scalar: string
+      default: ""
+    - name: consoleURL
+      type:
+        scalar: string
+      default: ""
 - name: com.github.openshift.api.operator.v1.ConsoleProviders
   map:
     fields:
@@ -1025,7 +1036,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: ingress
       type:
-        namedType: com.github.openshift.api.operator.v1.Ingress
+        namedType: com.github.openshift.api.operator.v1.ConsoleIngress
       default: {}
     - name: logLevel
       type:
@@ -1757,17 +1768,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: internalTransitSwitchSubnet
       type:
         scalar: string
-- name: com.github.openshift.api.operator.v1.Ingress
-  map:
-    fields:
-    - name: clientDownloadsURL
-      type:
-        scalar: string
-      default: ""
-    - name: consoleURL
-      type:
-        scalar: string
-      default: ""
 - name: com.github.openshift.api.operator.v1.IngressController
   map:
     fields:
