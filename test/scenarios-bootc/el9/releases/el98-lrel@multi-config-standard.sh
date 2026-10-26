@@ -77,9 +77,6 @@ EOF"
     # Wait for MicroShift to be ready
     wait_for_microshift_to_be_ready host1
 
-    # Setup oc client and kubeconfig for scripts that need it
-    setup_oc_and_kubeconfig host1
-
     # Create LVMS workloads
     echo "INFO: Creating LVMS workloads to validate storage..."
     run_command_on_vm host1 'bash -s' < "${TESTDIR}/../scripts/lvms-helpers/createWorkloads.sh"
