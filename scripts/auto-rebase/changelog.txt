@@ -1,31 +1,22 @@
-- cluster-kube-apiserver-operator embedded-component 91b9bf68d7dd8c81b19f120bc4ac73956ecd850e to 3915db668832c6d730f0ba4fe87604564204ff46
-  - b2f9012 2026-10-14T08:40:58-05:00 UPSTREAM: <drop>: vendor
-  - cf9e835 2026-10-14T08:40:58-05:00 UPSTREAM: <carry>: [release-4.20] OCPBUGS-103840: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.50.0-sec.4 to address CVE-2026-33814
+- cluster-dns-operator embedded-component 82578923164636746e0d74d594ab32d83a660c0b to ae484139f2e7b093cc97784e4382eba84a247bdc
+  - 11122b5 2026-09-24T03:20:31Z OCPBUGS-103832: Use patched x/net fork v0.50.0-sec.4
 
-- cluster-kube-scheduler-operator embedded-component 84eb8c5a73a730d6d08794e51da9c20013ca4304 to 6a8f72baf4f6cce052fed660343de13854197cd2
-  - 9c561db 2026-09-08T14:40:10+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
+- cluster-network-operator embedded-component 5a60886d1e93a65bc7359ed1de4d7d2d47007d3d to 8186dacc5fe87d25dd90351375e37aabb13f8b00
+  - 360c63e 2026-09-10T13:06:40+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
 
-- openshift-controller-manager embedded-component d9e543dd31e981f279c447e4f92f0dac3f665f9e to b1b4e785fbcf66f86c5a99974fb2bad9d96ccb65
-  - f4c1a8b 2026-09-24T06:20:26Z OCPBUGS-103921: Use patched x/net fork v0.50.0-sec.4
+- cluster-policy-controller embedded-component 67083fab6cea4dde724efd5be5a22bda1f8437d1 to debe523c1edc20e080a44afc9e8699ce3ab15599
+  - 535270c 2026-08-24T17:22:14+02:00 UPSTREAM: <carry>: OCPBUGS-103864: Bump golang.org/x/net to v0.50.0-sec.3
+  - f016756 2026-08-24T17:22:13+02:00 UPSTREAM: <drop>: OCPBUGS-103864: Bump golang.org/x/net to v0.50.0-sec.3
 
-- route-controller-manager embedded-component 1a0229e40e5c569c6c59f6b10c26584bccd084b5 to f41c08505753958be4f829526e5a1a1b3eb9bbda
-  - 145fc3f 2026-09-07T18:21:25+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+- ovn-kubernetes image-amd64 67204d98a054b54d04c59527149a1fdcd06345a1 to 8608e797c1b08e75fead3c12b53d4fd5b3b50462
+  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
+  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
+  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
+  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
 
-- coredns image-amd64 6f39336e6da9dc77b2db140a96773c413d50a665 to 6c72c97daf9c64684998a255ae03bec0981c4ab8
-  - 762f7dc 2026-08-26T13:38:41+05:30 Fix: added patched version of golang.org/x/net pacakge to rectify CVE-2026-33814
-
-- kube-rbac-proxy image-amd64 b9134351be37c43408334047d8eb85d0ac01fe4e to 414ba4c4e22eef44eb99feec10b833f9aa0ea7e1
-  - 66bc71e 2026-09-29T21:38:30+05:30 Replace golang.org/x/net with github.com/openshift-sustaining/net v0.43.0-sec.4 to resolve CVE-2026-39821
-
-- ovn-kubernetes image-amd64 c8595e7acc4f5334bd403e2700d905aaf4078d93 to 67204d98a054b54d04c59527149a1fdcd06345a1
-  - ca18296f 2026-09-29T09:38:55Z egressip: fix duplicate IP assignment on control-plane restart
-
-- coredns image-arm64 6f39336e6da9dc77b2db140a96773c413d50a665 to 6c72c97daf9c64684998a255ae03bec0981c4ab8
-  - 762f7dc 2026-08-26T13:38:41+05:30 Fix: added patched version of golang.org/x/net pacakge to rectify CVE-2026-33814
-
-- kube-rbac-proxy image-arm64 b9134351be37c43408334047d8eb85d0ac01fe4e to 414ba4c4e22eef44eb99feec10b833f9aa0ea7e1
-  - 66bc71e 2026-09-29T21:38:30+05:30 Replace golang.org/x/net with github.com/openshift-sustaining/net v0.43.0-sec.4 to resolve CVE-2026-39821
-
-- ovn-kubernetes image-arm64 c8595e7acc4f5334bd403e2700d905aaf4078d93 to 67204d98a054b54d04c59527149a1fdcd06345a1
-  - ca18296f 2026-09-29T09:38:55Z egressip: fix duplicate IP assignment on control-plane restart
+- ovn-kubernetes image-arm64 67204d98a054b54d04c59527149a1fdcd06345a1 to 8608e797c1b08e75fead3c12b53d4fd5b3b50462
+  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
+  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
+  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
+  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
 
