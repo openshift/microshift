@@ -32,7 +32,7 @@ Deploy Web Server
     [Arguments]    ${ns}=${NAMESPACE}
     Cleanup Stale Web Server Pods    ${ns}
     Oc Create    -f ${WEB_SERVER_DEPLOY} -n ${ns}
-    Labeled Pod Should Be Ready    ${WEB_SERVER_LABEL}    ns=${ns}    timeout=120s
+    Named Deployment Rollout Should Be Complete    web-server-deploy    ns=${ns}    timeout=120s
 
 Deploy Web Server Signed
     [Documentation]    Deploy the nginx web server with TLS (service-serving-cert) and services.
@@ -43,7 +43,7 @@ Deploy Web Server Signed
     Oc Create    -f ${WEB_SERVER_SIGNED_DEPLOY} -n ${ns}
     Wait Until Keyword Succeeds    300s    2s
     ...    Run With Kubeconfig    oc get secret service-secret -n ${ns}
-    Labeled Pod Should Be Ready    ${WEB_SERVER_LABEL}    ns=${ns}    timeout=120s
+    Named Deployment Rollout Should Be Complete    web-server-deploy    ns=${ns}    timeout=120s
 
 Deploy Test Client Pod
     [Documentation]    Deploy the test client pod for running curl commands.
