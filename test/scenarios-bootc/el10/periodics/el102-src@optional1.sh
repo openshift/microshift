@@ -34,10 +34,8 @@ scenario_remove_vms() {
 scenario_run_tests() {
     local skip_args=""
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args="--skip sriov --skip tls-scanner"
+        skip_args="--skip sriov"
     fi
-    # Skip generic device plugin on RHEL 10 until we can get the correct kernel-devel package.
-    skip_args+=" --skip generic-device-plugin"
     # shellcheck disable=SC2086
     run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
