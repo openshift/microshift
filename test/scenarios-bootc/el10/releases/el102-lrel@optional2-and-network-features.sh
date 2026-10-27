@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel98-bootc-brew-lrel-optional"
+start_image="rhel102-bootc-brew-lrel-optional"
 
 scenario_create_vms() {
     exit_if_image_not_found "${start_image}"
@@ -20,9 +20,18 @@ scenario_remove_vms() {
 scenario_run_tests() {
     exit_if_image_not_found "${start_image}"
 
+    local skip_args=""
+    if [[ "${UNAME_M}" =~ aarch64 ]]; then
+        skip_args="--skip tls-scanner"
+    fi
+    # Skip generic device plugin on RHEL 10 until we can get the correct kernel-devel package.
+    skip_args+=" --skip generic-device-plugin"
+    # shellcheck disable=SC2086
     run_tests host1 \
+        ${skip_args} \
         suites/network/network-policy.robot \
         suites/network/service-types.robot \
         suites/network/host-networking.robot \
-        suites/router/route-types.robot
+        suites/router/route-types.robot \
+        suites/optional2/
 }
