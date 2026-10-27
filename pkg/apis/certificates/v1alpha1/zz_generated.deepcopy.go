@@ -128,6 +128,11 @@ func (in *CertificateStatusList) DeepCopyInto(out *CertificateStatusList) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.PendingRenewal != nil {
+		in, out := &in.PendingRenewal, &out.PendingRenewal
+		*out = new(CertificateRenewalResult)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Warnings != nil {
 		in, out := &in.Warnings, &out.Warnings
 		*out = make([]string, len(*in))

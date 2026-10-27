@@ -34,6 +34,7 @@ type certificateSigner struct {
 	service        string
 	signerDir      string
 	signerValidity time.Duration
+	limitValidity  bool
 
 	// signerConfig should only be used in case this is a sub-ca signer
 	// It should be populated during CertificateSigner.SignSubCA()
@@ -130,12 +131,14 @@ func (s *certificateSigner) Complete() (*CertificateSigner, error) {
 		signerDir:      s.signerDir,
 		signerValidity: s.signerValidity,
 		signerConfig:   signerConfig,
+		limitValidity:  s.limitValidity,
 
 		subCAs:             make(map[string]*CertificateSigner),
 		signedCertificates: make(map[string]*signedCertificateInfo),
 
 		caBundlePaths: sets.New[string](),
 	}
+	signerCompleted.boundIssuerValidity()
 
 	for _, subCA := range s.subCAs {
 		if err := signerCompleted.SignSubCA(subCA); err != nil {
