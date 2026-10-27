@@ -38,11 +38,13 @@ type certStatusOptions struct {
 // NewCertsCommand creates the certificate administration command family.
 func NewCertsCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
 	command := newCertsCommand(&certStatusOptions{
-		IOStreams:     ioStreams,
-		now:           time.Now,
-		loadConfig:    config.ActiveConfig,
-		loadInventory: loadCertificateInventory,
-		prepare:       prepareCertificateAccess,
+		IOStreams:  ioStreams,
+		now:        time.Now,
+		loadConfig: config.ActiveConfig,
+		prepare:    prepareCertificateAccess,
+		loadInventory: func(cfg *config.Config) (certchains.CertificateInventory, error) {
+			return loadCertificateInventory(cfg, config.DataDir)
+		},
 		loadPending: func() (*certificatesv1alpha1.CertificateRenewalResult, []string, error) {
 			return loadCertificateRenewalStatus(config.DataDir)
 		},
@@ -162,8 +164,8 @@ func invalidCertificateConfiguration() error {
 		errors.New("failed to load MicroShift configuration; check /etc/microshift/config.yaml and /etc/microshift/config.d")}
 }
 
-func loadCertificateInventory(cfg *config.Config) (certchains.CertificateInventory, error) {
-	builder, err := certificateChainsSetup(cfg, config.DataDir)
+func loadCertificateInventory(cfg *config.Config, dataDir string) (certchains.CertificateInventory, error) {
+	builder, err := certificateChainsSetup(cfg, dataDir)
 	if err != nil {
 		return nil, err
 	}

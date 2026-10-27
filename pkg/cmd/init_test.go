@@ -42,9 +42,7 @@ func TestProductionCertificateInventory(t *testing.T) {
 	require.NoError(t, err)
 	// Use a fresh builder to exercise status's disk-loading path independently
 	// of the builder that created the certificates.
-	builder, err = certificateChainsSetup(cfg, dataDir)
-	require.NoError(t, err)
-	inventory, err := builder.LoadInventory()
+	inventory, err := loadCertificateInventory(cfg, dataDir)
 	require.NoError(t, err)
 	require.Equal(t, chains.Inventory(), inventory)
 

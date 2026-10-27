@@ -158,8 +158,7 @@ func activateCertificateRenewal(cfg *config.Config, transaction *certificates.Tr
 	return activatePendingCertificateRenewal(cfg, transaction, state, etcdStopped, now)
 }
 
-func activatePendingCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, state *pendingCertificateRenewal,
-	etcdStopped func() error, now time.Time) (bool, error) {
+func activatePendingCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, state *pendingCertificateRenewal, etcdStopped func() error, now time.Time) (bool, error) {
 	if err := etcdStopped(); err != nil {
 		return false, err
 	}
@@ -191,11 +190,7 @@ func activatePendingCertificateRenewal(cfg *config.Config, transaction *certific
 			return false, discardPendingCertificateRenewal(transaction, err.Error()+"; normal startup may rotate CAs")
 		}
 	}
-	activeBuilder, err := certificateChainsSetup(cfg, transaction.DataDir)
-	if err != nil {
-		return false, err
-	}
-	before, err := activeBuilder.LoadInventory()
+	before, err := loadCertificateInventory(cfg, transaction.DataDir)
 	if err != nil {
 		return false, err
 	}
