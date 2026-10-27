@@ -1,8 +1,8 @@
 {
   "release": {
-    "base": "5.1.0-0.nightly-2026-10-21-040310"
+    "base": "5.1.0-0.nightly-2026-10-26-164535"
   },
   "images": {
-    "kube_state_metrics": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:f6084d7b219ef05e1cfa0ba0f11219ffcb071d2f6ab7629a87e7f89fb7779e07"
+    "kube_state_metrics": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:9d13988aa69894c3c408ba55197ada63747e478f7b5fb047291fd78f9942352f"
   }
 }

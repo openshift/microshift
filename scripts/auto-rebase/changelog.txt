@@ -1,126 +1,78 @@
-- cluster-ingress-operator embedded-component 45007ca6932ce7159ee5120084bde0a4d33c4b83 to 2bb2799f289338c4f3c16fa46d15ad1b7ef2cae6
-  - 862a9df1 2026-10-20T13:36:15Z TRT-3032: Revert #1607 "OCPBUGS-121851: Report ingress Available=True on zero-worker HyperShift startup"
-  - 1db933fc 2026-10-19T20:16:24Z NE-2901: Document commit conventions
-  - 96770a98 2026-10-15T23:16:27Z Remove obsolete hardcoded replicas
-  - 557f9299 2026-10-07T16:06:02-03:00 Allow disabling endpoint address validation
-  - 892b47b1 2026-10-07T21:03:51+02:00 OCPBUGS-121851: Test Available=True/AwaitingNodes through node arrival and loss
-  - 57a6e938 2026-10-07T15:19:25+02:00 OCPBUGS-121851: Report ingress Progressing=False on zero-worker HyperShift startup
-  - 21a33c93 2026-10-07T12:16:43+02:00 OCPBUGS-121851: Add node-wait scenario tests and extract availability helper
-  - cfba2b5e 2026-10-06T12:15:52+02:00 OCPBUGS-121851: Report ingress Available=True on zero-worker HyperShift startup
+- api embedded-component 24b2699a9b327b3ab54962520e809745f8adf96c to 9809689a2448b3df15f9a84616f9f7c89be81b77
+  - 792fcba3 2026-10-22T13:25:47+01:00 remove OpenShiftPodSecurityAdmission feature gate from Default feature set
+  - 10969a31 2026-10-20T13:59:18+02:00 STOR-3180: Add Feature Gate StoragePathAlert
+  - 23ba8585 2026-10-19T20:06:45Z OCPKUEU-887: Enable TopologyAwareWorkloadScheduling in Dev/TechPreview
+  - 236b125a 2026-10-19T19:40:51Z OCPKUEU-887: Enable workload scheduling feature gates in Dev/TechPreview
+  - 50d6a720 2026-10-19T15:21:30-04:00 drop v1apha1 CRIOCredentialProviderConfig entirely
+  - 5d25b2d7 2026-10-19T15:40:16+01:00 OCPCLOUD-3330: Add ClusterAPIOperator feature gate
+  - 13c3cb05 2026-10-14T11:52:24-04:00 make update
+  - 2708defd 2026-10-14T10:50:30-04:00 Graduate KMSEncryption to GA
 
-- cluster-kube-controller-manager-operator embedded-component c4854ad5ad5d1f9b2dfef3f721f96632334acde7 to 8935774b925a368067e112b15554534a85b87718
-  - 7955edd 2026-10-16T14:45:46-06:00 STOR-2875: wire volumeForceDetach config observer for KCM
-  - f624d80 2026-10-16T14:39:04-06:00 Bump library-go to get ObserveVolumeForceDetach
+- cluster-ingress-operator embedded-component 2bb2799f289338c4f3c16fa46d15ad1b7ef2cae6 to 32bb7bd36863c3f452830cdc7f0e5eee5944ab10
+  - 97c8753b 2026-10-23T09:34:18-04:00 OCPBUGS-121851: Preserve startup error details
+  - d084d8c4 2026-10-23T09:34:18-04:00 OCPBUGS-121851: Clarify startup checks
+  - b4f3fff2 2026-10-23T09:27:54-04:00 OCPBUGS-121851: Scope zero-worker readiness to CVO
+  - fe9c02d4 2026-10-23T09:27:53-04:00 OCPBUGS-121851: Fix router node-affinity matching
+  - e0979117 2026-10-22T17:43:19Z NE-2852: Bump Kubernetes to 1.37.1
+  - 38231505 2026-10-21T02:47:04Z Test admission policy and binding recreation
+  - 7e6a95c8 2026-10-21T02:47:02Z Manage Gateway API CRD protection in CIO
+  - 334b3281 2026-10-13T20:57:20-03:00 Remove HAProxy 2.8 reference
+  - 7e088ed6 2026-10-13T20:57:14-03:00 bump openshift/api
 
-- cluster-network-operator embedded-component fc66cef8b3724a5d724fc8f8d9ef5c7bac755916 to 089066d165506791a70df51c6b546a9377e865c7
-  - c60a139 2026-10-15T09:21:40+02:00 Align frr-k8s 5.1 CRDs
+- cluster-kube-apiserver-operator embedded-component 5f22e9c7b00f1cd914e9938ef56899684ee8ac5a to 79331b98acc015bf64f3638f5abf223c87e065b7
+  - 6feb9b3 2026-10-23T14:10:08+03:00 Update library-go
+  - a3a6dae 2025-12-02T11:20:44+08:00 Use BoundServceAccountTokenVolume dy default
 
-- cluster-policy-controller embedded-component c9e9a348260921c9e788e33a51e904502cbe2d13 to 81e222007c2ceec48a908877eb71fb135a2c2453
-  - 8a858a8 2026-10-19T11:44:21+01:00 OCPSTRAT-3618: go mod vendor
-  - e299ba8 2026-10-19T11:44:21+01:00 OCPSTRAT-3618: Bump ci/docker images
-  - 9cd10ee 2026-10-12T11:48:29+01:00 OCPSTRAT-3618: Rebase kube v1.37.1
+- cluster-network-operator embedded-component 089066d165506791a70df51c6b546a9377e865c7 to d5e0bbf1ce0923a0799bd0dc274b45ea9bbce19a
+  - ff24d2f 2026-10-19T22:20:58-04:00 fix(workloads): network node identity use read-only root filesystems
+  - 37b57c1 2026-10-15T13:59:36-04:00 fix(workloads): enforce read-only root filesystems
+  - 10b012e 2026-10-15T11:05:21+02:00 statusmanager: reset the install latch before the stale-state phase
+  - 7269b96 2026-10-15T11:05:21+02:00 statusmanager: pin the desired>0 side of the zero-node condition
+  - 0f306df 2026-10-15T11:04:48+02:00 statusmanager: drop dead clock step from the zero-node DaemonSet test
+  - 03c151f 2026-10-15T11:04:33+02:00 statusmanager: a DaemonSet matching zero nodes is not progressing
+  - 5f3fee1 2026-10-14T10:02:27+05:30 Bump Kubernetes to 1.37.1
 
-- csi-external-snapshotter embedded-component a019d1a9d9e1d26ffd0b2e0d911733180fa608b2 to a570de6a368dab9532e540d7f1ce10c3b03c6d1a
-  - 8f2c6ee 2026-10-14T14:40:31+02:00 UPSTREAM: <carry>: Add OpenShift files
-  - d57944f 2026-10-12T13:38:26-04:00 Add changelog to release-8.7 branch
-  - 9c43be8 2026-10-11T09:07:12Z Squashed 'release-tools/' changes from 7c58653f..7bacb813
-  - e4e4f5a 2026-10-09T11:12:03-04:00 feat: add regression test
-  - 278e31b 2026-10-09T11:12:03-04:00 fix: shutdown broadcaster when Run returns
-  - 756a409 2026-10-08T22:53:07-04:00 Fix unit test after updating deps
-  - 822794c 2026-10-08T22:04:33-04:00 Update K8s deps to 1.37
-  - 73c720a 2026-10-08T21:57:31-04:00 Update deps
-  - f956292 2026-10-08T21:47:46-04:00 Ignore sidecar-owned VolumeGroupSnapshotContent updates to honor requeue backoff
-  - 01dc519 2026-08-20T13:49:06-04:00 Enable VGS feature gate
-  - 4799cee 2026-08-14T09:37:58Z fix: data race in scheduleOpsInFlightMetric
-  - 121c2a2 2026-08-14T09:07:51Z Squashed 'release-tools/' changes from 3472c3ffc..7c58653f2
-  - 47f0b3d 2026-08-11T11:50:06Z fix: GHSA-hrxh-6v49-42gf
-  - 12d5cbf 2026-08-11T09:27:32Z Squashed 'release-tools/' changes from 34632b81..3472c3ff
-  - 280ec96 2026-08-04T17:54:31-04:00 Requeue VolumeGroupSnapshotContent with backoff when not ready to use
-  - 72fcb26 2026-07-28T15:23:41+02:00 Skip NotFound errors when deleting snapshot content objects
-  - 9b03820 2026-07-16T11:22:43Z Bump actions/setup-go from 6.5.0 to 7.0.0
-  - 4dce899 2026-07-15T14:57:09Z Bump the github-dependencies group across 1 directory with 26 updates
-  - 7ed8205 2026-07-09T16:29:16+05:30 Squashed 'release-tools/' changes from 0d7d9d495..34632b812
-  - 32e3774 2026-07-06T11:24:03Z Bump github.com/go-openapi/swag/jsonname from 0.26.1 to 0.27.0
-  - e31226c 2026-06-29T14:00:27Z Bump the k8s-dependencies group across 1 directory with 7 updates
-  - 41694a5 2026-06-29T11:23:32Z Bump the github-dependencies group across 1 directory with 10 updates
-  - 6a31dcb 2026-06-24T11:22:42Z Bump actions/setup-go from 6.4.0 to 6.5.0
-  - 8dc7e07 2026-06-19T11:22:25Z Bump actions/checkout from 6.0.2 to 7.0.0
-  - 1d996ef 2026-06-09T14:13:02+05:30 deploy: update sidecar image versions
-  - a7b6be6 2026-06-09T03:36:49Z Squashed 'release-tools/' changes from 31186bf0a..0d7d9d495
-  - e5b78e7 2026-06-08T11:24:28Z Bump the github-dependencies group across 1 directory with 28 updates
-  - 43d4672 2026-06-08T11:23:00Z Bump sigs.k8s.io/apiserver-network-proxy/konnectivity-client
-  - 9519baf 2026-05-28T17:16:23-04:00 Update deps in client
+- etcd embedded-component 8480451b19d39e15760c32e773521a295920eaa9 to 73444cb5a323cd994151234e2eed701f8647b0ea
+  - ef31a466 2026-10-14T16:56:57Z DOWNSTREAM: <carry>: tests: allow snapshot member publication retry
+  - 85e137f3 2026-10-14T16:30:57Z DOWNSTREAM: <carry>: tests: allow retained client reconnect in TestIssue3699
 
-- machine-config-operator embedded-component 64f25ad7893fe24b5774235375f9d03c5a46d36f to 7090103994904d03eb6467387c86c0ad5eb80a71
-  - eb9ca7c9 2026-10-19T15:14:25Z OCPBUGS-132308: stabilize test 66436 - disable weak SSH cipher suites
+- machine-config-operator embedded-component 7090103994904d03eb6467387c86c0ad5eb80a71 to 553bfba2ef395f7fcf910b8f83a5267644a401c6
+  - 09c25191 2026-10-22T10:30:14+02:00 OPNET-818: on-prem: BGP VIP static pods follow platform pod conventions
+  - dd417afa 2026-10-16T15:06:58-04:00 Update MCO dependencies to Kubernetes 1.37
+  - 7d234616 2026-10-09T13:50:46+02:00 on-prem: give the frr-k8s static pod reloader writable /tmp and /var/log/frr
+  - 6029635b 2026-09-22T14:57:56-04:00 machine-config-controller: enable readOnlyRootFilesystem for the container
 
-- csi-external-snapshotter image-amd64 a019d1a9d9e1d26ffd0b2e0d911733180fa608b2 to a570de6a368dab9532e540d7f1ce10c3b03c6d1a
-  - 8f2c6ee 2026-10-14T14:40:31+02:00 UPSTREAM: <carry>: Add OpenShift files
-  - d57944f 2026-10-12T13:38:26-04:00 Add changelog to release-8.7 branch
-  - 9c43be8 2026-10-11T09:07:12Z Squashed 'release-tools/' changes from 7c58653f..7bacb813
-  - e4e4f5a 2026-10-09T11:12:03-04:00 feat: add regression test
-  - 278e31b 2026-10-09T11:12:03-04:00 fix: shutdown broadcaster when Run returns
-  - 756a409 2026-10-08T22:53:07-04:00 Fix unit test after updating deps
-  - 822794c 2026-10-08T22:04:33-04:00 Update K8s deps to 1.37
-  - 73c720a 2026-10-08T21:57:31-04:00 Update deps
-  - f956292 2026-10-08T21:47:46-04:00 Ignore sidecar-owned VolumeGroupSnapshotContent updates to honor requeue backoff
-  - 01dc519 2026-08-20T13:49:06-04:00 Enable VGS feature gate
-  - 4799cee 2026-08-14T09:37:58Z fix: data race in scheduleOpsInFlightMetric
-  - 121c2a2 2026-08-14T09:07:51Z Squashed 'release-tools/' changes from 3472c3ffc..7c58653f2
-  - 47f0b3d 2026-08-11T11:50:06Z fix: GHSA-hrxh-6v49-42gf
-  - 12d5cbf 2026-08-11T09:27:32Z Squashed 'release-tools/' changes from 34632b81..3472c3ff
-  - 280ec96 2026-08-04T17:54:31-04:00 Requeue VolumeGroupSnapshotContent with backoff when not ready to use
-  - 72fcb26 2026-07-28T15:23:41+02:00 Skip NotFound errors when deleting snapshot content objects
-  - 9b03820 2026-07-16T11:22:43Z Bump actions/setup-go from 6.5.0 to 7.0.0
-  - 4dce899 2026-07-15T14:57:09Z Bump the github-dependencies group across 1 directory with 26 updates
-  - 7ed8205 2026-07-09T16:29:16+05:30 Squashed 'release-tools/' changes from 0d7d9d495..34632b812
-  - 32e3774 2026-07-06T11:24:03Z Bump github.com/go-openapi/swag/jsonname from 0.26.1 to 0.27.0
-  - e31226c 2026-06-29T14:00:27Z Bump the k8s-dependencies group across 1 directory with 7 updates
-  - 41694a5 2026-06-29T11:23:32Z Bump the github-dependencies group across 1 directory with 10 updates
-  - 6a31dcb 2026-06-24T11:22:42Z Bump actions/setup-go from 6.4.0 to 6.5.0
-  - 8dc7e07 2026-06-19T11:22:25Z Bump actions/checkout from 6.0.2 to 7.0.0
-  - 1d996ef 2026-06-09T14:13:02+05:30 deploy: update sidecar image versions
-  - a7b6be6 2026-06-09T03:36:49Z Squashed 'release-tools/' changes from 31186bf0a..0d7d9d495
-  - e5b78e7 2026-06-08T11:24:28Z Bump the github-dependencies group across 1 directory with 28 updates
-  - 43d4672 2026-06-08T11:23:00Z Bump sigs.k8s.io/apiserver-network-proxy/konnectivity-client
-  - 9519baf 2026-05-28T17:16:23-04:00 Update deps in client
+- operator-framework-olm embedded-component 14f999ff089a3275d3a144224e871d825461ec3b to 191c02fc8f0c9f6aac2fa780f5bec55a5758524e
+  - ce52f05b 2026-10-22T00:18:57Z OPRUN-4798: build: update dependencies for TLS curve support (#3943)
+  - 9d616348 2026-10-22T00:17:33Z :seedling: bump github.com/prometheus/common from 0.72.0 to 0.72.1 (#3940)
+  - b11806ec 2026-10-22T00:17:03Z Add client-certificate authorization mode for metrics endpoint (#3936)
+  - 027b29a3 2026-10-22T00:16:24Z :seedling: bump golang.org/x/net from 0.59.0 to 0.61.0 (#3939)
+  - 2cf78f68 2026-10-22T00:15:34Z :seedling: bump github.com/prometheus/client_golang (#3937)
+  - 92682596 2026-10-22T00:15:08Z :seedling: bump github.com/onsi/ginkgo/v2 from 2.33.0 to 2.33.1 (#3938)
+  - 58e9ce01 2026-10-22T00:14:24Z :seedling: bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.13.0 to 6.14.0 (#3935)
+  - 397ce18a 2026-10-22T00:14:01Z :seedling: bump github.com/prometheus/common from 0.71.0 to 0.72.0 (#3934)
+  - ef5f32ca 2026-10-22T00:12:48Z :seedling: bump google.golang.org/grpc from 1.83.2 to 1.84.0 (#3932)
+  - 30c3c890 2026-10-22T00:11:56Z :seedling: bump github.com/onsi/gomega from 1.43.1 to 1.44.0 (#3931)
+  - 7f48d00a 2026-10-22T00:11:01Z :seedling: bump github.com/containerd/containerd from 1.7.35 to 1.7.36 (#3930)
+  - 5a746ea9 2026-10-22T00:10:26Z Revert "add cpu limits to catalogsource pods (#3915)" (#3929)
+  - eddd509b 2026-10-22T00:09:48Z :seedling: Bump github.com/onsi/ginkgo/v2 from 2.32.1 to 2.33.0 (#3926)
+  - 26fb11e3 2026-10-22T00:09:05Z :seedling: Bump go.podman.io/image/v5 from 5.41.1 to 5.41.2 (#3927)
+  - 5fa301a1 2026-10-22T00:07:50Z :seedling: Bump github.com/onsi/gomega from 1.43.0 to 1.43.1 (#3925)
+  - 36366716 2026-10-22T00:06:36Z :seedling: Bump github.com/prometheus/common from 0.70.1 to 0.71.0 (#3924)
 
-- ovn-kubernetes image-amd64 0de3886bb79aa0db71e17ddc42898f934e43359e to 0d60766d732f5d158ab77ab915a3fbceb13cdf50
-  - aa1cad3b 2026-10-15T13:19:32+05:30 Keep the OVN bindings on the version we ship
-  - 8986384d 2026-10-15T13:18:17+05:30 e2e: register openshift extension images from DeploymentConfig
-  - 3ef2999d 2026-10-13T12:37:03+02:00 e2e: remove obsolete KubeVirt image cleanup
-  - 6eac5131 2026-10-13T12:36:19+02:00 e2e: register Fedora disk in the image registry
-  - 37e0ff3c 2026-10-12T16:53:37-04:00 Synchronize OVS pinning tests with feature state changes
-  - ba143151 2026-10-12T16:53:37-04:00 Fix OVS CPU affinity reconciliation for process threads
-  - 376b234a 2026-10-12T12:49:44-04:00 ci: skip build jobs for documentation-only pull requests
-  - c1fd5d7b 2026-10-12T12:27:42-04:00 ci: move affected runners to Ubuntu 26.04
-  - 0be5f6c2 2026-10-12T12:37:38+05:30 Added content to pod creation
-  - 78d61c14 2026-10-10T11:03:40-07:00 docs: update links for the versioned documentation site
-  - 18b5d708 2026-10-09T09:52:40-07:00 docs: fix broken MkDocs nav and section index links
-  - 38b67b42 2026-10-09T09:42:36-07:00 docs: link Code of Conduct and add enforcement contact
-  - 7af18194 2026-10-09T12:30:29+02:00 kind: only sudo in disable_bridge_netfilter when needed
-  - fe4a8ef0 2026-10-08T20:11:25+02:00 node: update Uplink default gateways without rebuilding the gateway
-  - dc016044 2026-10-08T20:10:41+02:00 vrfmanager: replace same-key tracked routes instead of accumulating them
-  - b323dec3 2026-10-08T10:09:57-04:00 Bump Ubuntu to 26.09
-  - 1a434f4c 2026-10-08T13:49:06+02:00 ovn: bump OVN image to ovn-26.09.0-33.fc44
-  - 8d7614f0 2026-10-08T10:17:27+02:00 e2e: poll network readiness on the spec context
-  - 5aaf7877 2026-10-08T09:31:11+02:00 kubevirt: refresh IPv4 gateways after default network migration
-  - 6e5e8225 2026-10-08T09:31:11+02:00 kubevirt: isolate layer2 gateway reconciliation
-  - f7a083ce 2026-10-08T09:31:11+02:00 kubevirt: introduce default-network reconciliation entry point
-  - 5498b82e 2026-10-07T19:50:54+02:00 factory test: count handler calls after the callback returns
-  - 545fa2e8 2026-10-07T13:47:23-04:00 e2e: centralize test image IDs in DeploymentConfig
-  - 9bddc29e 2026-10-07T13:43:32-04:00 docs: exempt test infrastructure from unit test requirements
-  - c8e641be 2026-10-07T19:26:27+02:00 factory: fix flaky serialized add/update ordering test
-  - f35f7200 2026-10-07T18:36:37+02:00 e2e: run the Uplink specs on the spec context
-  - 30bcd128 2026-10-07T08:39:52-07:00 node: configure a recovered DPU representor again
-  - 533e86fa 2026-10-07T11:56:49+05:30 tests,e2e: fix orphan node egressip test flake
-  - c93b2d49 2026-10-06T09:25:29-07:00 node: requeue DPU pods for a NAD from an index
-  - 79396b89 2026-10-06T09:07:23-07:00 node: level-driven single DPU pod controller for all networks
-  - 174b4e1e 2026-10-06T14:06:39+01:00 E2E "pod connected to UserDefinedNetwork cannot be deleted when being used" flake fix
-  - 5ff6a2d8 2026-10-01T16:55:29-07:00 Add libovsdb helpers to delete OVS ports from a bridge
-  - 327fa844 2026-08-20T14:31:17+05:30 Add gateway mode content
+- oc image-amd64 586088c46cba2cd87e1a128a304fe484cf678cd5 to 027bf0b05d713f85d6fc4674ff2e076684538a74
+  - df4b7006 2026-10-21T15:12:33+02:00 observe: Fix nil pointer panic in dumpMetrics
+  - c12c4b5c 2026-10-19T17:59:35+02:00 Makefile: Dump k8s version to 1.37.1
+  - b3025969 2026-10-19T17:59:35+02:00 Update base images to OCP 5.1
+  - 0914b0d5 2026-10-19T17:59:35+02:00 describe: Add AuthenticationConfiguration to test exceptions
+  - 756062d0 2026-10-19T17:59:35+02:00 go mod vendor
+  - cd2c1b43 2026-10-19T17:59:35+02:00 deps: Rebase to 1.37 and update some deps
+  - d674d70a 2026-10-19T17:58:49+02:00 Add pkg/helpers/generate
 
-- ovn-kubernetes image-arm64 0d60766d732f5d158ab77ab915a3fbceb13cdf50 to baff7a3fb039209599691f57b01bf46d8c3a2466
+- coredns image-amd64 83aefed36b4dd6eb800885e56af7cf97fc9db8d7 to ad7aaecd3e975727735ee8245d3917ee870cc50c
+  - 7ed467c 2026-10-01T20:16:14-04:00 UPSTREAM: 530b0a5ff: validate DNS requests before unpacking
+
+- ovn-kubernetes image-amd64 0d60766d732f5d158ab77ab915a3fbceb13cdf50 to baff7a3fb039209599691f57b01bf46d8c3a2466
   - 2b0866cd 2026-10-22T18:33:26+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
   - f2e99ce5 2026-10-21T13:27:18+02:00 OTE: promote CI-validated E2Es to blocking, defer untested ones
   - 753e847a 2026-10-21T13:27:18+02:00 OTE: Add license headers and license-check tooling
@@ -190,4 +142,16 @@
   - 014c9532 2026-10-09T09:59:33-04:00 e2e: wait for EgressIP SNAT programming after reassignment
   - 693ba00d 2026-10-09T09:59:33-04:00 e2e: bound KubeVirt guest curl commands
   - cd4dfcf5 2026-09-16T10:32:44-07:00 e2e: clean up external container on post-create failure
+
+- oc image-arm64 586088c46cba2cd87e1a128a304fe484cf678cd5 to 027bf0b05d713f85d6fc4674ff2e076684538a74
+  - df4b7006 2026-10-21T15:12:33+02:00 observe: Fix nil pointer panic in dumpMetrics
+  - c12c4b5c 2026-10-19T17:59:35+02:00 Makefile: Dump k8s version to 1.37.1
+  - b3025969 2026-10-19T17:59:35+02:00 Update base images to OCP 5.1
+  - 0914b0d5 2026-10-19T17:59:35+02:00 describe: Add AuthenticationConfiguration to test exceptions
+  - 756062d0 2026-10-19T17:59:35+02:00 go mod vendor
+  - cd2c1b43 2026-10-19T17:59:35+02:00 deps: Rebase to 1.37 and update some deps
+  - d674d70a 2026-10-19T17:58:49+02:00 Add pkg/helpers/generate
+
+- coredns image-arm64 83aefed36b4dd6eb800885e56af7cf97fc9db8d7 to ad7aaecd3e975727735ee8245d3917ee870cc50c
+  - 7ed467c 2026-10-01T20:16:14-04:00 UPSTREAM: 530b0a5ff: validate DNS requests before unpacking
 
