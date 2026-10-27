@@ -250,7 +250,7 @@ func fetchServiceAccountKey(ctx context.Context, client kubernetes.Interface, na
 
 func generateEtcdCertificates(cfg *config.Config) error {
 	certsDir := cryptomaterial.CertsDirectory(config.DataDir)
-	etcdSignerDir := cryptomaterial.EtcdSignerDir(certsDir)
+	etcdSignerDir := cryptomaterial.PeerCADir(certsDir)
 
 	caCertPath := cryptomaterial.CACertPath(etcdSignerDir)
 	caKeyPath := cryptomaterial.CAKeyPath(etcdSignerDir)
@@ -436,7 +436,7 @@ func configureEtcdForCluster(ctx context.Context, cfg *config.Config, clusterMem
 	tlsInfo := transport.TLSInfo{
 		CertFile:      cryptomaterial.PeerCertPath(etcdPeerClientCertDir),
 		KeyFile:       cryptomaterial.PeerKeyPath(etcdPeerClientCertDir),
-		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.EtcdSignerDir(certsDir)),
+		TrustedCAFile: cryptomaterial.CACertPath(cryptomaterial.PeerCADir(certsDir)),
 	}
 	tlsConfig, err := tlsInfo.ClientConfig()
 	if err != nil {

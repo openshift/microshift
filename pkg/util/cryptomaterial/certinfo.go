@@ -46,114 +46,65 @@ func ServingKeyPath(dir string) string  { return filepath.Join(dir, ServerKeyFil
 func PeerCertPath(dir string) string { return filepath.Join(dir, PeerCertFileName) }
 func PeerKeyPath(dir string) string  { return filepath.Join(dir, PeerKeyFileName) }
 
-func KubeControlPlaneSignerCertDir(certsDir string) string {
-	return filepath.Join(certsDir, "kube-control-plane-signer")
-}
+// ClientCADir returns the path to the consolidated client CA directory.
+func ClientCADir(certsDir string) string { return filepath.Join(certsDir, "client-ca") }
 
+// ServingCADir returns the path to the consolidated serving CA directory.
+func ServingCADir(certsDir string) string { return filepath.Join(certsDir, "serving-ca") }
+
+// PeerCADir returns the path to the peer (etcd) CA directory.
+func PeerCADir(certsDir string) string { return filepath.Join(certsDir, "peer-ca") }
+
+// Client CA leaf directories (all under client-ca/).
 func KubeSchedulerClientCertDir(certsDir string) string {
-	return filepath.Join(KubeControlPlaneSignerCertDir(certsDir), "kube-scheduler")
+	return filepath.Join(ClientCADir(certsDir), "kube-scheduler")
 }
-
 func KubeControllerManagerClientCertDir(certsDir string) string {
-	return filepath.Join(KubeControlPlaneSignerCertDir(certsDir), "kube-controller-manager")
+	return filepath.Join(ClientCADir(certsDir), "kube-controller-manager")
 }
-
-func KubeAPIServerToKubeletSignerCertDir(certsDir string) string {
-	return filepath.Join(certsDir, "kube-apiserver-to-kubelet-client-signer")
-}
-
 func KubeAPIServerToKubeletClientCertDir(certsDir string) string {
-	return filepath.Join(KubeAPIServerToKubeletSignerCertDir(certsDir), "kube-apiserver-to-kubelet-client")
+	return filepath.Join(ClientCADir(certsDir), "kube-apiserver-to-kubelet-client")
 }
-
-func AdminKubeconfigSignerDir(certsDir string) string {
-	return filepath.Join(certsDir, "admin-kubeconfig-signer")
-}
-
-func AdminKubeconfigClientCertDir(certsDir string) string {
-	return filepath.Join(AdminKubeconfigSignerDir(certsDir), "admin-kubeconfig-client")
-}
-
 func MetricsServerKubeletClientCertDir(certsDir string) string {
-	return filepath.Join(KubeAPIServerToKubeletSignerCertDir(certsDir), "metrics-server-kubelet-client")
+	return filepath.Join(ClientCADir(certsDir), "metrics-server-kubelet-client")
 }
-
-// KubeletCSRSignerSignerCertDir returns path to the signer that signs kubelet CSRs
-// and the signer that signs CSRs of the CSR API
-func KubeletCSRSignerSignerCertDir(certsDir string) string {
-	return filepath.Join(certsDir, "kubelet-csr-signer-signer")
+func AdminKubeconfigClientCertDir(certsDir string) string {
+	return filepath.Join(ClientCADir(certsDir), "admin-kubeconfig-client")
 }
-
-func CSRSignerCertDir(certsDir string) string {
-	return filepath.Join(KubeletCSRSignerSignerCertDir(certsDir), "csr-signer")
-}
-
 func KubeletClientCertDir(certsDir string) string {
-	return filepath.Join(CSRSignerCertDir(certsDir), "kubelet-client")
+	return filepath.Join(ClientCADir(certsDir), "kubelet-client")
 }
 
+// Serving CA leaf directories (all under serving-ca/).
+func KASServingCertDir(certsDir string) string {
+	return filepath.Join(ServingCADir(certsDir), "kube-apiserver-serving")
+}
 func KubeletServingCertDir(certsDir string) string {
-	return filepath.Join(CSRSignerCertDir(certsDir), "kubelet-server")
+	return filepath.Join(ServingCADir(certsDir), "kubelet-server")
 }
 
-func ServiceCADir(certsDir string) string {
-	return filepath.Join(certsDir, "service-ca")
-}
-
+// Unchanged CA directories.
+func ServiceCADir(certsDir string) string { return filepath.Join(certsDir, "service-ca") }
 func RouteControllerManagerServingCertDir(certsDir string) string {
 	return filepath.Join(ServiceCADir(certsDir), "route-controller-manager-serving")
 }
-
-func IngressCADir(certsDir string) string {
-	return filepath.Join(certsDir, "ingress-ca")
-}
-
+func IngressCADir(certsDir string) string { return filepath.Join(certsDir, "ingress-ca") }
 func AggregatorSignerDir(certsDir string) string {
 	return filepath.Join(certsDir, "aggregator-signer")
 }
-
 func AggregatorClientCertDir(certsDir string) string {
 	return filepath.Join(AggregatorSignerDir(certsDir), "aggregator-client")
 }
 
-func EtcdSignerDir(certsDir string) string {
-	return filepath.Join(certsDir, "etcd-signer")
-}
-
-func EtcdPeerCertDir(certsDir string) string {
-	return filepath.Join(EtcdSignerDir(certsDir), "etcd-peer")
-}
-
+// Peer CA leaf directories (all under peer-ca/).
 func EtcdAPIServerClientCertDir(certsDir string) string {
-	return filepath.Join(EtcdSignerDir(certsDir), "apiserver-etcd-client")
+	return filepath.Join(PeerCADir(certsDir), "apiserver-etcd-client")
 }
-
+func EtcdPeerCertDir(certsDir string) string {
+	return filepath.Join(PeerCADir(certsDir), "etcd-peer")
+}
 func EtcdServingCertDir(certsDir string) string {
-	return filepath.Join(EtcdSignerDir(certsDir), "etcd-serving")
-}
-
-func KubeAPIServerExternalSigner(certsDir string) string {
-	return filepath.Join(certsDir, "kube-apiserver-external-signer")
-}
-
-func KubeAPIServerExternalServingCertDir(certsDir string) string {
-	return filepath.Join(KubeAPIServerExternalSigner(certsDir), "kube-external-serving")
-}
-
-func KubeAPIServerLocalhostSigner(certsDir string) string {
-	return filepath.Join(certsDir, "kube-apiserver-localhost-signer")
-}
-
-func KubeAPIServerLocalhostServingCertDir(certsDir string) string {
-	return filepath.Join(KubeAPIServerLocalhostSigner(certsDir), "kube-apiserver-localhost-serving")
-}
-
-func KubeAPIServerServiceNetworkSigner(certsDir string) string {
-	return filepath.Join(certsDir, "kube-apiserver-service-network-signer")
-}
-
-func KubeAPIServerServiceNetworkServingCertDir(certsDir string) string {
-	return filepath.Join(KubeAPIServerServiceNetworkSigner(certsDir), "kube-apiserver-service-network-serving")
+	return filepath.Join(PeerCADir(certsDir), "etcd-serving")
 }
 
 // TotalClientCABundlePath returns the path to the cert bundle with all client certificate signers

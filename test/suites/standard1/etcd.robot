@@ -15,9 +15,9 @@ Test Tags           etcd
 
 *** Variables ***
 ${ETCD_SYSTEMD_UNIT}        microshift-etcd.scope
-${ETCD_CA_CERT}             /var/lib/microshift/certs/etcd-signer/ca.crt
-${ETCD_CLIENT_CERT}         /var/lib/microshift/certs/etcd-signer/apiserver-etcd-client/client.crt
-${ETCD_CLIENT_KEY}          /var/lib/microshift/certs/etcd-signer/apiserver-etcd-client/client.key
+${ETCD_CA_CERT}             /var/lib/microshift/certs/peer-ca/ca.crt
+${ETCD_CLIENT_CERT}         /var/lib/microshift/certs/peer-ca/apiserver-etcd-client/client.crt
+${ETCD_CLIENT_KEY}          /var/lib/microshift/certs/peer-ca/apiserver-etcd-client/client.key
 ${ETCD_ENDPOINT}            https://localhost:2379
 ${ETCDCTL_LOCAL_PATH}       ${EXECDIR}/../_output/bin/etcdctl
 ${ETCDCTL_BIN}              /tmp/etcdctl

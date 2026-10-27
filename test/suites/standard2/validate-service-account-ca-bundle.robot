@@ -21,17 +21,14 @@ ${ROOT_CA_CONFIGMAP_NAME}       kube-root-ca.crt
 
 *** Test Cases ***
 Root CA ConfigMap Contains All Signers
-    [Documentation]    Verify that the kube-root-ca.crt ConfigMap contains certificates
-    ...    from all required signers: kube-apiserver-localhost-signer,
-    ...    kube-apiserver-service-network-signer, and kube-apiserver-external-signer
+    [Documentation]    Verify that the kube-root-ca.crt ConfigMap contains a certificate
+    ...    from the consolidated serving CA (serving-ca).
     ${configmap}=    Oc Get    configmap    ${NAMESPACE}    ${ROOT_CA_CONFIGMAP_NAME}
     VAR    ${ca_bundle}=    ${configmap.data['ca.crt']}
     Should Not Be Empty    ${ca_bundle}
 
     ${subjects}=    Get Certificate Subjects From Bundle    ${ca_bundle}
-    Should Contain    ${subjects}    kube-apiserver-localhost-signer
-    Should Contain    ${subjects}    kube-apiserver-service-network-signer
-    Should Contain    ${subjects}    kube-apiserver-external-signer
+    Should Contain    ${subjects}    serving-ca
 
 
 *** Keywords ***
