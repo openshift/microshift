@@ -236,6 +236,8 @@ Configured CA Renewal Bounds Descendant Lifetimes
     ${result}=    Renewal Document    ca    yaml
     ${after}=    Certificate Material Digest
     Should Be Equal    ${digest}    ${after}
+    # Changing restart policy must not invalidate the prepared six-week certificates.
+    Drop In Certificate Policy    true
     Restart MicroShift
     Renewal Matches Current Status    ${result}
     Renewal Activation Has Finished
@@ -311,8 +313,9 @@ Corrupt Pending Metadata Does Not Block Startup
 *** Keywords ***
 Drop In Certificate Policy
     [Documentation]    Set six-week serving and two-year CA lifetimes without changing the running service.
+    [Arguments]    ${force_restart}=false
     Drop In MicroShift Config
-    ...    certificates:\n\ \ servingValidity: 1008h\n\ \ caValidity: 17520h\n\ \ forceRestartOnExpirationImminent: false\n
+    ...    certificates:\n\ \ servingValidity: 1008h\n\ \ caValidity: 17520h\n\ \ forceRestartOnExpirationImminent: ${force_restart}\n
     ...    99-cert-renew-policy
 
 Restore Certificate Policy

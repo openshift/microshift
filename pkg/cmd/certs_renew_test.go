@@ -259,11 +259,13 @@ func TestCertificateRenewalPlanRejectsCADueForRotation(t *testing.T) {
 	before := certificateFileDigests(t, dir)
 	_, err = builder.PlanRenewal(false, now)
 	require.NoError(t, err, "cryptographic validity alone permits renewal")
-	_, err = planCertificateRenewal(builder, false, now)
+	_, err = planCertificateRenewal(builder, false, true, now)
 	require.ErrorContains(t, err, "automatic rotation deadline")
 	require.ErrorContains(t, err, "use --ca")
-	_, err = planCertificateRenewal(builder, true, now)
+	_, err = planCertificateRenewal(builder, true, true, now)
 	require.NoError(t, err, "CA renewal can replace the due signers")
+	_, err = planCertificateRenewal(builder, false, false, now)
+	require.NoError(t, err, "warn-only policy permits renewal while the CA is still valid")
 	require.Equal(t, before, certificateFileDigests(t, dir), "planning must not modify active or pending material")
 }
 
@@ -271,16 +273,21 @@ func TestCertificateRotationDeadline(t *testing.T) {
 	now := time.Now().UTC().Truncate(time.Second)
 	for _, tt := range []struct {
 		name     string
+		policy   certchains.RotationPolicy
 		validity time.Duration
 		advance  time.Duration
 	}{
-		{"short-lived", 365 * 24 * time.Hour, 120 * 24 * time.Hour},
-		{"long-lived", 10 * 365 * 24 * time.Hour, 360 * 24 * time.Hour},
+		{"short-standard", certchains.RotationPolicyStandard, 1000 * time.Hour, 333 * time.Hour},
+		{"short-extended", certchains.RotationPolicyExtended, 1000 * time.Hour, 100 * time.Hour},
+		{"one-year-extended", certchains.RotationPolicyExtended, 8760 * time.Hour, 876 * time.Hour},
+		{"long-extended", certchains.RotationPolicyExtended, 87600 * time.Hour, 8760 * time.Hour},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			entry := certificateInventoryEntry("test", "ca", certchains.CertificateRoleCA, certchains.RotationPolicyExtended, now.Add(-tt.validity), now)
+			entry := certificateInventoryEntry("test", "client", certchains.CertificateRoleClient, tt.policy, now.Add(-tt.validity), now)
 			deadline := now.Add(-tt.advance)
-			require.Equal(t, deadline, entry.RotationDeadline())
+			actual, err := entry.RotationDeadline()
+			require.NoError(t, err)
+			require.Equal(t, deadline, actual)
 			inventory := certchains.CertificateInventory{entry}
 			require.NoError(t, checkCertificateRotationDeadline(inventory, deadline.Add(-time.Second)))
 			require.ErrorContains(t, checkCertificateRotationDeadline(inventory, deadline), "automatic rotation deadline")

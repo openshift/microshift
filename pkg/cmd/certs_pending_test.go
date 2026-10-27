@@ -138,6 +138,7 @@ func TestCertStatusShowsActiveAndPendingSeparately(t *testing.T) {
 
 func TestPendingRenewalExpiredBeforeActivation(t *testing.T) {
 	cfg, dir := pendingRenewalFixture(t)
+	cfg.Certificates.ForceRestartOnExpirationImminent = ptr.To(false)
 	before := activeCertificateFileDigests(t, dir)
 	tx := &certificates.Transaction{DataDir: dir}
 	activated, err := activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now().AddDate(20, 0, 0))
@@ -164,9 +165,19 @@ func TestPendingRenewalNotYetValidBeforeActivation(t *testing.T) {
 }
 
 func TestPendingRenewalRotationDeadline(t *testing.T) {
-	for _, offset := range []time.Duration{-time.Second, 0, time.Second} {
-		t.Run(offset.String(), func(t *testing.T) {
+	for _, tc := range []struct {
+		name         string
+		offset       time.Duration
+		forceRestart bool
+	}{
+		{"before deadline", -time.Second, true},
+		{"at deadline", 0, true},
+		{"after deadline", time.Second, true},
+		{"warn only", time.Second, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
 			cfg, dir := pendingRenewalFixture(t)
+			cfg.Certificates.ForceRestartOnExpirationImminent = ptr.To(tc.forceRestart)
 			before := activeCertificateFileDigests(t, dir)
 			tx := &certificates.Transaction{DataDir: dir}
 			_, err := tx.LoadPending()
@@ -178,11 +189,11 @@ func TestPendingRenewalRotationDeadline(t *testing.T) {
 			_, deadline, err := certchains.WhenToRotateAtEarliest(chains)
 			require.NoError(t, err)
 			// The generation is still valid when its automatic rotation is due.
-			_, err = builder.ValidateRenewal(false, deadline.Add(offset))
+			_, err = builder.ValidateRenewal(false, deadline.Add(tc.offset))
 			require.NoError(t, err)
-			activated, err := activateCertificateRenewal(cfg, tx, func() error { return nil }, deadline.Add(offset))
+			activated, err := activateCertificateRenewal(cfg, tx, func() error { return nil }, deadline.Add(tc.offset))
 			require.NoError(t, err)
-			require.Equal(t, offset < 0, activated)
+			require.Equal(t, !tc.forceRestart || tc.offset < 0, activated)
 			if !activated {
 				require.Equal(t, before, activeCertificateFileDigests(t, dir), "discard must precede active replacement")
 			}

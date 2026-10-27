@@ -92,7 +92,8 @@ then reports current and proposed expiry times without generating keys or stagin
 new material. Renewal uses the configured serving and CA validity periods and
 caps each descendant's expiry at the earliest expiry in its signing chain. If a
 CA is expired or not yet valid, leaf-only renewal is refused; use `--ca` to renew
-the chain.
+the chain. With `forceRestartOnExpirationImminent` enabled, leaf-only renewal
+also refuses CAs that have reached their policy-derived rotation deadline.
 
 ### Optional Pre-Renewal Backup
 
@@ -288,12 +289,15 @@ certificate initialization using the current configuration and active material.
 Run renewal again if still needed. Unrelated settings, such as logging, do not
 invalidate a pending renewal.
 
-Startup also checks the pending generation's automatic rotation deadline. If that
-deadline has already arrived, it discards the generation and uses normal
+When `forceRestartOnExpirationImminent` is enabled, startup also checks the pending
+generation's policy-derived rotation deadline. If that deadline has already
+arrived, it discards the generation and uses normal
 certificate initialization instead of activating it and immediately restarting.
 The warning notes that normal startup may rotate CAs, even if the discarded
 renewal selected only `--serving`. Prepare and activate renewal before the
 deadline; a pending generation does not postpone automatic rotation.
+With the setting disabled, reaching this threshold alone does not block
+activation; certificate validity and integrity checks still apply.
 
 #### Corrupt Renewal Metadata
 

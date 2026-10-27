@@ -117,25 +117,12 @@ sudo timedatectl set-ntp true
 
 ### Certificate Lifetime and Rotation
 
-Microshift certificates are separated into two basic groups:
+MicroShift allows configuring the validity of newly issued managed CA and serving
+certificates. By default, it restarts when a certificate reaches its
+`ExpirationImminent` threshold. Setting
+`certificates.forceRestartOnExpirationImminent: false` logs a warning instead; it
+does not disable certificate regeneration during a later start.
 
-- long lived certificates with certificate validity of **10 years**
-- short lived certificates with certificate validity of **1 year**
-
-Most of the leaf certificates are short lived.
-
-An example of a long-lived certificate is the client certificate for `system:admin`
-user authentication, or the certificate of the signer of the kube-apiserver
-external serving certificate.
-
-The below (non-proportional!) graph shows when certificates are rotated.
-
-![Cert Rotation](../images/certrotation.png)
-
-- a certificate in the **green zone** does not get rotated
-- a certificate in the **yellow zone** is rotated on Microshift start (or restart)
-- Microshift will get restarted should a certificate get to the **red zone**, the
-  certificate will be rotated for a new one.
-
-If the rotated certificate is a CA, all of the certificates it signed get rotated
-as well.
+These settings do not disable the IP-address or clock-change restarts described
+in this guide. See [Certificate management](howto_certificates.md#configuring-certificate-lifetimes-and-restart-policy)
+for configuration details and renewal behavior.

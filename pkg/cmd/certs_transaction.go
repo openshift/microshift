@@ -174,7 +174,7 @@ func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) 
 	if err != nil {
 		return nil, err
 	}
-	plan, err := planCertificateRenewal(builder, renewCAs, time.Now())
+	plan, err := planCertificateRenewal(builder, renewCAs, cfg.Certificates.ForceRestartEnabled(), time.Now())
 	if err != nil {
 		return nil, err
 	}

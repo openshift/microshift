@@ -100,13 +100,17 @@ func TestConfiguredCertificateRenewal(t *testing.T) {
 			renewed, err := applyCertificateRenewal(cfg, dir, renewCAs)
 			require.NoError(t, err)
 			require.Equal(t, before, activeCertificateFileDigests(t, dir), "online preparation must preserve active PKI")
-			for _, planned := range plan {
-				for _, entry := range renewed {
-					if strings.Join(planned.Path, "/") == strings.Join(entry.Path, "/") {
-						require.WithinDuration(t, planned.NewNotAfter, entry.Certificate.NotAfter, 5*time.Second)
-					}
-				}
+			renewedExpiries := make(map[string]time.Time, len(renewed))
+			for _, entry := range renewed {
+				renewedExpiries[strings.Join(entry.Path, "/")] = entry.Certificate.NotAfter
 			}
+			for _, planned := range plan {
+				path := strings.Join(planned.Path, "/")
+				require.Contains(t, renewedExpiries, path)
+				require.WithinDuration(t, planned.NewNotAfter, renewedExpiries[path], 5*time.Second, path)
+			}
+			// Short-lived material must also activate if restart policy is re-enabled.
+			cfg.Certificates.ForceRestartOnExpirationImminent = ptr.To(true)
 			activated, err := activateCertificateRenewal(cfg, &certificates.Transaction{DataDir: dir}, func() error { return nil }, time.Now())
 			require.NoError(t, err)
 			require.True(t, activated)

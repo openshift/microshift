@@ -102,24 +102,31 @@ func (o *certRenewOptions) run() error {
 	return nil
 }
 
-func planCertificateRenewal(builder certchains.CertificateChainsBuilder, renewCAs bool, now time.Time) ([]certchains.CertificateRenewalPlanEntry, error) {
+func planCertificateRenewal(builder certchains.CertificateChainsBuilder, renewCAs, forceRestart bool, now time.Time) ([]certchains.CertificateRenewalPlanEntry, error) {
 	plan, err := builder.PlanRenewal(renewCAs, now)
-	if err != nil || renewCAs {
-		return plan, err
-	}
-	inventory, err := builder.LoadInventory()
 	if err != nil {
-		return nil, &certchains.InventoryReadError{Err: err}
+		return nil, err
 	}
-	if err := checkCertificateRotationDeadline(inventory.ByRole(certchains.CertificateRoleCA), now); err != nil {
-		return nil, fmt.Errorf("%w; use --ca to renew the CA chain", err)
+	if !renewCAs && forceRestart {
+		// Retained CAs must not immediately trigger an automatic restart.
+		inventory, err := builder.LoadInventory()
+		if err != nil {
+			return nil, &certchains.InventoryReadError{Err: err}
+		}
+		if err := checkCertificateRotationDeadline(inventory.ByRole(certchains.CertificateRoleCA), now); err != nil {
+			return nil, fmt.Errorf("%w; use --ca to renew the CA chain", err)
+		}
 	}
 	return plan, nil
 }
 
 func checkCertificateRotationDeadline(inventory certchains.CertificateInventory, now time.Time) error {
 	for _, entry := range inventory {
-		if !now.Before(entry.RotationDeadline()) {
+		deadline, err := entry.RotationDeadline()
+		if err != nil {
+			return err
+		}
+		if !now.Before(deadline) {
 			return fmt.Errorf("certificate %q has reached its automatic rotation deadline", entry.Name)
 		}
 	}

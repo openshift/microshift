@@ -65,12 +65,10 @@ func WhenToRotateAtEarliest(cs *CertificateChains) ([]string, time.Time, error) 
 
 	for _, entry := range cs.Inventory() {
 		currentPath := entry.Path
-		c := entry.Certificate
-		_, critical, err := entry.RotationPolicy.StatusThresholds()
+		rotateAt, err := entry.RotationDeadline()
 		if err != nil {
-			return nil, time.Time{}, fmt.Errorf("certificate %q: %w", entry.Name, err)
+			return nil, time.Time{}, err
 		}
-		rotateAt := c.NotAfter.Add(-time.Duration(float64(c.NotAfter.Sub(c.NotBefore)) * critical))
 		klog.Infof("%v reaches ExpirationImminent at: %s", currentPath, rotateAt.String())
 
 		if rotationDate.IsZero() {

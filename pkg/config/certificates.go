@@ -42,24 +42,21 @@ func (c *Certificates) UnmarshalJSON(data []byte) error {
 	type plainCertificates Certificates
 	decoded := struct {
 		*plainCertificates
+
 		ServingValidity json.RawMessage `json:"servingValidity"`
 		CAValidity      json.RawMessage `json:"caValidity"`
 	}{plainCertificates: (*plainCertificates)(c)}
 	if err := json.Unmarshal(data, &decoded); err != nil {
 		return fmt.Errorf("invalid certificates configuration: %w", err)
 	}
-	for _, field := range []struct {
-		name   string
-		data   json.RawMessage
-		target **metav1.Duration
-	}{
-		{"servingValidity", decoded.ServingValidity, &c.ServingValidity},
-		{"caValidity", decoded.CAValidity, &c.CAValidity},
-	} {
-		if len(field.data) > 0 {
-			if err := json.Unmarshal(field.data, field.target); err != nil {
-				return fmt.Errorf("certificates.%s must be a Go duration string", field.name)
-			}
+	if len(decoded.ServingValidity) > 0 {
+		if err := json.Unmarshal(decoded.ServingValidity, &c.ServingValidity); err != nil {
+			return fmt.Errorf("certificates.servingValidity must be a Go duration string")
+		}
+	}
+	if len(decoded.CAValidity) > 0 {
+		if err := json.Unmarshal(decoded.CAValidity, &c.CAValidity); err != nil {
+			return fmt.Errorf("certificates.caValidity must be a Go duration string")
 		}
 	}
 	return nil
