@@ -32,19 +32,40 @@ type certStatusOptions struct {
 	now           func() time.Time
 	loadConfig    func() (*config.Config, error)
 	loadInventory func(*config.Config) (certchains.CertificateInventory, error)
+	loadPending   func() (*certificatesv1alpha1.CertificateRenewalResult, []string, error)
+	prepare       func(bool) (func(), error)
 }
 
 // NewCertsCommand creates the certificate administration command family.
 func NewCertsCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {
-	return newCertsCommand(&certStatusOptions{
+	command := newCertsCommand(&certStatusOptions{
 		IOStreams:     ioStreams,
 		now:           time.Now,
 		loadConfig:    config.ActiveConfig,
 		loadInventory: loadCertificateInventory,
-	}, shouldRunPrivileged)
+		prepare:       prepareCertificateAccess,
+		loadPending: func() (*certificatesv1alpha1.CertificateRenewalResult, []string, error) {
+			return loadCertificateRenewalStatus(config.DataDir)
+		},
+	})
+	command.AddCommand(newCertsRenewCommand(&certRenewOptions{
+		IOStreams: ioStreams, now: time.Now, loadConfig: config.ActiveConfig,
+		prepare: prepareCertificateAccess,
+		plan: func(cfg *config.Config, renewCAs bool, now time.Time) ([]certchains.CertificateRenewalPlanEntry, error) {
+			builder, err := certificateChainsSetup(cfg, config.DataDir)
+			if err != nil {
+				return nil, invalidCertificateConfiguration()
+			}
+			return planCertificateRenewal(builder, renewCAs, now)
+		},
+		apply: func(cfg *config.Config, renewCAs bool) (certchains.CertificateInventory, error) {
+			return applyCertificateRenewal(cfg, config.DataDir, renewCAs)
+		},
+	}))
+	return command
 }
 
-func newCertsCommand(options *certStatusOptions, requirePrivileges func() error) *cobra.Command {
+func newCertsCommand(options *certStatusOptions) *cobra.Command {
 	command := &cobra.Command{
 		Use:   "certs",
 		Short: "Inspect and manage MicroShift certificates",
@@ -52,27 +73,25 @@ func newCertsCommand(options *certStatusOptions, requirePrivileges func() error)
 	}
 	command.SetOut(options.Out)
 	command.SetErr(options.ErrOut)
-	command.AddCommand(newCertsStatusCommand(options, requirePrivileges))
+	command.AddCommand(newCertsStatusCommand(options))
 	return command
 }
 
 // certificatePreRun checks privileges without shadowing root initialization.
 // Attach it to each executable certificate subcommand as PreRunE.
-func certificatePreRun(requirePrivileges func() error) func(*cobra.Command, []string) error {
-	return func(_ *cobra.Command, _ []string) error {
-		if err := requirePrivileges(); err != nil {
-			return &certificateCommandError{certificatesv1alpha1.ErrorCodeInsufficientPrivileges, err}
-		}
-		return nil
+func certificatePreRun(_ *cobra.Command, _ []string) error {
+	if err := shouldRunPrivileged(); err != nil {
+		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInsufficientPrivileges, err}
 	}
+	return nil
 }
 
-func newCertsStatusCommand(options *certStatusOptions, requirePrivileges func() error) *cobra.Command {
+func newCertsStatusCommand(options *certStatusOptions) *cobra.Command {
 	command := &cobra.Command{
 		Use:     "status",
 		Short:   "Report the status of managed MicroShift certificates",
 		Args:    cobra.NoArgs,
-		PreRunE: certificatePreRun(requirePrivileges),
+		PreRunE: certificatePreRun,
 		RunE: func(_ *cobra.Command, _ []string) error {
 			return options.run()
 		},
@@ -86,13 +105,19 @@ func (o *certStatusOptions) run() error {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidArguments,
 			fmt.Errorf("unsupported output format %q; supported formats: json, yaml", o.output)}
 	}
+	if o.prepare != nil {
+		release, err := o.prepare(false)
+		if err != nil {
+			return err
+		}
+		defer release()
+	}
 
 	cfg, err := o.loadConfig()
 	if err != nil {
 		// Loader errors can include raw configuration and credentials. Do not
 		// retain their contents in errors returned by certificate commands.
-		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidConfiguration,
-			errors.New("failed to load MicroShift configuration; check /etc/microshift/config.yaml and /etc/microshift/config.d")}
+		return invalidCertificateConfiguration()
 	}
 	inventory, err := o.loadInventory(cfg)
 	if err != nil {
@@ -104,6 +129,17 @@ func (o *certStatusOptions) run() error {
 	if err != nil {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeCertificateInventoryFailed,
 			fmt.Errorf("failed to build certificate status: %w", err)}
+	}
+	if o.loadPending != nil {
+		var warnings []string
+		status.PendingRenewal, warnings, err = o.loadPending()
+		if err != nil {
+			return &certificateCommandError{certificatesv1alpha1.ErrorCodeCertificateInventoryFailed, err}
+		}
+		status.Warnings = append(status.Warnings, warnings...)
+		if status.PendingRenewal != nil {
+			status.Warnings = append(status.Warnings, "Renewed certificates are pending activation. Status items describe active files; restart MicroShift to activate the pending renewal.")
+		}
 	}
 	switch c := o.output; c {
 	case certificateOutputJSON, certificateOutputYAML:
@@ -120,6 +156,11 @@ func (o *certStatusOptions) run() error {
 		return &certificateCommandError{certificatesv1alpha1.ErrorCodeInternalError, err}
 	}
 	return nil
+}
+
+func invalidCertificateConfiguration() error {
+	return &certificateCommandError{certificatesv1alpha1.ErrorCodeInvalidConfiguration,
+		errors.New("failed to load MicroShift configuration; check /etc/microshift/config.yaml and /etc/microshift/config.d")}
 }
 
 func loadCertificateInventory(cfg *config.Config) (certchains.CertificateInventory, error) {

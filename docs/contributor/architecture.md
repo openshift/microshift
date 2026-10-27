@@ -29,6 +29,19 @@ This document describes how MicroShift is built and how its components interact 
 | `pkg/servicemanager/` | Dependency-aware service lifecycle manager with startup recording |
 | `pkg/admin/` | Backup/restore, data management, pre-run checks (version metadata, feature gates, health verification) |
 
+#### Certificate Administration Commands
+
+| Command | Purpose |
+|---------|---------|
+| `microshift certs status` | Report active certificate files and any pending renewal. |
+| `microshift certs renew` | Prepare replacements while MicroShift runs, selecting either `--serving` or `--ca`. Use `--dry-run` to validate and preview without preparing replacements. |
+
+Startup activates pending material before components start, using the recoverable
+transaction in `pkg/admin/certificates/`. See the
+[user guide](../user/howto_certificates.md) for commands and recovery precautions,
+and [Certificate Renewal Transactions](./certificates.md) for the
+implementation.
+
 ### Post-Startup Components
 
 | Package | Purpose |
@@ -110,6 +123,15 @@ After the control plane is ready, `StartComponents()` deploys infrastructure ser
 ### 5. Graceful Shutdown
 
 Signal handling (SIGTERM, SIGINT) triggers ordered service termination with a 15-second timeout.
+
+## Certificate Renewal Transactions
+
+The renewal CLI stages new certificates without replacing active files.
+Startup validates and activates the pending generation after data management and
+before components read certificates. Replacement failures roll back; interrupted
+activation is recovered before startup uses the files. See
+[Certificate Renewal Transactions](./certificates.md) for the private on-disk
+layout, validation, and recovery protocol.
 
 ## Deployment Modes
 

@@ -24,7 +24,7 @@ import (
 
 func TestCertsCommandRunHooks(t *testing.T) {
 	for _, hook := range []string{"PersistentPreRun", "PersistentPreRunE"} {
-		for _, failure := range []string{"", "root", "privileges"} {
+		for _, failure := range []string{"", "root"} {
 			if hook == "PersistentPreRun" && failure == "root" {
 				continue
 			}
@@ -44,13 +44,10 @@ func TestCertsCommandRunHooks(t *testing.T) {
 					},
 				}
 				root := &cobra.Command{Use: "microshift"}
-				root.AddCommand(newCertsCommand(options, func() error {
-					calls = append(calls, "privileges")
-					if failure == "privileges" {
-						return errors.New("privilege check failed")
-					}
-					return nil
-				}))
+				root.AddCommand(newCertsCommand(options))
+				status, _, err := root.Find([]string{"certs", "status"})
+				require.NoError(t, err)
+				status.PreRunE = nil // Exercise root hooks independently of the test runner's UID.
 				if hook == "PersistentPreRun" {
 					root.PersistentPreRun = func(*cobra.Command, []string) { calls = append(calls, "root") }
 				} else {
@@ -65,7 +62,7 @@ func TestCertsCommandRunHooks(t *testing.T) {
 				code := RunCertsCommand(root, []string{"certs", "status", "-o", "json"})
 				if failure == "" {
 					require.Zero(t, code)
-					require.Equal(t, []string{"root", "privileges", "config", "inventory"}, calls)
+					require.Equal(t, []string{"root", "config", "inventory"}, calls)
 					require.Empty(t, stderr.String())
 					return
 				}
@@ -73,13 +70,8 @@ func TestCertsCommandRunHooks(t *testing.T) {
 				require.Empty(t, stdout.String())
 				var document certificatesv1alpha1.Error
 				require.NoError(t, json.Unmarshal(stderr.Bytes(), &document))
-				if failure == "root" {
-					require.Equal(t, []string{"root"}, calls)
-					require.Equal(t, certificatesv1alpha1.ErrorCodeInternalError, document.Code)
-				} else {
-					require.Equal(t, []string{"root", "privileges"}, calls)
-					require.Equal(t, certificatesv1alpha1.ErrorCodeInsufficientPrivileges, document.Code)
-				}
+				require.Equal(t, []string{"root"}, calls)
+				require.Equal(t, certificatesv1alpha1.ErrorCodeInternalError, document.Code)
 			})
 		}
 	}
@@ -95,7 +87,8 @@ func TestCertsCommandRestoresLogging(t *testing.T) {
 	root := &cobra.Command{Use: "microshift"}
 	root.SetOut(io.Discard)
 	root.SetErr(io.Discard)
-	root.AddCommand(newCertsCommand(&certStatusOptions{}, func() error { return errors.New("privileges required") }))
+	root.AddCommand(newCertsCommand(&certStatusOptions{}))
+	root.PersistentPreRunE = func(*cobra.Command, []string) error { return errors.New("root hook failed") }
 	require.Equal(t, 1, RunCertsCommand(root, []string{"certs", "status", "-o", "json"}))
 	require.Empty(t, logs.String())
 	klog.Info("logging after certificate command")
@@ -112,7 +105,6 @@ func TestCertStatusErrors(t *testing.T) {
 			code      certificatesv1alpha1.ErrorCode
 			arguments []string
 		}{
-			{name: "privileges", code: certificatesv1alpha1.ErrorCodeInsufficientPrivileges},
 			{name: "configuration", code: certificatesv1alpha1.ErrorCodeInvalidConfiguration},
 			{name: "inventory", code: certificatesv1alpha1.ErrorCodeCertificateInventoryFailed},
 			{name: "certificate data", code: certificatesv1alpha1.ErrorCodeCertificateInventoryFailed},
@@ -127,7 +119,6 @@ func TestCertStatusErrors(t *testing.T) {
 					IOStreams: genericclioptions.IOStreams{Out: &stdout, ErrOut: &stderr},
 					now:       time.Now,
 					loadConfig: func() (*config.Config, error) {
-						require.NotEqual(t, "privileges", tt.name, "privilege failures must not read configuration")
 						if tt.name == "configuration" {
 							return nil, fmt.Errorf("failed to convert config yaml (%q) to json: invalid YAML", sensitiveConfig)
 						}
@@ -141,19 +132,17 @@ func TestCertStatusErrors(t *testing.T) {
 						if tt.name == "certificate data" {
 							return certchains.CertificateInventory{{Name: "invalid-certificate"}}, nil
 						}
-						t.Fatal("argument and privilege failures must not load the inventory")
+						t.Fatal("argument failures must not load the inventory")
 						return nil, nil
 					},
 				}
 				root := &cobra.Command{Use: "microshift"}
 				root.SetOut(&stdout)
 				root.SetErr(&stderr)
-				root.AddCommand(newCertsCommand(options, func() error {
-					if tt.name == "privileges" {
-						return errors.New("command requires root privileges")
-					}
-					return nil
-				}))
+				root.AddCommand(newCertsCommand(options))
+				status, _, err := root.Find([]string{"certs", "status"})
+				require.NoError(t, err)
+				status.PreRunE = nil // Privilege errors are covered using the real UID check.
 				args := append([]string{"certs", "status"}, tt.arguments...)
 				if format != "" {
 					// Put output after the invalid flag to exercise early parse failures.

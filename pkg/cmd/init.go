@@ -443,12 +443,17 @@ func certificateChainsSetup(cfg *config.Config, dataDir string) (certchains.Cert
 func initKubeconfigs(
 	cfg *config.Config,
 	certChains *certchains.CertificateChains,
+	dataDir string,
 ) error {
-	externalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(config.DataDir))))
+	kubeconfigPath := func(id config.KubeConfigID) string {
+		return filepath.Join(dataDir, "resources", string(id), "kubeconfig")
+	}
+	adminRoot := filepath.Join(dataDir, "resources", string(config.KubeAdmin))
+	externalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerExternalSigner(cryptomaterial.CertsDirectory(dataDir))))
 	if err != nil {
 		return fmt.Errorf("failed to load the external trust signer: %v", err)
 	}
-	internalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(config.DataDir))))
+	internalTrustPEM, err := os.ReadFile(cryptomaterial.CACertPath(cryptomaterial.KubeAPIServerLocalhostSigner(cryptomaterial.CertsDirectory(dataDir))))
 	if err != nil {
 		return fmt.Errorf("failed to load the internal trust signer: %v", err)
 	}
@@ -465,9 +470,13 @@ func initKubeconfigs(
 
 	// Generate one kubeconfigs per name
 	for _, name := range append(cfg.ApiServer.SubjectAltNames, cfg.Node.HostnameOverride) {
+		path, err := adminKubeconfigPath(adminRoot, name)
+		if err != nil {
+			return err
+		}
 		u.Host = net.JoinHostPort(name, strconv.Itoa(cfg.ApiServer.Port))
 		if err := util.KubeConfigWithClientCerts(
-			cfg.KubeConfigAdminPath(name),
+			path,
 			u.String(),
 			externalTrustPEM,
 			adminKubeconfigCertPEM,
@@ -477,7 +486,7 @@ func initKubeconfigs(
 		}
 	}
 
-	if err := cleanupStaleKubeconfigs(cfg, cfg.KubeConfigRootAdminPath()); err != nil {
+	if err := cleanupStaleKubeconfigs(cfg, adminRoot); err != nil {
 		klog.Warningf("Unable to remove stale kubeconfigs: %v", err)
 	}
 
@@ -523,8 +532,12 @@ func initKubeconfigs(
 				continue
 			}
 
+			path, err := adminKubeconfigPath(adminRoot, dns)
+			if err != nil {
+				return err
+			}
 			if err := util.KubeConfigWithClientCerts(
-				cfg.KubeConfigAdminPath(dns),
+				path,
 				ul.String(),
 				[]byte{},
 				adminKubeconfigCertPEM,
@@ -536,7 +549,7 @@ func initKubeconfigs(
 	}
 
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.KubeAdmin),
+		kubeconfigPath(config.KubeAdmin),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		adminKubeconfigCertPEM,
@@ -550,7 +563,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.KubeControllerManager),
+		kubeconfigPath(config.KubeControllerManager),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		kcmCertPEM,
@@ -564,7 +577,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.KubeScheduler),
+		kubeconfigPath(config.KubeScheduler),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		schedulerCertPEM, schedulerKeyPEM,
@@ -577,7 +590,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.Kubelet),
+		kubeconfigPath(config.Kubelet),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		kubeletCertPEM, kubeletKeyPEM,
@@ -589,7 +602,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.ClusterPolicyController),
+		kubeconfigPath(config.ClusterPolicyController),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		clusterPolicyControllerCertPEM, clusterPolicyControllerKeyPEM,
@@ -602,7 +615,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.RouteControllerManager),
+		kubeconfigPath(config.RouteControllerManager),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		routeControllerManagerCertPEM, routeControllerManagerKeyPEM,
@@ -614,7 +627,7 @@ func initKubeconfigs(
 		return err
 	}
 	if err := util.KubeConfigWithClientCerts(
-		cfg.KubeConfigPath(config.ObservabilityClient),
+		kubeconfigPath(config.ObservabilityClient),
 		cfg.ApiServer.URL,
 		internalTrustPEM,
 		observabilityClientCertPEM, observabilityClientKeyPEM,
@@ -622,6 +635,15 @@ func initKubeconfigs(
 		return err
 	}
 	return nil
+}
+
+// Names become directory components. Keep all writes within the configured
+// resource tree, particularly when that tree is a renewal staging directory.
+func adminKubeconfigPath(root, name string) (string, error) {
+	if name == "" || name == "." || name == ".." || filepath.Base(name) != name {
+		return "", fmt.Errorf("invalid name for generated administrator kubeconfig")
+	}
+	return filepath.Join(root, name, "kubeconfig"), nil
 }
 
 // certsToRegenerate returns paths to certificates in the given certificate chains

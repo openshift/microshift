@@ -63,7 +63,7 @@ func startCSISnapshotController(ctx context.Context, cfg *config.Config, kubecon
 		if err := assets.ApplyRoleBindings(ctx, rb, kubeconfigPath); err != nil {
 			return fmt.Errorf("apply roleBinding: %w", err)
 		}
-		if err := assets.ApplyDeployments(ctx, deploy, renderTemplate, renderParamsFromConfig(cfg, nil), kubeconfigPath); err != nil {
+		if err := applyDeploymentsWithCertificates(ctx, deploy, renderParamsFromConfig(cfg, nil), kubeconfigPath, "kube-system"); err != nil {
 			return fmt.Errorf("apply deployments: %w", err)
 		}
 	} else {
