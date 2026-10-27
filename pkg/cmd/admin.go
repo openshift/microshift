@@ -14,6 +14,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const systemdStateFailed = "failed"
+
 func shouldRunPrivileged() error {
 	if os.Geteuid() > 0 {
 		return fmt.Errorf("command requires root privileges")
@@ -32,13 +34,13 @@ func servicesShouldBeInactive(backingUp bool) error {
 			return fmt.Errorf("error when checking if %q is active: %w", service, err)
 		}
 
-		if state == "failed" && backingUp {
+		if state == systemdStateFailed && backingUp {
 			fmt.Fprintf(os.Stderr, "WARNING: Service %q is %q - backup can potentially contain unhealthy data\n", service, state)
 		}
 
-		if state != "inactive" && state != "failed" {
+		if state != "inactive" && state != systemdStateFailed {
 			return fmt.Errorf("MicroShift must be stopped before creating or restoring backup (%q is %q, should be %q or %q)",
-				service, state, "inactive", "failed")
+				service, state, "inactive", systemdStateFailed)
 		}
 	}
 

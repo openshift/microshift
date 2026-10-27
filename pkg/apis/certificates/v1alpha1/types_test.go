@@ -54,7 +54,7 @@ func TestCertificateRenewalResultRoundTrip(t *testing.T) {
 		changed bool
 	}{
 		{certificatesv1alpha1.RenewalStatusValidated, true, false},
-		{certificatesv1alpha1.RenewalStatusCompleted, false, true},
+		{certificatesv1alpha1.RenewalStatusPending, false, true},
 	} {
 		t.Run(string(tt.status), func(t *testing.T) {
 			result := certificatesv1alpha1.CertificateRenewalResult{
