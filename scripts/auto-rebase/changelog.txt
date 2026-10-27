@@ -1,15 +1,19 @@
-- machine-config-operator embedded-component ddd94381334d055ed8cbbac3355fa405a8b17743 to 1061245400852b64e4af5328e30207be094ebd47
-  - d23533c0 2026-10-20T09:48:06Z [release-5.0] OCPBUGS-132359: only enable signed policy when testing signed payloads
-  - ca2cb8ff 2026-09-24T11:04:24Z Split wait-for-ipsec-connect into two services to avoid ipsec restart
+- cluster-ingress-operator embedded-component 4ef55ea002a406a2e9193594ef583a24ddb4ff3b to e8205bb54d84e9ec137d101cdee0ace5c1c63b85
+  - 3cb77923 2026-10-15T19:17:42Z Bump to ossm 3.4.3 and Istio v1.30.5 for TLS fixes
 
-- kube-rbac-proxy image-amd64 2f8a556d09638faeb09b366e95ecb75279ce7c8a to 14b6905aa3accb8bb16cd92f3438a9868597bd52
-  - bb3586d 2026-10-16T17:29:59+05:30 Address CVE-2026-84304
-  - bdeb151 2026-10-16T17:29:24+05:30 Address CVE-2026-84304 (vendor changes)
+- kubernetes embedded-component 8482edcf1236367d26adefd1e89505d528adade9 to b8b2c80fc60865caaa58f565f41d569355f124eb
+  - 10979680c 2026-10-22T15:36:08-04:00 UPSTREAM: 140661: test: clarify update test comment to note absence of old object
+  - f1191b2e5 2026-10-22T15:36:08-04:00 UPSTREAM: 140661: integration test: verify updates to orphaned namespace resources
+  - 13e5ad431 2026-10-22T15:36:08-04:00 UPSTREAM: 140661: Allow updates to objects in fully deleted namespaces
 
-- ovn-kubernetes image-arm64 4e410990a3440be5b727f9314d6f376450c0c2cd to 23b61c3ffcd93b8c7e85e913d37bbf82f47eedb9
+- machine-config-operator embedded-component 1061245400852b64e4af5328e30207be094ebd47 to 4e6a119c0ceeb1ec3ab3bb1208da99ad0233d937
+  - e268cfeb 2026-10-23T13:18:43Z OCPBUGS-132308: stabilize test 66436 - disable weak SSH cipher suites
+  - 574ba11b 2026-10-14T14:33:19Z MCD: Fix OCL rollback failure when extensions are installed
+
+- ovn-kubernetes image-amd64 4e410990a3440be5b727f9314d6f376450c0c2cd to 23b61c3ffcd93b8c7e85e913d37bbf82f47eedb9
   - 49e48bb1 2026-10-23T07:59:47Z Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
 
-- kubernetes image-arm64 8482edcf1236367d26adefd1e89505d528adade9 to b8b2c80fc60865caaa58f565f41d569355f124eb
+- kubernetes image-amd64 8482edcf1236367d26adefd1e89505d528adade9 to b8b2c80fc60865caaa58f565f41d569355f124eb
   - 10979680c 2026-10-22T15:36:08-04:00 UPSTREAM: 140661: test: clarify update test comment to note absence of old object
   - f1191b2e5 2026-10-22T15:36:08-04:00 UPSTREAM: 140661: integration test: verify updates to orphaned namespace resources
   - 13e5ad431 2026-10-22T15:36:08-04:00 UPSTREAM: 140661: Allow updates to objects in fully deleted namespaces
