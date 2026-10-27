@@ -8,11 +8,14 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/yaml"
 
 	"github.com/openshift/microshift/pkg/admin/certificates"
@@ -22,8 +25,16 @@ import (
 )
 
 func TestCertificateRenewalApply(t *testing.T) {
-	for _, mode := range []string{"serving", "ca"} {
-		t.Run(mode, func(t *testing.T) {
+	for _, tt := range []struct {
+		name                     string
+		renewCAs, customValidity bool
+	}{
+		{"serving", false, false},
+		{"ca", true, false},
+		{"serving/custom-validity", false, true},
+		{"ca/custom-validity", true, true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
 			cfg := &config.Config{
 				Network:   config.Network{ServiceNetwork: []string{"10.43.0.0/16"}},
 				Node:      config.Node{HostnameOverride: "test-node", NodeIP: "192.0.2.10"},
@@ -42,24 +53,45 @@ func TestCertificateRenewalApply(t *testing.T) {
 			before, err := builder.LoadInventory()
 			require.NoError(t, err)
 			beforeFiles := certificateFileDigests(t, dataDir)
-			plan, err := builder.PlanRenewal(mode == "ca", time.Now())
+			if tt.customValidity {
+				// Apply new policy to renewal without rewriting active certificates.
+				cfg.Certificates = config.Certificates{
+					ServingValidity:                  &metav1.Duration{Duration: 1008 * time.Hour},
+					CAValidity:                       &metav1.Duration{Duration: 17520 * time.Hour},
+					ForceRestartOnExpirationImminent: ptr.To(false),
+				}
+				builder, err = certificateChainsSetup(cfg, dataDir)
+				require.NoError(t, err)
+			}
+			plan, err := builder.PlanRenewal(tt.renewCAs, time.Now())
 			require.NoError(t, err)
 			require.Equal(t, beforeFiles, certificateFileDigests(t, dataDir))
 			wantCount := 19
-			if mode == "ca" {
+			if tt.renewCAs {
 				wantCount = 31
 			}
 			require.Len(t, plan, wantCount)
-			renewed, err := applyCertificateRenewal(cfg, dataDir, mode == "ca")
+			renewed, err := applyCertificateRenewal(cfg, dataDir, tt.renewCAs)
 			require.NoError(t, err)
 			require.Len(t, renewed, wantCount)
 			require.Equal(t, beforeFiles, activeCertificateFileDigests(t, dataDir), "preparation must not touch active files")
+			renewedExpiries := make(map[string]time.Time, len(renewed))
+			for _, entry := range renewed {
+				renewedExpiries[strings.Join(entry.Path, "/")] = entry.Certificate.NotAfter
+			}
+			for _, planned := range plan {
+				path := strings.Join(planned.Path, "/")
+				require.Contains(t, renewedExpiries, path)
+				require.WithinDuration(t, planned.NewNotAfter, renewedExpiries[path], 5*time.Second, path)
+			}
 			pending, err := loadPendingCertificateRenewal(dataDir)
 			require.NoError(t, err)
 			require.Equal(t, certificatesv1alpha1.RenewalStatusPending, pending.Status)
 			require.Len(t, pending.Items, wantCount)
 			// Resources may change between preparation and activation.
 			require.NoError(t, os.WriteFile(filepath.Join(unrelated, "kubeconfig"), []byte("updated component data"), 0600))
+			// Short-lived material must also activate if restart policy is re-enabled.
+			cfg.Certificates.ForceRestartOnExpirationImminent = ptr.To(true)
 			tx := &certificates.Transaction{DataDir: dataDir}
 			activated, err := activateCertificateRenewal(cfg, tx, func() error { return errors.New("etcd running") }, time.Now())
 			require.ErrorContains(t, err, "etcd running")
@@ -76,11 +108,25 @@ func TestCertificateRenewalApply(t *testing.T) {
 			contents, err := os.ReadFile(filepath.Join(unrelated, "kubeconfig"))
 			require.NoError(t, err)
 			require.Equal(t, "updated component data", string(contents))
-			_, err = validateCertificateRenewal(cfg, dataDir, before, mode == "ca")
+			inventory, err := validateCertificateRenewal(cfg, dataDir, before, tt.renewCAs)
 			require.NoError(t, err)
+			for _, entry := range inventory {
+				var expected time.Duration
+				if entry.Role == certchains.CertificateRoleServing {
+					expected = cfg.Certificates.ServingDuration()
+				} else if entry.Role == certchains.CertificateRoleCA {
+					expected = cfg.Certificates.CADuration()
+				}
+				if expected > 0 {
+					require.InDelta(t, expected.Seconds(), entry.Certificate.NotAfter.Sub(entry.Certificate.NotBefore).Seconds(), (24*time.Hour + time.Minute).Seconds(), entry.Name)
+				}
+				state, err := entry.StatusAt(time.Now())
+				require.NoError(t, err)
+				require.Equal(t, certchains.CertificateStatusHealthy, state, entry.Name)
+			}
 			_, err = os.Stat(filepath.Join(dataDir, ".cert-renewal"))
 			require.ErrorIs(t, err, os.ErrNotExist)
-			if mode == "serving" {
+			if !tt.renewCAs {
 				afterFiles := certificateFileDigests(t, dataDir)
 				for path, digest := range beforeFiles {
 					if filepath.Base(path) == "ca.crt" || filepath.Base(path) == "ca.key" {

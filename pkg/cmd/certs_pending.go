@@ -158,7 +158,8 @@ func activateCertificateRenewal(cfg *config.Config, transaction *certificates.Tr
 	return activatePendingCertificateRenewal(cfg, transaction, state, etcdStopped, now)
 }
 
-func activatePendingCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, state *pendingCertificateRenewal, etcdStopped func() error, now time.Time) (bool, error) {
+func activatePendingCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, state *pendingCertificateRenewal,
+	etcdStopped func() error, now time.Time) (bool, error) {
 	if err := etcdStopped(); err != nil {
 		return false, err
 	}

@@ -13,7 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/yaml"
 
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
@@ -44,6 +46,24 @@ func TestNewCertificateStatusList(t *testing.T) {
 	require.Equal(t, certificatesv1alpha1.CertificateStatusExpiresSoon, status.Items[0].Status)
 	require.Equal(t, int64((500*time.Hour)/time.Second), status.Items[0].RemainingSeconds)
 	require.Equal(t, "cert-b", inventory[0].Name, "building status must not reorder the inventory")
+
+	// Report new configuration without reclassifying existing certificates.
+	cfg := &config.Config{Certificates: config.Certificates{
+		ServingValidity:                  &metav1.Duration{Duration: 90 * time.Minute},
+		CAValidity:                       &metav1.Duration{Duration: 17520 * time.Hour},
+		ForceRestartOnExpirationImminent: ptr.To(false),
+	}}
+	configured, err := newCertificateStatusList(inventory, cfg, now)
+	require.NoError(t, err)
+	require.Equal(t, certificatesv1alpha1.CertificateStatusConfig{
+		ForceRestartOnExpirationImminent: false,
+		ServingValidity:                  "1h30m0s",
+		CAValidity:                       "17520h",
+	}, configured.Config)
+	require.Equal(t, status.Items, configured.Items, "classify the encoded lifetime, not new configuration")
+	var output bytes.Buffer
+	require.NoError(t, writeCertificateStatusTable(&output, configured))
+	require.Contains(t, output.String(), "Force restart on expiration imminent: false")
 }
 
 func TestCertStatusOutput(t *testing.T) {

@@ -141,6 +141,21 @@ func prerunDataManagement() error {
 	return prerun.DataManagement(dataManager)
 }
 
+func watchCertificateRotation(ctx context.Context, stop context.CancelFunc, rotationDate time.Time, forceRestart bool) {
+	deadline, cancel := context.WithDeadline(ctx, rotationDate)
+	defer cancel()
+	<-deadline.Done()
+	if ctx.Err() != nil {
+		return
+	}
+	if forceRestart {
+		klog.Info("Stopping services for certificate rotation")
+		stop()
+		return
+	}
+	klog.Warning("Certificates have reached ExpirationImminent; automatic certificate restart is disabled. Use microshift certs status to inspect active certificates, prepare renewal, and restart MicroShift before they expire")
+}
+
 //nolint:cyclop
 func RunMicroshift(cfg *config.Config) error {
 	// fail early if we don't have enough privileges
