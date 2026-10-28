@@ -194,7 +194,7 @@ func TestCertStatusStates(t *testing.T) {
 					rows := strings.Split(strings.TrimSpace(stdout.String()), "\n")
 					require.Len(t, rows, 4)
 					require.Empty(t, rows[2])
-					require.Contains(t, rows[3], "Force restart on expiration imminent: true")
+					require.Equal(t, "Force restart on expiration imminent: true (applied at service start)", rows[3])
 					require.Equal(t, []string{"SERVICE", "CERTIFICATE", "STATUS", "EXPIRY", "MESSAGE"}, strings.Fields(rows[0]))
 					fields := strings.Fields(rows[1])
 					require.GreaterOrEqual(t, len(fields), 5)

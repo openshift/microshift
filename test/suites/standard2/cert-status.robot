@@ -34,7 +34,7 @@ Table Reports Descriptive Certificate States
     Should Be True    len($rows) > 3
     Should Match Regexp
     ...    ${rows}[-1]
-    ...    ^Force restart on expiration imminent: (true|false) \\(configured; applied at service start\\)$
+    ...    ^Force restart on expiration imminent: (true|false) \\(applied at service start\\)$
     FOR    ${row}    IN    @{rows}[1:-2]
         Validate Certificate Table Message    ${row}
     END

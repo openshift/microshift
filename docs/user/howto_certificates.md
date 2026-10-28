@@ -402,6 +402,19 @@ trigger renewal. Existing certificates keep their encoded dates until explicit
 renewal or normal startup regeneration is required. All CAs use the extended
 policy, including legacy CAs originally issued for one year.
 
+After an upgrade, a legacy one-year CA becomes eligible for startup regeneration
+at 15% remaining validity (about 55 days), while its running-service critical
+deadline is at 10% remaining (about 37 days). A standard serving certificate
+becomes critical at 33.3% remaining validity. If a renewed serving certificate
+is capped by a retained CA's expiry, it can trigger a restart before the CA is
+eligible for regeneration, then be reissued again when the CA rotates. Additional
+certificate-driven restarts are therefore possible during this transition when
+automatic restart is enabled.
+
+An upgrade alone does not force CA replacement. To renew the chain together,
+prepare `microshift certs renew --ca` and restart during a maintenance window,
+following the CA trust and kubeconfig redistribution steps above.
+
 ## Warnings and Errors
 
 In table mode, configuration warnings are written to stderr with a `WARNING:`

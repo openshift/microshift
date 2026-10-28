@@ -29,6 +29,8 @@ func TestConfiguredCertificateIssuance(t *testing.T) {
 				ApiServer:    config.ApiServer{AdvertiseAddress: "10.44.0.0"},
 			}
 			dir := t.TempDir()
+			now := time.Now()
+			nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
 			builder, err := certificateChainsSetup(cfg, dir)
 			require.NoError(t, err)
 			chains, err := builder.Complete()
@@ -50,7 +52,7 @@ func TestConfiguredCertificateIssuance(t *testing.T) {
 				case certchains.CertificateRoleUnknown:
 					t.Fatalf("unknown role for %s", entry.Name)
 				}
-				require.InDelta(t, expected.Seconds(), entry.Certificate.NotAfter.Sub(entry.Certificate.NotBefore).Seconds(), (24*time.Hour + time.Minute).Seconds(), entry.Name)
+				require.WithinDuration(t, nextMidnight.Add(expected), entry.Certificate.NotAfter, time.Minute, entry.Name)
 			}
 			paths, err := certsToRegenerate(chains.Inventory(), time.Now())
 			require.NoError(t, err)

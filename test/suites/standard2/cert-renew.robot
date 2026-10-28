@@ -123,6 +123,20 @@ Invalid Configuration Is Rejected Before Lock Acquisition
     Should Be Equal    ${before}    ${after}
     [Teardown]    Remove Drop In MicroShift Config    99-cert-renew-test
 
+Busy Certificate Lock Reports Appropriate Errors
+    [Documentation]    Status and dry-run lock failures must not claim that renewal failed.
+    FOR    ${format}    IN    json    yaml
+        Renewal Error Should Be Reported
+        ...    flock -x ${CERTIFICATE_LOCK} microshift certs status -o ${format}
+        ...    ${format}    InternalError
+        Renewal Error Should Be Reported
+        ...    flock -x ${CERTIFICATE_LOCK} microshift certs renew --serving --dry-run -o ${format}
+        ...    ${format}    InternalError
+        Renewal Error Should Be Reported
+        ...    flock -x ${CERTIFICATE_LOCK} microshift certs renew --serving -o ${format}
+        ...    ${format}    RenewalFailed
+    END
+
 Leaf Renewal Keeps CAs Unchanged
     [Documentation]    Prepare leaves online, preserve active TLS and CA bytes, and activate only on restart.
     ${pods_before}=    Certificate Consumer Pod UIDs

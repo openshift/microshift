@@ -246,6 +246,13 @@ func TestPrepareCertificateAccessRefusesConcurrentWriter(t *testing.T) {
 		release, err := prepareCertificateTransaction(tx, lockPath, writing, func() error { return nil })
 		require.ErrorIs(t, err, certificates.ErrBusy)
 		require.Nil(t, release)
+		var commandError *certificateCommandError
+		require.ErrorAs(t, err, &commandError)
+		want := certificatesv1alpha1.ErrorCodeInternalError
+		if writing {
+			want = certificatesv1alpha1.ErrorCodeRenewalFailed
+		}
+		require.Equal(t, want, commandError.code)
 	}
 }
 
