@@ -12,7 +12,7 @@ import re
 import subprocess
 import sys
 import textwrap
-from collections import namedtuple
+from dataclasses import dataclass
 from pathlib import Path
 from timeit import default_timer as timer
 
@@ -43,7 +43,42 @@ _extra_msgs = []
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 
-RebaseScriptResult = namedtuple("RebaseScriptResult", ["success", "output"])
+@dataclass
+class RebaseScriptResult:
+    """The outcome and captured output of a rebase script."""
+
+    script_name: str
+    success: bool
+    output: str
+
+
+@dataclass
+class RebaseScript:
+    """A rebase script invocation and its execution settings."""
+
+    name: str
+    releases: tuple[str, ...]
+    no_branch: bool = False
+
+    def run(self) -> RebaseScriptResult:
+        """Run the script and capture its combined standard output and error."""
+        script_dir = Path(__file__).resolve().parent
+        args = [str(script_dir / self.name), "to", *self.releases]
+        env = os.environ.copy()
+        if self.no_branch:
+            env["NO_BRANCH"] = "true"
+        logging.info(f"Running: '{' '.join(args)}'")
+        start = timer()
+        result = subprocess.run(
+            args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False,
+            env=env)
+        logging.info(f"Return code: {result.returncode}. Output:\n" +
+                     "==================================================\n" +
+                     f"{result.stdout}" +
+                     "==================================================\n")
+        end = timer() - start
+        logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
+        return RebaseScriptResult(script_name=self.name, success=result.returncode == 0, output=result.stdout)
 
 
 def try_get_env(var_name, die=True):
@@ -60,83 +95,6 @@ def try_get_env(var_name, die=True):
             logging.info(f"Could not get environment variable '{var_name}' - ignoring")
             return ""
     return val
-
-
-def run_rebase_sh(release_amd64, release_arm64):
-    """Run the 'rebase.sh' script with the given release versions and return the script's output."""
-    script_dir = os.path.abspath(os.path.dirname(__file__))
-    args = [f"{script_dir}/rebase.sh", "to", release_amd64, release_arm64]
-    logging.info(f"Running: '{' '.join(args)}'")
-    start = timer()
-    result = subprocess.run(
-        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False)
-    logging.info(f"Return code: {result.returncode}. Output:\n" +
-                 "==================================================\n" +
-                 f"{result.stdout}" +
-                 "==================================================\n")
-    end = timer() - start
-    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
-    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
-
-
-def run_rebase_ai_model_serving_sh(release):
-    """Run the 'rebase_ai_model_serving.sh' script with the given release version and return the script's output."""
-    script_dir = os.path.abspath(os.path.dirname(__file__))
-    args = [f"{script_dir}/rebase_ai_model_serving.sh", "to", release]
-    env = os.environ.copy()
-    env["NO_BRANCH"] = "true"
-    logging.info(f"Running: '{' '.join(args)}'")
-    start = timer()
-    result = subprocess.run(
-        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False,
-        env=env)
-    logging.info(f"Return code: {result.returncode}. Output:\n" +
-                 "==================================================\n" +
-                 f"{result.stdout}" +
-                 "==================================================\n")
-    end = timer() - start
-    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
-    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
-
-
-def run_rebase_sriov_sh(release):
-    """Run the 'rebase_sriov.sh' script with the given release version and return the script's output."""
-    script_dir = os.path.abspath(os.path.dirname(__file__))
-    args = [f"{script_dir}/rebase_sriov.sh", "to", release]
-    env = os.environ.copy()
-    env["NO_BRANCH"] = "true"
-    logging.info(f"Running: '{' '.join(args)}'")
-    start = timer()
-    result = subprocess.run(
-        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False,
-        env=env)
-    logging.info(f"Return code: {result.returncode}. Output:\n" +
-                 "==================================================\n" +
-                 f"{result.stdout}" +
-                 "==================================================\n")
-    end = timer() - start
-    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
-    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
-
-
-def run_rebase_cert_manager_sh(release):
-    """Run the 'rebase_cert_manager.sh' script with the given release version and return the script's output."""
-    script_dir = os.path.abspath(os.path.dirname(__file__))
-    args = [f"{script_dir}/rebase_cert_manager.sh", "to", release]
-    env = os.environ.copy()
-    env["NO_BRANCH"] = "true"
-    logging.info(f"Running: '{' '.join(args)}'")
-    start = timer()
-    result = subprocess.run(
-        args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, check=False,
-        env=env)
-    logging.info(f"Return code: {result.returncode}. Output:\n" +
-                 "==================================================\n" +
-                 f"{result.stdout}" +
-                 "==================================================\n")
-    end = timer() - start
-    logging.info(f"Script returned code: {result.returncode}. It ran for {end/60:.0f}m{end%60:.0f}s.")
-    return RebaseScriptResult(success=result.returncode == 0, output=result.stdout)
 
 
 def make_sure_rebase_script_created_new_commits_or_exit(git_repo, base_branch):
@@ -323,13 +281,14 @@ def main():
         else base_branch_override
     )
 
-    rebase_result = run_rebase_sh(release_amd, release_arm)
-    ai_rebase_result = run_rebase_ai_model_serving_sh(rhoai_release)
-    sriov_rebase_result = run_rebase_sriov_sh(sriov_release)
-    cert_manager_rebase_result = run_rebase_cert_manager_sh(opm_version)
-
-    rebases_succeeded = all([rebase_result.success, ai_rebase_result.success, sriov_rebase_result.success,
-                             cert_manager_rebase_result.success])
+    scripts = [
+        RebaseScript("rebase.sh", (release_amd, release_arm)),
+        RebaseScript("rebase_ai_model_serving.sh", (rhoai_release,), no_branch=True),
+        RebaseScript("rebase_sriov.sh", (sriov_release,), no_branch=True),
+        RebaseScript("rebase_cert_manager.sh", (opm_version,)),
+    ]
+    results = [script.run() for script in scripts]
+    rebases_succeeded = all(result.success for result in results)
 
     if rebases_succeeded:
         # TODO How can we inform team that rebase job ran successfully just there was nothing new?
@@ -343,11 +302,7 @@ def main():
         logging.warning("Rebase script failed - everything will be committed")
         with open('rebase.log', mode='w', encoding='utf-8') as writer:
             separator = "==================================================\n"
-            output = (
-                "rebase.sh:\n" + f"{rebase_result.output}" + separator +
-                "rebase_ai_model_serving.sh:\n" + f"{ai_rebase_result.output}" + separator +
-                "rebase_sriov.sh:\n" + f"{sriov_rebase_result.output}" + separator +
-                "rebase_cert_manager.sh:\n" + f"{cert_manager_rebase_result.output}")
+            output = separator.join(f"{result.script_name}:\n{result.output}" for result in results)
             writer.write(output)
         if g.git_repo.active_branch.name == base_branch:
             # rebase.sh didn't reach the step that would create a branch
