@@ -36,6 +36,7 @@ func TestCorruptPendingRenewalAllowsStartup(t *testing.T) {
 		"invalid directory": `{"directory":"../outside","metadata":{}}`,
 		"invalid metadata":  `{"directory":"stage-test","metadata":"credential-bearing-data"}`,
 		"missing fields":    `{"directory":"stage-test","metadata":{"version":1}}`,
+		"missing stage":     `{"directory":"stage-missing","metadata":{"version":1}}`,
 	} {
 		t.Run(name, func(t *testing.T) {
 			tx := corruptPendingFixture(t, record)

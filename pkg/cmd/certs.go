@@ -259,7 +259,7 @@ func writeCertificateStatusTable(out io.Writer, status certificatesv1alpha1.Cert
 	if err := w.Flush(); err != nil {
 		return err
 	}
-	_, err := fmt.Fprintf(out, "\nForce restart on expiration imminent: %t (configured; applied at service start)\n", status.Config.ForceRestartOnExpirationImminent)
+	_, err := fmt.Fprintf(out, "\nForce restart on expiration imminent: %t (applied at service start)\n", status.Config.ForceRestartOnExpirationImminent)
 	return err
 }
 

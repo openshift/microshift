@@ -309,6 +309,22 @@ Corrupt Pending Metadata Does Not Block Startup
     Rejected Renewal Warning Has Cleared
     [Teardown]    Run Keyword If Test Failed    Replace Rejected Renewal
 
+Missing Pending Generation Does Not Block Startup
+    [Documentation]    A pending record pointing to a missing generation is rejected without replacing active CAs.
+    ${ca_before}=    CA Material Digest
+    ${result}=    Renewal Document    ca    json
+    Pending Renewal Matches Result    ${result}
+    ${stage}=    Command Should Work    jq -r '.directory' /var/lib/microshift/.cert-renewal/pending.json
+    Should Match Regexp    ${stage}    ^stage-[0-9]+$
+    Command Should Work
+    ...    mv /var/lib/microshift/.cert-renewal/${stage} /var/lib/microshift/.cert-renewal/${stage}.saved
+    Certificate Renewal Warning Is Reported    Pending certificate renewal metadata is invalid
+    Restart MicroShift
+    Certificate Renewal Warning Is Reported    A pending certificate renewal was rejected
+    ${ca_after}=    CA Material Digest
+    Should Be Equal    ${ca_before}    ${ca_after}
+    [Teardown]    Replace Rejected Renewal
+
 
 *** Keywords ***
 Drop In Certificate Policy
