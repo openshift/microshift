@@ -1100,8 +1100,24 @@
       "filesAnalyzed": false
     },
     {
+      "SPDXID": "SPDXRef-Package-certificate-206-206-algorithmPrimitive-other-api-tls.LoadX509KeyPair-cryptoFunction-other-findingType-certificate-handling-library-crypto-tls-materialSource-loaded-operation-other",
+      "name": "certificate:206:206:algorithmPrimitive=other:api=tls.LoadX509KeyPair:cryptoFunction=other:findingType=certificate_handling:library=crypto/tls:materialSource=loaded:operation=other",
+      "comment": "{\"assetType\":\"certificate\",\"certificateProperties\":{}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
       "SPDXID": "SPDXRef-Package-certificate-208-208-algorithmPrimitive-other-api-Certificate.Verify-cryptoFunction-verify-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-verify",
       "name": "certificate:208:208:algorithmPrimitive=other:api=Certificate.Verify:cryptoFunction=verify:findingType=certificate_handling:library=crypto/x509:materialSource=loaded:operation=verify",
+      "comment": "{\"assetType\":\"certificate\",\"certificateProperties\":{}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-certificate-212-212-algorithmPrimitive-other-api-Certificate.CheckSignatureFrom-cryptoFunction-verify-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-verify",
+      "name": "certificate:212:212:algorithmPrimitive=other:api=Certificate.CheckSignatureFrom:cryptoFunction=verify:findingType=certificate_handling:library=crypto/x509:materialSource=loaded:operation=verify",
       "comment": "{\"assetType\":\"certificate\",\"certificateProperties\":{}}",
       "description": "Converted CBOM component from CycloneDX to SPDX",
       "downloadLocation": "NOASSERTION",
@@ -1511,6 +1527,14 @@
       "SPDXID": "SPDXRef-Package-certificate-296-296--X.509-algorithmPrimitive-other-api-crypto.MakeServerCert-certificateExtKeyUsage--serverAuth--certificateIsCA-false-certificatePublicKeySize-2048-certificateSignatureAlgorithm-SHA256WithRSA-certificateState--active--library-openshift-library-go",
       "name": "certificate:296:296::X.509:algorithmPrimitive=other:api=crypto.MakeServerCert:certificateExtKeyUsage=[serverAuth]:certificateIsCA=false:certificatePublicKeySize=2048:certificateSignatureAlgorithm=SHA256WithRSA:certificateState=[active]:library=openshift/library-go",
       "comment": "{\"assetType\":\"certificate\",\"certificateProperties\":{\"certificateFormat\":\"X.509\"}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-Package-certificate-298-298-algorithmPrimitive-other-api-tls.LoadX509KeyPair-cryptoFunction-other-findingType-certificate-handling-library-crypto-tls-materialSource-loaded-operation-other",
+      "name": "certificate:298:298:algorithmPrimitive=other:api=tls.LoadX509KeyPair:cryptoFunction=other:findingType=certificate_handling:library=crypto/tls:materialSource=loaded:operation=other",
+      "comment": "{\"assetType\":\"certificate\",\"certificateProperties\":{}}",
       "description": "Converted CBOM component from CycloneDX to SPDX",
       "downloadLocation": "NOASSERTION",
       "filesAnalyzed": false
@@ -3724,7 +3748,17 @@
     },
     {
       "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-certificate-206-206-algorithmPrimitive-other-api-tls.LoadX509KeyPair-cryptoFunction-other-findingType-certificate-handling-library-crypto-tls-materialSource-loaded-operation-other",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
       "relatedSpdxElement": "SPDXRef-Package-certificate-208-208-algorithmPrimitive-other-api-Certificate.Verify-cryptoFunction-verify-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-verify",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-certificate-212-212-algorithmPrimitive-other-api-Certificate.CheckSignatureFrom-cryptoFunction-verify-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-verify",
       "relationshipType": "CONTAINS"
     },
     {
@@ -3980,6 +4014,11 @@
     {
       "spdxElementId": "SPDXRef-Package-RootPackage",
       "relatedSpdxElement": "SPDXRef-Package-certificate-296-296--X.509-algorithmPrimitive-other-api-crypto.MakeServerCert-certificateExtKeyUsage--serverAuth--certificateIsCA-false-certificatePublicKeySize-2048-certificateSignatureAlgorithm-SHA256WithRSA-certificateState--active--library-openshift-library-go",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-certificate-298-298-algorithmPrimitive-other-api-tls.LoadX509KeyPair-cryptoFunction-other-findingType-certificate-handling-library-crypto-tls-materialSource-loaded-operation-other",
       "relationshipType": "CONTAINS"
     },
     {

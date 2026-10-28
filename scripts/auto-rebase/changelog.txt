@@ -1,157 +1,23 @@
-- api embedded-component 24b2699a9b327b3ab54962520e809745f8adf96c to 9809689a2448b3df15f9a84616f9f7c89be81b77
-  - 792fcba3 2026-10-22T13:25:47+01:00 remove OpenShiftPodSecurityAdmission feature gate from Default feature set
-  - 10969a31 2026-10-20T13:59:18+02:00 STOR-3180: Add Feature Gate StoragePathAlert
-  - 23ba8585 2026-10-19T20:06:45Z OCPKUEU-887: Enable TopologyAwareWorkloadScheduling in Dev/TechPreview
-  - 236b125a 2026-10-19T19:40:51Z OCPKUEU-887: Enable workload scheduling feature gates in Dev/TechPreview
-  - 50d6a720 2026-10-19T15:21:30-04:00 drop v1apha1 CRIOCredentialProviderConfig entirely
-  - 5d25b2d7 2026-10-19T15:40:16+01:00 OCPCLOUD-3330: Add ClusterAPIOperator feature gate
-  - 13c3cb05 2026-10-14T11:52:24-04:00 make update
-  - 2708defd 2026-10-14T10:50:30-04:00 Graduate KMSEncryption to GA
+- api embedded-component 9809689a2448b3df15f9a84616f9f7c89be81b77 to da0032bf0c5f46a6385e10b20360eb737200ff4d
+  - 34e6fe4b 2026-10-26T14:39:47+01:00 OPNET-809: ship the BGPVIPConfig CRD in the payload
+  - d5a84d0e 2026-10-23T12:36:50+02:00 METAL-1977: add MetalEnrollmentAPI feature gate
+  - a75ffd95 2026-10-21T14:01:47+02:00 Graduate CompatibilityRequirement API to v1
 
-- cluster-ingress-operator embedded-component 2bb2799f289338c4f3c16fa46d15ad1b7ef2cae6 to 32bb7bd36863c3f452830cdc7f0e5eee5944ab10
-  - 97c8753b 2026-10-23T09:34:18-04:00 OCPBUGS-121851: Preserve startup error details
-  - d084d8c4 2026-10-23T09:34:18-04:00 OCPBUGS-121851: Clarify startup checks
-  - b4f3fff2 2026-10-23T09:27:54-04:00 OCPBUGS-121851: Scope zero-worker readiness to CVO
-  - fe9c02d4 2026-10-23T09:27:53-04:00 OCPBUGS-121851: Fix router node-affinity matching
-  - e0979117 2026-10-22T17:43:19Z NE-2852: Bump Kubernetes to 1.37.1
-  - 38231505 2026-10-21T02:47:04Z Test admission policy and binding recreation
-  - 7e6a95c8 2026-10-21T02:47:02Z Manage Gateway API CRD protection in CIO
-  - 334b3281 2026-10-13T20:57:20-03:00 Remove HAProxy 2.8 reference
-  - 7e088ed6 2026-10-13T20:57:14-03:00 bump openshift/api
+- cluster-ingress-operator embedded-component 32bb7bd36863c3f452830cdc7f0e5eee5944ab10 to 97da5fb8c7de84bfa6d38c4ce7a1709c45113959
+  - bab878cf 2026-10-24T00:18:04Z NE-2922: Migrate operator Ingress to v1
 
-- cluster-kube-apiserver-operator embedded-component 5f22e9c7b00f1cd914e9938ef56899684ee8ac5a to 79331b98acc015bf64f3638f5abf223c87e065b7
-  - 6feb9b3 2026-10-23T14:10:08+03:00 Update library-go
-  - a3a6dae 2025-12-02T11:20:44+08:00 Use BoundServceAccountTokenVolume dy default
+- cluster-kube-apiserver-operator embedded-component 79331b98acc015bf64f3638f5abf223c87e065b7 to 8619d44406fe87cbb21d188b0cf82bbb01709db0
+  - 5b7b309 2026-10-26T12:10:56-04:00 bump(openshift/library-go): to get KMS GA
 
-- cluster-network-operator embedded-component 089066d165506791a70df51c6b546a9377e865c7 to d5e0bbf1ce0923a0799bd0dc274b45ea9bbce19a
-  - ff24d2f 2026-10-19T22:20:58-04:00 fix(workloads): network node identity use read-only root filesystems
-  - 37b57c1 2026-10-15T13:59:36-04:00 fix(workloads): enforce read-only root filesystems
-  - 10b012e 2026-10-15T11:05:21+02:00 statusmanager: reset the install latch before the stale-state phase
-  - 7269b96 2026-10-15T11:05:21+02:00 statusmanager: pin the desired>0 side of the zero-node condition
-  - 0f306df 2026-10-15T11:04:48+02:00 statusmanager: drop dead clock step from the zero-node DaemonSet test
-  - 03c151f 2026-10-15T11:04:33+02:00 statusmanager: a DaemonSet matching zero nodes is not progressing
-  - 5f3fee1 2026-10-14T10:02:27+05:30 Bump Kubernetes to 1.37.1
+- cluster-network-operator embedded-component d5e0bbf1ce0923a0799bd0dc274b45ea9bbce19a to ae8e7aa0d19d67ec566575401cb59e70371ec35e
+  - 83a7c19 2026-10-22T10:32:43+02:00 OPNET-819: frr-k8s: master-monitor follows platform pod conventions
+  - 5fc1788 2026-10-21T10:44:10-07:00 Provide clarity on status of installation by CNO
 
-- etcd embedded-component 8480451b19d39e15760c32e773521a295920eaa9 to 73444cb5a323cd994151234e2eed701f8647b0ea
-  - ef31a466 2026-10-14T16:56:57Z DOWNSTREAM: <carry>: tests: allow snapshot member publication retry
-  - 85e137f3 2026-10-14T16:30:57Z DOWNSTREAM: <carry>: tests: allow retained client reconnect in TestIssue3699
-
-- machine-config-operator embedded-component 7090103994904d03eb6467387c86c0ad5eb80a71 to 553bfba2ef395f7fcf910b8f83a5267644a401c6
-  - 09c25191 2026-10-22T10:30:14+02:00 OPNET-818: on-prem: BGP VIP static pods follow platform pod conventions
-  - dd417afa 2026-10-16T15:06:58-04:00 Update MCO dependencies to Kubernetes 1.37
-  - 7d234616 2026-10-09T13:50:46+02:00 on-prem: give the frr-k8s static pod reloader writable /tmp and /var/log/frr
-  - 6029635b 2026-09-22T14:57:56-04:00 machine-config-controller: enable readOnlyRootFilesystem for the container
-
-- operator-framework-olm embedded-component 14f999ff089a3275d3a144224e871d825461ec3b to 191c02fc8f0c9f6aac2fa780f5bec55a5758524e
-  - ce52f05b 2026-10-22T00:18:57Z OPRUN-4798: build: update dependencies for TLS curve support (#3943)
-  - 9d616348 2026-10-22T00:17:33Z :seedling: bump github.com/prometheus/common from 0.72.0 to 0.72.1 (#3940)
-  - b11806ec 2026-10-22T00:17:03Z Add client-certificate authorization mode for metrics endpoint (#3936)
-  - 027b29a3 2026-10-22T00:16:24Z :seedling: bump golang.org/x/net from 0.59.0 to 0.61.0 (#3939)
-  - 2cf78f68 2026-10-22T00:15:34Z :seedling: bump github.com/prometheus/client_golang (#3937)
-  - 92682596 2026-10-22T00:15:08Z :seedling: bump github.com/onsi/ginkgo/v2 from 2.33.0 to 2.33.1 (#3938)
-  - 58e9ce01 2026-10-22T00:14:24Z :seedling: bump github.com/maxbrunsfeld/counterfeiter/v6 from 6.13.0 to 6.14.0 (#3935)
-  - 397ce18a 2026-10-22T00:14:01Z :seedling: bump github.com/prometheus/common from 0.71.0 to 0.72.0 (#3934)
-  - ef5f32ca 2026-10-22T00:12:48Z :seedling: bump google.golang.org/grpc from 1.83.2 to 1.84.0 (#3932)
-  - 30c3c890 2026-10-22T00:11:56Z :seedling: bump github.com/onsi/gomega from 1.43.1 to 1.44.0 (#3931)
-  - 7f48d00a 2026-10-22T00:11:01Z :seedling: bump github.com/containerd/containerd from 1.7.35 to 1.7.36 (#3930)
-  - 5a746ea9 2026-10-22T00:10:26Z Revert "add cpu limits to catalogsource pods (#3915)" (#3929)
-  - eddd509b 2026-10-22T00:09:48Z :seedling: Bump github.com/onsi/ginkgo/v2 from 2.32.1 to 2.33.0 (#3926)
-  - 26fb11e3 2026-10-22T00:09:05Z :seedling: Bump go.podman.io/image/v5 from 5.41.1 to 5.41.2 (#3927)
-  - 5fa301a1 2026-10-22T00:07:50Z :seedling: Bump github.com/onsi/gomega from 1.43.0 to 1.43.1 (#3925)
-  - 36366716 2026-10-22T00:06:36Z :seedling: Bump github.com/prometheus/common from 0.70.1 to 0.71.0 (#3924)
-
-- oc image-amd64 586088c46cba2cd87e1a128a304fe484cf678cd5 to 027bf0b05d713f85d6fc4674ff2e076684538a74
-  - df4b7006 2026-10-21T15:12:33+02:00 observe: Fix nil pointer panic in dumpMetrics
-  - c12c4b5c 2026-10-19T17:59:35+02:00 Makefile: Dump k8s version to 1.37.1
-  - b3025969 2026-10-19T17:59:35+02:00 Update base images to OCP 5.1
-  - 0914b0d5 2026-10-19T17:59:35+02:00 describe: Add AuthenticationConfiguration to test exceptions
-  - 756062d0 2026-10-19T17:59:35+02:00 go mod vendor
-  - cd2c1b43 2026-10-19T17:59:35+02:00 deps: Rebase to 1.37 and update some deps
-  - d674d70a 2026-10-19T17:58:49+02:00 Add pkg/helpers/generate
-
-- coredns image-amd64 83aefed36b4dd6eb800885e56af7cf97fc9db8d7 to ad7aaecd3e975727735ee8245d3917ee870cc50c
-  - 7ed467c 2026-10-01T20:16:14-04:00 UPSTREAM: 530b0a5ff: validate DNS requests before unpacking
-
-- ovn-kubernetes image-amd64 0d60766d732f5d158ab77ab915a3fbceb13cdf50 to baff7a3fb039209599691f57b01bf46d8c3a2466
-  - 2b0866cd 2026-10-22T18:33:26+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
-  - f2e99ce5 2026-10-21T13:27:18+02:00 OTE: promote CI-validated E2Es to blocking, defer untested ones
-  - 753e847a 2026-10-21T13:27:18+02:00 OTE: Add license headers and license-check tooling
-  - e01d0bd6 2026-10-21T13:27:18+02:00 OTE: Add unit tests for infraprovider package
-  - 33ed99ac 2026-10-21T13:27:18+02:00 OTE: add AGENT.md README.md files
-  - ba9dadb2 2026-10-21T13:27:18+02:00 OTE: skip EgressIP E2Es affected by GCP /32 node address
-  - 13221fff 2026-10-21T13:27:18+02:00 OTE: skip EgressIP GRPC health check E2Es
-  - 7a026a47 2026-10-21T13:27:18+02:00 OTE: skip EgressIP legacy health check E2Es
-  - 661ba56b 2026-10-21T13:27:17+02:00 OTE: skip EgressIP host-net-pod E2Es on bastion platforms
-  - ee37d6ea 2026-10-21T13:27:17+02:00 OTE: Skip Egress firewall E2Es
-  - c031b478 2026-10-21T13:27:17+02:00 OTE: skip EgressIP node readiness E2Es
-  - 15b4ab1b 2026-10-21T13:27:17+02:00 OTE: run podman with sudo on bastion hosts
-  - 55bfb962 2026-10-21T13:27:17+02:00 OTE: enable network segmentation env for EgressIP E2Es
-  - 69b589df 2026-10-21T13:27:17+02:00 OTE: skip EgressIP MTU fragmentation E2Es
-  - f7c1b6c8 2026-10-21T13:27:17+02:00 OTE: enable IP forwarding on node secondary interfaces
-  - 778fbf00 2026-10-21T13:27:17+02:00 OTE baremetal: enable secondary-host-eip tests
-  - 7f138c86 2026-10-21T13:27:17+02:00 OTE: add cloud platform support with shared baseInfra
-  - 9abb92db 2026-10-21T13:27:17+02:00 OTE baremetal: open external container port range at init
-  - 7704bfaa 2026-10-21T13:27:17+02:00 OTE: Initialize node primary IP allocator
-  - 6eb1a64c 2026-10-21T13:27:17+02:00 OTE: enable EgressIP E2E tests as serial, disable secondary-host-eip
-  - 3f6672c9 2026-10-21T13:27:17+02:00 baremetal: cache host-networked external containers for EgressIP E2Es
-  - 64728773 2026-10-19T17:54:36+02:00 sync test annotations with upstream changes
-  - a44516c9 2026-10-19T17:54:27+02:00 OTE: Adapt to InfrastructureNetworkExclusions API
-  - d74dd87f 2026-10-19T12:50:59+02:00 OTE: Adapt to new GetProviderNodeSubnets deploymentconfig API
-  - e5b1bbc2 2026-10-16T10:34:40-04:00 clustermanager: test invalid NAD dynamic tunnel keys
-  - f68b1db9 2026-10-16T10:34:40-04:00 clustermanager: test invalid node IDs during synchronization
-  - 1ba7bf30 2026-10-16T10:34:40-04:00 networkmanager: test invalid NAD network IDs
-  - d905d61f 2026-10-16T14:37:06+01:00 okep, qos: reject unsupported destination selectors
-  - 964e8f32 2026-10-16T09:11:26-04:00 cni: preserve default-network conntrack during VM migration
-  - d0434b71 2026-10-16T11:04:04+01:00 okep, qos: use discoverable pod IPs for destination matching
-  - 26a6120b 2026-10-16T11:04:04+01:00 okep, qos: single source matching approach using port groups
-  - 55de60d5 2026-10-16T11:04:04+01:00 okep, qos: add level-driven refactor as a prerequisite
-  - 47e0b45a 2026-10-16T11:04:04+01:00 okep: use port groups exclusively for source matching
-  - 035cff0e 2026-10-16T11:04:04+01:00 okep: signal unsupported ipamless configs via status condition
-  - cbd5d10a 2026-10-16T11:04:04+01:00 okep: complete NetworkQoS ipamless OKEP per template
-  - 14398976 2026-10-16T11:04:04+01:00 okep: NetworkQoS support for ipamless localnet networks
-  - baf7378c 2026-10-15T15:33:18-04:00 clustermanager: test invalid layer2 node tunnel IDs
-  - fa474d0d 2026-10-15T15:33:18-04:00 allocator: reject out-of-range bitmap offsets
-  - bf0349ef 2026-10-15T14:19:18+02:00 layer2: remove synthetic gateway migration notifications
-  - 4f9b5e77 2026-10-15T13:27:42+02:00 e2e: Implement InfrastructureNetworkExclusions API
-  - 078cee8c 2026-10-15T13:20:26+02:00 e2e: use provider-aware subnets for primary IP allocation
-  - a4a24977 2026-10-15T12:49:33+02:00 e2e: track the specific failed VM migration attempt
-  - 91fce521 2026-10-14T16:57:40+02:00 docs: describe RouteAdvertisements input validation
-  - 735e98de 2026-10-14T16:57:40+02:00 routeadvertisements: delete FRR config rejected by validation
-  - 45b7fa85 2026-10-14T16:33:08+02:00 routeadvertisements: validate the target VRF written to FRR config
-  - 447cd878 2026-10-14T16:33:08+02:00 routeadvertisements: validate neighbor keys written to FRR config
-  - 66f1b39e 2026-10-14T16:33:08+02:00 routeadvertisements: validate network values written to FRR config
-  - cd844b2d 2026-10-14T10:49:28+02:00 e2e: cover dynamic CUDN reactivation with reallocated node subnets
-  - 9d8bb297 2026-10-14T10:49:27+02:00 e2e: share Uplink provisioning between Dynamic UDN specs
-  - f5ed3a25 2026-10-14T10:27:27+02:00 networkmanager: delete dynamic UDN once its last NAD goes inactive
-  - 0e4ef97a 2026-10-14T10:17:00+03:00 images: prefer IPv4 for koji RPM download in Fedora Dockerfile
-  - 3c0643f8 2026-10-13T16:58:05+02:00 config: redact the bearer token from the parsed-config log line
-  - 28e0178d 2026-10-13T03:36:31-07:00 ovn: track pod IP allocation ownership
-  - 788a7944 2026-10-13T03:33:15-07:00 ovn: protect pod IP reservations across cleanup retries
-  - 97dea27d 2026-10-12T17:18:04-04:00 e2e: harden duplicate-primary UDN/CUDN test assertions
-  - 03893956 2026-10-12T17:18:04-04:00 e2e: wait for CUDN active namespaces in duplicate-primary test
-  - 22957897 2026-10-12T16:42:35-04:00 e2e: add tests for duplicate primary UDN/CUDN in same namespace
-  - 5ae56a65 2026-10-12T19:25:22+02:00 factory: remove duplicate pod informer init and dead selector
-  - 0b604da5 2026-10-12T16:19:48+02:00 unit: ensure pod informer cache is updated for UDN delete events
-  - fb3feea5 2026-10-12T12:41:23+02:00 e2e: make default RouteAdvertisements name configurable
-  - 61a58304 2026-10-12T12:41:23+02:00 e2e: restore original RouteAdvertisements spec after toggle
-  - cca571b2 2026-10-12T11:46:52+02:00 e2e: cover an Uplink bridge deleted under an active CUDN
-  - 77164768 2026-10-09T19:29:15+02:00 uplink: rediscover on OVS bridge additions and deletions
-  - e49ee125 2026-10-09T19:29:15+02:00 node: tolerate a missing link when deleting UDN masquerade neighbors
-  - 3d75bade 2026-10-09T19:29:15+02:00 node: never exit on a deleted Uplink bridge
-  - 48eaa7ac 2026-10-09T19:29:15+02:00 node: drop a vanished Uplink bridge on network cleanup
-  - 014c9532 2026-10-09T09:59:33-04:00 e2e: wait for EgressIP SNAT programming after reassignment
-  - 693ba00d 2026-10-09T09:59:33-04:00 e2e: bound KubeVirt guest curl commands
-  - cd4dfcf5 2026-09-16T10:32:44-07:00 e2e: clean up external container on post-create failure
-
-- oc image-arm64 586088c46cba2cd87e1a128a304fe484cf678cd5 to 027bf0b05d713f85d6fc4674ff2e076684538a74
-  - df4b7006 2026-10-21T15:12:33+02:00 observe: Fix nil pointer panic in dumpMetrics
-  - c12c4b5c 2026-10-19T17:59:35+02:00 Makefile: Dump k8s version to 1.37.1
-  - b3025969 2026-10-19T17:59:35+02:00 Update base images to OCP 5.1
-  - 0914b0d5 2026-10-19T17:59:35+02:00 describe: Add AuthenticationConfiguration to test exceptions
-  - 756062d0 2026-10-19T17:59:35+02:00 go mod vendor
-  - cd2c1b43 2026-10-19T17:59:35+02:00 deps: Rebase to 1.37 and update some deps
-  - d674d70a 2026-10-19T17:58:49+02:00 Add pkg/helpers/generate
-
-- coredns image-arm64 83aefed36b4dd6eb800885e56af7cf97fc9db8d7 to ad7aaecd3e975727735ee8245d3917ee870cc50c
-  - 7ed467c 2026-10-01T20:16:14-04:00 UPSTREAM: 530b0a5ff: validate DNS requests before unpacking
+- machine-config-operator embedded-component 553bfba2ef395f7fcf910b8f83a5267644a401c6 to 58efa1043fa36b699f87d07b6d048dcac4e87231
+  - 46a73816 2026-10-23T18:19:50+02:00 Relaxed fatal errors on policy checks
+  - 498b3698 2026-10-22T12:33:31-04:00 daemon & upgrademonitor: fix MCN stale current config edge case
+  - 728fbdce 2026-10-21T17:53:45+02:00 Handle restrictive policies for layered OS updates
+  - 3480ab48 2026-10-12T16:33:11-04:00 OCPBUGS-4602: Add system service GOMAXPROCS for kubelet and CRI-O
+  - fb4ce44a 2026-10-12T16:32:43-04:00 OCPBUGS-4602: Add container GOMAXPROCS injection via CRI-O min_injected_gomaxprocs
+  - fbe3f12e 2026-10-12T16:32:43-04:00 OCPBUGS-84661: Reconcile every matching ContainerRuntimeConfig pool
 
