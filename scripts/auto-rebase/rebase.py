@@ -25,6 +25,7 @@ import ghutils   # noqa: E402
 AMD64_RELEASE_ENV = "AMD64_RELEASE"
 ARM64_RELEASE_ENV = "ARM64_RELEASE"
 RHOAI_RELEASE_ENV = "RHOAI_RELEASE"
+LVMS_RELEASE_ENV = "LVMS_RELEASE"
 SRIOV_RELEASE_ENV = "SRIOV_RELEASE"
 OPM_VERSION_ENV = "OPM_RELEASE"
 JOB_NAME_ENV = "JOB_NAME"
@@ -59,11 +60,12 @@ class RebaseScript:
     name: str
     releases: tuple[str, ...]
     no_branch: bool = False
+    command: str = "to"
 
     def run(self) -> RebaseScriptResult:
         """Run the script and capture its combined standard output and error."""
         script_dir = Path(__file__).resolve().parent
-        args = [str(script_dir / self.name), "to", *self.releases]
+        args = [str(script_dir / self.name), self.command, *self.releases]
         env = os.environ.copy()
         if self.no_branch:
             env["NO_BRANCH"] = "true"
@@ -172,7 +174,7 @@ def generate_pr_description(amd_tag, arm_tag, prow_job_url, rebase_script_succed
     """)
     base = template.format(**locals())
     return (base if rebase_script_succeded
-            else "# rebase.sh failed - check committed rebase_sh.log\n\n" + base)
+            else "# Rebase failed - check committed rebase.log\n\n" + base)
 
 
 def get_release_tag(release):
@@ -265,6 +267,7 @@ def main():
     release_amd = try_get_env(AMD64_RELEASE_ENV)
     release_arm = try_get_env(ARM64_RELEASE_ENV)
     rhoai_release = try_get_env(RHOAI_RELEASE_ENV)
+    lvms_release = try_get_env(LVMS_RELEASE_ENV)
     sriov_release = try_get_env(SRIOV_RELEASE_ENV)
     opm_version = try_get_env(OPM_VERSION_ENV)
     base_branch_override = try_get_env(BASE_BRANCH_ENV, die=False)
@@ -281,11 +284,13 @@ def main():
         else base_branch_override
     )
 
+    lvms_registry, lvms_version = lvms_release.rsplit(":", 1)
     scripts = [
         RebaseScript("rebase.sh", (release_amd, release_arm)),
         RebaseScript("rebase_ai_model_serving.sh", (rhoai_release,), no_branch=True),
         RebaseScript("rebase_sriov.sh", (sriov_release,), no_branch=True),
         RebaseScript("rebase_cert_manager.sh", (opm_version,)),
+        RebaseScript("rebase_lvms.sh", (lvms_registry, lvms_version.lstrip("v")), command="latest"),
     ]
     results = [script.run() for script in scripts]
     rebases_succeeded = all(result.success for result in results)
