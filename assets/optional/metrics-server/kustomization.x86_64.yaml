@@ -1,4 +1,4 @@
 images:
   - name: quay.io/openshift/kube-metrics-server
     newName: quay.io/openshift-release-dev/ocp-v5.0-art-dev
-    digest: sha256:513163e4f336e881346c836cf12a4cab1ec8888450fe0adb35620b8e06c26852
+    digest: sha256:76c748894717bce6c61417918c72f5e6f2aa69e914d5e23135c1cbc8b8ed1142
