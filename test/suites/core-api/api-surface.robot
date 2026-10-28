@@ -49,7 +49,7 @@ Disabled APIs Are Not Served
     ...    installed.
     [Arguments]    ${api_resources}
     VAR    @{disabled_apis}=
-    ...    build    apps    image    imageregistry    config    user    template
+    ...    build    apps    image    imageregistry.operator    config    user    template
     IF    "certmanager" not in """${api_resources}"""
         Append To List    ${disabled_apis}    operator
     END
