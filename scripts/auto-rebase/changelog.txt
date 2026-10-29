@@ -1,13 +1,10 @@
-- cluster-kube-apiserver-operator embedded-component e9bc90906c726823f154c78d3e568c98ff77b6a5 to c7f615ba375151e412bb5d4ac79f3fe5bf6747a8
-  - 6f05d58 2026-09-30T19:01:43-05:00 UPSTREAM: <drop>: vendor
-  - c34abfe 2026-09-30T19:01:43-05:00 UPSTREAM: <carry>: [release-4.18] OCPBUGS-103402: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.4 to address CVE-2026-33814
+- oc image-arm64 a622623a766e65ea4855c15c711d4130b65a3438 to ccb0ad5375f159d7039b291ac2351bcb56daebe1
+  - 86ef6e94 2026-03-13T19:37:07+00:00 Makefile: Strip debugging symbols by default
 
-- cluster-kube-controller-manager-operator embedded-component 6347fc8179b2a04d51c99432ae612bf4df595dc0 to 1bab093a303a38f2a6c8ad14c7e3cecaa412079c
-  - e70425b 2026-08-27T11:57:30+05:30 Fix: added patch for golang.org/x/net package to rectify CVE-2026-33814
+- coredns image-arm64 8ca7f02b8becb40f7a9919243000e2620d7036d4 to 7733e9afa9d33e83e9ab29b96388db049995b6b0
+  - becc3ed 2026-08-26T13:45:33+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
 
-- machine-config-operator embedded-component 39cec53493313d04fba61fea6966cb579fe7679f to f6da18fbc1ae60c86633f5737e80ebbbaa329eae
-  - 70eaf721 2026-09-07T17:11:51+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
-
-- route-controller-manager embedded-component 2484b3e8e7fbb8bf14f930a71f56781289276dfa to 4c126441740eac46b0153b280f13d9ed54195249
-  - 72ba271 2026-09-07T18:21:50+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+- ovn-kubernetes image-arm64 97019aa52cc0641ab084f17c7fec3c51c37a0ce3 to 2b8fc771fbcdc1a7c5c4926d38caa4bc021c20ac
+  - ca18296f 2026-09-29T09:38:55+00:00 egressip: fix duplicate IP assignment on control-plane restart
+  - d562aa70 2026-07-21T11:05:14-07:00 add ability to skip tests that require root
 
