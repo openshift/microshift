@@ -25,14 +25,6 @@ release_arm64="$(oc image info --registry-config=/tmp/registry.json $OPENSHIFT_R
 pullspec_release_amd64="registry.ci.openshift.org/ocp/release:${release_amd64}"
 pullspec_release_arm64="registry.ci.openshift.org/ocp-arm64/release-arm64:${release_arm64}"
 
-APP_ID=$(cat /secrets/pr-creds/app_id) \
-KEY=/secrets/pr-creds/key.pem \
-ORG=${ORG:-openshift} \
-REPO=${REPO:-microshift} \
-AMD64_RELEASE=${pullspec_release_amd64} \
-ARM64_RELEASE=${pullspec_release_arm64} \
-./scripts/auto-rebase/rebase.py
-
 # LVMS is not tracked in the OCP release image.  Instead, rely on the
 #  latest X.Y stream as the release image.  LVMS also does not cut
 #  nightly releases where ocp-release does.  This means that latest
@@ -48,7 +40,14 @@ release_lvms="v4.15.0"
 # payload's X.Y version
 pullspec_release_lvms="registry.redhat.io/lvms4/lvms-operator-bundle:${release_lvms}"
 
-./scripts/auto-rebase/rebase-lvms.sh to "${pullspec_release_lvms}"
+APP_ID=$(cat /secrets/pr-creds/app_id) \
+KEY=/secrets/pr-creds/key.pem \
+ORG=${ORG:-openshift} \
+REPO=${REPO:-microshift} \
+AMD64_RELEASE=${pullspec_release_amd64} \
+ARM64_RELEASE=${pullspec_release_arm64} \
+LVMS_RELEASE=${pullspec_release_lvms} \
+./scripts/auto-rebase/rebase.py
 
 if [[ "${JOB_TYPE}" == "presubmit" ]]; then
     # Verify the assets after the rebase to make sure

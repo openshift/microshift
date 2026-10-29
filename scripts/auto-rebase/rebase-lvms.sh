@@ -65,11 +65,6 @@ rebase_lvms_to() {
 
     download_lvms_operator_bundle_manifest "${lvms_operator_bundle_manifest}"
 
-    # LVMS image names may include `/` and `:`, which make messy branch names.
-    rebase_branch="rebase-lvms-${lvms_operator_bundle_manifest//[:\/]/-}"
-    git branch -D "${rebase_branch}" || true
-    git checkout -b "${rebase_branch}"
-
     update_last_lvms_rebase "${lvms_operator_bundle_manifest}"
 
     update_lvms_images
