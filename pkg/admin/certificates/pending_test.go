@@ -47,12 +47,13 @@ func TestPendingGenerationRejectsUnsafeRecord(t *testing.T) {
 		`{"directory":"../outside","metadata":{}}`,
 		`{"directory":"/outside","metadata":{}}`,
 		`{"directory":"stage-../../outside","metadata":{}}`,
+		`{"directory":"stage-missing","metadata":{}}`,
 	} {
 		t.Run(record, func(t *testing.T) {
 			tx := newTestTransaction(t)
 			require.NoError(t, os.WriteFile(tx.readyPath(), []byte(record), 0600))
 			_, err := tx.LoadPending()
-			require.Error(t, err)
+			require.ErrorIs(t, err, ErrInvalidPendingMetadata)
 			require.Error(t, tx.Discard())
 			require.Error(t, tx.DiscardPending())
 			assertTransactionContents(t, tx, "old")
@@ -69,6 +70,7 @@ func TestPendingGenerationRejectsUnsafeRecord(t *testing.T) {
 			require.NoError(t, os.Symlink(path+".saved", path))
 			_, err := tx.LoadPending()
 			require.Error(t, err)
+			require.NotErrorIs(t, err, ErrInvalidPendingMetadata)
 			require.Error(t, tx.Discard())
 			require.Error(t, tx.DiscardPending())
 		})

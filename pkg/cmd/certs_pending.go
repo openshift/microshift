@@ -38,6 +38,8 @@ func certificateConfigHash(cfg *config.Config) (string, error) {
 		BaseDomain       string
 		AdvertiseAddress string
 		SubjectAltNames  []string
+		ServingValidity  time.Duration
+		CAValidity       time.Duration
 	}{
 		ServiceNetwork:   cfg.Network.ServiceNetwork,
 		Hostname:         cfg.Node.HostnameOverride,
@@ -45,6 +47,8 @@ func certificateConfigHash(cfg *config.Config) (string, error) {
 		BaseDomain:       cfg.DNS.BaseDomain,
 		AdvertiseAddress: cfg.ApiServer.AdvertiseAddress,
 		SubjectAltNames:  cfg.ApiServer.SubjectAltNames,
+		ServingValidity:  cfg.Certificates.ServingDuration(),
+		CAValidity:       cfg.Certificates.CADuration(),
 	})
 	if err != nil {
 		return "", invalidCertificateConfiguration()
@@ -181,14 +185,12 @@ func activatePendingCertificateRenewal(cfg *config.Config, transaction *certific
 		}
 		return false, fmt.Errorf("pending certificates cannot be activated; run microshift certs renew again: %w", err)
 	}
-	if err := checkCertificateRotationDeadline(pending, now); err != nil {
-		return false, discardPendingCertificateRenewal(transaction, err.Error()+"; normal startup may rotate CAs")
+	if cfg.Certificates.ForceRestartEnabled() {
+		if err := checkCertificateRotationDeadline(pending, now); err != nil {
+			return false, discardPendingCertificateRenewal(transaction, err.Error()+"; normal startup may rotate CAs")
+		}
 	}
-	activeBuilder, err := certificateChainsSetup(cfg, transaction.DataDir)
-	if err != nil {
-		return false, err
-	}
-	before, err := activeBuilder.LoadInventory()
+	before, err := loadCertificateInventory(cfg, transaction.DataDir)
 	if err != nil {
 		return false, err
 	}

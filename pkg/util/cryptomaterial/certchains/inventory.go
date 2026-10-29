@@ -114,14 +114,15 @@ func (entry CertificateInventoryEntry) StatusAt(now time.Time) (CertificateStatu
 	}
 }
 
-// RotationDeadline is the existing automatic shutdown deadline, distinct from
-// the percentage thresholds used to report certificate status.
-func (entry CertificateInventoryEntry) RotationDeadline() time.Time {
-	const month = 30 * 24 * time.Hour
-	if cryptomaterial.IsCertShortLived(&entry.Certificate) {
-		return entry.Certificate.NotAfter.Add(-4 * month)
+// RotationDeadline is when the certificate reaches ExpirationImminent, based
+// on its encoded lifetime and rotation policy, not current configuration.
+func (entry CertificateInventoryEntry) RotationDeadline() (time.Time, error) {
+	_, critical, err := entry.RotationPolicy.StatusThresholds()
+	if err != nil {
+		return time.Time{}, fmt.Errorf("certificate %q: %w", entry.Name, err)
 	}
-	return entry.Certificate.NotAfter.Add(-12 * month)
+	c := entry.Certificate
+	return c.NotAfter.Add(-time.Duration(float64(c.NotAfter.Sub(c.NotBefore)) * critical)), nil
 }
 
 // Inventory returns a deterministic snapshot of all certificates managed by

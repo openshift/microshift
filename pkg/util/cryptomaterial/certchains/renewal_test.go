@@ -123,7 +123,10 @@ func TestLeafRenewalPreservesLegacyCAs(t *testing.T) {
 		CSRMeta:  CSRMeta{Name: "client", Service: "test", Validity: 72 * time.Hour, RotationPolicy: RotationPolicyStandard},
 		UserInfo: &user.DefaultInfo{Name: "client"},
 	})
-	builder := NewCertificateChains(NewCertificateSigner("root", dir, 24*time.Hour).WithService("test").WithSubCAs(child))
+	root := NewCertificateSigner("root", dir, 24*time.Hour).WithService("test").WithSubCAs(child)
+	// Model PKI issued before startup enforced issuer validity bounds.
+	root.(*certificateSigner).limitValidity = false
+	builder := NewCertificateChains(root)
 	chains, err := builder.Complete()
 	require.NoError(t, err)
 	before := chains.Inventory()
@@ -161,12 +164,12 @@ func TestRenewExpiredCAWithChangedServingNames(t *testing.T) {
 	require.ErrorContains(t, err, "use --ca")
 	_, err = builder.PlanRenewal(true, time.Now())
 	require.NoError(t, err)
-	// Loading a staged copy may issue a temporary leaf for changed names. It
-	// must not prevent replacing the expired CA and issuing the final leaf.
+	// Startup may issue a temporary leaf for changed names. It must not prevent
+	// replacing the expired CA and issuing the final, bounded leaf.
 	serving.Hostnames = []string{"new.example.test"}
 	chains, err := builder.Complete()
 	require.NoError(t, err)
-	require.NoError(t, chains.RegenerateForRenewal("root"))
+	require.NoError(t, chains.Regenerate("root"))
 	after, err := builder.ValidateRenewal(true, time.Now())
 	require.NoError(t, err)
 	require.Equal(t, serving.Hostnames, after[1].Certificate.DNSNames)
