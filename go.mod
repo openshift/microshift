@@ -1,6 +1,6 @@
 module github.com/openshift/microshift
 
-go 1.22.5
+go 1.22.0
 
 toolchain go1.22.12
 
@@ -12,7 +12,7 @@ require (
 	github.com/openshift/api v0.0.0-20260713195309-f9b2d1ae30eb
 	github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c
 	github.com/openshift/client-go v0.0.0-20241001162912-da6d55e4611f
-	github.com/openshift/cluster-policy-controller v0.0.0-20260714082208-3b44245d8fe9
+	github.com/openshift/cluster-policy-controller 3b44245d8fe9d9b1083998d8d956c7bc4d96a066
 	github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060
 	github.com/openshift/route-controller-manager v0.0.0-20261021065021-4c126441740e
 	github.com/pkg/errors v0.9.1 // indirect
