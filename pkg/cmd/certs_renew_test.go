@@ -42,6 +42,7 @@ func TestCertificateRenewalApply(t *testing.T) {
 				ApiServer: config.ApiServer{AdvertiseAddress: "10.44.0.0", URL: "https://127.0.0.1:6443", Port: 6443},
 			}
 			dataDir := t.TempDir()
+			started := time.Now()
 			builder, err := certificateChainsSetup(cfg, dataDir)
 			require.NoError(t, err)
 			chains, err := builder.Complete()
@@ -73,6 +74,9 @@ func TestCertificateRenewalApply(t *testing.T) {
 			require.Len(t, plan, wantCount)
 			renewed, err := applyCertificateRenewal(cfg, dataDir, tt.renewCAs)
 			require.NoError(t, err)
+			// Planning and issuance sample the clock separately; allow elapsed
+			// setup/generation time plus certificate timestamp rounding.
+			expiryTolerance := time.Since(started) + time.Second
 			require.Len(t, renewed, wantCount)
 			require.Equal(t, beforeFiles, activeCertificateFileDigests(t, dataDir), "preparation must not touch active files")
 			renewedExpiries := make(map[string]time.Time, len(renewed))
@@ -82,7 +86,7 @@ func TestCertificateRenewalApply(t *testing.T) {
 			for _, planned := range plan {
 				path := strings.Join(planned.Path, "/")
 				require.Contains(t, renewedExpiries, path)
-				require.WithinDuration(t, planned.NewNotAfter, renewedExpiries[path], 5*time.Second, path)
+				require.WithinDuration(t, planned.NewNotAfter, renewedExpiries[path], expiryTolerance, path)
 			}
 			pending, err := loadPendingCertificateRenewal(dataDir)
 			require.NoError(t, err)
