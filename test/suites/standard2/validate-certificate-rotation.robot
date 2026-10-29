@@ -68,6 +68,7 @@ Certificate Rotation
     ${future_date}=    Compute Date After Days    ${FUTURE_DAYS}    ${TIMEDATECTL_DATE_FORMAT}
     Change System Date To    ${future_date}
     Certs Should Expire On    ${KUBE_SCHEDULER_CLIENT_CERT}    ${cert_expiry_date}
+    [Teardown]    Restore System Date
 
 
 *** Keywords ***
