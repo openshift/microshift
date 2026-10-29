@@ -65,18 +65,18 @@ else
     echo "INFO: Using provided PULLSPEC_RELEASE_ARM64: ${PULLSPEC_RELEASE_ARM64}"
 fi
 
+# LVMS is not tracked in the OCP release image. Use the latest z-stream
+# for this X.Y version, which needs manual updating between releases.
+lvms_release="registry.redhat.io/lvms4/lvms-operator-bundle:v4.18"
+
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
 ORG=${ORG:-openshift} \
 REPO=${REPO:-microshift} \
 AMD64_RELEASE=${PULLSPEC_RELEASE_AMD64} \
 ARM64_RELEASE=${PULLSPEC_RELEASE_ARM64} \
+LVMS_RELEASE=${lvms_release} \
 ./scripts/auto-rebase/rebase.py
-
-# LVMS is not tracked in the OCP release image. Instead, rely on the
-# latest z-stream for a given X.Y version. Only the X.Y needs manual
-# updating between releases.
-./scripts/auto-rebase/rebase_lvms.sh latest "registry.redhat.io/lvms4/lvms-operator-bundle" "4.18"
 
 if [[ "${JOB_TYPE}" == "presubmit" ]]; then
     # Verify the assets after the rebase to make sure
