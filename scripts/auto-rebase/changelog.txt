@@ -1,22 +1,3 @@
-- cluster-dns-operator embedded-component 82578923164636746e0d74d594ab32d83a660c0b to ae484139f2e7b093cc97784e4382eba84a247bdc
-  - 11122b5 2026-09-24T03:20:31Z OCPBUGS-103832: Use patched x/net fork v0.50.0-sec.4
-
-- cluster-network-operator embedded-component 5a60886d1e93a65bc7359ed1de4d7d2d47007d3d to 8186dacc5fe87d25dd90351375e37aabb13f8b00
-  - 360c63e 2026-09-10T13:06:40+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
-
-- cluster-policy-controller embedded-component 67083fab6cea4dde724efd5be5a22bda1f8437d1 to debe523c1edc20e080a44afc9e8699ce3ab15599
-  - 535270c 2026-08-24T17:22:14+02:00 UPSTREAM: <carry>: OCPBUGS-103864: Bump golang.org/x/net to v0.50.0-sec.3
-  - f016756 2026-08-24T17:22:13+02:00 UPSTREAM: <drop>: OCPBUGS-103864: Bump golang.org/x/net to v0.50.0-sec.3
-
-- ovn-kubernetes image-amd64 67204d98a054b54d04c59527149a1fdcd06345a1 to 8608e797c1b08e75fead3c12b53d4fd5b3b50462
-  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
-  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
-
-- ovn-kubernetes image-arm64 67204d98a054b54d04c59527149a1fdcd06345a1 to 8608e797c1b08e75fead3c12b53d4fd5b3b50462
-  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
-  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
+- machine-config-operator embedded-component 55a94a504b858fd1484d55def8191d327b6a16bf to 82e41b82787613e6a07313b3b99e5d6513627da1
+  - 42da9386 2026-10-23T14:47:21Z Split wait-for-ipsec-connect into two services to avoid ipsec restart
 
