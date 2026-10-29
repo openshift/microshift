@@ -2,6 +2,7 @@
   "type": "object",
   "required": [
     "apiServer",
+    "certificates",
     "clusterToCluster",
     "debugging",
     "dns",
@@ -176,6 +177,29 @@
               ]
             }
           }
+        }
+      }
+    },
+    "certificates": {
+      "description": "Certificates configures issuance and automatic restart for managed certificates.",
+      "type": "object",
+      "properties": {
+        "caValidity": {
+          "description": "CAValidity is the lifetime of newly issued managed CA certificates, expressed\nas a Go duration. It must be greater than ServingValidity; both must be positive.\nExpiration is aligned to the next midnight plus this duration. Intermediate\nCAs cannot outlive their signing chain. Existing certificates are unchanged.",
+          "type": "string",
+          "default": "87600h",
+          "example": "10008h"
+        },
+        "forceRestartOnExpirationImminent": {
+          "description": "ForceRestartOnExpirationImminent restarts MicroShift when a managed certificate\nreaches its critical remaining-validity threshold. When false, only a warning\nis logged. This setting takes effect at service startup; it does not disable\ncertificate regeneration during a later manual start.",
+          "type": "boolean",
+          "default": true
+        },
+        "servingValidity": {
+          "description": "ServingValidity is the lifetime of newly issued managed serving certificates,\nexpressed as a Go duration. Existing certificates are not rewritten by a\nconfiguration change. Expiration is aligned to the next midnight plus this\nduration and capped at the signing CA's expiration.",
+          "type": "string",
+          "default": "8760h",
+          "example": "1008h"
         }
       }
     },

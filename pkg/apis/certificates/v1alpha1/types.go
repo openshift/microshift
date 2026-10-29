@@ -65,7 +65,8 @@ type CertificateStatusList struct {
 	Warnings []string `json:"warnings"`
 }
 
-// CertificateStatusConfig reports the effective certificate policy.
+// CertificateStatusConfig reports the policy from the current configuration
+// files, which may differ from the running service's startup configuration.
 type CertificateStatusConfig struct {
 	ForceRestartOnExpirationImminent bool `json:"forceRestartOnExpirationImminent"`
 

@@ -30,6 +30,10 @@ apiServer:
     tls:
         cipherSuites: []
         minVersion: ""
+certificates:
+    caValidity: ""
+    forceRestartOnExpirationImminent:
+    servingValidity: ""
 clusterToCluster:
     dns:
         cacheNegativeTTL: 0
@@ -196,6 +200,10 @@ apiServer:
     tls:
         cipherSuites: []
         minVersion: VersionTLS12
+certificates:
+    caValidity: 87600h
+    forceRestartOnExpirationImminent: true
+    servingValidity: 8760h
 clusterToCluster:
     dns:
         cacheNegativeTTL: 10
