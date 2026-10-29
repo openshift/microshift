@@ -83,9 +83,10 @@ def run_rebase_sh(release_amd64, release_arm64):
 
 
 def run_rebase_lvms_sh(release):
-    """Run the 'rebase-lvms.sh' script with the given release version and return the script's output."""
+    """Run the LVMS rebase script against the latest z-stream of the given release."""
+    registry, version = release.rsplit(":", 1)
     script_dir = os.path.abspath(os.path.dirname(__file__))
-    args = [f"{script_dir}/rebase-lvms.sh", "to", release]
+    args = [f"{script_dir}/rebase_lvms.sh", "latest", registry, version.lstrip("v")]
     logging.info(f"Running: '{' '.join(args)}'")
     start = timer()
     result = subprocess.run(
@@ -507,7 +508,7 @@ def main():
             output = ("rebase.sh:\n" +
                       f"{rebase_result.output}" +
                       "==================================================\n" +
-                      "rebase-lvms.sh:\n" +
+                      "rebase_lvms.sh:\n" +
                       f"{lvms_rebase_result.output}")
             writer.write(output)
         if git_repo.active_branch.name == base_branch:

@@ -24,7 +24,7 @@ ASSETS_DIR = "assets/"
 STAGING_DIR = "_output/staging/"
 RECIPE_FILEPATHS = [
     "./scripts/auto-rebase/assets.yaml",
-    "./scripts/auto-rebase/lvms_assets.yaml",
+    "./scripts/auto-rebase/assets_lvms.yaml",
 ]
 
 
