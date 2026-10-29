@@ -77,7 +77,11 @@ func prepareCertificateAccess(writing bool) (func(), error) {
 func prepareCertificateTransaction(transaction *certificates.Transaction, lockPath string, writing bool, stopped func() error) (func(), error) {
 	lock, err := certificates.Lock(lockPath, writing)
 	if err != nil {
-		return nil, &certificateCommandError{certificatesv1alpha1.ErrorCodeRenewalFailed, err}
+		code := certificatesv1alpha1.ErrorCodeInternalError
+		if writing {
+			code = certificatesv1alpha1.ErrorCodeRenewalFailed
+		}
+		return nil, &certificateCommandError{code, err}
 	}
 	release := func() { _ = lock.Close() }
 	pending, err := transaction.Pending()
@@ -174,7 +178,7 @@ func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) 
 	if err != nil {
 		return nil, err
 	}
-	plan, err := planCertificateRenewal(builder, renewCAs, time.Now())
+	plan, err := planCertificateRenewal(builder, renewCAs, cfg.Certificates.ForceRestartEnabled(), time.Now())
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +193,9 @@ func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) 
 	// command owns its output contract, so keep those internal diagnostics out
 	// of versioned results (the same convention used by Complete).
 	if err := quietCertificateGeneration(func() error {
-		chains, err := builder.Complete()
+		// Load without issuance: changed SANs or an expired CA must not trigger
+		// temporary certificates before the selected chains are regenerated.
+		chains, err := builder.Load()
 		if err != nil {
 			return err
 		}

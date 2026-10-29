@@ -43,11 +43,13 @@ turn a published renewal into a reported failure.
 
 ## Activation and Recovery
 
-At activation, MicroShift validates the hashes and certificate material. A pending
-generation that has reached its automatic rotation deadline is discarded before
+At activation, MicroShift validates the hashes and certificate material. When
+`forceRestartOnExpirationImminent` is enabled, a pending generation that has
+reached its policy-derived rotation deadline is discarded before
 replacement, allowing normal certificate initialization in the same startup.
 The warning explicitly notes that normal startup may rotate CAs. Healthy pending
 generations are loaded unchanged rather than reissued by normal initialization.
+Warn-only mode skips the deadline check, not validity or integrity validation.
 
 MicroShift then refreshes staged `resources/` from the active
 `/var/lib/microshift/resources/` directory, which may have changed since

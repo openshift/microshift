@@ -123,6 +123,20 @@ Invalid Configuration Is Rejected Before Lock Acquisition
     Should Be Equal    ${before}    ${after}
     [Teardown]    Remove Drop In MicroShift Config    99-cert-renew-test
 
+Busy Certificate Lock Reports Appropriate Errors
+    [Documentation]    Status and dry-run lock failures must not claim that renewal failed.
+    FOR    ${format}    IN    json    yaml
+        Renewal Error Should Be Reported
+        ...    flock -x ${CERTIFICATE_LOCK} microshift certs status -o ${format}
+        ...    ${format}    InternalError
+        Renewal Error Should Be Reported
+        ...    flock -x ${CERTIFICATE_LOCK} microshift certs renew --serving --dry-run -o ${format}
+        ...    ${format}    InternalError
+        Renewal Error Should Be Reported
+        ...    flock -x ${CERTIFICATE_LOCK} microshift certs renew --serving -o ${format}
+        ...    ${format}    RenewalFailed
+    END
+
 Leaf Renewal Keeps CAs Unchanged
     [Documentation]    Prepare leaves online, preserve active TLS and CA bytes, and activate only on restart.
     ${pods_before}=    Certificate Consumer Pod UIDs
@@ -205,6 +219,66 @@ Unrelated Configuration Change Still Activates Renewal
     ...    Remove Drop In MicroShift Config    99-cert-renew-test
     ...    AND    Restart MicroShift
 
+Configured Lifetimes Can Be Prepared While Running
+    [Documentation]    CLI reads new validity settings without a restart; activation still waits for startup.
+    ${before}=    Certificate Status Document
+    ${digest}=    Certificate Material Digest
+    ${pid}=    MicroShift Process ID
+    Drop In Certificate Policy
+    Certificate Policy Changed Without Reissuing    ${before}
+    ${ca_before}=    CA Material Digest
+    ${plan}=    Renewal Document    serving    yaml    --dry-run
+    Validate Renewal Document    ${plan}    serving    ${True}    ${before}
+    ${result}=    Renewal Document    serving    json
+    Validate Renewal Document    ${result}    serving    ${False}    ${before}
+    ${after}=    Certificate Material Digest
+    Should Be Equal    ${digest}    ${after}
+    ${current_pid}=    MicroShift Process ID
+    Should Be Equal    ${pid}    ${current_pid}
+    Restart MicroShift
+    Renewal Matches Current Status    ${result}
+    Renewal Activation Has Finished
+    Configured Certificate Lifetimes Are Applied    ${False}    ${result}
+    ${ca_after}=    CA Material Digest
+    Should Be Equal    ${ca_before}    ${ca_after}
+    [Teardown]    Restore Certificate Policy
+
+Configured CA Renewal Bounds Descendant Lifetimes
+    [Documentation]    All renewed CAs use the configured lifetime and no descendant outlives its parent.
+    Drop In Certificate Policy
+    ${digest}=    Certificate Material Digest
+    ${result}=    Renewal Document    ca    yaml
+    ${after}=    Certificate Material Digest
+    Should Be Equal    ${digest}    ${after}
+    # Changing restart policy must not invalidate the prepared six-week certificates.
+    Drop In Certificate Policy    true
+    Restart MicroShift
+    Renewal Matches Current Status    ${result}
+    Renewal Activation Has Finished
+    Configured Certificate Lifetimes Are Applied    ${True}    ${result}
+    [Teardown]    Restore Certificate Policy
+
+Invalid Certificate Lifetimes Are Rejected
+    [Documentation]    Invalid policy fails status and renewal without mutating active certificates or pending renewal.
+    ${before}=    Certificate Material Digest
+    FOR    ${policy}    IN
+    ...    {servingValidity: 0s}
+    ...    {caValidity: -1h}
+    ...    {servingValidity: 1008h, caValidity: 1008h}
+    ...    {servingValidity: six-weeks}
+        Drop In MicroShift Config    certificates: ${policy}\n    99-cert-renew-policy
+        FOR    ${format}    IN    json    yaml
+            Renewal Error Should Be Reported
+            ...    microshift certs renew --serving -o ${format}    ${format}    InvalidConfiguration
+            Renewal Error Should Be Reported
+            ...    microshift certs status -o ${format}    ${format}    InvalidConfiguration
+        END
+    END
+    ${after}=    Certificate Material Digest
+    Should Be Equal    ${before}    ${after}
+    MicroShift Service Is Active
+    [Teardown]    Remove Drop In MicroShift Config    99-cert-renew-policy
+
 Certificate Configuration Change Discards Pending Renewal
     [Documentation]    Stale renewal must not block startup or skip normal generation for new SANs.
     ${ca_before}=    CA Material Digest
@@ -249,8 +323,71 @@ Corrupt Pending Metadata Does Not Block Startup
     Rejected Renewal Warning Has Cleared
     [Teardown]    Run Keyword If Test Failed    Replace Rejected Renewal
 
+Missing Pending Generation Does Not Block Startup
+    [Documentation]    A pending record pointing to a missing generation is rejected without replacing active CAs.
+    ${ca_before}=    CA Material Digest
+    ${result}=    Renewal Document    ca    json
+    Pending Renewal Matches Result    ${result}
+    ${stage}=    Command Should Work    jq -r '.directory' /var/lib/microshift/.cert-renewal/pending.json
+    Should Match Regexp    ${stage}    ^stage-[0-9]+$
+    Command Should Work
+    ...    mv /var/lib/microshift/.cert-renewal/${stage} /var/lib/microshift/.cert-renewal/${stage}.saved
+    Certificate Renewal Warning Is Reported    Pending certificate renewal metadata is invalid
+    Restart MicroShift
+    Certificate Renewal Warning Is Reported    A pending certificate renewal was rejected
+    ${ca_after}=    CA Material Digest
+    Should Be Equal    ${ca_before}    ${ca_after}
+    [Teardown]    Replace Rejected Renewal
+
 
 *** Keywords ***
+Drop In Certificate Policy
+    [Documentation]    Set six-week serving and two-year CA lifetimes without changing the running service.
+    [Arguments]    ${force_restart}=false
+    Drop In MicroShift Config
+    ...    certificates:\n\ \ servingValidity: 1008h\n\ \ caValidity: 17520h\n\ \ forceRestartOnExpirationImminent: ${force_restart}\n
+    ...    99-cert-renew-policy
+
+Restore Certificate Policy
+    [Documentation]    Restore both config and issued lifetimes so randomized later suites see default certificates.
+    Remove Drop In MicroShift Config    99-cert-renew-policy
+    Renewal Document    ca    json
+    Restart MicroShift
+
+Certificate Policy Changed Without Reissuing
+    [Documentation]    The CLI reads the updated policy but existing certificate validity stays unchanged.
+    [Arguments]    ${before}
+    ${configured}=    Certificate Status Document
+    ${before_dates}=    Evaluate
+    ...    [(i['service'], i['name'], i['notBefore'], i['notAfter']) for i in $before['items']]
+    ${configured_dates}=    Evaluate
+    ...    [(i['service'], i['name'], i['notBefore'], i['notAfter']) for i in $configured['items']]
+    Should Be Equal    ${before_dates}    ${configured_dates}
+    Should Be Equal    ${configured}[config][servingValidity]    1008h
+    Should Be Equal    ${configured}[config][caValidity]    17520h
+    Should Be Equal    ${configured}[config][forceRestartOnExpirationImminent]    ${False}
+
+Configured Certificate Lifetimes Are Applied
+    [Documentation]    Check encoded lifetimes, status and parent expiry after activation, allowing midnight alignment.
+    [Arguments]    ${renewed_cas}    ${result}
+    ${status}=    Certificate Status Document
+    ${ca_expiries}=    Evaluate    {i['name']: i['notAfter'] for i in $status['items'] if i['role'] == 'ca'}
+    FOR    ${item}    IN    @{status}[items]
+        Should Be Equal    ${item}[status]    Healthy
+        IF    $item['role'] == 'serving' or ($renewed_cas and $item['role'] == 'ca')
+            ${hours}=    Evaluate    1008 if $item['role'] == 'serving' else 17520
+            ${lifetime}=    Evaluate
+            ...    (datetime.datetime.fromisoformat($item['notAfter'].replace('Z', '+00:00')) - datetime.datetime.fromisoformat($item['notBefore'].replace('Z', '+00:00'))).total_seconds()
+            ...    modules=datetime
+            Should Be True    $hours * 3600 <= $lifetime <= ($hours + 24) * 3600 + 60
+        END
+    END
+    FOR    ${item}    IN    @{result}[items]
+        IF    $item['parentCA'] is not None
+            Should Be True    $item['newNotAfter'] <= $ca_expiries[$item['parentCA']]
+        END
+    END
+
 Setup
     [Documentation]    Connect and wait only for MicroShift and its PKI.
     Setup Suite
