@@ -1,128 +1,27 @@
-- cluster-csi-snapshot-controller-operator embedded-component e9b3b21fbc322cb410a58b5f147ac76893d851ea to 7aaacd74b124dc3c464d91d9588633fd02000b93
-  - e4e7f0c 2026-10-09T05:30:54Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+- cluster-ingress-operator embedded-component dd88d2da72c454d6bfeb155051464ac7310708a4 to a3092c7b6747019c0173224a7065dd5b859fc9c6
+  - da220e0 2026-10-21T18:54:40Z OCPBUGS-132773: bump OSSM to 3.3.8
 
-- cluster-dns-operator embedded-component dd2e29dd7570f7d9b6198d1ce941b106ae9d1d9e to d49df560be48fb7b0e44fe26c17d950da2d28eb7
-  - 33bf927 2026-09-24T03:23:16Z OCPBUGS-101899: Bump golang.org/x/net to v0.53.0
+- kubernetes-kube-storage-version-migrator embedded-component a67afb9b9fea72316591666c207b3a32e9e07835 to 011ac052b84dc897b1facf9a269180369e29ea77
+  - 293d544 2026-10-19T16:58:06Z UPSTREAM: <carry>: [release-4.22] OCPBUGS-101988: Bump golang.org/x/net to v0.55.0 to address CVE-2026-33814
 
-- cluster-ingress-operator embedded-component e237385c0fed7d9a27cf4c903a149a07ae3efbbb to dd88d2da72c454d6bfeb155051464ac7310708a4
-  - ff86876 2026-10-19T14:52:15Z OCPBUGS-126740: make Istio alias test version-agnostic
-  - 4d9f8e0 2026-10-19T14:52:15Z OCPBUGS-126740: resolve Istio alias for Sail installer
-  - 03894b9 2026-10-19T14:52:14Z OCPBUGS-126740: bump OSSM to 3.3.7
-  - bf95c98 2026-10-09T14:41:28Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+- machine-config-operator embedded-component 66c1760b72951b848bad99e119e7a94b6f4e3f63 to 31bfeb8ca7516218086811511331c3d3c09d2eb8
+  - 8481a9f5 2026-10-23T18:51:15+02:00 Relaxed fatal errors on policy checks
+  - 7a63b729 2026-10-22T19:52:31+02:00 [4.22 cherry-pick] Handle restrictive policies for layered OS updates
 
-- cluster-kube-apiserver-operator embedded-component a18571de7438badd6206ba84f40a17160f524e94 to b99173ad2a12fa8b60c317540a52aa5426f60e63
-  - b048d5c 2026-10-09T15:11:16Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+- operator-framework-olm embedded-component 6b4731534cf5e16d0742865ad2dac81a702f81ed to 89d41cf9a16e0905e5ac562708a53c21f5e657f9
+  - 4a992a72 2026-10-26T19:57:48Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
 
-- cluster-kube-controller-manager-operator embedded-component 83b412f83f54e0b53dbead58fab77a830b136e48 to cab37a8b6d19976051c70aa3b1e5f471297b0589
-  - 27aa10f 2026-10-09T15:44:10Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+- kube-rbac-proxy image-amd64 cd28f2710ec8c800d64e8eca846cb4b426247d27 to e87dbe50ad6bf76fd649b688de49024e3c18a1fc
+  - 9e045c1 2026-10-22T18:24:40+05:30 Address CVE-2026-84304
+  - 0387d1c 2026-10-22T18:24:40+05:30 Address CVE-2026-84304 (vendor changes)
 
-- cluster-network-operator embedded-component 093a47793d1db5de8b257bcff3dfc47605980133 to efa84fc1507c5287eddd65c5a1661da7f28c91cd
-  - 5be0d5c 2026-10-09T21:58:31Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+- ovn-kubernetes image-amd64 1b05d926fc98aec3f9897488bcda59d7d7726789 to 2cb8a7ad8fe8f42c53372ff65a879ccaa2419e7b
+  - 0a523185 2026-10-14T17:26:22+02:00 node: prioritize default network before primary UDN fan-out
 
-- cluster-openshift-controller-manager-operator embedded-component 923f6b0c2e1efd74b98e1f3d6500361fa4e03fbf to 0b26806c4afd016297e9eb612bd9a9746ec0bd8a
-  - d9f0082 2026-10-10T06:21:53Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
+- kube-rbac-proxy image-arm64 cd28f2710ec8c800d64e8eca846cb4b426247d27 to e87dbe50ad6bf76fd649b688de49024e3c18a1fc
+  - 9e045c1 2026-10-22T18:24:40+05:30 Address CVE-2026-84304
+  - 0387d1c 2026-10-22T18:24:40+05:30 Address CVE-2026-84304 (vendor changes)
 
-- cluster-policy-controller embedded-component 8fcea9019f04b65370b3aeb8bd8295b29c718b80 to 22810075f91276a6504358567abf04db071e23fa
-  - d604df7 2026-10-10T17:42:56Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
-
-- csi-external-snapshotter embedded-component c6b83544b30baa8049d6aa37e1e41f25e0ac5c61 to 0f6d62e49e13a1b18c79662b1a7bac751bbd336d
-  - e372714 2026-10-14T01:26:06Z UPSTREAM: <drop>: OCPBUGS-123142: Bump protobuf to v1.36.12 and update vendor
-  - 50e5cdf 2026-10-14T01:26:04Z UPSTREAM: <carry>: OCPBUGS-123142: Bump Go builder to 1.26 for OpenShift 4.22
-
-- etcd embedded-component 6bd01267dc858aca6ff21632f95e98dc62ba33e7 to 001a74e5c87c52b4e1828f18e89ef6b4bfa38958
-  - 2d1e6fc8 2026-10-21T16:57:31+05:30 DOWNSTREAM: <carry>: tests: allow snapshot member publication retry
-  - ef777d6d 2026-10-21T16:56:51+05:30 DOWNSTREAM: <carry>: Increase snapshot test new member wait timeout
-  - c2c08d0b 2026-10-21T15:03:56+05:30 DOWNSTREAM: <carry>: tests: allow retained client reconnect in TestIssue3699
-  - 2366e657 2026-10-16T16:27:00Z UPSTREAM: <drop>: OCPBUGS-123142: bump protobuf to v1.36.12
-  - 9570669d 2026-10-14T18:02:44Z UPSTREAM: <carry>: OCPBUGS-123142: Bump Go to 1.26
-
-- kubernetes embedded-component 9858a610ffeeca53f0ba04e92c634665c67237f5 to 7545c30c3e3ffbe226a8d3fd33b231447318ee61
-  - 54f9895a2 2026-10-19T09:28:05Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - f9a612f3b 2026-09-24T18:47:50Z UPSTREAM: <carry>: add explicit merge commit message to openshift-hack/rebase.sh
-  - 329000efd 2026-09-23T17:07:48Z Release commit for Kubernetes v1.35.9
-  - 9bfa496a5 2026-09-17T14:59:24+02:00 Bump images and versions to go 1.26.8 and distroless iptables
-  - 643b82979 2026-09-16T16:47:47-07:00 Refuse UNC symlink targets in Windows subPath resolution
-  - 5afddf1aa 2026-09-16T16:21:30-07:00 Restore only .spec part from ControllerRevision for any StatefulSet
-  - 87cc0aa5c 2026-09-08T10:43:23+08:00 DRA: avoid integer overflow in per-claim device-limit checks
-  - 627cff5b9 2026-09-02T09:21:57+08:00 fix job pod could not be removed while removing finalizer failed
-  - e05fd863f 2026-08-29T15:58:22+05:30 Add copyright boilerplate to filespec_test.go
-  - 93dac94eb 2026-08-29T15:58:21+05:30 Fix windows backslash escaping
-  - 52cb70ef3 2026-08-27T23:06:56+08:00 Avoid leaking node-specific kubelet config into the ConfigMap
-  - 7c068abba 2026-08-26T17:17:33Z conformance: demote guaranteed pod resize tests to e2e
-  - 6637d2842 2026-08-20T15:28:27Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.8
-  - daf2d79dc 2026-08-10T18:18:18Z Clarify multi-attach events
-  - bd79e93fc 2026-07-28T19:08:13Z Always set UpdatePodResources when a starting container is resized
-  - e4eb9b75b 2026-07-14T13:45:42-06:00 e2e: storage snapshot tests should read custom timeouts from manifest
-  - d5ae2f5da 2026-05-25T10:14:52+08:00 kubeadm: defer runtime config warning to 1.38
-  - 78d7db4a0 2026-05-25T10:13:18+08:00 kubelet: defer CRI fallback removal to 1.38
-
-- machine-config-operator embedded-component 92e253c13422774d42865cbfe9f637ab05bfe3d5 to 66c1760b72951b848bad99e119e7a94b6f4e3f63
-  - 6414cb7b 2026-10-22T09:15:21Z [release-4.22] OCPBUGS-132857: only enable signed policy when testing signed payloads
-  - f8acc404 2026-10-21T05:49:30+02:00 Split wait-for-ipsec-connect into two services to avoid ipsec restart
-  - b0de3edb 2026-10-14T16:25:07Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
-
-- openshift-controller-manager embedded-component 079a76c3f53787b813a00e80e97ecb80d0e4803c to f33af2098ca26cd602b452645e29e3072088e6cc
-  - 866505c 2026-10-14T16:25:09Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
-
-- operator-framework-olm embedded-component 5359e60525288af86885e14d89e3210878f87274 to 6b4731534cf5e16d0742865ad2dac81a702f81ed
-  - 2f48095b 2026-10-18T02:34:59Z UPSTREAM: <drop>: OCPBUGS-123142: bump protobuf to v1.36.12
-  - e72ffc94 2026-10-18T02:34:57Z UPSTREAM: <carry>: OCPBUGS-123142: Bump Go to 1.26
-
-- csi-external-snapshotter image-amd64 c6b83544b30baa8049d6aa37e1e41f25e0ac5c61 to 0f6d62e49e13a1b18c79662b1a7bac751bbd336d
-  - e372714 2026-10-14T01:26:06Z UPSTREAM: <drop>: OCPBUGS-123142: Bump protobuf to v1.36.12 and update vendor
-  - 50e5cdf 2026-10-14T01:26:04Z UPSTREAM: <carry>: OCPBUGS-123142: Bump Go builder to 1.26 for OpenShift 4.22
-
-- router image-amd64 4160f9e04d27dc3a9419b0d2e0f873629b67cf40 to 622d2dfc5256a723cf2ace4b742f4331918e8647
-  - 41b5b8a 2026-10-19T08:22:50Z OCPBUGS-126886: handle comments
-  - 027bcd3 2026-10-16T17:56:21Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
-  - 0d25109 2026-09-18T22:03:20Z OCPBUGS-126886: use add/del haproxy api calls
-
-- kubernetes image-amd64 9858a610ffeeca53f0ba04e92c634665c67237f5 to 7545c30c3e3ffbe226a8d3fd33b231447318ee61
-  - 54f9895a2 2026-10-19T09:28:05Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - f9a612f3b 2026-09-24T18:47:50Z UPSTREAM: <carry>: add explicit merge commit message to openshift-hack/rebase.sh
-  - 329000efd 2026-09-23T17:07:48Z Release commit for Kubernetes v1.35.9
-  - 9bfa496a5 2026-09-17T14:59:24+02:00 Bump images and versions to go 1.26.8 and distroless iptables
-  - 643b82979 2026-09-16T16:47:47-07:00 Refuse UNC symlink targets in Windows subPath resolution
-  - 5afddf1aa 2026-09-16T16:21:30-07:00 Restore only .spec part from ControllerRevision for any StatefulSet
-  - 87cc0aa5c 2026-09-08T10:43:23+08:00 DRA: avoid integer overflow in per-claim device-limit checks
-  - 627cff5b9 2026-09-02T09:21:57+08:00 fix job pod could not be removed while removing finalizer failed
-  - e05fd863f 2026-08-29T15:58:22+05:30 Add copyright boilerplate to filespec_test.go
-  - 93dac94eb 2026-08-29T15:58:21+05:30 Fix windows backslash escaping
-  - 52cb70ef3 2026-08-27T23:06:56+08:00 Avoid leaking node-specific kubelet config into the ConfigMap
-  - 7c068abba 2026-08-26T17:17:33Z conformance: demote guaranteed pod resize tests to e2e
-  - 6637d2842 2026-08-20T15:28:27Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.8
-  - daf2d79dc 2026-08-10T18:18:18Z Clarify multi-attach events
-  - bd79e93fc 2026-07-28T19:08:13Z Always set UpdatePodResources when a starting container is resized
-  - e4eb9b75b 2026-07-14T13:45:42-06:00 e2e: storage snapshot tests should read custom timeouts from manifest
-  - d5ae2f5da 2026-05-25T10:14:52+08:00 kubeadm: defer runtime config warning to 1.38
-  - 78d7db4a0 2026-05-25T10:13:18+08:00 kubelet: defer CRI fallback removal to 1.38
-
-- csi-external-snapshotter image-arm64 c6b83544b30baa8049d6aa37e1e41f25e0ac5c61 to 0f6d62e49e13a1b18c79662b1a7bac751bbd336d
-  - e372714 2026-10-14T01:26:06Z UPSTREAM: <drop>: OCPBUGS-123142: Bump protobuf to v1.36.12 and update vendor
-  - 50e5cdf 2026-10-14T01:26:04Z UPSTREAM: <carry>: OCPBUGS-123142: Bump Go builder to 1.26 for OpenShift 4.22
-
-- router image-arm64 4160f9e04d27dc3a9419b0d2e0f873629b67cf40 to 622d2dfc5256a723cf2ace4b742f4331918e8647
-  - 41b5b8a 2026-10-19T08:22:50Z OCPBUGS-126886: handle comments
-  - 027bcd3 2026-10-16T17:56:21Z OCPBUGS-123142: Bump Go to 1.26 and protobuf to v1.36.12
-  - 0d25109 2026-09-18T22:03:20Z OCPBUGS-126886: use add/del haproxy api calls
-
-- kubernetes image-arm64 9858a610ffeeca53f0ba04e92c634665c67237f5 to 7545c30c3e3ffbe226a8d3fd33b231447318ee61
-  - 54f9895a2 2026-10-19T09:28:05Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
-  - f9a612f3b 2026-09-24T18:47:50Z UPSTREAM: <carry>: add explicit merge commit message to openshift-hack/rebase.sh
-  - 329000efd 2026-09-23T17:07:48Z Release commit for Kubernetes v1.35.9
-  - 9bfa496a5 2026-09-17T14:59:24+02:00 Bump images and versions to go 1.26.8 and distroless iptables
-  - 643b82979 2026-09-16T16:47:47-07:00 Refuse UNC symlink targets in Windows subPath resolution
-  - 5afddf1aa 2026-09-16T16:21:30-07:00 Restore only .spec part from ControllerRevision for any StatefulSet
-  - 87cc0aa5c 2026-09-08T10:43:23+08:00 DRA: avoid integer overflow in per-claim device-limit checks
-  - 627cff5b9 2026-09-02T09:21:57+08:00 fix job pod could not be removed while removing finalizer failed
-  - e05fd863f 2026-08-29T15:58:22+05:30 Add copyright boilerplate to filespec_test.go
-  - 93dac94eb 2026-08-29T15:58:21+05:30 Fix windows backslash escaping
-  - 52cb70ef3 2026-08-27T23:06:56+08:00 Avoid leaking node-specific kubelet config into the ConfigMap
-  - 7c068abba 2026-08-26T17:17:33Z conformance: demote guaranteed pod resize tests to e2e
-  - 6637d2842 2026-08-20T15:28:27Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.8
-  - daf2d79dc 2026-08-10T18:18:18Z Clarify multi-attach events
-  - bd79e93fc 2026-07-28T19:08:13Z Always set UpdatePodResources when a starting container is resized
-  - e4eb9b75b 2026-07-14T13:45:42-06:00 e2e: storage snapshot tests should read custom timeouts from manifest
-  - d5ae2f5da 2026-05-25T10:14:52+08:00 kubeadm: defer runtime config warning to 1.38
-  - 78d7db4a0 2026-05-25T10:13:18+08:00 kubelet: defer CRI fallback removal to 1.38
+- ovn-kubernetes image-arm64 1b05d926fc98aec3f9897488bcda59d7d7726789 to 2cb8a7ad8fe8f42c53372ff65a879ccaa2419e7b
+  - 0a523185 2026-10-14T17:26:22+02:00 node: prioritize default network before primary UDN fan-out
 
