@@ -442,7 +442,7 @@ def main():
         g.checkout_branch(new_branch_name)
         g.add_files_to_staging_area(["test/bin/common_versions.sh"])
         g.commit("Update common_versions.sh")
-        g.push(new_branch_name)
+        g.push(new_branch_name, base_branch, gh)
 
         pull_req = gh.get_existing_pr_for_a_branch(base_branch, new_branch_name)
         if pull_req is None:
