@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component 4e6a119c0ceeb1ec3ab3bb1208da99ad0233d937 to e37b109010d1c5664b8f651733b35b538eb9cf01
+  - 94f7e1ba 2026-10-23T11:36:05-04:00 operator: add machineconfignode, pinnedimageset, machineosconfig, machineosbuild, and osimagestream resources to relatedObjects
+
