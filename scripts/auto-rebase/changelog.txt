@@ -1,18 +1,10 @@
-- cluster-kube-apiserver-operator embedded-component d9337a500419d77ac4ffae75a894ae6e5910509b to db80a3e83b79045aabd78589d37e17e3548f6a37
-  - d47a6a0 2026-09-30T18:47:35-05:00 UPSTREAM: <drop>: vendor
-  - 60e2118 2026-09-30T18:47:35-05:00 UPSTREAM: <carry>: [release-4.19] OCPBUGS-103624: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.43.0-sec.4 to address CVE-2026-33814
+- cluster-dns-operator embedded-component 659813065170f4e52f80b7a29bbab64bfa9aa172 to fcc716b3e237afe967c6e01a01a0aa2cc3f9d069
+  - 42029b8 2026-09-24T03:19:27+00:00 OCPBUGS-103625: Use patched x/net fork v0.43.0-sec.4
 
-- coredns image-amd64 4f64931403bf747b78bccb40ad877b08da534e23 to b3ea702f351e71c2aedf5d8ff2a8debe7f1c4e5e
-  - c551adc 2026-08-26T13:45:27+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+- cluster-kube-scheduler-operator embedded-component bf8cd78f223b3d27ea4fb170d22edea14df26df3 to ad104c60a68e8a7cee5ba918f8be5ac6895cc51a
+  - e37d5b8 2026-09-08T14:42:34+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
 
-- ovn-kubernetes image-amd64 ae900a5b4555e6bde78a3644eb8ad422737b6fbb to fc3d50bb4017598f8ac5a07e911c1ef9847d7fb5
-  - ca18296f 2026-09-29T09:38:55+00:00 egressip: fix duplicate IP assignment on control-plane restart
-  - d562aa70 2026-07-21T11:05:14-07:00 add ability to skip tests that require root
-
-- coredns image-arm64 4f64931403bf747b78bccb40ad877b08da534e23 to b3ea702f351e71c2aedf5d8ff2a8debe7f1c4e5e
-  - c551adc 2026-08-26T13:45:27+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
-
-- ovn-kubernetes image-arm64 ae900a5b4555e6bde78a3644eb8ad422737b6fbb to fc3d50bb4017598f8ac5a07e911c1ef9847d7fb5
-  - ca18296f 2026-09-29T09:38:55+00:00 egressip: fix duplicate IP assignment on control-plane restart
-  - d562aa70 2026-07-21T11:05:14-07:00 add ability to skip tests that require root
+- cluster-policy-controller embedded-component d1ea75b45228a6af17f3a1899ab4bd214e28f54b to d742072842859f9db567e8a69a0ba04a32c1458e
+  - 2bec838 2026-08-24T17:22:24+02:00 UPSTREAM: <carry>: OCPBUGS-103639: Bump golang.org/x/net to v0.43.0-sec.3
+  - 0d49b6a 2026-08-24T17:22:24+02:00 UPSTREAM: <drop>: OCPBUGS-103639: Bump golang.org/x/net to v0.43.0-sec.3
 
