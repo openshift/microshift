@@ -1,14 +1,14 @@
 {
   "release": {
-    "base": "1.20.0"
+    "base": "1.20.1"
   },
   "images": {
-    "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:4772792109e65d30e0a1838f1d4db6708bf34664440e62fa9f4ffc834b235802",
-    "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:a0805907ffdb84f69313cc5d9673ba080737ed9150e9fdff6bcba1c8a34ca2f1",
-    "cert-manager-trust-manager": "registry.redhat.io/cert-manager/cert-manager-trust-manager-rhel9@sha256:3f10c707305e25f91dc495b5c547a0bf8cdaeffe7ecce22acdd380a4fd5e2529",
-    "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:c7eb92be1e699143736b0b78f79b4e49ef2621c08f7df13519a65ad79aaa641e",
-    "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:7392848d7fbd47b77d03869e60fcd86f849bb342f89d5426dbddb31af5a53b70",
-    "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:7392848d7fbd47b77d03869e60fcd86f849bb342f89d5426dbddb31af5a53b70",
-    "cert-manager-controller": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:7392848d7fbd47b77d03869e60fcd86f849bb342f89d5426dbddb31af5a53b70"
+    "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:4b2dee04264ac684f0d1ad3de948eed070f58031471c3bf26d296fdbfd024fd4",
+    "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:b7288e241a54b176c6d247a05c7a0090a4cb3e00e75d1f6f737fb61f2f6bc78a",
+    "cert-manager-trust-manager": "registry.redhat.io/cert-manager/cert-manager-trust-manager-rhel9@sha256:fe8ab3b44c313f20004b145ea7d5584996eb852338bac14a3e5b9cc64480851e",
+    "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:ee61f7e3e43fa1d3261f011b2b219879fb1678ac05f94fb61a737b8186bd4251",
+    "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:88b53c2a27f6538e3a4077653ec604285ff3b119b7b204049d0d46781e884140",
+    "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:88b53c2a27f6538e3a4077653ec604285ff3b119b7b204049d0d46781e884140",
+    "cert-manager-controller": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:88b53c2a27f6538e3a4077653ec604285ff3b119b7b204049d0d46781e884140"
   }
 }
