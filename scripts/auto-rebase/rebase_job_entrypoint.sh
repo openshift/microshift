@@ -75,6 +75,11 @@ fi
 # https://catalog.redhat.com/software/containers/rhoai/odh-operator-bundle/659803ca929f3c931af06f28
 rhoai_release="registry.redhat.io/rhoai/odh-operator-bundle:v2.25"
 opm_release="registry.redhat.io/redhat/redhat-operator-index:v4.20"
+
+# LVMS is not tracked in the OCP release image. Use the latest z-stream
+# for this X.Y version, which needs manual updating between releases.
+lvms_release="registry.redhat.io/lvms4/lvms-operator-bundle:v4.20"
+
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
 ORG=${ORG:-openshift} \
@@ -82,13 +87,9 @@ REPO=${REPO:-microshift} \
 AMD64_RELEASE=${PULLSPEC_RELEASE_AMD64} \
 ARM64_RELEASE=${PULLSPEC_RELEASE_ARM64} \
 RHOAI_RELEASE=${rhoai_release} \
+LVMS_RELEASE=${lvms_release} \
 OPM_RELEASE=${opm_release} \
 ./scripts/auto-rebase/rebase.py
-
-# LVMS is not tracked in the OCP release image. Instead, rely on the
-# latest z-stream for a given X.Y version. Only the X.Y needs manual
-# updating between releases.
-./scripts/auto-rebase/rebase_lvms.sh latest "registry.redhat.io/lvms4/lvms-operator-bundle" "4.20"
 
 
 if [[ "${JOB_TYPE}" == "presubmit" ]]; then
