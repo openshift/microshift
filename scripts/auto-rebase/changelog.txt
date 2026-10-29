@@ -1,11 +1,3 @@
-- cluster-dns-operator embedded-component 41a53fed36e6e99c7c9ceb3a699c3547ee5d9bb9 to 0792200a88659a9db0394932e711bd3c1005204a
-  - 00148e9 2026-09-24T03:21:43Z OCPBUGS-104067: Use patched x/net fork v0.50.0-sec.4
-
-- cluster-policy-controller embedded-component e510507e20f6eb09694c880ecd79fa512a2b3470 to 518afaed0d2d33607059f1f7cfdb6961cb7d76a6
-  - 7c72fa5 2026-08-24T17:22:04+02:00 UPSTREAM: <carry>: OCPBUGS-104061: Bump golang.org/x/net to v0.50.0-sec.3
-  - e80f830 2026-08-24T17:22:04+02:00 UPSTREAM: <drop>: OCPBUGS-104061: Bump golang.org/x/net to v0.50.0-sec.3
-
-- machine-config-operator embedded-component 2ae316fed5fbfee4cf00f4a96f24e43afe6e7b0e to f6b0da26be75da9f903e2ec2815c0b4cb9a06653
-  - d7b4c106 2026-10-22T08:11:16Z Split wait-for-ipsec-connect into two services to avoid ipsec restart
-  - 81ee04db 2026-09-22T12:55:22Z mcs: replace wildcard permissions with explicit verbs
+- ovn-kubernetes image-arm64 ade3050b01d89ebdbfdfc132f5a3c24b04c27079 to 79abeace17e9628f8fbe9bdccfc3fe504225f9b4
+  - 0a523185 2026-10-14T17:26:22+02:00 node: prioritize default network before primary UDN fan-out
 
