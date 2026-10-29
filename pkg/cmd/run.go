@@ -141,6 +141,21 @@ func prerunDataManagement() error {
 	return prerun.DataManagement(dataManager)
 }
 
+func watchCertificateRotation(ctx context.Context, stop context.CancelFunc, rotationDate time.Time, forceRestart bool) {
+	deadline, cancel := context.WithDeadline(ctx, rotationDate)
+	defer cancel()
+	<-deadline.Done()
+	if ctx.Err() != nil {
+		return
+	}
+	if forceRestart {
+		klog.Info("Stopping services for certificate rotation")
+		stop()
+		return
+	}
+	klog.Warning("Certificates have reached ExpirationImminent; automatic certificate restart is disabled. Use microshift certs status to inspect active certificates, prepare renewal, and restart MicroShift before they expire")
+}
+
 //nolint:cyclop
 func RunMicroshift(cfg *config.Config) error {
 	// fail early if we don't have enough privileges
@@ -288,23 +303,7 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("failed to determine when to rotate certificates: %v", err)
 	}
 
-	// Establish a deadline for restarting to rotate the certificates.
-	certCtx, certCancel := context.WithDeadline(context.Background(), rotationDate)
-
-	// Watch for the certificate deadline context to be done, log a
-	// message, and cancel the run context to propagate the shutdown.
-	go func() {
-		select {
-		case <-certCtx.Done():
-			klog.Info("Stopping services for certificate rotation")
-			runCancel()
-			return
-		case <-runCtx.Done():
-			klog.Info("Certificate watcher exiting")
-			certCancel()
-			return
-		}
-	}()
+	go watchCertificateRotation(runCtx, runCancel, rotationDate, cfg.Certificates.ForceRestartEnabled())
 
 	// Start everything up
 	ready, stopped := make(chan struct{}), make(chan struct{})

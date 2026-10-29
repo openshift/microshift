@@ -86,7 +86,7 @@ func (o *certRenewOptions) run() error {
 		err = writeCertificateObject(o.Out, result, o.output)
 	} else {
 		var out bytes.Buffer
-		err = writeCertificateRenewalTable(&out, result, renewed)
+		err = writeCertificateRenewalTable(&out, result, renewed, cfg)
 		if err == nil {
 			for _, warning := range result.Warnings {
 				if _, err = fmt.Fprintf(o.ErrOut, "WARNING: %s\n", warning); err != nil {
@@ -102,24 +102,31 @@ func (o *certRenewOptions) run() error {
 	return nil
 }
 
-func planCertificateRenewal(builder certchains.CertificateChainsBuilder, renewCAs bool, now time.Time) ([]certchains.CertificateRenewalPlanEntry, error) {
+func planCertificateRenewal(builder certchains.CertificateChainsBuilder, renewCAs, forceRestart bool, now time.Time) ([]certchains.CertificateRenewalPlanEntry, error) {
 	plan, err := builder.PlanRenewal(renewCAs, now)
-	if err != nil || renewCAs {
-		return plan, err
-	}
-	inventory, err := builder.LoadInventory()
 	if err != nil {
-		return nil, &certchains.InventoryReadError{Err: err}
+		return nil, err
 	}
-	if err := checkCertificateRotationDeadline(inventory.ByRole(certchains.CertificateRoleCA), now); err != nil {
-		return nil, fmt.Errorf("%w; use --ca to renew the CA chain", err)
+	if !renewCAs && forceRestart {
+		// Retained CAs must not immediately trigger an automatic restart.
+		inventory, err := builder.LoadInventory()
+		if err != nil {
+			return nil, &certchains.InventoryReadError{Err: err}
+		}
+		if err := checkCertificateRotationDeadline(inventory.ByRole(certchains.CertificateRoleCA), now); err != nil {
+			return nil, fmt.Errorf("%w; use --ca to renew the CA chain", err)
+		}
 	}
 	return plan, nil
 }
 
 func checkCertificateRotationDeadline(inventory certchains.CertificateInventory, now time.Time) error {
 	for _, entry := range inventory {
-		if !now.Before(entry.RotationDeadline()) {
+		deadline, err := entry.RotationDeadline()
+		if err != nil {
+			return err
+		}
+		if !now.Before(deadline) {
 			return fmt.Errorf("certificate %q has reached its automatic rotation deadline", entry.Name)
 		}
 	}
@@ -197,13 +204,13 @@ func newCertificateRenewalResult(plan []certchains.CertificateRenewalPlanEntry, 
 	return result, nil
 }
 
-func writeCertificateRenewalTable(out io.Writer, result *certificatesv1alpha1.CertificateRenewalResult, renewed certchains.CertificateInventory) error {
+func writeCertificateRenewalTable(out io.Writer, result *certificatesv1alpha1.CertificateRenewalResult, renewed certchains.CertificateInventory, cfg *config.Config) error {
 	if result.DryRun {
 		if err := writeCertificateRenewalPlan(out, result); err != nil {
 			return err
 		}
 	} else {
-		if err := writePendingCertificateRenewal(out, result, renewed); err != nil {
+		if err := writePendingCertificateRenewal(out, result, renewed, cfg); err != nil {
 			return err
 		}
 	}
@@ -218,11 +225,11 @@ func writeCertificateRenewalTable(out io.Writer, result *certificatesv1alpha1.Ce
 	return nil
 }
 
-func writePendingCertificateRenewal(out io.Writer, result *certificatesv1alpha1.CertificateRenewalResult, renewed certchains.CertificateInventory) error {
+func writePendingCertificateRenewal(out io.Writer, result *certificatesv1alpha1.CertificateRenewalResult, renewed certchains.CertificateInventory, cfg *config.Config) error {
 	if _, err := fmt.Fprintf(out, "Prepared %d renewed certificates for activation at the next MicroShift start. Pending certificates:\n", len(result.Items)); err != nil {
 		return err
 	}
-	status, err := newCertificateStatusList(renewed, nil, result.GeneratedAt.Time)
+	status, err := newCertificateStatusList(renewed, cfg, result.GeneratedAt.Time)
 	if err != nil {
 		return err
 	}

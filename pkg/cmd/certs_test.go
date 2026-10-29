@@ -13,7 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/yaml"
 
 	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
@@ -29,7 +31,7 @@ func TestNewCertificateStatusList(t *testing.T) {
 		certificateInventoryEntry("service-a", "cert-a", certchains.CertificateRoleClient, certchains.RotationPolicyStandard, now.Add(-500*time.Hour), now.Add(500*time.Hour)),
 	}
 
-	status, err := newCertificateStatusList(inventory, nil, now)
+	status, err := newCertificateStatusList(inventory, &config.Config{}, now)
 	require.NoError(t, err)
 	require.Equal(t, certificatesv1alpha1.APIVersion, status.APIVersion)
 	require.Equal(t, "CertificateStatusList", status.Kind)
@@ -44,13 +46,31 @@ func TestNewCertificateStatusList(t *testing.T) {
 	require.Equal(t, certificatesv1alpha1.CertificateStatusExpiresSoon, status.Items[0].Status)
 	require.Equal(t, int64((500*time.Hour)/time.Second), status.Items[0].RemainingSeconds)
 	require.Equal(t, "cert-b", inventory[0].Name, "building status must not reorder the inventory")
+
+	// Report new configuration without reclassifying existing certificates.
+	cfg := &config.Config{Certificates: config.Certificates{
+		ServingValidity:                  &metav1.Duration{Duration: 90 * time.Minute},
+		CAValidity:                       &metav1.Duration{Duration: 17520 * time.Hour},
+		ForceRestartOnExpirationImminent: ptr.To(false),
+	}}
+	configured, err := newCertificateStatusList(inventory, cfg, now)
+	require.NoError(t, err)
+	require.Equal(t, certificatesv1alpha1.CertificateStatusConfig{
+		ForceRestartOnExpirationImminent: false,
+		ServingValidity:                  "1h30m0s",
+		CAValidity:                       "17520h",
+	}, configured.Config)
+	require.Equal(t, status.Items, configured.Items, "classify the encoded lifetime, not new configuration")
+	var output bytes.Buffer
+	require.NoError(t, writeCertificateStatusTable(&output, configured))
+	require.Contains(t, output.String(), "Force restart on expiration imminent: false")
 }
 
 func TestCertStatusOutput(t *testing.T) {
 	now := time.Date(2026, time.September, 8, 10, 30, 0, 0, time.UTC)
 	status, err := newCertificateStatusList(certchains.CertificateInventory{
 		certificateInventoryEntry("etcd", "etcd-serving", certchains.CertificateRolePeer, certchains.RotationPolicyExtended, now.Add(-900*time.Hour), now.Add(100*time.Hour)),
-	}, []string{"configuration warning"}, now)
+	}, &config.Config{Warnings: []string{"configuration warning"}}, now)
 	require.NoError(t, err)
 
 	var jsonOutput bytes.Buffer
@@ -172,7 +192,9 @@ func TestCertStatusStates(t *testing.T) {
 				require.Empty(t, stderr.String())
 				if format == "" {
 					rows := strings.Split(strings.TrimSpace(stdout.String()), "\n")
-					require.Len(t, rows, 2)
+					require.Len(t, rows, 4)
+					require.Empty(t, rows[2])
+					require.Equal(t, "Force restart on expiration imminent: true (applied at service start)", rows[3])
 					require.Equal(t, []string{"SERVICE", "CERTIFICATE", "STATUS", "EXPIRY", "MESSAGE"}, strings.Fields(rows[0]))
 					fields := strings.Fields(rows[1])
 					require.GreaterOrEqual(t, len(fields), 5)
@@ -259,7 +281,7 @@ func TestCertificateStatusThresholdMessages(t *testing.T) {
 			status, err := newCertificateStatusList(certchains.CertificateInventory{
 				certificateInventoryEntry("test", "test-certificate", certchains.CertificateRoleServing, tt.policy,
 					now.Add(tt.remaining-tt.validity), now.Add(tt.remaining)),
-			}, nil, now)
+			}, &config.Config{}, now)
 			require.NoError(t, err)
 			message, err := humanCertificateStatus(status.Items[0], now)
 			require.NoError(t, err)
@@ -280,7 +302,7 @@ func TestCertificateStatusThresholdMessages(t *testing.T) {
 
 func TestCertStatusOutputWriteFailure(t *testing.T) {
 	wantErr := errors.New("output unavailable")
-	status, err := newCertificateStatusList(nil, nil, time.Now())
+	status, err := newCertificateStatusList(nil, &config.Config{}, time.Now())
 	require.NoError(t, err)
 	require.ErrorIs(t, writeCertificateObject(failingCertificateWriter{wantErr}, &status, certificateOutputJSON), wantErr)
 	require.ErrorIs(t, writeCertificateObject(failingCertificateWriter{wantErr}, &status, certificateOutputYAML), wantErr)

@@ -24,7 +24,7 @@ type pendingGeneration struct {
 func (t *Transaction) readyPath() string { return filepath.Join(t.directory(), "pending.json") }
 
 // LoadPending selects the published generation without activating it. A missing
-// generation returns nil. Callers must hold the certificate operation lock.
+// pending record returns nil. Callers must hold the certificate operation lock.
 func (t *Transaction) LoadPending() ([]byte, error) {
 	if err := t.validatePaths(); err != nil {
 		return nil, err
@@ -52,6 +52,9 @@ func (t *Transaction) LoadPending() ([]byte, error) {
 	}
 	t.stage = filepath.Join(t.directory(), pending.Directory)
 	if err := regularTree(t.Stage()); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, ErrInvalidPendingMetadata
+		}
 		return nil, err
 	}
 	return pending.Metadata, nil
