@@ -1,8 +1,8 @@
-https://github.com/openshift/api embedded-component 9af1f7b4730c7e2d452d3833b016cc639373d8d5
+https://github.com/openshift/api embedded-component 1f109e9eefc7de7b098e08f64209db1cc60d577e
 https://github.com/openshift/cluster-csi-snapshot-controller-operator embedded-component 41e9a6ccf361de2b37c0e91c2e03fb7fec31a634
 https://github.com/openshift/cluster-dns-operator embedded-component 9d18bdd71092bd9eaad426c6ec42b719c3a992e9
 https://github.com/openshift/cluster-ingress-operator embedded-component 97da5fb8c7de84bfa6d38c4ce7a1709c45113959
-https://github.com/openshift/cluster-kube-apiserver-operator embedded-component 8619d44406fe87cbb21d188b0cf82bbb01709db0
+https://github.com/openshift/cluster-kube-apiserver-operator embedded-component acb844b0be5fa6c0f92b7455ef6354fc120b85de
 https://github.com/openshift/cluster-kube-controller-manager-operator embedded-component 8935774b925a368067e112b15554534a85b87718
 https://github.com/openshift/cluster-kube-scheduler-operator embedded-component ab8cbfbb1e5532cec39d08c6e84b8f8c0ea856ef
 https://github.com/openshift/cluster-network-operator embedded-component a1b26444418f0f14c7d35a1242c2bbd705932bdb
@@ -12,7 +12,7 @@ https://github.com/openshift/csi-external-snapshotter embedded-component a570de6
 https://github.com/openshift/etcd embedded-component 73444cb5a323cd994151234e2eed701f8647b0ea
 https://github.com/openshift/kubernetes embedded-component 8e30e543958ab5d408a337a5957663e5fd9aea12
 https://github.com/openshift/kubernetes-kube-storage-version-migrator embedded-component c67b43a2519e63f02e4be27ae6c8d4edcbc75950
-https://github.com/openshift/machine-config-operator embedded-component 734b76c3b4457ce89f2ad3995f39a2e45944e98b
+https://github.com/openshift/machine-config-operator embedded-component 86be7a7d621e003e02a6a82e26cc2d5bb34f7a1c
 https://github.com/openshift/openshift-controller-manager embedded-component 72964318318f2a65e66b766a288b2241e6a6c51e
 https://github.com/openshift/operator-framework-olm embedded-component 7cb8a9ba91cbb7d534ae2f42354f2315cd41ab66
 https://github.com/openshift/route-controller-manager embedded-component a158fff7ce3826058bd2d7338b206cdd600d0d40
