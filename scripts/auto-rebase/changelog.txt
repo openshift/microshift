@@ -1,3 +1,6 @@
-- machine-config-operator embedded-component 4e6a119c0ceeb1ec3ab3bb1208da99ad0233d937 to e37b109010d1c5664b8f651733b35b538eb9cf01
-  - 94f7e1ba 2026-10-23T11:36:05-04:00 operator: add machineconfignode, pinnedimageset, machineosconfig, machineosbuild, and osimagestream resources to relatedObjects
+- coredns image-amd64 bbbbf9a28f179e92c9481a2923c989ddeb84999b to 5929cdc03ef425d1db05552589cac0fd4adbd96a
+  - ad15ba8 2026-10-27T17:42:13Z UPSTREAM: 530b0a5ff: validate DNS requests before unpacking
+
+- coredns image-arm64 bbbbf9a28f179e92c9481a2923c989ddeb84999b to 5929cdc03ef425d1db05552589cac0fd4adbd96a
+  - ad15ba8 2026-10-27T17:42:13Z UPSTREAM: 530b0a5ff: validate DNS requests before unpacking
 
