@@ -1,0 +1,23 @@
+---
+# microshift-network default vars
+
+# Pod and service networks; empty keeps the MicroShift defaults. Changing them
+# after the first start needs microshift-cleanup-data.
+microshift_cluster_network: []
+microshift_service_network: []
+
+# Pod MTU for ovn.yaml; empty uses the default-route interface MTU; a change needs a reboot
+microshift_pod_mtu: ""
+
+# Inventory group of the hosts connected with C2CC
+c2cc_group: c2cc
+# Interface and IPv4 address/prefix of this host on the C2CC link
+c2cc_interface: ""
+c2cc_address: ""
+# MTU of the C2CC link interface; empty keeps the interface default
+c2cc_mtu: ""
+# DNS suffix the other members use for this cluster's Services
+c2cc_domain: "{{ inventory_hostname }}.remote"
+
+# Replace existing files this role did not write instead of failing
+microshift_network_adopt_files: false

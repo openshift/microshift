@@ -1,0 +1,201 @@
+---
+# microshift-network validation from inventory variables only, so peers outside
+# --limit are checked too. Sets microshift_network and c2cc_remote_cidrs; hosts
+# without the role's variables skip the checks (which need ansible.utils).
+
+- name: Require pod and service networks in inventory
+  ansible.builtin.assert:
+    that:
+      - microshift_cluster_network == (hostvars[inventory_hostname].microshift_cluster_network | default([]))
+      - microshift_service_network == (hostvars[inventory_hostname].microshift_service_network | default([]))
+    fail_msg: >-
+      Set microshift_cluster_network and microshift_service_network per host in the
+      inventory (host_vars or group_vars), so every C2CC peer sees the same values.
+    quiet: true
+
+- name: Start from the MicroShift defaults
+  ansible.builtin.set_fact:
+    _mn_members: "{{ groups[c2cc_group] | default([]) }}"
+    _mn_in_use: >-
+      {{ microshift_cluster_network | length > 0 or microshift_service_network | length > 0
+         or inventory_hostname in (groups[c2cc_group] | default([]))
+         or microshift_pod_mtu | string | length > 0 }}
+    microshift_network:
+      cluster_network: "{{ microshift_network_default_cluster_network }}"
+      service_network: "{{ microshift_network_default_service_network }}"
+      custom_networks: false
+      c2cc: false
+      interface: ""
+      address: ""
+      mtu: ""
+      remote_clusters: []
+    c2cc_remote_cidrs: []
+
+- name: Build and check the network settings
+  when: _mn_in_use | bool
+  block:
+    - name: Reset the network model
+      ansible.builtin.set_fact:
+        _mn_hosts: {}
+        _mn_cidrs: []
+        _mn_links: []
+        _mn_remote_clusters: []
+        _mn_peers: "{{ _mn_members | difference([inventory_hostname]) if inventory_hostname in _mn_members else [] }}"
+
+    - name: Collect the network settings of this host and its C2CC peers
+      ansible.builtin.set_fact:
+        _mn_hosts: >-
+          {{ _mn_hosts | combine({item: {
+               'cluster_network': hostvars[item].microshift_cluster_network
+                 | default(microshift_network_default_cluster_network, true),
+               'service_network': hostvars[item].microshift_service_network
+                 | default(microshift_network_default_service_network, true),
+               'interface': hostvars[item].c2cc_interface | default('', true),
+               'address': hostvars[item].c2cc_address | default('', true),
+               'domain': hostvars[item].c2cc_domain | default(item ~ '.remote', true)}}) }}
+      loop: "{{ [inventory_hostname] + _mn_peers }}"
+
+    - name: Check the pod and service networks
+      ansible.builtin.assert:
+        that:
+          - item.value.cluster_network is sequence and item.value.cluster_network is not string
+          - item.value.service_network is sequence and item.value.service_network is not string
+          - item.value.cluster_network | length == 1
+          - item.value.service_network | length == 1
+          - (item.value.cluster_network[0] | ansible.utils.ipv4('net')) == item.value.cluster_network[0]
+          - (item.value.service_network[0] | ansible.utils.ipv4('net')) == item.value.service_network[0]
+        fail_msg: >-
+          {{ item.key }}: microshift_cluster_network and microshift_service_network must each be
+          a list with one IPv4 network (CIDR with the host bits zero); dual stack is not supported
+          here.
+        quiet: true
+      loop: "{{ _mn_hosts | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Check the C2CC group
+      ansible.builtin.assert:
+        that:
+          - _mn_members | length >= 2
+        fail_msg: "The {{ c2cc_group }} group needs at least two hosts to connect."
+        quiet: true
+      when: inventory_hostname in _mn_members
+
+    - name: Check the C2CC link settings
+      ansible.builtin.assert:
+        that:
+          - item.value.interface | length > 0
+          - (item.value.address | ansible.utils.ipv4('host/prefix')) == item.value.address
+          - item.value.domain is match('^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$')
+          - item.value.domain | length <= 253
+          - item.value.domain != 'cluster.local'
+        fail_msg: >-
+          {{ item.key }}: c2cc_interface must be set, c2cc_address must be an IPv4 address with
+          prefix (e.g. 192.168.1.10/24) and c2cc_domain a DNS subdomain other than
+          cluster.local.
+        quiet: true
+      loop: "{{ _mn_hosts | dict2items if _mn_peers | length > 0 else [] }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: List the pod, service and link networks
+      ansible.builtin.set_fact:
+        _mn_cidrs: >-
+          {{ _mn_cidrs + [
+               {'label': item.key ~ ' clusterNetwork', 'cidr': item.value.cluster_network[0]},
+               {'label': item.key ~ ' serviceNetwork', 'cidr': item.value.service_network[0]}] }}
+        _mn_links: >-
+          {{ _mn_links + ([{'label': item.key ~ ' C2CC link',
+                            'cidr': item.value.address | ansible.utils.ipaddr('network/prefix')}]
+                          if _mn_peers | length > 0 else []) }}
+      loop: "{{ _mn_hosts | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Check that no pod or service networks overlap
+      ansible.builtin.assert:
+        that:
+          - not (item.0.cidr | ansible.utils.network_in_network(item.1.cidr))
+          - not (item.1.cidr | ansible.utils.network_in_network(item.0.cidr))
+        fail_msg: "{{ item.0.label }} {{ item.0.cidr }} overlaps {{ item.1.label }} {{ item.1.cidr }}"
+        quiet: true
+      loop: "{{ _mn_cidrs | combinations(2) | list }}"
+      loop_control:
+        label: "{{ item.0.label }} / {{ item.1.label }}"
+
+    # The hosts may share a link subnet; only the cluster networks must stay off it.
+    - name: Check that no pod or service network overlaps a C2CC link
+      ansible.builtin.assert:
+        that:
+          - not (item.0.cidr | ansible.utils.network_in_network(item.1.cidr))
+          - not (item.1.cidr | ansible.utils.network_in_network(item.0.cidr))
+        fail_msg: "{{ item.0.label }} {{ item.0.cidr }} overlaps {{ item.1.label }} {{ item.1.cidr }}"
+        quiet: true
+      loop: "{{ _mn_links | product(_mn_cidrs) | list }}"
+      loop_control:
+        label: "{{ item.0.label }} / {{ item.1.label }}"
+
+    # Checked across the whole group, not only for this host, so a --limit run
+    # also catches a conflict between two other members.
+    - name: Check that the C2CC addresses and domains are unique
+      ansible.builtin.assert:
+        that:
+          - _mn_hosts.values() | map(attribute='address') | map('ansible.utils.ipaddr', 'address')
+            | unique | length == _mn_hosts | length
+          - _mn_hosts.values() | map(attribute='domain') | unique | length == _mn_hosts | length
+        fail_msg: "Every member of the {{ c2cc_group }} group needs its own c2cc_address and c2cc_domain."
+        quiet: true
+      when: _mn_peers | length > 0
+
+    - name: Check that every C2CC member has every other member on its link
+      vars:
+        _mn_from: "{{ _mn_hosts[item.0] }}"
+        _mn_hop: "{{ _mn_hosts[item.1].address | ansible.utils.ipaddr('address') }}"
+      ansible.builtin.assert:
+        that:
+          - _mn_from.address | ansible.utils.ipaddr('network/prefix') | ansible.utils.network_in_usable(_mn_hop)
+          - _mn_hop != (hostvars[item.0].ansible_host | default(item.0))
+        fail_msg: >-
+          {{ item.0 }}: the nextHop {{ _mn_hop }} of {{ item.1 }} must be on the C2CC link
+          {{ _mn_from.address }} and must not be the address Ansible uses for {{ item.0 }}.
+        quiet: true
+      loop: "{{ _mn_hosts.keys() | list | permutations(2) | list if _mn_peers | length > 0 else [] }}"
+      loop_control:
+        label: "{{ item.0 }} -> {{ item.1 }}"
+
+    - name: Check the MTU settings
+      ansible.builtin.assert:
+        that:
+          - item.value | string | length == 0 or (item.value | string is match('^[0-9]+$') and item.value | int >= 576)
+        fail_msg: "{{ item.key }} must be empty or a number of at least 576."
+        quiet: true
+      loop:
+        - { key: microshift_pod_mtu, value: "{{ microshift_pod_mtu }}" }
+        - { key: c2cc_mtu, value: "{{ c2cc_mtu }}" }
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Describe the remote clusters of this host
+      ansible.builtin.set_fact:
+        _mn_remote_clusters: >-
+          {{ _mn_remote_clusters + [{
+               'nextHop': [_mn_hosts[item].address | ansible.utils.ipaddr('address')],
+               'clusterNetwork': _mn_hosts[item].cluster_network,
+               'serviceNetwork': _mn_hosts[item].service_network,
+               'domain': _mn_hosts[item].domain}] }}
+      loop: "{{ _mn_peers }}"
+
+    - name: Record the validated network settings
+      ansible.builtin.set_fact:
+        microshift_network:
+          cluster_network: "{{ _mn_hosts[inventory_hostname].cluster_network }}"
+          service_network: "{{ _mn_hosts[inventory_hostname].service_network }}"
+          custom_networks: "{{ microshift_cluster_network | length > 0 or microshift_service_network | length > 0 }}"
+          c2cc: "{{ _mn_peers | length > 0 }}"
+          interface: "{{ _mn_hosts[inventory_hostname].interface }}"
+          address: "{{ _mn_hosts[inventory_hostname].address }}"
+          mtu: "{{ c2cc_mtu }}"
+          remote_clusters: "{{ _mn_remote_clusters }}"
+        c2cc_remote_cidrs: >-
+          {{ (_mn_remote_clusters | map(attribute='clusterNetwork') | flatten)
+             + (_mn_remote_clusters | map(attribute='serviceNetwork') | flatten) }}

@@ -1,0 +1,265 @@
+---
+# microshift-network tasks: write the settings checked by validate.yml, after
+# install and before MicroShift first starts; nothing changes while it runs.
+
+- name: Validate the MicroShift network settings
+  ansible.builtin.include_tasks: validate.yml
+  when: microshift_network is not defined
+
+- name: Refuse a C2CC link that carries a default route
+  ansible.builtin.assert:
+    that:
+      - microshift_network.interface != (ansible_default_ipv4.interface | default(''))
+      - microshift_network.interface != (ansible_default_ipv6.interface | default(''))
+    fail_msg: "C2CC requires a dedicated link; {{ microshift_network.interface }} carries a default route."
+    quiet: true
+  when: microshift_network.c2cc | bool
+
+- name: Check the pod MTU against the IPv4 default-route MTU
+  ansible.builtin.assert:
+    that:
+      - ansible_default_ipv4.mtu is defined
+      - microshift_pod_mtu | int <= ansible_default_ipv4.mtu | int
+    fail_msg: >-
+      microshift_pod_mtu must not exceed the IPv4 default-route MTU
+      ({{ ansible_default_ipv4.mtu | default('unknown') }}).
+    quiet: true
+  when: microshift_pod_mtu | string | length > 0
+
+- name: Describe what this role manages
+  ansible.builtin.set_fact:
+    _mn_owned: []
+    _mn_profile: "c2cc-{{ microshift_network.interface }}"
+    _mn_dropin_dir: "{{ microshift_network_files.network | dirname }}"
+    _mn_managed:
+      - path: "{{ microshift_network_files.network }}"
+        template: 10-network.yaml.j2
+        wanted: "{{ microshift_network.custom_networks | bool }}"
+      - path: "{{ microshift_network_files.c2cc }}"
+        template: 50-c2cc.yaml.j2
+        wanted: "{{ microshift_network.c2cc | bool }}"
+      - path: "{{ microshift_network_files.ovn }}"
+        template: ovn.yaml.j2
+        wanted: "{{ microshift_pod_mtu | string | length > 0 }}"
+
+- name: Look for existing managed files
+  ansible.builtin.stat:
+    path: "{{ item.path }}"
+  loop: "{{ _mn_managed }}"
+  loop_control:
+    label: "{{ item.path }}"
+  register: _mn_stat
+
+- name: Read existing managed files
+  ansible.builtin.slurp:
+    src: "{{ item.stat.path }}"
+  loop: "{{ _mn_stat.results | selectattr('stat.exists') | list }}"
+  loop_control:
+    label: "{{ item.stat.path }}"
+  register: _mn_slurp
+
+- name: Record which existing files this role wrote
+  ansible.builtin.set_fact:
+    _mn_owned: "{{ _mn_owned + [item.source] }}"
+  loop: "{{ _mn_slurp.results }}"
+  loop_control:
+    label: "{{ item.source }}"
+  when: ((item.content | b64decode).splitlines() | first | default('')) == microshift_network_header
+
+# Foreign files are replaced only with microshift_network_adopt_files, never removed
+- name: Refuse to overwrite files this role did not write
+  ansible.builtin.assert:
+    that:
+      - item.path not in (_mn_stat.results | selectattr('stat.exists') | map(attribute='stat.path') | list)
+        or item.path in _mn_owned or microshift_network_adopt_files | bool
+    fail_msg: >-
+      {{ item.path }} exists and was not written by this role. Move it aside or set
+      microshift_network_adopt_files=true to replace it.
+    quiet: true
+  loop: "{{ _mn_managed | selectattr('wanted') | list }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+# MicroShift merges every config.d *.yaml in order, hidden files and symlinks included;
+# later keys win (null deletes), and subdirectories would change the order so are refused.
+- name: Check that no other drop-in overrides the managed settings
+  when: microshift_network.custom_networks | bool or microshift_network.c2cc | bool
+  block:
+    - name: Find MicroShift config drop-ins
+      ansible.builtin.find:
+        paths: "{{ _mn_dropin_dir }}"
+        file_type: any
+        hidden: true
+        recurse: true
+      register: _mn_dropins
+
+    - name: Refuse subdirectories in the drop-in directory
+      ansible.builtin.assert:
+        that:
+          - _mn_dropins.files | selectattr('isdir') | list | length == 0
+        fail_msg: >-
+          {{ _mn_dropin_dir }} has subdirectories ({{ _mn_dropins.files | selectattr('isdir')
+          | map(attribute='path') | join(', ') }}); this role only supports a flat drop-in directory.
+        quiet: true
+
+    - name: Read drop-ins that MicroShift loads after the managed ones
+      ansible.builtin.slurp:
+        src: "{{ item }}"
+      loop: >-
+        {{ _mn_dropins.files | rejectattr('isdir') | map(attribute='path')
+           | select('match', '.*\.yaml$')
+           | select('gt', microshift_network_files.network)
+           | reject('equalto', microshift_network_files.c2cc) | sort | list }}
+      register: _mn_later
+
+    # MicroShift skips empty drop-ins and refuses any other that is not a mapping.
+    - name: Refuse drop-ins that override the managed settings
+      vars:
+        _mn_text: "{{ item.content | b64decode }}"
+        _mn_cfg: "{{ (_mn_text | from_yaml) if _mn_text | trim | length > 0 else {} }}"
+      ansible.builtin.assert:
+        that:
+          - _mn_cfg is mapping
+          - not (microshift_network.custom_networks | bool) or 'network' not in _mn_cfg
+            or (_mn_cfg.network is mapping
+                and not (_mn_cfg.network.keys() | intersect(['clusterNetwork', 'serviceNetwork'])))
+          - not (microshift_network.c2cc | bool) or item.source < microshift_network_files.c2cc
+            or 'clusterToCluster' not in _mn_cfg
+        fail_msg: >-
+          {{ item.source }} is not a YAML mapping, or overrides or removes the network or C2CC
+          settings this role manages.
+        quiet: true
+      loop: "{{ _mn_later.results }}"
+      loop_control:
+        label: "{{ item.source }}"
+
+- name: Check whether MicroShift is running
+  ansible.builtin.command:
+    argv: [systemctl, is-active, --quiet, microshift]
+  register: _mn_running
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+# Dry-run changes first; refuse changes while MicroShift is running
+- name: Work out what would change
+  check_mode: true
+  block:
+    - name: Check the C2CC link connection profile
+      community.general.nmcli:
+        conn_name: "{{ _mn_profile }}"
+        ifname: "{{ microshift_network.interface }}"
+        type: ethernet
+        method4: manual
+        ip4:
+          - "{{ microshift_network.address }}"
+        method6: disabled
+        mtu: "{{ microshift_network.mtu | default(omit, true) }}"
+        autoconnect: true
+        state: present
+      register: _mn_plan_profile
+      when: microshift_network.c2cc | bool
+
+    - name: Check the managed files
+      ansible.builtin.template:
+        src: "{{ item.template }}"
+        dest: "{{ item.path }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop: "{{ _mn_managed | selectattr('wanted') | list }}"
+      loop_control:
+        label: "{{ item.path }}"
+      register: _mn_plan_files
+      # A missing drop-in directory means the file would be created: a change
+      failed_when: _mn_plan_files is failed and 'does not exist' not in (_mn_plan_files.msg | default(''))
+      changed_when: _mn_plan_files is changed or 'does not exist' in (_mn_plan_files.msg | default(''))
+
+    - name: Check the managed files that are no longer wanted
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ _mn_managed | rejectattr('wanted') | selectattr('path', 'in', _mn_owned) | list }}"
+      loop_control:
+        label: "{{ item.path }}"
+      register: _mn_plan_remove
+
+- name: Refuse to change the network settings of a running MicroShift
+  ansible.builtin.assert:
+    that:
+      - _mn_running.rc != 0 or not (_mn_plan_profile is changed or _mn_plan_files is changed
+        or _mn_plan_remove is changed)
+    fail_msg: >-
+      MicroShift is running and its network settings would change. Stop it first; a changed
+      pod or service network also needs microshift-cleanup-data --all, and a changed pod MTU a
+      reboot.
+    quiet: true
+
+- name: Apply the network settings
+  when: _mn_running.rc != 0
+  block:
+    - name: Configure the C2CC link connection profile
+      community.general.nmcli:
+        conn_name: "{{ _mn_profile }}"
+        ifname: "{{ microshift_network.interface }}"
+        type: ethernet
+        method4: manual
+        ip4:
+          - "{{ microshift_network.address }}"
+        method6: disabled
+        mtu: "{{ microshift_network.mtu | default(omit, true) }}"
+        autoconnect: true
+        state: present
+      register: _mn_profile_result
+      when: microshift_network.c2cc | bool
+
+    - name: Read the state of the C2CC link connection profile
+      ansible.builtin.command:
+        argv: [nmcli, -g, GENERAL.STATE, connection, show, "{{ _mn_profile }}"]
+      register: _mn_profile_state
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      when: microshift_network.c2cc | bool
+
+    # nmcli state=up leaves an active profile alone; reactivate to apply changes
+    - name: Activate the C2CC link connection profile
+      ansible.builtin.command:
+        argv: [nmcli, connection, up, "{{ _mn_profile }}"]
+      changed_when: true
+      when:
+        - microshift_network.c2cc | bool
+        - not ansible_check_mode
+        - _mn_profile_result is changed or (_mn_profile_state.stdout | default('')) != 'activated'
+
+    - name: Ensure the MicroShift config drop-in directory exists
+      ansible.builtin.file:
+        path: "{{ _mn_dropin_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      when: _mn_managed | selectattr('wanted') | list | length > 0
+
+    - name: Write the managed files
+      ansible.builtin.template:
+        src: "{{ item.template }}"
+        dest: "{{ item.path }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop: "{{ _mn_managed | selectattr('wanted') | list }}"
+      loop_control:
+        label: "{{ item.path }}"
+      register: _mn_write
+      # In check mode the directory above was not created.
+      failed_when: >-
+        _mn_write is failed and not (ansible_check_mode and 'does not exist' in (_mn_write.msg | default('')))
+
+    - name: Remove managed files that are no longer wanted
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ _mn_managed | rejectattr('wanted') | selectattr('path', 'in', _mn_owned) | list }}"
+      loop_control:
+        label: "{{ item.path }}"

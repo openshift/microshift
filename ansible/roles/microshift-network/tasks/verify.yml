@@ -1,0 +1,91 @@
+---
+# microshift-network verification that C2CC reaches every peer; needs MicroShift
+# running on all members (setup-node.yml tag c2cc-verify).
+
+- name: Validate the MicroShift network settings
+  ansible.builtin.include_tasks: validate.yml
+  when: microshift_network is not defined
+
+- name: Wait for every remote cluster to report Healthy
+  become: true
+  ansible.builtin.command:
+    argv: [timeout, -k, "5", "20", oc, --request-timeout=10s, --kubeconfig, "{{ microshift_kubeconfig }}",
+           get, remoteclusters.microshift.io, -o, json]
+  register: _mn_rc
+  changed_when: false
+  # Each remote cluster has a RemoteCluster named after its next hop, for
+  # example c2cc-192-168-1-20; every expected one must be Healthy.
+  vars:
+    _mn_expected: >-
+      {{ microshift_network.remote_clusters | map(attribute='nextHop') | map('first')
+         | map('replace', '.', '-') | map('regex_replace', '^', 'c2cc-') | list }}
+  until: >-
+    _mn_rc.rc == 0 and
+    _mn_expected | difference((_mn_rc.stdout | from_json)['items']
+      | selectattr('status', 'defined') | selectattr('status.state', 'defined')
+      | selectattr('status.state', 'equalto', 'Healthy') | map(attribute='metadata.name') | list)
+    | length == 0
+  timeout: 30
+  retries: 30
+  delay: 10
+
+- name: Read the C2CC routes, SNAT bypass rules and package versions
+  become: true
+  ansible.builtin.command:
+    argv: "{{ item }}"
+  loop:
+    - [ip, route, show, table, "{{ c2cc_route_table }}"]
+    - [nft, list, chain, inet, ovn-kubernetes, ovn-kube-pod-subnet-masq]
+    - [rpm, -qa, "microshift*", "cri-o*", "openvswitch*", "kernel-core*"]
+    - [uname, -r]
+  loop_control:
+    label: "{{ item | join(' ') }}"
+  register: _mn_state
+  changed_when: false
+
+- name: Read optional C2CC driver information
+  become: true
+  ansible.builtin.command:
+    argv: [ethtool, -i, "{{ microshift_network.interface }}"]
+  register: _mn_driver
+  changed_when: false
+  failed_when: false
+
+- name: Check the C2CC routes and SNAT bypass rules
+  vars:
+    _mn_routes: "{{ _mn_state.results[0].stdout }}"
+    _mn_nft: "{{ _mn_state.results[1].stdout }}"
+    _mn_hop: "{{ item.0.nextHop[0] }}"
+  ansible.builtin.assert:
+    that:
+      - (item.1 ~ ' via ' ~ _mn_hop ~ ' dev ' ~ microshift_network.interface) in _mn_routes
+      - ('c2cc-no-masq:' ~ item.1) in _mn_nft
+    fail_msg: >-
+      {{ item.1 }}: expected a route via {{ _mn_hop }} dev {{ microshift_network.interface }} in
+      table {{ c2cc_route_table }} and a c2cc-no-masq rule.
+    quiet: true
+  loop: "{{ microshift_network.remote_clusters | subelements('clusterNetwork') + microshift_network.remote_clusters | subelements('serviceNetwork') }}"
+  loop_control:
+    label: "{{ item.1 }}"
+
+# Imported, not included, so the tasks keep the c2cc-verify tag.
+- name: Initialize results directory
+  ansible.builtin.import_tasks: roles/common/tasks/results-dir.yml
+
+- name: Save the C2CC state
+  ansible.builtin.copy:
+    content: |
+      {{ _mn_rc.stdout | from_json | to_nice_json }}
+      {% for r in _mn_state.results %}
+      $ {{ r.item | join(' ') }}
+      {{ r.stdout }}
+      {% endfor %}
+      $ ethtool -i {{ microshift_network.interface }}
+      {% if _mn_driver.rc == 0 %}
+      {{ _mn_driver.stdout }}
+      {% else %}
+      unavailable (rc={{ _mn_driver.rc }}): {{ _mn_driver.stderr | default(_mn_driver.msg | default('no diagnostic'), true) }}
+      {% endif %}
+    dest: "{{ results_dir }}/c2cc-verify-{{ inventory_hostname }}.txt"
+    mode: "0644"
+  delegate_to: localhost

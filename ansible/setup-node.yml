@@ -6,6 +6,20 @@
 # ansible-playbook -i inventory/inventory setup-node.yml
 #
 
+# Runs first on every invocation without connecting to the hosts; its facts feed
+# the firewall and network plays
+- name: Validate microshift network settings
+  hosts: microshift
+  tags: [always]
+  gather_facts: false
+  vars_files:
+    - vars/all.yml
+  tasks:
+    - name: Validate microshift network and C2CC settings
+      ansible.builtin.import_role:
+        name: microshift-network
+        tasks_from: validate
+
 - name: Create vm and set up localhost
   hosts: localhost
   tags: [localhost]
@@ -52,6 +66,15 @@
     - role: install-microshift
       when: (install_microshift | bool)
 
+- name: Configure microshift network
+  hosts: microshift
+  tags: [network]
+  become: true
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: microshift-network
+
 - name: Resolve microshift nodename
   hosts: microshift
   tags: [nodename]
@@ -77,6 +100,24 @@
     - vars/all.yml
   roles:
     - role: microshift-start
+
+# Runs only with --tags c2cc-verify, once MicroShift runs on every C2CC member
+- name: Verify C2CC connectivity
+  hosts: microshift
+  tags: [never, c2cc-verify]
+  vars_files:
+    - vars/all.yml
+  pre_tasks:
+    - name: Share the C2CC verification timestamp
+      ansible.builtin.set_fact:
+        results_timestamp: "{{ results_timestamp | default(lookup('pipe', 'date +%Y-%m-%d_%H-%M-%S')) }}"
+      run_once: true
+  tasks:
+    - name: Verify C2CC towards every peer
+      ansible.builtin.import_role:
+        name: microshift-network
+        tasks_from: verify
+      when: microshift_network.c2cc | default(false) | bool
 
 - name: Add kubelet endpoint to prometheus
   hosts: logging

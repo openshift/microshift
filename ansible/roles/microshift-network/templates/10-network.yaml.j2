@@ -1,0 +1,3 @@
+{{ microshift_network_header }}
+{{ {'network': {'clusterNetwork': microshift_network.cluster_network,
+                'serviceNetwork': microshift_network.service_network}} | to_nice_yaml(indent=2) }}
