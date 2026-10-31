@@ -133,6 +133,30 @@ activation is recovered before startup uses the files. See
 [Certificate Renewal Transactions](./certificates.md) for the private on-disk
 layout, validation, and recovery protocol.
 
+## Local Metrics Service
+
+`pkg/metrics` owns an isolated Prometheus registry and a loopback HTTP listener.
+The service is registered before network/control-plane services, with no readiness
+dependencies. It starts after PKI initialization, not before startup data recovery.
+Bind/serve failures are non-fatal; existing core-service failure policy is unchanged.
+The listener accepts two concurrent scrapes, with a five-second scrape/header
+timeout, ten-second read/write timeouts, and a 16 KiB header limit.
+
+The first collector periodically calls `pkg/admin/certificates.Observe`, using the
+same chain builder and `StatusAt()` as the CLI. It takes a non-creating,
+non-blocking shared operation lock, reads public certificates and pending metadata,
+and never invokes CLI recovery. Scrapes read immutable cached metrics, not disk.
+Unavailable series are dropped while the last-success timestamp is retained.
+
+Pass collectors to `NewService(cfg, collectors...)`. Each implements `Collector`,
+which embeds `prometheus.Collector` and adds `Run(context.Context)` for background
+collection. The service registers and starts each collector independently, canceling
+their contexts on shutdown. `Collect` must only expose cached data.
+Do not register the Kubernetes/global registry or add Kubernetes authentication
+calls. The optional OTel collector is a consumer,
+not a dependency of this service. See [local certificate metrics](../user/howto_certificates.md#local-certificate-metrics)
+for configuration, labels, access limitations, and failure semantics.
+
 ## Deployment Modes
 
 MicroShift supports two deployment models:

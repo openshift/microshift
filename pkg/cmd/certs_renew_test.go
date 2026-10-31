@@ -43,7 +43,7 @@ func TestCertificateRenewalApply(t *testing.T) {
 			}
 			dataDir := t.TempDir()
 			started := time.Now()
-			builder, err := certificateChainsSetup(cfg, dataDir)
+			builder, err := certificates.NewChains(cfg, dataDir)
 			require.NoError(t, err)
 			chains, err := builder.Complete()
 			require.NoError(t, err)
@@ -61,7 +61,7 @@ func TestCertificateRenewalApply(t *testing.T) {
 					CAValidity:                       &metav1.Duration{Duration: 17520 * time.Hour},
 					ForceRestartOnExpirationImminent: ptr.To(false),
 				}
-				builder, err = certificateChainsSetup(cfg, dataDir)
+				builder, err = certificates.NewChains(cfg, dataDir)
 				require.NoError(t, err)
 			}
 			plan, err := builder.PlanRenewal(tt.renewCAs, time.Now())
@@ -295,7 +295,7 @@ func TestCertRenewErrors(t *testing.T) {
 
 func TestCertificateRenewalPlanRejectsCADueForRotation(t *testing.T) {
 	cfg, dir := pendingRenewalFixture(t)
-	builder, err := certificateChainsSetup(cfg, dir)
+	builder, err := certificates.NewChains(cfg, dir)
 	require.NoError(t, err)
 	inventory, err := builder.LoadInventory()
 	require.NoError(t, err)

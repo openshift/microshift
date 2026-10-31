@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/openshift/microshift/pkg/admin/certificates"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
@@ -31,7 +32,7 @@ func TestConfiguredCertificateIssuance(t *testing.T) {
 			dir := t.TempDir()
 			now := time.Now()
 			nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
-			builder, err := certificateChainsSetup(cfg, dir)
+			builder, err := certificates.NewChains(cfg, dir)
 			require.NoError(t, err)
 			chains, err := builder.Complete()
 			require.NoError(t, err)
@@ -60,7 +61,7 @@ func TestConfiguredCertificateIssuance(t *testing.T) {
 			// A later startup must reuse healthy certificates despite changed policy.
 			cfg.Certificates.ServingValidity = &metav1.Duration{Duration: 336 * time.Hour}
 			cfg.Certificates.CAValidity = &metav1.Duration{Duration: 8760 * time.Hour}
-			builder, err = certificateChainsSetup(cfg, dir)
+			builder, err = certificates.NewChains(cfg, dir)
 			require.NoError(t, err)
 			loaded, err := builder.Complete()
 			require.NoError(t, err)

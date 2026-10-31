@@ -19,17 +19,10 @@ import (
 const invalidPendingRenewalWarning = "Pending certificate renewal metadata is invalid; the pending certificates will not be activated. Restart MicroShift to quarantine this renewal, then run microshift certs renew again."
 const rejectedPendingRenewalWarning = "A pending certificate renewal was rejected because its metadata was invalid. The rejected certificates were not activated; normal certificate startup policy applies. Check active certificate status, then prepare and activate a replacement renewal to clear this warning."
 
-// This private on-disk record contains hashes, never configuration or key data.
-type pendingCertificateRenewal struct {
-	Version      int                                            `json:"version"`
-	ConfigHash   string                                         `json:"configHash"`
-	OriginalHash string                                         `json:"originalHash"`
-	RenewedHash  string                                         `json:"renewedHash"`
-	Result       *certificatesv1alpha1.CertificateRenewalResult `json:"result"`
-}
+type pendingCertificateRenewal = certificates.PendingRenewal
 
 func certificateConfigHash(cfg *config.Config) (string, error) {
-	// Only inputs used by certificateChainsSetup affect the prepared PKI.
+	// Only inputs used by certificates.NewChains affect the prepared PKI.
 	// Kubeconfigs and unrelated resources are rebuilt at activation.
 	contents, err := json.Marshal(struct {
 		ServiceNetwork   []string
@@ -94,19 +87,7 @@ func readPendingCertificateRenewal(transaction *certificates.Transaction) (*pend
 	if err != nil || contents == nil {
 		return nil, err
 	}
-	var state pendingCertificateRenewal
-	if err := json.Unmarshal(contents, &state); err != nil {
-		return nil, certificates.ErrInvalidPendingMetadata
-	}
-	if state.Version > 1 {
-		return nil, fmt.Errorf("unsupported pending certificate renewal version %d", state.Version)
-	}
-	if state.Version != 1 || state.ConfigHash == "" || state.OriginalHash == "" || state.RenewedHash == "" || state.Result == nil ||
-		state.Result.Status != certificatesv1alpha1.RenewalStatusPending ||
-		(state.Result.Mode != certificatesv1alpha1.RenewalModeServing && state.Result.Mode != certificatesv1alpha1.RenewalModeCA) {
-		return nil, certificates.ErrInvalidPendingMetadata
-	}
-	return &state, nil
+	return certificates.ParsePendingRenewal(contents)
 }
 
 func loadPendingCertificateRenewal(dataDir string) (*certificatesv1alpha1.CertificateRenewalResult, error) {
@@ -173,7 +154,7 @@ func activatePendingCertificateRenewal(cfg *config.Config, transaction *certific
 		return false, err
 	}
 	renewCAs := state.Result.Mode == certificatesv1alpha1.RenewalModeCA
-	builder, err := certificateChainsSetup(cfg, transaction.Stage())
+	builder, err := certificates.NewChains(cfg, transaction.Stage())
 	if err != nil {
 		return false, err
 	}
@@ -245,7 +226,7 @@ func validatePendingCertificateHash(dataDir, expected string) error {
 }
 
 func loadActivatedCertificates(cfg *config.Config, dataDir string) (*certchains.CertificateChains, error) {
-	builder, err := certificateChainsSetup(cfg, dataDir)
+	builder, err := certificates.NewChains(cfg, dataDir)
 	if err != nil {
 		return nil, err
 	}
