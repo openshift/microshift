@@ -148,10 +148,12 @@ non-blocking shared operation lock, reads public certificates and pending metada
 and never invokes CLI recovery. Scrapes read immutable cached metrics, not disk.
 Unavailable series are dropped while the last-success timestamp is retained.
 
-Future collectors can use `Service.Register` with the existing Prometheus collector
-interface. Keep collection I/O in background workers tied to service cancellation;
-`Collect` must only expose cached data. Do not register the Kubernetes/global registry
-or add Kubernetes authentication calls. The optional OTel collector is a consumer,
+Pass collectors to `NewService(cfg, collectors...)`. Each implements `Collector`,
+which embeds `prometheus.Collector` and adds `Run(context.Context)` for background
+collection. The service registers and starts each collector independently, canceling
+their contexts on shutdown. `Collect` must only expose cached data.
+Do not register the Kubernetes/global registry or add Kubernetes authentication
+calls. The optional OTel collector is a consumer,
 not a dependency of this service. See [local certificate metrics](../user/howto_certificates.md#local-certificate-metrics)
 for configuration, labels, access limitations, and failure semantics.
 

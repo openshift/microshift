@@ -14,22 +14,24 @@ import (
 	"k8s.io/klog/v2"
 )
 
+// Collector serves cached metrics while Run handles background collection.
+type Collector interface {
+	prometheus.Collector
+	Run(context.Context)
+}
+
 type Service struct {
-	config       config.Metrics
-	registry     *prometheus.Registry
-	certificates *CertificateCollector
+	config     config.Metrics
+	registry   *prometheus.Registry
+	collectors []Collector
 }
 
-func NewService(cfg config.Metrics, certificates *CertificateCollector) *Service {
+func NewService(cfg config.Metrics, collectors ...Collector) *Service {
 	registry := prometheus.NewRegistry()
-	registry.MustRegister(certificates)
-	return &Service{config: cfg, registry: registry, certificates: certificates}
-}
-
-// Register adds future MicroShift collectors to this isolated registry. Collect
-// implementations must serve cached data, not perform blocking I/O.
-func (s *Service) Register(collector prometheus.Collector) error {
-	return s.registry.Register(collector)
+	for _, collector := range collectors {
+		registry.MustRegister(collector)
+	}
+	return &Service{config: cfg, registry: registry, collectors: collectors}
 }
 
 func (s *Service) Name() string           { return "microshift-metrics" }
@@ -71,7 +73,9 @@ func (s *Service) Run(ctx context.Context, ready chan<- struct{}, stopped chan<-
 	defer func() { _ = server.Close() }()
 	collectionCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	go s.certificates.Run(collectionCtx)
+	for _, collector := range s.collectors {
+		go collector.Run(collectionCtx)
+	}
 	serveError := make(chan error, 1)
 	go func() { serveError <- server.Serve(listener) }()
 	close(ready)

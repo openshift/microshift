@@ -28,10 +28,12 @@ func TestLocalMetricsService(t *testing.T) {
 				<-blocked // Neither slow collection nor API readiness gates serving.
 				return certificates.Observation{}
 			})
-			service := metrics.NewService(config.Metrics{Status: "Enabled", ListenAddress: address}, collector)
-			other := prometheus.NewGauge(prometheus.GaugeOpts{Name: "test_other_collector", Help: "Independent collector."})
+			other := &testCollector{
+				Gauge:   prometheus.NewGauge(prometheus.GaugeOpts{Name: "test_other_collector", Help: "Independent collector."}),
+				started: make(chan struct{}), stopped: make(chan struct{}),
+			}
 			other.Set(42)
-			require.NoError(t, service.Register(other))
+			service := metrics.NewService(config.Metrics{Status: "Enabled", ListenAddress: address}, collector, other)
 			require.Empty(t, service.Dependencies())
 			ctx, cancel := context.WithCancel(t.Context())
 			defer cancel()
@@ -43,6 +45,7 @@ func TestLocalMetricsService(t *testing.T) {
 			case <-time.After(5 * time.Second):
 				t.Fatal("metrics listener did not start")
 			}
+			require.Eventually(t, func() bool { return isClosed(other.started) }, time.Second, time.Millisecond)
 			client := &http.Client{Timeout: 2 * time.Second, Transport: &http.Transport{Proxy: nil}}
 			defer client.CloseIdleConnections()
 			response, err := client.Get("http://" + address + "/metrics")
@@ -62,6 +65,7 @@ func TestLocalMetricsService(t *testing.T) {
 			case <-time.After(5 * time.Second):
 				t.Fatal("metrics listener did not stop")
 			}
+			require.Eventually(t, func() bool { return isClosed(other.stopped) }, time.Second, time.Millisecond)
 		})
 	}
 }
@@ -80,6 +84,18 @@ func TestMetricsDisabledOrBusyPortIsNonFatal(t *testing.T) {
 		require.NoError(t, service.Run(t.Context(), ready, stopped))
 		require.Eventually(t, func() bool { return isClosed(ready) && isClosed(stopped) }, time.Second, time.Millisecond)
 	}
+}
+
+type testCollector struct {
+	prometheus.Gauge
+
+	started, stopped chan struct{}
+}
+
+func (c *testCollector) Run(ctx context.Context) {
+	close(c.started)
+	<-ctx.Done()
+	close(c.stopped)
 }
 
 func isClosed(ch <-chan struct{}) bool {
