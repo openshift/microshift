@@ -1,0 +1,26 @@
+---
+# run-network-perf default vars
+
+# e2e-benchmarking release that drives k8s-netperf; MicroShift needs v2.9.18 or later
+network_perf_e2e_repo: https://github.com/cloud-bulldozer/e2e-benchmarking.git
+network_perf_e2e_git_revision: v2.10.4
+# k8s-netperf release the wrapper downloads
+network_perf_netperf_version: v0.1.44
+# Workload file in workloads/network-perf-v2 (the perf report's test set)
+network_perf_workload: full-run.yaml
+network_perf_iterations: 1
+# Seconds k8s-netperf may run per iteration before it is stopped
+network_perf_timeout: 14400
+# Seconds per cleanup or evidence API call, and to wait for namespace deletion
+network_perf_api_timeout: 60
+network_perf_cleanup_timeout: 600
+
+# One checkout per host: run.sh keeps the k8s-netperf binary and CSVs in its directory
+network_perf_work_dir: "{{ lookup('env', 'HOME') }}/.cache/network-perf/{{ inventory_hostname }}"
+# Kubeconfig of this host's cluster, as saved by the fetch-kubeconfig role
+network_perf_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube/kubeconfig.{{ inventory_hostname }}"
+# Shared by all hosts of a run; pass an earlier value with -e to add iterations to it
+network_perf_campaign: ""
+network_perf_results_dir: "{{ results_base_dir }}/{{ microshift_version }}/network-perf"
+# Fail when the campaign's containers ran different images (k8s-netperf pulls by tag)
+network_perf_fail_on_image_mismatch: true

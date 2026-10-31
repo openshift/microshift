@@ -30,3 +30,4 @@ deploy_gpu_test: "{{ deploy_gpu_test_arg | default('true') }}"
 
 # Workload execution
 run_workloads: "{{ run_workloads_arg | default('false') }}"
+run_network_perf: "{{ run_network_perf_arg | default('false') }}"
