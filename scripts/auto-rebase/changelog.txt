@@ -1,3 +1,12 @@
-- machine-config-operator embedded-component 55a94a504b858fd1484d55def8191d327b6a16bf to 82e41b82787613e6a07313b3b99e5d6513627da1
-  - 42da9386 2026-10-23T14:47:21Z Split wait-for-ipsec-connect into two services to avoid ipsec restart
+- machine-config-operator embedded-component 82e41b82787613e6a07313b3b99e5d6513627da1 to 5898231e3a667bed143e9937556ff325f449e930
+  - a39e6599 2026-10-21T15:27:37Z mcs: replace wildcard permissions with explicit verbs
+
+- ovn-kubernetes image-amd64 8608e797c1b08e75fead3c12b53d4fd5b3b50462 to 11ce58156a939a7d34f2e8d6a2924e273f13f3fc
+  - 730b2489 2026-10-27T17:47:33+05:30 Fix UDN controller startup timeout during pod sync
+
+- ovn-kubernetes image-arm64 8608e797c1b08e75fead3c12b53d4fd5b3b50462 to c020cc51b0f2fca38aba028a994db70fcb96a18b
+  - 67c195f5 2026-10-29T16:16:02+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
+  - 730b2489 2026-10-27T17:47:33+05:30 Fix UDN controller startup timeout during pod sync
+  - 92374f84 2026-10-20T11:55:52-04:00 Fixes gateway egress IP node update logic
+  - e0883fbf 2026-10-20T11:55:49-04:00 EgressIP: Fix crash from mutating node informer object
 
