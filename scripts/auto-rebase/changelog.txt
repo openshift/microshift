@@ -1,3 +1,10 @@
-- ovn-kubernetes image-arm64 ade3050b01d89ebdbfdfc132f5a3c24b04c27079 to 79abeace17e9628f8fbe9bdccfc3fe504225f9b4
+- machine-config-operator embedded-component f6b0da26be75da9f903e2ec2815c0b4cb9a06653 to 3d2a579a78b323cddbb0c5d3dedb5ac3c4963748
+  - 2342d431 2026-10-21T17:02:24Z MCD: Fix OCL rollback failure when extensions are installed
+
+- ovn-kubernetes image-amd64 ade3050b01d89ebdbfdfc132f5a3c24b04c27079 to 055440152f97390db94a74e43ca495567c77acd4
+  - 49e48bb1 2026-10-23T07:59:47Z Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
   - 0a523185 2026-10-14T17:26:22+02:00 node: prioritize default network before primary UDN fan-out
+
+- ovn-kubernetes image-arm64 79abeace17e9628f8fbe9bdccfc3fe504225f9b4 to 055440152f97390db94a74e43ca495567c77acd4
+  - 49e48bb1 2026-10-23T07:59:47Z Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
 
