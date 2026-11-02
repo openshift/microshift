@@ -22,6 +22,8 @@ spec:
       initContainers:
         - name: init-router
           imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
           command: ["/bin/bash", "-c", "cp -R -p /var/lib/haproxy/* /mnt/config/"]
           volumeMounts:
