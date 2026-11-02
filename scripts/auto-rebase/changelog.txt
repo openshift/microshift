@@ -1,6 +1,46 @@
-- coredns image-amd64 bbbbf9a28f179e92c9481a2923c989ddeb84999b to 5929cdc03ef425d1db05552589cac0fd4adbd96a
-  - ad15ba8 2026-10-27T17:42:13Z UPSTREAM: 530b0a5ff: validate DNS requests before unpacking
+- cluster-ingress-operator embedded-component e8205bb54d84e9ec137d101cdee0ace5c1c63b85 to 84c07fda5ef3a362e894245f3634ff57cc9f0871
+  - 68e34e5a 2026-10-22T18:50:01Z e2e: discover AWS subnets from CAPI with MAPI fallback
+  - 4344ada7 2026-10-20T15:13:39Z Allow disabling endpoint address validation
+  - 18eb1349 2026-10-06T19:36:35Z Remove unsupported init-router tmp mount
+  - 123a4c37 2026-10-06T19:36:35Z NE-2837: Enable readOnlyRootFilesystem for cluster ingress components
 
-- coredns image-arm64 bbbbf9a28f179e92c9481a2923c989ddeb84999b to 5929cdc03ef425d1db05552589cac0fd4adbd96a
-  - ad15ba8 2026-10-27T17:42:13Z UPSTREAM: 530b0a5ff: validate DNS requests before unpacking
+- cluster-network-operator embedded-component 7e02bed52e6d6c7a92a73538cfb45944678cf637 to df46ddbcc728f5c8372726725f38bc289f4562a0
+  - 64d6476 2026-10-05T08:11:42Z fix(ovn-kubernetes): disable local DB probes
+
+- machine-config-operator embedded-component e37b109010d1c5664b8f651733b35b538eb9cf01 to 0e2557038232d89cfbf810a6aabf85430d472211
+  - 4b7ce438 2026-10-28T19:23:47Z daemon & upgrademonitor: fix MCN stale current config edge case
+  - 68b1e1a0 2026-10-28T10:22:34Z Relaxed fatal errors on policy checks
+  - 6de130c4 2026-10-28T10:22:34Z Handle restrictive policies for layered OS updates
+
+- router image-amd64 a39a742e03e7be863c92c4b820025c6e0f78a7eb to a3a92ffb3b2b6f84d6c875a1d0a573a47bbb837c
+  - d75baeb 2026-10-27T12:59:05Z OCPBUGS-77056: Persist external certificate status through contention
+  - ebe5b5a 2026-10-27T12:59:05Z OCPBUGS-77056: Avoid false contention on certificate status changes
+  - 59b658d 2026-10-27T12:59:05Z OCPBUGS-77056: Reconcile restricted routes after admission
+  - 28000e6 2026-10-27T12:59:05Z OCPBUGS-77056: Recheck newly admitted external cert routes
+  - 41d5557 2026-10-27T12:59:05Z Make gofmt verification handle nested modules
+  - 01bd1d4 2026-10-27T12:58:56Z OCPBUGS-77056: Restore route admission at scale
+
+- router image-amd64 a39a742e03e7be863c92c4b820025c6e0f78a7eb to a3a92ffb3b2b6f84d6c875a1d0a573a47bbb837c
+  - d75baeb 2026-10-27T12:59:05Z OCPBUGS-77056: Persist external certificate status through contention
+  - ebe5b5a 2026-10-27T12:59:05Z OCPBUGS-77056: Avoid false contention on certificate status changes
+  - 59b658d 2026-10-27T12:59:05Z OCPBUGS-77056: Reconcile restricted routes after admission
+  - 28000e6 2026-10-27T12:59:05Z OCPBUGS-77056: Recheck newly admitted external cert routes
+  - 41d5557 2026-10-27T12:59:05Z Make gofmt verification handle nested modules
+  - 01bd1d4 2026-10-27T12:58:56Z OCPBUGS-77056: Restore route admission at scale
+
+- router image-arm64 a39a742e03e7be863c92c4b820025c6e0f78a7eb to a3a92ffb3b2b6f84d6c875a1d0a573a47bbb837c
+  - d75baeb 2026-10-27T12:59:05Z OCPBUGS-77056: Persist external certificate status through contention
+  - ebe5b5a 2026-10-27T12:59:05Z OCPBUGS-77056: Avoid false contention on certificate status changes
+  - 59b658d 2026-10-27T12:59:05Z OCPBUGS-77056: Reconcile restricted routes after admission
+  - 28000e6 2026-10-27T12:59:05Z OCPBUGS-77056: Recheck newly admitted external cert routes
+  - 41d5557 2026-10-27T12:59:05Z Make gofmt verification handle nested modules
+  - 01bd1d4 2026-10-27T12:58:56Z OCPBUGS-77056: Restore route admission at scale
+
+- router image-arm64 a39a742e03e7be863c92c4b820025c6e0f78a7eb to a3a92ffb3b2b6f84d6c875a1d0a573a47bbb837c
+  - d75baeb 2026-10-27T12:59:05Z OCPBUGS-77056: Persist external certificate status through contention
+  - ebe5b5a 2026-10-27T12:59:05Z OCPBUGS-77056: Avoid false contention on certificate status changes
+  - 59b658d 2026-10-27T12:59:05Z OCPBUGS-77056: Reconcile restricted routes after admission
+  - 28000e6 2026-10-27T12:59:05Z OCPBUGS-77056: Recheck newly admitted external cert routes
+  - 41d5557 2026-10-27T12:59:05Z Make gofmt verification handle nested modules
+  - 01bd1d4 2026-10-27T12:58:56Z OCPBUGS-77056: Restore route admission at scale
 
