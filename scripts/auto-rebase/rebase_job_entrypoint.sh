@@ -27,7 +27,7 @@ pullspec_release_arm64="registry.ci.openshift.org/ocp-arm64/release-arm64:${rele
 
 # LVMS is not tracked in the OCP release image. Use the latest z-stream
 # for this X.Y version, which needs manual updating between releases.
-release_lvms="v4.15"
+release_lvms="v4.16"
 pullspec_release_lvms="registry.redhat.io/lvms4/lvms-operator-bundle:${release_lvms}"
 
 APP_ID=$(cat /secrets/pr-creds/app_id) \
