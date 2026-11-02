@@ -1,6 +1,42 @@
-- cluster-ingress-operator embedded-component 486cf49118585fbb2431a28002f0f6406f9b5b62 to fd63a64723ae8d734aef449ec140e7884fa8bdf1
-  - 11d2089 2026-08-31T22:00:48+05:30 OCPBUGS-102952: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+- cluster-csi-snapshot-controller-operator embedded-component 439826e1a723c094717877db0f2ca1848d0fb10a to 3cdc34f90e64ad44099e7a7add0811e170f51c5d
+  - 679ec6f 2026-08-31T22:31:22-05:00 OCPBUGS-102965: CVE-2026-33814 - replace golang.org/x/net with openshift-sustaining fork
 
-- operator-framework-olm embedded-component 6dabe49ae51c3a93043cee45062fdd5ffb1e4645 to c6bdcdc0f8d54b42e0ee12ded744b0cd3914ba20
-  - 654d9650 2026-08-31T13:13:40+05:30 OCPBUGS-103070: CVE-2026-33814: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3
+- csi-external-snapshotter embedded-component ee32ba01e1f89bac057611ad4580589652f250a3 to 6a67c0a4642ff68c8ca62046c0a24f44da403ab7
+  - a8a5c9c 2026-09-01T00:04:54+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- oc image-amd64 33afbae38573e7a0944ab0d00c8acee6b321c196 to cb89b608d4c8d322c5aa5d2776ec43936f1f47e3
+  - 588e1ac5 2026-09-24T06:00:29+00:00 OCPBUGS-102912,OCPBUGS-102935,OCPBUGS-103104: Use patched x/net fork v0.35.0-sec.4
+
+- csi-external-snapshotter image-amd64 ee32ba01e1f89bac057611ad4580589652f250a3 to 6a67c0a4642ff68c8ca62046c0a24f44da403ab7
+  - a8a5c9c 2026-09-01T00:04:54+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- csi-external-snapshotter image-amd64 ee32ba01e1f89bac057611ad4580589652f250a3 to 6a67c0a4642ff68c8ca62046c0a24f44da403ab7
+  - a8a5c9c 2026-09-01T00:04:54+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- csi-external-snapshotter image-amd64 ee32ba01e1f89bac057611ad4580589652f250a3 to 6a67c0a4642ff68c8ca62046c0a24f44da403ab7
+  - a8a5c9c 2026-09-01T00:04:54+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- router image-amd64 94888b69fccf33ebd6ef87fb21fbde1318f0c1e2 to c9c28f5d129bb4c4217b29170196b0d451190e8d
+  - 8fafeca 2026-09-11T14:33:08+05:30 OCPBUGS-103005: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- ovn-kubernetes image-amd64 5b36fd8eb481809b4d2e2d65c5a6ce8f03407749 to 5b9965d5d19411ac369126a15863210ed2cb4110
+  - 0337534c 2026-09-30T12:57:32-04:00 node: fix serviceUpdateNotNeeded nil pointer comparison
+
+- oc image-arm64 33afbae38573e7a0944ab0d00c8acee6b321c196 to cb89b608d4c8d322c5aa5d2776ec43936f1f47e3
+  - 588e1ac5 2026-09-24T06:00:29+00:00 OCPBUGS-102912,OCPBUGS-102935,OCPBUGS-103104: Use patched x/net fork v0.35.0-sec.4
+
+- csi-external-snapshotter image-arm64 ee32ba01e1f89bac057611ad4580589652f250a3 to 6a67c0a4642ff68c8ca62046c0a24f44da403ab7
+  - a8a5c9c 2026-09-01T00:04:54+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- csi-external-snapshotter image-arm64 ee32ba01e1f89bac057611ad4580589652f250a3 to 6a67c0a4642ff68c8ca62046c0a24f44da403ab7
+  - a8a5c9c 2026-09-01T00:04:54+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- csi-external-snapshotter image-arm64 ee32ba01e1f89bac057611ad4580589652f250a3 to 6a67c0a4642ff68c8ca62046c0a24f44da403ab7
+  - a8a5c9c 2026-09-01T00:04:54+05:30 UPSTREAM: <carry>: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- router image-arm64 94888b69fccf33ebd6ef87fb21fbde1318f0c1e2 to c9c28f5d129bb4c4217b29170196b0d451190e8d
+  - 8fafeca 2026-09-11T14:33:08+05:30 OCPBUGS-103005: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.35.0-sec.3 to address CVE-2026-33814
+
+- ovn-kubernetes image-arm64 5b36fd8eb481809b4d2e2d65c5a6ce8f03407749 to 5b9965d5d19411ac369126a15863210ed2cb4110
+  - 0337534c 2026-09-30T12:57:32-04:00 node: fix serviceUpdateNotNeeded nil pointer comparison
 
