@@ -80,7 +80,7 @@ opm_release="registry.redhat.io/redhat/redhat-operator-index:v4.22"
 
 # LVMS is not tracked in the OCP release image. Use the latest z-stream
 # for this X.Y version, which needs manual updating between releases.
-lvms_release="registry.redhat.io/lvms4/lvms-operator-bundle:v4.21"
+lvms_release="registry.redhat.io/lvms4/lvms-operator-bundle:v4.22"
 
 APP_ID=$(cat /secrets/pr-creds/app_id) \
 KEY=/secrets/pr-creds/key.pem \
