@@ -7,6 +7,11 @@ import (
 	"strconv"
 )
 
+const (
+	MetricsEnabled  = "Enabled"
+	MetricsDisabled = "Disabled"
+)
+
 // Metrics configures the MicroShift-owned local metrics endpoint, independently
 // of telemetry uploads and the optional OpenTelemetry Collector package.
 type Metrics struct {
@@ -22,11 +27,11 @@ type Metrics struct {
 }
 
 func metricsDefaults() Metrics {
-	return Metrics{Status: "Disabled", ListenAddress: "127.0.0.1:9090"}
+	return Metrics{Status: MetricsDisabled, ListenAddress: "127.0.0.1:9090"}
 }
 
 func (m Metrics) Validate() error {
-	if m.Status != "Enabled" && m.Status != "Disabled" {
+	if m.Status != MetricsEnabled && m.Status != MetricsDisabled {
 		return fmt.Errorf("metrics.status must be Enabled or Disabled")
 	}
 	host, port, err := net.SplitHostPort(m.ListenAddress)

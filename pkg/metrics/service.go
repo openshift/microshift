@@ -41,7 +41,7 @@ func (s *Service) Dependencies() []string { return nil }
 // No other service depends on this readiness signal.
 func (s *Service) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
-	if s.config.Status != "Enabled" {
+	if s.config.Status != config.MetricsEnabled {
 		close(ready)
 		return nil
 	}
