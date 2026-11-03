@@ -93,7 +93,7 @@ Only literal loopback addresses are accepted. Use `[::1]:9090` for IPv6 instead;
 one configured address is served, not both families automatically. The endpoint
 uses HTTP without authentication: local users and host-networked workloads can
 read it. Loopback binding is not authentication. No Kubernetes Service, Route,
-remote export, or automatic collector configuration is created.
+or remote export is created by MicroShift itself.
 
 Collection runs immediately and once per minute. Metrics describe **active files
 on disk**, just like `certs status`, not certificates cached in running components
@@ -126,8 +126,19 @@ The listener starts after certificate initialization, before waiting for etcd or
 kube-apiserver readiness. It shares MicroShift's process lifetime and is unavailable
 if initialization fails or MicroShift exits. Listener failures are logged without
 stopping the control plane; restart MicroShift after fixing a bind failure.
-Configuration changes require a restart. This first pass does not install an OTel
-scrape drop-in or modify existing observability presets.
+Configuration changes require a restart.
+
+The optional `microshift-observability` RPM installs
+`/etc/microshift/observability/scrape.d/microshift.yaml`. All three bundled presets
+scrape the default endpoint once per minute and attach the host's name as an OTel
+resource attribute. Enable the endpoint as shown above and restart
+`microshift-observability` to load the drop-in. If you choose a different loopback
+address or port, update the drop-in's target to match. Customized collector
+configurations must load the drop-ins and include host identity; see the
+[scrape integration guide](../contributor/observability_metric_exporters.md#local-microshift-target).
+An unavailable endpoint reports `up=0`; it does not prevent other collection.
+To disable this scrape, set `scrape_configs: []` in the drop-in and restart the
+collector. Package upgrades preserve edits to that file.
 
 ## Renewing Certificates
 
