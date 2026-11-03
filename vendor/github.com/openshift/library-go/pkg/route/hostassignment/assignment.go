@@ -37,7 +37,7 @@ type HostnameGenerator interface {
 // AllocateHost allocates a host name ONLY if the route doesn't specify a subdomain wildcard policy and
 // the host name on the route is empty and an allocator is configured.
 // It must first allocate the shard and may return an error if shard allocation fails.
-func AllocateHost(ctx context.Context, route *routev1.Route, sarc route.SubjectAccessReviewCreator, routeAllocator HostnameGenerator) field.ErrorList {
+func AllocateHost(ctx context.Context, route *routev1.Route, sarc route.SubjectAccessReviewCreator, routeAllocator HostnameGenerator, opts route.RouteValidationOptions) field.ErrorList {
 	hostSet := len(route.Spec.Host) > 0
 	certSet := route.Spec.TLS != nil &&
 		(len(route.Spec.TLS.CACertificate) > 0 ||
@@ -45,7 +45,7 @@ func AllocateHost(ctx context.Context, route *routev1.Route, sarc route.SubjectA
 			len(route.Spec.TLS.DestinationCACertificate) > 0 ||
 			len(route.Spec.TLS.Key) > 0)
 
-	if route.Spec.TLS != nil && route.Spec.TLS.ExternalCertificate != nil {
+	if opts.AllowExternalCertificates && route.Spec.TLS != nil && route.Spec.TLS.ExternalCertificate != nil {
 		certSet = certSet || len(route.Spec.TLS.ExternalCertificate.Name) > 0
 	}
 
@@ -103,7 +103,7 @@ func AllocateHost(ctx context.Context, route *routev1.Route, sarc route.SubjectA
 	return nil
 }
 
-func hasCertificateInfo(tls *routev1.TLSConfig) bool {
+func hasCertificateInfo(tls *routev1.TLSConfig, opts route.RouteValidationOptions) bool {
 	if tls == nil {
 		return false
 	}
@@ -112,7 +112,7 @@ func hasCertificateInfo(tls *routev1.TLSConfig) bool {
 		len(tls.CACertificate) > 0 ||
 		len(tls.DestinationCACertificate) > 0
 
-	if tls.ExternalCertificate != nil {
+	if opts.AllowExternalCertificates && tls.ExternalCertificate != nil {
 		hasInfo = hasInfo || len(tls.ExternalCertificate.Name) > 0
 	}
 	return hasInfo
@@ -122,11 +122,11 @@ func hasCertificateInfo(tls *routev1.TLSConfig) bool {
 // Note: If (newer/updated) route uses externalCertificate, this function always returns true, as we cannot definitively verify if
 // the content of the referenced secret has been modified. Even if the secret name remains the same,
 // we must assume that the secret content is changed, necessitating authorization.
-func certificateChangeRequiresAuth(route, older *routev1.Route) bool {
+func certificateChangeRequiresAuth(route, older *routev1.Route, opts route.RouteValidationOptions) bool {
 	switch {
 	case route.Spec.TLS != nil && older.Spec.TLS != nil:
 		a, b := route.Spec.TLS, older.Spec.TLS
-		if !hasCertificateInfo(a) {
+		if !hasCertificateInfo(a, opts) {
 			// removing certificate info is allowed
 			return false
 		}
@@ -136,14 +136,16 @@ func certificateChangeRequiresAuth(route, older *routev1.Route) bool {
 			a.DestinationCACertificate != b.DestinationCACertificate ||
 			a.Key != b.Key
 
-		if route.Spec.TLS.ExternalCertificate != nil {
-			certChanged = true
+		if opts.AllowExternalCertificates {
+			if route.Spec.TLS.ExternalCertificate != nil {
+				certChanged = true
+			}
 		}
 
 		return certChanged
 	case route.Spec.TLS != nil:
 		// using any default certificate is allowed
-		return hasCertificateInfo(route.Spec.TLS)
+		return hasCertificateInfo(route.Spec.TLS, opts)
 	default:
 		// all other cases we are not adding additional certificate info
 		return false
@@ -175,10 +177,10 @@ func validateImmutableField(newVal, oldVal interface{}, fldPath *field.Path, err
 // since we cannot verify state of external secret object.
 // Due to this it proceeds with the assumption that the certificate has changed
 // when the route has externalCertificate set.
-func ValidateHostUpdate(ctx context.Context, route, older *routev1.Route, sarc route.SubjectAccessReviewCreator) field.ErrorList {
+func ValidateHostUpdate(ctx context.Context, route, older *routev1.Route, sarc route.SubjectAccessReviewCreator, opts route.RouteValidationOptions) field.ErrorList {
 	hostChanged := route.Spec.Host != older.Spec.Host
 	subdomainChanged := route.Spec.Subdomain != older.Spec.Subdomain
-	certChanged := certificateChangeRequiresAuth(route, older)
+	certChanged := certificateChangeRequiresAuth(route, older, opts)
 	if !hostChanged && !certChanged && !subdomainChanged {
 		return nil
 	}
@@ -249,12 +251,14 @@ func ValidateHostUpdate(ctx context.Context, route, older *routev1.Route, sarc r
 			errs = append(errs, validateImmutableField(route.Spec.TLS.DestinationCACertificate, older.Spec.TLS.DestinationCACertificate, field.NewPath("spec", "tls", "destinationCACertificate"), routeTLSPermissionErrMsg)...)
 			errs = append(errs, validateImmutableField(route.Spec.TLS.Key, older.Spec.TLS.Key, field.NewPath("spec", "tls", "key"), routeTLSPermissionErrMsg)...)
 
-			if route.Spec.TLS.ExternalCertificate == nil || older.Spec.TLS.ExternalCertificate == nil {
-				errs = append(errs, validateImmutableField(route.Spec.TLS.ExternalCertificate, older.Spec.TLS.ExternalCertificate, field.NewPath("spec", "tls", "externalCertificate"), routeTLSPermissionErrMsg)...)
-			} else {
-				// since the state of the external secret cannot be verified, return error (even when secret name remains unchanged)
-				// without performing immutability checks, if externalCertificate is set.
-				errs = append(errs, field.Invalid(field.NewPath("spec", "tls", "externalCertificate"), route.Spec.TLS.ExternalCertificate, routeTLSPermissionErrMsg))
+			if opts.AllowExternalCertificates {
+				if route.Spec.TLS.ExternalCertificate == nil || older.Spec.TLS.ExternalCertificate == nil {
+					errs = append(errs, validateImmutableField(route.Spec.TLS.ExternalCertificate, older.Spec.TLS.ExternalCertificate, field.NewPath("spec", "tls", "externalCertificate"), routeTLSPermissionErrMsg)...)
+				} else {
+					// since the state of the external secret cannot be verified, return error (even when secret name remains unchanged)
+					// without performing immutability checks, if externalCertificate is set.
+					errs = append(errs, field.Invalid(field.NewPath("spec", "tls", "externalCertificate"), route.Spec.TLS.ExternalCertificate, routeTLSPermissionErrMsg))
+				}
 			}
 			return errs
 		}

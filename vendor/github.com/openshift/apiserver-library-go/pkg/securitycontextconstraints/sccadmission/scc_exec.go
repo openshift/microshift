@@ -27,7 +27,7 @@ func RegisterSCCExecRestrictions(plugins *admission.Plugins) {
 }
 
 var (
-	_ = initializer.WantsUnconditionalAuthorizer(&sccExecRestrictions{})
+	_ = initializer.WantsAuthorizer(&sccExecRestrictions{})
 	_ = initializer.WantsExternalKubeClientSet(&sccExecRestrictions{})
 	_ = WantsSecurityInformer(&sccExecRestrictions{})
 	_ = admission.ValidationInterface(&sccExecRestrictions{})
@@ -98,8 +98,8 @@ func (d *sccExecRestrictions) SetSecurityInformers(informers securityv1informers
 	d.constraintAdmission.SetSecurityInformers(informers)
 }
 
-func (d *sccExecRestrictions) SetUnconditionalAuthorizer(a authorizer.UnconditionalAuthorizer) {
-	d.constraintAdmission.SetUnconditionalAuthorizer(a)
+func (d *sccExecRestrictions) SetAuthorizer(authorizer authorizer.Authorizer) {
+	d.constraintAdmission.SetAuthorizer(authorizer)
 }
 
 // Validate defines actions to validate sccExecRestrictions

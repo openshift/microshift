@@ -60,7 +60,7 @@ func parseCgroupString(cgroupStr string) (*Cgroup, error) {
 	}
 	cgroup.HierarchyID, err = strconv.Atoi(fields[0])
 	if err != nil {
-		return nil, fmt.Errorf("%w: hierarchy ID: %q", ErrFileParse, fields[0])
+		return nil, fmt.Errorf("%w: hierarchy ID: %q", ErrFileParse, cgroup.HierarchyID)
 	}
 	if fields[1] != "" {
 		ssNames := strings.Split(fields[1], ",")

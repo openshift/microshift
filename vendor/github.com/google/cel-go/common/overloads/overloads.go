@@ -291,6 +291,7 @@ const (
 const (
 	DurationToDuration = "duration_to_duration"
 	StringToDuration   = "string_to_duration"
+	IntToDuration      = "int64_to_duration"
 )
 
 // Convert to dyn

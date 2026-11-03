@@ -214,19 +214,6 @@ func (err AlreadyRegisteredError) Error() string {
 // by a Gatherer to report multiple errors during MetricFamily gathering.
 type MultiError []error
 
-// SafeMultiError is a thread-safe wrapper around MultiError using a mutex.
-type SafeMultiError struct {
-	mu   sync.Mutex
-	errs MultiError
-}
-
-// Appends the provided error to the contained MultiError in a thread-safe way.
-func (s *SafeMultiError) Append(err error) {
-	s.mu.Lock()
-	s.errs.Append(err)
-	s.mu.Unlock()
-}
-
 // Error formats the contained errors as a bullet point list, preceded by the
 // total number of errors. Note that this results in a multi-line string.
 func (errs MultiError) Error() string {
@@ -421,16 +408,6 @@ func (r *Registry) MustRegister(cs ...Collector) {
 	}
 }
 
-// MustGather implements Gatherer.
-// Wraps around Gather and panics if Gather fails for any reason.
-func (r *Registry) MustGather() []*dto.MetricFamily {
-	mfs, err := r.Gather()
-	if err != nil {
-		panic(err)
-	}
-	return mfs
-}
-
 // Gather implements Gatherer.
 func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 	r.mtx.RLock()
@@ -446,7 +423,7 @@ func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 		uncheckedMetricChan = make(chan Metric, capMetricChan)
 		metricHashes        = map[uint64]struct{}{}
 		wg                  sync.WaitGroup
-		safeErrs            = &SafeMultiError{} // To collect errors in a threadsafe way
+		errs                MultiError          // The collected errors to return in the end.
 		registeredDescIDs   map[uint64]struct{} // Only used for pedantic checks
 	)
 
@@ -476,9 +453,9 @@ func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 		for {
 			select {
 			case collector := <-checkedCollectors:
-				safeErrs.Append((safeCollect(collector, checkedMetricChan)))
+				collector.Collect(checkedMetricChan)
 			case collector := <-uncheckedCollectors:
-				safeErrs.Append(safeCollect(collector, uncheckedMetricChan))
+				collector.Collect(uncheckedMetricChan)
 			default:
 				return
 			}
@@ -522,7 +499,7 @@ func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 				cmc = nil
 				break
 			}
-			safeErrs.Append(processMetric(
+			errs.Append(processMetric(
 				metric, metricFamiliesByName,
 				metricHashes,
 				registeredDescIDs,
@@ -532,7 +509,7 @@ func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 				umc = nil
 				break
 			}
-			safeErrs.Append(processMetric(
+			errs.Append(processMetric(
 				metric, metricFamiliesByName,
 				metricHashes,
 				nil,
@@ -549,7 +526,7 @@ func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 						cmc = nil
 						break
 					}
-					safeErrs.Append(processMetric(
+					errs.Append(processMetric(
 						metric, metricFamiliesByName,
 						metricHashes,
 						registeredDescIDs,
@@ -559,7 +536,7 @@ func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 						umc = nil
 						break
 					}
-					safeErrs.Append(processMetric(
+					errs.Append(processMetric(
 						metric, metricFamiliesByName,
 						metricHashes,
 						nil,
@@ -579,8 +556,7 @@ func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 			break
 		}
 	}
-
-	return internal.NormalizeMetricFamilies(metricFamiliesByName), safeErrs.errs.MaybeUnwrap()
+	return internal.NormalizeMetricFamilies(metricFamiliesByName), errs.MaybeUnwrap()
 }
 
 // Describe implements Collector.
@@ -593,24 +569,6 @@ func (r *Registry) Describe(ch chan<- *Desc) {
 	for _, c := range r.collectorsByID {
 		c.Describe(ch)
 	}
-}
-
-// Helper wrapper around Collector.Collect.
-// It tries to collect from the channel, recovers on panic and
-// if it has recovered from a panic, then it sends an InvalidMetric into
-// the channel with an InvalidDesc, and an error that includes a stack trace.
-func safeCollect(c Collector, ch chan<- Metric) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			buf := make([]byte, 64<<10) //	64 KB
-			n := runtime.Stack(buf, false)
-			err = fmt.Errorf("prometheus collector panic recovered: type=%T: error=%v\nstack trace=%s", c, r, buf[:n])
-			ch <- NewInvalidMetric(NewInvalidDesc(err), err)
-		}
-	}()
-	c.Collect(ch)
-
-	return err
 }
 
 // Collect implements Collector.
@@ -641,12 +599,10 @@ func WriteToTextfile(filename string, g Gatherer) error {
 
 	mfs, err := g.Gather()
 	if err != nil {
-		tmp.Close()
 		return err
 	}
 	for _, mf := range mfs {
 		if _, err := expfmt.MetricFamilyToText(tmp, mf); err != nil {
-			tmp.Close()
 			return err
 		}
 	}
@@ -729,9 +685,6 @@ func processMetric(
 		metricFamily = &dto.MetricFamily{}
 		metricFamily.Name = proto.String(desc.fqName)
 		metricFamily.Help = proto.String(desc.help)
-		if desc.unit != "" {
-			metricFamily.Unit = proto.String(desc.unit)
-		}
 		// TODO(beorn7): Simplify switch once Desc has type.
 		switch {
 		case dtoMetric.Gauge != nil:

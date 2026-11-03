@@ -108,7 +108,7 @@ func (lib *celBindings) CompileOptions() []cel.EnvOption {
 
 func (lib *celBindings) ProgramOptions() []cel.ProgramOption {
 	if lib.version >= 1 {
-		celBlockPlan := func(i interpreter.InterpretableV2) (interpreter.InterpretableV2, error) {
+		celBlockPlan := func(i interpreter.Interpretable) (interpreter.Interpretable, error) {
 			call, ok := i.(interpreter.InterpretableCall)
 			if !ok {
 				return i, nil
@@ -140,7 +140,7 @@ func (lib *celBindings) ProgramOptions() []cel.ProgramOption {
 				return i, nil
 			}
 		}
-		return []cel.ProgramOption{cel.CustomDecoratorV2(celBlockPlan)}
+		return []cel.ProgramOption{cel.CustomDecorator(celBlockPlan)}
 	}
 	return []cel.ProgramOption{}
 }
@@ -190,7 +190,7 @@ func celBind(mef cel.MacroExprFactory, target ast.Expr, args []ast.Expr) (ast.Ex
 	), nil
 }
 
-func newDynamicBlock(slotExprs []interpreter.InterpretableV2, expr interpreter.InterpretableV2) interpreter.InterpretableV2 {
+func newDynamicBlock(slotExprs []interpreter.Interpretable, expr interpreter.Interpretable) interpreter.Interpretable {
 	bs := &dynamicBlock{
 		slotExprs: slotExprs,
 		expr:      expr,
@@ -213,8 +213,8 @@ func newDynamicBlock(slotExprs []interpreter.InterpretableV2, expr interpreter.I
 }
 
 type dynamicBlock struct {
-	slotExprs          []interpreter.InterpretableV2
-	expr               interpreter.InterpretableV2
+	slotExprs          []interpreter.Interpretable
+	expr               interpreter.Interpretable
 	slotActivationPool *sync.Pool
 }
 
@@ -223,23 +223,12 @@ func (b *dynamicBlock) ID() int64 {
 	return b.expr.ID()
 }
 
-// Exec implements the Interpretable interface method and pushes a new frame onto the
-// execution frame for the duration of the block execution.
-func (b *dynamicBlock) Exec(frame *interpreter.ExecutionFrame) ref.Val {
-	sa := b.slotActivationPool.Get().(*dynamicSlotActivation)
-	sa.frame = frame.Push(sa)
-	// Ensure the 'unwrapped' Activation points to the original one from the frame,
-	// and not the hierarchical activation which composes the original and the slot
-	// activation.
-	sa.Activation = frame.Activation
-	defer sa.frame.Pop()
-	defer b.clearSlots(sa)
-	return b.expr.Exec(sa.frame)
-}
-
 // Eval implements the Interpretable interface method.
 func (b *dynamicBlock) Eval(activation cel.Activation) ref.Val {
-	return b.Exec(interpreter.AsFrame(activation))
+	sa := b.slotActivationPool.Get().(*dynamicSlotActivation)
+	sa.Activation = activation
+	defer b.clearSlots(sa)
+	return b.expr.Eval(sa)
 }
 
 func (b *dynamicBlock) clearSlots(sa *dynamicSlotActivation) {
@@ -254,8 +243,7 @@ type slotVal struct {
 
 type dynamicSlotActivation struct {
 	cel.Activation
-	frame     *interpreter.ExecutionFrame
-	slotExprs []interpreter.InterpretableV2
+	slotExprs []interpreter.Interpretable
 	slotCount int
 	slotVals  []*slotVal
 }
@@ -279,7 +267,7 @@ func (sa *dynamicSlotActivation) ResolveName(name string) (any, bool) {
 			return *v.value, true
 		}
 		v.visited = true
-		val := sa.slotExprs[idx].Exec(sa.frame)
+		val := sa.slotExprs[idx].Eval(sa)
 		v.value = &val
 		return val, true
 	}
@@ -288,14 +276,13 @@ func (sa *dynamicSlotActivation) ResolveName(name string) (any, bool) {
 
 func (sa *dynamicSlotActivation) reset() {
 	sa.Activation = nil
-	sa.frame = nil
 	for _, sv := range sa.slotVals {
 		sv.visited = false
 		sv.value = nil
 	}
 }
 
-func newConstantBlock(slots traits.Lister, expr interpreter.InterpretableV2) interpreter.InterpretableV2 {
+func newConstantBlock(slots traits.Lister, expr interpreter.Interpretable) interpreter.Interpretable {
 	count := slots.Size().(types.Int)
 	return &constantBlock{slots: slots, slotCount: int(count), expr: expr}
 }
@@ -303,7 +290,7 @@ func newConstantBlock(slots traits.Lister, expr interpreter.InterpretableV2) int
 type constantBlock struct {
 	slots     traits.Lister
 	slotCount int
-	expr      interpreter.InterpretableV2
+	expr      interpreter.Interpretable
 }
 
 // ID implements the interpreter.Interpretable interface method.
@@ -311,24 +298,15 @@ func (b *constantBlock) ID() int64 {
 	return b.expr.ID()
 }
 
-// Exec implements the Interpretable interface method and pushes a new frame onto the
-// stack for the duration of the block execution.
-func (b *constantBlock) Exec(frame *interpreter.ExecutionFrame) ref.Val {
-	sa := constantSlotActivation{Activation: frame.Activation, slots: b.slots, slotCount: b.slotCount}
-	sa.frame = frame.Push(sa)
-	defer sa.frame.Pop()
-	return b.expr.Exec(sa.frame)
-}
-
 // Eval implements the interpreter.Interpretable interface method, and will proxy @index prefixed variable
 // lookups into a set of constant slots determined from the plan step.
 func (b *constantBlock) Eval(activation cel.Activation) ref.Val {
-	return b.Exec(interpreter.AsFrame(activation))
+	vars := constantSlotActivation{Activation: activation, slots: b.slots, slotCount: b.slotCount}
+	return b.expr.Eval(vars)
 }
 
 type constantSlotActivation struct {
 	cel.Activation
-	frame     *interpreter.ExecutionFrame
 	slots     traits.Lister
 	slotCount int
 }

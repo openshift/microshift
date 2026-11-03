@@ -101,9 +101,6 @@ type SummaryOpts struct {
 	// string.
 	Help string
 
-	// Unit provides the unit of this Summary.
-	Unit string
-
 	// ConstLabels are used to attach fixed labels to this metric. Metrics
 	// with the same fully-qualified name must have the same label names in
 	// their ConstLabels.
@@ -184,12 +181,11 @@ type SummaryVecOpts struct {
 // NewSummary creates a new Summary based on the provided SummaryOpts.
 func NewSummary(opts SummaryOpts) Summary {
 	return newSummary(
-		V2.NewDesc(
+		NewDesc(
 			BuildFQName(opts.Namespace, opts.Subsystem, opts.Name),
 			opts.Help,
-			UnconstrainedLabels(nil),
+			nil,
 			opts.ConstLabels,
-			WithUnit(opts.Unit),
 		),
 		opts,
 	)
@@ -582,7 +578,6 @@ func (v2) NewSummaryVec(opts SummaryVecOpts) *SummaryVec {
 		opts.Help,
 		opts.VariableLabels,
 		opts.ConstLabels,
-		WithUnit(opts.Unit),
 	)
 	return &SummaryVec{
 		MetricVec: NewMetricVec(desc, func(lvs ...string) Metric {

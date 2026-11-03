@@ -17,10 +17,10 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io"
-	"os"
 	"strconv"
 	"strings"
+
+	"github.com/prometheus/procfs/internal/util"
 )
 
 // A MountInfo is a type that describes the details, options
@@ -160,19 +160,9 @@ func mountOptionsParser(mountOptions string) map[string]string {
 	return opts
 }
 
-// readMountInfo reads a full mountinfo file (no 1 MiB cap, unlike util.ReadFileNoStat).
-func readMountInfo(path string) ([]byte, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return io.ReadAll(f)
-}
-
 // GetMounts retrieves mountinfo information from `/proc/self/mountinfo`.
 func GetMounts() ([]*MountInfo, error) {
-	data, err := readMountInfo("/proc/self/mountinfo")
+	data, err := util.ReadFileNoStat("/proc/self/mountinfo")
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +171,7 @@ func GetMounts() ([]*MountInfo, error) {
 
 // GetProcMounts retrieves mountinfo information from a processes' `/proc/<pid>/mountinfo`.
 func GetProcMounts(pid int) ([]*MountInfo, error) {
-	data, err := readMountInfo(fmt.Sprintf("/proc/%d/mountinfo", pid))
+	data, err := util.ReadFileNoStat(fmt.Sprintf("/proc/%d/mountinfo", pid))
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +180,7 @@ func GetProcMounts(pid int) ([]*MountInfo, error) {
 
 // GetMounts retrieves mountinfo information from `/proc/self/mountinfo`.
 func (fs FS) GetMounts() ([]*MountInfo, error) {
-	data, err := readMountInfo(fs.proc.Path("self/mountinfo"))
+	data, err := util.ReadFileNoStat(fs.proc.Path("self/mountinfo"))
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +189,7 @@ func (fs FS) GetMounts() ([]*MountInfo, error) {
 
 // GetProcMounts retrieves mountinfo information from a processes' `/proc/<pid>/mountinfo`.
 func (fs FS) GetProcMounts(pid int) ([]*MountInfo, error) {
-	data, err := readMountInfo(fs.proc.Path(fmt.Sprintf("%d/mountinfo", pid)))
+	data, err := util.ReadFileNoStat(fs.proc.Path(fmt.Sprintf("%d/mountinfo", pid)))
 	if err != nil {
 		return nil, err
 	}

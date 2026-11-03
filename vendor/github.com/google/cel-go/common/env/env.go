@@ -50,7 +50,6 @@ type Config struct {
 	Functions       []*Function      `yaml:"functions,omitempty"`
 	Validators      []*Validator     `yaml:"validators,omitempty"`
 	Features        []*Feature       `yaml:"features,omitempty"`
-	Limits          []*Limit         `yaml:"limits,omitempty"`
 }
 
 // Validate validates the whole configuration is well-formed.
@@ -90,11 +89,6 @@ func (c *Config) Validate() error {
 	}
 	for _, feat := range c.Features {
 		if err := feat.Validate(); err != nil {
-			errs = append(errs, err)
-		}
-	}
-	for _, limit := range c.Limits {
-		if err := limit.Validate(); err != nil {
 			errs = append(errs, err)
 		}
 	}
@@ -212,12 +206,6 @@ func (c *Config) AddFeatures(feats ...*Feature) *Config {
 	return c
 }
 
-// AddLimits appends one or more limits to the config.
-func (c *Config) AddLimits(limits ...*Limit) *Config {
-	c.Limits = append(c.Limits, limits...)
-	return c
-}
-
 // NewImport returns a serializable import value from the qualified type name.
 func NewImport(name string) *Import {
 	return &Import{Name: name}
@@ -258,9 +246,7 @@ type Variable struct {
 
 	// Type represents the type declaration for the variable.
 	//
-	// When serialized, 'type' is used for shorthand specifier string.
-	//
-	// Use GetType() for getting the effective type.
+	// Deprecated: use the embedded *TypeDesc fields directly.
 	Type *TypeDesc `yaml:"type,omitempty"`
 
 	// TypeDesc is an embedded set of fields allowing for the specification of the Variable type.
@@ -277,9 +263,6 @@ func (v *Variable) Validate() error {
 	}
 	if err := v.GetType().Validate(); err != nil {
 		return fmt.Errorf("invalid variable %q: %w", v.Name, err)
-	}
-	if v.GetType().IsTypeParam {
-		return fmt.Errorf("invalid variable %q: variables cannot be type parameters", v.Name)
 	}
 	return nil
 }
@@ -751,29 +734,6 @@ func (feat *Feature) Validate() error {
 	return nil
 }
 
-// Limit represents a named limit in the CEL environment. This is used to control
-// the complexity tolerated before failing parsing, type checking, or planning.
-type Limit struct {
-	Name  string `yaml:"name"`
-	Value int    `yaml:"value"`
-}
-
-// NewLimit creates a new limit.
-func NewLimit(name string, value int) *Limit {
-	return &Limit{name, value}
-}
-
-// Validate validates a limit.
-func (l *Limit) Validate() error {
-	if l == nil {
-		return errors.New("invalid limit: nil")
-	}
-	if l.Name == "" {
-		return errors.New("invalid limit: missing name")
-	}
-	return nil
-}
-
 // NewTypeDesc describes a simple or complex type with parameters.
 func NewTypeDesc(typeName string, params ...*TypeDesc) *TypeDesc {
 	return &TypeDesc{TypeName: typeName, Params: params}
@@ -836,45 +796,9 @@ func (td *TypeDesc) Validate() error {
 			return fmt.Errorf("invalid type: optional_type expects 1 parameter, got %d", len(td.Params))
 		}
 		return td.Params[0].Validate()
-	case "type":
-		if len(td.Params) == 0 {
-			return nil
-		}
-		if len(td.Params) != 1 {
-			return fmt.Errorf("invalid type: type expects 0 or 1 parameters, got %d", len(td.Params))
-		}
-		return td.Params[0].Validate()
 	default:
 	}
 	return nil
-}
-
-func formatSpecifierImpl(td *TypeDesc, sb *strings.Builder) {
-	if td.IsTypeParam {
-		sb.WriteRune('~')
-		sb.WriteString(td.TypeName)
-		return
-	}
-	sb.WriteString(td.TypeName)
-	l := len(td.Params)
-	if l < 1 {
-		return
-	}
-	sb.WriteRune('<')
-	for i, p := range td.Params {
-		formatSpecifierImpl(p, sb)
-		if i < l-1 {
-			sb.WriteString(", ")
-		}
-	}
-	sb.WriteRune('>')
-}
-
-// SpecifierFormat returns the short text representation of the type. e.g. "map<string, int>"
-func (td *TypeDesc) SpecifierFormat() string {
-	var sb strings.Builder
-	formatSpecifierImpl(td, &sb)
-	return sb.String()
 }
 
 // AsCELType converts the serializable object to a *types.Type value.
@@ -886,27 +810,6 @@ func (td *TypeDesc) AsCELType(tp types.Provider) (*types.Type, error) {
 	switch td.TypeName {
 	case "dyn":
 		return types.DynType, nil
-	// short aliases for WKTs
-	case "duration":
-		return types.DurationType, nil
-	case "timestamp":
-		return types.TimestampType, nil
-	case "any":
-		return types.AnyType, nil
-	case "null", "null_type":
-		return types.NullType, nil
-	case "bool_wrapper":
-		return types.NewNullableType(types.BoolType), nil
-	case "bytes_wrapper":
-		return types.NewNullableType(types.BytesType), nil
-	case "double_wrapper":
-		return types.NewNullableType(types.DoubleType), nil
-	case "int_wrapper":
-		return types.NewNullableType(types.IntType), nil
-	case "uint_wrapper":
-		return types.NewNullableType(types.UintType), nil
-	case "string_wrapper":
-		return types.NewNullableType(types.StringType), nil
 	case "map":
 		kt, err := td.Params[0].AsCELType(tp)
 		if err != nil {
@@ -929,15 +832,6 @@ func (td *TypeDesc) AsCELType(tp types.Provider) (*types.Type, error) {
 			return nil, err
 		}
 		return types.NewOptionalType(et), nil
-	case "type":
-		if len(td.Params) == 0 {
-			return types.TypeType, nil
-		}
-		pt, err := td.Params[0].AsCELType(tp)
-		if err != nil {
-			return nil, err
-		}
-		return types.NewTypeTypeWithParam(pt), nil
 	default:
 		if td.IsTypeParam {
 			return types.NewTypeParamType(td.TypeName), nil
@@ -979,15 +873,6 @@ func SerializeTypeDesc(t *types.Type) *TypeDesc {
 	var params []*TypeDesc
 	for _, p := range t.Parameters() {
 		params = append(params, SerializeTypeDesc(p))
-	}
-	// Special types, these aren't useful for describing environments.
-	switch t.Kind() {
-	case types.ErrorKind:
-		typeName = "*error*"
-	case types.UnknownKind:
-		typeName = "*unknown*"
-	case types.UnspecifiedKind:
-		typeName = "*unspecified type*"
 	}
 	return NewTypeDesc(typeName, params...)
 }

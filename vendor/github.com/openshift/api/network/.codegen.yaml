@@ -1,4 +1,1 @@
-protobuf:
-  disabled: false
-  disabledVersions:
-  - v1alpha1
+schemapatch:

@@ -48,13 +48,11 @@ type Crypto struct {
 	Walksize    *uint64
 }
 
-var cryptoFile = "crypto"
-
 // Crypto parses an crypto-file (/proc/crypto) and returns a slice of
 // structs containing the relevant info.  More information available here:
 // https://kernel.readthedocs.io/en/sphinx-samples/crypto-API.html
 func (fs FS) Crypto() ([]Crypto, error) {
-	path := fs.proc.Path(cryptoFile)
+	path := fs.proc.Path("crypto")
 	b, err := util.ReadFileNoStat(path)
 	if err != nil {
 		return nil, fmt.Errorf("%w: Cannot read file %v: %w", ErrFileRead, b, err)
@@ -82,10 +80,6 @@ func parseCrypto(r io.Reader) ([]Crypto, error) {
 			out = append(out, Crypto{})
 		case text == "":
 			continue
-		}
-
-		if len(out) == 0 {
-			return nil, fmt.Errorf("%w: parsed invalid line before name parsed: %q", ErrFileParse, text)
 		}
 
 		kv := strings.Split(text, ":")

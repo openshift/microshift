@@ -434,18 +434,10 @@ func convertToCelType(refType reflect.Type) (*cel.Type, bool) {
 		if refType == timestampType {
 			return cel.TimestampType, true
 		}
-		if refType.Implements(refValType) {
-			emptyCelVal := reflect.New(refType).Elem().Interface().(ref.Val)
-			return emptyCelVal.Type().(*cel.Type), true
-		}
 		return cel.ObjectType(
 			fmt.Sprintf("%s.%s", simplePkgAlias(refType.PkgPath()), refType.Name()),
 		), true
 	case reflect.Pointer:
-		if refType.Implements(refValType) {
-			emptyCelVal := reflect.New(refType.Elem()).Interface().(ref.Val)
-			return emptyCelVal.Type().(*cel.Type), true
-		}
 		if refType.Implements(pbMsgInterfaceType) {
 			pbMsg := reflect.New(refType.Elem()).Interface().(protoreflect.ProtoMessage)
 			return cel.ObjectType(string(pbMsg.ProtoReflect().Descriptor().FullName())), true
@@ -616,10 +608,6 @@ func newNativeTypes(fieldNameHandler NativeTypesFieldNameHandler, rawType reflec
 	alreadySeen := make(map[string]struct{})
 	var iterateStructMembers func(reflect.Type)
 	iterateStructMembers = func(t reflect.Type) {
-		if t.Implements(reflect.TypeFor[ref.Val]()) {
-			// skip this field since it's a CEL ref.Val instance.
-			return
-		}
 		if k := t.Kind(); k == reflect.Pointer || k == reflect.Slice || k == reflect.Array || k == reflect.Map {
 			iterateStructMembers(t.Elem())
 			return
@@ -803,8 +791,7 @@ func isSupportedType(refType reflect.Type) bool {
 }
 
 var (
-	pbMsgInterfaceType = reflect.TypeFor[protoreflect.ProtoMessage]()
-	refValType         = reflect.TypeFor[ref.Val]()
-	timestampType      = reflect.TypeFor[time.Time]()
-	durationType       = reflect.TypeFor[time.Duration]()
+	pbMsgInterfaceType = reflect.TypeOf((*protoreflect.ProtoMessage)(nil)).Elem()
+	timestampType      = reflect.TypeOf(time.Now())
+	durationType       = reflect.TypeOf(time.Nanosecond)
 )

@@ -23,7 +23,7 @@ import (
 )
 
 type Key = groupcache.Key
-type EvictionFunc = func(key Key, value any)
+type EvictionFunc = func(key Key, value interface{})
 
 // Cache is a thread-safe fixed size LRU cache.
 type Cache struct {
@@ -57,14 +57,14 @@ func (c *Cache) SetEvictionFunc(f EvictionFunc) error {
 }
 
 // Add adds a value to the cache.
-func (c *Cache) Add(key Key, value any) {
+func (c *Cache) Add(key Key, value interface{}) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.cache.Add(key, value)
 }
 
 // Get looks up a key's value from the cache.
-func (c *Cache) Get(key Key) (value any, ok bool) {
+func (c *Cache) Get(key Key) (value interface{}, ok bool) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	return c.cache.Get(key)

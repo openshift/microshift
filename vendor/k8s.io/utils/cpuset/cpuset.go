@@ -210,7 +210,9 @@ func Parse(s string) (CPUSet, error) {
 
 	// Split CPU list string:
 	// "0-5,34,46-48" => ["0-5", "34", "46-48"]
-	for r := range strings.SplitSeq(s, ",") {
+	ranges := strings.Split(s, ",")
+
+	for _, r := range ranges {
 		boundaries := strings.SplitN(r, "-", 2)
 		if len(boundaries) == 1 {
 			// Handle ranges that consist of only one element like "34".

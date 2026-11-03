@@ -45,7 +45,7 @@ func consistentReadSync(filename string, attempts int, sync func(int)) ([]byte, 
 	if err != nil {
 		return nil, err
 	}
-	for i := range attempts {
+	for i := 0; i < attempts; i++ {
 		if sync != nil {
 			sync(i)
 		}

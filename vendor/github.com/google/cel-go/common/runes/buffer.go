@@ -16,7 +16,6 @@
 package runes
 
 import (
-	"fmt"
 	"strings"
 	"unicode/utf8"
 )
@@ -114,64 +113,45 @@ var _ Buffer = &supplementalBuffer{}
 
 var nilBuffer = &emptyBuffer{}
 
-// SizeLimitError indicates that the input exceeded the configured code point limit.
-type SizeLimitError struct {
-	Size  int
-	Limit int
-}
-
-func (e *SizeLimitError) Error() string {
-	return fmt.Sprintf("expression code point size exceeds limit: size: %d, limit %d", e.Size, e.Limit)
-}
-
 // NewBuffer returns an efficient implementation of Buffer for the given text based on the ranges of
 // the encoded code points contained within.
+//
+// Code points are represented as an array of byte, uint16, or rune. This approach ensures that
+// each index represents a code point by itself without needing to use an array of rune. At first
+// we assume all code points are less than or equal to '\u007f'. If this holds true, the
+// underlying storage is a byte array containing only ASCII characters. If we encountered a code
+// point above this range but less than or equal to '\uffff' we allocate a uint16 array, copy the
+// elements of previous byte array to the uint16 array, and continue. If this holds true, the
+// underlying storage is a uint16 array containing only Unicode characters in the Basic Multilingual
+// Plane. If we encounter a code point above '\uffff' we allocate an rune array, copy the previous
+// elements of the byte or uint16 array, and continue. The underlying storage is an rune array
+// containing any Unicode character.
 func NewBuffer(data string) Buffer {
-	buf, _, _ := newBufferWithLimit(data, false, -1)
+	buf, _ := newBuffer(data, false)
 	return buf
 }
 
 // NewBufferAndLineOffsets returns an efficient implementation of Buffer for the given text based on
 // the ranges of the encoded code points contained within, as well as returning the line offsets.
+//
+// Code points are represented as an array of byte, uint16, or rune. This approach ensures that
+// each index represents a code point by itself without needing to use an array of rune. At first
+// we assume all code points are less than or equal to '\u007f'. If this holds true, the
+// underlying storage is a byte array containing only ASCII characters. If we encountered a code
+// point above this range but less than or equal to '\uffff' we allocate a uint16 array, copy the
+// elements of previous byte array to the uint16 array, and continue. If this holds true, the
+// underlying storage is a uint16 array containing only Unicode characters in the Basic Multilingual
+// Plane. If we encounter a code point above '\uffff' we allocate an rune array, copy the previous
+// elements of the byte or uint16 array, and continue. The underlying storage is an rune array
+// containing any Unicode character.
 func NewBufferAndLineOffsets(data string) (Buffer, []int32) {
-	buf, offs, _ := newBufferWithLimit(data, true, -1)
-	return buf, offs
+	return newBuffer(data, true)
 }
 
-// NewBufferAndLineOffsetsWithLimit returns an efficient implementation of Buffer for the given text
-// and enforces a code point limit while constructing the buffer.
-func NewBufferAndLineOffsetsWithLimit(data string, limit int) (Buffer, []int32, error) {
-	if limit < 0 || len(data) <= limit {
-		return newBufferWithLimit(data, true, -1)
-	}
-	return newBufferWithLimit(data, true, limit)
-}
-
-func countRemainingCodePoints(data string, idx int, count int) int {
-	for idx < len(data) {
-		_, s := utf8.DecodeRuneInString(data[idx:])
-		idx += s
-		count++
-	}
-	return count
-}
-
-func newBufferWithLimit(data string, lines bool, limit int) (Buffer, []int32, error) {
+func newBuffer(data string, lines bool) (Buffer, []int32) {
 	if len(data) == 0 {
-		return nilBuffer, []int32{0}, nil
+		return nilBuffer, []int32{0}
 	}
-	if limit >= 0 && len(data) > limit {
-		size := countRemainingCodePoints(data, 0, 0)
-		if size > limit {
-			return nil, nil, &SizeLimitError{
-				Size:  size,
-				Limit: limit,
-			}
-		}
-	}
-
-	// The resulting buffers store one element per code point, so the worst case
-	// element count never exceeds len(data).
 	var (
 		idx         = 0
 		off   int32 = 0
@@ -215,8 +195,7 @@ func newBufferWithLimit(data string, lines bool, limit int) (Buffer, []int32, er
 	}
 	return &asciiBuffer{
 		arr: buf8,
-	}, offs, nil
-
+	}, offs
 copy16:
 	for idx < len(data) {
 		r, s := utf8.DecodeRuneInString(data[idx:])
@@ -243,8 +222,7 @@ copy16:
 	}
 	return &basicBuffer{
 		arr: buf16,
-	}, offs, nil
-
+	}, offs
 copy32:
 	for idx < len(data) {
 		r, s := utf8.DecodeRuneInString(data[idx:])
@@ -260,5 +238,5 @@ copy32:
 	}
 	return &supplementalBuffer{
 		arr: buf32,
-	}, offs, nil
+	}, offs
 }

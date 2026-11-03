@@ -4,7 +4,8 @@ routes.route.openshift.io:
   CRDName: routes.route.openshift.io
   Capability: ""
   Category: ""
-  FeatureGates: []
+  FeatureGates:
+  - RouteExternalCertificate
   FilenameOperatorName: ""
   FilenameOperatorOrdering: ""
   FilenameRunLevel: ""

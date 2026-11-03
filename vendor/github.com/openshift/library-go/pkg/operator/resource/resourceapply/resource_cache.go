@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"reflect"
-	"sync"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -27,7 +26,6 @@ type cachedResource struct {
 }
 
 type resourceCache struct {
-	mu    sync.RWMutex
 	cache map[cachedVersionKey]cachedResource
 }
 
@@ -116,9 +114,7 @@ func (c *resourceCache) UpdateCachedResourceMetadata(required runtime.Object, ac
 		return
 	}
 
-	c.mu.Lock()
 	c.cache[cacheKey] = cachedResource{resourceHash, resourceVersion}
-	c.mu.Unlock()
 	klog.V(7).Infof("updated resourceVersion of %s:%s:%s %s", name, kind, namespace, resourceVersion)
 }
 
@@ -148,13 +144,14 @@ func (c *resourceCache) SafeToSkipApply(required runtime.Object, existing runtim
 		return false
 	}
 
-	c.mu.RLock()
-	cached, exists := c.cache[cacheKey]
-	c.mu.RUnlock()
-
-	if exists && cached.resourceVersion == resourceVersion && cached.resourceHash == resourceHash {
-		klog.V(4).Infof("found matching resourceVersion & manifest hash")
-		return true
+	var versionMatch, hashMatch bool
+	if cached, exists := c.cache[cacheKey]; exists {
+		versionMatch = cached.resourceVersion == resourceVersion
+		hashMatch = cached.resourceHash == resourceHash
+		if versionMatch && hashMatch {
+			klog.V(4).Infof("found matching resourceVersion & manifest hash")
+			return true
+		}
 	}
 
 	return false

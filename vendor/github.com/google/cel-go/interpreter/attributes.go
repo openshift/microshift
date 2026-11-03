@@ -190,7 +190,7 @@ func (r *attrFactory) AbsoluteAttribute(id int64, names ...string) NamespacedAtt
 func (r *attrFactory) ConditionalAttribute(id int64, expr Interpretable, t, f Attribute) Attribute {
 	return &conditionalAttribute{
 		id:      id,
-		expr:    adaptToV2(expr),
+		expr:    expr,
 		truthy:  t,
 		falsy:   f,
 		adapter: r.adapter,
@@ -225,7 +225,7 @@ func (r *attrFactory) MaybeAttribute(id int64, name string) Attribute {
 func (r *attrFactory) RelativeAttribute(id int64, operand Interpretable) Attribute {
 	return &relativeAttribute{
 		id:                     id,
-		operand:                adaptToV2(operand),
+		operand:                operand,
 		qualifiers:             []Qualifier{},
 		adapter:                r.adapter,
 		fac:                    r,
@@ -349,7 +349,7 @@ func (a *absoluteAttribute) Resolve(vars Activation) (any, error) {
 		obj, found := v.ResolveName(nm)
 		if found {
 			if celErr, ok := obj.(*types.Err); ok {
-				return nil, celErr
+				return nil, celErr.Unwrap()
 			}
 			obj, isOpt, err := applyQualifiers(v, obj, a.qualifiers)
 			if err != nil {
@@ -384,7 +384,7 @@ func (a *absoluteAttribute) Resolve(vars Activation) (any, error) {
 
 type conditionalAttribute struct {
 	id      int64
-	expr    InterpretableV2
+	expr    Interpretable
 	truthy  Attribute
 	falsy   Attribute
 	adapter types.Adapter
@@ -571,7 +571,7 @@ func (a *maybeAttribute) String() string {
 
 type relativeAttribute struct {
 	id         int64
-	operand    InterpretableV2
+	operand    Interpretable
 	qualifiers []Qualifier
 	adapter    types.Adapter
 	fac        AttributeFactory
@@ -964,11 +964,9 @@ func (q *intQualifier) qualifyInternal(vars Activation, obj any, presenceTest, p
 		}
 	case map[int32]any:
 		isMap = true
-		if i32 := int32(i); int64(i32) == i {
-			obj, isKey := o[i32]
-			if isKey {
-				return obj, true, nil
-			}
+		obj, isKey := o[int32(i)]
+		if isKey {
+			return obj, true, nil
 		}
 	case map[int64]any:
 		isMap = true
@@ -1091,11 +1089,9 @@ func (q *uintQualifier) qualifyInternal(vars Activation, obj any, presenceTest, 
 			return obj, true, nil
 		}
 	case map[uint32]any:
-		if u32 := uint32(u); uint64(u32) == u {
-			obj, isKey := o[u32]
-			if isKey {
-				return obj, true, nil
-			}
+		obj, isKey := o[uint32(u)]
+		if isKey {
+			return obj, true, nil
 		}
 	case map[uint64]any:
 		obj, isKey := o[u]
@@ -1305,7 +1301,7 @@ func applyQualifiers(vars Activation, obj any, qualifiers []Qualifier) (any, boo
 		if !optObj.HasValue() {
 			return optObj, false, nil
 		}
-		obj = optObj.GetValue()
+		obj = optObj.GetValue().Value()
 	}
 
 	var err error

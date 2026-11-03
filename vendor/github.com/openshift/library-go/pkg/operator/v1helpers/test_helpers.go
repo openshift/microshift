@@ -24,18 +24,10 @@ import (
 
 // NewFakeSharedIndexInformer returns a fake shared index informer, suitable to use in static pod controller unit tests.
 func NewFakeSharedIndexInformer() cache.SharedIndexInformer {
-	return &fakeSharedIndexInformer{synced: newFakeSyncedChan()}
+	return &fakeSharedIndexInformer{}
 }
 
-type fakeSharedIndexInformer struct {
-	synced chan struct{}
-}
-
-func newFakeSyncedChan() chan struct{} {
-	ch := make(chan struct{})
-	close(ch)
-	return ch
-}
+type fakeSharedIndexInformer struct{}
 
 func (i fakeSharedIndexInformer) AddEventHandler(handler cache.ResourceEventHandler) (cache.ResourceEventHandlerRegistration, error) {
 	return nil, nil
@@ -73,29 +65,8 @@ func (fakeSharedIndexInformer) RunWithContext(ctx context.Context) {
 	panic("implement me")
 }
 
-func (f fakeSharedIndexInformer) HasSynced() bool {
-	select {
-	case <-f.synced:
-		return true
-	default:
-		return false
-	}
-}
-
-type fakeSharedIndexInformerDone struct {
-	synced chan struct{}
-}
-
-func (fd *fakeSharedIndexInformerDone) Name() string {
-	return "FakeSharedIndexInformer"
-}
-
-func (fd *fakeSharedIndexInformerDone) Done() <-chan struct{} {
-	return fd.synced
-}
-
-func (f fakeSharedIndexInformer) HasSyncedChecker() cache.DoneChecker {
-	return &fakeSharedIndexInformerDone{synced: f.synced}
+func (fakeSharedIndexInformer) HasSynced() bool {
+	return true
 }
 
 func (fakeSharedIndexInformer) LastSyncResourceVersion() string {
@@ -147,7 +118,7 @@ type fakeStaticPodOperatorClient struct {
 }
 
 func (c *fakeStaticPodOperatorClient) Informer() cache.SharedIndexInformer {
-	return NewFakeSharedIndexInformer()
+	return &fakeSharedIndexInformer{}
 
 }
 func (c *fakeStaticPodOperatorClient) GetObjectMeta() (*metav1.ObjectMeta, error) {
@@ -301,7 +272,7 @@ func (n *fakeNodeLister) List(selector labels.Selector) ([]*corev1.Node, error) 
 }
 
 func (n *fakeNodeLister) Get(name string) (*corev1.Node, error) {
-	return n.client.CoreV1().Nodes().Get(context.TODO(), name, metav1.GetOptions{})
+	panic("implement me")
 }
 
 // NewFakeOperatorClient returns a fake operator client suitable to use in static pod controller unit tests.
@@ -330,7 +301,7 @@ type fakeOperatorClient struct {
 }
 
 func (c *fakeOperatorClient) Informer() cache.SharedIndexInformer {
-	return NewFakeSharedIndexInformer()
+	return &fakeSharedIndexInformer{}
 }
 
 func (c *fakeOperatorClient) GetObjectMeta() (*metav1.ObjectMeta, error) {
@@ -499,7 +470,6 @@ func mergeStaticPodOperatorStatusApplyConfiguration(currentOperatorStatus *v1.Op
 	for _, nodeStatus := range applyConfiguration.NodeStatuses {
 		newNodeStatus := operatorv1.NodeStatus{
 			NodeName:                 ptr.Deref(nodeStatus.NodeName, ""),
-			NodeUID:                  ptr.Deref(nodeStatus.NodeUID, ""),
 			CurrentRevision:          ptr.Deref(nodeStatus.CurrentRevision, 0),
 			TargetRevision:           ptr.Deref(nodeStatus.TargetRevision, 0),
 			LastFailedRevision:       ptr.Deref(nodeStatus.LastFailedRevision, 0),

@@ -78,8 +78,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ClusterImagePolicyList{},
 		&InsightsDataGather{},
 		&InsightsDataGatherList{},
-		&CRIOCredentialProviderConfig{},
-		&CRIOCredentialProviderConfigList{},
 	)
 	metav1.AddToGroupVersion(scheme, GroupVersion)
 	return nil

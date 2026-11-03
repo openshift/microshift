@@ -6,12 +6,13 @@ import (
 	"time"
 
 	operatorv1 "github.com/openshift/api/operator/v1"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
+
 	"github.com/openshift/library-go/pkg/controller/factory"
 	"github.com/openshift/library-go/pkg/operator/condition"
 	"github.com/openshift/library-go/pkg/operator/events"
 	"github.com/openshift/library-go/pkg/operator/v1helpers"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 const (
@@ -79,7 +80,6 @@ func NewCertRotationController(
 		RotatedSelfSignedCertKeySecret: rotatedSelfSignedCertKeySecret,
 		StatusReporter:                 reporter,
 	}
-
 	return factory.New().
 		ResyncEvery(time.Minute).
 		WithSync(c.Sync).
@@ -126,7 +126,7 @@ func (c CertRotationController) Sync(ctx context.Context, syncCtx factory.SyncCo
 		return updateErr
 	}
 	if updated && syncErr != nil {
-		syncCtx.Recorder().Warningf("RotationError", "%s", syncErr.Error())
+		syncCtx.Recorder().Warningf("RotationError", syncErr.Error())
 	}
 
 	return syncErr

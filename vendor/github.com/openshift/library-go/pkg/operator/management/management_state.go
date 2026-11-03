@@ -62,7 +62,7 @@ func IsOperatorUnknownState(state v1.ManagementState) bool {
 
 // IsOperatorManaged indicates whether the operator management state allows the control loop to proceed and manage the operand.
 func IsOperatorManaged(state v1.ManagementState) bool {
-	if IsOperatorAlwaysManaged() {
+	if IsOperatorAlwaysManaged() || IsOperatorNotRemovable() {
 		return true
 	}
 	switch state {
