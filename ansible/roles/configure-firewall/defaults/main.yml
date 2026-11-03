@@ -23,7 +23,8 @@ firewall_ports:
   - 30000-32767/tcp
   - 30000-32767/udp
 
-firewall_trusted_cidr:
-  - 10.42.0.0/16
-  - 169.254.169.1/32
-  - fd01::/48
+# Local pod network, OVN-Kubernetes masquerade and IPv6 pod networks, plus C2CC peers
+firewall_trusted_cidr: >-
+  {{ (microshift_network.cluster_network | default(['10.42.0.0/16']))
+     + ['169.254.169.1/32', 'fd01::/48']
+     + (c2cc_remote_cidrs | default([])) }}

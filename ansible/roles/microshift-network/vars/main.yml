@@ -1,0 +1,18 @@
+---
+# microshift-network internal vars
+
+microshift_network_default_cluster_network:
+  - 10.42.0.0/16
+microshift_network_default_service_network:
+  - 10.43.0.0/16
+
+# First line of every file this role writes; files without it are not ours.
+microshift_network_header: "# Managed by the microshift-network Ansible role. Local changes are overwritten."
+microshift_network_files:
+  network: /etc/microshift/config.d/10-network.yaml
+  c2cc: /etc/microshift/config.d/50-c2cc.yaml
+  ovn: /etc/microshift/ovn.yaml
+
+microshift_kubeconfig: /var/lib/microshift/resources/kubeadmin/kubeconfig
+# Linux policy routing table C2CC uses for remote CIDRs (the MicroShift default).
+c2cc_route_table: 200

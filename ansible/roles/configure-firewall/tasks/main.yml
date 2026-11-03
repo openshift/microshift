@@ -1,6 +1,21 @@
 ---
 # configure-firewall tasks
 
+# An overridden firewall_trusted_cidr must still cover the MicroShift networks
+- name: Check that the trusted zone covers the MicroShift networks
+  vars:
+    _fw_required: >-
+      {{ (microshift_network.cluster_network | default([])) + ['169.254.169.1/32', 'fd01::/48']
+         + (c2cc_remote_cidrs | default([])) }}
+  ansible.builtin.assert:
+    that:
+      - _fw_required | difference(firewall_trusted_cidr) | length == 0
+    fail_msg: >-
+      firewall_trusted_cidr lacks {{ _fw_required | difference(firewall_trusted_cidr) | join(', ') }},
+      which the MicroShift network settings of this host need.
+    quiet: true
+  when: (microshift_network.custom_networks | default(false) | bool) or (microshift_network.c2cc | default(false) | bool)
+
 - name: Permit traffic in trusted zone from CIDR
   ansible.posix.firewalld:
     source: "{{ item }}"

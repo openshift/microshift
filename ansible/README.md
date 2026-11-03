@@ -118,7 +118,9 @@ time ansible-playbook -v \
 #### Running Selected Plays
 
 Every play in `setup-node.yml` carries a tag: `localhost`, `repos`, `host`, `install`,
-`nodename`, `logging`, `start`, `warm`, `gpu`, `kubeconfig` and `workloads`. Use
+`network`, `nodename`, `logging`, `start`, `warm`, `gpu`, `kubeconfig` and `workloads`. The
+first play validates the MicroShift network settings and runs on every invocation (tag
+`always`); the C2CC verification play runs only when asked for with `--tags c2cc-verify`. Use
 `--skip-tags` or `--tags` to rerun parts of the playbook without editing it. For example, to
 reinstall MicroShift and repeat the startup measurements on a host whose subscription,
 repositories, packages and firewall are already set up:
@@ -134,6 +136,52 @@ installed instead. In that case `start` removes the MicroShift data if MicroShif
 the last boot (unless `cleanup_microshift` is false) and still reboots the host, and the
 pre-installation disk baseline (`disk0.txt`) is not captured, so the run is not a complete
 fresh-install measurement.
+
+### Connected Clusters (C2CC)
+
+The `microshift-network` role sets the pod and service networks of each MicroShift host and
+connects the hosts of the `c2cc` inventory group with
+[Cluster-to-Cluster Connectivity](../docs/user/howto_c2cc.md): every member gets a
+`remoteClusters` entry for every other member, a NetworkManager profile with its address on the
+C2CC link, and the remote pod and service networks in the firewall trusted zone. The settings
+are checked before anything on the hosts changes (non-overlapping networks, next hops on the
+link subnet, unique domains), which needs the `ansible.utils` collection and the Python
+`netaddr` package on the control node. Only hosts that set the role's variables need them.
+
+Example inventory with two hosts that share the link subnet 192.168.1.0/24:
+```ini
+[microshift]
+host-a ansible_host=10.0.0.10
+host-b ansible_host=10.0.0.20
+
+[c2cc]
+host-a
+host-b
+```
+with `host_vars/host-a.yml`:
+```yaml
+microshift_cluster_network: [10.42.0.0/16]
+microshift_service_network: [10.43.0.0/16]
+c2cc_interface: enp2s0
+c2cc_address: 192.168.1.10/24
+```
+and `host_vars/host-b.yml`:
+```yaml
+microshift_cluster_network: [10.45.0.0/16]
+microshift_service_network: [10.46.0.0/16]
+c2cc_interface: enp2s0
+c2cc_address: 192.168.1.20/24
+```
+
+The networks must be set before MicroShift first starts. The role writes its files between the
+`install` and `start` plays and refuses to change them while MicroShift is running. Once every
+member is installed and running, check that C2CC works:
+```bash
+ansible-playbook -i inventory/inventory setup-node.yml --tags c2cc-verify
+```
+This waits for every `RemoteCluster` to report `Healthy`, checks the C2CC routes and SNAT bypass
+rules, and saves them with the package versions to `c2cc-verify-<host>.txt` in the results
+directory.
 
 ## Output
 
@@ -204,6 +252,15 @@ Most of the following variables are defined in `vars/all.yml`. The source-build 
 | `kube_burner_extra_flags` | Extra kube-burner-ocp flags appended to every workload | `""` |
 | `prometheus_query_endpoint` | External Prometheus URL for the network measurement and kube-burner metrics | `http://<logging-host>:9091` |
 | `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.8") | `undefined` |
+| `microshift_cluster_network` | Pod network of the MicroShift host, a list with one IPv4 CIDR; empty keeps the MicroShift default `10.42.0.0/16` | `[]` |
+| `microshift_service_network` | Service network of the MicroShift host, a list with one IPv4 CIDR; empty keeps the MicroShift default `10.43.0.0/16` | `[]` |
+| `microshift_pod_mtu` | Pod MTU written to `/etc/microshift/ovn.yaml`; empty keeps the MicroShift default | `""` |
+| `c2cc_group` | Inventory group of the hosts connected with C2CC | `c2cc` |
+| `c2cc_interface` | Dedicated C2CC link interface, without a default route | `""` |
+| `c2cc_address` | IPv4 address with prefix of the host on the C2CC link, used by the other members as next hop | `""` |
+| `c2cc_mtu` | MTU of the C2CC link interface; empty keeps the interface default | `""` |
+| `c2cc_domain` | DNS suffix under which the other members resolve the host's Services | `<inventory_hostname>.remote` |
+| `microshift_network_adopt_files` | Replace existing files at the paths the `microshift-network` role manages instead of failing | `false` |
 | `manage_host_sysctls` | Write the `host_sysctls` drop-ins under `/etc/sysctl.d` on the MicroShift host | `true` |
 | `host_sysctls` | Kernel settings written as drop-ins under `/etc/sysctl.d` on the MicroShift host (IPv6 loopback, inotify limits) | see role defaults |
 
