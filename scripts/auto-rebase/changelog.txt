@@ -1,107 +1,275 @@
-- api embedded-component da0032bf0c5f46a6385e10b20360eb737200ff4d to 9af1f7b4730c7e2d452d3833b016cc639373d8d5
-  - 6c69bfe6 2026-10-27T18:49:27+01:00 feat(cluster-api): decouple configuration from machine management
-  - f4ca4038 2026-10-27T11:50:23+05:30 adding files from make update
-  - 5cc1e518 2026-10-26T16:33:08+05:30 Update features/features.go
-  - f525135e 2026-10-26T15:36:26+05:30 Nutanix: featuregate for MachineAPIMigrationNutanix
+- api embedded-component 9af1f7b4730c7e2d452d3833b016cc639373d8d5 to f677639a402fe455b8243b23b1d160cfc3587918
+  - 9d603712 2026-10-29T14:44:29-04:00 Add OpenStack.maxAllowedAddressPairs to Infrastructure API
+  - acac8213 2026-10-29T13:20:48+05:30 feat: register FeatureGateClusterAPIMachineManagementNutanix
+  - 9871aa83 2026-10-28T17:37:47Z Add example of validating an OpenShift release version
+  - cbba7821 2026-10-28T17:34:21Z Bump ENVTEST_K8S_VERSION to 1.34.1
+  - d52e47cf 2026-10-27T12:04:14+01:00 config: scope remote write URL userinfo validation to authority
+  - 56a02a37 2026-10-23T16:25:21+02:00 config: allow remote write URL query parameters
+  - 72bdcb86 2026-10-23T13:26:38+02:00 OCPBUGS-105408: Remove DualReplica feature gate
+  - fd92b2bc 2026-10-22T11:03:10+02:00 OCPBUGS-104847: Remove SELinuxMountGAReadiness feature gate
+  - 43579676 2026-10-12T11:50:21+02:00 features: promote AzureMultiDisk to GA
+  - b8fed5b5 2026-09-21T11:22:04+02:00 MON-4645: allow __ prefixed labels in sourceLabels
 
-- cluster-network-operator embedded-component ae8e7aa0d19d67ec566575401cb59e70371ec35e to a1b26444418f0f14c7d35a1242c2bbd705932bdb
-  - 7fddcd7 2026-10-22T15:56:39+02:00 ovn-kubernetes: Gate MAC security schemas for Tech Preview
+- cluster-ingress-operator embedded-component 97da5fb8c7de84bfa6d38c4ce7a1709c45113959 to 7d6e32bc7f1d5932303db24f6c5446d73d52a14f
+  - 9ced01f2 2026-10-30T23:00:31Z Set TLS profile on new default IngressController
+  - 8c0ba365 2026-10-29T13:17:17-03:00 NE-2922: Use the featuregate to add Ingress resource
 
-- machine-config-operator embedded-component 58efa1043fa36b699f87d07b6d048dcac4e87231 to 734b76c3b4457ce89f2ad3995f39a2e45944e98b
-  - 40587ead 2026-10-08T11:55:15-04:00 machine-os-builder & create-digest-configmap: enable readOnlyRootFilesystem for the container
+- cluster-kube-apiserver-operator embedded-component 8619d44406fe87cbb21d188b0cf82bbb01709db0 to cc0ed4791d5802e613e33e89b97c9b18b1786a8a
+  - 75296a5 2026-10-30T15:10:42-04:00 bump(openshift/library-go): to get retry in preflight check status report
+  - 07702ac 2026-10-29T13:52:26Z fix(operator): raise memory request to 230Mi
+  - fe30999 2026-10-29T11:59:51+05:30 Migrate remaining folders to ote
+  - 0f00645 2026-10-28T08:58:06+03:00 Update library-go to run conditional step in KMS
 
-- operator-framework-olm embedded-component 191c02fc8f0c9f6aac2fa780f5bec55a5758524e to 7cb8a9ba91cbb7d534ae2f42354f2315cd41ab66
-  - ddf4349b 2026-10-26T09:47:25-04:00 OPRUN-4664: omit empty package server TLS curve flag
-  - f909da8c 2026-10-26T09:34:48-04:00 OPRUN-4664: configure package server TLS curves
-  - 8c3f7793 2026-10-24T00:13:13Z OPRUN-4798: feat: configure OLMv0 TLS curves from cluster profile (#3946)
+- cluster-kube-controller-manager-operator embedded-component 8935774b925a368067e112b15554534a85b87718 to c5551c1428d12edd17eb97d80cca43ee45b113cc
+  - 4121472 2026-10-27T13:19:30+01:00 chore: go mod tidy && go mod vendor
+  - cb2aa5c 2026-10-27T13:19:25+01:00 feat: inject tls groups
 
-- coredns image-amd64 ad7aaecd3e975727735ee8245d3917ee870cc50c to c7b28efa94231de224dcb057e49bbabc9fe0286b
-  - 46319ec 2026-10-26T14:53:25-04:00 UPSTREAM: <drop>: openshift: Add rebase v1.14.7 reports and documentation
-  - fb07594 2026-10-26T14:53:25-04:00 UPSTREAM: <carry>: openshift: update vendor
-  - 60d7b57 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: OCPBUGS-114428: Bump google.golang.org/protobuf to v1.36.12
-  - d31c5f5 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: add ocp_dnsnameresolver plugin
-  - aa66933 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Align Go version files to 1.26 builder images
-  - 65ad670 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Add make test target and set GOTOOLCHAIN=local
-  - 86ca24f 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Track vendor directory in git
-  - 1c69da2 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Add .ci-operator.yaml and Dockerfile.ocp
-  - fee9a22 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Disable dependabot
-  - 9d12002 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Update OWNERS
-  - 6bf6c61 2026-10-26T14:53:14-04:00 UPSTREAM: Rebase CoreDNS to v1.14.7
+- cluster-network-operator embedded-component a1b26444418f0f14c7d35a1242c2bbd705932bdb to 67681812fea3d0477cdcdd5be167dcd959164e1b
+  - 4b4d168 2026-10-29T20:04:23+05:30 Update AdminPolicyBasedExternalRoute CRD to be consistent with upstream
+  - 2067fcc 2026-10-23T17:54:31-04:00 [CNO] Migrate OTE conformance test cases from openshift-tests-private
+  - b080924 2026-10-23T17:54:31-04:00 Implement OpenShift Tests Extension (OTE) framework for CNO
 
-- ovn-kubernetes image-amd64 baff7a3fb039209599691f57b01bf46d8c3a2466 to 937c2eddec69ed8a5f517e4db6ccbbad8cce75a4
-  - 3060a945 2026-10-22T19:40:12+05:30 OTE: bump docker/docker to v28 for e2e NetworkInspect API
-  - eaffdc68 2026-10-22T06:43:13-04:00 ci: exempt generated Go from test check
-  - 5e52c784 2026-10-22T13:43:06+05:30 Add content to traffic flow
-  - 41742d5a 2026-10-21T17:02:39-04:00 github: prepare Go modules before CI
-  - 5f8dbc6d 2026-10-22T01:22:42+05:30 controllermanager: add UDN EgressIP Start-order NBDB unit tests
-  - a97b2281 2026-10-22T01:22:42+05:30 egressip: register networks via reconciler before live EIP programming
-  - f23242fb 2026-10-21T11:14:31-04:00 contrib: bump frr to 10.6.2 to pick up coredump fix
-  - 0200ee7b 2026-10-21T10:05:58-04:00 egressservice: validate endpoint pod ownership
-  - 2b8b15dc 2026-10-21T18:49:17+05:30 networkmanager: async UDN start for ovnkube-controller
-  - ee6e892d 2026-10-21T13:28:29+02:00 test/e2e: drop the metallb replace directive
-  - e5fb5c19 2026-10-21T10:53:08+02:00 test/e2e: bump kube-openapi to fix json/v2 errors
-  - 673eef22 2026-10-21T10:53:01+02:00 test/e2e: switch to docker/docker network.InspectOptions
-  - 21f409f0 2026-10-20T13:22:13-04:00 evpn: validate VTEP advertisements and preserve existing owners
-  - f584d450 2026-10-20T08:32:13-07:00 docs: correct wording and spelling
-  - 1854a05d 2026-10-20T09:53:38-04:00 test: skip pod generation check that removes protected annotations
-  - f95c5f9c 2026-10-20T09:53:38-04:00 helm: handle absent annotations in default network admission
-  - e64f5f0a 2026-10-20T09:53:38-04:00 ovnwebhook: protect pod network allocation annotations
-  - 5f192114 2026-10-20T12:00:08+02:00 e2e: avoid cluster subnet overlap in VM address tests
-  - e29d9a6b 2026-10-19T13:08:49-07:00 cni: use the netdev ifindex for VFIO DHCP
-  - 526b7351 2026-10-19T15:32:24-04:00 github: restore Go caching in CI jobs
-  - 29e69bee 2026-10-19T15:16:45-04:00 github: cache DPU CI Go dependencies
-  - 9e41d971 2026-10-19T12:59:47-04:00 clustermanager: validate restored subnet sizes
-  - 09e767aa 2026-10-19T12:59:47-04:00 helm: protect hybrid overlay subnet ownership
-  - aff6b70f 2026-10-19T12:59:47-04:00 helm: protect node subnet ownership
-  - 3d6284d8 2026-10-19T09:44:50-04:00 egressqos: fix remote pod test fixture
-  - a45ed730 2026-10-19T08:17:53+02:00 node: preserve Service steering across endpoint changes
-  - 9a64b521 2026-10-15T13:49:05-07:00 libovsdb: add context support to OVS transactions and waits
-  - 4ed2a52e 2026-10-15T13:49:05-07:00 node: wait for patch-port removal before restoring flows
-  - 26e17e58 2026-10-15T13:49:05-07:00 libovsdb: match ovs-vsctl port and bridge behavior
-  - 26fa391f 2026-10-12T16:47:37+02:00 dpu e2e: wait for ovnkube-node to stop before releasing the VF
+- etcd embedded-component 73444cb5a323cd994151234e2eed701f8647b0ea to 7d21cb41113f72a3267d0eaab8d0f38f3a9f70d1
+  - 4d7356fb 2026-10-14T10:27:31+02:00 UPSTREAM: <carry>: Add --curve-preferences to configure TLS curves
 
-- coredns image-arm64 ad7aaecd3e975727735ee8245d3917ee870cc50c to c7b28efa94231de224dcb057e49bbabc9fe0286b
-  - 46319ec 2026-10-26T14:53:25-04:00 UPSTREAM: <drop>: openshift: Add rebase v1.14.7 reports and documentation
-  - fb07594 2026-10-26T14:53:25-04:00 UPSTREAM: <carry>: openshift: update vendor
-  - 60d7b57 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: OCPBUGS-114428: Bump google.golang.org/protobuf to v1.36.12
-  - d31c5f5 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: add ocp_dnsnameresolver plugin
-  - aa66933 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Align Go version files to 1.26 builder images
-  - 65ad670 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Add make test target and set GOTOOLCHAIN=local
-  - 86ca24f 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Track vendor directory in git
-  - 1c69da2 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Add .ci-operator.yaml and Dockerfile.ocp
-  - fee9a22 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Disable dependabot
-  - 9d12002 2026-10-26T14:53:24-04:00 UPSTREAM: <carry>: openshift: Update OWNERS
-  - 6bf6c61 2026-10-26T14:53:14-04:00 UPSTREAM: Rebase CoreDNS to v1.14.7
+- kubernetes embedded-component 8e30e543958ab5d408a337a5957663e5fd9aea12 to 096638bbe2ee3da6e20336ae559c7a520c6e5089
+  - 350cb3632 2026-10-22T11:32:18+02:00 UPSTREAM: revert: <carry>: Store SELinuxWarningController upgrade check as a ConfigMap
 
-- ovn-kubernetes image-arm64 baff7a3fb039209599691f57b01bf46d8c3a2466 to 937c2eddec69ed8a5f517e4db6ccbbad8cce75a4
-  - 3060a945 2026-10-22T19:40:12+05:30 OTE: bump docker/docker to v28 for e2e NetworkInspect API
-  - eaffdc68 2026-10-22T06:43:13-04:00 ci: exempt generated Go from test check
-  - 5e52c784 2026-10-22T13:43:06+05:30 Add content to traffic flow
-  - 41742d5a 2026-10-21T17:02:39-04:00 github: prepare Go modules before CI
-  - 5f8dbc6d 2026-10-22T01:22:42+05:30 controllermanager: add UDN EgressIP Start-order NBDB unit tests
-  - a97b2281 2026-10-22T01:22:42+05:30 egressip: register networks via reconciler before live EIP programming
-  - f23242fb 2026-10-21T11:14:31-04:00 contrib: bump frr to 10.6.2 to pick up coredump fix
-  - 0200ee7b 2026-10-21T10:05:58-04:00 egressservice: validate endpoint pod ownership
-  - 2b8b15dc 2026-10-21T18:49:17+05:30 networkmanager: async UDN start for ovnkube-controller
-  - ee6e892d 2026-10-21T13:28:29+02:00 test/e2e: drop the metallb replace directive
-  - e5fb5c19 2026-10-21T10:53:08+02:00 test/e2e: bump kube-openapi to fix json/v2 errors
-  - 673eef22 2026-10-21T10:53:01+02:00 test/e2e: switch to docker/docker network.InspectOptions
-  - 21f409f0 2026-10-20T13:22:13-04:00 evpn: validate VTEP advertisements and preserve existing owners
-  - f584d450 2026-10-20T08:32:13-07:00 docs: correct wording and spelling
-  - 1854a05d 2026-10-20T09:53:38-04:00 test: skip pod generation check that removes protected annotations
-  - f95c5f9c 2026-10-20T09:53:38-04:00 helm: handle absent annotations in default network admission
-  - e64f5f0a 2026-10-20T09:53:38-04:00 ovnwebhook: protect pod network allocation annotations
-  - 5f192114 2026-10-20T12:00:08+02:00 e2e: avoid cluster subnet overlap in VM address tests
-  - e29d9a6b 2026-10-19T13:08:49-07:00 cni: use the netdev ifindex for VFIO DHCP
-  - 526b7351 2026-10-19T15:32:24-04:00 github: restore Go caching in CI jobs
-  - 29e69bee 2026-10-19T15:16:45-04:00 github: cache DPU CI Go dependencies
-  - 9e41d971 2026-10-19T12:59:47-04:00 clustermanager: validate restored subnet sizes
-  - 09e767aa 2026-10-19T12:59:47-04:00 helm: protect hybrid overlay subnet ownership
-  - aff6b70f 2026-10-19T12:59:47-04:00 helm: protect node subnet ownership
-  - 3d6284d8 2026-10-19T09:44:50-04:00 egressqos: fix remote pod test fixture
-  - a45ed730 2026-10-19T08:17:53+02:00 node: preserve Service steering across endpoint changes
-  - 9a64b521 2026-10-15T13:49:05-07:00 libovsdb: add context support to OVS transactions and waits
-  - 4ed2a52e 2026-10-15T13:49:05-07:00 node: wait for patch-port removal before restoring flows
-  - 26e17e58 2026-10-15T13:49:05-07:00 libovsdb: match ovs-vsctl port and bridge behavior
-  - 26fa391f 2026-10-12T16:47:37+02:00 dpu e2e: wait for ovnkube-node to stop before releasing the VF
+- machine-config-operator embedded-component 734b76c3b4457ce89f2ad3995f39a2e45944e98b to 9dadf03d34883f9e6ace6231a3a003e2358f2048
+  - 59eced67 2026-10-30T14:49:49Z OCPBUGS-135256: update automated scale tests for the oldest supported boot image
+  - 744af3b8 2026-10-29T10:02:00Z OCPBUGS-132697: correctly wait for the cluster to settle after scale up/down operations
+  - 5c183d8b 2026-10-27T11:46:50+01:00 OPNET-811: on-prem: propagate BGP VIP peer changes; disable-connected-check for FRR neighbors
+  - 4b457892 2026-10-16T12:53:33Z Fix coderabbitai comments
+  - 396e6fa8 2026-10-16T12:53:33Z Fix coderabbitai comments
+  - 696c724e 2026-10-16T12:53:33Z MCO-2522: implement capi machinesets
+  - 0e295802 2026-09-29T15:42:17-04:00 mosb: replace wildcard permissions with explicit verbs
+
+- operator-framework-olm embedded-component 7cb8a9ba91cbb7d534ae2f42354f2315cd41ab66 to 6726ed5dc88b02262fca4a2242387df51d6da18b
+  - 4b4b3626 2026-10-29T15:55:53-04:00 build: use controller-tools v0.22.0 for OLM code generation (#3954)
+  - 89d963f4 2026-10-29T15:49:37-04:00 :seedling: bump the k8s-dependencies group across 1 directory with 2 updates (#3949)
+  - 4d05c196 2026-10-28T17:11:38-04:00 Vendor OLMv0 test extension Kubernetes 1.37 dependencies
+  - 9476465f 2026-10-28T17:11:30-04:00 Update OLMv0 test extension to Kubernetes 1.37
+
+- oc image-amd64 027bf0b05d713f85d6fc4674ff2e076684538a74 to 14498e9ce7fa0fff64e132d96d58ae557f840d36
+  - b59ffccd 2026-10-30T10:35:49-04:00 Include generation in topology discovery reports
+  - 87f62240 2026-10-29T15:47:51-05:00 align transition status tests with nested output format
+  - 774338fc 2026-10-29T15:47:51-05:00 typo fix
+  - c2c4f3dd 2026-10-29T15:47:51-05:00 wrap transition data with header struct field
+  - e133c0b7 2026-10-29T15:47:51-05:00 marshal transition status output via yaml
+  - dcef822e 2026-10-29T15:47:50-05:00 revert coderabbit change, fix output formatting
+  - 2c09869b 2026-10-29T15:47:50-05:00 tweak output formatting
+  - 840cc35b 2026-10-29T15:47:50-05:00 tweak output format
+  - 7bd5d18b 2026-10-29T15:47:50-05:00 fix: evaluated and competed conditions vars swapped
+  - fe756d44 2026-10-29T15:47:43-05:00 OCPEDGE-2960 Update topology subcommand to read transition status from infra API (used to be from CCO conditions array)
+  - d8ddcb5d 2026-10-29T10:22:53-04:00 Use stable names for discovery API error tests
+  - ae1faeec 2026-10-29T10:15:28-04:00 Document discovery output and test functions
+  - dcb8803e 2026-10-29T08:54:36-04:00 Read topology transitions from controller status
+
+- ovn-kubernetes image-amd64 937c2eddec69ed8a5f517e4db6ccbbad8cce75a4 to a6dca1bb5cbd5014ca1dccf90fc87c3e438d7e04
+  - a14438fd 2026-10-30T14:40:39+05:30 OTE: Enable EgressFirewall tests
+  - 7c56158f 2026-10-28T16:41:42+05:30 sync test annotations with upstream changes
+  - feefa32a 2026-10-28T16:39:25+05:30 OTE: implement OVNControllerLogPath for OpenShift DeploymentConfig
+  - 4f52e65f 2026-10-26T15:19:20-07:00 udn: keep DHCP and IPAM localnet ports across restart
+  - b849f00c 2026-10-26T13:43:14-07:00 admission: protect NAD allocation ownership
+  - 8a1cf6fc 2026-10-26T13:43:14-07:00 e2e: restore orphan-node coverage with node admission enabled
+  - 632f9834 2026-10-26T13:43:14-07:00 clustermanager: preserve allocations across NAD config changes
+  - 349fffd6 2026-10-26T13:43:14-07:00 allocator: preserve existing tunnel keys after allocation failures
+  - bdac1ea0 2026-10-26T12:25:40-07:00 util: recover unusable node allocation annotations
+  - 8257517d 2026-10-26T15:13:56-04:00 uplink: reconcile Ready after cache lag
+  - aebe74ad 2026-10-26T19:06:26Z Add node IPs static mac bindings support to MACBindingController
+  - 753fad4a 2026-10-26T19:06:26Z Add MACBindingController
+  - bbb95c61 2026-10-26T18:04:05Z Add configuration flag to disable ARP/NDP flooding to UDNs
+  - f82be8cc 2026-10-26T11:03:46-07:00 deps: bump go to 1.26.10 and x/net to v0.60.0
+  - 729bb950 2026-10-26T10:19:45+01:00 go-controller: drop the gogo/protobuf replace
+  - 151580e0 2026-10-26T10:10:41+01:00 go-controller: drop the j-keck/arpiing replace directive
+  - e56d20b3 2026-10-26T10:10:36+01:00 go-controller: drop the hcsshim replace
+  - 067093bb 2026-10-26T00:51:38-07:00 util: skip managed fields entries without a time
+  - ffd9b7d6 2026-10-24T22:36:19-07:00 ovn: use a default route for pod egress in shared gateway mode
+  - 8d663f59 2026-10-23T16:55:52-04:00 ci: verify test modules are tidy
+  - 618e8611 2026-10-23T13:55:30-07:00 clustermanager: include the maximum valid EgressIP mark
+  - a6b241b0 2026-10-23T13:55:30-07:00 ovnwebhook: close node annotation ownership bypasses
+  - 2f562a8a 2026-10-23T13:55:30-07:00 admission: protect controller-owned node allocations
+  - af07f80a 2026-10-23T16:55:21-04:00 ci: ignore licenses when sizing PRs
+  - 6955c60e 2026-10-23T16:54:54-04:00 ci: run the retest action directly on the runner
+  - 9936c594 2026-10-23T16:54:54-04:00 ci: skip builder setup when merging image manifests
+  - 54e86ed5 2026-10-23T16:54:54-04:00 ci: run gofmt with the installed Go toolchain
+  - f0fb7318 2026-10-23T16:49:14-04:00 uplink: reconcile CUDN readiness after cache lag
+  - db0c6a8a 2026-10-23T15:17:47-04:00 docs: explain how to prepare backports
+  - cfc415a0 2026-10-23T23:00:52+05:30 e2e: fix issues with e2e directory
+  - 37e7b695 2026-10-23T11:06:07-04:00 helm: remove empty ovs-node annotations
+  - fe11a611 2026-10-23T11:06:07-04:00 Mark remaining node services as node-critical, not cluster-critical
+  - ca2ff748 2026-10-23T11:05:47-04:00 helm: replace non-functional critical-pod annotations with priorityClassName
+  - 2f84a03f 2026-10-23T15:20:35+02:00 CI: remove zone from the test name, replace with cni mode for all tests
+  - 6c297e79 2026-10-23T15:20:35+02:00 unprivileged: disable kubelet cgroup match
+  - 13d23586 2026-10-23T15:20:35+02:00 e2e: update the route cache flush to run on the node instead ovnkube
+  - 91d8ced3 2026-10-23T15:20:35+02:00 unprivileged mode: bind host sys/net
+  - c26376c1 2026-10-23T15:20:31+02:00 kind: enable unprivileged mode
+  - 02359474 2026-10-23T10:34:28Z docs: add OKEP-6691 for scalable ARP and NDP broadcast handling for UDN
+  - 7608ed92 2026-10-22T16:01:04-04:00 test: wait for EVPN annotation reconciliation before counting calls
+  - 278efc6b 2026-10-23T00:32:46+05:30 e2e: create EgressFirewall via RunKubectlInput
+  - a35b908c 2026-10-22T13:30:59-04:00 ci: label PRs by size
+  - 507bda0e 2026-10-22T12:56:19-04:00 e2e: preserve Kind interface names across node restarts
+  - 21130c96 2026-10-22T12:40:32-04:00 docs: avoid duplicate documentation for agent guidance
+  - 0b5e29c7 2026-10-22T12:27:11-04:00 ci: skip expensive jobs for CodeRabbit configuration changes
+  - d499e10d 2026-10-22T12:27:11-04:00 docs: correct CodeRabbit architecture document references
+  - 4617d42e 2026-10-22T12:07:40-04:00 ci: run serial tests with managed BGP routing
+  - b765f2f9 2026-10-22T11:53:22-04:00 docs: ask CodeRabbit to evaluate PR motivation
+  - f3f8a14a 2026-10-22T11:49:24-04:00 docs: preserve production invariants when writing tests
+  - 1f10a11e 2026-10-22T11:40:58-04:00 docs: require CI execution checks for new E2E tests
+  - 6bbbe995 2026-10-22T15:09:58+02:00 go-controller, test/e2e: document go-iptables replace directive
+  - b13665ca 2026-10-22T06:45:27-04:00 go-controller: always use pinned modelgen
+  - dffbc9f5 2026-10-22T06:45:26-04:00 go-controller: bump libovsdb to v0.9.0
+  - 9e877632 2026-10-21T15:31:38-04:00 e2e: cover managed BGP self-peer address changes
+  - 51ac45c3 2026-10-21T15:31:38-04:00 routeadvertisements: fix managed BGP self-peer filtering
+  - 43c6a6b6 2026-10-21T18:54:27+05:30 e2e: get ovn-controller log path from DeploymentConfig
+  - 30530919 2026-10-21T11:22:21+02:00 ci: derive the DPU host-node e2e Uplink interface from dpu-sim
+  - f8f84d08 2026-10-21T11:22:21+02:00 e2e: check that a deleted DPU host node loses its UplinkStates
+  - d5ac1b65 2026-10-21T11:22:21+02:00 clustermanager, uplink: delete UplinkStates of deleted nodes at runtime
+  - 2cf02dd1 2026-10-20T18:57:13-04:00 test: fix EVPN mapping reconciliation assertion race
+  - 5bb02e88 2026-10-20T08:35:40-07:00 crd: validate APB external route static IPs
+  - 55e346a3 2026-10-01T09:45:42+02:00 node: add test for service replay when a namespace joins a running UDN
+  - 01ece5fc 2026-10-01T09:45:42+02:00 node: replay services when a namespace joins a running primary UDN
+  - b7489915 2026-09-30T13:22:14+02:00 node: avoid retries during primary UDN cleanup
+
+- kubernetes image-amd64 8e30e543958ab5d408a337a5957663e5fd9aea12 to 096638bbe2ee3da6e20336ae559c7a520c6e5089
+  - 350cb3632 2026-10-22T11:32:18+02:00 UPSTREAM: revert: <carry>: Store SELinuxWarningController upgrade check as a ConfigMap
+
+- oc image-arm64 027bf0b05d713f85d6fc4674ff2e076684538a74 to 2f55121aecb29c388ce2f8a6aab1705d911c494a
+  - acad6dd1 2026-11-02T16:33:12+01:00 feat: extend oc adm transition topology for standalone infrastructure transitions
+  - b59ffccd 2026-10-30T10:35:49-04:00 Include generation in topology discovery reports
+  - 87f62240 2026-10-29T15:47:51-05:00 align transition status tests with nested output format
+  - 774338fc 2026-10-29T15:47:51-05:00 typo fix
+  - c2c4f3dd 2026-10-29T15:47:51-05:00 wrap transition data with header struct field
+  - e133c0b7 2026-10-29T15:47:51-05:00 marshal transition status output via yaml
+  - dcef822e 2026-10-29T15:47:50-05:00 revert coderabbit change, fix output formatting
+  - 2c09869b 2026-10-29T15:47:50-05:00 tweak output formatting
+  - 840cc35b 2026-10-29T15:47:50-05:00 tweak output format
+  - 7bd5d18b 2026-10-29T15:47:50-05:00 fix: evaluated and competed conditions vars swapped
+  - fe756d44 2026-10-29T15:47:43-05:00 OCPEDGE-2960 Update topology subcommand to read transition status from infra API (used to be from CCO conditions array)
+  - d8ddcb5d 2026-10-29T10:22:53-04:00 Use stable names for discovery API error tests
+  - ae1faeec 2026-10-29T10:15:28-04:00 Document discovery output and test functions
+  - dcb8803e 2026-10-29T08:54:36-04:00 Read topology transitions from controller status
+
+- router image-arm64 01bee8da2387d0cfbd7a1acd934bb92a8c320527 to 1b024c668470bae1845760547f784b9d512553f7
+  - 52c173f0 2026-10-28T13:01:58Z tests-extension: build from committed QE fixtures
+  - 27170d5e 2026-10-22T19:32:31-03:00 Allow disabling endpoint address validation
+  - 8983c7e4 2026-10-20T13:33:05Z ART-24596: Update openshift/origin to v1.6.2 in tests-extension
+  - b0d4df7b 2026-10-15T17:35:44+05:30 NE-2126: Ship tests-ext binary as raw gzip instead of tar.gz
+  - 290a2b76 2026-10-10T06:16:58-04:00 OCPBUGS-77056: Persist external certificate status through contention
+  - 6fac08e4 2026-10-10T02:42:18-04:00 OCPBUGS-77056: Avoid false contention on certificate status changes
+  - 42deb015 2026-10-09T23:37:04-04:00 OCPBUGS-77056: Reconcile restricted routes after admission
+  - 1ebb0bdf 2026-10-09T20:29:45-04:00 OCPBUGS-77056: Recheck newly admitted external cert routes
+  - a5b9e789 2026-10-09T20:29:39-04:00 Make gofmt verification handle nested modules
+  - 113d4bbf 2026-10-09T15:00:53-04:00 OCPBUGS-77056: Restore route admission at scale
+  - 4f05f2a2 2026-10-01T18:50:39-03:00 enable dcm on route changes
+  - d3e5ef0f 2026-10-01T18:50:39-03:00 Revert "reload router if route is changed on DCM"
+  - 3bf9e784 2026-09-29T19:57:14+05:30 NE-2126: Migrating Route test cases from QE repo
+  - f71aceba 2026-09-24T21:26:26Z NE-2912: Use OCP 5.1 base for HAProxy 3.4
+  - 2ead53f7 2026-09-23T21:32:53Z NE-2912: Use RHEL 10 base for HAProxy 3.4
+  - 66a6966e 2026-09-23T21:21:24Z NE-2912: Add HAProxy 3.4 standalone image
+  - 6d11db5c 2026-09-21T20:40:47Z Validate positive rate limits
+  - d59e2616 2026-09-21T19:30:41Z Refactor rate-limit annotation template lookups
+  - 8a15b44f 2026-07-30T03:17:47Z Remove unused os_wildcard_domain.map
+
+- router image-arm64 01bee8da2387d0cfbd7a1acd934bb92a8c320527 to 1b024c668470bae1845760547f784b9d512553f7
+  - 52c173f0 2026-10-28T13:01:58Z tests-extension: build from committed QE fixtures
+  - 27170d5e 2026-10-22T19:32:31-03:00 Allow disabling endpoint address validation
+  - 8983c7e4 2026-10-20T13:33:05Z ART-24596: Update openshift/origin to v1.6.2 in tests-extension
+  - b0d4df7b 2026-10-15T17:35:44+05:30 NE-2126: Ship tests-ext binary as raw gzip instead of tar.gz
+  - 290a2b76 2026-10-10T06:16:58-04:00 OCPBUGS-77056: Persist external certificate status through contention
+  - 6fac08e4 2026-10-10T02:42:18-04:00 OCPBUGS-77056: Avoid false contention on certificate status changes
+  - 42deb015 2026-10-09T23:37:04-04:00 OCPBUGS-77056: Reconcile restricted routes after admission
+  - 1ebb0bdf 2026-10-09T20:29:45-04:00 OCPBUGS-77056: Recheck newly admitted external cert routes
+  - a5b9e789 2026-10-09T20:29:39-04:00 Make gofmt verification handle nested modules
+  - 113d4bbf 2026-10-09T15:00:53-04:00 OCPBUGS-77056: Restore route admission at scale
+  - 4f05f2a2 2026-10-01T18:50:39-03:00 enable dcm on route changes
+  - d3e5ef0f 2026-10-01T18:50:39-03:00 Revert "reload router if route is changed on DCM"
+  - 3bf9e784 2026-09-29T19:57:14+05:30 NE-2126: Migrating Route test cases from QE repo
+  - f71aceba 2026-09-24T21:26:26Z NE-2912: Use OCP 5.1 base for HAProxy 3.4
+  - 2ead53f7 2026-09-23T21:32:53Z NE-2912: Use RHEL 10 base for HAProxy 3.4
+  - 66a6966e 2026-09-23T21:21:24Z NE-2912: Add HAProxy 3.4 standalone image
+  - 6d11db5c 2026-09-21T20:40:47Z Validate positive rate limits
+  - d59e2616 2026-09-21T19:30:41Z Refactor rate-limit annotation template lookups
+  - 8a15b44f 2026-07-30T03:17:47Z Remove unused os_wildcard_domain.map
+
+- ovn-kubernetes image-arm64 937c2eddec69ed8a5f517e4db6ccbbad8cce75a4 to bf4c82a9834f5b5ffc95525bb01bb750d7d1cc2c
+  - a14438fd 2026-10-30T14:40:39+05:30 OTE: Enable EgressFirewall tests
+  - 267ed307 2026-10-30T09:06:34Z sync test annotations with upstream changes
+  - 0c356f1c 2026-10-29T12:12:42-04:00 e2e: verify service marks follow advertisement selection
+  - b202b9a3 2026-10-29T12:12:42-04:00 node: preserve other networks' service marks during refresh
+  - f08e0f86 2026-10-29T12:12:42-04:00 node: refresh UDN service marks on advertisement changes
+  - c494dedf 2026-10-29T12:12:42-04:00 node: align UDN service marking with transport routing
+  - 76d400ab 2026-10-29T11:41:24-04:00 node: wait for UplinkState events before programming gateways
+  - 79164517 2026-10-29T11:41:24-04:00 uplink: restrict UplinkState writes to the owning node
+  - 00daf89d 2026-10-29T05:39:28-07:00 ovn: reconcile policy membership from pod handling
+  - cd49d297 2026-10-28T15:50:20-07:00 context: plumb context through controller event handlers
+  - 7c56158f 2026-10-28T16:41:42+05:30 sync test annotations with upstream changes
+  - feefa32a 2026-10-28T16:39:25+05:30 OTE: implement OVNControllerLogPath for OpenShift DeploymentConfig
+  - 4f52e65f 2026-10-26T15:19:20-07:00 udn: keep DHCP and IPAM localnet ports across restart
+  - b849f00c 2026-10-26T13:43:14-07:00 admission: protect NAD allocation ownership
+  - 8a1cf6fc 2026-10-26T13:43:14-07:00 e2e: restore orphan-node coverage with node admission enabled
+  - 632f9834 2026-10-26T13:43:14-07:00 clustermanager: preserve allocations across NAD config changes
+  - 349fffd6 2026-10-26T13:43:14-07:00 allocator: preserve existing tunnel keys after allocation failures
+  - bdac1ea0 2026-10-26T12:25:40-07:00 util: recover unusable node allocation annotations
+  - 8257517d 2026-10-26T15:13:56-04:00 uplink: reconcile Ready after cache lag
+  - aebe74ad 2026-10-26T19:06:26Z Add node IPs static mac bindings support to MACBindingController
+  - 753fad4a 2026-10-26T19:06:26Z Add MACBindingController
+  - bbb95c61 2026-10-26T18:04:05Z Add configuration flag to disable ARP/NDP flooding to UDNs
+  - f82be8cc 2026-10-26T11:03:46-07:00 deps: bump go to 1.26.10 and x/net to v0.60.0
+  - 729bb950 2026-10-26T10:19:45+01:00 go-controller: drop the gogo/protobuf replace
+  - 151580e0 2026-10-26T10:10:41+01:00 go-controller: drop the j-keck/arpiing replace directive
+  - e56d20b3 2026-10-26T10:10:36+01:00 go-controller: drop the hcsshim replace
+  - 067093bb 2026-10-26T00:51:38-07:00 util: skip managed fields entries without a time
+  - ffd9b7d6 2026-10-24T22:36:19-07:00 ovn: use a default route for pod egress in shared gateway mode
+  - 8d663f59 2026-10-23T16:55:52-04:00 ci: verify test modules are tidy
+  - 618e8611 2026-10-23T13:55:30-07:00 clustermanager: include the maximum valid EgressIP mark
+  - a6b241b0 2026-10-23T13:55:30-07:00 ovnwebhook: close node annotation ownership bypasses
+  - 2f562a8a 2026-10-23T13:55:30-07:00 admission: protect controller-owned node allocations
+  - af07f80a 2026-10-23T16:55:21-04:00 ci: ignore licenses when sizing PRs
+  - 6955c60e 2026-10-23T16:54:54-04:00 ci: run the retest action directly on the runner
+  - 9936c594 2026-10-23T16:54:54-04:00 ci: skip builder setup when merging image manifests
+  - 54e86ed5 2026-10-23T16:54:54-04:00 ci: run gofmt with the installed Go toolchain
+  - f0fb7318 2026-10-23T16:49:14-04:00 uplink: reconcile CUDN readiness after cache lag
+  - db0c6a8a 2026-10-23T15:17:47-04:00 docs: explain how to prepare backports
+  - cfc415a0 2026-10-23T23:00:52+05:30 e2e: fix issues with e2e directory
+  - 37e7b695 2026-10-23T11:06:07-04:00 helm: remove empty ovs-node annotations
+  - fe11a611 2026-10-23T11:06:07-04:00 Mark remaining node services as node-critical, not cluster-critical
+  - ca2ff748 2026-10-23T11:05:47-04:00 helm: replace non-functional critical-pod annotations with priorityClassName
+  - 2f84a03f 2026-10-23T15:20:35+02:00 CI: remove zone from the test name, replace with cni mode for all tests
+  - 6c297e79 2026-10-23T15:20:35+02:00 unprivileged: disable kubelet cgroup match
+  - 13d23586 2026-10-23T15:20:35+02:00 e2e: update the route cache flush to run on the node instead ovnkube
+  - 91d8ced3 2026-10-23T15:20:35+02:00 unprivileged mode: bind host sys/net
+  - c26376c1 2026-10-23T15:20:31+02:00 kind: enable unprivileged mode
+  - 02359474 2026-10-23T10:34:28Z docs: add OKEP-6691 for scalable ARP and NDP broadcast handling for UDN
+  - 7608ed92 2026-10-22T16:01:04-04:00 test: wait for EVPN annotation reconciliation before counting calls
+  - 278efc6b 2026-10-23T00:32:46+05:30 e2e: create EgressFirewall via RunKubectlInput
+  - a35b908c 2026-10-22T13:30:59-04:00 ci: label PRs by size
+  - 507bda0e 2026-10-22T12:56:19-04:00 e2e: preserve Kind interface names across node restarts
+  - 21130c96 2026-10-22T12:40:32-04:00 docs: avoid duplicate documentation for agent guidance
+  - 0b5e29c7 2026-10-22T12:27:11-04:00 ci: skip expensive jobs for CodeRabbit configuration changes
+  - d499e10d 2026-10-22T12:27:11-04:00 docs: correct CodeRabbit architecture document references
+  - 4617d42e 2026-10-22T12:07:40-04:00 ci: run serial tests with managed BGP routing
+  - b765f2f9 2026-10-22T11:53:22-04:00 docs: ask CodeRabbit to evaluate PR motivation
+  - f3f8a14a 2026-10-22T11:49:24-04:00 docs: preserve production invariants when writing tests
+  - 1f10a11e 2026-10-22T11:40:58-04:00 docs: require CI execution checks for new E2E tests
+  - 6bbbe995 2026-10-22T15:09:58+02:00 go-controller, test/e2e: document go-iptables replace directive
+  - b13665ca 2026-10-22T06:45:27-04:00 go-controller: always use pinned modelgen
+  - dffbc9f5 2026-10-22T06:45:26-04:00 go-controller: bump libovsdb to v0.9.0
+  - 9e877632 2026-10-21T15:31:38-04:00 e2e: cover managed BGP self-peer address changes
+  - 51ac45c3 2026-10-21T15:31:38-04:00 routeadvertisements: fix managed BGP self-peer filtering
+  - 43c6a6b6 2026-10-21T18:54:27+05:30 e2e: get ovn-controller log path from DeploymentConfig
+  - 30530919 2026-10-21T11:22:21+02:00 ci: derive the DPU host-node e2e Uplink interface from dpu-sim
+  - f8f84d08 2026-10-21T11:22:21+02:00 e2e: check that a deleted DPU host node loses its UplinkStates
+  - d5ac1b65 2026-10-21T11:22:21+02:00 clustermanager, uplink: delete UplinkStates of deleted nodes at runtime
+  - 2cf02dd1 2026-10-20T18:57:13-04:00 test: fix EVPN mapping reconciliation assertion race
+  - 5bb02e88 2026-10-20T08:35:40-07:00 crd: validate APB external route static IPs
+  - a6ec3c87 2026-10-07T15:52:34+02:00 e2e: fix manually added nodeIPs cleanup
+  - c82e3bd0 2026-10-07T15:52:29+02:00 CI: add upgrade tests for half-upgraded cluster
+  - 55e346a3 2026-10-01T09:45:42+02:00 node: add test for service replay when a namespace joins a running UDN
+  - 01ece5fc 2026-10-01T09:45:42+02:00 node: replay services when a namespace joins a running primary UDN
+  - b7489915 2026-09-30T13:22:14+02:00 node: avoid retries during primary UDN cleanup
+
+- kubernetes image-arm64 8e30e543958ab5d408a337a5957663e5fd9aea12 to 45f8abebafb080978a1d422f78c49ef4e9ba80e7
+  - 7bc201f1c 2026-11-02T13:50:02-06:00 UPSTREAM: <carry>: rpm: this patch preps for kubernetes 1.38 changing to static binaries
+  - 350cb3632 2026-10-22T11:32:18+02:00 UPSTREAM: revert: <carry>: Store SELinuxWarningController upgrade check as a ConfigMap
 
