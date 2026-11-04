@@ -39,7 +39,7 @@ import (
 )
 
 const (
-	gracefulShutdownTimeout = 15
+	gracefulShutdownTimeout = 30
 )
 
 var (

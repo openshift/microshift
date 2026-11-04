@@ -231,7 +231,7 @@ func (s *KubeAPIServer) configure(ctx context.Context, cfg *config.Config) error
 			},
 			"enable-admission-plugins":              {},
 			"send-retry-after-while-not-ready-once": {"true"},
-			"shutdown-delay-duration":               {"5s"},
+			"shutdown-delay-duration":               {"1s"},
 			"feature-gates":                         featureGateArgs,
 		},
 		GenericAPIServerConfig: configv1.GenericAPIServerConfig{
