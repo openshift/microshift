@@ -380,13 +380,6 @@ func (c *Controller) Run(ctx context.Context, workers int) {
 			wait.UntilWithContext(ctx, c.runWorker, time.Second)
 		})
 	}
-
-	seLinuxConflictsReporterController := NewSELinuxConflictsReporterController(c.kubeClient, c.labelCache)
-	wg.Go(func() {
-		defer utilruntime.HandleCrash()
-		seLinuxConflictsReporterController.Run(ctx)
-	})
-
 	<-ctx.Done()
 }
 
