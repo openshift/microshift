@@ -20,8 +20,8 @@ https://github.com/openshift/service-ca-operator embedded-component ed872ba14b61
 https://github.com/openshift/oc image-amd64 4b0a124d300cef187037bda6f1b04caa69ab8b62
 https://github.com/openshift/coredns image-amd64 5929cdc03ef425d1db05552589cac0fd4adbd96a
 https://github.com/openshift/csi-external-snapshotter image-amd64 a019d1a9d9e1d26ffd0b2e0d911733180fa608b2
-https://github.com/openshift/router image-amd64 a3a92ffb3b2b6f84d6c875a1d0a573a47bbb837c
-https://github.com/openshift/router image-amd64 a3a92ffb3b2b6f84d6c875a1d0a573a47bbb837c
+https://github.com/openshift/router image-amd64 eb35a8aff38045e77800c8a3b10f9b3479098972
+https://github.com/openshift/router image-amd64 eb35a8aff38045e77800c8a3b10f9b3479098972
 https://github.com/openshift/kube-rbac-proxy image-amd64 14b6905aa3accb8bb16cd92f3438a9868597bd52
 https://github.com/openshift/ovn-kubernetes image-amd64 23b61c3ffcd93b8c7e85e913d37bbf82f47eedb9
 https://github.com/openshift/kubernetes image-amd64 b8b2c80fc60865caaa58f565f41d569355f124eb
@@ -29,8 +29,8 @@ https://github.com/openshift/service-ca-operator image-amd64 ed872ba14b615ca5726
 https://github.com/openshift/oc image-arm64 4b0a124d300cef187037bda6f1b04caa69ab8b62
 https://github.com/openshift/coredns image-arm64 5929cdc03ef425d1db05552589cac0fd4adbd96a
 https://github.com/openshift/csi-external-snapshotter image-arm64 a019d1a9d9e1d26ffd0b2e0d911733180fa608b2
-https://github.com/openshift/router image-arm64 a3a92ffb3b2b6f84d6c875a1d0a573a47bbb837c
-https://github.com/openshift/router image-arm64 a3a92ffb3b2b6f84d6c875a1d0a573a47bbb837c
+https://github.com/openshift/router image-arm64 eb35a8aff38045e77800c8a3b10f9b3479098972
+https://github.com/openshift/router image-arm64 eb35a8aff38045e77800c8a3b10f9b3479098972
 https://github.com/openshift/kube-rbac-proxy image-arm64 14b6905aa3accb8bb16cd92f3438a9868597bd52
 https://github.com/openshift/ovn-kubernetes image-arm64 23b61c3ffcd93b8c7e85e913d37bbf82f47eedb9
 https://github.com/openshift/kubernetes image-arm64 b8b2c80fc60865caaa58f565f41d569355f124eb
