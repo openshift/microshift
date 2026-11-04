@@ -176,3 +176,15 @@
   roles:
     - role: run-workloads
       when: (run_workloads | bool)
+
+# Runs on the control node for every MicroShift host at once, each against its own cluster
+- name: Run network performance workloads
+  hosts: microshift
+  tags: [network-perf]
+  gather_facts: false
+  become: false
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: run-network-perf
+      when: (run_network_perf | bool)

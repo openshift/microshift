@@ -1,0 +1,225 @@
+---
+# One network-perf-v2 iteration. --clean=false keeps the pods to record their image;
+# after a failed run (benchmark possibly still running) they are removed first, and
+# the cluster stays locked unless their removal is confirmed.
+
+- name: Set the iteration identity
+  ansible.builtin.set_fact:
+    _np_iter_dir: "{{ _np_host_dir }}/iteration-{{ '%02d' | format(network_perf_iteration) }}"
+    _np_uuid: "{{ (inventory_hostname ~ '/' ~ _np_campaign_dir ~ '/' ~ network_perf_iteration) | to_uuid }}"
+    _np_containers: []
+    # Keep the cluster lock unless cleanup below confirms the netperf namespace is gone
+    _np_keep_lock: true
+
+- name: Check that no benchmark resources are left on the cluster
+  ansible.builtin.command:
+    argv: [timeout, -k, "10", "{{ network_perf_api_timeout }}", oc, --kubeconfig, "{{ network_perf_kubeconfig }}",
+           "--request-timeout={{ network_perf_api_timeout }}s", get, namespace, netperf, --ignore-not-found, -o, name]
+  register: _np_ns
+  changed_when: false
+  delegate_to: localhost
+
+- name: Fail when the netperf namespace already exists
+  ansible.builtin.assert:
+    that:
+      - _np_ns.stdout | length == 0
+    fail_msg: >-
+      The netperf namespace exists on {{ inventory_hostname }}; an earlier benchmark was not
+      cleaned up.
+    quiet: true
+
+- name: Create the iteration results directory
+  ansible.builtin.file:
+    path: "{{ _np_iter_dir }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+
+# run.sh prints every *.csv in its directory, so start without the previous ones.
+- name: Find results of earlier iterations in the checkout
+  ansible.builtin.find:
+    paths: "{{ _np_workload_dir }}"
+    patterns: "*.csv,*.json"
+    excludes: "*Network.json"
+  register: _np_stale
+  delegate_to: localhost
+
+- name: Remove results of earlier iterations from the checkout
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ _np_stale.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  delegate_to: localhost
+
+- name: Run network-perf-v2 and save its evidence
+  block:
+    - name: Record the start time
+      ansible.builtin.set_fact:
+        _np_start: "{{ now(utc=true).strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+
+    # Set every input env.sh and run.sh read, so the control node's environment can't leak in
+    - name: Run k8s-netperf through network-perf-v2
+      ansible.builtin.command:
+        argv: [./run.sh]
+        chdir: "{{ _np_workload_dir }}"
+      environment:
+        KUBECONFIG: "{{ network_perf_kubeconfig }}"
+        PLATFORM: microshift
+        LOCAL: "true"
+        POD: "true"
+        VM: "false"
+        USE_VIRTCTL: ""
+        UDNL2: "false"
+        UDNL3: "false"
+        BRIDGE: ""
+        BRIDGE_CONFIG: ""
+        LOCALNET: ""
+        LOCALNET_CONFIG: ""
+        EXTERNAL_SERVER_ADDRESS: ""
+        ALL_SCENARIOS: "true"
+        DEBUG: "true"
+        TOLERANCE: "70"
+        WORKLOAD: "{{ network_perf_workload }}"
+        WORKLOAD_NAME: k8s-netperf
+        NETPERF_VERSION: "{{ network_perf_netperf_version }}"
+        NETPERF_FILENAME: k8s-netperf
+        NETPERF_URL: ""
+        OS: Linux
+        UUID: "{{ _np_uuid }}"
+        CLEAN_UP: "false"
+        TEST_TIMEOUT: "{{ network_perf_timeout }}"
+        METRICS: "false"
+        PROMETHEUS_URL: ""
+        ES_SERVER: ""
+        # utils/index.sh takes the Prow, Jenkins or Airflow path when one of these is set.
+        PROW_JOB_ID: ""
+        BUILD_ID: ""
+        AIRFLOW_CTX_DAG_ID: ""
+      register: _np_run
+      changed_when: true
+      failed_when: false
+      delegate_to: localhost
+
+    - name: Record the end time
+      ansible.builtin.set_fact:
+        _np_end: "{{ now(utc=true).strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+
+    - name: Read the benchmark pods
+      ansible.builtin.command:
+        argv: [timeout, -k, "10", "{{ network_perf_api_timeout }}", oc, --kubeconfig, "{{ network_perf_kubeconfig }}",
+               "--request-timeout={{ network_perf_api_timeout }}s", get, pods, -n, netperf, -o, json]
+      register: _np_pods
+      changed_when: false
+      failed_when: false
+      when: _np_run.rc == 0
+      delegate_to: localhost
+
+    - name: Describe the benchmark containers
+      ansible.builtin.set_fact:
+        _np_containers: >-
+          {{ _np_containers + [{'pod': item.0.metadata.name, 'node': item.0.spec.nodeName | default(''),
+                                'container': item.1.name, 'image': item.1.image,
+                                'imageID': item.1.imageID | default('')}] }}
+      loop: >-
+        {{ ((_np_pods.stdout | from_json)['items'] if (_np_pods.rc | default(1)) == 0 else [])
+           | subelements('status.containerStatuses', skip_missing=true) }}
+      loop_control:
+        label: "{{ item.0.metadata.name }}/{{ item.1.name }}"
+
+    - name: Find the results of this iteration
+      ansible.builtin.find:
+        paths: "{{ _np_workload_dir }}"
+        patterns: "*.csv,*.json"
+        excludes: "*Network.json"
+      register: _np_results
+      delegate_to: localhost
+
+    - name: Archive the results of this iteration
+      ansible.builtin.copy:
+        src: "{{ item.path }}"
+        dest: "{{ _np_iter_dir }}/{{ item.path | basename }}"
+        remote_src: true
+        mode: "0644"
+      loop: "{{ _np_results.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
+      delegate_to: localhost
+
+    - name: Archive the run log, the benchmark pods and the run record
+      ansible.builtin.copy:
+        content: "{{ item.content }}"
+        dest: "{{ _np_iter_dir }}/{{ item.name }}"
+        mode: "0644"
+      loop:
+        - name: run.log
+          content: "{{ _np_run.stdout }}\n--- stderr ---\n{{ _np_run.stderr }}\n"
+        - name: pods.json
+          content: "{{ _np_pods.stdout | default('') }}\n"
+        - name: run-info.json
+          content: >-
+            {{ {'host': inventory_hostname, 'campaign': _np_campaign_dir | basename,
+                'iteration': network_perf_iteration, 'uuid': _np_uuid, 'rc': _np_run.rc,
+                'start': _np_start, 'end': _np_end,
+                'e2e_repo': network_perf_e2e_repo, 'e2e_revision': network_perf_e2e_git_revision,
+                'e2e_commit': _np_git.after, 'netperf_version': network_perf_netperf_version,
+                'workload': network_perf_workload, 'workload_sha256': _np_workload.stat.checksum,
+                'kubeconfig': network_perf_kubeconfig, 'containers': _np_containers} | to_nice_json }}
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: localhost
+
+  always:
+    - name: Remove the benchmark pods
+      ansible.builtin.command:
+        argv: [timeout, -k, "10", "{{ network_perf_cleanup_timeout | int + network_perf_api_timeout | int }}",
+               oc, --kubeconfig, "{{ network_perf_kubeconfig }}", "--request-timeout={{ network_perf_api_timeout }}s",
+               delete, namespace, netperf, --ignore-not-found, --wait=true, "--timeout={{ network_perf_cleanup_timeout }}s"]
+      register: _np_cleanup
+      changed_when: true
+      failed_when: false
+      delegate_to: localhost
+
+    - name: Check that the benchmark pods are gone
+      ansible.builtin.command:
+        argv: [timeout, -k, "10", "{{ network_perf_api_timeout }}", oc, --kubeconfig, "{{ network_perf_kubeconfig }}",
+               "--request-timeout={{ network_perf_api_timeout }}s", get, namespace, netperf, --ignore-not-found, -o, name]
+      register: _np_gone
+      changed_when: false
+      failed_when: false
+      delegate_to: localhost
+
+    - name: Release the lock of this iteration once the benchmark pods are gone
+      ansible.builtin.set_fact:
+        _np_keep_lock: false
+      when: _np_gone.rc == 0 and _np_gone.stdout | length == 0
+
+    - name: Archive the outcome of the removal
+      ansible.builtin.copy:
+        content: >-
+          rc={{ _np_cleanup.rc }}
+
+          {{ _np_cleanup.stdout }}
+
+          {{ _np_cleanup.stderr }}
+
+          confirmed gone: {{ _np_gone.rc == 0 and _np_gone.stdout | length == 0 }}
+        dest: "{{ _np_iter_dir }}/cleanup.log"
+        mode: "0644"
+      delegate_to: localhost
+
+- name: Check the iteration
+  ansible.builtin.assert:
+    that:
+      - _np_run.rc == 0
+      - _np_cleanup.rc == 0
+      - not (_np_keep_lock | default(false))
+      - _np_containers | length > 0
+      - _np_containers | map(attribute='imageID') | select('equalto', '') | list | length == 0
+    fail_msg: >-
+      Iteration {{ network_perf_iteration }} on {{ inventory_hostname }} failed (run.sh exit code
+      {{ _np_run.rc }}, namespace removal exit code {{ _np_cleanup.rc }}, removal confirmed:
+      {{ not (_np_keep_lock | default(false)) }}, {{ _np_containers | length }} benchmark
+      containers recorded); see {{ _np_iter_dir }}.
+    quiet: true
