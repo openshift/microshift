@@ -115,14 +115,16 @@ func (s *CertificateSigner) Regenerate(certPath ...string) error {
 }
 
 func (s *CertificateSigner) regenerateSelf() error {
-	if err := os.RemoveAll(s.signerDir); err != nil {
-		return fmt.Errorf("failed to regenerate CA %q: %v", s.signerName, err)
+	// Preserve issuance history, including counters belonging to nested CAs.
+	serialGenerator, err := crypto.NewSerialFileGenerator(cryptomaterial.CASerialsPath(s.signerDir))
+	if err != nil {
+		return fmt.Errorf("failed to load serial counter for CA %q: %w", s.signerName, err)
 	}
 
-	signerConfig, _, err := crypto.EnsureCA(
+	signerConfig, err := crypto.MakeSelfSignedCA(
 		cryptomaterial.CACertPath(s.signerDir),
 		cryptomaterial.CAKeyPath(s.signerDir),
-		cryptomaterial.CASerialsPath(s.signerDir),
+		"", // Supplying a serial file would reset the existing counter.
 		s.signerName,
 		s.signerValidity,
 	)
@@ -131,6 +133,7 @@ func (s *CertificateSigner) regenerateSelf() error {
 		return fmt.Errorf("failed to regenerate %s CA certificate: %w", s.signerName, err)
 	}
 
+	signerConfig.SerialGenerator = serialGenerator
 	s.signerConfig = signerConfig
 	s.boundIssuerValidity()
 
@@ -143,15 +146,23 @@ func (s *CertificateSigner) regenerateSubCA(subCAName string) error {
 		return NewSignerNotFound(subCAName)
 	}
 
-	if err := os.RemoveAll(subCA.signerDir); err != nil {
-		return fmt.Errorf("failed to remove subCA dir %q: %v", subCA.signerDir, err)
+	// Replace only the CA material; SignSubCA reloads the preserved counter.
+	if _, err := s.signerConfig.MakeAndWriteSubCA(
+		cryptomaterial.CABundlePath(subCA.signerDir),
+		cryptomaterial.CAKeyPath(subCA.signerDir),
+		"",
+		subCA.signerName,
+		subCA.signerValidity,
+	); err != nil {
+		return fmt.Errorf("failed to regenerate subCA %q certificate: %w", subCA.signerName, err)
 	}
 
 	if err := s.SignSubCA(subCA.toBuilder()); err != nil {
 		return fmt.Errorf("failed to regenerate subCA %q certificate: %v", subCA.signerName, err)
 	}
 
-	return nil
+	// Existing descendant files now need to be reissued under the new CA.
+	return s.GetSubCA(subCAName).Regenerate()
 }
 
 func (s *CertificateSigner) regenerateCertificate(certName string) error {
