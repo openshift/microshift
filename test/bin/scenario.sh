@@ -439,7 +439,7 @@ get_lrel_release_image_url() {
     fi
 
     # Resolve the arch-specific digest from both registries
-    local -r image_path="openshift4/microshift-bootc-rhel${rhel_version}"
+    local -r image_path="openshift${release_version%%.*}/microshift-bootc-rhel${rhel_version}"
     local -r image_tag="v${release_version}"
     local -r prod_registry="registry.redhat.io"
     local -r stage_registry="registry.stage.redhat.io"
