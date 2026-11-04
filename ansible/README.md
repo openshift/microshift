@@ -252,6 +252,7 @@ Most of the following variables are defined in `vars/all.yml`. The source-build 
 | `kube_burner_extra_flags` | Extra kube-burner-ocp flags appended to every workload | `""` |
 | `prometheus_query_endpoint` | External Prometheus URL for the network measurement and kube-burner metrics | `http://<logging-host>:9091` |
 | `rhel_target_version` | Pin RHEL to a specific version during upgrades (e.g., "9.8") | `undefined` |
+| `upgrade_packages` | Upgrade all packages on the MicroShift host during host setup | `true` |
 | `microshift_cluster_network` | Pod network of the MicroShift host, a list with one IPv4 CIDR; empty keeps the MicroShift default `10.42.0.0/16` | `[]` |
 | `microshift_service_network` | Service network of the MicroShift host, a list with one IPv4 CIDR; empty keeps the MicroShift default `10.43.0.0/16` | `[]` |
 | `microshift_pod_mtu` | Pod MTU written to `/etc/microshift/ovn.yaml`; empty keeps the MicroShift default | `""` |

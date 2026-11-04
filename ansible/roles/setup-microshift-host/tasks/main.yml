@@ -106,6 +106,7 @@
     state: latest
     nobest: true
   notify: reboot machine
+  when: upgrade_packages | bool
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
