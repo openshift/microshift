@@ -2,7 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-start_image="rhel98-bootc-brew-lrel-fips"
+start_image="rhel98-bootc-brew-lrel-fips-ai"
 
 # Currently, RHOAI is only available for x86_64
 check_platform() {
