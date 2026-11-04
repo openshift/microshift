@@ -71,9 +71,6 @@ if [ ! -d "${RF_VENV}" ]; then
     "${ROOTDIR}/scripts/fetch_tools.sh" robotframework
 fi
 "${ROOTDIR}/scripts/fetch_tools.sh" etcdctl
-if [[ "${SCENARIO_SOURCES:-}" =~ .*releases.* ]]; then
-    "${ROOTDIR}/scripts/fetch_tools.sh" ginkgo
-fi
 
 # Tell scenario.sh to merge stderr into stdout
 export SCENARIO_MERGE_OUTPUT_STREAMS=true

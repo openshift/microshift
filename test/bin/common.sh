@@ -25,10 +25,6 @@ KICKSTART_TEMPLATE_DIR="${TESTDIR}/kickstart-templates"
 # The location the web server should serve.
 export IMAGEDIR="${OUTPUTDIR}/test-images"
 
-# Ginkgo test binary path
-export GINKGO_TEST_BINARY="${OUTPUTDIR}/bin/extended-platform-tests"
-export HANDLERESULT_SCRIPT="${OUTPUTDIR}/bin/handleresult.py"
-
 # The storage pool base name for VMs.
 # The actual pool names will be '${VM_POOL_BASENAME}-${SCENARIO}'.
 VM_POOL_BASENAME="vm-storage"
