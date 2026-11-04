@@ -16,8 +16,9 @@ Test Tags           restart
 
 
 *** Variables ***
-${CERTIFICATE_LOCK}     /var/lib/microshift-backups/certs.lock
-${RUNTIME_LOCK}         /var/lib/microshift-backups/certs-runtime.lock
+${CERTIFICATE_LOCK}         /var/lib/microshift-backups/certs.lock
+${RUNTIME_LOCK}             /var/lib/microshift-backups/certs-runtime.lock
+${KUBELET_SIGNER_DIR}       /var/lib/microshift/certs/kubelet-csr-signer-signer
 
 
 *** Test Cases ***
@@ -162,6 +163,7 @@ Leaf Renewal Keeps CAs Unchanged
 
 CA Renewal Updates The Whole Chain
     [Documentation]    Prepare all CAs online with old credentials still usable; activate the new chain on restart.
+    ${serial_before}=    Command Should Work    cat ${KUBELET_SIGNER_DIR}/serial.txt
     ${pods_before}=    Certificate Consumer Pod UIDs
     ${before}=    Certificate Status Document
     ${files_before}=    Certificate Material Digest
@@ -177,6 +179,7 @@ CA Renewal Updates The Whole Chain
     Should Be Equal As Integers    ${restarts}    0    msg=CA activation must not require an automatic startup retry
     ${ca_after}=    CA Material Digest
     Should Not Be Equal    ${ca_before}    ${ca_after}
+    CSR Signer Serial Has Advanced    ${serial_before}
     Renewal Matches Current Status    ${result}
     Renewal Activation Has Finished
     Certificate Consumers Use Renewed Material    ${pods_before}    ${True}
@@ -526,6 +529,12 @@ Renewal Matches Current Status
     FOR    ${item}    IN    @{result}[items]
         Should Be True    $expiries[($item['service'], $item['name'])] == $item['newNotAfter']
     END
+
+CSR Signer Serial Has Advanced
+    [Documentation]    CA renewal must continue the parent's issuance counter instead of resetting it.
+    [Arguments]    ${serial_before}
+    ${serial_after}=    Command Should Work    openssl x509 -in ${KUBELET_SIGNER_DIR}/csr-signer/ca.crt -noout -serial
+    Should Be True    int($serial_after.split('=')[1], 16) > int($serial_before, 16)
 
 Renewal Activation Has Finished
     [Documentation]    Activation removes the pending generation and releases the operation lock.
