@@ -170,7 +170,7 @@ func applyCertificateRenewal(cfg *config.Config, dataDir string, renewCAs bool) 
 		return nil, err
 	}
 	stage := transaction.Stage()
-	builder, err := certificateChainsSetup(cfg, stage)
+	builder, err := certificates.NewChains(cfg, stage)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func quietCertificateGeneration(generate func() error) error {
 }
 
 func validateCertificateRenewal(cfg *config.Config, dataDir string, before certchains.CertificateInventory, renewCAs bool) (certchains.CertificateInventory, error) {
-	builder, err := certificateChainsSetup(cfg, dataDir)
+	builder, err := certificates.NewChains(cfg, dataDir)
 	if err != nil {
 		return nil, err
 	}

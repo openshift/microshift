@@ -22,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/openshift/microshift/pkg/admin/certificates"
 	"github.com/openshift/microshift/pkg/config"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
 	"github.com/stretchr/testify/assert"
@@ -36,7 +37,7 @@ func TestProductionCertificateInventory(t *testing.T) {
 		ApiServer: config.ApiServer{AdvertiseAddress: "10.44.0.0"},
 	}
 	dataDir := t.TempDir()
-	builder, err := certificateChainsSetup(cfg, dataDir)
+	builder, err := certificates.NewChains(cfg, dataDir)
 	require.NoError(t, err)
 	chains, err := builder.Complete()
 	require.NoError(t, err)
