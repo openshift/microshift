@@ -1,13 +1,13 @@
 {
   "release": {
-    "base": "1.18.1"
+    "base": "1.20.1"
   },
   "images": {
-    "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:57a1aea49d7cc275b37b8f52d602a3a9d1601ec6a21a3268dd4903566cb2e335",
-    "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:41df7aabbce42599bad7fdc721cd12aa6e12d17e1c0658fb3294a1f68483d656",
-    "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:155383c4664ea3ed18d0f079be720ad68a5de044448a744d7579af7ff0fc7e0a",
-    "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:09c857f0c20721d6b447f5f567182befc1ca6157128225849117a5c830feab23",
-    "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:09c857f0c20721d6b447f5f567182befc1ca6157128225849117a5c830feab23",
-    "cert-manager-controller": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:09c857f0c20721d6b447f5f567182befc1ca6157128225849117a5c830feab23"
+    "cert-manager-operator": "registry.redhat.io/cert-manager/cert-manager-operator-rhel9@sha256:403674a15e95ce09e0823b49c961f09a070e36c33d051c8a97e9cafc260da397",
+    "cert-manager-istiocsr": "registry.redhat.io/cert-manager/cert-manager-istio-csr-rhel9@sha256:0329f6bd8b196ecd1fb76dde04b8f3b9b2e64a1064db05b7d5211b50d8353a95",
+    "cert-manager-acmesolver": "registry.redhat.io/cert-manager/jetstack-cert-manager-acmesolver-rhel9@sha256:6df582e555424ab8a71758b228e72d1649206002fe2293398bcedd5001c8b11d",
+    "cert-manager-webhook": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:d5e31002f72b74edfd91e09b72c4c37eb3bbbeb7ddbc69202f5d82b8f61c8ab4",
+    "cert-manager-ca-injector": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:d5e31002f72b74edfd91e09b72c4c37eb3bbbeb7ddbc69202f5d82b8f61c8ab4",
+    "cert-manager-controller": "registry.redhat.io/cert-manager/jetstack-cert-manager-rhel9@sha256:d5e31002f72b74edfd91e09b72c4c37eb3bbbeb7ddbc69202f5d82b8f61c8ab4"
   }
 }
