@@ -1,8 +1,8 @@
 {
   "release": {
-    "base": "5.1.0-0.nightly-arm64-2026-10-29-003032"
+    "base": "5.1.0-0.nightly-arm64-2026-11-05-000536"
   },
   "images": {
-    "metrics_server": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:e27835aeec5916bd515a8a0b27f3a2645179f52b427334eaba003d784a03bd66"
+    "metrics_server": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:d7e6257bfd33b76a35a606eb4c00aa45875e1b355cdf59850da5e855ba94b46d"
   }
 }
