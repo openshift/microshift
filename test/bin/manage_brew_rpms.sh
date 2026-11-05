@@ -106,8 +106,15 @@ brew_curl_download() {
     for current_arch in ${arch} noarch; do
         local base_url="http://download.devel.redhat.com/rhel-9/brew/packages/microshift/${pkg_version}/${pkg_release}/${current_arch}/"
 
+        # Reject failed or truncated directory listings instead of
+        # proceeding with a partial list of the RPM files
+        local rpm_listing
+        if ! rpm_listing=$(curl -k -s --max-time 60 "${base_url}"); then
+            echo "ERROR: Failed to list RPM files at ${base_url}"
+            return 1
+        fi
         local rpm_files
-        rpm_files=$(curl -k -s --max-time 60 "${base_url}" | sed -n 's/.*href="\([^"]*\.rpm\)".*/\1/p') || true
+        rpm_files=$(sed -n 's/.*href="\([^"]*\.rpm\)".*/\1/p' <<< "${rpm_listing}")
         if [ -z "${rpm_files}" ]; then
             echo "ERROR: No RPM files found at ${base_url}"
             return 1
@@ -116,10 +123,14 @@ brew_curl_download() {
         echo "Downloading from: ${base_url}"
         for rpm_file in ${rpm_files}; do
             echo "Downloading: ${rpm_file}"
-            if ! curl -k -s -O --retry 5 --retry-delay 5 --max-time 600 "${base_url}${rpm_file}"; then
+            # Download to a temporary file, and only rename it on success to
+            # avoid leaving partial RPM files behind on failed transfers
+            if ! curl -k -s -o "${rpm_file}.part" --retry 5 --retry-delay 5 --max-time 600 "${base_url}${rpm_file}"; then
+                rm -f "${rpm_file}.part"
                 echo "ERROR: Failed to download ${rpm_file}"
                 return 1
             fi
+            mv -f "${rpm_file}.part" "${rpm_file}"
         done
     done
 }
