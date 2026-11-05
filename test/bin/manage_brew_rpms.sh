@@ -110,7 +110,7 @@ brew_curl_download() {
         # proceeding with a partial list of the RPM files
         local rpm_listing
         if ! rpm_listing=$(curl -k -s --max-time 60 "${base_url}"); then
-            echo "ERROR: Failed to list RPM files at ${base_url}"
+            echo "ERROR: Failed to list the '${current_arch}' RPM files of the '${package}' package"
             return 1
         fi
         local rpm_files
@@ -122,6 +122,13 @@ brew_curl_download() {
 
         echo "Downloading from: ${base_url}"
         for rpm_file in ${rpm_files}; do
+            # Only accept plain RPM file names from the listing, rejecting
+            # anything containing a path or starting with a dash that could
+            # escape the output directory or act as a command line option
+            if [[ ! "${rpm_file}" =~ ^[A-Za-z0-9][A-Za-z0-9._+~-]*\.rpm$ ]] ; then
+                echo "ERROR: Invalid RPM file name '${rpm_file}' in the listing"
+                return 1
+            fi
             echo "Downloading: ${rpm_file}"
             # Download to a temporary file, and only rename it on success to
             # avoid leaving partial RPM files behind on failed transfers
