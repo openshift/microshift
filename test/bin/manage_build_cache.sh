@@ -43,9 +43,10 @@ The cache directory structure is '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>'.
 
   getlast:  Retrieve the '${AWS_BUCKET_NAME}/<branch>/<arch>/last'
             file contents from the AWS S3 bucket. The output format is
-            "LAST: <tag>" for easy parsing. The script returns the
-            specified '<tag>' as a fallback if the bucket file does
-            not exist.
+            "LAST: <tag>" for easy parsing. If the bucket file does not
+            exist or cannot be read, the script returns the most recent
+            complete tag available in the bucket, or the specified
+            '<tag>' as a fallback if none is found.
 
   dellast:  Delete the data pointed by the '${AWS_BUCKET_NAME}/<branch>/<arch>/last'
             file contents and update the 'last' file contents in the AWS S3 bucket
@@ -185,42 +186,70 @@ action_setlast() {
     rm -f "${src_file}"
 }
 
-action_getlast() {
+# Read the 'last' marker contents, printing them to stdout. The progress
+# information is printed to stderr. Return a non-zero status when the
+# marker is missing or unreadable, without printing any tag.
+read_last_marker() {
     local -r src_file="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/last"
     local -r dst_file="$(mktemp /tmp/getlast.XXXXXXXX)"
 
-    echo "Reading '${src_file}' tag contents"
+    echo "Reading '${src_file}' tag contents" >&2
     if ! run_aws_cli s3 cp "${src_file}" "${dst_file}" ; then
-        echo "WARNING: Failed to read the '${src_file}' file contents"
+        echo "WARNING: Failed to read the '${src_file}' file contents" >&2
         rm -f "${dst_file}"
+        return 1
     fi
-    if [ -s "${dst_file}" ] ; then
-        echo "LAST: $(cat "${dst_file}")"
-    else
-        # Fall back to the most recent tag available in the bucket, allowing
-        # the jobs to use a retained cache while the 'last' marker is missing
-        # or unreadable. Keep the caller-provided tag as the last resort.
-        local latest_tag
-        latest_tag=$(run_aws_cli s3 ls "s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/" \
-            | grep '/$' | awk '{print $NF}' | tr -d '/' | sort -n | tail -1 || true)
-        if [ -n "${latest_tag}" ] ; then
-            echo "LAST: ${latest_tag}"
-        else
-            echo "LAST: ${TAG_SUBDIR}"
-        fi
+    if [ ! -s "${dst_file}" ] ; then
+        rm -f "${dst_file}"
+        return 1
     fi
+    cat "${dst_file}"
     rm -f "${dst_file}"
+}
+
+# List the cache tags available in the bucket in descending order.
+list_cache_tags() {
+    run_aws_cli s3 ls "s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/" \
+        | grep '/$' | awk '{print $NF}' | tr -d '/' | sort -rn | uniq || true
+}
+
+action_getlast() {
+    local marker
+    if marker=$(read_last_marker) ; then
+        echo "LAST: ${marker}"
+        return
+    fi
+
+    # Fall back to the most recent complete tag available in the bucket,
+    # allowing the jobs to use a retained cache while the 'last' marker is
+    # missing or unreadable. Incomplete tags, for example from interrupted
+    # uploads, are skipped in favor of older but complete ones. Keep the
+    # caller-provided tag as the last resort.
+    local -r requested_tag="${TAG_SUBDIR}"
+    local candidate
+    while read -r candidate ; do
+        [ -n "${candidate}" ] || continue
+        TAG_SUBDIR="${candidate}"
+        if check_contents ; then
+            TAG_SUBDIR="${requested_tag}"
+            echo "LAST: ${candidate}"
+            return
+        fi
+    done < <(list_cache_tags)
+    TAG_SUBDIR="${requested_tag}"
+    echo "LAST: ${requested_tag}"
 }
 
 action_dellast() {
     local -r top_dir="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}"
-    # Get the last contents with the ${TAG_SUBDIR} default
-    local -r last_dir="$(action_getlast | awk '/LAST:/ {print $NF}')"
-
-    if [ -z "${last_dir}" ] ; then
-        echo "ERROR: Cannot delete 'last' tag because it is not set or empty"
+    # Only delete the data pointed to by a readable 'last' marker, avoiding
+    # any action on a tag guessed from the bucket contents
+    local last_dir
+    if ! last_dir=$(read_last_marker) ; then
+        echo "ERROR: Cannot delete 'last' tag because it is not set or unreadable"
         exit 1
     fi
+
     if [ "${last_dir}" = "${TAG_SUBDIR}" ] ; then
         echo "ERROR: Cannot delete 'last' tag because it is the same as the new '${TAG_SUBDIR}' tag"
         exit 1
