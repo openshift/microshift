@@ -785,8 +785,12 @@ def main():
             common.print_msg("Skipping all image builds")
             success_message = True
             return
-        # Add local registry credentials to the input pull secret file
+        # Add local registry credentials to the input pull secret file.
+        # Create the output directory explicitly, because it is only created
+        # as a side effect of the container image extraction and mirroring
+        # steps, which are skipped by the '-E' invocations.
         global PULL_SECRET
+        os.makedirs(BOOTC_IMAGE_DIR, exist_ok=True)
         opull_secret = os.path.join(BOOTC_IMAGE_DIR, "pull_secret.json", )
         common.update_pull_secret(PULL_SECRET, opull_secret, MIRROR_REGISTRY)
         PULL_SECRET = opull_secret

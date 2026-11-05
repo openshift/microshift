@@ -79,7 +79,10 @@ action_download() {
 
         mkdir -p "${adir}"
         pushd "${adir}" &>/dev/null
-        if ! brew download-build --arch="${arch}" --arch="noarch" "${package}" ; then
+        # Run the download under a timeout to avoid hanging the whole CI job
+        # when the brew connection stalls: fall through to the curl fallback
+        # on failure instead of waiting until the job's overall timeout.
+        if ! timeout --kill-after=1m 30m brew download-build --arch="${arch}" --arch="noarch" "${package}" ; then
             echo "WARNING: Failed to download '${package}' packages using brew download-build command, using curl as a fallback mechanism"
             if ! brew_curl_download "${package}" "${arch}" ; then
                 echo "ERROR: Failed to download '${package}' packages using curl command"
@@ -103,8 +106,15 @@ brew_curl_download() {
     for current_arch in ${arch} noarch; do
         local base_url="http://download.devel.redhat.com/rhel-9/brew/packages/microshift/${pkg_version}/${pkg_release}/${current_arch}/"
 
+        # Reject failed or truncated directory listings instead of
+        # proceeding with a partial list of the RPM files
+        local rpm_listing
+        if ! rpm_listing=$(curl -k -s --max-time 60 "${base_url}"); then
+            echo "ERROR: Failed to list the '${current_arch}' RPM files of the '${package}' package"
+            return 1
+        fi
         local rpm_files
-        rpm_files=$(curl -k -s "${base_url}" | sed -n 's/.*href="\([^"]*\.rpm\)".*/\1/p') || true
+        rpm_files=$(sed -n 's/.*href="\([^"]*\.rpm\)".*/\1/p' <<< "${rpm_listing}")
         if [ -z "${rpm_files}" ]; then
             echo "ERROR: No RPM files found at ${base_url}"
             return 1
@@ -112,11 +122,22 @@ brew_curl_download() {
 
         echo "Downloading from: ${base_url}"
         for rpm_file in ${rpm_files}; do
+            # Only accept plain RPM file names from the listing, rejecting
+            # anything containing a path or starting with a dash that could
+            # escape the output directory or act as a command line option
+            if [[ ! "${rpm_file}" =~ ^[A-Za-z0-9][A-Za-z0-9._+~-]*\.rpm$ ]] ; then
+                echo "ERROR: Invalid RPM file name '${rpm_file}' in the listing"
+                return 1
+            fi
             echo "Downloading: ${rpm_file}"
-            if ! curl -s -O "${base_url}${rpm_file}"; then
+            # Download to a temporary file, and only rename it on success to
+            # avoid leaving partial RPM files behind on failed transfers
+            if ! curl -k -s -o "${rpm_file}.part" --retry 5 --retry-delay 5 --max-time 600 "${base_url}${rpm_file}"; then
+                rm -f "${rpm_file}.part"
                 echo "ERROR: Failed to download ${rpm_file}"
                 return 1
             fi
+            mv -f "${rpm_file}.part" "${rpm_file}"
         done
     done
 }
