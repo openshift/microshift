@@ -199,12 +199,16 @@ read_last_marker() {
         rm -f "${dst_file}"
         return 1
     fi
-    if [ ! -s "${dst_file}" ] ; then
-        rm -f "${dst_file}"
+    local marker
+    marker=$(cat "${dst_file}")
+    rm -f "${dst_file}"
+    # Reject markers with invalid contents, such as files containing only
+    # whitespace, to avoid returning an empty tag to the callers
+    if [[ ! "${marker}" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] ; then
+        echo "WARNING: Invalid '${src_file}' file contents" >&2
         return 1
     fi
-    cat "${dst_file}"
-    rm -f "${dst_file}"
+    echo "${marker}"
 }
 
 # List the cache tags available in the bucket in descending order.
