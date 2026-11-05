@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.3
+    controller-gen.kubebuilder.io/version: v0.21.0
   creationTimestamp: null
   name: lvmvolumegroupnodestatuses.lvm.topolvm.io
 spec:
@@ -46,16 +46,16 @@ spec:
                 items:
                   properties:
                     deviceDiscoveryPolicy:
-                      default: RuntimeDynamic
+                      default: RuntimeStatic
                       description: |-
-                        DeviceDiscoveryPolicy is a field to indicate whether the devices are discovered
-                        at runtime or preconfigured through a DeviceSelector
-                        Setting this to DeviceDiscoveryPolicyPreconfigured indicates the devices are preconfigured through a DeviceSelector.
-                        Setting this to DeviceDiscoveryPolicyRuntimeDynamic indicates the devices are added to the VG dynamically if they are present at runtime.
-                        By default, the value is set to RuntimeDynamic.
+                        DeviceDiscoveryPolicy is a field to indicate the effective device discovery policy for this volume group.
+                        Preconfigured indicates explicit DeviceSelector paths are configured and the discovery policy is not applicable.
+                        RuntimeDynamic indicates devices are discovered and added dynamically at runtime (no explicit paths, Dynamic policy).
+                        RuntimeStatic indicates devices were discovered at install time and new devices are ignored (no explicit paths, Static policy).
                       enum:
                       - Preconfigured
                       - RuntimeDynamic
+                      - RuntimeStatic
                       type: string
                     devices:
                       description: Devices is the list of devices used by the volume
@@ -86,6 +86,68 @@ spec:
                     name:
                       description: Name is the name of the volume group
                       type: string
+                    raidStatus:
+                      description: RAIDStatus reports the RAID health for this device
+                        class. Only set when the device class uses RAIDConfig.
+                      properties:
+                        degradedMemberCount:
+                          description: DegradedMemberCount is the number of physical
+                            volumes that are missing or degraded.
+                          type: integer
+                        lvHealth:
+                          description: LVHealth contains per-logical-volume RAID health
+                            details.
+                          items:
+                            description: RAIDLVHealth reports the health of a single
+                              RAID logical volume.
+                            properties:
+                              healthStatus:
+                                description: |-
+                                  HealthStatus is the LVM health status string. Empty for healthy volumes.
+                                  Examples: "partial", "refresh needed", "mismatches exist".
+                                type: string
+                              name:
+                                description: Name is the logical volume name.
+                                type: string
+                              raidType:
+                                description: RAIDType is the RAID level of this logical
+                                  volume.
+                                enum:
+                                - raid1
+                                - raid4
+                                - raid5
+                                - raid6
+                                - raid10
+                                type: string
+                              syncPercent:
+                                description: SyncPercent is the resynchronization
+                                  progress (0-100).
+                                type: integer
+                            required:
+                            - name
+                            - raidType
+                            - syncPercent
+                            type: object
+                          type: array
+                        memberCount:
+                          description: MemberCount is the total number of physical
+                            volumes in the RAID volume group.
+                          type: integer
+                        minSyncPercent:
+                          description: |-
+                            MinSyncPercent is the minimum resynchronization progress across all RAID logical volumes (0-100).
+                            100 means all LVs are fully synced. Nil when no RAID LVs exist.
+                          type: integer
+                        status:
+                          description: Status is the overall RAID health.
+                          enum:
+                          - Healthy
+                          - Degraded
+                          - Failed
+                          type: string
+                      required:
+                      - status
+                      type: object
                     reason:
                       description: Reason provides more detail on the volume group
                         creation status

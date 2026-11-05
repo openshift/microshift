@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.3
+    controller-gen.kubebuilder.io/version: v0.21.0
   creationTimestamp: null
   name: lvmclusters.lvm.topolvm.io
 spec:
@@ -58,6 +58,19 @@ spec:
                             class is the default. You can configure only a single
                             default device class.
                           type: boolean
+                        deviceDiscoveryPolicy:
+                          description: |-
+                            DeviceDiscoveryPolicy specifies the policy for discovering devices for this device class.
+                            Static means the volume group is created with devices found at install time; new devices are ignored.
+                            Dynamic means devices are continuously discovered and added to the volume group.
+                            When not set on new clusters without explicit device paths, the webhook defaults this to Static.
+                            When explicit device paths are configured, the policy is left unset (paths override the policy
+                            and status reports Preconfigured). Existing clusters upgraded from before this field was
+                            introduced keep nil, which the controller treats as Dynamic for backward compatibility.
+                          enum:
+                          - Static
+                          - Dynamic
+                          type: string
                         deviceSelector:
                           description: DeviceSelector contains the configuration to
                             specify paths to the devices that you want to add to the
@@ -70,13 +83,19 @@ spec:
                                 Force wipe the devices only when you know that they do not contain any important data.
                               type: boolean
                             optionalPaths:
-                              description: OptionalPaths specify the optional device
-                                paths.
+                              description: |-
+                                OptionalPaths is a list of device paths. At least one path must resolve on each node.
+                                Prefer stable, consistent paths such as /dev/disk/by-id/… instead of
+                                /dev/sda, which may be renamed or reordered by the kernel on reboot.
+                                This can be used to provide a single list of disk IDs across multiple nodes.
                               items:
                                 type: string
                               type: array
                             paths:
-                              description: Paths specify the device paths.
+                              description: |-
+                                Paths is a list of device paths. All paths must resolve on each node.
+                                Prefer stable, consistent paths such as /dev/disk/by-id/… instead of
+                                /dev/sda, which may be renamed or reordered by the kernel on reboot.
                               items:
                                 type: string
                               type: array
@@ -90,8 +109,10 @@ spec:
                           enum:
                           - xfs
                           - ext4
-                          - ""
                           type: string
+                          x-kubernetes-validations:
+                          - message: fstype is immutable
+                            rule: oldSelf == self
                         name:
                           description: Name specifies a name for the device class
                           maxLength: 245
@@ -189,6 +210,98 @@ spec:
                           - nodeSelectorTerms
                           type: object
                           x-kubernetes-map-type: atomic
+                        raidConfig:
+                          description: |-
+                            RAIDConfig configures native LVM RAID for this device class. When set, the device class
+                            uses thick provisioning and all logical volumes are RAID-protected at the specified level.
+                            Mutually exclusive with ThinPoolConfig. All fields are immutable after creation.
+                          properties:
+                            mirrors:
+                              description: |-
+                                Mirrors is the number of mirror copies. Only valid for raid1 and raid10.
+                                Default is 1 (2 total copies: original + 1 mirror).
+                              minimum: 1
+                              type: integer
+                            stripeSize:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              description: |-
+                                StripeSize is the size of each stripe chunk. Only valid for raid4, raid5, raid6, and raid10.
+                                Must be a power of 2 (e.g., 64Ki, 128Ki, 256Ki, 512Ki). Default is 64Ki.
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            stripes:
+                              description: |-
+                                Stripes is the number of data stripes. Only valid for raid4, raid5, raid6, and raid10.
+                                When not specified, LVM uses its default (typically all available devices minus parity).
+                              minimum: 2
+                              type: integer
+                            type:
+                              description: Type is the LVM RAID level.
+                              enum:
+                              - raid1
+                              - raid4
+                              - raid5
+                              - raid6
+                              - raid10
+                              type: string
+                          required:
+                          - type
+                          type: object
+                          x-kubernetes-validations:
+                          - message: raidConfig is immutable after creation
+                            rule: oldSelf == self
+                        storageClassOptions:
+                          default: {}
+                          description: StorageClassOptions allows customization of
+                            the StorageClass created for this device class.
+                          properties:
+                            additionalLabels:
+                              additionalProperties:
+                                type: string
+                              description: |-
+                                AdditionalLabels sets additional labels on the StorageClass.
+                                This is the only StorageClassOptions field that can be changed after creation.
+                              maxProperties: 16
+                              type: object
+                            additionalParameters:
+                              additionalProperties:
+                                type: string
+                              default: {}
+                              description: |-
+                                AdditionalParameters sets additional parameters on the StorageClass.
+                                LVMS-owned keys (topolvm.io/device-class, csi.storage.k8s.io/fstype) cannot be overridden.
+                                This field is immutable after creation.
+                              maxProperties: 16
+                              type: object
+                              x-kubernetes-validations:
+                              - message: additionalParameters is immutable once set
+                                rule: oldSelf == self
+                            reclaimPolicy:
+                              default: Delete
+                              description: |-
+                                ReclaimPolicy sets the reclaim policy for PVs provisioned by this device class.
+                                When set to Retain, PVs and their underlying logical volumes are preserved when PVCs are deleted.
+                              enum:
+                              - Delete
+                              - Retain
+                              type: string
+                              x-kubernetes-validations:
+                              - message: reclaimPolicy is immutable once set
+                                rule: oldSelf == self
+                            volumeBindingMode:
+                              default: WaitForFirstConsumer
+                              description: VolumeBindingMode sets the binding mode
+                                for PVs provisioned by this device class.
+                              enum:
+                              - WaitForFirstConsumer
+                              - Immediate
+                              type: string
+                              x-kubernetes-validations:
+                              - message: volumeBindingMode is immutable once set
+                                rule: oldSelf == self
+                          type: object
                         thinPoolConfig:
                           description: ThinPoolConfig contains the configuration to
                             create a thin pool in the LVM volume group. If you exclude
@@ -260,8 +373,13 @@ spec:
                           - name
                           - overprovisionRatio
                           type: object
+                      required:
+                      - name
                       type: object
                     type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
                 type: object
               tolerations:
                 description: Tolerations to apply to nodes to act on
@@ -283,9 +401,10 @@ spec:
                     operator:
                       description: |-
                         Operator represents a key's relationship to the value.
-                        Valid operators are Exists and Equal. Defaults to Equal.
+                        Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                         Exists is equivalent to wildcard for value, so that a pod can
                         tolerate all taints of a particular category.
+                        Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                       type: string
                     tolerationSeconds:
                       description: |-
@@ -380,16 +499,16 @@ spec:
                           deviceclass on the node
                         properties:
                           deviceDiscoveryPolicy:
-                            default: RuntimeDynamic
+                            default: RuntimeStatic
                             description: |-
-                              DeviceDiscoveryPolicy is a field to indicate whether the devices are discovered
-                              at runtime or preconfigured through a DeviceSelector
-                              Setting this to DeviceDiscoveryPolicyPreconfigured indicates the devices are preconfigured through a DeviceSelector.
-                              Setting this to DeviceDiscoveryPolicyRuntimeDynamic indicates the devices are added to the VG dynamically if they are present at runtime.
-                              By default, the value is set to RuntimeDynamic.
+                              DeviceDiscoveryPolicy is a field to indicate the effective device discovery policy for this volume group.
+                              Preconfigured indicates explicit DeviceSelector paths are configured and the discovery policy is not applicable.
+                              RuntimeDynamic indicates devices are discovered and added dynamically at runtime (no explicit paths, Dynamic policy).
+                              RuntimeStatic indicates devices were discovered at install time and new devices are ignored (no explicit paths, Static policy).
                             enum:
                             - Preconfigured
                             - RuntimeDynamic
+                            - RuntimeStatic
                             type: string
                           devices:
                             description: Devices is the list of devices used by the
@@ -423,6 +542,68 @@ spec:
                           node:
                             description: Node is the name of the node
                             type: string
+                          raidStatus:
+                            description: RAIDStatus reports the RAID health for this
+                              device class. Only set when the device class uses RAIDConfig.
+                            properties:
+                              degradedMemberCount:
+                                description: DegradedMemberCount is the number of
+                                  physical volumes that are missing or degraded.
+                                type: integer
+                              lvHealth:
+                                description: LVHealth contains per-logical-volume
+                                  RAID health details.
+                                items:
+                                  description: RAIDLVHealth reports the health of
+                                    a single RAID logical volume.
+                                  properties:
+                                    healthStatus:
+                                      description: |-
+                                        HealthStatus is the LVM health status string. Empty for healthy volumes.
+                                        Examples: "partial", "refresh needed", "mismatches exist".
+                                      type: string
+                                    name:
+                                      description: Name is the logical volume name.
+                                      type: string
+                                    raidType:
+                                      description: RAIDType is the RAID level of this
+                                        logical volume.
+                                      enum:
+                                      - raid1
+                                      - raid4
+                                      - raid5
+                                      - raid6
+                                      - raid10
+                                      type: string
+                                    syncPercent:
+                                      description: SyncPercent is the resynchronization
+                                        progress (0-100).
+                                      type: integer
+                                  required:
+                                  - name
+                                  - raidType
+                                  - syncPercent
+                                  type: object
+                                type: array
+                              memberCount:
+                                description: MemberCount is the total number of physical
+                                  volumes in the RAID volume group.
+                                type: integer
+                              minSyncPercent:
+                                description: |-
+                                  MinSyncPercent is the minimum resynchronization progress across all RAID logical volumes (0-100).
+                                  100 means all LVs are fully synced. Nil when no RAID LVs exist.
+                                type: integer
+                              status:
+                                description: Status is the overall RAID health.
+                                enum:
+                                - Healthy
+                                - Degraded
+                                - Failed
+                                type: string
+                            required:
+                            - status
+                            type: object
                           reason:
                             description: Reason provides more detail on the volume
                               group creation status
