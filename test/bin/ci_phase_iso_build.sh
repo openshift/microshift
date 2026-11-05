@@ -130,6 +130,14 @@ run_image_build() {
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
 
+        # Build the distro installer ISOs (e.g. rhel98-installer.iso) needed
+        # by the RPM scenarios symlinked into test/scenarios. The installer
+        # build is independent of the bootc container stack, and it is skipped
+        # when the ISO was already downloaded from the build cache, so that
+        # the jobs do not depend on the cache availability.
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -E -b image-installer \
+            -l ./image-blueprints-bootc/el9/layer1-base
+
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
         fi
