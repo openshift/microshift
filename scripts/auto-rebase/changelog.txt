@@ -1,15 +1,9 @@
-- openshift-controller-manager embedded-component 5b3063ff149f290bebca0783fc508dfbf07689a5 to 15a9435de87464d81acd2680bf086b10f5b833ef
-  - cf2e464 2026-09-24T06:16:42+00:00 OCPBUGS-103700: Use patched x/net fork v0.43.0-sec.4
+- machine-config-operator embedded-component 725b0f0df6b353683550c008e232a3012f6b8024 to d316db2249aa01affeec463d52ef453da2a3b5ce
+  - 8b6193b0 2026-10-28T17:29:40+00:00 Split wait-for-ipsec-connect into two services to avoid ipsec restart
 
-- ovn-kubernetes image-amd64 fc3d50bb4017598f8ac5a07e911c1ef9847d7fb5 to a170755e8d60b563b98e599f961ae6c1efddacf6
-  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
-  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
+- ovn-kubernetes image-amd64 a170755e8d60b563b98e599f961ae6c1efddacf6 to 041dd90d7eef2d1ac5e84fc4aa448aadc208c7b7
+  - 730b2489 2026-10-27T17:47:33+05:30 Fix UDN controller startup timeout during pod sync
 
-- ovn-kubernetes image-arm64 fc3d50bb4017598f8ac5a07e911c1ef9847d7fb5 to a170755e8d60b563b98e599f961ae6c1efddacf6
-  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
-  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
+- ovn-kubernetes image-arm64 a170755e8d60b563b98e599f961ae6c1efddacf6 to 041dd90d7eef2d1ac5e84fc4aa448aadc208c7b7
+  - 730b2489 2026-10-27T17:47:33+05:30 Fix UDN controller startup timeout during pod sync
 
