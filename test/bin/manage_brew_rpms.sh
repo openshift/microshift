@@ -79,7 +79,10 @@ action_download() {
 
         mkdir -p "${adir}"
         pushd "${adir}" &>/dev/null
-        if ! brew download-build --arch="${arch}" --arch="noarch" "${package}" ; then
+        # Run the download under a timeout to avoid hanging the whole CI job
+        # when the brew connection stalls: fall through to the curl fallback
+        # on failure instead of waiting until the job's overall timeout.
+        if ! timeout --kill-after=1m 30m brew download-build --arch="${arch}" --arch="noarch" "${package}" ; then
             echo "WARNING: Failed to download '${package}' packages using brew download-build command, using curl as a fallback mechanism"
             if ! brew_curl_download "${package}" "${arch}" ; then
                 echo "ERROR: Failed to download '${package}' packages using curl command"
@@ -104,7 +107,7 @@ brew_curl_download() {
         local base_url="http://download.devel.redhat.com/rhel-9/brew/packages/microshift/${pkg_version}/${pkg_release}/${current_arch}/"
 
         local rpm_files
-        rpm_files=$(curl -k -s "${base_url}" | sed -n 's/.*href="\([^"]*\.rpm\)".*/\1/p') || true
+        rpm_files=$(curl -k -s --max-time 60 "${base_url}" | sed -n 's/.*href="\([^"]*\.rpm\)".*/\1/p') || true
         if [ -z "${rpm_files}" ]; then
             echo "ERROR: No RPM files found at ${base_url}"
             return 1
@@ -113,7 +116,7 @@ brew_curl_download() {
         echo "Downloading from: ${base_url}"
         for rpm_file in ${rpm_files}; do
             echo "Downloading: ${rpm_file}"
-            if ! curl -s -O "${base_url}${rpm_file}"; then
+            if ! curl -k -s -O --retry 5 --retry-delay 5 --max-time 600 "${base_url}${rpm_file}"; then
                 echo "ERROR: Failed to download ${rpm_file}"
                 return 1
             fi
