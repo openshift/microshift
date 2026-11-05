@@ -1,0 +1,8 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: TrustManager
+metadata:
+  name: cluster
+spec:
+  trustManagerConfig:
+    defaultCAPackage:
+      policy: Enabled
