@@ -933,6 +933,14 @@ launch_vm() {
         return 0
     fi
 
+    # Fail early with an actionable error if the boot ISO is missing,
+    # instead of letting virt-install report a storage creation problem.
+    if [ ! -f "${VM_DISK_BASEDIR}/${boot_blueprint}.iso" ]; then
+        error "The '${VM_DISK_BASEDIR}/${boot_blueprint}.iso' boot ISO of the '${boot_blueprint}' blueprint does not exist"
+        record_junit "${vmname}" "install_vm" "FAILED"
+        exit 1
+    fi
+
     echo "Creating ${full_vmname}"
 
     # Create the pool if it does not exist
