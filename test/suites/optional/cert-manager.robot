@@ -52,6 +52,12 @@ ${HOSTSFILE_ENABLED}                SEPARATOR=\n
 ${TRUST_MANAGER_BUNDLE_NAME}        test-trust-bundle
 ${TRUST_MANAGER_NS}                 cert-manager
 ${TRUST_MANAGER_CR_FILE}            ./assets/cert-manager/trust-manager-cr.yaml
+${TRUST_MANAGER_DEFAULT_CA_CR}      ./assets/cert-manager/trust-manager-cr-default-ca.yaml
+${CM_SOURCE_BUNDLE_TMPL}            ./assets/cert-manager/trust-bundle-configmap-source.yaml.template
+${DEFAULT_CAS_BUNDLE_TMPL}          ./assets/cert-manager/trust-bundle-default-cas.yaml.template
+${CA_SOURCE_CONFIGMAP_NAME}         ca-configmap-source
+${CERT_MANAGER_OPERATOR_NS}         cert-manager-operator
+${OPERATOR_TRUSTED_CA_CM_NAME}      cert-manager-operator-trusted-ca-bundle
 
 
 *** Test Cases ***
@@ -215,6 +221,68 @@ Trust Manager Survives MicroShift Restart
     ...    AND    Oc Delete    certificate/ca-certificate -n ${TRUST_MANAGER_NS} --ignore-not-found
     ...    AND    Remove ClusterIssuer
     ...    AND    Disable Trust Manager
+
+Trust Manager Bundle Injects Into Labeled Namespace
+    [Documentation]    Verify trust-manager injects a Bundle (sourced from a ConfigMap) into a
+    ...    namespace labeled with trust.cert-manager.io/inject=true, following the OpenShift
+    ...    best-practice namespaceSelector pattern, and does not inject into unlabeled namespaces.
+    [Tags]    trust-manager
+    [Setup]    Enable Trust Manager
+
+    ${INJECT_NS}=    Create Unique Namespace
+    VAR    ${INJECT_NS}=    ${INJECT_NS}    scope=TEST
+    Run With Kubeconfig    oc label namespace ${INJECT_NS} trust.cert-manager.io/inject=true --overwrite
+
+    Create CA ConfigMap For Trust Manager
+    Apply Template    ${CM_SOURCE_BUNDLE_TMPL}
+    Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${source_ca}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${TRUST_MANAGER_NS}
+    ...    ${CA_SOURCE_CONFIGMAP_NAME}
+    ...    .data.ca\\.crt
+    ${cm_data}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${INJECT_NS}
+    ...    ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    .data.ca-bundle\\.crt
+    Should Contain    ${cm_data}    ${source_ca}    msg=Bundle was not injected into the labeled namespace
+
+    ConfigMap Should Not Exist    ${TRUST_MANAGER_BUNDLE_NAME}    ${NAMESPACE}
+
+    [Teardown]    Run Keywords
+    ...    Cleanup Inject Label Resources    ${INJECT_NS}
+    ...    AND    Disable Trust Manager
+
+Trust Manager Bundle With Default CAs
+    [Documentation]    Verify trust-manager can distribute CA certificates via the useDefaultCAs
+    ...    source. On MicroShift there is no cluster-network-operator to populate the operator's
+    ...    trusted CA bundle, so the cert-manager-operator-trusted-ca-bundle ConfigMap must be
+    ...    created manually before enabling the default CA package.
+    [Tags]    trust-manager
+    [Setup]    Run Keywords
+    ...    Create Operator Trusted CA Bundle ConfigMap
+    ...    AND    Enable Trust Manager With Default CA Package
+
+    Apply Template    ${DEFAULT_CAS_BUNDLE_TMPL}
+    Oc Wait    bundle ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    --for=jsonpath='{.status.conditions[?(@.type=="Synced")].status}'=True --timeout=${DEFAULT_WAIT_TIMEOUT}
+
+    ${source_ca}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${CERT_MANAGER_OPERATOR_NS}
+    ...    ${OPERATOR_TRUSTED_CA_CM_NAME}
+    ...    .data.ca-bundle\\.crt
+    ${cm_data}=    Oc Get JsonPath
+    ...    configmap
+    ...    ${NAMESPACE}
+    ...    ${TRUST_MANAGER_BUNDLE_NAME}
+    ...    .data.ca-bundle\\.crt
+    Should Contain    ${cm_data}    ${source_ca}    msg=ConfigMap does not contain default CA certificate data
+
+    [Teardown]    Teardown Default CA Package Test
 
 
 *** Keywords ***
@@ -436,12 +504,45 @@ Enable Trust Manager
     Wait Until Keyword Succeeds    30x    10s
     ...    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
 
+Enable Trust Manager With Default CA Package
+    [Documentation]    Deploy trust-manager with the default CA package enabled so that Bundles
+    ...    can use the "useDefaultCAs: true" source. Requires the operator trusted CA bundle
+    ...    ConfigMap to already exist. The default policy is Disabled.
+    Oc Apply    -f ${TRUST_MANAGER_DEFAULT_CA_CR}
+    Wait Until Keyword Succeeds    30x    10s
+    ...    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
+    Wait Until Keyword Succeeds    30x    10s
+    ...    TrustManager CR Should Be Ready
+
 Disable Trust Manager
     [Documentation]    Remove the TrustManager CR and leftover Bundle.
     ...    The operator keeps the trust-manager deployment running while the
     ...    TrustManager feature gate is enabled, so we do not assert pod absence.
     Oc Delete    trustmanager cluster --ignore-not-found
     Oc Delete    bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
+
+Teardown Default CA Package Test
+    [Documentation]    Restore the default CA package policy to Disabled and wait for the
+    ...    trust-manager deployment rollout to finish before removing the CR and test
+    ...    ConfigMaps, so the operand is left in a clean state for subsequent tests.
+    Oc Apply    -f ${TRUST_MANAGER_CR_FILE}
+    Wait For Trust Manager Rollout
+    Cleanup Trust Bundle
+    Oc Delete    configmap ${OPERATOR_TRUSTED_CA_CM_NAME} -n ${CERT_MANAGER_OPERATOR_NS} --ignore-not-found
+    Disable Trust Manager
+
+Wait For Trust Manager Rollout
+    [Documentation]    Wait for the trust-manager deployment rollout to complete so the operand
+    ...    reaches a steady state after a default CA package policy change. Tolerant of failure
+    ...    so a transient issue does not block the remaining teardown cleanup.
+    ${name}=    Run With Kubeconfig
+    ...    oc get deployment -n ${TRUST_MANAGER_NS} -l app.kubernetes.io/name=cert-manager-trust-manager -o jsonpath={.items[0].metadata.name}
+    ...    allow_fail=True
+    IF    "${name}" != "${EMPTY}"
+        Run With Kubeconfig
+        ...    oc rollout status deployment/${name} -n ${TRUST_MANAGER_NS} --timeout=${DEFAULT_WAIT_TIMEOUT}
+        ...    allow_fail=True
+    END
 
 Create CA Secret For Trust Manager
     [Documentation]    Generate a self-signed CA cert locally and create a secret in the trust namespace
@@ -455,16 +556,62 @@ Create CA Secret For Trust Manager
     Oc Create    secret generic ca-source-secret -n ${TRUST_MANAGER_NS} --from-file=tls.crt=${cert_file}
     Remove File    ${cert_file}
 
+Create CA ConfigMap For Trust Manager
+    [Documentation]    Generate a self-signed CA cert locally and create a ConfigMap in the trust namespace
+    ${cert_file}=    Create Random Temp File
+    ${result}=    Process.Run Process
+    ...    openssl    req    -x509    -newkey    ec    -pkeyopt    ec_paramgen_curve:prime256v1
+    ...    -nodes    -keyout    /dev/null    -out    ${cert_file}    -days    365
+    ...    -subj    /CN\=test-configmap-ca.example.com
+    ...    stderr=STDOUT
+    Should Be Equal As Integers    ${result.rc}    0
+    Oc Create    configmap ${CA_SOURCE_CONFIGMAP_NAME} -n ${TRUST_MANAGER_NS} --from-file=ca.crt=${cert_file}
+    Remove File    ${cert_file}
+
+Create Operator Trusted CA Bundle ConfigMap
+    [Documentation]    Create the cert-manager-operator-trusted-ca-bundle ConfigMap that the
+    ...    operator injects into trust-manager as the default CA package. On MicroShift there is
+    ...    no cluster-network-operator to populate it, so it is created manually here.
+    ${cert_file}=    Create Random Temp File
+    ${result}=    Process.Run Process
+    ...    openssl    req    -x509    -newkey    ec    -pkeyopt    ec_paramgen_curve:prime256v1
+    ...    -nodes    -keyout    /dev/null    -out    ${cert_file}    -days    365
+    ...    -subj    /CN\=test-default-ca.example.com
+    ...    stderr=STDOUT
+    Should Be Equal As Integers    ${result.rc}    0
+    Oc Create
+    ...    configmap ${OPERATOR_TRUSTED_CA_CM_NAME} -n ${CERT_MANAGER_OPERATOR_NS} --from-file=ca-bundle.crt=${cert_file}
+    Remove File    ${cert_file}
+
 TrustManager CR Should Be Ready
     [Documentation]    Check TrustManager CR has Ready=True status condition
     ${status}=    Oc Get JsonPath    trustmanager    ${EMPTY}    cluster
     ...    .status.conditions[?(@.type=="Ready")].status
     Should Be Equal    ${status}    True    msg=TrustManager CR is not ready
 
+ConfigMap Should Not Exist
+    [Documentation]    Fails unless the ConfigMap is reported NotFound, so that a transient
+    ...    API error (which also exits non-zero) is not mistaken for proof of absence.
+    ...    Mirrors the error handling of Namespace Should Not Exist.
+    [Arguments]    ${name}    ${ns}
+    ${stdout}    ${rc}=    Run With Kubeconfig    oc get configmap ${name} -n ${ns}
+    ...    allow_fail=True    return_rc=True
+    Should Not Be Equal As Integers    ${rc}    0    msg=ConfigMap ${name} unexpectedly exists in namespace ${ns}
+    Should Contain    ${stdout}    NotFound
+    ...    msg=oc get configmap ${name} -n ${ns} failed for a reason other than NotFound: ${stdout}
+
 Cleanup Trust Bundle
     [Documentation]    Remove the test trust-manager Bundle CR and its target ConfigMap
     Oc Delete    bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
     Oc Delete    configmap ${TRUST_MANAGER_BUNDLE_NAME} -n ${NAMESPACE} --ignore-not-found
+
+Cleanup Inject Label Resources
+    [Documentation]    Remove the inject-label test Bundle, source ConfigMap, and labeled namespace.
+    ...    Deleting the Bundle lets trust-manager garbage-collect the injected target ConfigMap.
+    [Arguments]    ${inject_ns}
+    Oc Delete    bundle ${TRUST_MANAGER_BUNDLE_NAME} --ignore-not-found
+    Oc Delete    configmap ${CA_SOURCE_CONFIGMAP_NAME} -n ${TRUST_MANAGER_NS} --ignore-not-found
+    Remove Namespace    ${inject_ns}
 
 Setup Trust Bundle With Cert Manager CA
     [Documentation]    Create a self-signed CA via cert-manager and configure a trust Bundle

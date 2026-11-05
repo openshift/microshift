@@ -1,0 +1,16 @@
+---
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: ${TRUST_MANAGER_BUNDLE_NAME}
+spec:
+  sources:
+    - configMap:
+        name: ca-configmap-source
+        key: ca.crt
+  target:
+    configMap:
+      key: ca-bundle.crt
+    namespaceSelector:
+      matchLabels:
+        trust.cert-manager.io/inject: "true"
