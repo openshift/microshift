@@ -1,29 +1,31 @@
-- cluster-dns-operator embedded-component 7cafd0c7dca2edb154b8444602b600b5901afeba to d825bd8f39cfd8d10ab9c206ef9a86c88bb68b5f
-  - b6d8da5 2026-09-24T03:18:08+00:00 OCPBUGS-103403: Use patched x/net fork v0.35.0-sec.4
+- cluster-policy-controller embedded-component 3b44245d8fe9d9b1083998d8d956c7bc4d96a066 to 95a6e79d80b1784d5b83cac059e851cbc70f35fc
+  - 769565d 2026-08-24T17:22:31+02:00 UPSTREAM: <carry>: OCPBUGS-103406: Bump golang.org/x/net to v0.35.0-sec.3
+  - e77ab3c 2026-08-24T17:22:31+02:00 UPSTREAM: <drop>: OCPBUGS-103406: Bump golang.org/x/net to v0.35.0-sec.3
 
-- cluster-kube-scheduler-operator embedded-component 4e99db62cea1d2ca48765230c6f5663d1f2c2702 to 9955cdf445bc69dcd28ca977eb01f77bd0fcca86
-  - cdb8db2 2026-09-08T15:04:46+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
+- kubernetes embedded-component 91c24081f468e7636c824f4f5a2eb68660b81012 to b930000f05a24910f41ea92fa881d3ab4f3d966c
+  - b12b0ea8c 2026-10-13T15:34:17+05:30 UPSTREAM: <drop>: Align staging modules with verify-vendor output
+  - 6eec1fc4d 2026-09-30T15:04:18+05:30 UPSTREAM: <drop>: Refresh vendor for CVE-2026-35469
+  - fc9aa9c04 2026-09-30T15:03:54+05:30 UPSTREAM: <carry>: Bump github.com/moby/spdystream from v0.4.0 to v0.5.1
 
-- openshift-controller-manager embedded-component 8ee744063ed12b249f1a2b89e9af4f53b2f1daf7 to 6a1bf7e388dc0f05436651e3bb8d0b44d8845a29
-  - b705aeb 2026-09-24T06:13:03+00:00 OCPBUGS-103487: Use patched x/net fork v0.35.0-sec.4
+- ovn-kubernetes image-amd64 2b8fc771fbcdc1a7c5c4926d38caa4bc021c20ac to 64266695b08bcaeedda876ecc5ff8829ef566ee9
+  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
+  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
+  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
+  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
 
-- oc image-amd64 a622623a766e65ea4855c15c711d4130b65a3438 to ccb0ad5375f159d7039b291ac2351bcb56daebe1
-  - 86ef6e94 2026-03-13T19:37:07+00:00 Makefile: Strip debugging symbols by default
+- kubernetes image-amd64 91c24081f468e7636c824f4f5a2eb68660b81012 to b930000f05a24910f41ea92fa881d3ab4f3d966c
+  - b12b0ea8c 2026-10-13T15:34:17+05:30 UPSTREAM: <drop>: Align staging modules with verify-vendor output
+  - 6eec1fc4d 2026-09-30T15:04:18+05:30 UPSTREAM: <drop>: Refresh vendor for CVE-2026-35469
+  - fc9aa9c04 2026-09-30T15:03:54+05:30 UPSTREAM: <carry>: Bump github.com/moby/spdystream from v0.4.0 to v0.5.1
 
-- coredns image-amd64 8ca7f02b8becb40f7a9919243000e2620d7036d4 to 7733e9afa9d33e83e9ab29b96388db049995b6b0
-  - becc3ed 2026-08-26T13:45:33+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
+- ovn-kubernetes image-arm64 2b8fc771fbcdc1a7c5c4926d38caa4bc021c20ac to 64266695b08bcaeedda876ecc5ff8829ef566ee9
+  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
+  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
+  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
+  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
 
-- ovn-kubernetes image-amd64 97019aa52cc0641ab084f17c7fec3c51c37a0ce3 to 2b8fc771fbcdc1a7c5c4926d38caa4bc021c20ac
-  - ca18296f 2026-09-29T09:38:55+00:00 egressip: fix duplicate IP assignment on control-plane restart
-  - d562aa70 2026-07-21T11:05:14-07:00 add ability to skip tests that require root
-
-- oc image-arm64 a622623a766e65ea4855c15c711d4130b65a3438 to ccb0ad5375f159d7039b291ac2351bcb56daebe1
-  - 86ef6e94 2026-03-13T19:37:07+00:00 Makefile: Strip debugging symbols by default
-
-- coredns image-arm64 8ca7f02b8becb40f7a9919243000e2620d7036d4 to 7733e9afa9d33e83e9ab29b96388db049995b6b0
-  - becc3ed 2026-08-26T13:45:33+05:30 Fix: added patched version of golang.org/x/net package to rectify CVE-2026-33814
-
-- ovn-kubernetes image-arm64 97019aa52cc0641ab084f17c7fec3c51c37a0ce3 to 2b8fc771fbcdc1a7c5c4926d38caa4bc021c20ac
-  - ca18296f 2026-09-29T09:38:55+00:00 egressip: fix duplicate IP assignment on control-plane restart
-  - d562aa70 2026-07-21T11:05:14-07:00 add ability to skip tests that require root
+- kubernetes image-arm64 91c24081f468e7636c824f4f5a2eb68660b81012 to b930000f05a24910f41ea92fa881d3ab4f3d966c
+  - b12b0ea8c 2026-10-13T15:34:17+05:30 UPSTREAM: <drop>: Align staging modules with verify-vendor output
+  - 6eec1fc4d 2026-09-30T15:04:18+05:30 UPSTREAM: <drop>: Refresh vendor for CVE-2026-35469
+  - fc9aa9c04 2026-09-30T15:03:54+05:30 UPSTREAM: <carry>: Bump github.com/moby/spdystream from v0.4.0 to v0.5.1
 
