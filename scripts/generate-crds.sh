@@ -11,7 +11,7 @@ OUTPUT_PKG="github.com/openshift/microshift/pkg/generated"
 pushd "${ROOTDIR}" &>/dev/null
 
 echo "Generating deepcopy methods"
-${CONTROLLER_BIN} object paths=./pkg/apis/microshift/v1alpha1/
+${CONTROLLER_BIN} object paths="./pkg/apis/microshift/v1alpha1/;./pkg/apis/certificates/v1alpha1/"
 
 echo "Generating CRD YAML"
 ${CONTROLLER_BIN} crd paths=./pkg/apis/microshift/v1alpha1/ output:crd:artifacts:config=assets/crd/

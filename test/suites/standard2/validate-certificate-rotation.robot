@@ -23,7 +23,8 @@ ${ETCD_APISERVER_CLIENT_CERT}       /var/lib/microshift/certs/etcd-signer/apiser
 ${OSSL_CMD}                         openssl x509 -noout -dates -in
 ${OSSL_DATE_FORMAT}                 %b %d %Y
 ${TIMEDATECTL_DATE_FORMAT}          %Y-%m-%d %H:%M:%S
-${FUTURE_DAYS}                      150
+# A one-year standard certificate enters ExpiresSoon after about 153 days.
+${FUTURE_DAYS}                      160
 
 
 *** Test Cases ***
@@ -67,6 +68,7 @@ Certificate Rotation
     ${future_date}=    Compute Date After Days    ${FUTURE_DAYS}    ${TIMEDATECTL_DATE_FORMAT}
     Change System Date To    ${future_date}
     Certs Should Expire On    ${KUBE_SCHEDULER_CLIENT_CERT}    ${cert_expiry_date}
+    [Teardown]    Restore System Date
 
 
 *** Keywords ***
