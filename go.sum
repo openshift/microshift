@@ -1223,8 +1223,8 @@ github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrk
 github.com/mitchellh/go-wordwrap v1.0.1 h1:TLuKupo69TCn6TQSyGxwI1EblZZEsQ0vMlAFQflz0v0=
 github.com/mitchellh/go-wordwrap v1.0.1/go.mod h1:R62XHJLzvMFRBbcrT7m7WgmE1eOyTSsCt+hzestvNj0=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
-github.com/moby/spdystream v0.4.0 h1:Vy79D6mHeJJjiPdFEL2yku1kl0chZpJfZcPpb16BRl8=
-github.com/moby/spdystream v0.4.0/go.mod h1:xBAYlnt/ay+11ShkdFKNAG7LsyK/tmNBVvVOwrfMgdI=
+github.com/moby/spdystream v0.5.1 h1:9sNYeYZUcci9R6/w7KDaFWEWeV4LStVG78Mpyq/Zm/Y=
+github.com/moby/spdystream v0.5.1/go.mod h1:xBAYlnt/ay+11ShkdFKNAG7LsyK/tmNBVvVOwrfMgdI=
 github.com/moby/sys/mountinfo v0.7.1 h1:/tTvQaSJRr2FshkhXiIpux6fQ2Zvc4j7tAhMTStAG2g=
 github.com/moby/sys/mountinfo v0.7.1/go.mod h1:IJb6JQeOklcdMU9F5xQ8ZALD+CUr5VlGpwtX+VE0rpI=
 github.com/moby/term v0.5.0 h1:xt8Q1nalod/v7BqbG21f8mQPqH+xAaC9C3N3wfWbVP0=
@@ -1271,8 +1271,8 @@ github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c h1:gJ
 github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c/go.mod h1:8jcm8UPtg2mCAsxfqKil1xrmRMI3a+XU2TZ9fF8A7TE=
 github.com/openshift/client-go v0.0.0-20241001162912-da6d55e4611f h1:FRc0bVNWprihWS0GqQWzb3dY4dkCwpOP3mDw5NwSoR4=
 github.com/openshift/client-go v0.0.0-20241001162912-da6d55e4611f/go.mod h1:KiZi2mJRH1TOJ3FtBDYS6YvUL30s/iIXaGSUrSa36mo=
-github.com/openshift/cluster-policy-controller v0.0.0-20260714082208-3b44245d8fe9 h1:hku1lbNyPw1N6RfXl1WMjQg5mw8EyUjHbaOAP9Eio5A=
-github.com/openshift/cluster-policy-controller v0.0.0-20260714082208-3b44245d8fe9/go.mod h1:pOBrTHnqpYWUv7KeGyv1VggKLWRsY6b2HGtpc5Sam+Y=
+github.com/openshift/cluster-policy-controller v0.0.0-20261103150605-95a6e79d80b1 h1:UqdqBIOeZJO1pZwf+NIj6iWL9vD367kp2/j8izdPFgg=
+github.com/openshift/cluster-policy-controller v0.0.0-20261103150605-95a6e79d80b1/go.mod h1:yVw8khOgo9Ts0yzb2zExW1r9sZL5m6tQs3171EtlJzs=
 github.com/openshift/etcd/api/v3 v3.5.1-0.20250801133949-b5a4f8d079fb h1:YcPmVJZPwhYyu3F93zUn6g0oqr9Euh/24stIcJZNI/c=
 github.com/openshift/etcd/api/v3 v3.5.1-0.20250801133949-b5a4f8d079fb/go.mod h1:uY03Ob2H50077J7Qq0DeehjM/A9S8PhVfbQ1mSaMopU=
 github.com/openshift/etcd/client/pkg/v3 v3.5.1-0.20250801133949-b5a4f8d079fb h1:FkgVktzmXJjEjivXo9uCrd2zTUxigHaGPedlzTZfCcc=

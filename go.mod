@@ -12,7 +12,7 @@ require (
 	github.com/openshift/api v0.0.0-20260713195309-f9b2d1ae30eb
 	github.com/openshift/build-machinery-go v0.0.0-20250602125535-1b6d00b8c37c
 	github.com/openshift/client-go v0.0.0-20241001162912-da6d55e4611f
-	github.com/openshift/cluster-policy-controller v0.0.0-20260714082208-3b44245d8fe9
+	github.com/openshift/cluster-policy-controller v0.0.0-20261103150605-95a6e79d80b1
 	github.com/openshift/library-go v0.0.0-20241107160307-0064ad7bd060
 	github.com/openshift/route-controller-manager v0.0.0-20261021065021-4c126441740e
 	github.com/pkg/errors v0.9.1 // indirect
@@ -126,7 +126,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mistifyio/go-zfs v2.1.2-0.20190413222219-f784269be439+incompatible // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/moby/spdystream v0.4.0 // indirect
+	github.com/moby/spdystream v0.5.1 // indirect
 	github.com/moby/sys/mountinfo v0.7.1 // indirect
 	github.com/moby/term v0.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
