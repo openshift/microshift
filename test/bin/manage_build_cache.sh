@@ -190,11 +190,24 @@ action_getlast() {
     local -r dst_file="$(mktemp /tmp/getlast.XXXXXXXX)"
 
     echo "Reading '${src_file}' tag contents"
-    run_aws_cli s3 cp --quiet "${src_file}" "${dst_file}" || true
+    if ! run_aws_cli s3 cp "${src_file}" "${dst_file}" ; then
+        echo "WARNING: Failed to read the '${src_file}' file contents"
+        rm -f "${dst_file}"
+    fi
     if [ -s "${dst_file}" ] ; then
         echo "LAST: $(cat "${dst_file}")"
     else
-        echo "LAST: ${TAG_SUBDIR}"
+        # Fall back to the most recent tag available in the bucket, allowing
+        # the jobs to use a retained cache while the 'last' marker is missing
+        # or unreadable. Keep the caller-provided tag as the last resort.
+        local latest_tag
+        latest_tag=$(run_aws_cli s3 ls "s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/" \
+            | grep '/$' | awk '{print $NF}' | tr -d '/' | sort -n | tail -1 || true)
+        if [ -n "${latest_tag}" ] ; then
+            echo "LAST: ${latest_tag}"
+        else
+            echo "LAST: ${TAG_SUBDIR}"
+        fi
     fi
     rm -f "${dst_file}"
 }
