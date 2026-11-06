@@ -1542,20 +1542,6 @@ items:
     - get
     - list
     - watch
-  - apiGroups:
-    - ""
-    resources:
-    - configmaps
-    verbs:
-    - create
-  - apiGroups:
-    - ""
-    resourceNames:
-    - selinux-conflicts
-    resources:
-    - configmaps
-    verbs:
-    - patch
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRole
   metadata:
