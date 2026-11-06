@@ -19,8 +19,6 @@ import (
 const invalidPendingRenewalWarning = "Pending certificate renewal metadata is invalid; the pending certificates will not be activated. Restart MicroShift to quarantine this renewal, then run microshift certs renew again."
 const rejectedPendingRenewalWarning = "A pending certificate renewal was rejected because its metadata was invalid. The rejected certificates were not activated; normal certificate startup policy applies. Check active certificate status, then prepare and activate a replacement renewal to clear this warning."
 
-type pendingCertificateRenewal = certificates.PendingRenewal
-
 func certificateConfigHash(cfg *config.Config) (string, error) {
 	// Only inputs used by certificates.NewChains affect the prepared PKI.
 	// Kubeconfigs and unrelated resources are rebuilt at activation.
@@ -49,7 +47,7 @@ func certificateConfigHash(cfg *config.Config) (string, error) {
 	return fmt.Sprintf("%x", sha256.Sum256(contents)), nil
 }
 
-func newPendingCertificateRenewal(cfg *config.Config, dataDir string) (*pendingCertificateRenewal, error) {
+func newPendingCertificateRenewal(cfg *config.Config, dataDir string) (*certificates.PendingRenewal, error) {
 	configHash, err := certificateConfigHash(cfg)
 	if err != nil {
 		return nil, err
@@ -58,10 +56,10 @@ func newPendingCertificateRenewal(cfg *config.Config, dataDir string) (*pendingC
 	if err != nil {
 		return nil, err
 	}
-	return &pendingCertificateRenewal{Version: 1, ConfigHash: configHash, OriginalHash: originalHash}, nil
+	return &certificates.PendingRenewal{Version: 1, ConfigHash: configHash, OriginalHash: originalHash}, nil
 }
 
-func publishCertificateRenewal(transaction *certificates.Transaction, state *pendingCertificateRenewal) error {
+func publishCertificateRenewal(transaction *certificates.Transaction, state *certificates.PendingRenewal) error {
 	var err error
 	state.RenewedHash, err = certificates.DigestTree(filepath.Join(transaction.Stage(), "certs"))
 	if err != nil {
@@ -82,7 +80,7 @@ func publishCertificateRenewal(transaction *certificates.Transaction, state *pen
 	return transaction.Publish(contents)
 }
 
-func readPendingCertificateRenewal(transaction *certificates.Transaction) (*pendingCertificateRenewal, error) {
+func readPendingCertificateRenewal(transaction *certificates.Transaction) (*certificates.PendingRenewal, error) {
 	contents, err := transaction.LoadPending()
 	if err != nil || contents == nil {
 		return nil, err
@@ -139,7 +137,7 @@ func activateCertificateRenewal(cfg *config.Config, transaction *certificates.Tr
 	return activatePendingCertificateRenewal(cfg, transaction, state, etcdStopped, now)
 }
 
-func activatePendingCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, state *pendingCertificateRenewal, etcdStopped func() error, now time.Time) (bool, error) {
+func activatePendingCertificateRenewal(cfg *config.Config, transaction *certificates.Transaction, state *certificates.PendingRenewal, etcdStopped func() error, now time.Time) (bool, error) {
 	if err := etcdStopped(); err != nil {
 		return false, err
 	}

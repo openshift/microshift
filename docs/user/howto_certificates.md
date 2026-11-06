@@ -124,8 +124,15 @@ Collection never reads private keys, repairs transactions, or renews certificate
 
 The listener starts after certificate initialization, before waiting for etcd or
 kube-apiserver readiness. It shares MicroShift's process lifetime and is unavailable
-if initialization fails or MicroShift exits. Listener failures are logged without
-stopping the control plane; restart MicroShift after fixing a bind failure.
+if initialization fails or MicroShift exits. Invalid metrics configuration or
+failure to bind an enabled endpoint prevents MicroShift from starting. Fix the
+configuration or port conflict before starting MicroShift again.
+
+A serving failure after the listener starts is logged without stopping the control
+plane. The listener does not retry automatically; fix the problem and restart
+MicroShift. Configure your monitoring backend to alert on scrape failures or
+missing data; MicroShift does not install alert rules.
+
 Configuration changes require a restart. This first pass does not install an OTel
 scrape drop-in or modify existing observability presets.
 

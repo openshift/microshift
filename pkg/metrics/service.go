@@ -4,6 +4,7 @@ package metrics
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"time"
@@ -37,24 +38,20 @@ func NewService(cfg config.Metrics, collectors ...Collector) *Service {
 func (s *Service) Name() string           { return "microshift-metrics" }
 func (s *Service) Dependencies() []string { return nil }
 
-// Run is deliberately non-fatal: losing observability must not stop MicroShift.
-// No other service depends on this readiness signal.
+// Run rejects invalid configuration and bind failures during startup. Once
+// started, serving failures are logged without stopping MicroShift.
 func (s *Service) Run(ctx context.Context, ready chan<- struct{}, stopped chan<- struct{}) error {
 	defer close(stopped)
-	if s.config.Status != config.MetricsEnabled {
-		close(ready)
-		return nil
-	}
 	if err := s.config.Validate(); err != nil {
-		klog.ErrorS(err, "Local metrics endpoint disabled")
+		return fmt.Errorf("invalid metrics configuration: %w", err)
+	}
+	if s.config.Status == config.MetricsDisabled {
 		close(ready)
 		return nil
 	}
 	listener, err := (&net.ListenConfig{}).Listen(ctx, "tcp", s.config.ListenAddress)
 	if err != nil {
-		klog.ErrorS(err, "Local metrics endpoint unavailable; MicroShift will continue without it")
-		close(ready)
-		return nil
+		return fmt.Errorf("failed to start local metrics endpoint: %w", err)
 	}
 	mux := http.NewServeMux()
 	mux.Handle("GET /metrics", promhttp.HandlerFor(s.registry, promhttp.HandlerOpts{

@@ -70,19 +70,34 @@ func TestLocalMetricsService(t *testing.T) {
 	}
 }
 
-func TestMetricsDisabledOrBusyPortIsNonFatal(t *testing.T) {
+func TestMetricsStartupFailures(t *testing.T) {
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
 	defer listener.Close()
-	for _, status := range []string{"Enabled", "Disabled"} {
-		collector := metrics.NewCertificateCollector(func(time.Time) certificates.Observation {
-			t.Error("collection should not start without a listener")
-			return certificates.Observation{}
+	for _, tt := range []struct {
+		name, status, address, wantError string
+	}{
+		{"disabled", config.MetricsDisabled, listener.Addr().String(), ""},
+		{"busy port", config.MetricsEnabled, listener.Addr().String(), "failed to start local metrics endpoint"},
+		{"invalid address", config.MetricsEnabled, "0.0.0.0:9090", "invalid metrics configuration"},
+		{"invalid status", "unknown", listener.Addr().String(), "invalid metrics configuration"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			collector := metrics.NewCertificateCollector(func(time.Time) certificates.Observation {
+				t.Error("collection should not start without a listener")
+				return certificates.Observation{}
+			})
+			service := metrics.NewService(config.Metrics{Status: tt.status, ListenAddress: tt.address}, collector)
+			ready, stopped := make(chan struct{}), make(chan struct{})
+			err := service.Run(t.Context(), ready, stopped)
+			if tt.wantError == "" {
+				require.NoError(t, err)
+			} else {
+				require.ErrorContains(t, err, tt.wantError)
+			}
+			require.Equal(t, tt.wantError == "", isClosed(ready), "startup failures must not report readiness")
+			require.True(t, isClosed(stopped))
 		})
-		service := metrics.NewService(config.Metrics{Status: status, ListenAddress: listener.Addr().String()}, collector)
-		ready, stopped := make(chan struct{}), make(chan struct{})
-		require.NoError(t, service.Run(t.Context(), ready, stopped))
-		require.Eventually(t, func() bool { return isClosed(ready) && isClosed(stopped) }, time.Second, time.Millisecond)
 	}
 }
 

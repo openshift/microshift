@@ -11,6 +11,8 @@ Library             ../../resources/DataFormats.py
 Suite Setup         Setup
 Suite Teardown      Teardown
 
+Test Tags           restart
+
 
 *** Test Cases ***
 Local Metrics Report The Managed Certificate Inventory
@@ -34,6 +36,29 @@ Metrics Listen Only On Loopback
     ${count}=    Get Line Count    ${listeners}
     Should Be Equal As Integers    ${count}    1
     Should Contain    ${listeners}    127.0.0.1:9090
+
+Metrics Port Conflict Prevents Startup
+    [Documentation]    An enabled endpoint must fail startup when its port is already occupied.
+    Stop MicroShift
+    ${command}=    Catenate    SEPARATOR=${SPACE}
+    ...    systemd-run --quiet --collect --unit=microshift-metrics-port-test
+    ...    python3 -c "import socket,time; s=socket.socket(); s.bind(('127.0.0.1',9090)); s.listen(); time.sleep(300)"
+    Command Should Work    ${command}
+    Wait Until Keyword Succeeds    10s    500ms
+    ...    Command Should Work    ss -H -lnt 'sport = :9090' | grep -q '127.0.0.1:9090'
+    ${started}=    Command Should Work    date --iso-8601=seconds
+    Command Should Fail    timeout 60 systemctl start microshift
+    Stop MicroShift
+    ${logs}=    Command Should Work    journalctl -u microshift --since '${started}' --no-pager
+    Should Contain    ${logs}    failed to start local metrics endpoint
+    Should Contain    ${logs}    address already in use
+
+    [Teardown]    Run Keywords
+    ...    Stop MicroShift
+    ...    AND    Command Should Work    systemctl stop microshift-metrics-port-test
+    ...    AND    Command Should Work    systemctl reset-failed microshift.service
+    ...    AND    Start MicroShift
+    ...    AND    Wait For MicroShift
 
 
 *** Keywords ***

@@ -138,7 +138,8 @@ layout, validation, and recovery protocol.
 `pkg/metrics` owns an isolated Prometheus registry and a loopback HTTP listener.
 The service is registered before network/control-plane services, with no readiness
 dependencies. It starts after PKI initialization, not before startup data recovery.
-Bind/serve failures are non-fatal; existing core-service failure policy is unchanged.
+Invalid metrics configuration or failure to bind an enabled endpoint fails startup.
+Once listening, a serving failure is logged without stopping the control plane.
 The listener accepts two concurrent scrapes, with a five-second scrape/header
 timeout, ten-second read/write timeouts, and a 16 KiB header limit.
 

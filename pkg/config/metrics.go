@@ -2,9 +2,7 @@ package config
 
 import (
 	"fmt"
-	"net"
 	"net/netip"
-	"strconv"
 )
 
 const (
@@ -34,16 +32,14 @@ func (m Metrics) Validate() error {
 	if m.Status != MetricsEnabled && m.Status != MetricsDisabled {
 		return fmt.Errorf("metrics.status must be Enabled or Disabled")
 	}
-	host, port, err := net.SplitHostPort(m.ListenAddress)
+	address, err := netip.ParseAddrPort(m.ListenAddress)
 	if err != nil {
-		return fmt.Errorf("metrics.listenAddress must be a loopback IP address and port")
+		return fmt.Errorf("metrics.listenAddress must be a literal loopback IP address and port between 1 and 65535")
 	}
-	ip, err := netip.ParseAddr(host)
-	if err != nil || !ip.IsLoopback() || ip.Zone() != "" {
+	if !address.Addr().IsLoopback() || address.Addr().Zone() != "" {
 		return fmt.Errorf("metrics.listenAddress must use a literal loopback IP address")
 	}
-	number, err := strconv.Atoi(port)
-	if err != nil || number < 1 || number > 65535 {
+	if address.Port() == 0 {
 		return fmt.Errorf("metrics.listenAddress port must be between 1 and 65535")
 	}
 	return nil
