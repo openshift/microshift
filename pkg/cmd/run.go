@@ -23,6 +23,7 @@ import (
 	"github.com/openshift/microshift/pkg/kustomize"
 	"github.com/openshift/microshift/pkg/loadbalancerservice"
 	"github.com/openshift/microshift/pkg/mdns"
+	"github.com/openshift/microshift/pkg/metrics"
 	"github.com/openshift/microshift/pkg/node"
 	"github.com/openshift/microshift/pkg/release"
 	"github.com/openshift/microshift/pkg/servicemanager"
@@ -267,7 +268,12 @@ func RunMicroshift(cfg *config.Config) error {
 
 	// Establish the context we will use to control execution
 	runCtx, runCancel := context.WithCancel(context.Background())
+	defer runCancel()
 	m := servicemanager.NewServiceManager(startRec)
+	// Start the independent listener before services that wait for etcd or the API.
+	util.Must(m.AddService(metrics.NewService(cfg.Metrics, metrics.NewCertificateCollector(func(now time.Time) certificates.Observation {
+		return certificates.Observe(cfg, config.DataDir, certificateLockPath, now)
+	}))))
 	util.Must(m.AddService(node.NewNetworkConfiguration(cfg)))
 	util.Must(m.AddService(controllers.NewEtcd(cfg)))
 	util.Must(m.AddService(sysconfwatch.NewSysConfWatchController(cfg)))
