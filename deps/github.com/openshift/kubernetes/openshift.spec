@@ -132,7 +132,7 @@ Provides:       kube-apiserver = %{version}
 %ifarch s390x
   BUILD_PLATFORM="linux/s390x"
 %endif
-KUBE_BUILD_PLATFORMS="${BUILD_PLATFORM}" %{os_git_vars} make all WHAT='cmd/kube-apiserver cmd/kube-controller-manager cmd/kube-scheduler cmd/kubelet'
+KUBE_CGO_OVERRIDES="kubelet kube-apiserver kube-controller-manager kube-scheduler" KUBE_BUILD_PLATFORMS="${BUILD_PLATFORM}" %{os_git_vars} make all WHAT='cmd/kube-apiserver cmd/kube-controller-manager cmd/kube-scheduler cmd/kubelet'
 %endif
 
 %install
