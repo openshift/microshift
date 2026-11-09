@@ -819,7 +819,9 @@ func (c Config) IsIPv6() bool {
 var allHostnames []string
 
 func getAllHostnames() ([]string, error) {
-	if len(allHostnames) != 0 {
+	// A non-nil (possibly empty) slice means the lookup already ran, so
+	// hosts without any DNS names do not re-run 'hostname -A' every time.
+	if allHostnames != nil {
 		return allHostnames, nil
 	}
 	cmd := exec.Command("/bin/hostname", "-A")
@@ -829,13 +831,17 @@ func getAllHostnames() ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error when executing 'hostname -A': %v", err)
 	}
-	outString := out.String()
-	outString = strings.Trim(outString[:len(outString)-1], " ")
-	// Remove duplicates to avoid having them in the certificates.
-	names := strings.Split(outString, " ")
-	set := sets.NewString(names...)
-	allHostnames = set.List()
+	allHostnames = parseHostnames(out.String())
 	return allHostnames, nil
+}
+
+// parseHostnames converts the output of 'hostname -A' into a sorted list of
+// unique hostnames. On hosts without DNS (e.g. offline), 'hostname -A' may
+// print only whitespace, so empty names are dropped instead of being returned
+// as an empty subjectAltName.
+func parseHostnames(output string) []string {
+	// Remove duplicates to avoid having them in the certificates.
+	return sets.NewString(strings.Fields(output)...).List()
 }
 
 func checkAdvertiseAddressConfigured(advertiseAddress string) error {
