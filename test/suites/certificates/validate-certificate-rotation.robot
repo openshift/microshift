@@ -2,6 +2,7 @@
 Documentation       Tests related to MicroShift automated certificate rotation.
 
 Resource            ../../resources/common.resource
+Resource            ../../resources/microshift-config.resource
 Resource            ../../resources/microshift-process.resource
 Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/ostree-health.resource
@@ -69,6 +70,94 @@ Certificate Rotation
     Change System Date To    ${future_date}
     Certs Should Expire On    ${KUBE_SCHEDULER_CLIENT_CERT}    ${cert_expiry_date}
     [Teardown]    Restore System Date
+
+Renewal Recovers Certificates After The CA Has Expired
+    [Documentation]    Verify that when an admin misses the renewal window and the CA has expired,
+    ...    leaf-only renewal is refused with advice to use --ca, CA renewal succeeds, and the
+    ...    renewed certificates are active and healthy after MicroShift starts. MicroShift is
+    ...    stopped before the clock change because startup regenerates expired certificates by
+    ...    itself, so a running service would test startup instead of the renew command.
+    ...
+    ...    Verifies the expired-state half of the OCPEDGE-2998 acceptance criteria
+    ...    ("renew --serving regenerates serving leaves only (not CAs)" via its
+    ...    refusal, "renew --ca regenerates CAs and all descendants" via the
+    ...    recovery), and the OCPSTRAT-2899 goal that renewal is the admin's
+    ...    recovery path when the rotation window was missed.
+    ...    OCPSTRAT-2899 TC-24
+    [Tags]    qe    OCPSTRAT-2899
+    # No [Timeout] here: Robot timeouts are wall-clock based and this test
+    # jumps the wall clock ten years forward, which would blow any timeout
+    # instantly (false failure observed 2026-11-04). Hang protection comes
+    # from the reconnecting teardown instead.
+    Move Clock Past CA Expiry With MicroShift Stopped
+
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    microshift certs renew --serving -o json
+    Should Not Be Equal As Integers    ${rc}    0
+    ${error}=    Evaluate    json.loads($stderr)    modules=json
+    Should Be Equal    ${error}[code]    RenewalFailed
+    Should Contain    ${error}[message]    --ca
+
+    ${output}=    Command Should Work    microshift certs renew --ca -o json
+    ${result}=    Evaluate    json.loads($output)    modules=json
+    Should Be Equal    ${result}[status]    pending
+
+    Start MicroShift
+    Wait For MicroShift
+    ${status}=    Certificate Status
+    ${unhealthy}=    Evaluate    [i['name'] for i in $status['items'] if i['status'] != 'Healthy']
+    Should Be Empty    ${unhealthy}    msg=Certificates not healthy after recovery: ${unhealthy}
+    ${active}=    Evaluate    {(i['service'], i['name']): i['notAfter'] for i in $status['items']}
+    # $active is passed via a namespace because the special `$var` syntax is not
+    # visible inside the condition of a generator expression.
+    VAR    &{ns}=    active=${active}
+    ${not_renewed}=    Evaluate
+    ...    [i['name'] for i in $result['items'] if active[(i['service'], i['name'])] != i['newNotAfter']]
+    ...    namespace=${ns}
+    Should Be Empty    ${not_renewed}    msg=Active certificates are not the ones prepared by renew: ${not_renewed}
+    [Teardown]    Run Keywords    Start MicroShift    AND    Restore Date With Fresh SSH Connection
+
+ExpirationImminent Does Not Force Exit When Disabled
+    [Documentation]    Verify that with certificates.forceRestartOnExpirationImminent
+    ...    set to false, a running MicroShift does not exit when a managed certificate
+    ...    crosses into the ExpirationImminent zone: the process ID stays the same,
+    ...    a warning is logged instead of a shutdown, and the service keeps serving.
+    ...    The default forced-exit path is already exercised by the Certificate
+    ...    Rotation test in this suite, which expects the process ID to change.
+    ...    OCPSTRAT-2899 TC-27
+    [Tags]    qe    OCPSTRAT-2899
+    # No [Timeout]: wall-clock-based timeouts false-fail on clock-jump tests
+    # (see TC-24 above).
+    Drop In MicroShift Config    certificates: {forceRestartOnExpirationImminent: false}    99-tc27-no-forced-exit
+    Restart MicroShift
+    Wait For MicroShift
+
+    # Two days before the earliest serving-cert expiry every serving cert is deep
+    # inside the ExpirationImminent zone (Standard policy red zone starts at 33%
+    # of validity remaining) while nothing is expired yet.
+    ${status}=    Certificate Status
+    ${earliest_serving_expiry}=    Evaluate    min(i['notAfter'] for i in $status['items'] if i['role'] == 'serving')
+    ${red_zone_date}=    Evaluate
+    ...    (datetime.datetime.fromisoformat($earliest_serving_expiry.replace('Z', '+00:00')) - datetime.timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')
+    ...    modules=datetime
+
+    ${ushift_pid}=    MicroShift Process ID
+    Systemctl    stop    chronyd
+    Command Should Work    TZ=UTC timedatectl set-time "${red_zone_date}"
+
+    Sleep    30s    # give the rotation watcher time to fire on the passed deadline
+    ${current_pid}=    MicroShift Process ID
+    Should Be Equal As Integers    ${current_pid}    ${ushift_pid}
+    ...    msg=MicroShift restarted despite forceRestartOnExpirationImminent: false
+
+    ${journal}=    Command Should Work    journalctl -u microshift --since "-2 min" --no-pager
+    Should Contain    ${journal}    automatic certificate restart is disabled
+    Should Not Contain    ${journal}    Stopping services for certificate rotation
+
+    ${status}=    Certificate Status
+    ${imminent}=    Evaluate    [i['name'] for i in $status['items'] if i['status'] == 'ExpirationImminent']
+    Should Not Be Empty    ${imminent}    msg=No certificate reported ExpirationImminent after the clock change
+    Wait For MicroShift Healthcheck Success
+    [Teardown]    Restore Default Rotation Policy And Date
 
 
 *** Keywords ***
@@ -160,3 +249,64 @@ Get Cert Fingerprint
     ${fingerprint}=    Command Should Work
     ...    openssl x509 -noout -fingerprint -sha256 -in ${cert_file}
     RETURN    ${fingerprint}
+
+Certificate Status
+    [Documentation]    Return the parsed `microshift certs status` JSON document.
+    ${output}=    Command Should Work    microshift certs status -o json
+    ${status}=    Evaluate    json.loads($output)    modules=json
+    RETURN    ${status}
+
+Move Clock Past CA Expiry With MicroShift Stopped
+    [Documentation]    Stop MicroShift and time sync, then set the clock two days after the latest
+    ...    CA expiry date. Every CA is then expired, and startup cannot regenerate them first.
+    ${status}=    Certificate Status
+    ${latest_ca_expiry}=    Evaluate    max(i['notAfter'] for i in $status['items'] if i['role'] == 'ca')
+    ${expired_date}=    Evaluate
+    ...    (datetime.datetime.fromisoformat($latest_ca_expiry.replace('Z', '+00:00')) + datetime.timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')
+    ...    modules=datetime
+    Stop MicroShift
+    Systemctl    stop    chronyd
+    Command Should Work    TZ=UTC timedatectl set-time "${expired_date}"
+
+Restore Default Rotation Policy And Date
+    [Documentation]    Restore real time, remove the policy drop-in, and restart with
+    ...    default configuration. The clock restore is a large backward step
+    ...    (about a year), so it uses a fresh SSH connection for the same
+    ...    reason as Restore Date With Fresh SSH Connection: the step under it
+    ...    may not survive. The suite teardown's Restore System Date then
+    ...    skips, because chronyd is already active. The Sleep before
+    ...    reconnecting waits out chronyd's clock step with nothing
+    ...    connected (see Restore Date With Fresh SSH Connection).
+    Systemctl    start    chronyd
+    Close All Connections
+    Sleep    60s    # chronyd steps the clock in this window; no connection exists for the step to kill
+    Login MicroShift Host
+    Wait Until Keyword Succeeds    30x    5s    System Date Should Be Synchronized
+    Remove Drop In MicroShift Config    99-tc27-no-forced-exit
+    Restart MicroShift
+    Wait For MicroShift
+
+Restore Date With Fresh SSH Connection
+    [Documentation]    Restore the system date after a large clock jump without
+    ...    relying on any SSH connection surviving the time step. A multi-year
+    ...    backward step breaks connections under SSHLibrary and the next
+    ...    command on the dead channel blocks forever (observed 2026-11-04,
+    ...    and again 2026-11-05: the step also killed a connection opened
+    ...    immediately after chronyd started — chronyd selects a source and
+    ...    steps within about five seconds, so a prompt reconnect races the
+    ...    step and loses). Start chronyd, drop the connection at once
+    ...    (Close All Connections is local and needs no remote round trip),
+    ...    wait out the step with nothing connected, and only then log back
+    ...    in. Small steps (days) do not break the connection, which is why
+    ...    the other date-restoring keywords do not need this.
+    Systemctl    start    chronyd
+    Close All Connections
+    Sleep    60s    # chronyd selects a source and steps the clock in this window; no connection exists for the step to kill
+    Login MicroShift Host
+    Wait Until Keyword Succeeds    30x    5s    System Date Should Be Synchronized
+    Wait For MicroShift
+
+System Date Should Be Synchronized
+    [Documentation]    Fail unless NTP reports the system clock as synchronized.
+    ${output}=    Command Should Work    timedatectl show -p NTPSynchronized --value
+    Should Be Equal As Strings    ${output.strip()}    yes
