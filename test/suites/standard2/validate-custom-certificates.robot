@@ -108,6 +108,45 @@ Test Wildcard With Names Cert
     MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
     [Teardown]    Remove Entry From Local Hosts    ${hostname}
 
+Internal Renewal Leaves Named Certificates Alone
+    [Documentation]    Verify that when serving and CA certificates are renewed, a user-supplied
+    ...    namedCertificate is not changed on disk (same SHA-256 and modification time) and is
+    ...    still served to clients. A second CA renewal right after the first must not cause an
+    ...    extra automatic restart: preparing a renewal does not reset the running service's
+    ...    rotation deadline, so the only restart must be the one that activates the renewal.
+    ...    OCPSTRAT-2899 TC-18
+    [Tags]    qe    OCPSTRAT-2899
+    [Setup]    Setup Test
+    Create Keys
+    ${hostname}=    Generate Random HostName
+    Create Cert    TestCN    ${hostname}
+    Upload Certificates
+    Configure Named Certificates    ${TMPDIR}/server.crt    ${TMPDIR}/server.key
+    Restart MicroShift
+    Add Entry To Local Hosts    ${USHIFT_HOST}    ${hostname}
+    Setup Custom Kubeconfig    ${hostname}
+    MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
+    ${before}=    Named Certificate Files State
+
+    FOR    ${mode}    IN    serving    ca    ca
+        Command Should Work    microshift certs renew --${mode} -o json
+        Restart MicroShift
+        ${after}=    Named Certificate Files State
+        Should Be Equal    ${before}    ${after}    msg=namedCertificate files changed after ${mode} renewal
+        Setup Custom Kubeconfig    ${hostname}
+        MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
+    END
+
+    ${cursor}=    Get Journal Cursor
+    Pattern Should Not Appear In Log Output
+    ...    ${cursor}    Stopping services for certificate rotation    retries=6    wait=10
+    ${restarts}=    Get Systemd Setting    microshift.service    NRestarts
+    Should Be Equal As Integers    ${restarts}    0    msg=MicroShift restarted by itself after renewal
+    [Teardown]    Run Keywords
+    ...    Remove Entry From Local Hosts    ${hostname}
+    ...    AND    Remove Drop In MicroShift Config    10-subjectAltNames
+    ...    AND    Restart MicroShift
+
 
 *** Keywords ***
 Setup
@@ -197,3 +236,9 @@ MicroShift Is Live With Custom CA
     [Documentation]    Check the /livez endpoint with Custom CA
     [Arguments]    ${ca_path}
     MicroShift Is Live    --certificate-authority ${ca_path}
+
+Named Certificate Files State
+    [Documentation]    Return the SHA-256 and modification time of the namedCertificate files on the host.
+    ${hashes}=    Command Should Work    sha256sum ${TMPDIR}/server.crt ${TMPDIR}/server.key
+    ${mtimes}=    Command Should Work    stat -c '%Y %n' ${TMPDIR}/server.crt ${TMPDIR}/server.key
+    RETURN    ${hashes}\n${mtimes}
