@@ -1,0 +1,14 @@
+- machine-config-operator embedded-component 0e2557038232d89cfbf810a6aabf85430d472211 to 0e5e436ae771980e0a2c9f03aaf2446c76f8666f
+  - 90f73c2f 2026-11-03T15:06:07+01:00 OCPBUGS-136379: Render waits for sub-controllers MCs
+  - bd525685 2026-10-29T16:09:55Z mosb: replace wildcard permissions with explicit verbs
+
+- operator-framework-olm embedded-component c3d56d2021bbb8d57bc359fabded3b35b253f55e to 61311618b07654231c15a52c66070b121436aa50
+  - 8c003ade 2026-11-05T09:43:24-08:00 pkg/controller/operators/openshift: Drop hard coded upgradeable 4.23 or 5.0 (#3955)
+  - ec308599 2026-10-07T10:37:25-04:00 OCPBUGS-129498: Restore registry-server startup probe FailureThreshold to 15
+
+- ovn-kubernetes image-amd64 23b61c3ffcd93b8c7e85e913d37bbf82f47eedb9 to 1e8e04173ca26331e78dc691210cbba5d3ed44c6
+  - 9fd86479 2026-10-29T09:00:12Z Remove isEmptyStatusManagedField restriction from startup cleanup
+
+- ovn-kubernetes image-arm64 23b61c3ffcd93b8c7e85e913d37bbf82f47eedb9 to 1e8e04173ca26331e78dc691210cbba5d3ed44c6
+  - 9fd86479 2026-10-29T09:00:12Z Remove isEmptyStatusManagedField restriction from startup cleanup
+
