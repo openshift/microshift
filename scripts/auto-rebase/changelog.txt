@@ -1,31 +1,8 @@
-- cluster-policy-controller embedded-component 3b44245d8fe9d9b1083998d8d956c7bc4d96a066 to 95a6e79d80b1784d5b83cac059e851cbc70f35fc
-  - 769565d 2026-08-24T17:22:31+02:00 UPSTREAM: <carry>: OCPBUGS-103406: Bump golang.org/x/net to v0.35.0-sec.3
-  - e77ab3c 2026-08-24T17:22:31+02:00 UPSTREAM: <drop>: OCPBUGS-103406: Bump golang.org/x/net to v0.35.0-sec.3
+- cluster-network-operator embedded-component bb2b3f7e6f3d628ddde0a17a107f01ce9db34afb to 30e316ec0685d70c02cccbf656c7f44dc8278018
+  - 0ac1d1c 2026-08-18T14:36:20+00:00 Skip _stackmanager execution for libreswan 5.3+
 
-- kubernetes embedded-component 91c24081f468e7636c824f4f5a2eb68660b81012 to b930000f05a24910f41ea92fa881d3ab4f3d966c
-  - b12b0ea8c 2026-10-13T15:34:17+05:30 UPSTREAM: <drop>: Align staging modules with verify-vendor output
-  - 6eec1fc4d 2026-09-30T15:04:18+05:30 UPSTREAM: <drop>: Refresh vendor for CVE-2026-35469
-  - fc9aa9c04 2026-09-30T15:03:54+05:30 UPSTREAM: <carry>: Bump github.com/moby/spdystream from v0.4.0 to v0.5.1
-
-- ovn-kubernetes image-amd64 2b8fc771fbcdc1a7c5c4926d38caa4bc021c20ac to 64266695b08bcaeedda876ecc5ff8829ef566ee9
-  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
-  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
-
-- kubernetes image-amd64 91c24081f468e7636c824f4f5a2eb68660b81012 to b930000f05a24910f41ea92fa881d3ab4f3d966c
-  - b12b0ea8c 2026-10-13T15:34:17+05:30 UPSTREAM: <drop>: Align staging modules with verify-vendor output
-  - 6eec1fc4d 2026-09-30T15:04:18+05:30 UPSTREAM: <drop>: Refresh vendor for CVE-2026-35469
-  - fc9aa9c04 2026-09-30T15:03:54+05:30 UPSTREAM: <carry>: Bump github.com/moby/spdystream from v0.4.0 to v0.5.1
-
-- ovn-kubernetes image-arm64 2b8fc771fbcdc1a7c5c4926d38caa4bc021c20ac to 64266695b08bcaeedda876ecc5ff8829ef566ee9
-  - 4d4b5bf9 2026-10-14T12:33:47+02:00 egressip: fix e2e IFA_PROTO check for Linux address cases
-  - 8659f31d 2026-10-14T12:33:35+02:00 egressip: extend e2e tests to verify IFA_PROTO on EgressIP addresses
-  - a2908a60 2026-10-14T12:33:03+02:00 egressip: set IFA_PROTO on EgressIP addresses
-  - 6d3569a5 2026-10-12T09:55:51+02:00 Bump vishvananda/netlink
-
-- kubernetes image-arm64 91c24081f468e7636c824f4f5a2eb68660b81012 to b930000f05a24910f41ea92fa881d3ab4f3d966c
-  - b12b0ea8c 2026-10-13T15:34:17+05:30 UPSTREAM: <drop>: Align staging modules with verify-vendor output
-  - 6eec1fc4d 2026-09-30T15:04:18+05:30 UPSTREAM: <drop>: Refresh vendor for CVE-2026-35469
-  - fc9aa9c04 2026-09-30T15:03:54+05:30 UPSTREAM: <carry>: Bump github.com/moby/spdystream from v0.4.0 to v0.5.1
+- machine-config-operator embedded-component f6da18fbc1ae60c86633f5737e80ebbbaa329eae to d680cca82e00522cae4cb30784aed05ca8dad79f
+  - 276e79dd 2026-11-02T09:54:35-05:00 Split wait-for-ipsec-connect into two services to avoid ipsec restart
+  - d550560d 2026-10-27T11:02:49-04:00 Use auto=start only for IPsec out connections
+  - 10a6fe73 2026-10-27T11:02:47-04:00 Modify regex for ipsec showstates command
 
