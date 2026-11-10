@@ -46,7 +46,7 @@ require (
 	github.com/opencontainers/selinux v1.15.1
 	github.com/openshift-eng/openshift-tests-extension v0.0.0-20260812190735-a8b44e9f9fed
 	github.com/openshift/api v0.0.0-20261001152744-764bd4c566f9
-	github.com/openshift/apiserver-library-go v0.0.0-20261001145254-218f2c488d90
+	github.com/openshift/apiserver-library-go v0.0.0-20261105191743-7aae4f33b4b4
 	github.com/openshift/client-go v0.0.0-20261001003915-dcaad1dc7fe8
 	github.com/openshift/library-go v0.0.0-20261001144932-192662696fc7
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2
