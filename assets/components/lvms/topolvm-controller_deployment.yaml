@@ -19,6 +19,8 @@ spec:
       name: topolvm-controller
       namespace: openshift-storage
     spec:
+      securityContext:
+        runAsUser: 65532
       containers:
       - command:
         - /topolvm-controller
