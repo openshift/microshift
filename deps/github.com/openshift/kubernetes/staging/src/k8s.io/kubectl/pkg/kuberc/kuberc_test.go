@@ -2687,6 +2687,10 @@ func TestGetExplicitKuberc(t *testing.T) {
 			expected: "/tmp/filepath",
 		},
 		{
+			args:     []string{"kubectl", "get", "--kuberc=/tmp/env=dev"},
+			expected: "/tmp/env=dev",
+		},
+		{
 			args:     []string{"kubectl", "get", "--kuberc=/tmp/filepath", "--", "/bin/bash", "--kuberc", "anotherpath"},
 			expected: "/tmp/filepath",
 		},

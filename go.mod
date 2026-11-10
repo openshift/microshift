@@ -142,7 +142,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/opencontainers/runtime-spec v1.3.0 // indirect
-	github.com/openshift/apiserver-library-go v0.0.0-20261001145254-218f2c488d90 // indirect
+	github.com/openshift/apiserver-library-go v0.0.0-20261105191743-7aae4f33b4b4 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
 	github.com/prometheus/client_golang v1.24.0 // indirect

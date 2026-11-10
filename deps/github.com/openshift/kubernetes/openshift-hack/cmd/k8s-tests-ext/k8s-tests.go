@@ -103,9 +103,17 @@ func main() {
 		TestTimeout: &hpaTestTimeout,
 	})
 
-	for k, v := range image.GetOriginalImageConfigs() {
-		image := convertToImage(v)
-		image.Index = int(k)
+	mirror := "quay.io/openshift/community-e2e-images"
+	if v := os.Getenv("TEST_IMAGE_MIRROR"); len(v) > 0 {
+		mirror = v
+	}
+
+	originals := image.GetOriginalImageConfigs()
+	mapped := image.GetMappedImageConfigs(originals, mirror)
+	for k, v := range originals {
+		image := convertToImage(v, int(k))
+		mappedImage := convertToImage(mapped[k], int(k))
+		image.Mapped = &mappedImage
 		kubeTestsExtension.RegisterImage(image)
 	}
 
@@ -171,7 +179,7 @@ func buildKubeTestSpecs() (ext.ExtensionTestSpecs, error) {
 // convertToImages converts an image.Config to an extension.Image, which
 // can easily be serialized to JSON. Since image.Config has unexported fields,
 // reflection is used to read its values.
-func convertToImage(obj interface{}) e.Image {
+func convertToImage(obj interface{}, index int) e.Image {
 	image := e.Image{}
 	val := reflect.ValueOf(obj)
 	typ := reflect.TypeOf(obj)
@@ -187,6 +195,7 @@ func convertToImage(obj interface{}) e.Image {
 			image.Version = fieldValue.String()
 		}
 	}
+	image.Index = index
 	return image
 }
 

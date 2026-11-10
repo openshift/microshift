@@ -546,7 +546,7 @@ github.com/openshift/api/template
 github.com/openshift/api/template/v1
 github.com/openshift/api/user
 github.com/openshift/api/user/v1
-# github.com/openshift/apiserver-library-go v0.0.0-20261001145254-218f2c488d90
+# github.com/openshift/apiserver-library-go v0.0.0-20261105191743-7aae4f33b4b4
 ## explicit; go 1.26.0
 github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy
 github.com/openshift/apiserver-library-go/pkg/admission/imagepolicy/apis/imagepolicy/v1
