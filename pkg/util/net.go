@@ -83,6 +83,9 @@ found:
 	return hostIP, nil
 }
 
+// retryGetDialTimeout bounds name resolution and TCP connect of each readiness dial.
+const retryGetDialTimeout = 5 * time.Second
+
 func RetryInsecureGet(ctx context.Context, url string) int {
 	return RetryGet(ctx, url, "")
 }
@@ -106,9 +109,13 @@ func RetryGet(ctx context.Context, url, additionalCAPath string) int {
 		}
 	}
 	status := 0
+	attempts := 0
+	var lastErr error
 	err = wait.PollUntilContextTimeout(ctx, time.Second, 120*time.Second, true, func(ctx context.Context) (bool, error) {
+		attempts++
 		c := http.Client{
 			Transport: &http.Transport{
+				DialContext: (&tcpnet.Dialer{Timeout: retryGetDialTimeout}).DialContext,
 				TLSClientConfig: &tls.Config{
 					RootCAs:    rootCAs,
 					MinVersion: tls.VersionTLS12,
@@ -117,6 +124,7 @@ func RetryGet(ctx context.Context, url, additionalCAPath string) int {
 		}
 		resp, err := c.Get(url)
 		if err != nil {
+			lastErr = err
 			return false, nil
 		}
 		defer func() { _ = resp.Body.Close() }()
@@ -125,7 +133,7 @@ func RetryGet(ctx context.Context, url, additionalCAPath string) int {
 	})
 
 	if err != nil && err == context.DeadlineExceeded {
-		klog.Warningf("Endpoint is not returning any status code")
+		klog.Warningf("Endpoint %s is not returning any status code after %d attempts, last error: %v", url, attempts, lastErr)
 	}
 
 	return status
