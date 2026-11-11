@@ -5,6 +5,9 @@
 # Leave undefined to upgrade to the latest available version
 rhel_target_version: "9.8"
 
+# Set to false to skip upgrading all packages during host setup
+upgrade_packages: true
+
 go_arch: arm64
 go_files:
   - go
