@@ -5,10 +5,6 @@ IFS=$'\n\t'
 
 ARCH="$(uname -m)"
 
-# Set GitHub token for private repository access
-GITHUB_TOKEN="$(cat /tmp/token-git 2>/dev/null || echo '')"
-export GITHUB_TOKEN
-
 SCRIPT_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 ROOT_DIR=$(realpath "${SCRIPT_DIR}/..")
 DEFAULT_DEST_DIR="${ROOT_DIR}/_output/bin"
@@ -353,75 +349,6 @@ gettool_tar-diff() {
     for pkg in tar-diff tar-patch ; do
         GOBIN=${DEST_DIR} GOFLAGS="" go install -mod=mod github.com/containers/tar-diff/cmd/${pkg}@${ver}
     done
-}
-
-gettool_ginkgo() {
-    # shellcheck source=test/bin/common.sh
-    source "${SCRIPT_DIR}/../test/bin/common.sh"
-    # shellcheck source=test/bin/common_versions.sh
-    source "${SCRIPT_DIR}/../test/bin/common_versions.sh"
-
-    local -r repo_url="https://${GITHUB_TOKEN}@github.com/openshift/openshift-tests-private.git"
-    local -r repo_branch="${OPENSHIFT_TESTS_PRIVATE_REPO_BRANCH}"
-    local -r repo_commit="${OPENSHIFT_TESTS_PRIVATE_REPO_COMMIT}"
-    local clone_dir="${WORK_DIR}/openshift-tests-private"
-    
-    local -r binary_path="${GINKGO_TEST_BINARY}"
-    local -r handleresult_script="${HANDLERESULT_SCRIPT}"
-
-    # Check if Go is available
-    if ! command -v go &> /dev/null; then
-        echo "Error: Go is required to build openshift-tests-private binary"
-        return 1
-    fi
-
-    # Check if binary and handleresult.py already exist
-    [[ -f "${binary_path}" ]] && [[ -f "${handleresult_script}" ]] && return 0
-    mkdir -p "$(dirname "${binary_path}")"
-
-    # Clone repository with release branch preference
-    if ! git clone --depth 1000 --branch "${repo_branch}" "${repo_url}" "${clone_dir}" 2>/dev/null; then
-        echo "Error: Failed to clone repository"
-        return 1
-    fi
-
-    pushd "${clone_dir}" &>/dev/null
-
-    # Checkout a valid commit to be sure ginkgo tests are working
-    if ! (git checkout --quiet "${repo_commit}"); then
-        echo "Error: Failed to checkout specific commit"
-        return 1
-    fi
-
-    # Download Go modules before building — the Makefile's patch-bindata
-    # target needs the origin module in the cache before go build runs.
-    go mod download
-
-    # Build the binary
-    make all
-
-    # Copy binary to centralized location
-    local test_binary="./bin/extended-platform-tests"
-    if [[ -f "${test_binary}" ]]; then
-        cp "${test_binary}" "${binary_path}"
-        chmod +x "${binary_path}"
-        echo "Binary installed to ${binary_path}"
-    else
-        echo "Error: Test binary not found after build"
-        return 1
-    fi
-
-    # Copy handleresult.py to the tools directory
-    local handleresult_script_local="./pipeline/handleresult.py"
-    if [[ -f "${handleresult_script_local}" ]] && [[ ! -f "${handleresult_script}" ]]; then
-        cp "${handleresult_script_local}" "${handleresult_script}"
-        chmod +x "${handleresult_script}"
-        echo "handleresult.py installed to ${handleresult_script}"
-    else
-        echo "Error: pipeline/handleresult.py not found in repository"
-        return 1
-    fi
-    popd &>/dev/null
 }
 
 tool_getters=$(declare -F | awk '$3 ~ /^gettool_/ {print $3}' | sed 's/^gettool_//g')
