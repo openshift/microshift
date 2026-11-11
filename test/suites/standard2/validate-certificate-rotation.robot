@@ -254,6 +254,10 @@ Restore Date With Fresh SSH Connection
     Evaluate    time.sleep(60)    modules=time
     Login MicroShift Host
     Wait Until Keyword Succeeds    30x    5s    System Date Should Be Synchronized
+    # The restart that follows the backward step regenerates certificates and
+    # rewrites the kubeadmin kubeconfig (TC-24's own CA renewal also invalidates
+    # the copy saved at suite setup). Re-read it before any healthcheck.
+    Setup Kubeconfig
     Wait For MicroShift
 
 System Date Should Be Synchronized
