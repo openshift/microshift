@@ -84,6 +84,9 @@ Renewal Recovers From An Expired CA
     ...    recovery), and the OCPSTRAT-2899 goal that renewal is the admin's
     ...    recovery path when the rotation window was missed.
     ...    OCPSTRAT-2899 TC-24
+    ...    Fulfills OCPEDGE-2998 acceptance criteria (expired-state half, via the
+    ...    leaf-refusal and CA-recovery) and the OCPSTRAT-2899 goal that renewal
+    ...    is the admin's recovery path when the rotation window was missed.
     [Tags]    qe    ocpstrat-2899
     # No [Timeout] here: Robot timeouts are wall-clock based and this test
     # jumps the wall clock ten years forward, which would blow any timeout
