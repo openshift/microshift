@@ -127,21 +127,20 @@ Internal Renewal Leaves Named Certificates Alone
     Setup Custom Kubeconfig    ${hostname}
     MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
     ${before}=    Named Certificate Files State
+    # Capture the cursor before the renewals: the assertion must cover stop
+    # messages emitted while they run, not only afterwards.
+    ${cursor}=    Get Journal Cursor
 
     FOR    ${mode}    IN    serving    ca    ca
-        Command Should Work    microshift certs renew --${mode} -o json
-        Restart MicroShift
-        ${after}=    Named Certificate Files State
-        Should Be Equal    ${before}    ${after}    msg=namedCertificate files changed after ${mode} renewal
-        Setup Custom Kubeconfig    ${hostname}
-        MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
+        Renewal Should Not Disturb Named Certificates    ${mode}    ${before}    ${hostname}
     END
 
-    ${cursor}=    Get Journal Cursor
+    # The observation window must be an explicit wait: the journal keyword
+    # returns immediately when no match is found, so retries alone observe the
+    # log for zero seconds.
+    Sleep    60s
     Pattern Should Not Appear In Log Output
     ...    ${cursor}    Stopping services for certificate rotation    retries=6    wait=10
-    ${restarts}=    Get Systemd Setting    microshift.service    NRestarts
-    Should Be Equal As Integers    ${restarts}    0    msg=MicroShift restarted by itself after renewal
     [Teardown]    Run Keywords
     ...    Remove Entry From Local Hosts    ${hostname}
     ...    AND    Remove Drop In MicroShift Config    10-subjectAltNames
@@ -149,6 +148,23 @@ Internal Renewal Leaves Named Certificates Alone
 
 
 *** Keywords ***
+Renewal Should Not Disturb Named Certificates
+    [Documentation]    Run one renewal in the given mode and verify it neither changes the
+    ...    namedCertificate files nor restarts MicroShift by itself. The restart counter
+    ...    must be read before the manual restart: Restart MicroShift runs
+    ...    `systemctl reset-failed`, which would erase an automatic restart that
+    ...    happened during the renewal.
+    [Arguments]    ${mode}    ${before}    ${hostname}
+    Command Should Work    microshift certs renew --${mode} -o json
+    ${restarts}=    Get Systemd Setting    microshift.service    NRestarts
+    Should Be Equal As Integers    ${restarts}    0
+    ...    msg=MicroShift restarted by itself after ${mode} renewal
+    Restart MicroShift
+    ${after}=    Named Certificate Files State
+    Should Be Equal    ${before}    ${after}    msg=namedCertificate files changed after ${mode} renewal
+    Setup Custom Kubeconfig    ${hostname}
+    MicroShift Is Live With Custom CA    ${TMPDIR}/ca.crt
+
 Setup
     [Documentation]    Set up all of the tests in this suite
     Check Required Env Variables

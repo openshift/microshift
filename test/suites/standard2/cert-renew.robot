@@ -350,7 +350,9 @@ Renewal Messages Match The Real Impact On External Kubeconfigs
     ...    still works after serving activation. The output must also say that a restart is
     ...    needed to activate the renewal. OCPSTRAT-2899 TC-09
     [Tags]    qe    ocpstrat-2899
-    Command Should Work    cp ${HOST_KUBECONFIG} ${SAVED_KUBECONFIG}
+    # install forces mode 600 even if the destination was pre-created by
+    # another local user with permissive permissions; cp would preserve them.
+    Command Should Work    install -m 600 ${HOST_KUBECONFIG} ${SAVED_KUBECONFIG}
 
     ${serving}=    Renewal Document    serving    json
     Should Not Be True    $serving['impact']['kubeconfigRedistributionRequired']
@@ -869,12 +871,20 @@ Old CA Certificates Should Not Be Trusted
     ${stdout}    ${stderr}    ${rc}=    Command Execution
     ...    grep -rlF -f ${OLD_CA_PATTERNS} /var/lib/microshift/certs
     Should Be Equal As Integers    ${rc}    1    msg=Old CA certificate still present in: ${stdout} ${stderr}
-    ${objects}=    Command Should Work
-    ...    oc --kubeconfig ${HOST_KUBECONFIG} get configmaps,secrets -A -o json
-    ${items}=    Evaluate    json.loads($objects)['items']    modules=json
-    ${texts}=    Evaluate
-    ...    [(i, base64.b64decode(v).decode('utf-8', 'ignore') if i['kind'] == 'Secret' else v) for i in $items for v in (i.get('data') or {}).values()]
-    ...    modules=base64
-    ${hits}=    Evaluate
-    ...    sorted({i['kind'] + ' ' + i['metadata']['namespace'] + '/' + i['metadata']['name'] for i, text in $texts for line in $old_ca_lines if line in text})
-    Should Be Empty    ${hits}    msg=Old CA certificate still present in: ${hits}
+    # Scan the objects on the host and return only the names that contain an
+    # old CA: piping the full `oc get` output back would put every Secret's
+    # contents into the Robot log.
+    ${scan}=    Catenate    SEPARATOR=\n
+    ...    import base64, json, sys
+    ...    lines = [l.strip() for l in open("${OLD_CA_PATTERNS}") if l.strip()]
+    ...    items = json.load(sys.stdin)["items"]
+    ...    hits = set()
+    ...    for i in items:
+    ...        for v in (i.get("data") or {}).values():
+    ...            text = base64.b64decode(v).decode("utf-8", "ignore") if i["kind"] == "Secret" else v
+    ...            if any(l in text for l in lines):
+    ...                hits.add(i["kind"] + " " + i["metadata"]["namespace"] + "/" + i["metadata"]["name"])
+    ...    print("\\n".join(sorted(hits)))
+    ${hits}=    Command Should Work
+    ...    oc --kubeconfig ${HOST_KUBECONFIG} get configmaps,secrets -A -o json | python3 -c '${scan}'
+    Should Be Empty    ${hits.strip().splitlines()}    msg=Old CA certificate still present in: ${hits}
