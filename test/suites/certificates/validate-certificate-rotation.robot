@@ -289,7 +289,9 @@ Restore Default Rotation Policy And Date
     ...    connected (see Restore Date With Fresh SSH Connection).
     Systemctl    start    chronyd
     Close All Connections
-    Sleep    60s    # chronyd steps the clock in this window; no connection exists for the step to kill
+    # Monotonic sleep; see Restore Date With Fresh SSH Connection for why
+    # Robot's wall-clock Sleep cannot be used here.
+    Evaluate    time.sleep(60)    modules=time
     Login MicroShift Host
     Wait Until Keyword Succeeds    30x    5s    System Date Should Be Synchronized
     Remove Drop In MicroShift Config    99-tc27-no-forced-exit
@@ -311,9 +313,12 @@ Restore Date With Fresh SSH Connection
     ...    the other date-restoring keywords do not need this.
     Systemctl    start    chronyd
     Close All Connections
-    # chronyd selects a source and steps the clock in this window; no connection exists for the step to kill
-    Sleep
-    ...    60s
+    # Wait out chronyd's clock step with nothing connected. This must be a
+    # monotonic sleep (Python time.sleep), not Robot's Sleep keyword: Robot
+    # measures Sleep against the wall clock, so the backward step landing
+    # mid-sleep turns "sleep 60s" into "sleep ten years" (observed 2026-11-11:
+    # the teardown hung forever inside Sleep).
+    Evaluate    time.sleep(60)    modules=time
     Login MicroShift Host
     Wait Until Keyword Succeeds    30x    5s    System Date Should Be Synchronized
     Wait For MicroShift
