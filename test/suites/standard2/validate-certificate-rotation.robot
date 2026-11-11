@@ -71,7 +71,7 @@ Certificate Rotation
     Certs Should Expire On    ${KUBE_SCHEDULER_CLIENT_CERT}    ${cert_expiry_date}
     [Teardown]    Restore System Date
 
-Renewal Recovers Certificates After The CA Has Expired
+Renewal Recovers From An Expired CA
     [Documentation]    Verify that when an admin misses the renewal window and the CA has expired,
     ...    leaf-only renewal is refused with advice to use --ca, CA renewal succeeds, and the
     ...    renewed certificates are active and healthy after MicroShift starts. MicroShift is
@@ -84,7 +84,7 @@ Renewal Recovers Certificates After The CA Has Expired
     ...    recovery), and the OCPSTRAT-2899 goal that renewal is the admin's
     ...    recovery path when the rotation window was missed.
     ...    OCPSTRAT-2899 TC-24
-    [Tags]    qe    OCPSTRAT-2899
+    [Tags]    qe    ocpstrat-2899
     # No [Timeout] here: Robot timeouts are wall-clock based and this test
     # jumps the wall clock ten years forward, which would blow any timeout
     # instantly (false failure observed 2026-11-04). Hang protection comes
@@ -103,20 +103,10 @@ Renewal Recovers Certificates After The CA Has Expired
 
     Start MicroShift
     Wait For MicroShift
-    ${status}=    Certificate Status
-    ${unhealthy}=    Evaluate    [i['name'] for i in $status['items'] if i['status'] != 'Healthy']
-    Should Be Empty    ${unhealthy}    msg=Certificates not healthy after recovery: ${unhealthy}
-    ${active}=    Evaluate    {(i['service'], i['name']): i['notAfter'] for i in $status['items']}
-    # $active is passed via a namespace because the special `$var` syntax is not
-    # visible inside the condition of a generator expression.
-    VAR    &{ns}=    active=${active}
-    ${not_renewed}=    Evaluate
-    ...    [i['name'] for i in $result['items'] if active[(i['service'], i['name'])] != i['newNotAfter']]
-    ...    namespace=${ns}
-    Should Be Empty    ${not_renewed}    msg=Active certificates are not the ones prepared by renew: ${not_renewed}
+    Renewed Chain Should Be Active And Healthy    ${result}
     [Teardown]    Run Keywords    Start MicroShift    AND    Restore Date With Fresh SSH Connection
 
-ExpirationImminent Does Not Force Exit When Disabled
+ExpirationImminent Does Not Force Exit
     [Documentation]    Verify that with certificates.forceRestartOnExpirationImminent
     ...    set to false, a running MicroShift does not exit when a managed certificate
     ...    crosses into the ExpirationImminent zone: the process ID stays the same,
@@ -124,7 +114,7 @@ ExpirationImminent Does Not Force Exit When Disabled
     ...    The default forced-exit path is already exercised by the Certificate
     ...    Rotation test in this suite, which expects the process ID to change.
     ...    OCPSTRAT-2899 TC-27
-    [Tags]    qe    OCPSTRAT-2899
+    [Tags]    qe    ocpstrat-2899
     # No [Timeout]: wall-clock-based timeouts false-fail on clock-jump tests
     # (see TC-24 above).
     Drop In MicroShift Config    certificates: {forceRestartOnExpirationImminent: false}    99-tc27-no-forced-exit
@@ -149,13 +139,7 @@ ExpirationImminent Does Not Force Exit When Disabled
     Should Be Equal As Integers    ${current_pid}    ${ushift_pid}
     ...    msg=MicroShift restarted despite forceRestartOnExpirationImminent: false
 
-    ${journal}=    Command Should Work    journalctl -u microshift --since "-2 min" --no-pager
-    Should Contain    ${journal}    automatic certificate restart is disabled
-    Should Not Contain    ${journal}    Stopping services for certificate rotation
-
-    ${status}=    Certificate Status
-    ${imminent}=    Evaluate    [i['name'] for i in $status['items'] if i['status'] == 'ExpirationImminent']
-    Should Not Be Empty    ${imminent}    msg=No certificate reported ExpirationImminent after the clock change
+    Suppression Should Be Logged And Visible
     Wait For MicroShift Healthcheck Success
     [Teardown]    Restore Default Rotation Policy And Date
 
@@ -256,6 +240,32 @@ Certificate Status
     ${status}=    Evaluate    json.loads($output)    modules=json
     RETURN    ${status}
 
+Renewed Chain Should Be Active And Healthy
+    [Documentation]    After recovery startup every certificate is Healthy and the
+    ...    active files are exactly the ones prepared by the pending renewal.
+    [Arguments]    ${result}
+    ${status}=    Certificate Status
+    ${unhealthy}=    Evaluate    [i['name'] for i in $status['items'] if i['status'] != 'Healthy']
+    Should Be Empty    ${unhealthy}    msg=Certificates not healthy after recovery: ${unhealthy}
+    ${active}=    Evaluate    {(i['service'], i['name']): i['notAfter'] for i in $status['items']}
+    # $active is passed via a namespace because the special `$var` syntax is not
+    # visible inside the condition of a generator expression.
+    VAR    &{ns}=    active=${active}
+    ${not_renewed}=    Evaluate
+    ...    [i['name'] for i in $result['items'] if active[(i['service'], i['name'])] != i['newNotAfter']]
+    ...    namespace=${ns}
+    Should Be Empty    ${not_renewed}    msg=Active certificates are not the ones prepared by renew: ${not_renewed}
+
+Suppression Should Be Logged And Visible
+    [Documentation]    The forced exit was skipped (warning logged, no shutdown) and
+    ...    the certificates are reported as ExpirationImminent.
+    ${journal}=    Command Should Work    journalctl -u microshift --since "-2 min" --no-pager
+    Should Contain    ${journal}    automatic certificate restart is disabled
+    Should Not Contain    ${journal}    Stopping services for certificate rotation
+    ${status}=    Certificate Status
+    ${imminent}=    Evaluate    [i['name'] for i in $status['items'] if i['status'] == 'ExpirationImminent']
+    Should Not Be Empty    ${imminent}    msg=No certificate reported ExpirationImminent after the clock change
+
 Move Clock Past CA Expiry With MicroShift Stopped
     [Documentation]    Stop MicroShift and time sync, then set the clock two days after the latest
     ...    CA expiry date. Every CA is then expired, and startup cannot regenerate them first.
@@ -301,7 +311,9 @@ Restore Date With Fresh SSH Connection
     ...    the other date-restoring keywords do not need this.
     Systemctl    start    chronyd
     Close All Connections
-    Sleep    60s    # chronyd selects a source and steps the clock in this window; no connection exists for the step to kill
+    # chronyd selects a source and steps the clock in this window; no connection exists for the step to kill
+    Sleep
+    ...    60s
     Login MicroShift Host
     Wait Until Keyword Succeeds    30x    5s    System Date Should Be Synchronized
     Wait For MicroShift

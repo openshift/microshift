@@ -16,12 +16,12 @@ Test Tags           restart
 
 
 *** Variables ***
-${CERTIFICATE_LOCK}     /var/lib/microshift-backups/certs.lock
-${RUNTIME_LOCK}         /var/lib/microshift-backups/certs-runtime.lock
-${HOST_KUBECONFIG}      /var/lib/microshift/resources/kubeadmin/kubeconfig
-${SAVED_KUBECONFIG}     /tmp/cert-renew-saved-kubeconfig
-${OLD_CA_PATTERNS}      /tmp/cert-renew-old-ca-lines
-${REDISTRIBUTION_WARNING}    Kubeconfigs stored outside the MicroShift data directory must be copied again after activation at the next MicroShift start.
+${CERTIFICATE_LOCK}             /var/lib/microshift-backups/certs.lock
+${RUNTIME_LOCK}                 /var/lib/microshift-backups/certs-runtime.lock
+${HOST_KUBECONFIG}              /var/lib/microshift/resources/kubeadmin/kubeconfig
+${SAVED_KUBECONFIG}             /tmp/cert-renew-saved-kubeconfig
+${OLD_CA_PATTERNS}              /tmp/cert-renew-old-ca-lines
+${REDISTRIBUTION_WARNING}       Kubeconfigs stored outside the MicroShift data directory must be copied again after activation at the next MicroShift start.
 
 
 *** Test Cases ***
@@ -343,14 +343,13 @@ Missing Pending Generation Does Not Block Startup
     Should Be Equal    ${ca_before}    ${ca_after}
     [Teardown]    Replace Rejected Renewal
 
-
 Renewal Messages Match The Real Impact On External Kubeconfigs
     [Documentation]    Verify that CA renewal warns that external kubeconfig copies must be copied
     ...    again, and that the warning is true: a copy saved before CA activation is rejected
     ...    afterwards. Verify that serving renewal gives no such warning, and that a saved copy
     ...    still works after serving activation. The output must also say that a restart is
     ...    needed to activate the renewal. OCPSTRAT-2899 TC-09
-    [Tags]    qe    OCPSTRAT-2899
+    [Tags]    qe    ocpstrat-2899
     Command Should Work    cp ${HOST_KUBECONFIG} ${SAVED_KUBECONFIG}
 
     ${serving}=    Renewal Document    serving    json
@@ -381,7 +380,7 @@ Renewed Certificates Meet ProdSec Rules
     ...    certificate file, ConfigMap, or Secret still contains an old CA certificate. A new
     ...    certificate on an old key leaves a stolen key valid, and a still-trusted old CA keeps
     ...    accepting what it signed. OCPSTRAT-2899 TC-19
-    [Tags]    qe    OCPSTRAT-2899
+    [Tags]    qe    ocpstrat-2899
     ${before}=    Certificate Identity Snapshot
     Renewal Document    serving    json
     Restart MicroShift
@@ -412,7 +411,7 @@ Configured And Default Certificate Lifetimes Are Applied
     ...    - "Defaults preserve current 1y serving / 10y CA behavior when unset"
     ...    The planning math is unit-tested by TestPlanRenewal; this is the
     ...    running-system half. OCPSTRAT-2899 TC-10 / TC-11.
-    [Tags]    qe    OCPSTRAT-2899
+    [Tags]    qe    ocpstrat-2899
     # The custom values (2y serving / 12y CA) are deliberately long: the
     # rotation watcher's deadline is notAfter minus the policy window, and a
     # much shorter validity would put that deadline in the past, turning the
@@ -429,6 +428,7 @@ Configured And Default Certificate Lifetimes Are Applied
     Restart MicroShift
     Renewal Matches Current Status    ${defaults}
     [Teardown]    Run Keywords    Remove Drop In MicroShift Config    99-tc10-lifetimes    AND    Restart MicroShift
+
 
 *** Keywords ***
 Drop In Certificate Policy
@@ -754,9 +754,7 @@ Renewed Lifetimes Should Match
     [Arguments]    ${result}    ${serving_hours}    ${ca_hours}
     ${now}=    Evaluate    datetime.datetime.now(datetime.timezone.utc)    modules=datetime
     FOR    ${item}    IN    @{result}[items]
-        IF    '${item}[role]' not in ('ca', 'serving')
-            CONTINUE
-        END
+        IF    '${item}[role]' not in ('ca', 'serving')    CONTINUE
         ${hours}=    Set Variable If    '${item}[role]' == 'ca'    ${ca_hours}    ${serving_hours}
         ${remaining}=    Evaluate
         ...    (datetime.datetime.fromisoformat($item['newNotAfter'].replace('Z', '+00:00')) - $now).total_seconds() / 3600
