@@ -1,17 +1,17 @@
 {
   "release": {
-    "base": "5.0.0-0.nightly-arm64-2026-11-09-184849"
+    "base": "5.0.0-0.nightly-arm64-2026-11-10-054143"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:56f74062826cf09f2c5f61ba5b0ce209aa01d2284c173397e26369ecf0ff816c",
-    "coredns": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:7ea1ef131649e8513924787da5d4f3ef5b7d33bc99df31052358f25f983a8f3b",
+    "coredns": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:6155801cb7a7e577ba5c50d0c01e5fbf58dbc978a5610f39c9e6a18037155dc0",
     "haproxy-router": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:4e1f45344f888f883be48f770276987d73d3ad1cb9aed96aeeb9da929d77b062",
     "haproxy-router-haproxy32": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:fc7ac9ce69eb63faffbb025d4187b3414c7711816fc745caa70f69f77a05c423",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:827220b6675b08b741c7b1f297d711f41dc5380ce0606f8b10dab7bdf63653c1",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:117671138c6b848adbbe576049c5c00863affca373718faa292d2c74abf3bbca",
     "pod": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:28535cddd3064e9e9f7d593d9d77c9df7490deca6e10702796893bcd41e87fba",
-    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:7008f680ff1d4dfcb9ad0f11983b65bc8b3d31b4011f22ea3b4142eb1c2a751d",
+    "service-ca-operator": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:f15cea366da3c1f6e331d8c2079147a82aefddd2ee9fcea388193184c548335a",
     "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:a0e22c2bad21314228c89d0433dce45ddc64e2d8cc4b1d63a238449d2c196a56",
-    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:139668efb3ce8d5331a03ab901fc3b0264601574148dd607be362664b4fffa8f"
+    "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:479f6551f85ac60e76445f88f943cbe6ebefcf1660449ec266fe5bdbea85b896"
   }
 }

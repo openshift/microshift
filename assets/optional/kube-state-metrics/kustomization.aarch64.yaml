@@ -4,4 +4,4 @@ images:
     digest: sha256:827220b6675b08b741c7b1f297d711f41dc5380ce0606f8b10dab7bdf63653c1
   - name: quay.io/openshift/kube-state-metrics
     newName: quay.io/openshift-release-dev/ocp-v5.0-art-dev
-    digest: sha256:b9578f9b3da4556619b3ffcda3ad356cb269401cff404326d80e6ebad3e444ea
+    digest: sha256:4ca6bde9ecb20b07965b5908f51463add1766f93e3ceee3f965f32c1b399a1f9
