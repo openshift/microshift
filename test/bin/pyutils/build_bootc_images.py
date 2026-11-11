@@ -33,11 +33,20 @@ HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 BIB_IMAGE_RHEL9 = "registry.redhat.io/rhel9/bootc-image-builder:latest"
 BIB_IMAGE = "registry.redhat.io/rhel10/bootc-image-builder:latest"
-BIB_IMAGE_CENTOS = "quay.io/centos-bootc/bootc-image-builder:latest"
+# CentOS Stream 9 and 10 builder images can be overridden independently.
+# Empty values fall back to the default image.
+BIB_IMAGE_CENTOS_DEFAULT = "quay.io/centos-bootc/bootc-image-builder:latest"
+BIB_IMAGE_CENTOS9 = os.environ.get('BIB_IMAGE_CENTOS9') or BIB_IMAGE_CENTOS_DEFAULT
+BIB_IMAGE_CENTOS10 = os.environ.get('BIB_IMAGE_CENTOS10') or BIB_IMAGE_CENTOS_DEFAULT
 IBC_IMAGE = "ghcr.io/osbuild/image-builder-cli:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
 FORCE_REBUILD = False
+
+
+def get_builder_images():
+    # Unique images in a stable order, as some of them may share the same reference
+    return list(dict.fromkeys([BIB_IMAGE_RHEL9, BIB_IMAGE, BIB_IMAGE_CENTOS9, BIB_IMAGE_CENTOS10, IBC_IMAGE]))
 
 
 def cleanup_atexit(dry_run):
@@ -48,7 +57,7 @@ def cleanup_atexit(dry_run):
         common.terminate_process(pid)
 
     # Terminate running image builder containers
-    for builder_image in [BIB_IMAGE_RHEL9, BIB_IMAGE, BIB_IMAGE_CENTOS, IBC_IMAGE]:
+    for builder_image in get_builder_images():
         podman_args = [
             "sudo", "podman", "ps",
             "--filter", f"ancestor={builder_image}",
@@ -357,9 +366,12 @@ def process_containerfile(groupdir, containerfile, dry_run):
 
 
 def get_bib_image(img):
-    # CentOS Stream family
-    if any(x in img for x in ("stream9", "stream10", "cos9", "cos10")):
-        return BIB_IMAGE_CENTOS
+    # CentOS Stream 9 family
+    if "stream9" in img or "cos9" in img:
+        return BIB_IMAGE_CENTOS9
+    # CentOS Stream 10 family
+    if "stream10" in img or "cos10" in img:
+        return BIB_IMAGE_CENTOS10
     # RHEL 9 family
     if "rhel9" in img or "rhel-9" in img:
         return BIB_IMAGE_RHEL9

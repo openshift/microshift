@@ -50,7 +50,7 @@ Pre-merge checks run via `scripts/verify/`:
 | `make verify-go` | golangci-lint, gofmt (Makefile target, not a script) |
 | `verify-shell.sh` | shellcheck for all bash scripts |
 | `verify-rf.sh` | Robot Framework syntax (robocop) |
-| `verify-py.sh` | Python linting (flake8) |
+| `verify-py.sh` | Python linting (flake8) and `test/bin/pyutils` unit tests |
 | `make lint-ansible` (`verify-ansible.sh`) | Ansible playbook and role linting |
 | `verify-containers.sh` | Containerfile linting (hadolint) |
 | `verify-assets.sh` | Asset integrity |

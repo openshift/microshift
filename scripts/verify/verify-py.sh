@@ -36,4 +36,10 @@ run_flake8() {
 
 }
 
+# Uses the venv created by run_flake8
+run_unittests() {
+    "${VENV}/bin/python3" -m unittest discover -s "${ROOTDIR}/test/bin/pyutils/tests" -v
+}
+
 run_flake8
+run_unittests

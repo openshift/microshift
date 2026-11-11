@@ -300,6 +300,26 @@ For example, to build all image from `layer1-base` blueprints, run:
 
 Run `./test/bin/build_bootc_images.sh -h` to see the full list of options and their uses.
 
+#### Bootc Image Builder Selection
+
+Installer ISOs for `.image-bootc` files are built with a bootc image builder
+selected by matching the source image reference:
+
+| Image reference contains | Default builder image | Override variable |
+|---|---|---|
+| `stream9` or `cos9` | `quay.io/centos-bootc/bootc-image-builder:latest` | `BIB_IMAGE_CENTOS9` |
+| `stream10` or `cos10` | `quay.io/centos-bootc/bootc-image-builder:latest` | `BIB_IMAGE_CENTOS10` |
+| `rhel9` or `rhel-9` | `registry.redhat.io/rhel9/bootc-image-builder:latest` | none |
+| anything else | `registry.redhat.io/rhel10/bootc-image-builder:latest` | none |
+
+The CentOS Stream 9 and 10 builder images can be overridden independently by
+exporting the corresponding variable before running the build script. Unset or
+empty variables use the default builder image.
+
+```shell
+BIB_IMAGE_CENTOS9=<builder-image-reference> ./test/bin/build_bootc_images.sh -l ./test/image-blueprints-bootc/upstream
+```
+
 #### Bootc Containerfile Naming
 
 Filename conventions are the same as [Blueprint Naming](#blueprint-naming) conventions.
