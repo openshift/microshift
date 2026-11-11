@@ -118,9 +118,10 @@ time ansible-playbook -v \
 #### Running Selected Plays
 
 Every play in `setup-node.yml` carries a tag: `localhost`, `repos`, `host`, `install`,
-`network`, `nodename`, `logging`, `start`, `warm`, `gpu`, `kubeconfig` and `workloads`. The
-first play validates the MicroShift network settings and runs on every invocation (tag
-`always`); the C2CC verification play runs only when asked for with `--tags c2cc-verify`. Use
+`network`, `nodename`, `logging`, `start`, `warm`, `gpu`, `kubeconfig`, `workloads` and
+`network-perf`. The first play validates the MicroShift network settings and runs on every
+invocation (tag `always`); the C2CC verification play runs only when asked for with
+`--tags c2cc-verify`. Use
 `--skip-tags` or `--tags` to rerun parts of the playbook without editing it. For example, to
 reinstall MicroShift and repeat the startup measurements on a host whose subscription,
 repositories, packages and firewall are already set up:
@@ -211,6 +212,17 @@ workloads_to_run:
 
 Metrics are collected with the kube-burner-ocp `microshift-metrics.yml` profile from the Prometheus set up by `prometheus_logging`, or from an external one named by `prometheus_query_endpoint`. Without either, the workloads run without metrics collection. The profile expects the kubelet scrape jobs to be named `kubelet-microshift` and `kubelet-microshift-cadvisor`, which the playbook configures.
 
+With `run_network_perf: true` (or `-e run_network_perf_arg=true`), the `network-perf` play runs the e2e-benchmarking `network-perf-v2` workload (k8s-netperf with client and server on the same node, `full-run.yaml` by default) against every MicroShift host in the play at the same time, each with its own kubeconfig (`~/.kube/kubeconfig.<host>`, written by the `kubeconfig` play), e2e-benchmarking checkout and results. For example, to run three iterations on clusters that are already installed:
+
+```bash
+ansible-playbook -i inventory/inventory setup-node.yml --tags network-perf \
+    -e run_network_perf_arg=true -e network_perf_iterations=3
+```
+
+Results go to `results/<microshift_version>/network-perf/<campaign>/<host>/iteration-<NN>/`: the k8s-netperf CSV results (`result-*.csv` and `loss-rt-result-*.csv`), `run.log`, `cleanup.log` (benchmark namespace removal), `pods.json` and `run-info.json` (UUID, times, exit code, e2e-benchmarking commit, k8s-netperf version, workload checksum and the image ID of every benchmark container). Results are not indexed. Because k8s-netperf pulls its image by tag, the play fails at the end when the containers of a campaign ran different images (`image-ids.json` lists them); set `network_perf_fail_on_image_mismatch: false` to only record them. Pass `-e network_perf_campaign=<campaign>` to add iterations to an earlier campaign.
+
+While it runs, the play holds a `network-perf-lock` namespace on each cluster, so a second run cannot start there. After a failed iteration the play itself removes the benchmark pods before it reads anything else from the cluster (run.sh in e2e-benchmarking v2.10.4 still runs its own debug queries first), and unless it can confirm that they are gone it fails and keeps the lock; delete the `netperf` and `network-perf-lock` namespaces by hand once the cluster is clean.
+
 ## Configuration Overview
 
 There are a few configuration files that can be configured before execution of the playbook.
@@ -243,6 +255,11 @@ Most of the following variables are defined in `vars/all.yml`. The source-build 
 | `enable_gpu` | Install NVIDIA GPU drivers and container toolkit for GPU workloads | `false` |
 | `deploy_gpu_test` | Deploy a test GPU workload to validate GPU functionality | `true` |
 | `run_workloads` | Run kube-burner performance workloads | `false` |
+| `run_network_perf` | Run the network-perf-v2 pod network workload on every MicroShift host at the same time | `false` |
+| `network_perf_iterations` | Iterations of the network-perf-v2 workload per host | `1` |
+| `network_perf_workload` | network-perf-v2 workload file | `"full-run.yaml"` |
+| `network_perf_e2e_git_revision` | e2e-benchmarking release to run network-perf-v2 from | `"v2.10.4"` |
+| `network_perf_netperf_version` | k8s-netperf release used by network-perf-v2 | `"v0.1.44"` |
 | `kube_burner_version` | kube-burner-ocp release downloaded by the wrapper | `"1.12.6"` |
 | `kube_burner_url` | URL of a kube-burner-ocp tarball to use instead of the release | `""` |
 | `kube_burner_es_server` | Elasticsearch server for remote indexing of kube-burner results; results are indexed locally when metrics collection is enabled | `""` |

@@ -1,0 +1,211 @@
+---
+# run-network-perf tasks: run network-perf-v2 (client and server on the same node)
+# against every MicroShift host's cluster at once from the control node, each with
+# its own kubeconfig, checkout and results directory.
+
+- name: Set the campaign of this run
+  ansible.builtin.set_fact:
+    _np_campaign: "{{ network_perf_campaign | default(lookup('pipe', 'date -u +%Y-%m-%d_%H-%M-%S'), true) }}"
+  run_once: true
+
+- name: Set this host's paths
+  ansible.builtin.set_fact:
+    _np_campaign_dir: "{{ network_perf_results_dir }}/{{ _np_campaign }}"
+    _np_host_dir: >-
+      {{ network_perf_results_dir }}/{{ _np_campaign }}/{{ inventory_hostname }}
+    _np_workload_dir: "{{ network_perf_work_dir }}/workloads/network-perf-v2"
+
+- name: Check that this host's kubeconfig exists
+  ansible.builtin.stat:
+    path: "{{ network_perf_kubeconfig }}"
+  register: _np_kubeconfig
+  delegate_to: localhost
+
+- name: Fail without this host's kubeconfig
+  ansible.builtin.assert:
+    that:
+      - _np_kubeconfig.stat.exists
+    fail_msg: "{{ network_perf_kubeconfig }} is missing; run the kubeconfig play for {{ inventory_hostname }} first."
+    quiet: true
+
+# A kubeconfig for another host would benchmark and clean up the wrong cluster
+- name: Read the node of this host's cluster
+  ansible.builtin.command:
+    argv: [oc, --kubeconfig, "{{ network_perf_kubeconfig }}", get, nodes, -o, json]
+  register: _np_nodes
+  changed_when: false
+  delegate_to: localhost
+
+# IP addresses must match exactly; DNS names also match on their first label.
+- name: Check that the kubeconfig belongs to this host
+  vars:
+    _np_items: "{{ (_np_nodes.stdout | from_json)['items'] }}"
+    _np_node_ids: >-
+      {{ (_np_items | map(attribute='status.addresses') | flatten | map(attribute='address') | list)
+         + (_np_items | map(attribute='metadata.name') | list) }}
+    _np_host_ids: "{{ [ansible_host | default(inventory_hostname), inventory_hostname] | unique }}"
+    _np_node_short: >-
+      {{ _np_node_ids | reject('match', '^[0-9.]+$') | reject('search', ':')
+         | map('regex_replace', '\..*$', '') | list }}
+    _np_host_short: >-
+      {{ _np_host_ids | reject('match', '^[0-9.]+$') | reject('search', ':')
+         | map('regex_replace', '\..*$', '') | list }}
+  ansible.builtin.assert:
+    that:
+      - _np_items | length == 1
+      - (_np_node_ids | intersect(_np_host_ids) | length > 0) or (_np_node_short | intersect(_np_host_short) | length > 0)
+    fail_msg: >-
+      {{ network_perf_kubeconfig }} points at a cluster whose node ({{ _np_node_ids | join(', ') }})
+      is not {{ inventory_hostname }}.
+    quiet: true
+
+# Namespace creation fails if it exists, so this locks the cluster against any
+# other run, from any control node
+- name: Claim the cluster for this run
+  ansible.builtin.command:
+    argv: [oc, --kubeconfig, "{{ network_perf_kubeconfig }}", create, namespace, network-perf-lock]
+  register: _np_lock
+  changed_when: true
+  failed_when: false
+  delegate_to: localhost
+
+- name: Fail when another run holds the cluster
+  ansible.builtin.assert:
+    that:
+      - _np_lock.rc == 0
+    fail_msg: >-
+      Could not create the network-perf-lock namespace on {{ inventory_hostname }}
+      ({{ _np_lock.stderr | trim }}). Another network-perf run is using this cluster; if none is,
+      delete that namespace and run again.
+    quiet: true
+
+- name: Run the campaign while holding the cluster
+  block:
+    - name: Label the claim with this campaign
+      ansible.builtin.command:
+        argv: [oc, --kubeconfig, "{{ network_perf_kubeconfig }}", label, namespace, network-perf-lock,
+               "network-perf-campaign={{ _np_campaign_dir | basename }}"]
+      changed_when: true
+      delegate_to: localhost
+
+    - name: Check out e2e-benchmarking for this host
+      ansible.builtin.git:
+        repo: "{{ network_perf_e2e_repo }}"
+        dest: "{{ network_perf_work_dir }}"
+        version: "{{ network_perf_e2e_git_revision }}"
+        force: true
+      register: _np_git
+      delegate_to: localhost
+
+    - name: Fingerprint the workload file
+      ansible.builtin.stat:
+        path: "{{ _np_workload_dir }}/{{ network_perf_workload }}"
+        checksum_algorithm: sha256
+      register: _np_workload
+      delegate_to: localhost
+
+    - name: Fail without the workload file
+      ansible.builtin.assert:
+        that:
+          - _np_workload.stat.exists
+        fail_msg: "{{ network_perf_workload }} is not in {{ _np_workload_dir }}."
+        quiet: true
+
+    # Continuing a campaign adds iterations after the ones already saved.
+    - name: Find the iterations already saved for this host
+      ansible.builtin.find:
+        paths: "{{ _np_host_dir }}"
+        file_type: directory
+        patterns: "iteration-*"
+      register: _np_saved
+      delegate_to: localhost
+
+    - name: Number the new iterations
+      vars:
+        _np_last: >-
+          {{ _np_saved.files | map(attribute='path') | map('basename')
+             | map('regex_replace', '^iteration-', '') | map('int') | max | default(0) }}
+      ansible.builtin.set_fact:
+        _np_iterations: "{{ range((_np_last | int) + 1, (_np_last | int) + 1 + (network_perf_iterations | int)) | list }}"
+
+    - name: Run the iterations
+      ansible.builtin.include_tasks: iteration.yml
+      loop: "{{ _np_iterations }}"
+      loop_control:
+        loop_var: network_perf_iteration
+
+  always:
+    - name: Release the cluster
+      ansible.builtin.command:
+        argv: [timeout, -k, "10", "{{ network_perf_cleanup_timeout | int + network_perf_api_timeout | int }}",
+               oc, --kubeconfig, "{{ network_perf_kubeconfig }}", "--request-timeout={{ network_perf_api_timeout }}s",
+               delete, namespace, network-perf-lock, --ignore-not-found, --wait=true, "--timeout={{ network_perf_cleanup_timeout }}s"]
+      register: _np_release
+      changed_when: true
+      failed_when: false
+      when: not (_np_keep_lock | default(false))
+      delegate_to: localhost
+
+    # A successful delete does not always mean the namespace is gone.
+    - name: Check that the cluster is released
+      ansible.builtin.command:
+        argv: [timeout, -k, "10", "{{ network_perf_api_timeout }}", oc, --kubeconfig, "{{ network_perf_kubeconfig }}",
+               "--request-timeout={{ network_perf_api_timeout }}s", get, namespace, network-perf-lock, --ignore-not-found, -o, name]
+      register: _np_released
+      changed_when: false
+      failed_when: _np_released.rc != 0 or _np_released.stdout | length > 0
+      when: not (_np_keep_lock | default(false))
+      delegate_to: localhost
+
+    - name: Report the kept cluster lock
+      ansible.builtin.debug:
+        msg: >-
+          Keeping the network-perf-lock namespace on {{ inventory_hostname }}: the removal of the
+          netperf namespace was not confirmed, so the benchmark may still be there. Once the
+          cluster is clean, delete both namespaces by hand.
+      when: _np_keep_lock | default(false)
+
+# Compares every iteration saved in the campaign, including earlier runs.
+- name: Compare the benchmark images of the campaign
+  run_once: true
+  block:
+    - name: Find the run records of the campaign
+      ansible.builtin.find:
+        paths: "{{ _np_campaign_dir }}"
+        patterns: run-info.json
+        recurse: true
+      register: _np_records
+      delegate_to: localhost
+
+    - name: Read the run records of the campaign
+      ansible.builtin.slurp:
+        src: "{{ item.path }}"
+      loop: "{{ _np_records.files }}"
+      loop_control:
+        label: "{{ item.path | relpath(_np_campaign_dir) }}"
+      register: _np_record_data
+      delegate_to: localhost
+
+    - name: Collect the benchmark images of the campaign
+      ansible.builtin.set_fact:
+        _np_all_ids: >-
+          {{ _np_record_data.results | map(attribute='content') | map('b64decode') | map('from_json')
+             | map(attribute='containers') | flatten | map(attribute='imageID') | unique | sort }}
+
+    - name: Save the benchmark images of the campaign
+      ansible.builtin.copy:
+        content: "{{ _np_all_ids | to_nice_json }}\n"
+        dest: "{{ _np_campaign_dir }}/image-ids.json"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Fail when the benchmark containers ran different images
+      ansible.builtin.assert:
+        that:
+          - _np_all_ids | length <= 1
+        fail_msg: >-
+          The benchmark containers of campaign {{ _np_campaign_dir | basename }} ran
+          {{ _np_all_ids | length }} different images ({{ _np_all_ids | join(', ') }}); do not compare
+          these iterations.
+        quiet: true
+      when: network_perf_fail_on_image_mismatch | bool
