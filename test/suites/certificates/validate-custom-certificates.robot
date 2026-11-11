@@ -115,6 +115,9 @@ Internal Renewal Leaves Named Certificates Alone
     ...    extra automatic restart: preparing a renewal does not reset the running service's
     ...    rotation deadline, so the only restart must be the one that activates the renewal.
     ...    OCPSTRAT-2899 TC-18
+    ...    Fulfills OCPSTRAT-2899 AC: minimal disruption during renewal (SHOULD #6,
+    ...    online-safe preparation half) and non-interference with admin-supplied
+    ...    namedCertificates.
     [Tags]    qe    ocpstrat-2899
     [Setup]    Setup Test
     Create Keys
