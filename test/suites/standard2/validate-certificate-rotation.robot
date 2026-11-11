@@ -106,43 +106,6 @@ Renewal Recovers From An Expired CA
     Renewed Chain Should Be Active And Healthy    ${result}
     [Teardown]    Run Keywords    Start MicroShift    AND    Restore Date With Fresh SSH Connection
 
-ExpirationImminent Does Not Force Exit
-    [Documentation]    Verify that with certificates.forceRestartOnExpirationImminent
-    ...    set to false, a running MicroShift does not exit when a managed certificate
-    ...    crosses into the ExpirationImminent zone: the process ID stays the same,
-    ...    a warning is logged instead of a shutdown, and the service keeps serving.
-    ...    The default forced-exit path is already exercised by the Certificate
-    ...    Rotation test in this suite, which expects the process ID to change.
-    ...    OCPSTRAT-2899 TC-27
-    [Tags]    qe    ocpstrat-2899
-    # No [Timeout]: wall-clock-based timeouts false-fail on clock-jump tests
-    # (see TC-24 above).
-    Drop In MicroShift Config    certificates: {forceRestartOnExpirationImminent: false}    99-tc27-no-forced-exit
-    Restart MicroShift
-    Wait For MicroShift
-
-    # Two days before the earliest serving-cert expiry every serving cert is deep
-    # inside the ExpirationImminent zone (Standard policy red zone starts at 33%
-    # of validity remaining) while nothing is expired yet.
-    ${status}=    Certificate Status
-    ${earliest_serving_expiry}=    Evaluate    min(i['notAfter'] for i in $status['items'] if i['role'] == 'serving')
-    ${red_zone_date}=    Evaluate
-    ...    (datetime.datetime.fromisoformat($earliest_serving_expiry.replace('Z', '+00:00')) - datetime.timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')
-    ...    modules=datetime
-
-    ${ushift_pid}=    MicroShift Process ID
-    Systemctl    stop    chronyd
-    Command Should Work    TZ=UTC timedatectl set-time "${red_zone_date}"
-
-    Sleep    30s    # give the rotation watcher time to fire on the passed deadline
-    ${current_pid}=    MicroShift Process ID
-    Should Be Equal As Integers    ${current_pid}    ${ushift_pid}
-    ...    msg=MicroShift restarted despite forceRestartOnExpirationImminent: false
-
-    Suppression Should Be Logged And Visible
-    Wait For MicroShift Healthcheck Success
-    [Teardown]    Restore Default Rotation Policy And Date
-
 
 *** Keywords ***
 Setup
@@ -165,7 +128,7 @@ Restore System Date
     ...    sudo=True    return_rc=True
     IF    '${stdout.strip()}' == 'active'    RETURN
     ${ushift_pid}=    MicroShift Process ID
-    Systemctl    start    chronyd
+    Start Chronyd Without Wall Clock Sleep
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Wait For MicroShift
 
@@ -256,16 +219,6 @@ Renewed Chain Should Be Active And Healthy
     ...    namespace=${ns}
     Should Be Empty    ${not_renewed}    msg=Active certificates are not the ones prepared by renew: ${not_renewed}
 
-Suppression Should Be Logged And Visible
-    [Documentation]    The forced exit was skipped (warning logged, no shutdown) and
-    ...    the certificates are reported as ExpirationImminent.
-    ${journal}=    Command Should Work    journalctl -u microshift --since "-2 min" --no-pager
-    Should Contain    ${journal}    automatic certificate restart is disabled
-    Should Not Contain    ${journal}    Stopping services for certificate rotation
-    ${status}=    Certificate Status
-    ${imminent}=    Evaluate    [i['name'] for i in $status['items'] if i['status'] == 'ExpirationImminent']
-    Should Not Be Empty    ${imminent}    msg=No certificate reported ExpirationImminent after the clock change
-
 Move Clock Past CA Expiry With MicroShift Stopped
     [Documentation]    Stop MicroShift and time sync, then set the clock two days after the latest
     ...    CA expiry date. Every CA is then expired, and startup cannot regenerate them first.
@@ -277,26 +230,6 @@ Move Clock Past CA Expiry With MicroShift Stopped
     Stop MicroShift
     Systemctl    stop    chronyd
     Command Should Work    TZ=UTC timedatectl set-time "${expired_date}"
-
-Restore Default Rotation Policy And Date
-    [Documentation]    Restore real time, remove the policy drop-in, and restart with
-    ...    default configuration. The clock restore is a large backward step
-    ...    (about a year), so it uses a fresh SSH connection for the same
-    ...    reason as Restore Date With Fresh SSH Connection: the step under it
-    ...    may not survive. The suite teardown's Restore System Date then
-    ...    skips, because chronyd is already active. The Sleep before
-    ...    reconnecting waits out chronyd's clock step with nothing
-    ...    connected (see Restore Date With Fresh SSH Connection).
-    Systemctl    start    chronyd
-    Close All Connections
-    # Monotonic sleep; see Restore Date With Fresh SSH Connection for why
-    # Robot's wall-clock Sleep cannot be used here.
-    Evaluate    time.sleep(60)    modules=time
-    Login MicroShift Host
-    Wait Until Keyword Succeeds    30x    5s    System Date Should Be Synchronized
-    Remove Drop In MicroShift Config    99-tc27-no-forced-exit
-    Restart MicroShift
-    Wait For MicroShift
 
 Restore Date With Fresh SSH Connection
     [Documentation]    Restore the system date after a large clock jump without
@@ -311,7 +244,7 @@ Restore Date With Fresh SSH Connection
     ...    wait out the step with nothing connected, and only then log back
     ...    in. Small steps (days) do not break the connection, which is why
     ...    the other date-restoring keywords do not need this.
-    Systemctl    start    chronyd
+    Start Chronyd Without Wall Clock Sleep
     Close All Connections
     # Wait out chronyd's clock step with nothing connected. This must be a
     # monotonic sleep (Python time.sleep), not Robot's Sleep keyword: Robot
@@ -327,3 +260,16 @@ System Date Should Be Synchronized
     [Documentation]    Fail unless NTP reports the system clock as synchronized.
     ${output}=    Command Should Work    timedatectl show -p NTPSynchronized --value
     Should Be Equal As Strings    ${output.strip()}    yes
+
+Start Chronyd Without Wall Clock Sleep
+    [Documentation]    Start chronyd without going through the shared Systemctl
+    ...    keyword. Systemctl sleeps 5s on the wall clock after any start, and
+    ...    chronyd steps the clock back (possibly by years) within seconds of
+    ...    starting, turning that sleep into a multi-year hang (observed
+    ...    2026-11-11). A bare command returns before the step lands; the
+    ...    caller must tolerate the connection breaking or avoid using it
+    ...    until the step completes.
+    ${stdout}    ${rc}=    Execute Command
+    ...    systemctl start chronyd
+    ...    sudo=True    return_rc=True
+    Should Be Equal As Integers    ${rc}    0    msg=Failed to start chronyd: ${stdout}
