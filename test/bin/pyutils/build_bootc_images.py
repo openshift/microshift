@@ -33,20 +33,15 @@ HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 BIB_IMAGE_RHEL9 = "registry.redhat.io/rhel9/bootc-image-builder:latest"
 BIB_IMAGE = "registry.redhat.io/rhel10/bootc-image-builder:latest"
-# CentOS Stream 9 and 10 builder images can be overridden independently.
-# Empty values fall back to the default image.
-BIB_IMAGE_CENTOS_DEFAULT = "quay.io/centos-bootc/bootc-image-builder:latest"
-BIB_IMAGE_CENTOS9 = os.environ.get('BIB_IMAGE_CENTOS9') or BIB_IMAGE_CENTOS_DEFAULT
-BIB_IMAGE_CENTOS10 = os.environ.get('BIB_IMAGE_CENTOS10') or BIB_IMAGE_CENTOS_DEFAULT
+# CentOS Stream 9 images use the last Fedora-based builder, pinned by digest,
+# because the CentOS Stream 10-based builder rejects the SHA1-certified
+# CentOS Stream 9 signing key
+BIB_IMAGE_CENTOS9 = "quay.io/centos-bootc/bootc-image-builder@sha256:2b52843ea2bfda73b0a08d97e76b734393b1d3a804681b9fabb26723bd3a2f0b"
+BIB_IMAGE_CENTOS10 = "quay.io/centos-bootc/bootc-image-builder:latest"
 IBC_IMAGE = "ghcr.io/osbuild/image-builder-cli:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
 FORCE_REBUILD = False
-
-
-def get_builder_images():
-    # Unique images in a stable order, as some of them may share the same reference
-    return list(dict.fromkeys([BIB_IMAGE_RHEL9, BIB_IMAGE, BIB_IMAGE_CENTOS9, BIB_IMAGE_CENTOS10, IBC_IMAGE]))
 
 
 def cleanup_atexit(dry_run):
@@ -57,7 +52,7 @@ def cleanup_atexit(dry_run):
         common.terminate_process(pid)
 
     # Terminate running image builder containers
-    for builder_image in get_builder_images():
+    for builder_image in [BIB_IMAGE_RHEL9, BIB_IMAGE, BIB_IMAGE_CENTOS9, BIB_IMAGE_CENTOS10, IBC_IMAGE]:
         podman_args = [
             "sudo", "podman", "ps",
             "--filter", f"ancestor={builder_image}",
