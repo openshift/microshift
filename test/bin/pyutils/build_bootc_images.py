@@ -33,7 +33,10 @@ HOME_DIR = common.get_env_var("HOME")
 PULL_SECRET = common.get_env_var('PULL_SECRET', f"{HOME_DIR}/.pull-secret.json")
 BIB_IMAGE_RHEL9 = "registry.redhat.io/rhel9/bootc-image-builder:latest"
 BIB_IMAGE = "registry.redhat.io/rhel10/bootc-image-builder:latest"
-BIB_IMAGE_CENTOS = "quay.io/centos-bootc/bootc-image-builder:latest"
+# Using upstream bootc-image-builder image instead of the CentOS one
+# to work around an issue with the CentOS 9 ISO builds.
+# quay.io/centos-bootc/bootc-image-builder:latest
+BIB_IMAGE_CENTOS = "ghcr.io/osbuild/bootc-image-builder:latest"
 IBC_IMAGE = "ghcr.io/osbuild/image-builder-cli:latest"
 GOMPLATE = common.get_env_var('GOMPLATE')
 MIRROR_REGISTRY = common.get_env_var('MIRROR_REGISTRY_URL')
