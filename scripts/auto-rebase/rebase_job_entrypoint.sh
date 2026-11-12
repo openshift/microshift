@@ -20,7 +20,7 @@ fi
 # - rhel-9-release-golang-1.21-openshift-4.16
 # - rhel-9-release-golang-1.22-openshift-4.17
 
-# Following code updates Go version in configure-vm.sh and microshift.spec
+# Following code updates Go version in configure-vm.sh, microshift.spec and Makefile
 # based on the version of Go inside the rebase job's container.
 #
 # It's not part of rebase.sh because we don't want this during manual rebases.
@@ -30,10 +30,11 @@ go_version=$(go version 2>/dev/null | awk '{print $3}' | tr -d '[a-z]')
 sed -i "s/GO_VER=.*/GO_VER=${go_version}/" ./scripts/devenv-builder/configure-vm.sh
 go_version_xy="$(echo "${go_version}" | cut -f1-2 -d.)"
 sed -i "s/^%global golang_version .*/%global golang_version ${go_version_xy}/" ./packaging/rpm/microshift.spec
+sed -i -E "s/^(RPM_BUILDER_IMAGE_TAG := rhel-9-golang-)[0-9]+\.[0-9]+(-openshift-.*)$/\1${go_version_xy}\2/" ./Makefile
 
-if [[ -n "$(git status -s ./scripts/devenv-builder/configure-vm.sh ./packaging/rpm/microshift.spec)" ]]; then
-    echo "Updating Go versions in microshift.spec and configure-vm.sh"
-    git add ./scripts/devenv-builder/configure-vm.sh ./packaging/rpm/microshift.spec
+if [[ -n "$(git status -s ./scripts/devenv-builder/configure-vm.sh ./packaging/rpm/microshift.spec ./Makefile)" ]]; then
+    echo "Updating Go versions in microshift.spec, configure-vm.sh and Makefile"
+    git add ./scripts/devenv-builder/configure-vm.sh ./packaging/rpm/microshift.spec ./Makefile
     git commit -m "Update Go version"
 fi
 
