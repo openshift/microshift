@@ -25,53 +25,53 @@ spec:
     spec:
       serviceAccountName: service-ca
       containers:
-        - name: service-ca-controller
-          image: '{{ .ReleaseImage.service_ca_operator }}'
-          imagePullPolicy: IfNotPresent
-          command: ["service-ca-operator", "controller"]
-          args:
-            - -v=2
-          ports:
-            - containerPort: 8443
-          securityContext:
-            runAsNonRoot: true
-          resources:
-            requests:
-              memory: 120Mi
-              cpu: 10m
-          env:
-            - name: OPERATOR_IMAGE_VERSION
-          terminationMessagePolicy: FallbackToLogsOnError
-          volumeMounts:
-            - mountPath: /var/run/secrets/signing-key
-              name: signing-key
-            - mountPath: /var/run/configmaps/signing-cabundle
-              name: signing-cabundle
-            - mountPath: /var/run/configmaps/config
-              name: config
+      - name: service-ca-controller
+        image: ${IMAGE}
+        imagePullPolicy: IfNotPresent
+        command: ["service-ca-operator", "controller"]
+        args:
+        - --config=/var/run/configmaps/config/controller-config.yaml
+        - --terminate-on-files=/var/run/configmaps/config/controller-config.yaml
+        ports:
+        - containerPort: 8443
+        securityContext:
+          runAsNonRoot: true
+        resources:
+          requests:
+            memory: 120Mi
+            cpu: 10m
+        env:
+        - name: OPERATOR_IMAGE_VERSION
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /var/run/secrets/signing-key
+          name: signing-key
+        - mountPath: /var/run/configmaps/signing-cabundle
+          name: signing-cabundle
+        - mountPath: /var/run/configmaps/config
+          name: config
       volumes:
-        - name: signing-key
-          secret:
-            secretName: '{{.TLSSecret}}'
-        - name: signing-cabundle
-          configMap:
-            name: '{{.CAConfigMap}}'
-        - name: config
-          configMap:
-            name: service-ca-controller-config
+      - name: signing-key
+        secret:
+          secretName: signing-key
+      - name: signing-cabundle
+        configMap:
+          name: signing-cabundle
+      - name: config
+        configMap:
+          name: service-ca-controller-config
       nodeSelector:
         node-role.kubernetes.io/master: ""
       priorityClassName: "system-cluster-critical"
       tolerations:
-        - key: node-role.kubernetes.io/master
-          operator: Exists
-          effect: "NoSchedule"
-        - key: "node.kubernetes.io/unreachable"
-          operator: "Exists"
-          effect: "NoExecute"
-          tolerationSeconds: 120
-        - key: "node.kubernetes.io/not-ready"
-          operator: "Exists"
-          effect: "NoExecute"
-          tolerationSeconds: 120
-  replicas: 1
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: "NoSchedule"
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 120

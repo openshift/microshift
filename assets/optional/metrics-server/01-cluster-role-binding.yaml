@@ -11,8 +11,6 @@ roleRef:
   kind: ClusterRole
   name: system:metrics-server
 subjects:
-  - kind: ServiceAccount
-    name: metrics-server
-    namespace: openshift-monitoring
-  - kind: User
-    name: system:metrics-server
+- kind: ServiceAccount
+  name: metrics-server
+  namespace: openshift-monitoring
