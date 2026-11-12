@@ -7,6 +7,7 @@ Library             SSHLibrary
 Library             ../../resources/journalctl.py
 Library             ../../resources/prometheus.py
 Library             ../../resources/loki.py
+Library             ../../resources/DataFormats.py
 Resource            ../../resources/kubeconfig.resource
 Resource            ../../resources/common.resource
 Resource            ../../resources/microshift-process.resource
@@ -24,6 +25,10 @@ ${JOURNAL_CUR}              ${EMPTY}
 ${DEFAULT_CONFIG_PATH}      /etc/microshift/observability/opentelemetry-collector-large.yaml
 ${OTEL_CONFIG_PATH}         /etc/microshift/observability/opentelemetry-collector.yaml
 ${TEST_CONFIG_PATH}         assets/observability/otel_config.yaml
+${CERTIFICATE_LOCK}         /var/lib/microshift-backups/certs.lock
+${CERT_LOCK_UNIT}           microshift-cert-metrics-lock
+# A one-year standard certificate enters its rotation window after about 153 days.
+${FUTURE_DAYS}              160
 
 
 *** Test Cases ***
@@ -92,6 +97,53 @@ Metrics Server Metrics Are Exported Via Scrape Drop-In
     ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${METRIC}
     Wait Until Keyword Succeeds    60s    5s
     ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
+
+Certificate Metrics Follow Renewal Preparation And Activation
+    [Documentation]    A prepared CA renewal sets microshift_certificate_renewal_pending to 1
+    ...    without changing the active certificates' metrics, and the value reaches Prometheus
+    ...    through the OpenTelemetry pipeline. While the operation lock is held the collection
+    ...    reports failure and drops its series instead of serving a stale observation. One
+    ...    activating restart clears the flag, every renewed certificate reports the reissued
+    ...    validity, and the metrics match the CLI. CA renewal reissues every certificate, so it
+    ...    covers serving renewal too. OCPEDGE-3226.
+    [Tags]    certificates    restart
+    ${before}    Wait For Certificate Metrics    0
+    ${stdout}    Command Should Work    microshift certs renew --ca -o json
+    ${result}    Json Parse    ${stdout}
+    ${pending}    Wait For Certificate Metrics    1
+    Should Be Equal    ${before}[certs]    ${pending}[certs]
+    Backend Should Report Renewal Pending
+    Stale Collection Is Reported During Lock Contention
+    # Stop the collector across the restart so it never logs transient scrape errors
+    # against the briefly-unavailable endpoint; the teardown restarts it, which also
+    # picks up its reissued client certificate.
+    Systemctl    stop    microshift-observability
+    Restart MicroShift
+    ${active}    Wait For Certificate Metrics    0
+    Renewed Metrics Match Renewal Result    ${result}    ${before}    ${active}
+    Metrics Match Certificate Status    ${active}
+    [Teardown]    Run Keywords
+    ...    Execute Command    systemctl stop ${CERT_LOCK_UNIT}    sudo=True
+    ...    AND    Run Keyword If Test Failed    Restart MicroShift
+    ...    AND    Systemctl    restart    microshift-observability
+
+Certificate Metrics Follow Automatic Rotation
+    [Documentation]    When the clock moves past the standard certificates' rotation window,
+    ...    MicroShift regenerates them on the automatic restart and every standard-policy
+    ...    certificate reports a later not_after, with metrics matching the CLI. The collector
+    ...    is stopped across the clock jump, and the future-dated Kubernetes events are deleted
+    ...    before it starts again, so nothing future-dated reaches the shared Prometheus and Loki
+    ...    backends. OCPEDGE-3226.
+    [Tags]    certificates    restart
+    [Setup]    Systemctl    stop    microshift-observability
+    ${before}    Wait For Certificate Metrics    0
+    Move Clock Past Standard Rotation
+    ${after}    Wait For Certificate Metrics    0
+    Standard Certificates Should Have Rotated    ${before}    ${after}
+    Metrics Match Certificate Status    ${after}
+    [Teardown]    Run Keywords    Restore System Date
+    ...    AND    Run With Kubeconfig    oc delete events --all --all-namespaces
+    ...    AND    Systemctl    start    microshift-observability
 
 Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration
@@ -192,3 +244,119 @@ Render Otel Test Config
     Command Should Work    sed -i "s|{{LOKI_HOST}}|${loki_host_formatted}|g" ${OTEL_CONFIG_PATH}
     Command Should Work    sed -i "s|{{LOKI_PORT}}|${LOKI_PORT}|g" ${OTEL_CONFIG_PATH}
     Command Should Work    sed -i "s|{{PROM_EXPORTER_PORT}}|${PROM_EXPORTER_PORT}|g" ${OTEL_CONFIG_PATH}
+
+Read Local Certificate Metrics
+    [Documentation]    Scrape MicroShift's loopback metrics endpoint on the host and parse it.
+    ${output}    Command Should Work
+    ...    curl --noproxy '*' --fail --silent --show-error --max-time 5 ${LOCAL_METRICS_URL}
+    ${metrics}    Parse Certificate Metrics    ${output}
+    RETURN    ${metrics}
+
+Wait For Certificate Metrics
+    [Documentation]    Wait for a successful collection reporting the given renewal_pending value
+    ...    and return it. A changed pending value, or a new MicroShift process (which starts
+    ...    with no previous collection), proves the snapshot is fresh.
+    [Arguments]    ${pending}
+    ${metrics}    Wait Until Keyword Succeeds    150s    5s
+    ...    Certificate Metrics Should Report    ${pending}
+    RETURN    ${metrics}
+
+Certificate Metrics Should Report
+    [Documentation]    Read the endpoint and require a successful collection with the given pending value.
+    [Arguments]    ${pending}
+    ${metrics}    Read Local Certificate Metrics
+    Should Be Equal As Numbers    ${metrics}[success]    1
+    Should Be Equal As Numbers    ${metrics}[pending]    ${pending}
+    RETURN    ${metrics}
+
+Renewed Metrics Match Renewal Result
+    [Documentation]    Every renewed certificate reports the newNotAfter the renewal printed and a
+    ...    later not_before than before. not_before is the activation proof: same-day renewals
+    ...    keep the same midnight-aligned not_after, but they are always issued later.
+    [Arguments]    ${result}    ${before}    ${active}
+    FOR    ${item}    IN    @{result}[items]
+        VAR    ${key}    ${item}[service]/${item}[name]
+        ${expected}    Evaluate
+        ...    int(datetime.datetime.fromisoformat($item['newNotAfter'].replace('Z', '+00:00')).timestamp())
+        ...    modules=datetime
+        Should Be Equal As Numbers    ${active}[certs][${key}][not_after]    ${expected}
+        Should Be True    ${active}[certs][${key}][not_before] > ${before}[certs][${key}][not_before]
+        ...    msg=${key} was not reissued
+    END
+
+Metrics Match Certificate Status
+    [Documentation]    The certificate set and each certificate's status match `microshift certs status`.
+    [Arguments]    ${metrics}
+    ${stdout}    Command Should Work    microshift certs status -o json
+    ${status}    Json Parse    ${stdout}
+    ${expected}    Evaluate    {i['service'] + '/' + i['name']: i['status'] for i in $status['items']}
+    ${actual}    Evaluate    {k: v['status'] for k, v in $metrics['certs'].items()}
+    Should Be Equal    ${actual}    ${expected}
+
+Standard Certificates Should Have Rotated
+    [Documentation]    Every standard-policy certificate (the one-year leaves that cross their
+    ...    rotation window after the clock jump) reports a later not_after than before.
+    [Arguments]    ${before}    ${after}
+    ${keys}    Evaluate    [k for k, v in $after['certs'].items() if v['rotation_policy'] == 'standard']
+    Should Not Be Empty    ${keys}
+    FOR    ${key}    IN    @{keys}
+        Should Be True    ${after}[certs][${key}][not_after] > ${before}[certs][${key}][not_after]
+        ...    msg=${key} did not rotate
+    END
+
+Backend Should Report Renewal Pending
+    [Documentation]    renewal_pending=1 reaches Prometheus for this host through the OpenTelemetry
+    ...    pipeline. The wait covers the collector refresh, the scrape and the remote write.
+    ${hostname}    Command Should Work    hostname
+    VAR    ${query}    microshift_certificate_renewal_pending{host_name="${hostname.strip()}"} == 1
+    Wait Until Keyword Succeeds    180s    10s
+    ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${query}    ${False}
+
+Stale Collection Is Reported During Lock Contention
+    [Documentation]    While the certificate operation lock is held exclusively, the collection
+    ...    reports failure and drops the certificate and pending series without advancing
+    ...    last-success. Releasing the lock restores a successful collection with pending intact.
+    # Hold the lock until stopped explicitly, so it cannot expire mid-check.
+    Command Should Work
+    ...    systemd-run --quiet --collect --unit=${CERT_LOCK_UNIT} flock -x ${CERTIFICATE_LOCK} sleep infinity
+    Wait Until Keyword Succeeds    10x    1s    Command Should Fail    flock -n ${CERTIFICATE_LOCK} true
+    # Read the epoch only once the lock is held: any later collection must fail,
+    # so a successful one can only predate this moment.
+    ${lock_epoch}    Command Should Work    date +%s
+    Wait Until Keyword Succeeds    90s    5s    Collection Reports Failure    ${lock_epoch}
+    Command Should Work    systemctl stop ${CERT_LOCK_UNIT}
+    Wait For Certificate Metrics    1
+
+Collection Reports Failure
+    [Documentation]    A failed observation sets collection_success to 0, drops the certificate and
+    ...    renewal_pending series, and keeps the previous last-success timestamp.
+    [Arguments]    ${lock_epoch}
+    ${metrics}    Read Local Certificate Metrics
+    Should Be Equal As Numbers    ${metrics}[success]    0
+    Should Be Equal    ${metrics}[pending]    ${None}
+    Should Be Empty    ${metrics}[certs]
+    Should Be True    0 < ${metrics}[last_success] <= ${lock_epoch.strip()}
+
+Move Clock Past Standard Rotation
+    [Documentation]    Stop time sync and move the clock ${FUTURE_DAYS} days ahead, past the
+    ...    rotation window of the one-year standard certificates, then wait for MicroShift to
+    ...    restart itself and regenerate them.
+    ${ushift_pid}    MicroShift Process ID
+    Systemctl    stop    chronyd
+    ${future_date}    Command Should Work    TZ=UTC date "+%Y-%m-%d %H:%M:%S" -d "+${FUTURE_DAYS} day"
+    Command Should Work    TZ=UTC timedatectl set-time "${future_date}"
+    Wait Until MicroShift Process ID Changes    ${ushift_pid}
+    Setup Kubeconfig
+    Wait For MicroShift Healthcheck Success
+
+Restore System Date
+    [Documentation]    Restart time sync so the clock returns to real time and wait for
+    ...    MicroShift to restart onto it. Skips if chronyd is already active.
+    ${stdout}    ${rc}    Execute Command
+    ...    systemctl is-active chronyd    sudo=True    return_rc=True
+    IF    '${stdout.strip()}' == 'active'    RETURN
+    ${ushift_pid}    MicroShift Process ID
+    Systemctl    start    chronyd
+    Wait Until MicroShift Process ID Changes    ${ushift_pid}
+    Setup Kubeconfig
+    Wait For MicroShift Healthcheck Success
