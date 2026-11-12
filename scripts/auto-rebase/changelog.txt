@@ -1,0 +1,29 @@
+- api embedded-component 1ebdd7bba8e6c503a1f61c6d467ed877783826e1 to 3e5cec41451c4adf9642fe6fb80a71c2fd4e6b3c
+  - b1568bc4 2026-10-19T13:04:49-04:00 Switch to slices stable sort on manifest merging
+  - 0b8b6d31 2026-10-15T12:38:32-04:00 Update VSphereMultiVCenters test for VSphereMultiVCenterDay2 interactions
+  - e4e9940e 2026-10-15T12:37:42-04:00 Regenerate derived artifacts for VSphereMultiVCenterDay2 backport
+  - 64add740 2026-10-15T12:34:40-04:00 Use atomic merge for x-kubernetes-validations in manifest merge schema
+  - f1e3a9de 2026-10-15T12:34:30-04:00 Hardcode vcenters MaxItems to 3 since VSphereMultiVCenters is GA
+  - b9a09d18 2026-10-15T11:02:09-04:00 Added vSphere failure domain to vcenter ratcheting tests
+  - 8884c898 2026-10-15T11:02:04-04:00 Added vSphere failure domain to vcenter check
+  - 730377ab 2026-10-15T11:01:52-04:00 Revert "TRT-2701: Revert "SPLAT-2793: Promoted VSphereMultiVCenterDay2 feature gate to TP""
+  - 62cd2c19 2026-10-15T11:01:42-04:00 Updated vcenter logic to make sure no server switching occurs
+  - 602e8ba9 2026-10-15T11:01:16-04:00 Added some ratcheting tests to cover change in min size of vCenters
+  - caabe724 2026-10-15T11:00:26-04:00 Modified parent logic to not check size, but only changes in existence, and other review suggestions.
+  - 76fc8b66 2026-10-15T10:59:19-04:00 Added vSphere Day 2 tests
+  - a577497d 2026-10-15T10:59:14-04:00 Added vSphere Day 2 logic to CRDs
+  - c25bd8ed 2026-10-15T10:56:00-04:00 Added new feature gate VSphereMultiVCenterDay2
+
+- machine-config-operator embedded-component d316db2249aa01affeec463d52ef453da2a3b5ce to 5c4da8ee05faad19b411f88da73512fb841db86a
+  - 2c36e5b7 2026-11-06T23:27:47+00:00 chore: update AMIs
+
+- ovn-kubernetes image-amd64 041dd90d7eef2d1ac5e84fc4aa448aadc208c7b7 to f50842657ce6358847b981330921cd162b9b7405
+  - 67c195f5 2026-10-29T16:16:02+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
+  - 92374f84 2026-10-20T11:55:52-04:00 Fixes gateway egress IP node update logic
+  - e0883fbf 2026-10-20T11:55:49-04:00 EgressIP: Fix crash from mutating node informer object
+
+- ovn-kubernetes image-arm64 041dd90d7eef2d1ac5e84fc4aa448aadc208c7b7 to f50842657ce6358847b981330921cd162b9b7405
+  - 67c195f5 2026-10-29T16:16:02+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
+  - 92374f84 2026-10-20T11:55:52-04:00 Fixes gateway egress IP node update logic
+  - e0883fbf 2026-10-20T11:55:49-04:00 EgressIP: Fix crash from mutating node informer object
+
