@@ -839,7 +839,8 @@ Snapshot Comparison Script
     ...    ternaries only, wrapped inside brackets): Robot continuation lines
     ...    cannot carry leading spaces, so indented Python would arrive
     ...    flattened and fail to parse.
-    ${script}=    Catenate    SEPARATOR=\n
+    ${script}=    Catenate
+    ...    SEPARATOR=\n
     ...    import sys
     ...    snap = lambda p: {
     ...    r[0]: dict(zip(("fp", "spki", "serial", "subject", "san"), r[1:]))
