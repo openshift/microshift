@@ -1,31 +1,4 @@
-- api embedded-component f94a02c852f17a74216c277542c391b2c851d6ce to 9803e9208397dca8280dfeeb6270216bcf035098
-  - 0166a2cd 2026-11-04T13:08:18-03:00 OCPBUGS-137031: Rename ingress struct to consoleingress
-  - b12ca7d9 2026-11-04T12:37:03-03:00 OCPBUGS-137031: Rename ingress file to ingresscontroller
-
-- cluster-ingress-operator embedded-component a3092c7b6747019c0173224a7065dd5b859fc9c6 to 3ff64f4447a3e0e4fb7fa81980875841b436724c
-  - c35d6f2 2026-10-30T23:01:08Z Remove unsupported init-router tmp mount
-  - ee6ec49 2026-10-30T23:01:08Z NE-2837: Enable readOnlyRootFilesystem for cluster ingress components
-
-- machine-config-operator embedded-component 6ee7ec8468a63d46e5fecb4a60244357b1b2a6ad to 29c5ded910b4877a0c554d93fbc14b233f948bd0
-  - e9051037 2026-11-03T08:30:00-05:00 operator: add machineconfignode, pinnedimageset, machineosconfig, and machineosbuild resources to relatedObjects
-  - ce9a3872 2026-10-30T20:07:41Z MCD: Fix OCL rollback failure when extensions are installed
-
-- operator-framework-olm embedded-component 89d41cf9a16e0905e5ac562708a53c21f5e657f9 to 4be0cbe0a8f1ddec542d05aced8aabb835a831c8
-  - 55363849 2026-10-07T10:35:32-04:00 OCPBUGS-129499: Restore registry-server startup probe FailureThreshold to 15
-
-- router image-amd64 622d2dfc5256a723cf2ace4b742f4331918e8647 to 9f128654822c99daf9be794c0b5887ba52d13d9f
-  - feafa56 2026-11-02T13:57:45Z OCPBUGS-77056: Persist external certificate status through contention
-  - 2311ad4 2026-11-02T13:57:45Z OCPBUGS-77056: Avoid false contention on certificate status changes
-  - c9bb11d 2026-11-02T13:57:45Z OCPBUGS-77056: Reconcile restricted routes after admission
-  - 7240332 2026-11-02T13:57:45Z OCPBUGS-77056: Recheck newly admitted external cert routes
-  - 0fa6433 2026-11-02T13:57:45Z Make gofmt verification handle nested modules
-  - d345513 2026-11-02T13:57:44Z OCPBUGS-77056: Restore route admission at scale
-
-- router image-arm64 622d2dfc5256a723cf2ace4b742f4331918e8647 to 9f128654822c99daf9be794c0b5887ba52d13d9f
-  - feafa56 2026-11-02T13:57:45Z OCPBUGS-77056: Persist external certificate status through contention
-  - 2311ad4 2026-11-02T13:57:45Z OCPBUGS-77056: Avoid false contention on certificate status changes
-  - c9bb11d 2026-11-02T13:57:45Z OCPBUGS-77056: Reconcile restricted routes after admission
-  - 7240332 2026-11-02T13:57:45Z OCPBUGS-77056: Recheck newly admitted external cert routes
-  - 0fa6433 2026-11-02T13:57:45Z Make gofmt verification handle nested modules
-  - d345513 2026-11-02T13:57:44Z OCPBUGS-77056: Restore route admission at scale
+- machine-config-operator embedded-component 29c5ded910b4877a0c554d93fbc14b233f948bd0 to 32d59dd3bbe513d8430516c192ec5788385f55b2
+  - fe3ca30c 2026-11-06T23:29:16Z chore: update AMIs
+  - 75dd7ad7 2026-10-29T13:10:34Z daemon & upgrademonitor: fix MCN stale current config edge case
 
