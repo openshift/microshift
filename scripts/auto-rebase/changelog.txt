@@ -1,17 +1,11 @@
-- machine-config-operator embedded-component 82e41b82787613e6a07313b3b99e5d6513627da1 to 5898231e3a667bed143e9937556ff325f449e930
-  - a39e6599 2026-10-21T15:27:37Z mcs: replace wildcard permissions with explicit verbs
+- kubernetes-kube-storage-version-migrator embedded-component 0f8a4eb84ace9b746cf25d51d80dacf34ca5f953 to 0c591355322c626c51e22f5071cbd61ed1d452dc
+  - bbc90a7 2026-11-04T16:53:42Z UPSTREAM: <carry>: [release-4.20] OCPBUGS-103897: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.50.0-sec.4 to address CVE-2026-33814
 
-- ovn-kubernetes image-amd64 8608e797c1b08e75fead3c12b53d4fd5b3b50462 to 6f5e049f27d2ac6293e46758d45cd21a075ad726
-  - 00d51c11 2026-10-31T18:48:33Z egressip: handle LinkNotFoundError gracefully in isEgressIPOnLink
-  - 67c195f5 2026-10-29T16:16:02+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
-  - 730b2489 2026-10-27T17:47:33+05:30 Fix UDN controller startup timeout during pod sync
-  - 92374f84 2026-10-20T11:55:52-04:00 Fixes gateway egress IP node update logic
-  - e0883fbf 2026-10-20T11:55:49-04:00 EgressIP: Fix crash from mutating node informer object
+- machine-config-operator embedded-component 5898231e3a667bed143e9937556ff325f449e930 to 45ac1ae9219992cb7f21d84a547881d62799e318
+  - bbea61c0 2026-11-09T17:38:01Z NO-ISSUE: Temporarily skip four OS build controller unit tests
+  - 0ae3bd10 2026-11-06T23:27:02Z chore: update AMIs
+  - 3324533f 2026-10-30T15:18:17-05:00 MCD: Fix OCL rollback failure when extensions are installed
 
-- ovn-kubernetes image-arm64 8608e797c1b08e75fead3c12b53d4fd5b3b50462 to 6f5e049f27d2ac6293e46758d45cd21a075ad726
-  - 00d51c11 2026-10-31T18:48:33Z egressip: handle LinkNotFoundError gracefully in isEgressIPOnLink
-  - 67c195f5 2026-10-29T16:16:02+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
-  - 730b2489 2026-10-27T17:47:33+05:30 Fix UDN controller startup timeout during pod sync
-  - 92374f84 2026-10-20T11:55:52-04:00 Fixes gateway egress IP node update logic
-  - e0883fbf 2026-10-20T11:55:49-04:00 EgressIP: Fix crash from mutating node informer object
+- operator-framework-olm embedded-component e1d090d165aa3e31de614b18da7cf4dd2f6976f6 to fe6fa07eeec7fd97d8294b2d28ac8b2eb4e9df37
+  - 49c63ef6 2026-10-07T10:39:09-04:00 OCPBUGS-129501: Restore registry-server startup probe FailureThreshold to 15
 
