@@ -1,8 +1,0 @@
-- cluster-network-operator embedded-component bb2b3f7e6f3d628ddde0a17a107f01ce9db34afb to 30e316ec0685d70c02cccbf656c7f44dc8278018
-  - 0ac1d1c 2026-08-18T14:36:20+00:00 Skip _stackmanager execution for libreswan 5.3+
-
-- machine-config-operator embedded-component f6da18fbc1ae60c86633f5737e80ebbbaa329eae to d680cca82e00522cae4cb30784aed05ca8dad79f
-  - 276e79dd 2026-11-02T09:54:35-05:00 Split wait-for-ipsec-connect into two services to avoid ipsec restart
-  - d550560d 2026-10-27T11:02:49-04:00 Use auto=start only for IPsec out connections
-  - 10a6fe73 2026-10-27T11:02:47-04:00 Modify regex for ipsec showstates command
-
