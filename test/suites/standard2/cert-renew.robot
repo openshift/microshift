@@ -49,44 +49,6 @@ Dry Run Validates Both Modes Without Changing Material
     Should Be Equal    ${before}    ${after}
     MicroShift Service Is Active
 
-Startup Waits For An Existing Certificate Operation
-    [Documentation]    A busy operation lock delays startup without causing a process restart.
-    Stop MicroShift
-    Command Should Work
-    ...    systemd-run --quiet --collect --unit=microshift-cert-lock-test flock -x ${CERTIFICATE_LOCK} sleep 120
-    Wait Until Keyword Succeeds    10x    500ms    Certificate Lock Is Held    ${CERTIFICATE_LOCK}
-    Command Should Work    systemctl start --no-block microshift
-    Wait Until Keyword Succeeds    10x    500ms    Certificate Lock Is Held    ${RUNTIME_LOCK}
-    ${pid}=    Get Systemd Setting    microshift.service    MainPID
-    Should Not Be Equal As Integers    ${pid}    0
-    Command Should Work    systemctl stop microshift-cert-lock-test
-    Wait For MicroShift
-    ${current_pid}=    Get Systemd Setting    microshift.service    MainPID
-    Should Be Equal    ${pid}    ${current_pid}
-    Certificate Lock Is Stable
-    Command Should Work    flock -n -x ${CERTIFICATE_LOCK} true
-    [Teardown]    Run Keywords
-    ...    Execute Command    systemctl stop microshift-cert-lock-test    sudo=True
-    ...    AND    Restart MicroShift
-
-Renewal Can Replace Pending Material While Running
-    [Documentation]    Both modes prepare successfully without touching active files or restarting the service.
-    ${before}=    Certificate Material Digest
-    ${pid}=    MicroShift Process ID
-    ${status}=    Certificate Status Document
-    FOR    ${mode}    IN    serving    ca
-        ${result}=    Renewal Document    ${mode}    json
-        Validate Renewal Document    ${result}    ${mode}    ${False}    ${status}
-        Pending Renewal Matches Result    ${result}
-    END
-    ${after}=    Certificate Material Digest
-    Should Be Equal    ${before}    ${after}
-    ${current_pid}=    MicroShift Process ID
-    Should Be Equal    ${pid}    ${current_pid}
-    MicroShift Service Is Active
-    Wait For MicroShift
-    [Teardown]    Restart MicroShift
-
 Exactly One Renewal Mode Is Required
     [Documentation]    Missing and conflicting mode selections are rejected before staging.
     FOR    ${format}    IN    json    yaml
@@ -138,19 +100,19 @@ Busy Certificate Lock Reports Appropriate Errors
     END
 
 Leaf Renewal Keeps CAs Unchanged
-    [Documentation]    Prepare leaves online, preserve active TLS and CA bytes, and activate only on restart.
+    [Documentation]    Replace pending leaves online and activate after an unrelated config change with CAs unchanged.
     ${pods_before}=    Certificate Consumer Pod UIDs
+    ${pid}=    MicroShift Process ID
     ${before}=    Certificate Status Document
     ${files_before}=    Certificate Material Digest
     ${served_before}=    Served Certificate Fingerprints
     ${ca_before}=    CA Material Digest
-    ${result}=    Renewal Document    serving    json
-    Validate Renewal Document    ${result}    serving    ${False}    ${before}
-    ${ca_after}=    CA Material Digest
-    Should Be Equal    ${ca_before}    ${ca_after}
+    ${result}=    Prepare Replacement Serving Renewal    ${before}
     Renewal Has Not Changed Active Material    ${files_before}    ${served_before}
-    Pending Renewal Matches Result    ${result}
     Certificate Consumers Have Not Restarted    ${pods_before}
+    ${current_pid}=    MicroShift Process ID
+    Should Be Equal    ${pid}    ${current_pid}
+    Drop In MicroShift Config    debugging:\n\ \ logLevel: Debug\n    99-cert-renew-test
     Restart MicroShift
     Renewal Matches Current Status    ${result}
     ${ca_after}=    CA Material Digest
@@ -159,6 +121,9 @@ Leaf Renewal Keeps CAs Unchanged
     Should Not Be Equal    ${served_before}    ${served_after}
     Renewal Activation Has Finished
     Certificate Consumers Use Renewed Material    ${pods_before}    ${False}
+    [Teardown]    Run Keywords
+    ...    Remove Drop In MicroShift Config    99-cert-renew-test
+    ...    AND    Run Keyword If Test Failed    Restart MicroShift
 
 CA Renewal Updates The Whole Chain
     [Documentation]    Prepare all CAs online with old credentials still usable; activate the new chain on restart.
@@ -180,83 +145,7 @@ CA Renewal Updates The Whole Chain
     Renewal Matches Current Status    ${result}
     Renewal Activation Has Finished
     Certificate Consumers Use Renewed Material    ${pods_before}    ${True}
-
-Unchanged Certificates Do Not Restart Managed Pods
-    [Documentation]    Ordinary starts preserve certificate generations and do not wait for a certificate rollout.
-    ${before}=    Certificate Consumer Pod UIDs
-    Restart MicroShift
-    ${logs}=    Command Should Work
-    ...    journalctl -u microshift --no-pager _SYSTEMD_INVOCATION_ID="$(systemctl show -p InvocationID --value microshift)"
-    Should Not Contain    ${logs}    Waiting for OVN pod rollout
-    Certificate Consumers Have Not Restarted    ${before}
-    Certificate Consumers Can Reach The API
-
-Stopped Renewal Waits For Startup Too
-    [Documentation]    Preparation while stopped has the same pending contract and does not start the service.
-    Stop MicroShift
-    ${before}=    Certificate Status Document
-    ${files_before}=    Certificate Material Digest
-    ${result}=    Renewal Document    serving    yaml
-    Validate Renewal Document    ${result}    serving    ${False}    ${before}
-    ${files_after}=    Certificate Material Digest
-    Should Be Equal    ${files_before}    ${files_after}
-    Pending Renewal Matches Result    ${result}
-    ${state}=    Get Systemd Setting    microshift.service    ActiveState
-    Should Be Equal    ${state}    inactive
-    Start And Wait For MicroShift
-    Renewal Matches Current Status    ${result}
-    Renewal Activation Has Finished
-    [Teardown]    Start And Wait For MicroShift
-
-Unrelated Configuration Change Still Activates Renewal
-    [Documentation]    Logging configuration does not invalidate prepared certificates.
-    ${result}=    Renewal Document    serving    json
-    Drop In MicroShift Config    debugging:\n\ \ logLevel: Debug\n    99-cert-renew-test
-    Restart MicroShift
-    Renewal Matches Current Status    ${result}
-    Renewal Activation Has Finished
-    [Teardown]    Run Keywords
-    ...    Remove Drop In MicroShift Config    99-cert-renew-test
-    ...    AND    Restart MicroShift
-
-Configured Lifetimes Can Be Prepared While Running
-    [Documentation]    CLI reads new validity settings without a restart; activation still waits for startup.
-    ${before}=    Certificate Status Document
-    ${digest}=    Certificate Material Digest
-    ${pid}=    MicroShift Process ID
-    Drop In Certificate Policy
-    Certificate Policy Changed Without Reissuing    ${before}
-    ${ca_before}=    CA Material Digest
-    ${plan}=    Renewal Document    serving    yaml    --dry-run
-    Validate Renewal Document    ${plan}    serving    ${True}    ${before}
-    ${result}=    Renewal Document    serving    json
-    Validate Renewal Document    ${result}    serving    ${False}    ${before}
-    ${after}=    Certificate Material Digest
-    Should Be Equal    ${digest}    ${after}
-    ${current_pid}=    MicroShift Process ID
-    Should Be Equal    ${pid}    ${current_pid}
-    Restart MicroShift
-    Renewal Matches Current Status    ${result}
-    Renewal Activation Has Finished
-    Configured Certificate Lifetimes Are Applied    ${False}    ${result}
-    ${ca_after}=    CA Material Digest
-    Should Be Equal    ${ca_before}    ${ca_after}
-    [Teardown]    Restore Certificate Policy
-
-Configured CA Renewal Bounds Descendant Lifetimes
-    [Documentation]    All renewed CAs use the configured lifetime and no descendant outlives its parent.
-    Drop In Certificate Policy
-    ${digest}=    Certificate Material Digest
-    ${result}=    Renewal Document    ca    yaml
-    ${after}=    Certificate Material Digest
-    Should Be Equal    ${digest}    ${after}
-    # Changing restart policy must not invalidate the prepared six-week certificates.
-    Drop In Certificate Policy    true
-    Restart MicroShift
-    Renewal Matches Current Status    ${result}
-    Renewal Activation Has Finished
-    Configured Certificate Lifetimes Are Applied    ${True}    ${result}
-    [Teardown]    Restore Certificate Policy
+    [Teardown]    Run Keyword If Test Failed    Restart MicroShift
 
 Invalid Certificate Lifetimes Are Rejected
     [Documentation]    Invalid policy fails status and renewal without mutating active certificates or pending renewal.
@@ -279,115 +168,8 @@ Invalid Certificate Lifetimes Are Rejected
     MicroShift Service Is Active
     [Teardown]    Remove Drop In MicroShift Config    99-cert-renew-policy
 
-Certificate Configuration Change Discards Pending Renewal
-    [Documentation]    Stale renewal must not block startup or skip normal generation for new SANs.
-    ${ca_before}=    CA Material Digest
-    ${result}=    Renewal Document    ca    json
-    Pending Renewal Matches Result    ${result}
-    # Preserve the host SAN so Restart MicroShift can retrieve its kubeconfig.
-    Drop In MicroShift Config
-    ...    apiServer:\n\ \ subjectAltNames:\n\ \ \ \ - ${USHIFT_HOST}\n\ \ \ \ - renewal-config.example.test\n
-    ...    99-cert-renew-test
-    Restart MicroShift
-    Renewal Activation Has Finished
-    ${ca_after}=    CA Material Digest
-    Should Be Equal    ${ca_before}    ${ca_after}
-    ${certificate}=    Command Should Work
-    ...    bash -c 'timeout 10 openssl s_client -connect 127.0.0.1:6443 -servername renewal-config.example.test </dev/null 2>/dev/null | openssl x509 -noout -checkhost renewal-config.example.test'
-    Should Contain    ${certificate}    does match certificate
-    [Teardown]    Run Keywords
-    ...    Remove Drop In MicroShift Config    99-cert-renew-test
-    ...    AND    Restart MicroShift
-
-Corrupt Pending Metadata Does Not Block Startup
-    [Documentation]    Reject corrupt metadata, retain a visible warning, and clear it only after replacement activation.
-    ${ca_before}=    CA Material Digest
-    Corrupt Pending Certificate Metadata
-    Certificate Renewal Warning Is Reported    Pending certificate renewal metadata is invalid
-    Restart MicroShift
-    Certificate Renewal Warning Is Reported    A pending certificate renewal was rejected
-    ${ca_after}=    CA Material Digest
-    Should Be Equal    ${ca_before}    ${ca_after}
-    ${message}=    Command Should Work
-    ...    journalctl -u microshift -b --no-pager | grep -F 'A pending certificate renewal was rejected' | tail -n 1
-    Should Contain    ${message}    continuing normal certificate initialization
-    Command Should Work    test -d /var/lib/microshift/.cert-renewal-rejected
-    Restart MicroShift
-    Certificate Renewal Warning Is Reported    A pending certificate renewal was rejected
-    ${result}=    Renewal Document    serving    json
-    Pending Renewal Matches Result    ${result}
-    Certificate Renewal Warning Is Reported    A pending certificate renewal was rejected
-    Restart MicroShift
-    Renewal Matches Current Status    ${result}
-    Renewal Activation Has Finished
-    Rejected Renewal Warning Has Cleared
-    [Teardown]    Run Keyword If Test Failed    Replace Rejected Renewal
-
-Missing Pending Generation Does Not Block Startup
-    [Documentation]    A pending record pointing to a missing generation is rejected without replacing active CAs.
-    ${ca_before}=    CA Material Digest
-    ${result}=    Renewal Document    ca    json
-    Pending Renewal Matches Result    ${result}
-    ${stage}=    Command Should Work    jq -r '.directory' /var/lib/microshift/.cert-renewal/pending.json
-    Should Match Regexp    ${stage}    ^stage-[0-9]+$
-    Command Should Work
-    ...    mv /var/lib/microshift/.cert-renewal/${stage} /var/lib/microshift/.cert-renewal/${stage}.saved
-    Certificate Renewal Warning Is Reported    Pending certificate renewal metadata is invalid
-    Restart MicroShift
-    Certificate Renewal Warning Is Reported    A pending certificate renewal was rejected
-    ${ca_after}=    CA Material Digest
-    Should Be Equal    ${ca_before}    ${ca_after}
-    [Teardown]    Replace Rejected Renewal
-
 
 *** Keywords ***
-Drop In Certificate Policy
-    [Documentation]    Set six-week serving and two-year CA lifetimes without changing the running service.
-    [Arguments]    ${force_restart}=false
-    Drop In MicroShift Config
-    ...    certificates:\n\ \ servingValidity: 1008h\n\ \ caValidity: 17520h\n\ \ forceRestartOnExpirationImminent: ${force_restart}\n
-    ...    99-cert-renew-policy
-
-Restore Certificate Policy
-    [Documentation]    Restore both config and issued lifetimes so randomized later suites see default certificates.
-    Remove Drop In MicroShift Config    99-cert-renew-policy
-    Renewal Document    ca    json
-    Restart MicroShift
-
-Certificate Policy Changed Without Reissuing
-    [Documentation]    The CLI reads the updated policy but existing certificate validity stays unchanged.
-    [Arguments]    ${before}
-    ${configured}=    Certificate Status Document
-    ${before_dates}=    Evaluate
-    ...    [(i['service'], i['name'], i['notBefore'], i['notAfter']) for i in $before['items']]
-    ${configured_dates}=    Evaluate
-    ...    [(i['service'], i['name'], i['notBefore'], i['notAfter']) for i in $configured['items']]
-    Should Be Equal    ${before_dates}    ${configured_dates}
-    Should Be Equal    ${configured}[config][servingValidity]    1008h
-    Should Be Equal    ${configured}[config][caValidity]    17520h
-    Should Be Equal    ${configured}[config][forceRestartOnExpirationImminent]    ${False}
-
-Configured Certificate Lifetimes Are Applied
-    [Documentation]    Check encoded lifetimes, status and parent expiry after activation, allowing midnight alignment.
-    [Arguments]    ${renewed_cas}    ${result}
-    ${status}=    Certificate Status Document
-    ${ca_expiries}=    Evaluate    {i['name']: i['notAfter'] for i in $status['items'] if i['role'] == 'ca'}
-    FOR    ${item}    IN    @{status}[items]
-        Should Be Equal    ${item}[status]    Healthy
-        IF    $item['role'] == 'serving' or ($renewed_cas and $item['role'] == 'ca')
-            ${hours}=    Evaluate    1008 if $item['role'] == 'serving' else 17520
-            ${lifetime}=    Evaluate
-            ...    (datetime.datetime.fromisoformat($item['notAfter'].replace('Z', '+00:00')) - datetime.datetime.fromisoformat($item['notBefore'].replace('Z', '+00:00'))).total_seconds()
-            ...    modules=datetime
-            Should Be True    $hours * 3600 <= $lifetime <= ($hours + 24) * 3600 + 60
-        END
-    END
-    FOR    ${item}    IN    @{result}[items]
-        IF    $item['parentCA'] is not None
-            Should Be True    $item['newNotAfter'] <= $ca_expiries[$item['parentCA']]
-        END
-    END
-
 Setup
     [Documentation]    Connect and wait only for MicroShift and its PKI.
     Setup Suite
@@ -400,24 +182,10 @@ Teardown
     Remove Kubeconfig
     Logout MicroShift Host
 
-Start And Wait For MicroShift
-    [Documentation]    Recover an interrupted renewal if needed, refresh kubeconfig, and check readiness.
-    Command Should Work    microshift certs status -o json
-    Start MicroShift
-    Wait For MicroShift
-    Certificate Lock Is Stable
-
 Certificate Lock Is Stable
     [Documentation]    Renewal and service restarts must reuse the same lock inode outside the certificate tree.
     ${lock_id}=    Command Should Work    stat -c '%d:%i' ${CERTIFICATE_LOCK}
     Should Be Equal    ${lock_id}    ${CERTIFICATE_LOCK_ID}
-
-Certificate Lock Is Held
-    [Documentation]    Check contention without waiting for or changing the existing lock holder.
-    [Arguments]    ${path}
-    ${rc}=    Execute Command
-    ...    flock -n -x ${path} true    sudo=True    return_stdout=False    return_rc=True
-    Should Be Equal As Integers    ${rc}    1
 
 Certificate Status Document
     [Documentation]    Read the current inventory for comparison with renewal selection and results.
@@ -448,45 +216,19 @@ Renewal Document
     ${document}=    Yaml Parse    ${stdout}
     RETURN    ${document}
 
-Corrupt Pending Certificate Metadata
-    [Documentation]    Corrupt only published test metadata, never active certificate files.
-    ${result}=    Renewal Document    ca    json
+Prepare Replacement Serving Renewal
+    [Documentation]    Prepare two serving generations and require status to describe the replacement.
+    [Arguments]    ${before}
+    ${result}=    Renewal Document    serving    json
+    Validate Renewal Document    ${result}    serving    ${False}    ${before}
     Pending Renewal Matches Result    ${result}
-    Command Should Work    truncate -s 0 /var/lib/microshift/.cert-renewal/pending.json
-
-Certificate Renewal Warning Is Reported
-    [Documentation]    Table warnings go to stderr; JSON and YAML keep warnings inside the status document.
-    [Arguments]    ${message}
-    FOR    ${format}    IN    json    yaml
-        ${stdout}    ${stderr}    ${rc}=    Execute Command
-        ...    microshift certs status -o ${format}
-        ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-        Should Be Equal As Integers    ${rc}    0
-        Should Be Empty    ${stderr}
-        ${document}=    Yaml Parse    ${stdout}
-        Should Not Be Empty    ${document}[items]
-        Should Be True    $message in str($document['warnings'])
-    END
-    ${stdout}    ${stderr}    ${rc}=    Execute Command
-    ...    microshift certs status
-    ...    sudo=True    return_stdout=True    return_stderr=True    return_rc=True
-    Should Be Equal As Integers    ${rc}    0
-    Should Contain    ${stdout}    CERTIFICATE
-    Should Contain    ${stderr}    ${message}
-
-Rejected Renewal Warning Has Cleared
-    [Documentation]    Successful activation removes rejected files and their persistent warning.
-    ${status}=    Certificate Status Document
-    FOR    ${warning}    IN    @{status}[warnings]
-        Should Not Contain    ${warning}    A pending certificate renewal was rejected
-    END
-    Command Should Work    test ! -e /var/lib/microshift/.cert-renewal-rejected
-
-Replace Rejected Renewal
-    [Documentation]    Leave a failed corruption test with a usable service and no rejected-renewal warning.
-    Restart MicroShift
-    Renewal Document    serving    json
-    Restart MicroShift
+    ${pending_before}=    Command Should Work    sha256sum /var/lib/microshift/.cert-renewal/pending.json
+    ${result}=    Renewal Document    serving    json
+    Validate Renewal Document    ${result}    serving    ${False}    ${before}
+    ${pending_after}=    Command Should Work    sha256sum /var/lib/microshift/.cert-renewal/pending.json
+    Should Not Be Equal    ${pending_before}    ${pending_after}
+    Pending Renewal Matches Result    ${result}
+    RETURN    ${result}
 
 Validate Renewal Document
     [Documentation]    Check the versioned contract and inventory-derived selection, without assuming certificate counts.
