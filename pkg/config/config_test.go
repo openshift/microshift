@@ -1246,3 +1246,47 @@ func TestMicroshiftConfigNodeNameValidationBadName(t *testing.T) {
 		t.Errorf("failed to validate node name.")
 	}
 }
+
+func TestParseHostnames(t *testing.T) {
+	tests := []struct {
+		name     string
+		output   string
+		expected []string
+	}{
+		{
+			name:     "empty output",
+			output:   "",
+			expected: []string{},
+		},
+		{
+			name:     "only newline, offline host without DNS",
+			output:   "\n",
+			expected: []string{},
+		},
+		{
+			name:     "only whitespace, offline host without DNS",
+			output:   " \n",
+			expected: []string{},
+		},
+		{
+			name:     "single hostname with trailing space and newline",
+			output:   "host.example.com \n",
+			expected: []string{"host.example.com"},
+		},
+		{
+			name:     "multiple hostnames are sorted and deduplicated",
+			output:   "b.example.com a.example.com b.example.com \n",
+			expected: []string{"a.example.com", "b.example.com"},
+		},
+		{
+			name:     "repeated separators do not produce empty names",
+			output:   "a.example.com   b.example.com\t\n",
+			expected: []string{"a.example.com", "b.example.com"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, parseHostnames(tt.output))
+		})
+	}
+}
