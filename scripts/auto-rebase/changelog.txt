@@ -1,0 +1,107 @@
+- api embedded-component 70586205d5fa77e2a47a0373d1ea712c9a3e0b6a to 7a9ff1ebb38fe6f6ff2d244b81b4c428a7949dc0
+  - 316b11f3 2026-10-19T08:45:36-04:00 Promote VSphereMultiVCenterDay2 to GA
+
+- etcd embedded-component 7cf5f0dbc98a20dc8b765151ab8b53f3019e3c81 to ec76d3a9dc27020ef0f16389bc58cedc0ab13ded
+  - 8af2cd45 2026-11-05T15:05:27-05:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 0b065e61 2026-10-22T15:52:36-07:00 version: bump up to 3.6.16
+  - 2578838c 2026-10-22T14:22:53-07:00 dependency: bump github.com/klauspost/compress from v1.17.9 to v1.18.7
+  - 0a3eddc4 2026-10-21T09:56:25Z mvcc: fix data race between Hash and Restore
+  - 087fc31f 2026-10-20T16:16:51+08:00 Build with Go 1.26.10
+  - dd4ce837 2026-10-17T17:59:25+03:00 etcdserver: add test for processMessages output order
+  - f31a5aa5 2026-10-15T18:40:46+01:00 [release-3.6] Bump golang.org/x/net to v0.61.0
+  - 10cc38c4 2026-10-13T08:41:15-04:00 [release-3.6] Bump otel to v1.45.0 to fix GO-2026-6505
+  - a5e23b59 2026-10-09T19:48:52Z Bump go to 1.26.9
+  - 1413a8a0 2026-10-07T09:01:02-04:00 fix(txn): parse lease ID as hex in comparison
+  - a3346427 2026-09-22T13:52:05-07:00 version: bump up to 3.6.15
+  - 16f44fe5 2026-09-22T09:27:31+01:00 dependency: bump google.golang.org/grpc to v1.83.2
+  - 64063198 2026-09-21T19:09:38+01:00 fileutil: close locked files when purging fails
+  - 3b070b32 2026-09-11T20:24:07+01:00 Bump go to 1.26.8
+  - b741e79a 2026-09-10T16:46:29+08:00 fix: fsync snap directory when saving a received snapshot db
+  - c1572229 2026-09-10T09:36:45+01:00 fix: deflake TestIssue20271
+  - 4e6d3a96 2026-09-09T11:39:16+01:00 Deflake TestEtcdGrpcResolverRoundRobin: sleep 1s to allow all grpc sub channel to be ready
+  - 629123fb 2026-09-01T21:50:35Z build(deps): bump distroless/static-debian12 from `a9fcaed` to `d75cdd7`
+  - 24c5b693 2026-08-31T15:08:02-07:00 Bump github.com/gorilla/websocket from v1.4.2 to v1.5.3
+  - 3f895dd6 2026-08-31T15:08:00-07:00 Bump golang.org/x/text from v0.38.0 to v0.39.0
+  - bba6944a 2026-08-23T21:28:46+01:00 Bump go 1.25.14
+  - db0001ea 2026-08-14T15:09:26-07:00 Bump Go to 1.25.13
+  - b4536a06 2026-07-29T18:17:16+05:30 etcdctl: remove duplicate RaftTerm in endpoint status fields output The fields output for endpoint status currently prints RaftTerm twice, once from the response header and the other from the status body. Both of them come from the same raft term, so the second one is redundant.
+  - 2a71ac2a 2026-07-28T04:41:09Z build(deps): bump distroless/static-debian12 from `9c346e4` to `a9fcaed`
+  - 497f4a68 2026-07-26T22:39:45-07:00 dependency: bump go.opentelemetry.io/otel to v1.44.0
+  - fc04cf70 2026-07-23T12:19:04-07:00 version: bump up to 3.6.14
+  - 84b0d31d 2026-07-21T21:56:59-07:00 deps: bump google.golang.org/grpc to 1.82.1
+  - d2013b6d 2026-07-21T20:54:27Z Fix unsynchronized range over leaseCache.entries
+  - d4cbc7ec 2026-07-21T20:51:47Z Fix unbounded io.ReadAll on peer lease HTTP handler body
+  - 4d6d3e95 2026-07-21T20:49:25Z Set a reasonable value for snapshotLimitByte
+  - 10530caa 2026-07-21T20:47:36Z Set a 5-minutes ReadHeaderTimeout for client http.Server
+  - 89ff6d50 2026-07-21T20:45:23Z Set a tlsHandshakeTimeout for tlsListener
+  - cca254a7 2026-07-21T20:38:27Z Fix the costTxnReq ignores nested RequestTxn issue
+  - f3fb4dca 2026-07-21T20:38:27Z Add an unit test to reproduce the issue of costTxnReq ignores nested RequestTxn
+  - 6643f806 2026-07-10T15:29:05+01:00 Fix the security issue where a user granted read permission on one key could receive watch responses for every key starting from that key
+  - 724eb198 2026-07-10T15:28:19+01:00 Create a test case to reproduce the security issue that a user with low permission can watch more keys
+  - d26daa0b 2026-07-09T03:19:07Z [release-3.6] Bump Go to 1.25.12
+  - 1cdf1189 2026-07-01T14:02:38-07:00 dependency: bump golang.org/x/net from 0.54.0 to 0.55.0
+
+- kubernetes embedded-component b8b2c80fc60865caaa58f565f41d569355f124eb to 4608138db381874dacf91e8262cedd33df913b26
+  - a3ed97865 2026-11-02T10:52:12Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 1b2171b11 2026-10-27T12:02:52Z Release commit for Kubernetes v1.36.6
+  - 77de0942d 2026-10-22T17:43:17+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
+  - 3b53392ac 2026-10-20T00:38:52-04:00 upgrade .go-version to 1.26.10
+  - d35fdb8e7 2026-10-16T23:59:13+02:00 Bump images and versions to Go 1.26.9 and update distroless-iptables
+  - cbe3b9483 2026-10-14T08:49:22+08:00 hack: match OpenSSL 3.5 CN=127.0.0.1 output in client cert check
+  - 1eb49c2b0 2026-10-06T20:28:16-07:00 apiserver: accept large identity header sets with Go 1.27
+  - ef37531a7 2026-09-24T23:44:47+09:00 job controller: simplify recreation regression test
+  - ddcf967c8 2026-09-24T23:42:13+09:00 job controller: extend recreation regression coverage
+  - e68220f85 2026-09-24T23:42:13+09:00 job controller: clear expectations when deleting Job
+  - 4501bd277 2026-09-23T17:20:01Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.5
+  - 9b333de9f 2026-09-17T19:02:41-04:00 Don't set nf_conntrack_max if it's already larger than needed
+  - 44debb24f 2026-09-17T19:01:26-04:00 Move hashsize parameter setting out of SetMax
+  - 2626d6a77 2026-09-17T18:59:34-04:00 Move detectNumCPU() into conntrackConfigurer interface
+  - b8fa6b043 2026-09-11T04:50:19Z Fix flapping pod.status.resourceClaimStatuses
+  - e3bbe5196 2026-08-28T17:05:23-07:00 scheduler: fix negative namespace selector evaluation
+
+- machine-config-operator embedded-component 0e5e436ae771980e0a2c9f03aaf2446c76f8666f to 5ba6e9577fbf4f0ecedfe627e3de7cb73066313f
+  - 20d9187e 2026-11-09T15:33:53Z NO-ISSUE: Temporarily skip four OS build controller unit tests
+  - 6b7441a1 2026-11-06T23:28:32Z chore: update AMIs
+
+- oc image-amd64 4b0a124d300cef187037bda6f1b04caa69ab8b62 to 6b40d97dee3b6c7b007aa3c415364304e747e0d0
+  - ea025acc 2026-11-04T18:39:28+05:30 Bump k8s.io/kubectl to v0.36.5 for CVE-2026-19444 and Makefile (kubectl cp Windows path traversal)
+
+- kubernetes image-amd64 b8b2c80fc60865caaa58f565f41d569355f124eb to 4608138db381874dacf91e8262cedd33df913b26
+  - a3ed97865 2026-11-02T10:52:12Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 1b2171b11 2026-10-27T12:02:52Z Release commit for Kubernetes v1.36.6
+  - 77de0942d 2026-10-22T17:43:17+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
+  - 3b53392ac 2026-10-20T00:38:52-04:00 upgrade .go-version to 1.26.10
+  - d35fdb8e7 2026-10-16T23:59:13+02:00 Bump images and versions to Go 1.26.9 and update distroless-iptables
+  - cbe3b9483 2026-10-14T08:49:22+08:00 hack: match OpenSSL 3.5 CN=127.0.0.1 output in client cert check
+  - 1eb49c2b0 2026-10-06T20:28:16-07:00 apiserver: accept large identity header sets with Go 1.27
+  - ef37531a7 2026-09-24T23:44:47+09:00 job controller: simplify recreation regression test
+  - ddcf967c8 2026-09-24T23:42:13+09:00 job controller: extend recreation regression coverage
+  - e68220f85 2026-09-24T23:42:13+09:00 job controller: clear expectations when deleting Job
+  - 4501bd277 2026-09-23T17:20:01Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.5
+  - 9b333de9f 2026-09-17T19:02:41-04:00 Don't set nf_conntrack_max if it's already larger than needed
+  - 44debb24f 2026-09-17T19:01:26-04:00 Move hashsize parameter setting out of SetMax
+  - 2626d6a77 2026-09-17T18:59:34-04:00 Move detectNumCPU() into conntrackConfigurer interface
+  - b8fa6b043 2026-09-11T04:50:19Z Fix flapping pod.status.resourceClaimStatuses
+  - e3bbe5196 2026-08-28T17:05:23-07:00 scheduler: fix negative namespace selector evaluation
+
+- oc image-arm64 4b0a124d300cef187037bda6f1b04caa69ab8b62 to 6b40d97dee3b6c7b007aa3c415364304e747e0d0
+  - ea025acc 2026-11-04T18:39:28+05:30 Bump k8s.io/kubectl to v0.36.5 for CVE-2026-19444 and Makefile (kubectl cp Windows path traversal)
+
+- kubernetes image-arm64 b8b2c80fc60865caaa58f565f41d569355f124eb to 4608138db381874dacf91e8262cedd33df913b26
+  - a3ed97865 2026-11-02T10:52:12Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 1b2171b11 2026-10-27T12:02:52Z Release commit for Kubernetes v1.36.6
+  - 77de0942d 2026-10-22T17:43:17+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
+  - 3b53392ac 2026-10-20T00:38:52-04:00 upgrade .go-version to 1.26.10
+  - d35fdb8e7 2026-10-16T23:59:13+02:00 Bump images and versions to Go 1.26.9 and update distroless-iptables
+  - cbe3b9483 2026-10-14T08:49:22+08:00 hack: match OpenSSL 3.5 CN=127.0.0.1 output in client cert check
+  - 1eb49c2b0 2026-10-06T20:28:16-07:00 apiserver: accept large identity header sets with Go 1.27
+  - ef37531a7 2026-09-24T23:44:47+09:00 job controller: simplify recreation regression test
+  - ddcf967c8 2026-09-24T23:42:13+09:00 job controller: extend recreation regression coverage
+  - e68220f85 2026-09-24T23:42:13+09:00 job controller: clear expectations when deleting Job
+  - 4501bd277 2026-09-23T17:20:01Z Update CHANGELOG/CHANGELOG-1.36.md for v1.36.5
+  - 9b333de9f 2026-09-17T19:02:41-04:00 Don't set nf_conntrack_max if it's already larger than needed
+  - 44debb24f 2026-09-17T19:01:26-04:00 Move hashsize parameter setting out of SetMax
+  - 2626d6a77 2026-09-17T18:59:34-04:00 Move detectNumCPU() into conntrackConfigurer interface
+  - b8fa6b043 2026-09-11T04:50:19Z Fix flapping pod.status.resourceClaimStatuses
+  - e3bbe5196 2026-08-28T17:05:23-07:00 scheduler: fix negative namespace selector evaluation
+
