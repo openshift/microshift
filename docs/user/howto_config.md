@@ -148,6 +148,9 @@ ingress:
 kubelet:
 manifests:
     kustomizePaths: []
+metrics:
+    listenAddress: ""
+    status: ""
 network:
     clusterNetwork: []
     cniPlugin: ""
@@ -325,6 +328,9 @@ manifests:
         - /usr/lib/microshift/manifests.d/*
         - /etc/microshift/manifests
         - /etc/microshift/manifests.d/*
+metrics:
+    listenAddress: 127.0.0.1:9090
+    status: Disabled
 network:
     clusterNetwork:
         - 10.42.0.0/16
