@@ -22,9 +22,9 @@ scenario_create_vms() {
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
         networks="${VM_MULTUS_NETWORK},${VM_MULTUS_NETWORK}"
     fi
-    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template rhel102-bootc-source-optionals
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source-optionals
     # Three nics - one for sriov, one for macvlan, another for ipvlan (they cannot enslave the same interface)
-    launch_vm rhel102-bootc --network "${networks}" --vm_disksize 25 --vm_vcpus 4
+    launch_vm rhel98-bootc --network "${networks}" --vm_disksize 25 --vm_vcpus 4
 }
 
 scenario_remove_vms() {
@@ -34,10 +34,8 @@ scenario_remove_vms() {
 scenario_run_tests() {
     local skip_args=""
     if [[ "${UNAME_M}" =~ aarch64 ]]; then
-        skip_args="--skip sriov --skip tls-scanner"
+        skip_args="--skip sriov"
     fi
-    # Skip generic device plugin on RHEL 10 until we can get the correct kernel-devel package.
-    skip_args+=" --skip generic-device-plugin"
     # shellcheck disable=SC2086
     run_tests host1 \
         --variable "PROMETHEUS_HOST:$(hostname)" \
