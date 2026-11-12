@@ -21,6 +21,7 @@ ${RUNTIME_LOCK}                 /var/lib/microshift-backups/certs-runtime.lock
 ${HOST_KUBECONFIG}              /var/lib/microshift/resources/kubeadmin/kubeconfig
 ${SAVED_KUBECONFIG}             /tmp/cert-renew-saved-kubeconfig
 ${OLD_CA_PATTERNS}              /tmp/cert-renew-old-ca-lines
+${TC19_SNAPSHOT_DIR}            /tmp/cert-renew-identity-check
 ${REDISTRIBUTION_WARNING}       Kubeconfigs stored outside the MicroShift data directory must be copied again after activation at the next MicroShift start.
 
 
@@ -387,22 +388,29 @@ Renewed Certificates Meet ProdSec Rules
     ...    Fulfills OCPSTRAT-2899 AC (ProdSec guidance): key file permissions,
     ...    no key reuse, old CA trust removed.
     [Tags]    qe    ocpstrat-2899
-    ${before}=    Certificate Identity Snapshot
+    # The snapshots and their comparison stay on the host: certificate
+    # subjects and SANs must not end up in the Robot log.
+    Command Should Work    install -d -m 700 ${TC19_SNAPSHOT_DIR}
+    Save Certificate Identity Snapshot    ${TC19_SNAPSHOT_DIR}/before
     Renewal Document    serving    json
     Restart MicroShift
-    ${after_serving}=    Certificate Identity Snapshot
-    Renewed Certificates Should Meet ProdSec Rules    ${before}    ${after_serving}    ${False}
+    Save Certificate Identity Snapshot    ${TC19_SNAPSHOT_DIR}/after-serving
+    Snapshots Meet ProdSec Rules
+    ...    ${TC19_SNAPSHOT_DIR}/before    ${TC19_SNAPSHOT_DIR}/after-serving    ${False}
     Private Keys Should Be Restricted
 
     ${old_ca_lines}=    CA Certificate Lines
     Renewal Document    ca    json
     Restart MicroShift
-    ${after_ca}=    Certificate Identity Snapshot
-    Renewed Certificates Should Meet ProdSec Rules    ${after_serving}    ${after_ca}    ${True}
+    Save Certificate Identity Snapshot    ${TC19_SNAPSHOT_DIR}/after-ca
+    Snapshots Meet ProdSec Rules
+    ...    ${TC19_SNAPSHOT_DIR}/after-serving    ${TC19_SNAPSHOT_DIR}/after-ca    ${True}
     Private Keys Should Be Restricted
     Wait Until Keyword Succeeds    12x    10s
     ...    Old CA Certificates Should Not Be Trusted    ${old_ca_lines}
-    [Teardown]    Command Should Work    rm -f ${OLD_CA_PATTERNS}
+    [Teardown]    Run Keywords
+    ...    Command Should Work    rm -rf ${TC19_SNAPSHOT_DIR}
+    ...    AND    Command Should Work    rm -f ${OLD_CA_PATTERNS}
 
 Configured And Default Certificate Lifetimes Are Applied
     [Documentation]    Configured servingValidity and caValidity propagate into the notAfter of
@@ -784,9 +792,13 @@ Kubeconfig Should Not Connect
     Should Not Be Equal As Integers    ${rc}    0
     Should Contain    ${stderr}    certificate signed by unknown authority
 
-Certificate Identity Snapshot
-    [Documentation]    Map each certificate file to its fingerprint, public key hash, serial number,
-    ...    subject, and SANs. CA bundle files are skipped because they hold several certificates.
+Save Certificate Identity Snapshot
+    [Documentation]    Write each certificate file's fingerprint, public key hash, serial number,
+    ...    subject, and SANs to a file on the host, for later comparison by
+    ...    Snapshots Meet ProdSec Rules. The data never returns
+    ...    to Robot: certificate subjects and SANs must not end up in test logs.
+    ...    CA bundle files are skipped because they hold several certificates.
+    [Arguments]    ${path}
     ${command}=    Catenate    SEPARATOR=${SPACE}
     ...    bash -o pipefail -c 'find /var/lib/microshift/certs -type f -name "*.crt"
     ...    ! -name ca-bundle.crt ! -path "*/ca-bundle/*" | sort | while read -r f; do
@@ -795,63 +807,62 @@ Certificate Identity Snapshot
     ...    serial=$(openssl x509 -in "$f" -noout -serial | cut -d= -f2);
     ...    subject=$(openssl x509 -in "$f" -noout -subject -nameopt RFC2253 | cut -d= -f2-);
     ...    san=$(openssl x509 -in "$f" -noout -ext subjectAltName 2>/dev/null | tail -n +2 | tr -d " ");
-    ...    echo "$f|$fp|$spki|$serial|$subject|$san"; done'
-    ${output}=    Command Should Work    ${command}
-    ${snapshot}=    Evaluate
-    ...    {line.split('|')[0]: dict(zip(('fp', 'spki', 'serial', 'subject', 'san'), line.split('|')[1:])) for line in $output.splitlines() if line}
-    Should Not Be Empty    ${snapshot}
-    RETURN    ${snapshot}
+    ...    echo "$f|$fp|$spki|$serial|$subject|$san"; done > ${path}'
+    ...    && test -s ${path}
+    Command Should Work    ${command}
 
-Renewed Certificates Should Meet ProdSec Rules
-    [Documentation]    Every certificate that changed between two snapshots has a new key and serial
-    ...    number and keeps its subject and SANs. CA renewal must change CA certificates and
-    ...    serving renewal must not.
-    ...
-    ...    The snapshots are passed to Evaluate via an explicit namespace because the
-    ...    special `$var` syntax is only visible in the outermost scope of an expression,
-    ...    not inside the conditions of generator expressions.
+Snapshots Meet ProdSec Rules
+    [Documentation]    Compare two snapshots taken by Save Certificate Identity Snapshot:
+    ...    every certificate that changed has a new key and serial number and keeps
+    ...    its subject and SANs, CA renewal changes at least one CA certificate, and
+    ...    serving renewal changes none. The comparison runs on the host so that
+    ...    identity data stays out of Robot logs; on failure only the violating
+    ...    certificate paths are printed.
     [Arguments]    ${before}    ${after}    ${ca_renewal}
-    VAR    &{ns}=    before=${before}    after=${after}
-    ${changed}=    Evaluate
-    ...    sorted(p for p in after if p in before and after[p]['fp'] != before[p]['fp'])
-    ...    namespace=${ns}
-    Should Not Be Empty    ${changed}
-    Set To Dictionary    ${ns}    changed=${changed}
-    Changed Certificates Should Have Fresh Material    ${ns}
-    Changed CA Certificates Should Match Renewal Mode    ${changed}    ${ca_renewal}
+    ${script}=    Snapshot Comparison Script
+    ${stdout}    ${stderr}    ${rc}=    Command Execution
+    ...    python3 -c '${script}' ${before} ${after} ${ca_renewal}
+    Should Be Equal As Integers    ${rc}    0    msg=${stdout}${stderr}
 
-Changed Certificates Should Have Fresh Material
-    [Documentation]    Every changed certificate gets a new private key and serial number and
-    ...    keeps its subject and SANs.
-    [Arguments]    ${ns}
-    ${reused_key}=    Evaluate    [p for p in changed if after[p]['spki'] == before[p]['spki']]
-    ...    namespace=${ns}
-    Should Be Empty    ${reused_key}    msg=Private key reused for: ${reused_key}
-    # The kubelet csr-signer sub-CA is issued from the parent CA's serial
-    # counter, which a CA renewal resets to zero, so the sub-CA is re-issued
-    # with a new key but the same serial number (observed on the 2026-11-03
-    # host run). Whether that violates the ProdSec serial-uniqueness guidance
-    # is pending a ruling from the feature developer; until then, only
-    # certificates of this signer are excluded from the serial check below.
-    ${reused_serial}=    Evaluate
-    ...    [p for p in changed if after[p]['serial'] == before[p]['serial'] and '/kubelet-csr-signer-signer/' not in p]
-    ...    namespace=${ns}
-    Should Be Empty    ${reused_serial}    msg=Serial number reused for: ${reused_serial}
-    ${identity_changed}=    Evaluate
-    ...    [p for p in changed if (after[p]['subject'], after[p]['san']) != (before[p]['subject'], before[p]['san'])]
-    ...    namespace=${ns}
-    Should Be Empty    ${identity_changed}    msg=Subject or SANs changed for: ${identity_changed}
-
-Changed CA Certificates Should Match Renewal Mode
-    [Documentation]    CA renewal must change at least one CA certificate. Serving renewal must not
-    ...    change any CA certificate.
-    [Arguments]    ${changed}    ${ca_renewal}
-    ${changed_cas}=    Evaluate    [p for p in $changed if p.endswith('/ca.crt')]
-    IF    ${ca_renewal}
-        Should Not Be Empty    ${changed_cas}    msg=CA renewal did not change any CA certificate
-    ELSE
-        Should Be Empty    ${changed_cas}    msg=Serving renewal changed CA certificates: ${changed_cas}
-    END
+Snapshot Comparison Script
+    [Documentation]    Python source of the snapshot comparison. Every changed certificate
+    ...    must have a new key and serial number and keep its subject and SANs.
+    ...
+    ...    The kubelet csr-signer sub-CA is issued from the parent CA's serial
+    ...    counter, which a CA renewal resets to zero, so the sub-CA is re-issued
+    ...    with a new key but the same serial number (observed on the 2026-11-03
+    ...    host run). Whether that violates the ProdSec serial-uniqueness guidance
+    ...    is pending a ruling from the feature developer; until then, only
+    ...    certificates of this signer are excluded from the serial check.
+    ...
+    ...    The script is written without statement blocks (comprehensions and
+    ...    ternaries only, wrapped inside brackets): Robot continuation lines
+    ...    cannot carry leading spaces, so indented Python would arrive
+    ...    flattened and fail to parse.
+    ${script}=    Catenate    SEPARATOR=\n
+    ...    import sys
+    ...    snap = lambda p: {
+    ...    r[0]: dict(zip(("fp", "spki", "serial", "subject", "san"), r[1:]))
+    ...    for r in (line.rstrip("\\n").split("|") for line in open(p) if line.strip())
+    ...    }
+    ...    before = snap(sys.argv[1])
+    ...    after = snap(sys.argv[2])
+    ...    ca_renewal = sys.argv[3] == "True"
+    ...    changed = sorted(p for p in after if p in before and after[p]["fp"] != before[p]["fp"])
+    ...    changed_cas = [p for p in changed if p.endswith("/ca.crt")]
+    ...    violations = ["no certificate changed between the snapshots"] if not changed else []
+    ...    violations += ["private key reused: " + p for p in changed if after[p]["spki"] == before[p]["spki"]]
+    ...    violations += [
+    ...    "serial number reused: " + p
+    ...    for p in changed
+    ...    if after[p]["serial"] == before[p]["serial"] and "/kubelet-csr-signer-signer/" not in p
+    ...    ]
+    ...    violations += ["subject or SANs changed: " + p for p in changed if (after[p]["subject"], after[p]["san"]) != (before[p]["subject"], before[p]["san"])]
+    ...    violations += ["CA renewal did not change any CA certificate"] if ca_renewal and not changed_cas else []
+    ...    violations += ["serving renewal changed CA certificates: " + ", ".join(changed_cas)] if not ca_renewal and changed_cas else []
+    ...    print("\\n".join(violations))
+    ...    sys.exit(1 if violations else 0)
+    RETURN    ${script}
 
 Private Keys Should Be Restricted
     [Documentation]    Every private key under the certificate directory is mode 0600 or stricter
@@ -880,17 +891,21 @@ Old CA Certificates Should Not Be Trusted
     # Scan the objects on the host and return only the names that contain an
     # old CA: piping the full `oc get` output back would put every Secret's
     # contents into the Robot log.
+    # The scan is written without statement blocks (comprehensions and
+    # lambdas only): Robot continuation lines cannot carry leading spaces, so
+    # indented Python would arrive flattened and fail to parse.
     ${scan}=    Catenate    SEPARATOR=\n
     ...    import base64, json, sys
     ...    lines = [l.strip() for l in open("${OLD_CA_PATTERNS}") if l.strip()]
     ...    items = json.load(sys.stdin)["items"]
-    ...    hits = set()
-    ...    for i in items:
-    ...        for v in (i.get("data") or {}).values():
-    ...            text = base64.b64decode(v).decode("utf-8", "ignore") if i["kind"] == "Secret" else v
-    ...            if any(l in text for l in lines):
-    ...                hits.add(i["kind"] + " " + i["metadata"]["namespace"] + "/" + i["metadata"]["name"])
-    ...    print("\\n".join(sorted(hits)))
+    ...    decode = lambda i, v: base64.b64decode(v).decode("utf-8", "ignore") if i["kind"] == "Secret" else v
+    ...    hits = sorted(
+    ...    i["kind"] + " " + i["metadata"]["namespace"] + "/" + i["metadata"]["name"]
+    ...    for i in items
+    ...    for v in (i.get("data") or {}).values()
+    ...    if any(l in decode(i, v) for l in lines)
+    ...    )
+    ...    print("\\n".join(hits))
     ${hits}=    Command Should Work
     ...    oc --kubeconfig ${HOST_KUBECONFIG} get configmaps,secrets -A -o json | python3 -c '${scan}'
     Should Be Empty    ${hits.strip().splitlines()}    msg=Old CA certificate still present in: ${hits}
