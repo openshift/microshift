@@ -16,8 +16,13 @@ Test Tags           restart
 
 
 *** Variables ***
-${CERTIFICATE_LOCK}     /var/lib/microshift-backups/certs.lock
-${RUNTIME_LOCK}         /var/lib/microshift-backups/certs-runtime.lock
+${CERTIFICATE_LOCK}             /var/lib/microshift-backups/certs.lock
+${RUNTIME_LOCK}                 /var/lib/microshift-backups/certs-runtime.lock
+${HOST_KUBECONFIG}              /var/lib/microshift/resources/kubeadmin/kubeconfig
+${SAVED_KUBECONFIG}             /tmp/cert-renew-saved-kubeconfig
+${OLD_CA_PATTERNS}              /tmp/cert-renew-old-ca-lines
+${TC19_SNAPSHOT_DIR}            /tmp/cert-renew-identity-check
+${REDISTRIBUTION_WARNING}       Kubeconfigs stored outside the MicroShift data directory must be copied again after activation at the next MicroShift start.
 
 
 *** Test Cases ***
@@ -339,6 +344,107 @@ Missing Pending Generation Does Not Block Startup
     Should Be Equal    ${ca_before}    ${ca_after}
     [Teardown]    Replace Rejected Renewal
 
+Renewal Messages Match The Real Impact On External Kubeconfigs
+    [Documentation]    Verify that CA renewal warns that external kubeconfig copies must be copied
+    ...    again, and that the warning is true: a copy saved before CA activation is rejected
+    ...    afterwards. Verify that serving renewal gives no such warning, and that a saved copy
+    ...    still works after serving activation. The output must also say that a restart is
+    ...    needed to activate the renewal. OCPSTRAT-2899 TC-09
+    ...    Fulfills OCPSTRAT-2899 AC: clear impact messaging — certs renewed,
+    ...    restart required, client cert redistribution (MUST #3).
+    [Tags]    qe    ocpstrat-2899
+    # install forces mode 600 even if the destination was pre-created by
+    # another local user with permissive permissions; cp would preserve them.
+    Command Should Work    install -m 600 ${HOST_KUBECONFIG} ${SAVED_KUBECONFIG}
+
+    ${serving}=    Renewal Document    serving    json
+    Should Not Be True    $serving['impact']['kubeconfigRedistributionRequired']
+    Should Not Contain    ${serving}[warnings]    ${REDISTRIBUTION_WARNING}
+    Restart MicroShift
+    Kubeconfig Should Connect    ${SAVED_KUBECONFIG}
+
+    ${ca}=    Renewal Document    ca    json
+    Should Be True    $ca['impact']['kubeconfigRedistributionRequired']
+    Should Be True    $ca['impact']['serviceRestartRequired']
+    Should Contain    ${ca}[warnings]    ${REDISTRIBUTION_WARNING}
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    microshift certs renew --ca
+    Should Be Equal As Integers    ${rc}    0
+    Should Contain    ${stderr}    WARNING: ${REDISTRIBUTION_WARNING}
+    Should Contain    ${stdout}    Start or restart microshift.service to activate a pending renewal.
+    Restart MicroShift
+    Kubeconfig Should Connect    ${HOST_KUBECONFIG}
+    Kubeconfig Should Not Connect    ${SAVED_KUBECONFIG}
+    [Teardown]    Run Keywords
+    ...    Command Should Work    rm -f ${SAVED_KUBECONFIG}
+    ...    AND    Restart MicroShift
+
+Renewed Certificates Meet ProdSec Rules
+    [Documentation]    Verify that every certificate changed by serving renewal and by CA renewal
+    ...    has a new private key and serial number but the same subject and SANs, that every
+    ...    private key is mode 0600 or stricter and owned by root, and that after CA renewal no
+    ...    certificate file, ConfigMap, or Secret still contains an old CA certificate. A new
+    ...    certificate on an old key leaves a stolen key valid, and a still-trusted old CA keeps
+    ...    accepting what it signed. OCPSTRAT-2899 TC-19
+    ...    Fulfills OCPSTRAT-2899 AC (ProdSec guidance): key file permissions,
+    ...    no key reuse, old CA trust removed.
+    [Tags]    qe    ocpstrat-2899
+    # The snapshots and their comparison stay on the host: certificate
+    # subjects and SANs must not end up in the Robot log.
+    Command Should Work    install -d -m 700 ${TC19_SNAPSHOT_DIR}
+    Save Certificate Identity Snapshot    ${TC19_SNAPSHOT_DIR}/before
+    Renewal Document    serving    json
+    Restart MicroShift
+    Save Certificate Identity Snapshot    ${TC19_SNAPSHOT_DIR}/after-serving
+    Snapshots Meet ProdSec Rules
+    ...    ${TC19_SNAPSHOT_DIR}/before    ${TC19_SNAPSHOT_DIR}/after-serving    ${False}
+    Private Keys Should Be Restricted
+
+    ${old_ca_lines}=    CA Certificate Lines
+    Renewal Document    ca    json
+    Restart MicroShift
+    Save Certificate Identity Snapshot    ${TC19_SNAPSHOT_DIR}/after-ca
+    Snapshots Meet ProdSec Rules
+    ...    ${TC19_SNAPSHOT_DIR}/after-serving    ${TC19_SNAPSHOT_DIR}/after-ca    ${True}
+    Private Keys Should Be Restricted
+    Wait Until Keyword Succeeds    12x    10s
+    ...    Old CA Certificates Should Not Be Trusted    ${old_ca_lines}
+    [Teardown]    Run Keywords
+    ...    Command Should Work    rm -rf ${TC19_SNAPSHOT_DIR}
+    ...    AND    Command Should Work    rm -f ${OLD_CA_PATTERNS}
+
+Configured And Default Certificate Lifetimes Are Applied
+    [Documentation]    Configured servingValidity and caValidity propagate into the notAfter of
+    ...    renewed CA and serving certificates, and once the configuration is removed
+    ...    the historical defaults (1y serving / 10y CA) apply again. Client and peer
+    ...    certificates are excluded: they are issued with hardcoded lifetimes
+    ...    (see Renewed Lifetimes Should Match).
+    ...
+    ...    Verifies OCPEDGE-2999 acceptance criteria, end to end:
+    ...    - "Custom serving lifetime appears in newly issued serving cert NotAfter"
+    ...    - "Custom CA lifetime appears in newly issued CA NotAfter"
+    ...    - "Defaults preserve current 1y serving / 10y CA behavior when unset"
+    ...    The planning math is unit-tested by TestPlanRenewal; this is the
+    ...    running-system half. OCPSTRAT-2899 TC-10 / TC-11.
+    ...    Fulfills OCPSTRAT-2899 AC: configurable serving/CA validity (SHOULD #4/#5)
+    ...    and default-preserving backward compatibility when config is omitted.
+    [Tags]    qe    ocpstrat-2899
+    # The custom values (2y serving / 12y CA) are deliberately long: the
+    # rotation watcher's deadline is notAfter minus the policy window, and a
+    # much shorter validity would put that deadline in the past, turning the
+    # activation restart into an immediate rotation restart.
+    Drop In MicroShift Config    certificates: {servingValidity: 17520h, caValidity: 105192h}    99-tc10-lifetimes
+    ${result}=    Renewal Document    ca    json
+    Renewed Lifetimes Should Match    ${result}    17520    105192
+    Restart MicroShift
+    Renewal Matches Current Status    ${result}
+
+    Remove Drop In MicroShift Config    99-tc10-lifetimes
+    ${defaults}=    Renewal Document    ca    json
+    Renewed Lifetimes Should Match    ${defaults}    8760    87600
+    Restart MicroShift
+    Renewal Matches Current Status    ${defaults}
+    [Teardown]    Run Keywords    Remove Drop In MicroShift Config    99-tc10-lifetimes    AND    Restart MicroShift
+
 
 *** Keywords ***
 Drop In Certificate Policy
@@ -645,3 +751,162 @@ Renewal Error Should Be Reported
     Should Be Equal    ${error}[kind]    Error
     Should Be Equal    ${error}[code]    ${code}
     Should Not Be Empty    ${error}[message]
+
+Renewed Lifetimes Should Match
+    [Documentation]    Every renewed CA and serving certificate's newNotAfter is about the
+    ...    configured validity away from now: at least 90% of it, and at most the
+    ...    validity plus three days (validity is aligned to the following midnight,
+    ...    which adds up to a day). The wide window only has to separate the
+    ...    configured value from the neighboring default (a factor of two apart),
+    ...    not measure it exactly.
+    ...
+    ...    Client and peer certificates are skipped: they are issued with hardcoded
+    ...    lifetimes (1y, and 10y for admin-kubeconfig-client) instead of the
+    ...    configured servingValidity, so their expiry does not follow the
+    ...    configuration (observed on the 2026-11-05 host run). The acceptance
+    ...    criteria only promise configured lifetimes for serving and CA
+    ...    certificates; whether client certificates should follow servingValidity
+    ...    is an open question for the feature developer.
+    [Arguments]    ${result}    ${serving_hours}    ${ca_hours}
+    ${now}=    Evaluate    datetime.datetime.now(datetime.timezone.utc)    modules=datetime
+    FOR    ${item}    IN    @{result}[items]
+        IF    '${item}[role]' not in ('ca', 'serving')    CONTINUE
+        ${hours}=    Set Variable If    '${item}[role]' == 'ca'    ${ca_hours}    ${serving_hours}
+        ${remaining}=    Evaluate
+        ...    (datetime.datetime.fromisoformat($item['newNotAfter'].replace('Z', '+00:00')) - $now).total_seconds() / 3600
+        ...    modules=datetime
+        Should Be True    ${hours} * 0.9 <= ${remaining} <= ${hours} + 72
+        ...    msg=${item}[service] ${item}[name] renewed with ${remaining} hours remaining, expected about ${hours}
+    END
+
+Kubeconfig Should Connect
+    [Documentation]    The kubeconfig file at the given host path can reach the API server.
+    [Arguments]    ${path}
+    Wait Until Keyword Succeeds    10x    6s
+    ...    Command Should Work    oc --kubeconfig ${path} get --raw /livez
+
+Kubeconfig Should Not Connect
+    [Documentation]    The kubeconfig file at the given host path is rejected during TLS verification.
+    [Arguments]    ${path}
+    ${stdout}    ${stderr}    ${rc}=    Command Execution    oc --kubeconfig ${path} get --raw /livez
+    Should Not Be Equal As Integers    ${rc}    0
+    Should Contain    ${stderr}    certificate signed by unknown authority
+
+Save Certificate Identity Snapshot
+    [Documentation]    Write each certificate file's fingerprint, public key hash, serial number,
+    ...    subject, and SANs to a file on the host, for later comparison by
+    ...    Snapshots Meet ProdSec Rules. The data never returns
+    ...    to Robot: certificate subjects and SANs must not end up in test logs.
+    ...    CA bundle files are skipped because they hold several certificates.
+    [Arguments]    ${path}
+    ${command}=    Catenate    SEPARATOR=${SPACE}
+    ...    bash -o pipefail -c 'find /var/lib/microshift/certs -type f -name "*.crt"
+    ...    ! -name ca-bundle.crt ! -path "*/ca-bundle/*" | sort | while read -r f; do
+    ...    fp=$(openssl x509 -in "$f" -noout -fingerprint -sha256 | cut -d= -f2);
+    ...    spki=$(openssl x509 -in "$f" -noout -pubkey | openssl pkey -pubin -outform der | sha256sum | cut -c1-64);
+    ...    serial=$(openssl x509 -in "$f" -noout -serial | cut -d= -f2);
+    ...    subject=$(openssl x509 -in "$f" -noout -subject -nameopt RFC2253 | cut -d= -f2-);
+    ...    san=$(openssl x509 -in "$f" -noout -ext subjectAltName 2>/dev/null | tail -n +2 | tr -d " ");
+    ...    echo "$f|$fp|$spki|$serial|$subject|$san"; done > ${path}'
+    ...    && test -s ${path}
+    Command Should Work    ${command}
+
+Snapshots Meet ProdSec Rules
+    [Documentation]    Compare two snapshots taken by Save Certificate Identity Snapshot:
+    ...    every certificate that changed has a new key and serial number and keeps
+    ...    its subject and SANs, CA renewal changes at least one CA certificate, and
+    ...    serving renewal changes none. The comparison runs on the host so that
+    ...    identity data stays out of Robot logs; on failure only the violating
+    ...    certificate paths are printed.
+    [Arguments]    ${before}    ${after}    ${ca_renewal}
+    ${script}=    Snapshot Comparison Script
+    ${stdout}    ${stderr}    ${rc}=    Command Execution
+    ...    python3 -c '${script}' ${before} ${after} ${ca_renewal}
+    Should Be Equal As Integers    ${rc}    0    msg=${stdout}${stderr}
+
+Snapshot Comparison Script
+    [Documentation]    Python source of the snapshot comparison. Every changed certificate
+    ...    must have a new key and serial number and keep its subject and SANs.
+    ...
+    ...    The kubelet csr-signer sub-CA is issued from the parent CA's serial
+    ...    counter, which a CA renewal resets to zero, so the sub-CA is re-issued
+    ...    with a new key but the same serial number (observed on the 2026-11-03
+    ...    host run). Whether that violates the ProdSec serial-uniqueness guidance
+    ...    is pending a ruling from the feature developer; until then, only
+    ...    certificates of this signer are excluded from the serial check.
+    ...
+    ...    The script is written without statement blocks (comprehensions and
+    ...    ternaries only, wrapped inside brackets): Robot continuation lines
+    ...    cannot carry leading spaces, so indented Python would arrive
+    ...    flattened and fail to parse.
+    ${script}=    Catenate
+    ...    SEPARATOR=\n
+    ...    import sys
+    ...    snap = lambda p: {
+    ...    r[0]: dict(zip(("fp", "spki", "serial", "subject", "san"), r[1:]))
+    ...    for r in (line.rstrip("\\n").split("|") for line in open(p) if line.strip())
+    ...    }
+    ...    before = snap(sys.argv[1])
+    ...    after = snap(sys.argv[2])
+    ...    ca_renewal = sys.argv[3] == "True"
+    ...    changed = sorted(p for p in after if p in before and after[p]["fp"] != before[p]["fp"])
+    ...    changed_cas = [p for p in changed if p.endswith("/ca.crt")]
+    ...    violations = ["no certificate changed between the snapshots"] if not changed else []
+    ...    violations += ["private key reused: " + p for p in changed if after[p]["spki"] == before[p]["spki"]]
+    ...    violations += [
+    ...    "serial number reused: " + p
+    ...    for p in changed
+    ...    if after[p]["serial"] == before[p]["serial"] and "/kubelet-csr-signer-signer/" not in p
+    ...    ]
+    ...    violations += ["subject or SANs changed: " + p for p in changed if (after[p]["subject"], after[p]["san"]) != (before[p]["subject"], before[p]["san"])]
+    ...    violations += ["CA renewal did not change any CA certificate"] if ca_renewal and not changed_cas else []
+    ...    violations += ["serving renewal changed CA certificates: " + ", ".join(changed_cas)] if not ca_renewal and changed_cas else []
+    ...    print("\\n".join(violations))
+    ...    sys.exit(1 if violations else 0)
+    RETURN    ${script}
+
+Private Keys Should Be Restricted
+    [Documentation]    Every private key under the certificate directory is mode 0600 or stricter
+    ...    and owned by root.
+    ${loose}=    Command Should Work
+    ...    find /var/lib/microshift/certs -type f -name '*.key' \\( -perm /177 -o ! -user root \\) -print
+    Should Be Empty    ${loose}    msg=Private keys with a weak mode or owner: ${loose}
+
+CA Certificate Lines
+    [Documentation]    Return one line from the middle of each CA certificate file. That line comes
+    ...    from the key or signature data, so it identifies the certificate in any other PEM file.
+    ${output}=    Command Should Work
+    ...    bash -c 'for f in $(find /var/lib/microshift/certs -type f -name ca.crt | sort); do n=$(grep -c . "$f"); sed -n "$((n / 2))p" "$f"; done'
+    ${lines}=    Evaluate    [line for line in $output.splitlines() if line]
+    Should Not Be Empty    ${lines}
+    RETURN    ${lines}
+
+Old CA Certificates Should Not Be Trusted
+    [Documentation]    No certificate file, ConfigMap, or Secret still contains an old CA certificate.
+    [Arguments]    ${old_ca_lines}
+    ${joined}=    Catenate    @{old_ca_lines}
+    Command Should Work    bash -c 'printf "%s\\n" ${joined} > ${OLD_CA_PATTERNS}'
+    ${stdout}    ${stderr}    ${rc}=    Command Execution
+    ...    grep -rlF -f ${OLD_CA_PATTERNS} /var/lib/microshift/certs
+    Should Be Equal As Integers    ${rc}    1    msg=Old CA certificate still present in: ${stdout} ${stderr}
+    # Scan the objects on the host and return only the names that contain an
+    # old CA: piping the full `oc get` output back would put every Secret's
+    # contents into the Robot log.
+    # The scan is written without statement blocks (comprehensions and
+    # lambdas only): Robot continuation lines cannot carry leading spaces, so
+    # indented Python would arrive flattened and fail to parse.
+    ${scan}=    Catenate    SEPARATOR=\n
+    ...    import base64, json, sys
+    ...    lines = [l.strip() for l in open("${OLD_CA_PATTERNS}") if l.strip()]
+    ...    items = json.load(sys.stdin)["items"]
+    ...    decode = lambda i, v: base64.b64decode(v).decode("utf-8", "ignore") if i["kind"] == "Secret" else v
+    ...    hits = sorted(
+    ...    i["kind"] + " " + i["metadata"]["namespace"] + "/" + i["metadata"]["name"]
+    ...    for i in items
+    ...    for v in (i.get("data") or {}).values()
+    ...    if any(l in decode(i, v) for l in lines)
+    ...    )
+    ...    print("\\n".join(hits))
+    ${hits}=    Command Should Work
+    ...    oc --kubeconfig ${HOST_KUBECONFIG} get configmaps,secrets -A -o json | python3 -c '${scan}'
+    Should Be Empty    ${hits.strip().splitlines()}    msg=Old CA certificate still present in: ${hits}
