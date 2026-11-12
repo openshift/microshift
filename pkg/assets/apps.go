@@ -7,6 +7,7 @@ import (
 	embedded "github.com/openshift/microshift/assets"
 
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	appsclientv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
@@ -32,8 +33,9 @@ func appsClient(kubeconfigPath string) *appsclientv1.AppsV1Client {
 }
 
 type dpApplier struct {
-	Client *appsclientv1.AppsV1Client
-	dp     *appsv1.Deployment
+	Client         *appsclientv1.AppsV1Client
+	dp             *appsv1.Deployment
+	podAnnotations map[string]string
 }
 
 func (d *dpApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
@@ -49,19 +51,23 @@ func (d *dpApplier) Read(objBytes []byte, render RenderFunc, params RenderParams
 		panic(err)
 	}
 	d.dp = obj.(*appsv1.Deployment)
+	annotatePodTemplate(&d.dp.Spec.Template, d.podAnnotations)
 }
 
 func (d *dpApplier) Handle(ctx context.Context) error {
-	obj, _, err := resourceapply.ApplyDeployment(ctx, d.Client, assetsEventRecorder, d.dp, 0)
+	obj, changed, err := resourceapply.ApplyDeployment(ctx, d.Client, assetsEventRecorder, d.dp, 0)
 	if err != nil {
 		klog.ErrorS(err, "Failed to apply deployment asset", "actual", obj, "new", d.dp)
+	} else if changed && len(d.podAnnotations) > 0 {
+		klog.InfoS("Reconciled deployment pod annotations", "deployment", klog.KObj(d.dp), "annotations", d.podAnnotations)
 	}
 	return err
 }
 
 type dsApplier struct {
-	Client *appsclientv1.AppsV1Client
-	ds     *appsv1.DaemonSet
+	Client         *appsclientv1.AppsV1Client
+	ds             *appsv1.DaemonSet
+	podAnnotations map[string]string
 }
 
 func (d *dsApplier) Read(objBytes []byte, render RenderFunc, params RenderParams) {
@@ -77,9 +83,13 @@ func (d *dsApplier) Read(objBytes []byte, render RenderFunc, params RenderParams
 		panic(err)
 	}
 	d.ds = obj.(*appsv1.DaemonSet)
+	annotatePodTemplate(&d.ds.Spec.Template, d.podAnnotations)
 }
 func (d *dsApplier) Handle(ctx context.Context) error {
-	_, _, err := resourceapply.ApplyDaemonSet(ctx, d.Client, assetsEventRecorder, d.ds, 0)
+	_, changed, err := resourceapply.ApplyDaemonSet(ctx, d.Client, assetsEventRecorder, d.ds, 0)
+	if err == nil && changed && len(d.podAnnotations) > 0 {
+		klog.InfoS("Reconciled daemonset pod annotations", "daemonset", klog.KObj(d.ds), "annotations", d.podAnnotations)
+	}
 	return err
 }
 
@@ -103,14 +113,23 @@ func applyApps(ctx context.Context, apps []string, handler resourceHandler, rend
 	return nil
 }
 
-func ApplyDeployments(ctx context.Context, dps []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
-	dp := &dpApplier{}
+func ApplyDeployments(ctx context.Context, dps []string, render RenderFunc, params RenderParams, kubeconfigPath string, podAnnotations map[string]string) error {
+	dp := &dpApplier{podAnnotations: podAnnotations}
 	dp.Client = appsClient(kubeconfigPath)
 	return applyApps(ctx, dps, dp, render, params)
 }
 
-func ApplyDaemonSets(ctx context.Context, apps []string, render RenderFunc, params RenderParams, kubeconfigPath string) error {
-	ds := &dsApplier{}
+func ApplyDaemonSets(ctx context.Context, apps []string, render RenderFunc, params RenderParams, kubeconfigPath string, podAnnotations map[string]string) error {
+	ds := &dsApplier{podAnnotations: podAnnotations}
 	ds.Client = appsClient(kubeconfigPath)
 	return applyApps(ctx, apps, ds, render, params)
+}
+
+func annotatePodTemplate(template *corev1.PodTemplateSpec, annotations map[string]string) {
+	for key, value := range annotations {
+		if template.Annotations == nil {
+			template.Annotations = make(map[string]string, len(annotations))
+		}
+		template.Annotations[key] = value
+	}
 }

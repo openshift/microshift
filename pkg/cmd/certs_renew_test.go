@@ -1,0 +1,375 @@
+package cmd
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/json"
+	"errors"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/utils/ptr"
+	"sigs.k8s.io/yaml"
+
+	"github.com/openshift/microshift/pkg/admin/certificates"
+	certificatesv1alpha1 "github.com/openshift/microshift/pkg/apis/certificates/v1alpha1"
+	"github.com/openshift/microshift/pkg/config"
+	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
+)
+
+func TestCertificateRenewalApply(t *testing.T) {
+	for _, tt := range []struct {
+		name                     string
+		renewCAs, customValidity bool
+	}{
+		{"serving", false, false},
+		{"ca", true, false},
+		{"serving/custom-validity", false, true},
+		{"ca/custom-validity", true, true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			cfg := &config.Config{
+				Network:   config.Network{ServiceNetwork: []string{"10.43.0.0/16"}},
+				Node:      config.Node{HostnameOverride: "test-node", NodeIP: "192.0.2.10"},
+				DNS:       config.DNS{BaseDomain: "example.test"},
+				ApiServer: config.ApiServer{AdvertiseAddress: "10.44.0.0", URL: "https://127.0.0.1:6443", Port: 6443},
+			}
+			dataDir := t.TempDir()
+			started := time.Now()
+			builder, err := certificateChainsSetup(cfg, dataDir)
+			require.NoError(t, err)
+			chains, err := builder.Complete()
+			require.NoError(t, err)
+			require.NoError(t, initKubeconfigs(cfg, chains, dataDir))
+			unrelated := filepath.Join(dataDir, "resources", "unrelated")
+			require.NoError(t, os.Mkdir(unrelated, 0700))
+			require.NoError(t, os.WriteFile(filepath.Join(unrelated, "kubeconfig"), []byte("unrelated component data"), 0600))
+			before, err := builder.LoadInventory()
+			require.NoError(t, err)
+			beforeFiles := certificateFileDigests(t, dataDir)
+			if tt.customValidity {
+				// Apply new policy to renewal without rewriting active certificates.
+				cfg.Certificates = config.Certificates{
+					ServingValidity:                  &metav1.Duration{Duration: 1008 * time.Hour},
+					CAValidity:                       &metav1.Duration{Duration: 17520 * time.Hour},
+					ForceRestartOnExpirationImminent: ptr.To(false),
+				}
+				builder, err = certificateChainsSetup(cfg, dataDir)
+				require.NoError(t, err)
+			}
+			plan, err := builder.PlanRenewal(tt.renewCAs, time.Now())
+			require.NoError(t, err)
+			require.Equal(t, beforeFiles, certificateFileDigests(t, dataDir))
+			wantCount := 19
+			if tt.renewCAs {
+				wantCount = 31
+			}
+			require.Len(t, plan, wantCount)
+			renewed, err := applyCertificateRenewal(cfg, dataDir, tt.renewCAs)
+			require.NoError(t, err)
+			// Planning and issuance sample the clock separately; allow elapsed
+			// setup/generation time plus certificate timestamp rounding.
+			expiryTolerance := time.Since(started) + time.Second
+			require.Len(t, renewed, wantCount)
+			require.Equal(t, beforeFiles, activeCertificateFileDigests(t, dataDir), "preparation must not touch active files")
+			renewedExpiries := make(map[string]time.Time, len(renewed))
+			for _, entry := range renewed {
+				renewedExpiries[strings.Join(entry.Path, "/")] = entry.Certificate.NotAfter
+			}
+			for _, planned := range plan {
+				path := strings.Join(planned.Path, "/")
+				require.Contains(t, renewedExpiries, path)
+				require.WithinDuration(t, planned.NewNotAfter, renewedExpiries[path], expiryTolerance, path)
+			}
+			pending, err := loadPendingCertificateRenewal(dataDir)
+			require.NoError(t, err)
+			require.Equal(t, certificatesv1alpha1.RenewalStatusPending, pending.Status)
+			require.Len(t, pending.Items, wantCount)
+			// Resources may change between preparation and activation.
+			require.NoError(t, os.WriteFile(filepath.Join(unrelated, "kubeconfig"), []byte("updated component data"), 0600))
+			// Short-lived material must also activate if restart policy is re-enabled.
+			cfg.Certificates.ForceRestartOnExpirationImminent = ptr.To(true)
+			tx := &certificates.Transaction{DataDir: dataDir}
+			activated, err := activateCertificateRenewal(cfg, tx, func() error { return errors.New("etcd running") }, time.Now())
+			require.ErrorContains(t, err, "etcd running")
+			require.False(t, activated)
+			activated, err = activateCertificateRenewal(cfg, tx, func() error { return nil }, time.Now())
+			require.NoError(t, err)
+			require.True(t, activated)
+			activeFiles := activeCertificateFileDigests(t, dataDir)
+			loaded, err := loadActivatedCertificates(cfg, dataDir)
+			require.NoError(t, err)
+			require.Len(t, loaded.Inventory(), len(before))
+			require.NotEmpty(t, cfg.Ingress.ServingCertificate)
+			require.Equal(t, activeFiles, activeCertificateFileDigests(t, dataDir), "startup must retain the exact activated material")
+			contents, err := os.ReadFile(filepath.Join(unrelated, "kubeconfig"))
+			require.NoError(t, err)
+			require.Equal(t, "updated component data", string(contents))
+			inventory, err := validateCertificateRenewal(cfg, dataDir, before, tt.renewCAs)
+			require.NoError(t, err)
+			for _, entry := range inventory {
+				var expected time.Duration
+				if entry.Role == certchains.CertificateRoleServing {
+					expected = cfg.Certificates.ServingDuration()
+				} else if entry.Role == certchains.CertificateRoleCA {
+					expected = cfg.Certificates.CADuration()
+				}
+				if expected > 0 {
+					require.InDelta(t, expected.Seconds(), entry.Certificate.NotAfter.Sub(entry.Certificate.NotBefore).Seconds(), (24*time.Hour + time.Minute).Seconds(), entry.Name)
+				}
+				state, err := entry.StatusAt(time.Now())
+				require.NoError(t, err)
+				require.Equal(t, certchains.CertificateStatusHealthy, state, entry.Name)
+			}
+			_, err = os.Stat(filepath.Join(dataDir, ".cert-renewal"))
+			require.ErrorIs(t, err, os.ErrNotExist)
+			if !tt.renewCAs {
+				afterFiles := certificateFileDigests(t, dataDir)
+				for path, digest := range beforeFiles {
+					if filepath.Base(path) == "ca.crt" || filepath.Base(path) == "ca.key" {
+						require.Equal(t, digest, afterFiles[path], "CA material must remain unchanged: %s", path)
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestCertRenewCommand(t *testing.T) {
+	for _, output := range []string{"", certificateOutputJSON, certificateOutputYAML} {
+		for _, dryRun := range []bool{true, false} {
+			t.Run(output+"/"+map[bool]string{true: "dry-run", false: "apply"}[dryRun], func(t *testing.T) {
+				now := time.Now().UTC().Truncate(time.Second)
+				entry := certificateInventoryEntry("test", "client", certchains.CertificateRoleClient, certchains.RotationPolicyStandard, now.Add(-time.Hour), now.Add(time.Hour))
+				entry.ParentCA = "test-ca"
+				plan := []certchains.CertificateRenewalPlanEntry{{CertificateInventoryEntry: entry, NewNotAfter: now.Add(24 * time.Hour)}}
+				var stdout, stderr bytes.Buffer
+				applied, released, configLoaded := false, false, false
+				options := &certRenewOptions{
+					IOStreams: genericclioptions.IOStreams{Out: &stdout, ErrOut: &stderr},
+					now:       func() time.Time { return now },
+					loadConfig: func() (*config.Config, error) {
+						configLoaded = true
+						return &config.Config{}, nil
+					},
+					prepare: func(writing bool) (func(), error) {
+						require.True(t, configLoaded, "validate configuration before transaction access")
+						require.Equal(t, !dryRun, writing)
+						return func() { released = true }, nil
+					},
+					plan: func(*config.Config, bool, time.Time) ([]certchains.CertificateRenewalPlanEntry, error) {
+						return plan, nil
+					},
+					apply: func(*config.Config, bool) (certchains.CertificateInventory, error) {
+						applied = true
+						entry.Certificate.NotAfter = plan[0].NewNotAfter
+						return certchains.CertificateInventory{entry}, nil
+					},
+				}
+				root := newCertsCommand(&certStatusOptions{IOStreams: options.IOStreams})
+				renew := newCertsRenewCommand(options)
+				renew.PreRunE = nil // Exercise output independently of the test runner's UID.
+				root.AddCommand(renew)
+				args := []string{"renew", "--serving"}
+				if dryRun {
+					args = append(args, "--dry-run")
+				}
+				if output != "" {
+					args = append(args, "-o", output)
+				}
+				require.Zero(t, RunCertsCommand(root, args), stderr.String())
+				require.Equal(t, !dryRun, applied)
+				require.True(t, released)
+				if output == "" {
+					require.Contains(t, stdout.String(), "client")
+					require.Contains(t, stderr.String(), "WARNING:")
+					return
+				}
+				require.Empty(t, stderr.String())
+				var result certificatesv1alpha1.CertificateRenewalResult
+				object, gvk, err := certificateCodecs.UniversalDeserializer().Decode(stdout.Bytes(), nil, nil)
+				require.NoError(t, err)
+				require.IsType(t, &certificatesv1alpha1.CertificateRenewalResult{}, object)
+				require.Equal(t, certificatesv1alpha1.GroupVersion.WithKind(certificatesv1alpha1.CertificateRenewalResultKind), *gvk)
+				if output == certificateOutputJSON {
+					require.NoError(t, json.Unmarshal(stdout.Bytes(), &result))
+				} else {
+					require.NoError(t, yaml.UnmarshalStrict(stdout.Bytes(), &result))
+				}
+				require.Equal(t, certificatesv1alpha1.CertificateRenewalResultKind, result.Kind)
+				require.Equal(t, dryRun, result.DryRun)
+				require.Equal(t, !dryRun, result.Items[0].Changed)
+				require.Equal(t, "test-ca", *result.Items[0].ParentCA)
+				require.True(t, plan[0].NewNotAfter.Equal(result.Items[0].NewNotAfter.Time))
+				if dryRun {
+					require.Equal(t, certificatesv1alpha1.RenewalStatusValidated, result.Status)
+				} else {
+					require.Equal(t, certificatesv1alpha1.RenewalStatusPending, result.Status)
+				}
+				require.True(t, result.Impact.ServiceRestartRequired)
+				require.False(t, result.Impact.KubeconfigRedistributionRequired)
+			})
+		}
+	}
+}
+
+func TestCertRenewErrors(t *testing.T) {
+	for _, tt := range []struct {
+		name string
+		args []string
+		code certificatesv1alpha1.ErrorCode
+	}{
+		{"missing mode", nil, certificatesv1alpha1.ErrorCodeInvalidArguments},
+		{"both modes", []string{"--ca", "--serving"}, certificatesv1alpha1.ErrorCodeInvalidArguments},
+		{"configuration", []string{"--ca", "--dry-run"}, certificatesv1alpha1.ErrorCodeInvalidConfiguration},
+		{"planning", []string{"--serving", "--dry-run"}, certificatesv1alpha1.ErrorCodeRenewalFailed},
+		{"inventory", []string{"--serving", "--dry-run"}, certificatesv1alpha1.ErrorCodeCertificateInventoryFailed},
+		{"recovery", []string{"--serving"}, certificatesv1alpha1.ErrorCodeRecoveryFailed},
+		{"apply", []string{"--serving"}, certificatesv1alpha1.ErrorCodeRenewalFailed},
+		{"rollback", []string{"--serving"}, certificatesv1alpha1.ErrorCodeRecoveryFailed},
+	} {
+		for _, output := range []string{"", certificateOutputJSON, certificateOutputYAML} {
+			t.Run(tt.name+"/"+output, func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				options := &certRenewOptions{
+					IOStreams: genericclioptions.IOStreams{Out: &stdout, ErrOut: &stderr}, now: time.Now,
+					loadConfig: func() (*config.Config, error) {
+						if tt.name == "configuration" {
+							return nil, errors.New("credential-bearing-configuration")
+						}
+						return &config.Config{}, nil
+					},
+					prepare: func(bool) (func(), error) {
+						require.NotEqual(t, "configuration", tt.name, "invalid configuration must not prepare or recover a transaction")
+						if tt.name == "recovery" {
+							return nil, &certificateCommandError{tt.code, errors.New("operation refused")}
+						}
+						return func() {}, nil
+					},
+					plan: func(*config.Config, bool, time.Time) ([]certchains.CertificateRenewalPlanEntry, error) {
+						if tt.name == "inventory" {
+							return nil, &certchains.InventoryReadError{Err: errors.New("cannot read inventory")}
+						}
+						if tt.name == "apply" || tt.name == "rollback" {
+							return []certchains.CertificateRenewalPlanEntry{{}}, nil
+						}
+						return nil, errors.New("invalid key pair")
+					},
+					apply: func(*config.Config, bool) (certchains.CertificateInventory, error) {
+						if tt.name == "rollback" {
+							return nil, &certificates.RecoveryError{Err: errors.New("cannot restore backup")}
+						}
+						return nil, errors.New("cannot stage certificates")
+					},
+				}
+				root := newCertsCommand(&certStatusOptions{IOStreams: options.IOStreams})
+				renew := newCertsRenewCommand(options)
+				renew.PreRunE = nil // Exercise operation errors independently of the test runner's UID.
+				root.AddCommand(renew)
+				args := append([]string{"renew", "-o", output}, tt.args...)
+				require.Equal(t, 1, RunCertsCommand(root, args))
+				require.Empty(t, stdout.String())
+				require.NotContains(t, stderr.String(), "credential-bearing-configuration")
+				if output == "" {
+					require.Contains(t, stderr.String(), "Error:")
+					return
+				}
+				var failure certificatesv1alpha1.Error
+				if output == certificateOutputJSON {
+					require.NoError(t, json.Unmarshal(stderr.Bytes(), &failure))
+				} else {
+					require.NoError(t, yaml.UnmarshalStrict(stderr.Bytes(), &failure))
+				}
+				require.Equal(t, tt.code, failure.Code)
+			})
+		}
+	}
+}
+
+func TestCertificateRenewalPlanRejectsCADueForRotation(t *testing.T) {
+	cfg, dir := pendingRenewalFixture(t)
+	builder, err := certificateChainsSetup(cfg, dir)
+	require.NoError(t, err)
+	inventory, err := builder.LoadInventory()
+	require.NoError(t, err)
+	var now time.Time
+	for _, entry := range inventory.ByRole(certchains.CertificateRoleCA) {
+		candidate := entry.Certificate.NotAfter.Add(-90 * 24 * time.Hour)
+		if now.IsZero() || candidate.Before(now) {
+			now = candidate
+		}
+	}
+	before := certificateFileDigests(t, dir)
+	_, err = builder.PlanRenewal(false, now)
+	require.NoError(t, err, "cryptographic validity alone permits renewal")
+	_, err = planCertificateRenewal(builder, false, true, now)
+	require.ErrorContains(t, err, "automatic rotation deadline")
+	require.ErrorContains(t, err, "use --ca")
+	_, err = planCertificateRenewal(builder, true, true, now)
+	require.NoError(t, err, "CA renewal can replace the due signers")
+	_, err = planCertificateRenewal(builder, false, false, now)
+	require.NoError(t, err, "warn-only policy permits renewal while the CA is still valid")
+	require.Equal(t, before, certificateFileDigests(t, dir), "planning must not modify active or pending material")
+}
+
+func TestCertificateRotationDeadline(t *testing.T) {
+	now := time.Now().UTC().Truncate(time.Second)
+	for _, tt := range []struct {
+		name     string
+		policy   certchains.RotationPolicy
+		validity time.Duration
+		advance  time.Duration
+	}{
+		{"short-standard", certchains.RotationPolicyStandard, 1000 * time.Hour, 333 * time.Hour},
+		{"short-extended", certchains.RotationPolicyExtended, 1000 * time.Hour, 100 * time.Hour},
+		{"one-year-extended", certchains.RotationPolicyExtended, 8760 * time.Hour, 876 * time.Hour},
+		{"long-extended", certchains.RotationPolicyExtended, 87600 * time.Hour, 8760 * time.Hour},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			entry := certificateInventoryEntry("test", "client", certchains.CertificateRoleClient, tt.policy, now.Add(-tt.validity), now)
+			deadline := now.Add(-tt.advance)
+			actual, err := entry.RotationDeadline()
+			require.NoError(t, err)
+			require.Equal(t, deadline, actual)
+			inventory := certchains.CertificateInventory{entry}
+			require.NoError(t, checkCertificateRotationDeadline(inventory, deadline.Add(-time.Second)))
+			require.ErrorContains(t, checkCertificateRotationDeadline(inventory, deadline), "automatic rotation deadline")
+			require.Error(t, checkCertificateRotationDeadline(inventory, deadline.Add(time.Second)))
+		})
+	}
+}
+
+func activeCertificateFileDigests(t *testing.T, dir string) map[string][32]byte {
+	t.Helper()
+	files := certificateFileDigests(t, filepath.Join(dir, "certs"))
+	for path, digest := range certificateFileDigests(t, filepath.Join(dir, "resources")) {
+		files[path] = digest
+	}
+	return files
+}
+
+func certificateFileDigests(t *testing.T, dir string) map[string][32]byte {
+	t.Helper()
+	files := map[string][32]byte{}
+	require.NoError(t, filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !entry.IsDir() {
+			contents, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			files[path] = sha256.Sum256(contents)
+		}
+		return nil
+	}))
+	return files
+}

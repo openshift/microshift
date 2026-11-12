@@ -18,7 +18,7 @@ package cmd
 import (
 	"os"
 	"path/filepath"
-	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -26,108 +26,118 @@ import (
 	"github.com/openshift/microshift/pkg/util/cryptomaterial/certchains"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"k8s.io/apiserver/pkg/authentication/user"
 )
 
-func Test_certsToRegenerate(t *testing.T) {
-	tests := []struct {
-		name    string
-		chains  *certchains.CertificateChains
-		want    [][]string
-		wantErr bool
-	}{
-		{
-			name:   "empty chains",
-			chains: &certchains.CertificateChains{},
-			want:   [][]string{},
-		},
-		{
-			name: "no cert to regenerate",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 365*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 280 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				)),
-			want: [][]string{},
-		},
-		{
-			name: "signer needs regen",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 140*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 270 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				)),
-			want: [][]string{{"signer"}},
-		},
-		{
-			name: "leaf cert needs regen",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 270*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 150 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				),
-			),
-			want: [][]string{{"signer", "somename"}},
-		},
-		{
-			name: "leaf cert needs regen",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 270*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 150 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				),
-			),
-			want: [][]string{{"signer", "somename"}},
-		},
-		{
-			name: "both need regen",
-			chains: mustComplete(t,
-				certchains.NewCertificateChains(certchains.NewCertificateSigner("signer", t.TempDir(), 160*24*time.Hour).
-					WithClientCertificates(&certchains.ClientCertificateSigningRequestInfo{
-						CSRMeta: certchains.CSRMeta{
-							Name:     "somename",
-							Validity: 150 * 24 * time.Hour,
-						},
-						UserInfo: &user.DefaultInfo{Name: "someclient"},
-					}),
-				),
-			),
-			want: [][]string{{"signer"}, {"signer", "somename"}},
-		},
+func TestProductionCertificateInventory(t *testing.T) {
+	cfg := &config.Config{
+		Network:   config.Network{ServiceNetwork: []string{"10.43.0.0/16"}},
+		Node:      config.Node{HostnameOverride: "test-node", NodeIP: "192.0.2.10"},
+		DNS:       config.DNS{BaseDomain: "example.test"},
+		ApiServer: config.ApiServer{AdvertiseAddress: "10.44.0.0"},
 	}
+	dataDir := t.TempDir()
+	builder, err := certificateChainsSetup(cfg, dataDir)
+	require.NoError(t, err)
+	chains, err := builder.Complete()
+	require.NoError(t, err)
+	// Use a fresh builder to exercise status's disk-loading path independently
+	// of the builder that created the certificates.
+	inventory, err := loadCertificateInventory(cfg, dataDir)
+	require.NoError(t, err)
+	require.Equal(t, chains.Inventory(), inventory)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := certsToRegenerate(tt.chains)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("certsToRegenerate() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("certsToRegenerate() = %v, want %v", got, tt.want)
+	const (
+		ca       = certchains.CertificateRoleCA
+		client   = certchains.CertificateRoleClient
+		serving  = certchains.CertificateRoleServing
+		peer     = certchains.CertificateRolePeer
+		standard = certchains.RotationPolicyStandard
+		extended = certchains.RotationPolicyExtended
+	)
+	type metadata struct {
+		service string
+		role    certchains.CertificateRole
+		policy  certchains.RotationPolicy
+	}
+	expected := map[string]metadata{
+		"admin-kubeconfig-signer":                                                      {"authentication", ca, extended},
+		"admin-kubeconfig-signer/admin-kubeconfig-client":                              {"authentication", client, extended},
+		"admin-kubeconfig-signer/openshift-observability-client":                       {"observability", client, standard},
+		"aggregator-signer":                                                            {"kube-apiserver", ca, extended},
+		"aggregator-signer/aggregator-client":                                          {"kube-apiserver", client, standard},
+		"etcd-signer":                                                                  {"etcd", ca, extended},
+		"etcd-signer/apiserver-etcd-client":                                            {"kube-apiserver", client, extended},
+		"etcd-signer/etcd-peer":                                                        {"etcd", peer, extended},
+		"etcd-signer/etcd-serving":                                                     {"etcd", peer, extended},
+		"ingress-ca":                                                                   {"ingress", ca, extended},
+		"ingress-ca/router-default-serving":                                            {"ingress", serving, standard},
+		"kube-apiserver-external-signer":                                               {"kube-apiserver", ca, extended},
+		"kube-apiserver-external-signer/kube-external-serving":                         {"kube-apiserver", serving, standard},
+		"kube-apiserver-localhost-signer":                                              {"kube-apiserver", ca, extended},
+		"kube-apiserver-localhost-signer/kube-apiserver-localhost-serving":             {"kube-apiserver", serving, standard},
+		"kube-apiserver-service-network-signer":                                        {"kube-apiserver", ca, extended},
+		"kube-apiserver-service-network-signer/kube-apiserver-service-network-serving": {"kube-apiserver", serving, standard},
+		"kube-apiserver-to-kubelet-signer":                                             {"kube-apiserver", ca, extended},
+		"kube-apiserver-to-kubelet-signer/kube-apiserver-to-kubelet-client":            {"kube-apiserver", client, standard},
+		"kube-apiserver-to-kubelet-signer/metrics-server-kubelet-client":               {"metrics-server", client, standard},
+		"kube-control-plane-signer":                                                    {"control-plane", ca, extended},
+		"kube-control-plane-signer/cluster-policy-controller":                          {"cluster-policy-controller", client, standard},
+		"kube-control-plane-signer/kube-controller-manager":                            {"kube-controller-manager", client, standard},
+		"kube-control-plane-signer/kube-scheduler":                                     {"kube-scheduler", client, standard},
+		"kube-control-plane-signer/route-controller-manager":                           {"route-controller-manager", client, standard},
+		"kubelet-signer":                                                               {"kubelet", ca, extended},
+		"kubelet-signer/kube-csr-signer":                                               {"kubelet", ca, extended},
+		"kubelet-signer/kube-csr-signer/kubelet-client":                                {"kubelet", client, standard},
+		"kubelet-signer/kube-csr-signer/kubelet-server":                                {"kubelet", serving, standard},
+		"service-ca": {"service-ca", ca, extended},
+		"service-ca/route-controller-manager-serving": {"route-controller-manager", serving, standard},
+	}
+	require.Len(t, inventory, len(expected))
+	for _, entry := range inventory {
+		path := strings.Join(entry.Path, "/")
+		t.Run(path, func(t *testing.T) {
+			want, ok := expected[path]
+			require.True(t, ok, "unexpected certificate %q", path)
+			require.Equal(t, want, metadata{entry.Service, entry.Role, entry.RotationPolicy})
+			parts := strings.Split(path, "/")
+			require.Equal(t, parts[len(parts)-1], entry.Name)
+			if len(parts) == 1 {
+				require.Empty(t, entry.ParentCA)
+			} else {
+				require.Equal(t, parts[len(parts)-2], entry.ParentCA)
 			}
 		})
+		delete(expected, path)
 	}
+	require.Empty(t, expected, "every production certificate must be covered")
+}
+
+func Test_certsToRegenerate(t *testing.T) {
+	now := time.Now().UTC().Truncate(time.Second)
+	for _, policy := range []certchains.RotationPolicy{certchains.RotationPolicyStandard, certchains.RotationPolicyExtended} {
+		for _, lifetime := range []time.Duration{1008 * time.Hour, 8760 * time.Hour, 87600 * time.Hour} {
+			warning, _, err := policy.StatusThresholds()
+			require.NoError(t, err)
+			boundary := time.Duration(float64(lifetime) * warning)
+			for _, remaining := range []time.Duration{lifetime, boundary + time.Second, boundary, boundary - time.Second, 0, -time.Second, lifetime + time.Second} {
+				entry := certificateInventoryEntry("test", "certificate", certchains.CertificateRoleClient, policy, now.Add(remaining-lifetime), now.Add(remaining))
+				entry.Path = []string{"signer", "certificate"}
+				got, err := certsToRegenerate(certchains.CertificateInventory{entry}, now)
+				require.NoError(t, err)
+				if remaining > boundary && remaining <= lifetime {
+					require.Empty(t, got)
+				} else {
+					require.Equal(t, [][]string{entry.Path}, got)
+				}
+			}
+		}
+	}
+	got, err := certsToRegenerate(nil, now)
+	require.NoError(t, err)
+	require.Empty(t, got)
+	unknown := certificateInventoryEntry("test", "unknown", certchains.CertificateRoleClient, certchains.RotationPolicyUnknown, now.Add(-time.Hour), now.Add(time.Hour))
+	_, err = certsToRegenerate(certchains.CertificateInventory{unknown}, now)
+	require.ErrorContains(t, err, "unknown rotation policy")
 }
 
 func Test_removeStaleKubeconfig(t *testing.T) {
@@ -167,10 +177,4 @@ func Test_removeStaleKubeconfig(t *testing.T) {
 			t.Fatalf("dir %s should remain: %v", d, err)
 		}
 	}
-}
-
-func mustComplete(t *testing.T, cs certchains.CertificateChainsBuilder) *certchains.CertificateChains {
-	ret, err := cs.Complete()
-	require.NoError(t, err)
-	return ret
 }

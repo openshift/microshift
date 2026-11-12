@@ -168,7 +168,7 @@ func startServiceCAController(ctx context.Context, cfg *config.Config, kubeconfi
 		"CAConfigMap": cmName,
 		"TLSSecret":   secretName,
 	}
-	if err := assets.ApplyDeployments(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := applyDeploymentsWithCertificates(ctx, apps, renderParamsFromConfig(cfg, extraParams), kubeconfigPath, "openshift-service-ca", caCertPath); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err
 	}
@@ -306,7 +306,7 @@ func startIngressController(ctx context.Context, cfg *config.Config, kubeconfigP
 		return err
 	}
 
-	if err := assets.ApplyDeployments(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := applyDeploymentsWithCertificates(ctx, apps, renderParamsFromConfig(cfg, extraParams), kubeconfigPath, "openshift-ingress"); err != nil {
 		klog.Warningf("Failed to apply apps %v: %v", apps, err)
 		return err
 	}
@@ -404,8 +404,12 @@ func startDNSController(ctx context.Context, cfg *config.Config, kubeconfigPath 
 		}
 	}
 
-	if err := assets.ApplyDaemonSets(ctx, apps, renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath); err != nil {
+	if err := applyDaemonSetsWithCertificates(ctx, apps[:1], renderParamsFromConfig(cfg, extraParams), kubeconfigPath, "openshift-dns"); err != nil {
 		klog.Warningf("Failed to apply apps %v %v", apps, err)
+		return err
+	}
+	// The node resolver uses DNS, not an API client or certificate material.
+	if err := assets.ApplyDaemonSets(ctx, apps[1:], renderTemplate, renderParamsFromConfig(cfg, extraParams), kubeconfigPath, nil); err != nil {
 		return err
 	}
 	return nil

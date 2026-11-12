@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/daemon"
+	"github.com/openshift/microshift/pkg/admin/certificates"
 	"github.com/openshift/microshift/pkg/admin/data"
 	"github.com/openshift/microshift/pkg/admin/prerun"
 	"github.com/openshift/microshift/pkg/components"
@@ -140,11 +141,43 @@ func prerunDataManagement() error {
 	return prerun.DataManagement(dataManager)
 }
 
+func watchCertificateRotation(ctx context.Context, stop context.CancelFunc, rotationDate time.Time, forceRestart bool) {
+	deadline, cancel := context.WithDeadline(ctx, rotationDate)
+	defer cancel()
+	<-deadline.Done()
+	if ctx.Err() != nil {
+		return
+	}
+	if forceRestart {
+		klog.Info("Stopping services for certificate rotation")
+		stop()
+		return
+	}
+	klog.Warning("Certificates have reached ExpirationImminent; automatic certificate restart is disabled. Use microshift certs status to inspect active certificates, prepare renewal, and restart MicroShift before they expire")
+}
+
 //nolint:cyclop
 func RunMicroshift(cfg *config.Config) error {
 	// fail early if we don't have enough privileges
 	if os.Geteuid() > 0 {
 		klog.Fatalf("MicroShift must be run privileged")
+	}
+	// Keep activation/recovery exclusive to startup, but allow pending renewal
+	// while the service is running. The operation lock serializes CLI writers.
+	runtimeLock, err := certificates.Lock(certificateRuntimeLockPath, true)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = runtimeLock.Close() }()
+	certificateLock, err := waitForCertificateStartupLock(certificateLockPath, certificateStartupLockTimeout)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = certificateLock.Close() }()
+	transaction := certificates.Transaction{DataDir: config.DataDir}
+	stopEtcd := func() error { return stopCertificateStartupEtcd(certificateStartupEtcdTimeout) }
+	if err := recoverCertificateStartup(&transaction, stopEtcd); err != nil {
+		return err
 	}
 
 	microshiftStart := time.Now()
@@ -165,6 +198,11 @@ func RunMicroshift(cfg *config.Config) error {
 
 	if err := prerunDataManagement(); err != nil {
 		writeLogFileError(preRunFailedLogPath, err)
+		return err
+	}
+	// Data management may have restored a different data tree. Do not use an
+	// incomplete transaction from a restored backup either.
+	if err := recoverCertificateStartup(&transaction, stopEtcd); err != nil {
 		return err
 	}
 
@@ -205,14 +243,26 @@ func RunMicroshift(cfg *config.Config) error {
 	}
 
 	// TODO: change to only initialize what is strictly necessary for the selected role(s)
-	certChains, err := initCerts(cfg)
+	activated, err := activateCertificateRenewal(cfg, &transaction, stopEtcd, time.Now())
+	if err != nil {
+		return fmt.Errorf("failed to activate pending certificate renewal: %w", err)
+	}
+	var certChains *certchains.CertificateChains
+	if activated {
+		certChains, err = loadActivatedCertificates(cfg, config.DataDir)
+	} else {
+		certChains, err = initCerts(cfg)
+	}
 	if err != nil {
 		klog.Fatalf("failed to retrieve the necessary certificates: %v", err)
 	}
 
 	// create kubeconfig for kube-scheduler, kubelet,controller-manager
-	if err := initKubeconfigs(cfg, certChains); err != nil {
+	if err := initKubeconfigs(cfg, certChains, config.DataDir); err != nil {
 		klog.Fatalf("failed to create the necessary kubeconfigs for internal components: %v", err)
+	}
+	if err := certificateLock.Close(); err != nil {
+		return fmt.Errorf("failed to release certificate operation lock: %w", err)
 	}
 
 	// Establish the context we will use to control execution
@@ -253,23 +303,7 @@ func RunMicroshift(cfg *config.Config) error {
 		klog.Fatalf("failed to determine when to rotate certificates: %v", err)
 	}
 
-	// Establish a deadline for restarting to rotate the certificates.
-	certCtx, certCancel := context.WithDeadline(context.Background(), rotationDate)
-
-	// Watch for the certificate deadline context to be done, log a
-	// message, and cancel the run context to propagate the shutdown.
-	go func() {
-		select {
-		case <-certCtx.Done():
-			klog.Info("Stopping services for certificate rotation")
-			runCancel()
-			return
-		case <-runCtx.Done():
-			klog.Info("Certificate watcher exiting")
-			certCancel()
-			return
-		}
-	}()
+	go watchCertificateRotation(runCtx, runCancel, rotationDate, cfg.Certificates.ForceRestartEnabled())
 
 	// Start everything up
 	ready, stopped := make(chan struct{}), make(chan struct{})
