@@ -12,6 +12,7 @@ Resource            ../../resources/microshift-host.resource
 Resource            ../../resources/ostree.resource
 Resource            ../../resources/oc.resource
 Resource            ../../resources/network-testing.resource
+Library             Process
 Library             ../../resources/journalctl.py
 
 Suite Setup         Setup
@@ -144,7 +145,6 @@ Setup
     Setup Suite With Namespace
     Set Namespace Privileged    ${NAMESPACE}
     Make Usr Writable If Needed
-    Command Should Work    dnf install -y httpd-tools
     Command Should Work    install -d -o root -g root -m 0755 ${CP_BIN_DIR}
     Upload String To File    ${CP_PROVIDER_CONFIG}    ${CP_CONFIG_FILE}
     Start Test Registries
@@ -193,9 +193,11 @@ Configure Insecure Registries
 Start Auth Registry
     [Documentation]    Run a registry:2 container with htpasswd basic auth on the host loopback.
     [Arguments]    ${name}    ${port}    ${user}    ${pass}
-    ${htpasswd}=    Command Should Work    htpasswd -Bbn ${user} ${pass}
+    # Generate the password file on the hypervisor, which already has httpd-tools.
+    ${result}=    Process.Run Process    htpasswd    -Bbn    ${user}    ${pass}
+    Should Be Equal As Integers    ${result.rc}    0    msg=${result.stderr}
     Command Should Work    install -d -m 0755 /tmp/${name}-auth
-    Upload String To File    ${htpasswd}    /tmp/${name}-auth/htpasswd
+    Upload String To File    ${result.stdout}    /tmp/${name}-auth/htpasswd
     Command Should Work    podman rm -f ${name} 2>/dev/null || true
     VAR    ${run_cmd}=    SEPARATOR=${SPACE}
     ...    podman run -d --name ${name}
