@@ -93,6 +93,23 @@ Metrics Server Metrics Are Exported Via Scrape Drop-In
     Wait Until Keyword Succeeds    60s    5s
     ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${METRIC}
 
+MicroShift Certificate Metrics Are Exported Via Scrape Drop-In
+    [Documentation]    The packaged drop-in exports certificate, pending, and freshness metrics.
+    ...    The backend query also verifies host identity through its host_name filter.
+
+    FOR    ${metric}    IN
+    ...    microshift_certificate_not_before_timestamp_seconds
+    ...    microshift_certificate_not_after_timestamp_seconds
+    ...    microshift_certificate_status
+    ...    microshift_certificate_renewal_pending
+    ...    microshift_certificate_inventory_collection_success
+    ...    microshift_certificate_inventory_last_success_timestamp_seconds
+        Wait Until Keyword Succeeds    90s    5s
+        ...    Check Prometheus Query    ${PROMETHEUS_HOST}    ${PROMETHEUS_PORT}    ${metric}
+        Wait Until Keyword Succeeds    90s    5s
+        ...    Check Prometheus Exporter    ${USHIFT_HOST}    ${PROM_EXPORTER_PORT}    ${metric}
+    END
+
 Logs Should Not Contain Receiver Errors
     [Documentation]    Internal receiver errors are not treated as fatal. Typically these are due to a misconfiguration
     ...    and thus indicate the provided default config should be reviewed.
@@ -107,6 +124,9 @@ Setup Suite And Prepare Test Host
     [Documentation]    The service starts after MicroShift starts and thus will start generating pertinent log data
     ...    right away. When the suite is executed, immediately get the cursor for the microshift-observability unit.
     Setup Suite
+    Drop In MicroShift Config
+    ...    metrics: {status: Enabled, listenAddress: '127.0.0.1:9090'}
+    ...    99-observability-metrics
     Setup MicroShift With Optionals
     ...    003-microshift-observability
     ...    080-microshift-metrics-server
@@ -170,6 +190,7 @@ Set Test OTEL Configuration
 Teardown Suite And Revert Test Host
     [Documentation]    Set back original OTEL config and teardown Suite
     Set Back Original OTEL Configuration
+    Remove Drop In MicroShift Config    99-observability-metrics
     Teardown MicroShift With Optionals
     Teardown Suite With Namespace
 

@@ -56,6 +56,7 @@ type Config struct {
 	Ingress   IngressConfig `json:"ingress"`
 	Storage   Storage       `json:"storage"`
 	Telemetry Telemetry     `json:"telemetry"`
+	Metrics   Metrics       `json:"metrics"`
 	// Settings specified in this section are transferred as-is into the Kubelet config,
 	// except imageCredentialProviderConfigPath and imageCredentialProviderBinDir, which
 	// enable the kubelet image credential provider and are applied as kubelet startup
@@ -118,6 +119,7 @@ func (c *Config) fillDefaults() error {
 		LogLevel: "Normal",
 	}
 	c.Certificates = certificateDefaults()
+	c.Metrics = metricsDefaults()
 	c.ApiServer = ApiServer{
 		SubjectAltNames: subjectAltNames,
 		URL:             "https://localhost:6443",
@@ -221,6 +223,12 @@ func (c *Config) fillDefaults() error {
 // (usually the defaults).
 func (c *Config) incorporateUserSettings(u *Config) {
 	c.userSettings = u
+	if u.Metrics.Status != "" {
+		c.Metrics.Status = u.Metrics.Status
+	}
+	if u.Metrics.ListenAddress != "" {
+		c.Metrics.ListenAddress = u.Metrics.ListenAddress
+	}
 	if u.Certificates.ForceRestartOnExpirationImminent != nil {
 		c.Certificates.ForceRestartOnExpirationImminent = ptr.To(*u.Certificates.ForceRestartOnExpirationImminent)
 	}
@@ -756,6 +764,9 @@ func (c *Config) validate() error {
 		return fmt.Errorf("error validating DNS: %v", err)
 	}
 	if err := c.Certificates.Validate(); err != nil {
+		return err
+	}
+	if err := c.Metrics.Validate(); err != nil {
 		return err
 	}
 	if err := c.Network.Multus.Validate(); err != nil {

@@ -72,6 +72,74 @@ keys. Go consumers can use the exported types and `AddToScheme` in
 `github.com/openshift/microshift/pkg/apis/certificates/v1alpha1` to decode the
 versioned documents.
 
+## Local Certificate Metrics
+
+MicroShift can expose certificate health at a dedicated, local Prometheus-format
+endpoint that an OpenTelemetry Prometheus receiver can scrape. It is disabled by
+default. To enable it, add this to `/etc/microshift/config.yaml` or a config drop-in
+and restart MicroShift:
+
+```yaml
+metrics:
+  status: Enabled
+  listenAddress: 127.0.0.1:9090
+```
+
+```bash
+curl --noproxy '*' http://127.0.0.1:9090/metrics
+```
+
+Only literal loopback addresses are accepted. Use `[::1]:9090` for IPv6 instead;
+one configured address is served, not both families automatically. The endpoint
+uses HTTP without authentication: local users and host-networked workloads can
+read it. Loopback binding is not authentication. No Kubernetes Service, Route,
+or remote export is created by MicroShift itself.
+
+Collection runs immediately and once per minute. Metrics describe **active files
+on disk**, just like `certs status`, not certificates cached in running components
+or verified through TLS connections. Status uses encoded validity dates and the
+existing rotation policy. Preparing renewal changes the pending signal, not the
+active certificate dates; activation is still performed by normal startup.
+
+All signals are gauges. Per-certificate series have `name`, `service`, `role`,
+and `rotation_policy` labels; status adds the `status` label. Paths, serial
+numbers, fingerprints, private keys, and raw errors are not exposed.
+
+| Metric | Meaning |
+|--------|---------|
+| `microshift_certificate_not_before_timestamp_seconds` | Active certificate validity start, in Unix seconds. |
+| `microshift_certificate_not_after_timestamp_seconds` | Active certificate expiry, in Unix seconds. |
+| `microshift_certificate_status` | Five series per certificate: `Healthy`, `ExpiresSoon`, `ExpirationImminent`, `Expired`, `NotYetValid`. Exactly one is 1. |
+| `microshift_certificate_renewal_pending` | 1 when valid pending metadata is present, otherwise 0. This does not verify the staged files or guarantee successful activation. |
+| `microshift_certificate_inventory_collection_success` | 1 when the latest collection read both the active inventory and pending metadata successfully; otherwise 0. |
+| `microshift_certificate_inventory_last_success_timestamp_seconds` | Time of the last complete successful observation; 0 until the first success. |
+
+A failed inventory read removes certificate series. A failed pending-metadata
+read omits the pending gauge rather than reporting a misleading zero; a readable
+active inventory can still be reported independently. Lock contention or an
+interrupted activation makes both unavailable. The last-success time remains
+unchanged on failure. Alert on collection success and freshness as well as
+certificate status; endpoint reachability alone does not prove certificate health.
+Collection never reads private keys, repairs transactions, or renews certificates.
+
+The listener starts after certificate initialization, before waiting for etcd or
+kube-apiserver readiness. It shares MicroShift's process lifetime and is unavailable
+if initialization fails or MicroShift exits. Listener failures are logged without
+stopping the control plane; restart MicroShift after fixing a bind failure.
+Configuration changes require a restart.
+
+The optional `microshift-observability` RPM installs
+`/etc/microshift/observability/scrape.d/microshift.yaml`. All three bundled presets
+scrape the default endpoint once per minute and attach the host's name as an OTel
+resource attribute. Enable the endpoint as shown above and restart
+`microshift-observability` to load the drop-in. If you choose a different loopback
+address or port, update the drop-in's target to match. Customized collector
+configurations must load the drop-ins and include host identity; see the
+[scrape integration guide](../contributor/observability_metric_exporters.md#local-microshift-target).
+An unavailable endpoint reports `up=0`; it does not prevent other collection.
+To disable this scrape, set `scrape_configs: []` in the drop-in and restart the
+collector. Package upgrades preserve edits to that file.
+
 ## Renewing Certificates
 
 Select exactly one renewal mode:

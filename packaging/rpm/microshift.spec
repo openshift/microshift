@@ -618,6 +618,7 @@ install -p -m644 assets/optional/ai-model-serving/release-ai-model-serving-x86_6
 # observability
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability
 install -d -m755 %{buildroot}/%{_sysconfdir}/microshift/observability/scrape.d
+install -p -m644 packaging/observability/scrape.d/microshift.yaml %{buildroot}/%{_sysconfdir}/microshift/observability/scrape.d/
 install -p -m644 packaging/observability/*.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/
 # Explicit copy of large config as default. Not using symlink to avoid accidental package upgrade overwriting user config if the user edits the config without copying (i.e. edits the target of symlink).
 install -p -m644 packaging/observability/opentelemetry-collector-large.yaml -D %{buildroot}%{_sysconfdir}/microshift/observability/opentelemetry-collector.yaml
@@ -928,6 +929,7 @@ fi
 %dir %{_prefix}/lib/microshift/manifests.d/003-microshift-observability
 %dir %{_sysconfdir}/microshift/observability/
 %dir %{_sysconfdir}/microshift/observability/scrape.d/
+%config(noreplace) %{_sysconfdir}/microshift/observability/scrape.d/microshift.yaml
 %{_unitdir}/microshift-observability.service
 %config(noreplace) %{_sysconfdir}/microshift/observability/opentelemetry-collector.yaml
 %{_sysconfdir}/microshift/observability/opentelemetry-collector-*.yaml
