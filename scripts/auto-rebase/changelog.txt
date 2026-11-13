@@ -1,14 +1,20 @@
-- cluster-network-operator embedded-component e2c7bfa308a6168985d1ca0154a2c20913920930 to 0c4af6e4220f4ceb75d21277f0aa6e3b6364729d
-  - 023a5e2 2026-08-05T16:39:32+05:30 multus: Fix typo from 'k8d' to 'k8s' in multus.yaml
+- api embedded-component 248dd91956cec586fd277b02f58a745d1ed292e4 to ba4a47a719540db464149679fce18af601809d3c
+  - a4e3fbd7 2026-11-09T11:27:57+01:00 OCPBUGS-134623: drop empty string from ImportModeType enum
+  - 2019a51a 2026-11-09T11:23:24+01:00 make ImageSpec.ImageStreamImportMode omitempty
+  - ba1667a8 2026-11-06T21:05:24-06:00 EtcdBackup and EtcdBackupPolicy apis
+  - d0482d3a 2026-11-05T10:39:09+05:30 add api validation cases
+  - 86b371f2 2026-10-30T15:27:35+05:30 OSDOCS-24092: Fix typo corressponding -> corresponding
 
-- oc image-arm64 651634d88b4209cb4a01faec9dd3c889aa5169a6 to 121c3e2a79e02aac5f3a2ca48f229982116ab774
-  - 4f90e7cc 2026-11-06T20:01:51+05:30 OCPBUGS-133414: keep valid UTF-8 ConfigMap values in data
-  - 47f783c3 2026-11-02T18:06:45Z OCPBUGS-136039: update klauspost/compress to v1.20.2 to fix CVE-2026-116591
+- cluster-kube-apiserver-operator embedded-component 5105250647f33a232b1bf2982372f7cc66580deb to 6300c9aa30979eaf416853c9a3f640ac4b935e60
+  - bf9a5aa 2026-11-10T09:01:40+03:00 Update library-go to get unprivileged KMS container
+  - e74dfb8 2026-11-09T12:15:32+03:00 Update library-go to get new KMS CRD
 
-- ovn-kubernetes image-arm64 4df88b49aacd59fafcef9c48d8ba167e98817383 to 73795e582a10a9f601d317a5f9035428c82741b3
-  - f485a59b 2026-11-01T09:13:28+02:00 openshift: Activate mac-security with pods over layer2 topology tests
+- cluster-network-operator embedded-component 0c4af6e4220f4ceb75d21277f0aa6e3b6364729d to e2bf267f551f55a6b8a1e0cb590af4bf4887473c
+  - 5c14572 2026-11-05T14:11:45-05:00 HyperShift: relax ovnkube-control-plane zone anti-affinity
+  - 036d020 2026-11-03T12:06:28-05:00 ovn-kubernetes: Make EVPN conditional on RouteAdvertisements (OCPBUGS-105402)
 
-- kubernetes image-arm64 6a4bd0ddfd4a657f3bd2e3654ba134aa637b7208 to 9ef3dce9a728416939d2c1407cf56a7426e7698c
+- kubernetes embedded-component 6a4bd0ddfd4a657f3bd2e3654ba134aa637b7208 to 90b87c7dec8046734eea9392ae39b9bbf3b5b29b
+  - 453cc9670 2026-11-07T12:50:01+01:00 UPSTREAM: 143844: Add parameter for number of parallel clones
   - 59d21f680 2026-11-05T18:59:04Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - c50e5395f 2026-10-27T12:01:04Z Release commit for Kubernetes v1.37.2
   - 30459f59e 2026-10-22T17:43:17+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
@@ -24,4 +30,90 @@
   - 0d259cbda 2026-09-17T18:55:07-04:00 Don't set nf_conntrack_max if it's already larger than needed
   - f823fd6c5 2026-09-17T18:55:07-04:00 Move hashsize parameter setting out of SetMax
   - af56e5282 2026-09-17T18:55:07-04:00 Move detectNumCPU() into conntrackConfigurer interface
+
+- machine-config-operator embedded-component d7cef366b8a6ebdb2d45adf651a117f678e1c410 to 81077fc6d41d526c08a780972b06162ca246e468
+  - 7b1ef136 2026-11-06T12:31:21-05:00 Bump library-go
+  - e3474947 2026-11-06T12:31:21-05:00 Support kubelet tlsCurvePreferences
+  - f1585acc 2026-11-06T10:37:43+01:00 SPLAT-3023: test/extended: drop the MultiDiskSetup tag, skip on external topology
+  - b0018724 2026-01-20T18:45:57+01:00 Stop timer for Azure VIP routes reconciliation 15 minutes after boot
+  - 19867453 2026-01-20T18:45:55+01:00 Add SyslogIdentifier to GCP routes service
+  - 97766a81 2026-01-20T18:45:52+01:00 Add timer for Azure VIP routes reconciliation
+
+- route-controller-manager embedded-component a158fff7ce3826058bd2d7338b206cdd600d0d40 to d2fec61b151340ac930dfccc865bdfc3a78d1896
+  - 64a64a7 2026-10-14T18:05:18-03:00 bump grpc-go to v1.84.0
+
+- oc image-amd64 651634d88b4209cb4a01faec9dd3c889aa5169a6 to 121c3e2a79e02aac5f3a2ca48f229982116ab774
+  - 4f90e7cc 2026-11-06T20:01:51+05:30 OCPBUGS-133414: keep valid UTF-8 ConfigMap values in data
+  - 47f783c3 2026-11-02T18:06:45Z OCPBUGS-136039: update klauspost/compress to v1.20.2 to fix CVE-2026-116591
+
+- router image-amd64 bd0e4e8392ec875ae9f6c48c298298f002857f25 to 3533efa85fcd139f5806906cfd99a0b6748d202f
+  - 92a999e3 2026-10-29T13:45:57Z OCPBUGS-134713: Document router config polling snapshots
+  - 36baa599 2026-10-28T19:10:23Z OCPBUGS-134713: Reuse the successfully polled router config
+
+- router image-amd64 bd0e4e8392ec875ae9f6c48c298298f002857f25 to 3533efa85fcd139f5806906cfd99a0b6748d202f
+  - 92a999e3 2026-10-29T13:45:57Z OCPBUGS-134713: Document router config polling snapshots
+  - 36baa599 2026-10-28T19:10:23Z OCPBUGS-134713: Reuse the successfully polled router config
+
+- ovn-kubernetes image-amd64 4df88b49aacd59fafcef9c48d8ba167e98817383 to 73795e582a10a9f601d317a5f9035428c82741b3
+  - f485a59b 2026-11-01T09:13:28+02:00 openshift: Activate mac-security with pods over layer2 topology tests
+
+- kubernetes image-amd64 6a4bd0ddfd4a657f3bd2e3654ba134aa637b7208 to 90b87c7dec8046734eea9392ae39b9bbf3b5b29b
+  - 453cc9670 2026-11-07T12:50:01+01:00 UPSTREAM: 143844: Add parameter for number of parallel clones
+  - 59d21f680 2026-11-05T18:59:04Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - c50e5395f 2026-10-27T12:01:04Z Release commit for Kubernetes v1.37.2
+  - 30459f59e 2026-10-22T17:43:17+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
+  - 858b20771 2026-10-20T00:38:50-04:00 upgrade .go-version to 1.26.10
+  - ee88e92fa 2026-10-16T23:57:58+02:00 Bump images and versions to Go 1.26.9 and update distroless-iptables
+  - 1d9d380c9 2026-10-14T08:48:31+08:00 hack: match OpenSSL 3.5 CN=127.0.0.1 output in client cert check
+  - 58c4ed9c3 2026-10-06T20:14:28-07:00 apiserver: accept large identity header sets with Go 1.27
+  - 4c47f2bb0 2026-09-28T18:40:46Z dra: include extended resource claims in pod claim iteration and taint eviction
+  - 104233b2b 2026-09-24T23:27:27+09:00 job controller: simplify recreation regression test
+  - df7549941 2026-09-24T23:27:27+09:00 job controller: extend recreation regression coverage
+  - 31921ca2a 2026-09-24T23:27:26+09:00 job controller: clear expectations when deleting Job
+  - 8aaeb4e53 2026-09-23T17:20:55Z Update CHANGELOG/CHANGELOG-1.37.md for v1.37.1
+  - 0d259cbda 2026-09-17T18:55:07-04:00 Don't set nf_conntrack_max if it's already larger than needed
+  - f823fd6c5 2026-09-17T18:55:07-04:00 Move hashsize parameter setting out of SetMax
+  - af56e5282 2026-09-17T18:55:07-04:00 Move detectNumCPU() into conntrackConfigurer interface
+
+- router image-arm64 bd0e4e8392ec875ae9f6c48c298298f002857f25 to 3533efa85fcd139f5806906cfd99a0b6748d202f
+  - 92a999e3 2026-10-29T13:45:57Z OCPBUGS-134713: Document router config polling snapshots
+  - 36baa599 2026-10-28T19:10:23Z OCPBUGS-134713: Reuse the successfully polled router config
+
+- router image-arm64 bd0e4e8392ec875ae9f6c48c298298f002857f25 to 3533efa85fcd139f5806906cfd99a0b6748d202f
+  - 92a999e3 2026-10-29T13:45:57Z OCPBUGS-134713: Document router config polling snapshots
+  - 36baa599 2026-10-28T19:10:23Z OCPBUGS-134713: Reuse the successfully polled router config
+
+- ovn-kubernetes image-arm64 73795e582a10a9f601d317a5f9035428c82741b3 to 0a24f2d1e25cdd8b97518c781b2a05971f823b5c
+  - 08a2d95e 2026-11-09T21:38:53-08:00 openshift: add Feature:PersistentIPs to UDN static IP/MAC test name
+  - 26447bf6 2026-11-09T21:37:54-08:00 sync test annotations with upstream changes
+  - 6860c414 2026-11-06T18:36:28+01:00 ci: pin docs workflows to Python 3.14
+  - 7b3c2466 2026-11-05T17:48:31-03:00 Adds e2e test for DISABLE_UDN_ARP_NDP_FLOOD
+  - 2cfb6c11 2026-11-05T17:48:31-03:00 Enables CI lane for DISABLE_UDN_ARP_NDP_FLOOD
+  - a45dd4c8 2026-11-05T17:48:31-03:00 Links macbinding controller to ovnkube
+  - 075b9a53 2026-11-05T12:07:39-05:00 controller: test onDelete enqueues work for delete tombstones
+  - 7fae7e27 2026-11-05T15:55:41+01:00 MNP: ignore ipv4-mapped ipv6 addresses, like `::ffff:10.10.1.42`
+  - ed45ce27 2026-11-04T16:32:44-05:00 ci: identify reviewed PRs by workflow run name
+  - 89b4b079 2026-11-04T10:23:26+01:00 security: update instructions for reporting vulnerabilities
+  - 7675973b 2026-11-03T16:02:11-08:00 metrics: deprecate ovnkube controller resource latency histograms
+  - eb48f144 2026-11-03T14:38:20-05:00 test: wait for pod port before starting L3 UDN policy watcher
+  - 604c52c4 2026-11-03T12:47:59-05:00 e2e: filter persistent IP tests by feature label
+  - d456320f 2026-11-03T13:26:25Z docs: move CUDN test references to crd-integration
+  - 5af3e022 2026-11-03T13:21:48Z codeowners: move CUDN scenario ownership to crd-integration
+  - d5dc982d 2026-11-03T13:21:48Z test: migrate CUDN scenario tests to controller runtime client
+  - 394dd4ed 2026-11-03T14:10:43+01:00 multinetpol: accept bare IPs and not CIDRs for compatibility
+  - f39aea2f 2026-11-03T11:52:34+01:00 multinetpol: validate IPBlock when converting to netpol
+  - aca120d6 2026-11-02T10:05:47-05:00 cluster-udn: track namespaces before attempting NAD creation
+  - efc06b28 2026-10-30T15:21:06-04:00 docs: describe how UDN and CUDN deletion waits for pods
+  - 2d0ef1a8 2026-10-30T15:21:06-04:00 cluster-udn: back off the retries of a deletion waiting for its network
+  - b6506185 2026-10-30T15:21:06-04:00 cluster-udn: track a NAD as soon as it is created
+  - 54496229 2026-10-30T15:09:22+01:00 cni: remove primary Layer2 RA filter installation
+  - d80ab20a 2026-10-30T13:00:47+01:00 bridgeconfig: reject network names that can break ovn-bridge-mappings
+  - a688d976 2026-10-28T15:33:13+01:00 docs: Fix bullet nesting and OKEP heading levels for website rendering
+  - 87375455 2026-10-23T16:56:19-04:00 ci: allow manual refresh of PR labels
+  - dcdbe994 2026-10-23T16:56:19-04:00 ci: label PRs with current approvals
+  - 8881759d 2026-10-12T11:00:36+01:00 test: move cudn scenarios under crd-integration
+  - 84f44f84 2026-10-12T11:00:36+01:00 test: create a copy of scenario.go in crd-integration
+
+- kubernetes image-arm64 9ef3dce9a728416939d2c1407cf56a7426e7698c to 90b87c7dec8046734eea9392ae39b9bbf3b5b29b
+  - 453cc9670 2026-11-07T12:50:01+01:00 UPSTREAM: 143844: Add parameter for number of parallel clones
 
