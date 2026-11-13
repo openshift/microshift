@@ -1246,3 +1246,52 @@ func TestMicroshiftConfigNodeNameValidationBadName(t *testing.T) {
 		t.Errorf("failed to validate node name.")
 	}
 }
+
+func TestParseHostnames(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		raw      string
+		expected []string
+	}{
+		// Empty / whitespace-only output (the no-NIC bug this fixes): no names.
+		{"empty", "", []string{}},
+		{"newline only", "\n", []string{}},
+		{"spaces only", "   \n", []string{}},
+		{"assorted whitespace only", "\t \r\n\v\f ", []string{}},
+
+		// Basic splitting.
+		{"single", "host.example.com\n", []string{"host.example.com"}},
+		{"two names", "a.example.com b.example.com\n", []string{"a.example.com", "b.example.com"}},
+
+		// Whitespace variety between/around names is all collapsed.
+		{"repeated spaces", "a.example.com    b.example.com\n", []string{"a.example.com", "b.example.com"}},
+		{"tab separated", "a.example.com\tb.example.com\n", []string{"a.example.com", "b.example.com"}},
+		{"CRLF separated", "a.example.com\r\nb.example.com\r\n", []string{"a.example.com", "b.example.com"}},
+		{"leading and trailing whitespace", "   host.example.com   ", []string{"host.example.com"}},
+		{"mixed tabs spaces newlines", " a.example.com\t\tb.example.com\n c.example.com \n",
+			[]string{"a.example.com", "b.example.com", "c.example.com"}},
+
+		// De-duplication regardless of input order or spacing.
+		{"duplicates collapsed", "b.example.com a.example.com b.example.com a.example.com\n",
+			[]string{"a.example.com", "b.example.com"}},
+
+		// Output is lexicographically sorted, independent of input order.
+		{"unsorted input is sorted", "c.example.com a.example.com b.example.com",
+			[]string{"a.example.com", "b.example.com", "c.example.com"}},
+
+		// Sort is case-sensitive byte order: uppercase (A=0x41) before lowercase (b=0x62).
+		{"case sensitive sort", "beta.example.com Alpha.example.com",
+			[]string{"Alpha.example.com", "beta.example.com"}},
+
+		// Sort is lexicographic, not numeric: "10..." sorts before "2..." ('1' < '2').
+		{"lexicographic not numeric", "10.0.0.2 2.0.0.1", []string{"10.0.0.2", "2.0.0.1"}},
+
+		// Realistic 'hostname -A' output: short name, FQDNs, and address literals.
+		{"realistic mixed output", "myhost myhost.example.com 192.168.1.10 fe80::1\n",
+			[]string{"192.168.1.10", "fe80::1", "myhost", "myhost.example.com"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, parseHostnames(tc.raw))
+		})
+	}
+}

@@ -829,13 +829,16 @@ func getAllHostnames() ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error when executing 'hostname -A': %v", err)
 	}
-	outString := out.String()
-	outString = strings.Trim(outString[:len(outString)-1], " ")
-	// Remove duplicates to avoid having them in the certificates.
-	names := strings.Split(outString, " ")
-	set := sets.NewString(names...)
-	allHostnames = set.List()
+	allHostnames = parseHostnames(out.String())
 	return allHostnames, nil
+}
+
+// parseHostnames converts raw 'hostname -A' output into a de-duplicated, sorted
+// list of names. Empty or whitespace-only output yields an empty slice, not a
+// single empty string, so a host with no network interfaces produces no names
+// rather than an invalid empty kubeconfig/certificate name.
+func parseHostnames(raw string) []string {
+	return sets.NewString(strings.Fields(raw)...).List()
 }
 
 func checkAdvertiseAddressConfigured(advertiseAddress string) error {
