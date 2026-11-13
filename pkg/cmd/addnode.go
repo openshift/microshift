@@ -3,9 +3,12 @@ package cmd
 import (
 	"context"
 	"crypto/x509"
+	"errors"
 	"fmt"
+	"io"
 	"math/big"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -19,7 +22,10 @@ import (
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
 	"github.com/openshift/microshift/pkg/version"
 	"github.com/spf13/cobra"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	utilnet "k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apiserver/pkg/authentication/user"
 
 	"go.etcd.io/etcd/client/pkg/v3/transport"
@@ -126,7 +132,7 @@ func runAddNode(ctx context.Context, opts *AddNodeOptions) error {
 	}
 	klog.Info("Etcd certificates generated successfully")
 
-	clusterMembers, err := getClusterNodes(ctx, client)
+	clusterMembers, err := waitForClusterNodes(ctx, client)
 	if err != nil {
 		return fmt.Errorf("failed to get cluster information: %w", err)
 	}
@@ -372,6 +378,40 @@ func generateEtcdCertificates(cfg *config.Config) error {
 
 	klog.Info("All etcd certificates generated successfully with proper signatures and SAN entries")
 	return nil
+}
+
+func waitForClusterNodes(ctx context.Context, client kubernetes.Interface) ([]string, error) {
+	klog.Info("Waiting for a ready cluster node with an internal IP...")
+	var members []string
+	err := wait.PollUntilContextCancel(ctx, time.Second, true, func(ctx context.Context) (bool, error) {
+		var err error
+		members, err = getClusterNodes(ctx, client)
+		if err == nil {
+			return len(members) > 0, nil
+		}
+		var status apierrors.APIStatus
+		if apierrors.IsInternalError(err) ||
+			apierrors.IsServerTimeout(err) ||
+			apierrors.IsServiceUnavailable(err) ||
+			apierrors.IsTimeout(err) ||
+			apierrors.IsTooManyRequests(err) ||
+			(errors.As(err, &status) && status.Status().Code == http.StatusBadGateway) ||
+			utilnet.IsTimeout(err) ||
+			utilnet.IsConnectionRefused(err) ||
+			utilnet.IsConnectionReset(err) ||
+			errors.Is(err, io.EOF) ||
+			errors.Is(err, io.ErrUnexpectedEOF) ||
+			utilnet.IsProbableEOF(err) ||
+			utilnet.IsHTTP2ConnectionLost(err) {
+			klog.V(2).Infof("Retrying cluster node discovery after transient error: %v", err)
+			return false, nil
+		}
+		return false, err
+	})
+	if err != nil {
+		return nil, fmt.Errorf("waiting for a ready cluster node with an internal IP: %w", err)
+	}
+	return members, nil
 }
 
 func getClusterNodes(ctx context.Context, client kubernetes.Interface) ([]string, error) {
