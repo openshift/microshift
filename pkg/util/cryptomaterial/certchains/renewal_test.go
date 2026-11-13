@@ -110,10 +110,52 @@ func TestRenewalBoundsDescendantsAndReloadsPeers(t *testing.T) {
 	for i := range before {
 		require.NotEqual(t, before[i].Certificate.Raw, after[i].Certificate.Raw)
 		require.Equal(t, after[0].Certificate.NotAfter, after[i].Certificate.NotAfter)
+		if before[i].ParentCA != "" {
+			require.Positive(t, after[i].Certificate.SerialNumber.Cmp(before[i].Certificate.SerialNumber))
+		}
 	}
 	require.NoError(t, os.WriteFile(bundle, []byte("invalid bundle"), 0600))
 	_, err = builder.ValidateRenewal(true, time.Now())
 	require.ErrorContains(t, err, "invalid CA bundle")
+}
+
+func TestRenewalPreservesSerialCounters(t *testing.T) {
+	dir := t.TempDir()
+	subDir := filepath.Join(dir, "intermediate")
+	child := NewCertificateSigner("intermediate", subDir, 24*time.Hour).
+		WithClientCertificates(&ClientCertificateSigningRequestInfo{
+			CSRMeta:  CSRMeta{Name: "client", Validity: time.Hour},
+			UserInfo: &user.DefaultInfo{Name: "client"},
+		})
+	builder := NewCertificateChains(NewCertificateSigner("root", dir, 24*time.Hour).WithSubCAs(child))
+	_, err := builder.Complete()
+	require.NoError(t, err)
+	// Counters can exceed the serials of the certificates still on disk.
+	require.NoError(t, os.WriteFile(cryptomaterial.CASerialsPath(dir), []byte("0A\n"), 0600))
+	require.NoError(t, os.WriteFile(cryptomaterial.CASerialsPath(subDir), []byte("20\n"), 0600))
+
+	for range 2 {
+		chains, err := builder.Load()
+		require.NoError(t, err)
+		rootCounter, err := crypto.NewSerialFileGenerator(cryptomaterial.CASerialsPath(dir))
+		require.NoError(t, err)
+		subCounter, err := crypto.NewSerialFileGenerator(cryptomaterial.CASerialsPath(subDir))
+		require.NoError(t, err)
+
+		require.NoError(t, chains.RegenerateForRenewal("root"))
+		inventory, err := builder.ValidateRenewal(true, time.Now())
+		require.NoError(t, err)
+		require.Len(t, inventory, 3)
+		require.Equal(t, rootCounter.Serial+1, inventory[1].Certificate.SerialNumber.Int64())
+		require.Greater(t, inventory[2].Certificate.SerialNumber.Int64(), subCounter.Serial)
+
+		rootAfter, err := crypto.NewSerialFileGenerator(cryptomaterial.CASerialsPath(dir))
+		require.NoError(t, err)
+		subAfter, err := crypto.NewSerialFileGenerator(cryptomaterial.CASerialsPath(subDir))
+		require.NoError(t, err)
+		require.Equal(t, rootCounter.Serial+1, rootAfter.Serial)
+		require.Equal(t, inventory[2].Certificate.SerialNumber.Int64(), subAfter.Serial)
+	}
 }
 
 func TestLeafRenewalPreservesLegacyCAs(t *testing.T) {
