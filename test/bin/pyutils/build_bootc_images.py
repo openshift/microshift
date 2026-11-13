@@ -357,12 +357,12 @@ def process_containerfile(groupdir, containerfile, dry_run):
 
 
 def get_bib_image(img):
-    # CentOS Stream family
-    if any(x in img for x in ("stream9", "stream10", "cos9", "cos10")):
-        return BIB_IMAGE_CENTOS
-    # RHEL 9 family
-    if "rhel9" in img or "rhel-9" in img:
+    # EL 9 needs a matching builder: EL 10 rejects the CentOS 9 SHA-1 key.
+    if any(x in img for x in ("rhel9", "rhel-9", "stream9", "cos9")):
         return BIB_IMAGE_RHEL9
+    # CentOS Stream 10 family
+    if any(x in img for x in ("stream10", "cos10")):
+        return BIB_IMAGE_CENTOS
     # Default to RHEL 10 family
     return BIB_IMAGE
 
