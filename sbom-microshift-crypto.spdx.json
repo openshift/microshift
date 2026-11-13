@@ -772,6 +772,14 @@
       "filesAnalyzed": false
     },
     {
+      "SPDXID": "SPDXRef-Package-certificate-198-198-algorithmPrimitive-other-api-x509.ParseRevocationList-cryptoFunction-other-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-other",
+      "name": "certificate:198:198:algorithmPrimitive=other:api=x509.ParseRevocationList:cryptoFunction=other:findingType=certificate_handling:library=crypto/x509:materialSource=loaded:operation=other",
+      "comment": "{\"assetType\":\"certificate\",\"certificateProperties\":{}}",
+      "description": "Converted CBOM component from CycloneDX to SPDX",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false
+    },
+    {
       "SPDXID": "SPDXRef-Package-certificate-201-201-algorithmPrimitive-other-api-x509.ParseCertificate-cryptoFunction-other-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-other",
       "name": "certificate:201:201:algorithmPrimitive=other:api=x509.ParseCertificate:cryptoFunction=other:findingType=certificate_handling:library=crypto/x509:materialSource=loaded:operation=other",
       "comment": "{\"assetType\":\"certificate\",\"certificateProperties\":{}}",
@@ -798,14 +806,6 @@
     {
       "SPDXID": "SPDXRef-Package-certificate-204-204-algorithmPrimitive-other-api-CertPool.AddCert-cryptoFunction-other-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-other",
       "name": "certificate:204:204:algorithmPrimitive=other:api=CertPool.AddCert:cryptoFunction=other:findingType=certificate_handling:library=crypto/x509:materialSource=loaded:operation=other",
-      "comment": "{\"assetType\":\"certificate\",\"certificateProperties\":{}}",
-      "description": "Converted CBOM component from CycloneDX to SPDX",
-      "downloadLocation": "NOASSERTION",
-      "filesAnalyzed": false
-    },
-    {
-      "SPDXID": "SPDXRef-Package-certificate-206-206-algorithmPrimitive-other-api-x509.ParseRevocationList-cryptoFunction-other-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-other",
-      "name": "certificate:206:206:algorithmPrimitive=other:api=x509.ParseRevocationList:cryptoFunction=other:findingType=certificate_handling:library=crypto/x509:materialSource=loaded:operation=other",
       "comment": "{\"assetType\":\"certificate\",\"certificateProperties\":{}}",
       "description": "Converted CBOM component from CycloneDX to SPDX",
       "downloadLocation": "NOASSERTION",
@@ -3519,6 +3519,11 @@
     },
     {
       "spdxElementId": "SPDXRef-Package-RootPackage",
+      "relatedSpdxElement": "SPDXRef-Package-certificate-198-198-algorithmPrimitive-other-api-x509.ParseRevocationList-cryptoFunction-other-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-other",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-RootPackage",
       "relatedSpdxElement": "SPDXRef-Package-certificate-201-201-algorithmPrimitive-other-api-x509.ParseCertificate-cryptoFunction-other-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-other",
       "relationshipType": "CONTAINS"
     },
@@ -3535,11 +3540,6 @@
     {
       "spdxElementId": "SPDXRef-Package-RootPackage",
       "relatedSpdxElement": "SPDXRef-Package-certificate-204-204-algorithmPrimitive-other-api-CertPool.AddCert-cryptoFunction-other-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-other",
-      "relationshipType": "CONTAINS"
-    },
-    {
-      "spdxElementId": "SPDXRef-Package-RootPackage",
-      "relatedSpdxElement": "SPDXRef-Package-certificate-206-206-algorithmPrimitive-other-api-x509.ParseRevocationList-cryptoFunction-other-findingType-certificate-handling-library-crypto-x509-materialSource-loaded-operation-other",
       "relationshipType": "CONTAINS"
     },
     {

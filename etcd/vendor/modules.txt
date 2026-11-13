@@ -293,8 +293,8 @@ go.etcd.io/bbolt
 go.etcd.io/bbolt/errors
 go.etcd.io/bbolt/internal/common
 go.etcd.io/bbolt/internal/freelist
-# go.etcd.io/etcd/api/v3 v3.6.16 => github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20261109102637-ec76d3a9dc27
-## explicit; go 1.26.0
+# go.etcd.io/etcd/api/v3 v3.6.16 => github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20260930192053-7cf5f0dbc98a
+## explicit; go 1.25.0
 go.etcd.io/etcd/api/v3/authpb
 go.etcd.io/etcd/api/v3/etcdserverpb
 go.etcd.io/etcd/api/v3/etcdserverpb/gw
@@ -303,8 +303,8 @@ go.etcd.io/etcd/api/v3/mvccpb
 go.etcd.io/etcd/api/v3/v3rpc/rpctypes
 go.etcd.io/etcd/api/v3/version
 go.etcd.io/etcd/api/v3/versionpb
-# go.etcd.io/etcd/client/pkg/v3 v3.6.16 => github.com/openshift/etcd/client/pkg/v3 v3.0.0-20261109102637-ec76d3a9dc27
-## explicit; go 1.26.0
+# go.etcd.io/etcd/client/pkg/v3 v3.6.16 => github.com/openshift/etcd/client/pkg/v3 v3.0.0-20260930192053-7cf5f0dbc98a
+## explicit; go 1.25.0
 go.etcd.io/etcd/client/pkg/v3/fileutil
 go.etcd.io/etcd/client/pkg/v3/logutil
 go.etcd.io/etcd/client/pkg/v3/pathutil
@@ -314,15 +314,15 @@ go.etcd.io/etcd/client/pkg/v3/tlsutil
 go.etcd.io/etcd/client/pkg/v3/transport
 go.etcd.io/etcd/client/pkg/v3/types
 go.etcd.io/etcd/client/pkg/v3/verify
-# go.etcd.io/etcd/client/v3 v3.6.16 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20261109102637-ec76d3a9dc27
-## explicit; go 1.26.0
+# go.etcd.io/etcd/client/v3 v3.6.16 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260930192053-7cf5f0dbc98a
+## explicit; go 1.25.0
 go.etcd.io/etcd/client/v3
 go.etcd.io/etcd/client/v3/concurrency
 go.etcd.io/etcd/client/v3/credentials
 go.etcd.io/etcd/client/v3/internal/endpoint
 go.etcd.io/etcd/client/v3/internal/resolver
-# go.etcd.io/etcd/pkg/v3 v3.6.16 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20261109102637-ec76d3a9dc27
-## explicit; go 1.26.0
+# go.etcd.io/etcd/pkg/v3 v3.6.16 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20260930192053-7cf5f0dbc98a
+## explicit; go 1.25.0
 go.etcd.io/etcd/pkg/v3/adt
 go.etcd.io/etcd/pkg/v3/contention
 go.etcd.io/etcd/pkg/v3/cpuutil
@@ -340,8 +340,8 @@ go.etcd.io/etcd/pkg/v3/runtime
 go.etcd.io/etcd/pkg/v3/schedule
 go.etcd.io/etcd/pkg/v3/traceutil
 go.etcd.io/etcd/pkg/v3/wait
-# go.etcd.io/etcd/server/v3 v3.6.8 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20261109102637-ec76d3a9dc27
-## explicit; go 1.26.0
+# go.etcd.io/etcd/server/v3 v3.6.8 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20260930192053-7cf5f0dbc98a
+## explicit; go 1.25.0
 go.etcd.io/etcd/server/v3/auth
 go.etcd.io/etcd/server/v3/config
 go.etcd.io/etcd/server/v3/embed
@@ -1113,11 +1113,11 @@ sigs.k8s.io/yaml
 sigs.k8s.io/yaml/kyaml
 # github.com/openshift/microshift => ../
 # github.com/onsi/ginkgo/v2 => github.com/openshift/onsi-ginkgo/v2 v2.6.1-0.20260424201627-4d4cc33d669d
-# go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20261109102637-ec76d3a9dc27
-# go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.0.0-20261109102637-ec76d3a9dc27
-# go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20261109102637-ec76d3a9dc27
-# go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20261109102637-ec76d3a9dc27
-# go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20261109102637-ec76d3a9dc27
+# go.etcd.io/etcd/api/v3 => github.com/openshift/etcd/api/v3 v3.5.0-alpha.0.0.20260930192053-7cf5f0dbc98a
+# go.etcd.io/etcd/client/pkg/v3 => github.com/openshift/etcd/client/pkg/v3 v3.0.0-20260930192053-7cf5f0dbc98a
+# go.etcd.io/etcd/client/v3 => github.com/openshift/etcd/client/v3 v3.5.0-alpha.0.0.20260930192053-7cf5f0dbc98a
+# go.etcd.io/etcd/pkg/v3 => github.com/openshift/etcd/pkg/v3 v3.5.0-alpha.0.0.20260930192053-7cf5f0dbc98a
+# go.etcd.io/etcd/server/v3 => github.com/openshift/etcd/server/v3 v3.5.0-alpha.0.0.20260930192053-7cf5f0dbc98a
 # k8s.io/api => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/api
 # k8s.io/apiextensions-apiserver => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apiextensions-apiserver
 # k8s.io/apimachinery => ../deps/github.com/openshift/kubernetes/staging/src/k8s.io/apimachinery

@@ -284,15 +284,13 @@ func (pl *InterPodAffinity) PreFilter(ctx context.Context, cycleState fwk.CycleS
 		return nil, fwk.NewStatus(fwk.UnschedulableAndUnresolvable, fmt.Sprintf("parsing pod: %+v", err))
 	}
 
-	requiredAffinityTerms := s.podInfo.GetRequiredAffinityTerms()
-	for i := range requiredAffinityTerms {
-		if err := pl.mergeAffinityTermNamespacesIfNotEmpty(&requiredAffinityTerms[i]); err != nil {
+	for i := range s.podInfo.GetRequiredAffinityTerms() {
+		if err := pl.mergeAffinityTermNamespacesIfNotEmpty(s.podInfo.GetRequiredAffinityTerms()[i]); err != nil {
 			return nil, fwk.AsStatus(err)
 		}
 	}
-	requiredAntiAffinityTerms := s.podInfo.GetRequiredAntiAffinityTerms()
-	for i := range requiredAntiAffinityTerms {
-		if err := pl.mergeAffinityTermNamespacesIfNotEmpty(&requiredAntiAffinityTerms[i]); err != nil {
+	for i := range s.podInfo.GetRequiredAntiAffinityTerms() {
+		if err := pl.mergeAffinityTermNamespacesIfNotEmpty(s.podInfo.GetRequiredAntiAffinityTerms()[i]); err != nil {
 			return nil, fwk.AsStatus(err)
 		}
 	}

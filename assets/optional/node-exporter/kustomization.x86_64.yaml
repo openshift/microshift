@@ -4,4 +4,4 @@ images:
     digest: sha256:93d1021616b64c32900e5991ee888c665a09743a49fe8cce57eb93e840d336ab
   - name: quay.io/openshift/node-exporter
     newName: quay.io/openshift-release-dev/ocp-v5.0-art-dev
-    digest: sha256:bda5a5d98e2bad2f44df59e927ddb7c350ecf8a88816e6cad02f22707a4bd790
+    digest: sha256:118c1557b668c7c2b6b1d97e25a3a021f619d693e8756316d2f89db4915cd752
