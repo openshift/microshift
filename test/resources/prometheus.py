@@ -1,6 +1,14 @@
+import re
 import sys
 import requests
 import libipv6
+
+_CERT_LABEL_RE = re.compile(r'(\w+)="([^"]*)"')
+_CERT_SERIES = {
+    "microshift_certificate_not_before_timestamp_seconds": "not_before",
+    "microshift_certificate_not_after_timestamp_seconds": "not_after",
+    "microshift_certificate_status": "status",
+}
 
 
 def _run_prometheus_query(host: str, port: int, query: str) -> requests.Response:
@@ -60,6 +68,44 @@ def check_prometheus_exporter(host: str, port: int, query: str) -> None:
             _log(f"Found metric: {line}")
             return
     raise Exception(f"Prometheus query returned no results for metric: {query}")
+
+
+def parse_certificate_metrics(text: str) -> dict:
+    """Parse the microshift_certificate_* series of a Prometheus text exposition.
+
+    Returns {"pending", "success", "last_success", "certs"}, where certs maps
+    "<service>/<name>" to its not_before, not_after, status (the state whose
+    gauge is 1) and rotation_policy. Unknown series are ignored. A failed
+    collection drops the certificate and renewal_pending series, leaving certs
+    empty and pending None.
+    """
+    result = {"pending": None, "success": 0.0, "last_success": 0.0, "certs": {}}
+    for line in text.splitlines():
+        if not line.startswith("microshift_certificate_"):
+            continue
+        name_part, _, value = line.rpartition(" ")
+        metric, _, label_block = name_part.partition("{")
+        labels = dict(_CERT_LABEL_RE.findall(label_block))
+        value = float(value)
+        if metric == "microshift_certificate_renewal_pending":
+            result["pending"] = value
+        elif metric == "microshift_certificate_inventory_collection_success":
+            result["success"] = value
+        elif metric == "microshift_certificate_inventory_last_success_timestamp_seconds":
+            result["last_success"] = value
+        elif metric in _CERT_SERIES:
+            cert = result["certs"].setdefault(f"{labels['service']}/{labels['name']}", {
+                "rotation_policy": labels["rotation_policy"],
+                "not_before": None,
+                "not_after": None,
+                "status": None,
+            })
+            field = _CERT_SERIES[metric]
+            if field != "status":
+                cert[field] = value
+            elif value == 1.0:
+                cert["status"] = labels["status"]
+    return result
 
 
 if __name__ == '__main__':
