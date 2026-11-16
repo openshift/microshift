@@ -1,14 +1,21 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"slices"
+	"strconv"
+	"strings"
 
 	configv1 "github.com/openshift/api/config/v1"
 	"github.com/openshift/library-go/pkg/crypto"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+	psaapi "k8s.io/pod-security-admission/api"
+
+	uversion "k8s.io/apimachinery/pkg/util/version"
+	componentversion "k8s.io/component-base/version"
 )
 
 type ApiServer struct {
@@ -47,6 +54,8 @@ type ApiServer struct {
 	// advertising because of dual stack limitations there. This is only to
 	// make ovnk work properly.
 	AdvertiseAddresses []string `json:"-"`
+
+	PSAConfig PSAConfig `json:"psaConfig"`
 }
 
 // NamedCertificateEntry provides certificate details
@@ -241,4 +250,118 @@ func (fg *FeatureGates) validateFeatureGates() error {
 	}
 
 	return nil
+}
+
+type PSAConfig struct {
+	// Default value is `privileged`.
+	// Possible values are `restricted`, `baseline` and `privileged`.
+	// +kubebuilder:default="privileged"
+	Enforce string `json:"enforce"`
+	// When empty, enforceVersion uses cluster version.
+	// When set, enforceVersion enforces PSA according to the version
+	// set. Example, `v1.34` will only enforce according to the state
+	// of PSA in kubernetes 1.34 .
+	// +kubebuilder:default="latest"
+	EnforceVersion string `json:"enforceVersion,omitempty"`
+	// Default value is `privileged`.
+	// Possible values are `restricted`, `baseline` and `privileged`.
+	// +kubebuilder:default="privileged"
+	Audit string `json:"audit"`
+	// When empty, auditVersion uses cluster version.
+	// When set, auditVersion audits PSA according to the version
+	// set. Example, `v1.34` will only audit according to the state
+	// of PSA in kubernetes 1.34 .
+	// +kubebuilder:default="latest"
+	AuditVersion string `json:"auditVersion,omitempty"`
+	// Default value is `privileged`
+	// Possible values are `restricted`, `baseline` and `privileged`.
+	// +kubebuilder:default="privileged"
+	Warn string `json:"warn"`
+	// When empty, warnVersion uses cluster version.
+	// When set, warnVersion warns about PSA according to the version
+	// set. Example, `v1.34` will only warn according to the state
+	// of PSA in kubernetes 1.34 .
+	// +kubebuilder:default="latest"
+	WarnVersion string `json:"warnVersion,omitempty"`
+}
+
+func (psaConfig *PSAConfig) ValidatePSAConfig() error {
+	if psaConfig == nil {
+		return fmt.Errorf("apiServer.psaConfig must not be nil")
+	}
+
+	var errs []error
+
+	validateLevel := func(field, value string) {
+		lvl := psaapi.Level(value)
+		if !lvl.Valid() {
+			errs = append(errs, fmt.Errorf("apiServer.psaConfig.%s value %q is invalid: must be one of %q, %q or %q",
+				field, value, psaapi.LevelPrivileged, psaapi.LevelBaseline, psaapi.LevelRestricted))
+		}
+	}
+
+	validateLevel("enforce", psaConfig.Enforce)
+	validateLevel("audit", psaConfig.Audit)
+	validateLevel("warn", psaConfig.Warn)
+
+	kubeMinor, kubeMinorErr := kubeMinorVersion()
+	if kubeMinorErr != nil {
+		errs = append(errs, kubeMinorErr)
+	}
+
+	validateVersion := func(field, value string) {
+		// An empty version means the Kubernetes version MicroShift runs is used.
+		if value == "" {
+			return
+		}
+
+		parsed, err := psaapi.ParseVersion(value)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("apiServer.psaConfig.%s value %q is invalid: %w", field, value, err))
+			return
+		}
+
+		// "latest" always tracks the running Kubernetes version, and the minor
+		// version cannot be compared when the Kubernetes version is unknown.
+		if parsed.Latest() || kubeMinorErr != nil {
+			return
+		}
+
+		if parsed.Minor() > kubeMinor {
+			errs = append(errs, fmt.Errorf("apiServer.psaConfig.%s value %q is newer than the Kubernetes version MicroShift runs (v1.%d)",
+				field, value, kubeMinor))
+		}
+	}
+
+	validateVersion("enforceVersion", psaConfig.EnforceVersion)
+	validateVersion("auditVersion", psaConfig.AuditVersion)
+	validateVersion("warnVersion", psaConfig.WarnVersion)
+
+	return errors.Join(errs...)
+}
+
+// kubeMinorVersion returns the minor version of the Kubernetes release
+// MicroShift embeds. The value is injected at build time from
+// Makefile.kube_git.var through k8s.io/component-base/version. Builds without
+// those ldflags, such as unit tests, fall back to the version compiled into
+// component-base.
+func kubeMinorVersion() (int, error) {
+	// The minor version reported by component-base is numeric, possibly
+	// followed by a "+" for builds between releases.
+	minor := strings.TrimSuffix(componentversion.Get().Minor, "+")
+
+	if minor == "" {
+		parsed, err := uversion.ParseGeneric(componentversion.DefaultKubeBinaryVersion)
+		if err != nil {
+			return 0, fmt.Errorf("failed to parse the default Kubernetes version %q: %w",
+				componentversion.DefaultKubeBinaryVersion, err)
+		}
+		return int(parsed.Minor()), nil
+	}
+
+	parsed, err := strconv.Atoi(minor)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse the Kubernetes minor version %q: %w", minor, err)
+	}
+	return parsed, nil
 }
