@@ -204,15 +204,20 @@ Stopped Renewal Waits For Startup Too
     ${state}=    Get Systemd Setting    microshift.service    ActiveState
     Should Be Equal    ${state}    inactive
     Start And Wait For MicroShift
+    ${files_after}=    Certificate Material Digest
+    Should Not Be Equal    ${files_before}    ${files_after}
     Renewal Matches Current Status    ${result}
     Renewal Activation Has Finished
     [Teardown]    Start And Wait For MicroShift
 
 Unrelated Configuration Change Still Activates Renewal
     [Documentation]    Logging configuration does not invalidate prepared certificates.
+    ${files_before}=    Certificate Material Digest
     ${result}=    Renewal Document    serving    json
     Drop In MicroShift Config    debugging:\n\ \ logLevel: Debug\n    99-cert-renew-test
     Restart MicroShift
+    ${files_after}=    Certificate Material Digest
+    Should Not Be Equal    ${files_before}    ${files_after}
     Renewal Matches Current Status    ${result}
     Renewal Activation Has Finished
     [Teardown]    Run Keywords
