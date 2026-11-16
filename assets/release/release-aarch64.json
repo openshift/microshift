@@ -1,15 +1,15 @@
 {
   "release": {
-    "base": "5.1.0-0.nightly-arm64-2026-11-11-015656"
+    "base": "5.1.0-0.nightly-arm64-2026-11-11-211902"
   },
   "images": {
     "cli": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:80dec936bf505012381db71c13cb5d34e094b76156c9da64f6bb40906ad25c86",
     "coredns": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:d739d885e2ea5e2dc52a05d5bab66d6c2d69b2820d05619dbaea4c94f1bb318d",
-    "haproxy-router": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:3eac461eb7cd269da4f61827938af3e5478805d9cb738b63a5182de999f51ecc",
-    "haproxy-router-haproxy32": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:b0d047ce0be0ceeafcf573c8937de4fed5187891ff12244ad39a12937e92eb46",
+    "haproxy-router": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:f400e245a40dd1b8b1370b30a62aad5dd24a34fca9f5fe25afc6f0dd9bc06917",
+    "haproxy-router-haproxy32": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:85695b5a6127e79769ff722d939f17dea98445ef4b6778303717afce645fd88e",
     "kube-rbac-proxy": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:de48a38fe1dcf3fe6fea23cf772dd435c3de9da76577e25fa016f32ef6508e24",
     "ovn-kubernetes-microshift": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:2d423b81b5ae322ee287e3746b673e48afd4f66ddf55b8eb1272f093d2a6e23a",
-    "pod": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:9f7112e2b2423e5e20d924d9aa9796f38d9e8dc8fd5c2cfaf15d98cbe65b5516",
+    "pod": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:e9ce5d05d4c091472a011633911ecbfa66af40b5e9be82dbacd62d2885e9b7d0",
     "service-ca-operator": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:b933e0deb70aafa05455115cbd456b9d9b5982b05274cac7512307ec45527e31",
     "lvms_operator": "registry.redhat.io/lvms4/lvms-rhel9-operator@sha256:cfa6840ade306d4ac9a386d9a111871caa61a7e57fa9cdd2ca69b1ce5b188b3f",
     "csi-snapshot-controller": "quay.io/openshift-release-dev/ocp-v5.0-art-dev@sha256:d5a5729de96d562ed9a9725407a27f074529f4aaa57c9bcb7b2c84ddabcd5cd5"

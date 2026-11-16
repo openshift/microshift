@@ -218,3 +218,4 @@
 "[sig-api-machinery] health handlers should contain necessary checks [Suite:openshift/conformance/parallel] [Suite:k8s]"
 "[sig-api-machinery] health handlers should contain necessary checks"
 "[OTP][Jira:OCPCLOUD][sig-cluster-lifecycle] Cluster_Infrastructure CAPI IPAM should have IPAM CRDs installed"
+"[sig-cli] oc CLI additional tests Author:tkarekar-Medium-133414-oc set data should keep UTF-8 values in data"
