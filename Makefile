@@ -95,9 +95,11 @@ debug:
 
 GO_BUILD_FLAGS :=-tags 'include_gcs include_oss containers_image_openpgp gssapi providerless netcgo osusergo strictfipsruntime'
 
-# Set variables for test-unit target
-GO_TEST_FLAGS=$(GO_BUILD_FLAGS)
+# Unit-test binaries drop 'strictfipsruntime' to avoid slow FIPS external linking; shipped binaries keep it via GO_BUILD_FLAGS.
+GO_TEST_FLAGS=$(subst strictfipsruntime,,$(GO_BUILD_FLAGS))
 GO_TEST_PACKAGES=./cmd/... ./pkg/...
+# Disable CGO for unit-test binaries so Go uses its fast internal linker; does not affect shipped binaries.
+test-unit: export CGO_ENABLED=0
 
 # Enable CGO when building microshift binary for access to local libraries.
 # Use an environment variable to allow CI to disable when cross-compiling.
