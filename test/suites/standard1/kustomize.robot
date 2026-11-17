@@ -82,7 +82,7 @@ Setup Suite    # robocop: off=too-long-keyword
     Check Required Env Variables
     Login MicroShift Host
     Setup Kubeconfig    # for readiness checks
-    Make Usr Writable If OSTree System
+    Make Usr Writable If Needed
 
     # Used by "Load From /etc/microshift/manifests"
     ${ns}=    Generate Manifests    /etc/microshift/manifests
@@ -180,11 +180,6 @@ Teardown Suite    # robocop: off=too-many-calls-in-keyword
     Restore Default Config
     Logout MicroShift Host
     Remove Kubeconfig
-
-Make Usr Writable If OSTree System
-    [Documentation]    Makes /usr directory writable if host is an OSTree system.
-    ${is_ostree}=    Is System OSTree
-    IF    ${is_ostree}    Create Usr Directory Overlay
 
 Generate Manifests
     [Documentation]    Create a namespace and the manifests in the given path.
