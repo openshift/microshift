@@ -242,11 +242,11 @@ Remove ClusterIssuer
 
 Apply Template
     [Documentation]    Generate YAML from template and apply to cluster
-    [Arguments]    ${template_file}
+    [Arguments]    ${template_file}    ${opts}=${EMPTY}
     ${tmp}=    Create Random Temp File
     Generate File From Template    ${template_file}    ${tmp}
     TRY
-        Oc Apply    -f ${tmp}
+        Oc Apply    -f ${tmp} ${opts}
     FINALLY
         Remove File    ${tmp}
     END
@@ -435,6 +435,11 @@ Enable Trust Manager
     Oc Apply    -f ${TRUST_MANAGER_CR_FILE}
     Wait Until Keyword Succeeds    30x    10s
     ...    Labeled Pod Should Be Ready    app.kubernetes.io/name=cert-manager-trust-manager    ns=${TRUST_MANAGER_NS}
+    # Pod readiness does not guarantee that the API server trusts the webhook
+    # (caBundle injection might be late). To make sure the trust-manager webhook
+    # is really ready, wait until a server-side dry-run of a Bundle succeeds.
+    Wait Until Keyword Succeeds    5m    10s
+    ...    Apply Template    ${TRUST_BUNDLE_SRC_SECRET_TMPL}    --dry-run=server --request-timeout=10s
 
 Disable Trust Manager
     [Documentation]    Remove the TrustManager CR and leftover Bundle.
