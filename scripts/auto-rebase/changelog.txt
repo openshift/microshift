@@ -1,8 +1,0 @@
-- machine-config-operator embedded-component 3d2a579a78b323cddbb0c5d3dedb5ac3c4963748 to a15cd81fcde5c3cfa403ab9dd0ce3bf7409b8f8b
-  - dec46921 2026-11-09T17:37:15Z NO-ISSUE: Temporarily skip four OS build controller unit tests
-  - 1944ac76 2026-11-06T23:26:17Z chore: update AMIs
-  - cd6834dd 2026-10-30T11:35:24-05:00 Fix stale MachineOSBuild annotation preventing pool updates
-
-- operator-framework-olm embedded-component e0c18696b033d125090f0af6205ec5cd39eaf9de to eb89a4bd91a1a10fe34a911f85afad98929f4805
-  - f7f19f02 2026-10-07T10:38:21-04:00 OCPBUGS-129500: Restore registry-server startup probe FailureThreshold to 15
-
