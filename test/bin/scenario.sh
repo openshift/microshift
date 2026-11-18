@@ -1355,9 +1355,18 @@ configure_fast_datapath_repo() {
 # Arguments:
 #   vmname       -- VM name (e.g. "host1")
 #   rhel_version -- e.g. "9.8" or "10.2"
+#   [extra...]   -- optional MicroShift subpackages to install alongside the
+#                   base microshift RPM (e.g. "microshift-ai-model-serving").
+#                   Each is pinned to the same locally-built version.
+#
+# Environment:
+#   RPM_HEALTHCHECK_TIMEOUT -- healthcheck timeout (default "300s"). Scenarios
+#                   that pull large images at runtime can raise it.
 configure_rpm_scenario() {
     local -r vmname="$1"
     local -r rhel_version="$2"
+    shift 2
+    local -a optional_packages=("$@")
 
     if [[ -z "${LOCAL_REPO}" ]]; then
         echo "ERROR: LOCAL_REPO is not set" >&2
@@ -1381,9 +1390,14 @@ configure_rpm_scenario() {
     configure_fast_datapath_repo
     configure_microshift_mirror "${repo_url}"
 
-    run_command_on_vm "${vmname}" "sudo dnf install -y --allowerasing 'microshift-${target_version}'"
+    local -a packages=("microshift-${target_version}")
+    local pkg
+    for pkg in "${optional_packages[@]}"; do
+        packages+=("${pkg}-${target_version}")
+    done
+    run_command_on_vm "${vmname}" "sudo dnf install -y --allowerasing ${packages[*]}"
     run_command_on_vm "${vmname}" "sudo systemctl enable --now microshift.service"
-    run_command_on_vm "${vmname}" "sudo /usr/bin/microshift healthcheck --timeout 300s"
+    run_command_on_vm "${vmname}" "sudo /usr/bin/microshift healthcheck --timeout ${RPM_HEALTHCHECK_TIMEOUT:-300s}"
 }
 
 # Configure a MicroShift RPM mirror repository on host1. Used in upgrade
