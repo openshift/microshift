@@ -48,7 +48,7 @@ Setup
     [Documentation]    Test suite setup
     Login MicroShift Host
     Setup Suite With Namespace
-    Wait Until Greenboot Health Check Exited
+    Wait For MicroShift Healthcheck Success
 
 Teardown
     [Documentation]    Test suite teardown
