@@ -79,7 +79,7 @@ Then run:
 test/run.sh [suite paths...]
 ```
 
-Without suite arguments, it runs a default set (standard1, standard2, and selected osconfig/storage tests). The script automatically sets up a Python virtual environment with Robot Framework.
+Without suite arguments, it runs a default set (standard1, standard2, certificates, and selected osconfig/storage tests). The script automatically sets up a Python virtual environment with Robot Framework.
 
 ### Test Harness
 
