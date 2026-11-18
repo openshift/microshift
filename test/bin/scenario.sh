@@ -1256,9 +1256,10 @@ configure_cdn_repo() {
     local -r repo_id=$1
     local -r repo_name=$2
     local -r baseurl=$3
+    local -r vmname="${4:-host1}"
 
-    local -r cert=$(run_command_on_vm host1 "ls /etc/pki/entitlement/[0-9]*.pem | grep -v '\-key.pem' | head -n1")
-    local -r key=$(run_command_on_vm host1 "ls /etc/pki/entitlement/[0-9]*-key.pem | head -n1")
+    local -r cert=$(run_command_on_vm "${vmname}" "ls /etc/pki/entitlement/[0-9]*.pem | grep -v '\-key.pem' | head -n1")
+    local -r key=$(run_command_on_vm "${vmname}" "ls /etc/pki/entitlement/[0-9]*-key.pem | head -n1")
     local -r tmp_file=$(mktemp)
 
     tee "${tmp_file}" >/dev/null <<EOF
@@ -1273,8 +1274,8 @@ sslcacert=/etc/rhsm/ca/redhat-uep.pem
 sslclientcert=${cert}
 sslclientkey=${key}
 EOF
-    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-    run_command_on_vm host1 "sudo cp '${tmp_file}' '/etc/yum.repos.d/${repo_id}.repo'"
+    copy_file_to_vm "${vmname}" "${tmp_file}" "${tmp_file}"
+    run_command_on_vm "${vmname}" "sudo cp '${tmp_file}' '/etc/yum.repos.d/${repo_id}.repo'"
     rm -f "${tmp_file}"
 }
 
@@ -1295,6 +1296,7 @@ configure_rhocp_repo() {
     local -r rhocp=$1
     local -r major=$2
     local -r minor=$3
+    local -r vmname="${4:-host1}"
 
     # The repository may be empty if the beta mirror is not up yet
     if [[ -z "${rhocp}" ]] ; then
@@ -1302,16 +1304,17 @@ configure_rhocp_repo() {
     fi
 
     if [[ "${rhocp}" =~ ^[0-9]{1,2}$ ]]; then
-        local -r rhel_ver=$(run_command_on_vm host1 "rpm -E %{rhel}")
+        local -r rhel_ver=$(run_command_on_vm "${vmname}" "rpm -E %{rhel}")
         if [[ "${rhel_ver}" == "9" ]]; then
-            run_command_on_vm host1 \
+            run_command_on_vm "${vmname}" \
                 "sudo subscription-manager repos --enable rhocp-${major}.${rhocp}-for-rhel-9-\$(uname -m)-rpms"
         else
             local -r arch=$(uname -m)
             configure_cdn_repo \
                 "rhocp-${major}.${rhocp}" \
                 "Red Hat OpenShift ${major}.${rhocp} for RHEL 9" \
-                "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/rhocp/${major}.${rhocp}/os"
+                "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/rhocp/${major}.${rhocp}/os" \
+                "${vmname}"
         fi
     elif [[ "${rhocp}" =~ ^http ]]; then
         local -r ocp_repo_name="rhocp-${major}.${minor}-for-rhel-9-mirrorbeta-rpms"
@@ -1325,8 +1328,8 @@ enabled=1
 gpgcheck=0
 skip_if_unavailable=0
 EOF
-        copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-        run_command_on_vm host1 "sudo cp '${tmp_file}' '/etc/yum.repos.d/${ocp_repo_name}.repo'"
+        copy_file_to_vm "${vmname}" "${tmp_file}" "${tmp_file}"
+        run_command_on_vm "${vmname}" "sudo cp '${tmp_file}' '/etc/yum.repos.d/${ocp_repo_name}.repo'"
         rm -f "${tmp_file}"
     fi
 }
@@ -1335,16 +1338,18 @@ EOF
 # is enabled via subscription-manager; on other RHEL versions a CDN-backed
 # repo file is created via configure_cdn_repo.
 configure_fast_datapath_repo() {
-    local -r rhel_ver=$(run_command_on_vm host1 "rpm -E %{rhel}")
+    local -r vmname="${1:-host1}"
+    local -r rhel_ver=$(run_command_on_vm "${vmname}" "rpm -E %{rhel}")
     if [[ "${rhel_ver}" == "9" ]]; then
-        run_command_on_vm host1 \
+        run_command_on_vm "${vmname}" \
             "sudo subscription-manager repos --enable fast-datapath-for-rhel-9-\$(uname -m)-rpms"
     else
         local -r arch=$(uname -m)
         configure_cdn_repo \
             "fast-datapath" \
             "Red Hat Fast Datapath for RHEL 9" \
-            "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/fast-datapath/os"
+            "https://cdn.redhat.com/content/dist/layered/rhel9/${arch}/fast-datapath/os" \
+            "${vmname}"
     fi
 }
 
@@ -1385,10 +1390,10 @@ configure_rpm_scenario() {
     subscription_manager_register "${vmname}"
     run_command_on_vm "${vmname}" "sudo subscription-manager release --set ${rhel_version}"
 
-    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}"
-    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}"
-    configure_fast_datapath_repo
-    configure_microshift_mirror "${repo_url}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y}"       "${MAJOR_VERSION}" "${MINOR_VERSION}" "${vmname}"
+    configure_rhocp_repo "${RHOCP_MINOR_Y_BETA}"  "${MAJOR_VERSION}" "${MINOR_VERSION}" "${vmname}"
+    configure_fast_datapath_repo "${vmname}"
+    configure_microshift_mirror "${repo_url}" "${vmname}"
 
     local -a packages=("microshift-${target_version}")
     local pkg
@@ -1407,9 +1412,12 @@ configure_rpm_scenario() {
 # enabled subscription-manager repo).
 #
 # Arguments:
-#   repo -- Mirror URL, subscription-manager repo name, or empty string.
+#   repo   -- Mirror URL, subscription-manager repo name, or empty string.
+#   vmname -- VM to configure (default "host1"). Needed by multi-host
+#             scenarios (e.g. c2cc) that install MicroShift on host2/host3.
 configure_microshift_mirror() {
     local -r repo=$1
+    local -r vmname="${2:-host1}"
 
     # `repo` might be empty if we install microshift from rhocp
     if [[ -z "${repo}" ]] ; then
@@ -1431,8 +1439,8 @@ enabled=1
 gpgcheck=0
 skip_if_unavailable=0
 EOF
-    copy_file_to_vm host1 "${tmp_file}" "${tmp_file}"
-    run_command_on_vm host1 "sudo cp '${tmp_file}' /etc/yum.repos.d/microshift-mirror-rpms.repo"
+    copy_file_to_vm "${vmname}" "${tmp_file}" "${tmp_file}"
+    run_command_on_vm "${vmname}" "sudo cp '${tmp_file}' /etc/yum.repos.d/microshift-mirror-rpms.repo"
     rm -f "${tmp_file}"
 }
 
