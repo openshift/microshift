@@ -30,6 +30,15 @@ X86 64 Should Run RT Kernel
         Should End With    ${kernel}    +rt
     END
 
+Kernel Timer Migration Should Match Kernel
+    [Documentation]    Verify that kernel.timer_migration is enabled on RHEL 9 kernels, so timers armed
+    ...    on isolated CPUs do not stay there, and kept at the cpu-partitioning value on other kernels.
+
+    ${kernel}=    Command Should Work    uname -r
+    ${expected}=    Evaluate    1 if re.search(r"\\.el9[ _.]", "${kernel}") else 0    modules=re
+    ${timer_migration}=    Command Should Work    sysctl -n kernel.timer_migration
+    Should Be Equal As Integers    ${timer_migration}    ${expected}
+
 Kubelet Resources Are As Expected
     [Documentation]    Validates that kubelet detected right amount of online CPUs and hugepages.
 
