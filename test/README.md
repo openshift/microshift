@@ -172,7 +172,7 @@ Images are organized into "layers" that contain "groups".
 
 Each layer has its designation:
 - `base` layer is a prerequisite for all the subsequent ones
-- `presubmit` layer contains images used in presubmit CI jobs
+- `source` layer contains images built from the current MicroShift source
 - `periodic` layer contains images used in periodic CI jobs
 
 Layers are built one after the other. Each group in a given layer is built
@@ -256,7 +256,7 @@ example, to create an alias `rhel-9.2-microshift-source-aux` for
 `rhel-9.2-microshift-source`:
 
 ```
-$ cat ./test/image-blueprints/layer2-presubmit/group1/rhel-9.2-microshift-source-aux.alias
+$ cat ./test/image-blueprints/layer2-source/group1/rhel-9.2-microshift-source-aux.alias
 rhel-9.2-microshift-source
 ```
 

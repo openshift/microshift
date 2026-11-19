@@ -26,7 +26,7 @@ CI configuration files are in `openshift/release`:
 
 | Type | Trigger | What it tests |
 |------|---------|--------------|
-| **Presubmit** | Every PR update | Current source against presubmit image blueprints |
+| **Presubmit** | Every PR update | Current source installed as RPMs on a stock RHEL image (`test/scenarios-rpm`) |
 | **Periodic** | Nightly/weekly (cron) | Extended testing with periodic image blueprints |
 | **Release** | Before release cuts | Brew RPM-sourced images, upgrade paths |
 | **Rebase** | Weekdays at 5 AM UTC | Automated dependency sync with OpenShift |

@@ -19,14 +19,14 @@ from cache locally for all `bootc` test scenarios to execute successfully.
 
 > Note: Total build times are up to 10 minutes.
 
-## Bootc Presubmit layer
+## Bootc Source Layer
 
 Artifacts built in this layer cannot be cached as they depend on the current sources.
 
 |Group |Build Time|Description|
 |------|----------|-----------|
-|group1| Short    | Current source prerequisites on RHEL used in presubmits and periodics
-|group2| Short    | Current source artifacts on RHEL used in presubmits and periodics
+|group1| Short    | Current source prerequisites on RHEL used in periodic and c2cc CI jobs
+|group2| Short    | Current source artifacts on RHEL used in periodic and c2cc CI jobs
 
 > Note: Total build times are up to 5 minutes.
 
