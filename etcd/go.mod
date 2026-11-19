@@ -5,7 +5,7 @@ go 1.25.0
 replace github.com/openshift/microshift => ../
 
 require (
-	github.com/openshift/api v0.0.0-20260817165856-9fda5179a7f7
+	github.com/openshift/api v0.0.0-20261105224022-9803e9208397
 	github.com/openshift/build-machinery-go v0.0.0-20260902143904-520f675c892b
 	github.com/openshift/microshift v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.2
