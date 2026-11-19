@@ -137,18 +137,7 @@ Internal Renewal Leaves Named Certificates Alone
         Renewal Should Not Disturb Named Certificates    ${mode}    ${before}    ${hostname}
     END
 
-    # The observation window must be an explicit wait: the journal keyword
-    # returns immediately when no match is found, so retries alone observe the
-    # log for zero seconds.
-    Sleep    60s
-    Pattern Should Not Appear In Log Output
-    ...    ${cursor}    Stopping services for certificate rotation    retries=6    wait=10
-    # A crash during the window would restart MicroShift without ever
-    # emitting the rotation message; the in-loop counter reads predate this
-    # wait, so the restart state must be checked once more after it.
-    ${restarts}=    Get Systemd Setting    microshift.service    NRestarts
-    Should Be Equal As Integers    ${restarts}    0
-    ...    msg=MicroShift restarted during the observation window
+    No Rotation Restart During Observation Window    ${cursor}
     [Teardown]    Run Keywords
     ...    Remove Entry From Local Hosts    ${hostname}
     ...    AND    Remove Drop In MicroShift Config    10-subjectAltNames
@@ -156,6 +145,21 @@ Internal Renewal Leaves Named Certificates Alone
 
 
 *** Keywords ***
+No Rotation Restart During Observation Window
+    [Documentation]    Wait out an explicit observation window and verify that neither the
+    ...    rotation message nor an automatic restart appeared in it. The journal
+    ...    keyword returns immediately when no match is found, so the window must
+    ...    be an explicit wait; and a crash-and-systemd-restart during it would
+    ...    never emit the rotation message, so the restart counter is checked
+    ...    once more after the wait (the in-loop reads predate it).
+    [Arguments]    ${cursor}
+    Sleep    60s
+    Pattern Should Not Appear In Log Output
+    ...    ${cursor}    Stopping services for certificate rotation    retries=6    wait=10
+    ${restarts}=    Get Systemd Setting    microshift.service    NRestarts
+    Should Be Equal As Integers    ${restarts}    0
+    ...    msg=MicroShift restarted during the observation window
+
 Renewal Should Not Disturb Named Certificates
     [Documentation]    Run one renewal in the given mode and verify it neither changes the
     ...    namedCertificate files nor restarts MicroShift by itself. The restart counter
