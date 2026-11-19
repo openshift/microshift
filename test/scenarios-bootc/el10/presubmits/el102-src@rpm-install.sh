@@ -1,1 +1,0 @@
-../../../scenarios-rpm/el10/presubmits/el102-src@rpm-install.sh
