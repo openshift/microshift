@@ -355,8 +355,7 @@ Renewal Messages Match The Real Impact On External Kubeconfigs
     ...    afterwards. Verify that serving renewal gives no such warning, and that a saved copy
     ...    still works after serving activation. The output must also say that a restart is
     ...    needed to activate the renewal. OCPSTRAT-2899 TC-09
-    ...    Fulfills OCPSTRAT-2899 AC: clear impact messaging — certs renewed,
-    ...    restart required, client cert redistribution (MUST #3).
+    ...    Fulfills OCPSTRAT-2899 AC #3 (MUST): clear impact messaging.
     [Tags]    qe    ocpstrat-2899
     # install forces mode 600 even if the destination was pre-created by
     # another local user with permissive permissions; cp would preserve them.
@@ -390,8 +389,8 @@ Renewed Certificates Meet ProdSec Rules
     ...    certificate file, ConfigMap, or Secret still contains an old CA certificate. A new
     ...    certificate on an old key leaves a stolen key valid, and a still-trusted old CA keeps
     ...    accepting what it signed. OCPSTRAT-2899 TC-19
-    ...    Fulfills OCPSTRAT-2899 AC (ProdSec guidance): key file permissions,
-    ...    no key reuse, old CA trust removed.
+    ...    Fulfills OCPSTRAT-2899 ProdSec guidance: key permissions, no key
+    ...    reuse, old CA untrusted.
     [Tags]    qe    ocpstrat-2899
     # The snapshots and their comparison stay on the host: certificate
     # subjects and SANs must not end up in the Robot log.
@@ -430,8 +429,8 @@ Configured And Default Certificate Lifetimes Are Applied
     ...    - "Defaults preserve current 1y serving / 10y CA behavior when unset"
     ...    The planning math is unit-tested by TestPlanRenewal; this is the
     ...    running-system half. OCPSTRAT-2899 TC-10 / TC-11.
-    ...    Fulfills OCPSTRAT-2899 AC: configurable serving/CA validity (SHOULD #4/#5)
-    ...    and default-preserving backward compatibility when config is omitted.
+    ...    Fulfills OCPSTRAT-2899 AC #4/#5 (SHOULD): configurable validity,
+    ...    defaults preserved when unset.
     [Tags]    qe    ocpstrat-2899
     # The custom values (2y serving / 12y CA) are deliberately long: the
     # rotation watcher's deadline is notAfter minus the policy window, and a
