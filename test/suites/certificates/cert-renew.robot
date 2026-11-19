@@ -184,6 +184,26 @@ CA Renewal Updates The Whole Chain
     Renewal Activation Has Finished
     Certificate Consumers Use Renewed Material    ${pods_before}    ${True}
 
+Startup Repairs Interrupted CA Writes Without Resetting Counters
+    [Documentation]    Recover incomplete root and intermediate key writes, reissue descendants and retain issuance history.
+    FOR    ${signer_dir}    IN    ${KUBELET_SIGNER_DIR}    ${KUBELET_SIGNER_DIR}/csr-signer
+        Stop MicroShift
+        ${root_serial}=    Command Should Work    cat ${KUBELET_SIGNER_DIR}/serial.txt
+        ${child_serial}=    Command Should Work    cat ${KUBELET_SIGNER_DIR}/csr-signer/serial.txt
+        Command Should Work    truncate -s 0 ${signer_dir}/ca.key
+        Start And Wait For MicroShift
+        CSR Signer Serial Has Advanced    ${root_serial}
+        ${client_serial}=    Command Should Work
+        ...    openssl x509 -in ${KUBELET_SIGNER_DIR}/csr-signer/kubelet-client/client.crt -noout -serial
+        Should Be True    int($client_serial.split('=')[1], 16) > int($child_serial, 16)
+        ${verify}=    Catenate
+        ...    SEPARATOR=${SPACE}
+        ...    openssl verify -CAfile ${KUBELET_SIGNER_DIR}/ca.crt -untrusted ${KUBELET_SIGNER_DIR}/csr-signer/ca.crt
+        ...    ${KUBELET_SIGNER_DIR}/csr-signer/kubelet-client/client.crt ${KUBELET_SIGNER_DIR}/csr-signer/kubelet-server/server.crt
+        Command Should Work    ${verify}
+    END
+    [Teardown]    Start And Wait For MicroShift
+
 Unchanged Certificates Do Not Restart Managed Pods
     [Documentation]    Ordinary starts preserve certificate generations and do not wait for a certificate rollout.
     ${before}=    Certificate Consumer Pod UIDs

@@ -1,6 +1,7 @@
 package certchains
 
 import (
+	"maps"
 	"os"
 	"path/filepath"
 	"testing"
@@ -155,6 +156,105 @@ func TestRenewalPreservesSerialCounters(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, rootCounter.Serial+1, rootAfter.Serial)
 		require.Equal(t, inventory[2].Certificate.SerialNumber.Int64(), subAfter.Serial)
+	}
+}
+
+func TestCompleteRepairsInterruptedCARenewal(t *testing.T) {
+	for _, tc := range []struct {
+		name          string
+		subCA         bool
+		incompleteKey bool
+	}{
+		{name: "root replaced before descendants"},
+		{name: "root key write interrupted", incompleteKey: true},
+		{name: "intermediate replaced before descendants", subCA: true},
+		{name: "intermediate key write interrupted", subCA: true, incompleteKey: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			subDir := filepath.Join(dir, "intermediate")
+			newBuilder := func() CertificateChainsBuilder {
+				child := NewCertificateSigner("intermediate", subDir, 24*time.Hour).
+					WithClientCertificates(&ClientCertificateSigningRequestInfo{
+						CSRMeta: CSRMeta{Name: "child-client", Validity: time.Hour}, UserInfo: &user.DefaultInfo{Name: "child", Groups: []string{"test"}},
+					})
+				root := NewCertificateSigner("root", dir, 24*time.Hour).WithSubCAs(child).
+					WithClientCertificates(&ClientCertificateSigningRequestInfo{
+						CSRMeta: CSRMeta{Name: "client", Validity: time.Hour}, UserInfo: &user.DefaultInfo{Name: "client", Groups: []string{"test"}},
+					}).WithServingCertificates(&ServingCertificateSigningRequestInfo{
+					CSRMeta: CSRMeta{Name: "server", Validity: time.Hour}, Hostnames: []string{"localhost"},
+				}).WithPeerCertificiates(&PeerCertificateSigningRequestInfo{
+					CSRMeta: CSRMeta{Name: "peer", Validity: time.Hour}, UserInfo: &user.DefaultInfo{Name: "peer"}, Hostnames: []string{"localhost"},
+				})
+				return NewCertificateChains(root).WithCABundle(filepath.Join(dir, "bundle.crt"), []string{"root"}, []string{"root", "intermediate"})
+			}
+			chains, err := newBuilder().Complete()
+			require.NoError(t, err)
+			before := chains.Inventory()
+			// Preserve issuance history beyond the certificates currently on disk.
+			require.NoError(t, os.WriteFile(cryptomaterial.CASerialsPath(dir), []byte("0A\n"), 0600))
+			require.NoError(t, os.WriteFile(cryptomaterial.CASerialsPath(subDir), []byte("20\n"), 0600))
+			chains, err = newBuilder().Complete()
+			require.NoError(t, err)
+
+			// Stop after replacing a CA, before regenerating any descendants.
+			keyPath := cryptomaterial.CAKeyPath(dir)
+			if tc.subCA {
+				keyPath = cryptomaterial.CAKeyPath(subDir)
+				_, err = chains.GetSigner("root").signerConfig.MakeAndWriteSubCA(
+					cryptomaterial.CABundlePath(subDir), keyPath, "", "intermediate", 24*time.Hour)
+				require.NoError(t, err)
+			} else {
+				require.NoError(t, chains.GetSigner("root").regenerateSelf())
+			}
+			if tc.incompleteKey {
+				// The library truncates the key before writing the certificate.
+				require.NoError(t, os.WriteFile(keyPath, nil, 0600))
+			}
+
+			builder := newBuilder()
+			_, err = builder.Complete()
+			require.NoError(t, err)
+			after, err := builder.ValidateRenewal(true, time.Now())
+			require.NoError(t, err, "startup must repair the chain, key pairs and CA bundles")
+			for i, entry := range after {
+				if tc.subCA && entry.Name != "intermediate" && entry.ParentCA != "intermediate" {
+					require.Equal(t, before[i].Certificate.Raw, entry.Certificate.Raw, entry.Name)
+					continue
+				}
+				require.NotEqual(t, before[i].Certificate.Raw, entry.Certificate.Raw, entry.Name)
+				switch entry.ParentCA {
+				case "root":
+					require.Greater(t, entry.Certificate.SerialNumber.Int64(), int64(10), entry.Name)
+				case "intermediate":
+					require.Greater(t, entry.Certificate.SerialNumber.Int64(), int64(32), entry.Name)
+				}
+			}
+			// A subsequent startup must reuse the repaired material and counters.
+			files := renewalFiles(t, dir)
+			_, err = newBuilder().Complete()
+			require.NoError(t, err)
+			require.True(t, maps.Equal(files, renewalFiles(t, dir)), "a subsequent startup must not change the repaired files")
+		})
+	}
+}
+
+func TestCompleteRejectsInvalidSerialCounter(t *testing.T) {
+	for _, signer := range []string{"root", "intermediate"} {
+		t.Run(signer, func(t *testing.T) {
+			dir := t.TempDir()
+			rootDir := filepath.Join(dir, "root")
+			subDir := filepath.Join(dir, "intermediate")
+			builder := NewCertificateChains(NewCertificateSigner("root", rootDir, 24*time.Hour).
+				WithSubCAs(NewCertificateSigner("intermediate", subDir, 24*time.Hour)))
+			_, err := builder.Complete()
+			require.NoError(t, err)
+			require.NoError(t, os.WriteFile(cryptomaterial.CASerialsPath(filepath.Join(dir, signer)), []byte("invalid"), 0600))
+			before := renewalFiles(t, dir)
+			_, err = builder.Complete()
+			require.Error(t, err)
+			require.True(t, maps.Equal(before, renewalFiles(t, dir)), "do not reset a corrupt counter or replace its CA")
+		})
 	}
 }
 
