@@ -127,3 +127,13 @@ set -x
 
 check_cpu_list_state "${isolated_cores}" 1
 check_cpu_list_state "${offline_cpu_set}" 0
+
+# microshift-baseline enables timer migration on RHEL 9 kernels only.
+expected_timer_migration=0
+if [[ "${running_kernel}" =~ \.el9[\ _.] ]]; then
+    expected_timer_migration=1
+fi
+timer_migration=$(sysctl -n kernel.timer_migration)
+if [[ "${timer_migration}" != "${expected_timer_migration}" ]]; then
+    fail "kernel.timer_migration is '${timer_migration}', expected ${expected_timer_migration} for kernel '${running_kernel}'; check the microshift-baseline TuneD profile."
+fi
