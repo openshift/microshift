@@ -14,7 +14,7 @@ ARCH_SUBDIR="${UNAME_M}"
 
 usage() {
     cat - <<EOF
-${BASH_SOURCE[0]} (upload|download|verify|setlast|getlast|keep) [options]
+${BASH_SOURCE[0]} (upload|download|download-iso|download-mirror|verify|setlast|getlast|keep) [options]
 
 Manage build cache at the '${AWS_BUCKET_NAME}' AWS S3 bucket. The script
 assumes that the bucket exists and it is configured for read-write access
@@ -33,6 +33,10 @@ The cache directory structure is '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>'.
   download: Download build artifacts from the specified
             '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>' AWS S3 bucket
             to the local disk.
+
+  download-iso: Download a single <name> ISO from the 'vm-storage' sub-directory.
+
+  download-mirror: Download only the mirror-registry archive.
 
   verify:   Exit with 0 status if the specified
             '${AWS_BUCKET_NAME}/<branch>/<arch>/<tag>' sub-directory
@@ -160,6 +164,34 @@ action_download() {
     done
 }
 
+# Used by RPM jobs, which need only the installer ISO
+action_download-iso() {
+    local -r iso_name="${1:-}"
+    if [ -z "${iso_name}" ]; then
+        echo "ERROR: The ISO <name> argument is mandatory"
+        exit 1
+    fi
+
+    local -r src="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/${TAG_SUBDIR}/${VM_POOL_BASENAME}/${iso_name}"
+    local -r dst_dir="${IMAGEDIR}/${VM_POOL_BASENAME}"
+
+    echo "Downloading '${src}'"
+    mkdir -p "${dst_dir}"
+    run_aws_cli s3 cp --quiet "${src}" "${dst_dir}/${iso_name}"
+}
+
+# Used by RPM jobs to warm up the mirror registry
+action_download-mirror() {
+    local -r src="s3://${AWS_BUCKET_NAME}/${BCH_SUBDIR}/${ARCH_SUBDIR}/${TAG_SUBDIR}/mirror-registry.tar"
+    local -r dst="${IMAGEDIR}/mirror-registry.tar"
+
+    echo "Downloading '${src}'"
+    run_aws_cli s3 cp --quiet "${src}" "${dst}"
+    rm -rf "${IMAGEDIR}/mirror-registry"
+    tar xf "${dst}" -C "${IMAGEDIR}"
+    rm -f "${dst}"
+}
+
 action_verify() {
     if check_contents ; then
         echo OK
@@ -283,6 +315,8 @@ while getopts "b:t:a:h" opt; do
             ;;
     esac
 done
+# Positional arguments, e.g. the download-iso <name>
+shift $((OPTIND - 1))
 
 if [ -z "${BCH_SUBDIR}" ] || [ -z "${TAG_SUBDIR}" ] ; then
     echo "ERROR: The <branch> and <tag> sub-directory values are mandatory"
@@ -304,7 +338,7 @@ fi
 
 # Run actions
 case "${action}" in
-    upload|download|verify|setlast|getlast|dellast|keep)
+    upload|download|download-iso|download-mirror|verify|setlast|getlast|dellast|keep)
         "action_${action}" "$@"
         ;;
     -h|help)
