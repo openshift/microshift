@@ -132,8 +132,8 @@ Make Usr Writable If Needed
     ...    already created one.
     ${is_ostree}=    Is System OSTree
     IF    ${is_ostree}
-        ${rc}=    Execute Command
-        ...    touch /usr/libexec/.cp-rf-probe && rm -f /usr/libexec/.cp-rf-probe
-        ...    sudo=True    return_rc=True    return_stdout=False
+        ${stdout}    ${stderr}    ${rc}=    Execute Command
+        ...    sh -c 'touch /usr/libexec/.cp-rf-probe && rm -f /usr/libexec/.cp-rf-probe'
+        ...    sudo=True    return_rc=True    return_stdout=True    return_stderr=True
         IF    ${rc} != 0    Create Usr Directory Overlay
     END
