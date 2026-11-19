@@ -1,1 +1,0 @@
-../../../scenarios-rpm/el9/presubmits/el98-src@ai-model-serving-online.sh
