@@ -1978,6 +1978,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - key
+    - name: universeDomain
+      type:
+        scalar: string
 - name: com.github.openshift.api.config.v1.GCPResourceLabel
   map:
     fields:

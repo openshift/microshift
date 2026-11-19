@@ -14,16 +14,18 @@ import (
 // use these fields for configuration.
 type VSpherePlatformSpecApplyConfiguration struct {
 	// vcenters holds the connection details for services to communicate with vCenter.
-	// Currently, only a single vCenter is supported, but in tech preview 3 vCenters are supported.
+	// Up to 3 vCenters are supported.
 	// Once the cluster has been installed, you are unable to change the current number of defined
-	// vCenters except in the case where the cluster has been upgraded from a version of OpenShift
-	// where the vsphere platform spec was not present.  You may make modifications to the existing
+	// vCenters except when 1.) the cluster has been upgraded from a version of OpenShift
+	// where the vsphere platform spec was not present or 2.) in TechPreview you are able to add and
+	// remove vCenters but may not remove all vCenters.  You may make modifications to the existing
 	// vCenters that are defined in the vcenters list in order to match with any added or modified
 	// failure domains.
 	// ---
 	VCenters []VSpherePlatformVCenterSpecApplyConfiguration `json:"vcenters,omitempty"`
 	// failureDomains contains the definition of region, zone and the vCenter topology.
 	// If this is omitted failure domains (regions and zones) will not be used.
+	// Each failure domain's server must match the server field of an entry in the vcenters list.
 	FailureDomains []VSpherePlatformFailureDomainSpecApplyConfiguration `json:"failureDomains,omitempty"`
 	// nodeNetworking contains the definition of internal and external network constraints for
 	// assigning the node's networking.

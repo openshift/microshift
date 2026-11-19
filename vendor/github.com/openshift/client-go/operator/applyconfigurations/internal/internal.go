@@ -505,6 +505,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             scalar: string
           elementRelationship: atomic
+    - name: protocol
+      type:
+        scalar: string
     - name: subnets
       type:
         namedType: com.github.openshift.api.operator.v1.AWSSubnets
@@ -2178,6 +2181,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: endpointPublishingStrategy
       type:
         namedType: com.github.openshift.api.operator.v1.EndpointPublishingStrategy
+    - name: haproxyVersion
+      type:
+        scalar: string
     - name: httpCompression
       type:
         namedType: com.github.openshift.api.operator.v1.HTTPCompressionPolicy
