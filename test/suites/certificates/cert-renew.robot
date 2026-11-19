@@ -447,7 +447,14 @@ Configured And Default Certificate Lifetimes Are Applied
     Renewed Lifetimes Should Match    ${defaults}    8760    87600
     Restart MicroShift
     Renewal Matches Current Status    ${defaults}
-    [Teardown]    Run Keywords    Remove Drop In MicroShift Config    99-tc10-lifetimes    AND    Restart MicroShift
+    [Teardown]    Run Keywords
+    ...    Remove Drop In MicroShift Config    99-tc10-lifetimes
+    ...    AND    Renewal Document    ca    json
+    ...    AND    Restart MicroShift
+    # Removing the configuration alone does not rewrite certificates that
+    # were already issued: a failed run would leave the custom lifetimes in
+    # place for later suites. The teardown reissues with the default policy,
+    # mirroring Restore Certificate Policy.
 
 
 *** Keywords ***

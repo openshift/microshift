@@ -143,6 +143,12 @@ Internal Renewal Leaves Named Certificates Alone
     Sleep    60s
     Pattern Should Not Appear In Log Output
     ...    ${cursor}    Stopping services for certificate rotation    retries=6    wait=10
+    # A crash during the window would restart MicroShift without ever
+    # emitting the rotation message; the in-loop counter reads predate this
+    # wait, so the restart state must be checked once more after it.
+    ${restarts}=    Get Systemd Setting    microshift.service    NRestarts
+    Should Be Equal As Integers    ${restarts}    0
+    ...    msg=MicroShift restarted during the observation window
     [Teardown]    Run Keywords
     ...    Remove Entry From Local Hosts    ${hostname}
     ...    AND    Remove Drop In MicroShift Config    10-subjectAltNames

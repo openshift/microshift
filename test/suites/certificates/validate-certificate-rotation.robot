@@ -244,6 +244,7 @@ Restore Date With Fresh SSH Connection
     ...    wait out the step with nothing connected, and only then log back
     ...    in. Small steps (days) do not break the connection, which is why
     ...    the other date-restoring keywords do not need this.
+    ${ushift_pid}=    MicroShift Process ID
     Start Chronyd Without Wall Clock Sleep
     Close All Connections
     # Wait out chronyd's clock step with nothing connected. This must be a
@@ -254,9 +255,11 @@ Restore Date With Fresh SSH Connection
     Evaluate    time.sleep(60)    modules=time
     Login MicroShift Host
     Wait Until Keyword Succeeds    30x    5s    System Date Should Be Synchronized
-    # The restart that follows the backward step regenerates certificates and
-    # rewrites the kubeadmin kubeconfig (TC-24's own CA renewal also invalidates
-    # the copy saved at suite setup). Re-read it before any healthcheck.
+    # The backward step makes sysconfwatch restart MicroShift, and NTP
+    # synchronization does not mean the restart has finished: reading the
+    # kubeconfig too early captures the pre-restart client certificate. Wait
+    # for the new process before re-reading it.
+    Wait Until MicroShift Process ID Changes    ${ushift_pid}
     Setup Kubeconfig
     Wait For MicroShift
 
