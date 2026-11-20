@@ -472,7 +472,7 @@ func signedCertificateInfoMapKeysOrdered(stringMap map[string]*signedCertificate
 // Unlike library-go's EnsureSubCA, verify the parent before reusing a CA and
 // preserve its issuance counter when repairing an interrupted regeneration.
 func ensureSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expire time.Duration) (*crypto.CA, error) {
-	if subCA, err := crypto.GetCA(certFile, keyFile, serialFile); err == nil && subCA.Config.Certs[0].CheckSignatureFrom(ca.Config.Certs[0]) == nil {
+	if subCA, err := loadSigningCA(certFile, keyFile, serialFile); err == nil && subCA.Config.Certs[0].CheckSignatureFrom(ca.Config.Certs[0]) == nil {
 		return subCA, nil
 	}
 
@@ -486,22 +486,6 @@ func ensureSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expi
 	}
 	subCA.SerialGenerator = serialGenerator
 	return subCA, nil
-}
-
-// Initialize only missing counters; unreadable or corrupt counters must not be
-// reset, since they record serials issued to certificates no longer on disk.
-func ensureSerialGenerator(serialFile string) (*crypto.SerialFileGenerator, error) {
-	serialGenerator, err := crypto.NewSerialFileGenerator(serialFile)
-	if !os.IsNotExist(err) {
-		return serialGenerator, err
-	}
-	if err := os.MkdirAll(filepath.Dir(serialFile), 0755); err != nil { //nolint:gosec // Preserve library-go's CA directory permissions.
-		return nil, err
-	}
-	if err := os.WriteFile(serialFile, []byte("00\n"), 0600); err != nil {
-		return nil, err
-	}
-	return crypto.NewSerialFileGenerator(serialFile)
 }
 
 type sortedForDER []string

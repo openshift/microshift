@@ -125,7 +125,7 @@ func (s *certificateSigner) Complete() (*CertificateSigner, error) {
 	// certificate/key write without resetting the existing serial counter.
 	if signerCompleted.signerConfig == nil {
 		var err error
-		signerCompleted.signerConfig, err = crypto.GetCA(
+		signerCompleted.signerConfig, err = loadSigningCA(
 			cryptomaterial.CACertPath(s.signerDir),
 			cryptomaterial.CAKeyPath(s.signerDir),
 			cryptomaterial.CASerialsPath(s.signerDir),

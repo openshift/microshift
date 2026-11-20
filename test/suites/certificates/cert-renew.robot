@@ -190,8 +190,12 @@ Startup Repairs Interrupted CA Writes Without Resetting Counters
         Stop MicroShift
         ${root_serial}=    Command Should Work    cat ${KUBELET_SIGNER_DIR}/serial.txt
         ${child_serial}=    Command Should Work    cat ${KUBELET_SIGNER_DIR}/csr-signer/serial.txt
+        ${counter_inode}=    Command Should Work    stat -c '%d:%i' ${KUBELET_SIGNER_DIR}/serial.txt
         Command Should Work    truncate -s 0 ${signer_dir}/ca.key
         Start And Wait For MicroShift
+        ${new_counter_inode}=    Command Should Work    stat -c '%d:%i' ${KUBELET_SIGNER_DIR}/serial.txt
+        Should Not Be Equal    ${counter_inode}    ${new_counter_inode}
+        ...    msg=The parent counter must be replaced when reissuing its intermediate
         CSR Signer Serial Has Advanced    ${root_serial}
         ${client_serial}=    Command Should Work
         ...    openssl x509 -in ${KUBELET_SIGNER_DIR}/csr-signer/kubelet-client/client.crt -noout -serial
