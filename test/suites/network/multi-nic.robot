@@ -92,7 +92,7 @@ Setup
     Initialize Global Variables
     Setup Suite With Namespace
     Verify Multiple NICs
-    Wait Until Greenboot Health Check Exited
+    Wait For MicroShift Healthcheck Success
 
 Teardown
     [Documentation]    Test suite teardown
