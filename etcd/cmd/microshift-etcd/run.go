@@ -102,6 +102,11 @@ func (s *EtcdService) configure(cfg *config.Config) {
 
 	s.etcdCfg.MaxLearners = MaxLearners
 
+	// embed.NewConfig() leaves WarningUnaryRequestDuration at zero, which makes
+	// etcd log every unary request as a "request stats" warning. Use the same
+	// default threshold as the etcd binary.
+	s.etcdCfg.WarningUnaryRequestDuration = etcd.DefaultWarningUnaryRequestDuration
+
 	updateConfigFromFile(s.etcdCfg, getConfigFilePath())
 }
 
