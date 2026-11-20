@@ -2,6 +2,8 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+export SKIP_GREENBOOT=true
+
 # Redefine network-related settings to use the dedicated IPv6 network bridge
 # shellcheck disable=SC2034  # used elsewhere
 VM_BRIDGE_IP="$(get_vm_bridge_ip "${VM_IPV6_NETWORK}")"
@@ -12,8 +14,9 @@ MIRROR_REGISTRY_URL="${VM_BRIDGE_IP}:${MIRROR_REGISTRY_PORT}"
 
 scenario_create_vms() {
     # Enable IPv6 single stack in kickstart
-    prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source false true
-    launch_vm rhel-9.8 --network "${VM_IPV6_NETWORK}"
+    prepare_kickstart host1 kickstart-liveimg.ks.template "" false true
+    launch_vm rhel102-installer --network "${VM_IPV6_NETWORK}"
+    configure_rpm_scenario host1 "10.2"
 }
 
 scenario_remove_vms() {

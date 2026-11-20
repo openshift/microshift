@@ -2,10 +2,13 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+export SKIP_GREENBOOT=true
+
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source
+    prepare_kickstart host1 kickstart-liveimg.ks.template ""
     # Using multus as secondary network to have 2 nics in different networks.
-    launch_vm rhel98-bootc --network default,"${VM_MULTUS_NETWORK}"
+    launch_vm rhel102-installer --network default,"${VM_MULTUS_NETWORK}"
+    configure_rpm_scenario host1 "10.2"
 }
 
 scenario_remove_vms() {

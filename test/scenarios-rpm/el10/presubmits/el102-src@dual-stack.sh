@@ -2,9 +2,12 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+export SKIP_GREENBOOT=true
+
 scenario_create_vms() {
-    prepare_kickstart host1 kickstart-bootc.ks.template rhel102-bootc-source
-    launch_vm rhel102-bootc --network "${VM_DUAL_STACK_NETWORK}"
+    prepare_kickstart host1 kickstart-liveimg.ks.template ""
+    launch_vm rhel102-installer --network "${VM_DUAL_STACK_NETWORK}"
+    configure_rpm_scenario host1 "10.2"
 }
 
 scenario_remove_vms() {

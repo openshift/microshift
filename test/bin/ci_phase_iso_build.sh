@@ -22,9 +22,9 @@ exec &> >(tee >(awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush() }' >"${
 
 PULL_SECRET=${PULL_SECRET:-${HOME}/.pull-secret.json}
 
-# Detect a bootc build mode based on the job name
+# Detect bootc or RPM build modes based on the job name (no composer-cli builds)
 COMPOSER_CLI_BUILDS=true
-if [ -v CI_JOB_NAME ] && [[ "${CI_JOB_NAME}" =~ .*bootc.* ]]; then
+if [ -v CI_JOB_NAME ] && [[ "${CI_JOB_NAME}" =~ .*(bootc|rpm).* ]]; then
     COMPOSER_CLI_BUILDS=false
 fi
 
@@ -49,6 +49,34 @@ download_build_cache() {
         return $?
     fi
     return 1
+}
+
+# Download only the installer ISO and mirror registry needed by RPM jobs
+download_rpm_cache_artifacts() {
+    local iso
+    if [[ "${CI_JOB_NAME:-}" =~ el10 ]]; then
+        iso="rhel102-installer.iso"
+    else
+        iso="rhel98-installer.iso"
+    fi
+
+    local -r cache_last="$(\
+        ./bin/manage_build_cache.sh getlast \
+            -b "${SCENARIO_BUILD_BRANCH}" -t "${SCENARIO_BUILD_TAG}" | \
+            awk '/LAST:/ {print $NF}' \
+        )"
+    if [ -z "${cache_last}" ]; then
+        echo "ERROR: Could not determine the latest build cache tag"
+        exit 1
+    fi
+
+    echo "Fetching installer ISO '${iso}' from build cache tag '${cache_last}'"
+    $(dry_run) bash -x ./bin/manage_build_cache.sh download-iso \
+        -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}" "${iso}"
+
+    echo "Fetching mirror registry storage from build cache tag '${cache_last}'"
+    $(dry_run) bash -x ./bin/manage_build_cache.sh download-mirror \
+        -b "${SCENARIO_BUILD_BRANCH}" -t "${cache_last}"
 }
 
 # Run image build for the 'base' and 'release' layers and update the cache:
@@ -115,7 +143,7 @@ update_build_cache() {
 # Full builds are run if the 'CI_JOB_NAME' environment variable is not set.
 #
 # When the 'CI_JOB_NAME' environment variable is set:
-# - Always build the 'base' and 'presubmit' layers.
+# - Always build the 'base' and 'source' layers.
 # - Only build the 'periodic' layer when 'CI_JOB_NAME' contains 'periodic' token.
 run_image_build() {
     if [ -v CI_JOB_NAME ] ; then
@@ -128,7 +156,7 @@ run_image_build() {
         # Conditional per-layer builds when running in CI.
         # The build_images.sh script skips any images that have been downloaded from the cache.
         $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer1-base
-        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-presubmit
+        $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer2-source
 
         if [[ "${CI_JOB_NAME}" =~ .*periodic.* ]]; then
             $(dry_run) bash -x ./bin/build_images.sh -l ./image-blueprints/layer3-periodic
@@ -153,10 +181,10 @@ run_bootc_image_build() {
             return
         fi
 
-        # C2CC scenarios require both el9 and el10 presubmit images
+        # C2CC scenarios require both el9 and el10 source images
         if [[ "${CI_JOB_NAME}" =~ .*c2cc.* ]]; then
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base -l ./image-blueprints-bootc/el10/layer1-base
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit -l ./image-blueprints-bootc/el10/layer2-presubmit
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-source -l ./image-blueprints-bootc/el10/layer2-source
             return
         fi
 
@@ -165,7 +193,7 @@ run_bootc_image_build() {
         if [[ "${os}" == "el9" || "${os}" == "el10" ]]; then
 
             $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer1-base"
-            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer2-presubmit"
+            $(dry_run) bash -x ./bin/build_bootc_images.sh -l "./image-blueprints-bootc/${os}/layer2-source"
 
             if [[ "${os}" == "el10" ]]; then
                 # Build el9 images for upgrade tests
@@ -187,7 +215,7 @@ run_bootc_image_build() {
     else
         # Full build for all OS versions
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer1-base -l ./image-blueprints-bootc/el10/layer1-base
-        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-presubmit -l ./image-blueprints-bootc/el10/layer2-presubmit
+        $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer2-source -l ./image-blueprints-bootc/el10/layer2-source
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer3-periodic -l ./image-blueprints-bootc/el10/layer3-periodic
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/el9/layer4-release -l ./image-blueprints-bootc/el10/layer4-release
         $(dry_run) bash -x ./bin/build_bootc_images.sh -l ./image-blueprints-bootc/upstream
@@ -237,6 +265,16 @@ if [ $# -gt 0 ] && [ "$1" = "-update_cache" ] ; then
         exit 1
     fi
 else
+    # RPM jobs build no images and need only a subset of the build cache
+    if [[ "${CI_JOB_NAME:-}" =~ .*rpm.* ]]; then
+        $(dry_run) bash -x ./bin/build_rpms.sh
+        download_rpm_cache_artifacts
+        # No images are built: an empty list lets the mirror registry setup run
+        $(dry_run) touch "${CONTAINER_LIST}"
+        echo "Build phase complete"
+        exit 0
+    fi
+
     GOT_CACHED_DATA=false
     if ${HAS_CACHE_ACCESS} ; then
         if download_build_cache ; then

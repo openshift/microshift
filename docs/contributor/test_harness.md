@@ -4,10 +4,11 @@ The CI test harness provisions VMs, installs MicroShift, and runs Robot Framewor
 
 ## Deployment Modes
 
-The harness supports two deployment models, each with its own scenarios and image blueprints:
+The harness supports three deployment models, each with its own scenarios and image blueprints:
 
 | Mode | Scenarios | Image Blueprints | Description |
 |------|-----------|-----------------|-------------|
+| **RPM (direct install)** | `test/scenarios-rpm/` | n/a (stock RHEL installer image) | MicroShift installed via `dnf` on a plain RHEL image |
 | **ostree (RPM-based)** | `test/scenarios/` | `test/image-blueprints/` | MicroShift installed as RPMs on an rpm-ostree system |
 | **bootc (container image-based)** | `test/scenarios-bootc/` | `test/image-blueprints-bootc/` | MicroShift embedded in a bootable container image |
 
@@ -48,7 +49,7 @@ Scenarios are executed in parallel by `test/bin/ci_phase_boot_and_test.sh`, each
 
 | Type | Directory | When it runs |
 |------|-----------|-------------|
-| **Presubmit** | `presubmits/` | Every PR |
+| **Presubmit** | `presubmits/` (only under `test/scenarios-rpm/`) | Every PR |
 | **Periodic** | `periodics/` | Nightly/weekly |
 | **Release** | `releases/` | Before release cuts (Brew RPM sourced) |
 | **Upstream** | `upstream/` (bootc only) | CentOS-only testing |
@@ -74,14 +75,14 @@ Images are composed in layers with time-balanced caching. Each layer builds on t
 ### ostree Blueprints (`test/image-blueprints/`)
 
 1. **Layer 1 — Base** (cached, ~30min build): OS-only base and historical MicroShift versions (y-2, y-1)
-2. **Layer 2 — Presubmit** (not cached, ~10min): current source artifacts
+2. **Layer 2 — Source** (not cached, ~10min): current source artifacts
 3. **Layer 3 — Periodic** (not cached, ~15min): extended testing artifacts
 4. **Layer 4 — Release** (cached behind VPN, ~30min): Brew RPM artifacts and upgrade paths
 
 ### bootc Blueprints (`test/image-blueprints-bootc/`)
 
 1. **Layer 1 — Base** (cached, ~10min): basic prerequisites
-2. **Layer 2 — Presubmit** (not cached, ~5min): current source on RHEL
+2. **Layer 2 — Source** (not cached, ~5min): current source on RHEL
 3. **Layer 3 — Periodic** (not cached, ~15min): extended testing on RHEL
 4. **Layer 4 — Upstream** (not cached, ~15min): CentOS-based testing
 5. **Layer 5 — Release** (cached, ~15min): EC/RC/GA/z-stream releases

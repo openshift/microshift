@@ -21,14 +21,14 @@ for testing upgrades.
 
 > Note: Total build times are up to 30 minutes.
 
-## OSTree Presubmit Layer
+## OSTree Source Layer
 
 Artifacts built in this layer cannot be cached as they depend on the current sources.
-The artifacts are used by pre-submit and periodic CI jobs.
+The artifacts are used by periodic CI jobs.
 
 |Group |Build Time|Description|
 |------|----------|-----------|
-|group1| Average  | Current source prerequisites used in pre-submits and periodics
+|group1| Average  | Current source prerequisites used in periodics
 
 > Note: Total build times are up to 10 minutes.
 
