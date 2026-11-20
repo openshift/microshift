@@ -1,7 +1,6 @@
 package certchains
 
 import (
-	"fmt"
 	"time"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -109,35 +108,33 @@ func (s *certificateSigner) WithSubCAs(subCAsInfo ...CertificateSignerBuilder) C
 }
 
 func (s *certificateSigner) Complete() (*CertificateSigner, error) {
-	// in case this is a sub-ca, it's already going to have the signer-config populated
-	signerConfig := s.signerConfig
-	if signerConfig == nil {
-		var err error
-		signerConfig, _, err = crypto.EnsureCA(
-			cryptomaterial.CACertPath(s.signerDir),
-			cryptomaterial.CAKeyPath(s.signerDir),
-			cryptomaterial.CASerialsPath(s.signerDir),
-			s.signerName,
-			s.signerValidity,
-		)
-
-		if err != nil {
-			return nil, fmt.Errorf("failed to generate %s CA certificate: %w", s.signerName, err)
-		}
-	}
-
 	signerCompleted := &CertificateSigner{
 		signerName:     s.signerName,
 		service:        s.service,
 		signerDir:      s.signerDir,
 		signerValidity: s.signerValidity,
-		signerConfig:   signerConfig,
+		signerConfig:   s.signerConfig,
 		limitValidity:  s.limitValidity,
 
 		subCAs:             make(map[string]*CertificateSigner),
 		signedCertificates: make(map[string]*signedCertificateInfo),
 
 		caBundlePaths: sets.New[string](),
+	}
+	// Sub-CAs already have a signer config. For roots, recover an interrupted
+	// certificate/key write without resetting the existing serial counter.
+	if signerCompleted.signerConfig == nil {
+		var err error
+		signerCompleted.signerConfig, err = loadSigningCA(
+			cryptomaterial.CACertPath(s.signerDir),
+			cryptomaterial.CAKeyPath(s.signerDir),
+			cryptomaterial.CASerialsPath(s.signerDir),
+		)
+		if err != nil {
+			if err := signerCompleted.regenerateSelf(); err != nil {
+				return nil, err
+			}
+		}
 	}
 	signerCompleted.boundIssuerValidity()
 
