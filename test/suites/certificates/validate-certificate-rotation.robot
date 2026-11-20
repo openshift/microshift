@@ -260,6 +260,9 @@ Restore Date With Fresh SSH Connection
     # kubeconfig too early captures the pre-restart client certificate. Wait
     # for the new process before re-reading it.
     Wait Until MicroShift Process ID Changes    ${ushift_pid}
+    # The new process writes the kubeadmin kubeconfig during startup, before
+    # it reports service readiness: wait for the service before reading it.
+    Wait For MicroShift Service
     Setup Kubeconfig
     Wait For MicroShift
 
