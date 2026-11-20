@@ -5,6 +5,7 @@ List of the documents in alphabetical file name order, including sub-directories
 ### Top-level
 
 - [MicroShift Architecture](./architecture.md)
+- [Certificate Renewal Transactions](./certificates.md)
 - [Design Documentation](./design.md)
 - [MicroShift Development Environment in Cloud](./devenv_cloud.md)
 - [MicroShift Development Environment](./devenv_setup.md)

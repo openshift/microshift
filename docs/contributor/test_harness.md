@@ -132,6 +132,7 @@ VMs can be provisioned with different network setups:
 Test suites live in `test/suites/`, organized by feature area:
 
 - `standard1/`, `standard2/` — core functionality
+- `certificates/` — certificate status, renewal, automatic rotation, custom certificates, and CA bundles
 - `backup/` — backup/restore operations
 - `greenboot/` — health check validation
 - `upgrade/` — version upgrade scenarios
@@ -179,7 +180,7 @@ Then run:
 test/run.sh [suite paths...]
 ```
 
-Without suite arguments, it runs a default set (standard1, standard2, and selected osconfig/storage tests). The script automatically sets up a Python virtual environment with Robot Framework.
+Without suite arguments, it runs a default set (standard1, standard2, certificates, and selected osconfig/storage tests). The script automatically sets up a Python virtual environment with Robot Framework.
 
 ## CI Orchestration
 
