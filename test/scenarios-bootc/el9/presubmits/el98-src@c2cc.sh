@@ -1,1 +1,1 @@
-../../c2cc/el98-src@c2cc.sh
+../../../scenarios-rpm/el9/presubmits/el98-src@c2cc.sh

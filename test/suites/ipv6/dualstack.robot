@@ -129,7 +129,7 @@ Setup
     [Documentation]    Test suite setup
     Login MicroShift Host
     Setup Suite With Namespace
-    Wait Until Greenboot Health Check Exited
+    Wait For MicroShift Healthcheck Success
 
 Get MicroShift Node IPv6
     [Documentation]    Retrieve the IPv6 address from the MicroShift config under node.nodeIPv6

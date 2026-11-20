@@ -334,6 +334,46 @@ c2cc_create_vms() {
     launch_vm "${boot_blueprint}" --vmname host3 --network "${network}" "${mtu_args[@]}"
 }
 
+# c2cc_create_vms_rpm is the RPM-install counterpart of c2cc_create_vms for the
+# basic (IPv4, single-stack) c2cc presubmit. It boots three bare RHEL VMs from
+# the installer ISO (kickstart-liveimg) and installs MicroShift from the
+# locally-built RPMs on each, instead of booting pre-built bootc images.
+#
+# The per-cluster CIDRs are injected via kickstart so each MicroShift comes up
+# with the correct, non-overlapping network on first start; the kickstart-seeded
+# /etc/microshift/config.yaml survives the later `dnf install microshift`
+# because the RPM ships config.yaml.default, not config.yaml.
+#
+# The scenario must `export SKIP_GREENBOOT=true`: there is no post-install
+# reboot on the RPM path, so greenboot never runs. configure_rpm_scenario starts
+# and healthchecks MicroShift per host, and the greenboot waits in
+# configure_c2cc_hosts become no-ops under SKIP_GREENBOOT.
+#
+# Args: rhel_version   (e.g. "9.8" or "10.2")
+c2cc_create_vms_rpm() {
+    local -r rhel_version="${1}"
+    # "9.8" -> rhel98-installer, "10.2" -> rhel102-installer
+    local -r installer="rhel${rhel_version//./}-installer"
+
+    for host in host1 host2 host3; do
+        prepare_kickstart "${host}" kickstart-liveimg.ks.template ""
+    done
+
+    # Inject non-overlapping CIDRs so each MicroShift boots with the correct
+    # network from the start. host1 uses the MicroShift defaults (cluster A).
+    inject_kickstart_network host2 "${CLUSTER_B_POD_CIDR}" "${CLUSTER_B_SVC_CIDR}"
+    inject_kickstart_network host3 "${CLUSTER_C_POD_CIDR}" "${CLUSTER_C_SVC_CIDR}"
+
+    launch_vm "${installer}" --vmname host1
+    launch_vm "${installer}" --vmname host2
+    launch_vm "${installer}" --vmname host3
+
+    # Install and start MicroShift from the locally-built RPMs on each host.
+    configure_rpm_scenario host1 "${rhel_version}"
+    configure_rpm_scenario host2 "${rhel_version}"
+    configure_rpm_scenario host3 "${rhel_version}"
+}
+
 c2cc_remove_vms() {
     remove_vm host1
     remove_vm host2

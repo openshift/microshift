@@ -1,1 +1,1 @@
-../../c2cc/el102-src@c2cc.sh
+../../../scenarios-rpm/el10/presubmits/el102-src@c2cc.sh
