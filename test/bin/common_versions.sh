@@ -93,8 +93,8 @@ fi
 #
 # For a release branch, the current release repository should come from the
 # official 'rhocp' stream.
-CURRENT_RELEASE_REPO="https://mirror.openshift.com/pub/openshift-v5/${UNAME_M}/microshift/ocp/latest-5.0/el9/os"
-CURRENT_RELEASE_VERSION="$(get_vrel_from_beta "${CURRENT_RELEASE_REPO}")"
+CURRENT_RELEASE_REPO="rhocp-5.0-for-rhel-9-${UNAME_M}-rpms"
+CURRENT_RELEASE_VERSION="$(get_vrel_from_rhsm "${CURRENT_RELEASE_REPO}")"
 export CURRENT_RELEASE_REPO
 export CURRENT_RELEASE_VERSION
 
@@ -125,8 +125,8 @@ export YMINUS2_RELEASE_VERSION
 # The 'rhocp_major_y' and 'rhocp_minor_y' variables should be the major and minor
 # version numbers, if the current release is available through the 'rhocp' stream,
 # otherwise empty.
-RHOCP_MAJOR_Y=""
-RHOCP_MINOR_Y=""
+RHOCP_MAJOR_Y=5
+RHOCP_MINOR_Y=0
 # The beta repository, containing dependencies, should point to the
 # OpenShift mirror URL. If the mirror for current minor is not
 # available yet, it should point to an older release.
