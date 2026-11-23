@@ -1,0 +1,216 @@
+- api embedded-component ba4a47a719540db464149679fce18af601809d3c to ca0b115da1b166b050da9126c8d565616775dae2
+  - 8b8462ed 2026-11-16T18:05:49+01:00 NE-2926: Add control of the resource usage for Ingress pods
+  - a758ebd1 2026-11-13T13:57:16+01:00 Add a feature gate for Metal3 HostClaims API
+  - 39cac7b5 2026-11-12T09:26:30-07:00 STOR-3259: Promote ControllerManagerConfig to TechPreview
+  - a2fb4934 2026-11-12T16:38:05+01:00 OCPBUGS-140724: add a feature gate to guard BareMetalHost v1beta1
+  - 3964ebc1 2026-11-12T12:19:55+01:00 authentication: AuthenticationConfiguration: Clarify trustedCAFilePath scope
+  - 6aa4ac7b 2026-11-12T12:02:58+01:00 OCPBUGS-134623: accept empty imageStreamImportMode again, keep omitempty
+  - 2399e8fa 2026-11-11T12:09:54-05:00 Promote AWSDedicatedHosts to GA
+  - 7bc08775 2026-11-09T14:34:12-05:00 CONSOLE-5209: Mark Ingress lists atomic for schema validation
+  - a4d69b19 2026-11-09T13:50:04-05:00 CONSOLE-5209: Promote IngressComponentRouteLabels to Default
+  - 6d6c3c97 2026-11-09T10:29:16+02:00 commit products of 'make update'
+  - 008d7bf7 2026-11-09T10:29:16+02:00 features: graduate MACSecurity
+  - ea5bb0f5 2026-11-06T17:49:00+01:00 ClusterAPI: Add format validation for RevisionName
+  - c78363bc 2026-11-06T17:49:00+01:00 ClusterAPI: Update description of ContentID
+  - 70e08bcc 2026-11-06T17:48:59+01:00 Promote ClusterAPI operator API to v1
+  - 9e8ab770 2026-11-06T11:53:07+01:00 Promote CRDCompatibilityRequirementOperator feature gate to Default
+  - 635b39c6 2026-11-05T17:36:27+01:00 MON-4656: express additional Alertmanager timeout in integer milliseconds
+  - dcbb8c6d 2026-11-02T16:20:22+01:00 OCPCLOUD-3722: Stop serving CompatibilityRequirement v1alpha1
+  - f91d8ce5 2026-10-22T13:08:18+03:00 config: clarify NVMe subsystem collector behavior
+  - 01fd3464 2026-10-21T11:25:47Z Remove NewOLMOwnSingleNamespace feature gate registration
+
+- cluster-dns-operator embedded-component 9a611701deab3e9945c4c3f828ced0fab5f06616 to 09e58b646c01e9ab8a3615dfeefcde6d291b621e
+  - b1412eff 2026-11-13T14:33:56Z fix: make gofmt verification reliable
+
+- cluster-ingress-operator embedded-component 5a204691d0c24cbb4e4eb213e60bece9e53c3a56 to 8fc1523c3173ed4f83ac39931205b58544aecf22
+  - 1d93783e 2026-11-19T11:12:02Z NE-2842: Fix conformance TLS retry and feature claims
+  - 217ad98c 2026-11-19T11:12:02Z NE-2842: Include OpenShift SCC reads in Sail RBAC
+  - 2737d1ae 2026-11-19T11:11:51Z NE-2842: Bump Gateway API CRDs to v1.6.3 with OSSM 3.5
+  - cd925b95 2026-11-18T00:05:00+05:30 NE-2126: Re-land ingress operator QE tests
+  - 8bcdb643 2026-11-16T15:12:50-05:00 OCPBUGS-141883: Fix takeover check on upgrade
+  - 7ee73ad1 2026-11-15T14:39:05Z Revert #1624 for upgrade verification
+  - 2bb6575d 2026-11-13T01:12:07Z TRT-3102: Revert #1654 "NE-2126: Re-enable migrated ingress operator QE tests"
+  - d9fd58c2 2026-11-12T18:34:38Z NE-2842: Fix conformance TLS retry and feature claims
+  - eb75f86d 2026-11-12T18:34:38Z NE-2842: Include OpenShift SCC reads in Sail RBAC
+  - 67b0456b 2026-11-12T18:34:37Z NE-2842: Bump Gateway API CRDs to v1.6.3 with OSSM 3.5
+  - 0eb9dfdb 2026-11-11T13:39:18+05:30 OCPBUGS-132070: Re-enable ingress QE tests
+  - d469e589 2026-11-07T17:58:10Z NE-2912: Add HAProxy 3.4 image selection
+  - b1f08c95 2026-10-23T14:29:02-03:00 Detect unexpected router deployment updates
+
+- cluster-kube-apiserver-operator embedded-component 6300c9aa30979eaf416853c9a3f640ac4b935e60 to 4f7e0eda2f5c4d42274e14f485062f7d2c3ce941
+  - 326f259 2026-11-18T15:52:38+01:00 Set UserAgentSuffix on cert-regeneration controller
+  - db0403c 2026-11-18T15:51:57+01:00 deps: Update library-go
+  - 9699939 2026-11-16T15:38:02Z bump(openshift/library-go): to get revision controller no-downgrade fix
+  - e1dad1d 2026-11-12T18:19:42+01:00 configobservation/auth: improve readability, safer default
+  - aed05c4 2026-11-12T18:19:38+01:00 configobservation/auth: disarm PSA enforcement with gate on
+  - ce7c783 2026-11-11T11:31:56+01:00 oidc: prevent revisions with missing OIDC authentication config from deploying
+  - e30937f 2026-11-11T09:04:29+01:00 configobservation/auth: coordinate direct-to-webhook OIDC migration
+  - ad5a344 2026-11-02T11:29:59-05:00 OCPBUGS-130512: Bump golang.org/x/net to v0.60.0 to fix CVE-2026-78669
+
+- cluster-kube-controller-manager-operator embedded-component cd45079d8bb7a391ba0eb3282d9ef75232fe425c to 1cc5c68ea40fe8579db1807b565770274d51c09b
+  - 0541207 2026-11-18T14:45:42+01:00 Set UserAgentSuffix on cert-recovery controller
+  - f97308f 2026-11-18T14:45:40+01:00 deps: Update library-go
+  - cd8e06e 2026-11-06T14:24:38-08:00 CNTRLPLANE-4778: Turn node cert recovery off 24h after it's turned on
+
+- cluster-kube-scheduler-operator embedded-component cd261779c0461060d8f6f63606b59d146d664561 to 449df20e3d95bd0f337be913880fab40f131e51f
+  - 5877154 2026-11-18T15:34:38+01:00 Set UserAgentSuffix on cert-recovery controller
+  - fdc222d 2026-11-18T15:34:34+01:00 deps: Update library-go
+  - c7f08c1 2026-11-13T20:25:10Z OCPBUGS-133761: Raise kube-scheduler-operator memory request to 110Mi
+  - 65a54a8 2026-07-17T19:40:05+02:00 docs: add AGENTS.md, ARCHITECTURE.md, CLAUDE.md, CONTRIBUTING.md; trim README
+
+- cluster-network-operator embedded-component e2bf267f551f55a6b8a1e0cb590af4bf4887473c to 5711dcf5d887dba086ae5a9db2ba2d2a7753c0d1
+  - 1931322 2026-11-02T14:06:25-08:00 CORENET-7693: Don't enable Network Observability on upgrade
+  - b2f3730 2026-11-02T13:40:21-05:00 Add coverage for max-allowed-address-pairs
+  - d0d6008 2026-11-02T13:40:21-05:00 Pass OS max_allowed_address_pairs to CNCC via InfraStatus
+  - 6e30010 2026-11-02T13:40:16-05:00 Bump `openshift/api` to latest
+  - 4f431ed 2026-10-28T14:57:32-04:00 Add TLS curve preferences CLI arg to network-check-source
+  - ac91f5f 2026-10-28T14:57:32-04:00 Apply TLS curve preferences to the operator's serving config
+  - 73f6f3d 2026-10-28T14:57:31-04:00 Render TLS curve arg for the non-NGINX operands
+  - e7b3237 2026-10-26T11:26:36-04:00 Render TLS curve arg for the network-plugin-console
+  - ef9a2ce 2026-10-23T14:51:17Z ovn-kubernetes: Add disable-udn-arp-ndp-flood config override
+  - 557711e 2026-10-23T14:51:17Z ovn-kubernetes: Validate and sanitize config overrides
+
+- machine-config-operator embedded-component 81077fc6d41d526c08a780972b06162ca246e468 to 9dfb6bda9b5f66d9330faf157133cf4887be1aba
+  - a211a947 2026-11-19T18:16:24Z NO-ISSUE: derive supported Ignition versions in bootimage stub version test
+  - b4f23551 2026-11-16T09:32:24-05:00 MCO-2553: propagate TLS group preferences to MCS and kube-rbac-proxy sidecars
+  - 7e2269f9 2026-11-16T12:59:35Z Test osimagestream without going from rhel10 to rhel9
+  - e69799e4 2026-11-16T17:12:09+05:30 NO-ISSUE: derive supported Ignition versions in ign version tests
+  - c5d88f33 2026-11-16T17:12:09+05:30 fix: Removed in-repo code gen
+  - 2f689e81 2026-11-16T17:12:09+05:30 vendor: sync vendor directory for ignition v2.26.0
+  - c7f035be 2026-11-16T17:12:01+05:30 Bump internal ignition version to v3.6.0
+  - 907edaf1 2026-11-15T08:49:25Z OCPBUGS-72554: on-prem: partially revert API VIP health checks
+  - 2edbb2ef 2026-11-14T17:11:07Z OPNET-595: BGP VIP: withdraw ingress VIP on router readiness, not liveness
+  - d52bb918 2026-11-13T15:29:32-05:00 OCPBUGS-139151: Strip irreconcilable storage sections from OCL revert MC
+  - cb6a0eb2 2026-11-12T17:05:23Z NO-ISSUE: render: join test informers before returning the controller
+  - aa2e37fe 2026-11-12T09:45:21Z OPNET-823: keep BGP VIP peer passwords out of ControllerConfig
+  - b49aeff9 2026-11-11T15:38:49-05:00 OCPBUGS-128859: Fix mtu-migration sed eating space separator on IPv6 routes
+  - 14d7ceb9 2026-11-11T15:29:07-05:00 OCPBUGS-140607: Pass --cert-dir to buildah bud for internal registry trust
+  - 34236c36 2026-11-11T15:52:46Z go.mod: bump golang.org/x/net to v0.60.0
+  - e1a2783e 2026-11-09T18:16:20+01:00 MCO-2517: Use require.NoError for error checks
+  - caf440aa 2026-11-02T09:32:40-05:00 controller and manifest VAPs: block OSStream downgrades from rhel-10 to rhel-9
+  - 7bc64b96 2026-10-29T17:14:19-07:00 Bump default stop timeout to account for the fact that we need to increase KAS's shutdown delay on AWS to account for load balancer drain times.
+
+- operator-framework-olm embedded-component a941d9fec006aabc186915a87b52b6a75d76f5de to 9822880e21db21a145dfd8b560d866039324044d
+  - 9b8739fb 2026-11-14T00:09:57Z :seedling: bump go.opentelemetry.io/otel/sdk from 1.46.0 to 1.47.0 (#3968)
+  - c01348f7 2026-11-14T00:08:18Z :seedling: bump github.com/itchyny/gojq from 0.12.19 to 0.12.20 (#3965)
+  - fb858c9e 2026-11-14T00:07:35Z :seedling: bump github.com/onsi/ginkgo/v2 from 2.33.1 to 2.34.0 (#3964)
+  - 6be4a381 2026-11-14T00:07:03Z :seedling: bump github.com/spf13/pflag from 1.0.10 to 1.1.0 (#3963)
+  - fdf4aabb 2026-11-14T00:06:32Z :seedling: bump google.golang.org/grpc from 1.84.0 to 1.85.0 (#3966)
+  - dabd81b1 2026-11-11T17:52:21Z OCPBUGS-140011: Raise catalog-operator and PSM memory requests
+
+- route-controller-manager embedded-component d2fec61b151340ac930dfccc865bdfc3a78d1896 to c367dd41ffd8ce0e4f09b5add24bf255b5bcf7e0
+  - 5339f6a 2026-11-16T21:23:46+01:00 chore: update .ci-operator.yaml and Dockerfile to point to 5.1
+  - 250cdae 2026-11-16T21:23:40+01:00 fix(pkg/route/ingress): fix panic in the unit tests
+  - 3540686 2026-11-16T21:21:17+01:00 chore: bump k8s dependencies to 1.37.1, openshift to the latest
+
+- oc image-amd64 121c3e2a79e02aac5f3a2ca48f229982116ab774 to 4bd02390bf64d514f18bf5531f2c0bbbc3d946f1
+  - 28345d72 2026-11-17T07:52:44+03:00 Use OpenRoot to generate tmp directory for genman
+  - a47f5ca9 2026-11-11T17:31:15-06:00 fix(adm/transition): nest transition status under status.topologyTransitionStatus
+  - 8218a7a1 2026-11-11T17:21:40-06:00 feat(adm/transition): support -o json|yaml for status
+  - c878a6d5 2026-11-11T17:18:10-06:00 feat(adm/transition): validate -o format and fix status flag plumbing
+
+- router image-amd64 3533efa85fcd139f5806906cfd99a0b6748d202f to 735b2f012496dbca77426258821aa30f488def52
+  - b4180dba 2026-11-18T23:23:50+05:30 NE-2126: Migrate HAProxy router QE tests to OTE
+  - a69b27a2 2026-11-12T10:55:47-03:00 Remove HAProxy installation from the router image
+  - 18c12b4b 2026-11-06T09:34:10-03:00 remove blueprint routes
+
+- router image-amd64 3533efa85fcd139f5806906cfd99a0b6748d202f to 735b2f012496dbca77426258821aa30f488def52
+  - b4180dba 2026-11-18T23:23:50+05:30 NE-2126: Migrate HAProxy router QE tests to OTE
+  - a69b27a2 2026-11-12T10:55:47-03:00 Remove HAProxy installation from the router image
+  - 18c12b4b 2026-11-06T09:34:10-03:00 remove blueprint routes
+
+- ovn-kubernetes image-amd64 73795e582a10a9f601d317a5f9035428c82741b3 to f686ec839d757c12d8efa2991fa9091372b9f440
+  - e8021b80 2026-11-17T18:08:14+01:00 ote: enable localnet MAC-security pod tests
+  - 17a4b01c 2026-11-17T18:08:14+01:00 ote: configure localnet underlay with br-ex
+  - f5cdd526 2026-11-13T17:13:06+05:30 Revert "Keep the OVN bindings on the version we ship"
+  - 44d12bc6 2026-11-13T17:10:40+05:30 Bump ovn to 26.09
+  - a2a8901f 2026-11-13T17:10:40+05:30 Bump OCP base images to 5.1
+  - 0346101b 2026-11-12T09:40:00+01:00 master unittest: fix syncGateway race with the node controller
+  - 9cdad890 2026-11-12T09:39:57+01:00 podadmission: fix extra pod admissions for external components
+  - 41ed1322 2026-11-11T14:38:31-03:00 build: add a bench target
+  - f2e05dcf 2026-11-11T14:38:31-03:00 metrics: make the workqueue histograms usable
+  - 031509f1 2026-11-11T14:38:17-03:00 metrics: instrument route import and the EVPN node controllers
+  - 744cc414 2026-11-11T14:38:02-03:00 metrics: instrument the RouteAdvertisements controller
+  - 438a9921 2026-11-11T12:22:51+01:00 cni: validate cni logfile, only allow /var/log/ovn-kubernetes prefix
+  - cd010f4c 2026-11-10T23:21:20-03:00 metrics: add OVSDB transaction duration and size metrics
+  - d3de74f9 2026-11-10T20:34:14+01:00 ovn: use a single advertisement snapshot per node sync
+  - f7521a6e 2026-11-10T20:34:14+01:00 ovn: mark nodes for resync under the node handler lock on reconcile
+  - 08a2d95e 2026-11-09T21:38:53-08:00 openshift: add Feature:PersistentIPs to UDN static IP/MAC test name
+  - 26447bf6 2026-11-09T21:37:54-08:00 sync test annotations with upstream changes
+  - 50023422 2026-11-09T13:57:12-03:00 ci: compare ipfamily against the values the matrix uses
+  - bec0c94b 2026-11-09T13:57:12-03:00 ci: drop the unused ic matrix key
+  - be944b4e 2026-11-07T11:12:50+05:30 e2e: use official FRR image for external gateways
+  - 6860c414 2026-11-06T18:36:28+01:00 ci: pin docs workflows to Python 3.14
+  - 7b3c2466 2026-11-05T17:48:31-03:00 Adds e2e test for DISABLE_UDN_ARP_NDP_FLOOD
+  - 2cfb6c11 2026-11-05T17:48:31-03:00 Enables CI lane for DISABLE_UDN_ARP_NDP_FLOOD
+  - a45dd4c8 2026-11-05T17:48:31-03:00 Links macbinding controller to ovnkube
+  - 075b9a53 2026-11-05T12:07:39-05:00 controller: test onDelete enqueues work for delete tombstones
+  - 7fae7e27 2026-11-05T15:55:41+01:00 MNP: ignore ipv4-mapped ipv6 addresses, like `::ffff:10.10.1.42`
+  - 429ab5a7 2026-11-05T18:09:02+05:30 e2e: source nginx from upstream k8s NginxNew image
+  - bba28b12 2026-11-05T18:08:38+05:30 e2e: replace dedicated iperf image with netshoot
+  - 9d28a1e3 2026-11-05T18:08:36+05:30 e2e: drop personal itssurya metallb helper images
+  - ed45ce27 2026-11-04T16:32:44-05:00 ci: identify reviewed PRs by workflow run name
+  - 89b4b079 2026-11-04T10:23:26+01:00 security: update instructions for reporting vulnerabilities
+  - 7675973b 2026-11-03T16:02:11-08:00 metrics: deprecate ovnkube controller resource latency histograms
+  - eb48f144 2026-11-03T14:38:20-05:00 test: wait for pod port before starting L3 UDN policy watcher
+  - 604c52c4 2026-11-03T12:47:59-05:00 e2e: filter persistent IP tests by feature label
+  - d456320f 2026-11-03T13:26:25Z docs: move CUDN test references to crd-integration
+  - 5af3e022 2026-11-03T13:21:48Z codeowners: move CUDN scenario ownership to crd-integration
+  - d5dc982d 2026-11-03T13:21:48Z test: migrate CUDN scenario tests to controller runtime client
+  - 394dd4ed 2026-11-03T14:10:43+01:00 multinetpol: accept bare IPs and not CIDRs for compatibility
+  - f39aea2f 2026-11-03T11:52:34+01:00 multinetpol: validate IPBlock when converting to netpol
+  - aca120d6 2026-11-02T10:05:47-05:00 cluster-udn: track namespaces before attempting NAD creation
+  - efc06b28 2026-10-30T15:21:06-04:00 docs: describe how UDN and CUDN deletion waits for pods
+  - 2d0ef1a8 2026-10-30T15:21:06-04:00 cluster-udn: back off the retries of a deletion waiting for its network
+  - b6506185 2026-10-30T15:21:06-04:00 cluster-udn: track a NAD as soon as it is created
+  - 54496229 2026-10-30T15:09:22+01:00 cni: remove primary Layer2 RA filter installation
+  - d80ab20a 2026-10-30T13:00:47+01:00 bridgeconfig: reject network names that can break ovn-bridge-mappings
+  - 6977e9b0 2026-10-29T13:48:44-07:00 OCPBUGS-113964: skip tests when external container is unavailable
+  - a688d976 2026-10-28T15:33:13+01:00 docs: Fix bullet nesting and OKEP heading levels for website rendering
+  - 87375455 2026-10-23T16:56:19-04:00 ci: allow manual refresh of PR labels
+  - dcdbe994 2026-10-23T16:56:19-04:00 ci: label PRs with current approvals
+  - 8881759d 2026-10-12T11:00:36+01:00 test: move cudn scenarios under crd-integration
+  - 84f44f84 2026-10-12T11:00:36+01:00 test: create a copy of scenario.go in crd-integration
+
+- oc image-arm64 121c3e2a79e02aac5f3a2ca48f229982116ab774 to 4bd02390bf64d514f18bf5531f2c0bbbc3d946f1
+  - 28345d72 2026-11-17T07:52:44+03:00 Use OpenRoot to generate tmp directory for genman
+  - a47f5ca9 2026-11-11T17:31:15-06:00 fix(adm/transition): nest transition status under status.topologyTransitionStatus
+  - 8218a7a1 2026-11-11T17:21:40-06:00 feat(adm/transition): support -o json|yaml for status
+  - c878a6d5 2026-11-11T17:18:10-06:00 feat(adm/transition): validate -o format and fix status flag plumbing
+
+- router image-arm64 3533efa85fcd139f5806906cfd99a0b6748d202f to 735b2f012496dbca77426258821aa30f488def52
+  - b4180dba 2026-11-18T23:23:50+05:30 NE-2126: Migrate HAProxy router QE tests to OTE
+  - a69b27a2 2026-11-12T10:55:47-03:00 Remove HAProxy installation from the router image
+  - 18c12b4b 2026-11-06T09:34:10-03:00 remove blueprint routes
+
+- router image-arm64 3533efa85fcd139f5806906cfd99a0b6748d202f to 735b2f012496dbca77426258821aa30f488def52
+  - b4180dba 2026-11-18T23:23:50+05:30 NE-2126: Migrate HAProxy router QE tests to OTE
+  - a69b27a2 2026-11-12T10:55:47-03:00 Remove HAProxy installation from the router image
+  - 18c12b4b 2026-11-06T09:34:10-03:00 remove blueprint routes
+
+- ovn-kubernetes image-arm64 73707d761dde82973bd9d69c4f1134c59a052e2f to 440a707aa1142a8ae482947f95ea4fc68bded633
+  - 9d4710b8 2026-11-18T17:10:30+05:30 openshift/ote: drop API validation tests moved to crd-integration
+  - e771400c 2026-11-18T06:54:50+05:30 fix(egressip): fix node capacity pointer aliasing and recover failed CPICs
+  - e8021b80 2026-11-17T18:08:14+01:00 ote: enable localnet MAC-security pod tests
+  - 17a4b01c 2026-11-17T18:08:14+01:00 ote: configure localnet underlay with br-ex
+  - 38a8078a 2026-11-15T13:25:17Z egressip: avoid mutating cached cloud private ip config
+  - 85971276 2026-11-14T06:07:50Z crd-integration: migrate vtep and cnc api tests to envtest
+  - f5cdd526 2026-11-13T17:13:06+05:30 Revert "Keep the OVN bindings on the version we ship"
+  - 44d12bc6 2026-11-13T17:10:40+05:30 Bump ovn to 26.09
+  - a2a8901f 2026-11-13T17:10:40+05:30 Bump OCP base images to 5.1
+  - 0346101b 2026-11-12T09:40:00+01:00 master unittest: fix syncGateway race with the node controller
+  - 9cdad890 2026-11-12T09:39:57+01:00 podadmission: fix extra pod admissions for external components
+  - 41ed1322 2026-11-11T14:38:31-03:00 build: add a bench target
+  - f2e05dcf 2026-11-11T14:38:31-03:00 metrics: make the workqueue histograms usable
+  - 031509f1 2026-11-11T14:38:17-03:00 metrics: instrument route import and the EVPN node controllers
+  - 744cc414 2026-11-11T14:38:02-03:00 metrics: instrument the RouteAdvertisements controller
+  - 438a9921 2026-11-11T12:22:51+01:00 cni: validate cni logfile, only allow /var/log/ovn-kubernetes prefix
+  - cd010f4c 2026-11-10T23:21:20-03:00 metrics: add OVSDB transaction duration and size metrics
+  - 26ff59dc 2026-11-10T16:47:06+01:00 workflow: add backport workflow using korthout/backport-action
+  - 142e36c8 2026-11-06T10:19:19Z util: replace go-cmp in network comparisons
+  - 6977e9b0 2026-10-29T13:48:44-07:00 OCPBUGS-113964: skip tests when external container is unavailable
+
+- service-ca-operator image-arm64 ed872ba14b615ca5726ae90e987268877a0b0b20 to 2d3ddea30758a63800f2774fa879e2a5e8304d90
+  - a72e5f9 2026-11-20T16:13:59Z Update container images to ocp 5.1
+  - 180e200 2026-11-20T15:48:28Z Bump kubernetes dependencies to v0.37.2
+
