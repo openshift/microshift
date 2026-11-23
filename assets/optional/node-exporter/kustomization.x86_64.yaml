@@ -1,7 +1,7 @@
 images:
   - name: quay.io/openshift/kube-rbac-proxy
     newName: quay.io/openshift-release-dev/ocp-v5.0-art-dev
-    digest: sha256:330ab7ecb6b883729cfbd0b0a2007d92da1a6faeba618d37fcc87da0e1ef2a94
+    digest: sha256:3652380a162b0bad204669a533927643aaabff9d472212c3b107d56b87a4a5d2
   - name: quay.io/openshift/node-exporter
     newName: quay.io/openshift-release-dev/ocp-v5.0-art-dev
-    digest: sha256:e644905bb671a55490c8d091e5bbed2b9783459eded40439afa0cf76eaa0edd4
+    digest: sha256:8837329db3d504fc7e2ffacb73d82ed883c85f4ba10af15839b24176bbdacc34

@@ -1553,6 +1553,12 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: clientAccess
       type:
         scalar: string
+- name: com.github.openshift.api.operator.v1.GatewayAPIIngressConfig
+  map:
+    fields:
+    - name: managementMode
+      type:
+        scalar: string
 - name: com.github.openshift.api.operator.v1.GatewayConfig
   map:
     fields:
@@ -1768,6 +1774,27 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: internalTransitSwitchSubnet
       type:
         scalar: string
+- name: com.github.openshift.api.operator.v1.Ingress
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: com.github.openshift.api.operator.v1.IngressSpec
+      default: {}
+    - name: status
+      type:
+        namedType: com.github.openshift.api.operator.v1.IngressStatus
+      default: {}
 - name: com.github.openshift.api.operator.v1.IngressController
   map:
     fields:
@@ -2086,6 +2113,27 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: tunnelTimeout
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Duration
+- name: com.github.openshift.api.operator.v1.IngressSpec
+  map:
+    fields:
+    - name: gatewayAPI
+      type:
+        namedType: com.github.openshift.api.operator.v1.GatewayAPIIngressConfig
+      default: {}
+- name: com.github.openshift.api.operator.v1.IngressStatus
+  map:
+    fields:
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
+          elementRelationship: associative
+          keys:
+          - type
+    - name: observedGeneration
+      type:
+        scalar: numeric
 - name: com.github.openshift.api.operator.v1.InsightsOperator
   map:
     fields:
