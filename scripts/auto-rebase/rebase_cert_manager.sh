@@ -92,10 +92,21 @@ EOF
     fi
 }
 
-# Return the newest cert-manager operator bundle from a rendered OPM index.
+# Return the head of the cert-manager stable-v1 channel from a rendered OPM
+# index. Entry order carries no meaning, so follow the Operator Registry rule:
+# the head is the entry that no other channel entry replaces or skips.
 get_latest_bundle() {
     local operator_index="$1"
-    yq -r 'select(.package == "openshift-cert-manager-operator" and .name == "stable-v1") | .entries[-1].name' "${operator_index}"
+    local heads
+
+    heads=$(yq -r 'select(.schema == "olm.channel" and .package == "openshift-cert-manager-operator" and .name == "stable-v1")
+        | [.entries[] | .replaces, (.skips // [])[]] as $replaced
+        | .entries[] | select(.name as $n | $replaced | any_c(. == $n) | not) | .name' "${operator_index}")
+    if [[ -z "${heads}" || $(wc -l <<< "${heads}") -ne 1 ]]; then
+        echo "ERROR: expected one stable-v1 channel head, found: ${heads//$'\n'/ }" >&2
+        return 1
+    fi
+    echo "${heads}"
 }
 
 # Return the version of the newest cert-manager bundle in a rendered OPM index.
@@ -331,9 +342,12 @@ usage() {
     exit 1
 }
 
-check_preconditions
-
 command=${1:-help}
+# detect is read-only: it must not install tools or write a container policy.
+if [[ "${command}" != "detect" ]]; then
+    check_preconditions
+fi
+
 case "$command" in
     to)
         [[ $# -lt 2 ]] && usage
