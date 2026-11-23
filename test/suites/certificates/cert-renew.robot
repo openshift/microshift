@@ -459,7 +459,9 @@ Configured Certificate Lifetimes Are Applied
     FOR    ${item}    IN    @{status}[items]
         Should Be Equal    ${item}[status]    Healthy
         IF    $item['role'] == 'serving' or ($renewed_cas and $item['role'] == 'ca')
-            ${hours}=    Set Variable If    '${item}[role]' == 'ca'    ${ca_hours}    ${serving_hours}
+            # int(): the duration arguments arrive from call sites as strings,
+            # and a string would turn the comparison below into a TypeError.
+            ${hours}=    Evaluate    int($ca_hours if $item['role'] == 'ca' else $serving_hours)
             ${lifetime}=    Evaluate
             ...    (datetime.datetime.fromisoformat($item['notAfter'].replace('Z', '+00:00')) - datetime.datetime.fromisoformat($item['notBefore'].replace('Z', '+00:00'))).total_seconds()
             ...    modules=datetime
