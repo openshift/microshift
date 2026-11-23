@@ -1081,6 +1081,7 @@ var (
 					contactPerson("haircommander").
 					productScope(kubernetes).
 					enhancementPR("https://github.com/kubernetes/enhancements/issues/5055").
+					enable(inTechPreviewNoUpgrade(), inDevPreviewNoUpgrade()).
 					mustRegister()
 
 	FeatureGateControllerManagerConfig = newFeatureGate("ControllerManagerConfig").
@@ -1089,5 +1090,40 @@ var (
 						productScope(ocpSpecific).
 						enhancementPR("https://github.com/openshift/enhancements/pull/2095").
 						enable(inClusterProfile(SelfManaged), inDevPreviewNoUpgrade()).
+						mustRegister()
+
+	FeatureGateGenericWorkload = newFeatureGate("GenericWorkload").
+					reportProblemsToJiraComponent("node").
+					contactPerson("sairameshv").
+					productScope(kubernetes).
+					enhancementPR("https://github.com/kubernetes/enhancements/issues/4671").
+					mustRegister()
+
+	FeatureGatePodGroupPreemptionPolicy = newFeatureGate("PodGroupPreemptionPolicy").
+						reportProblemsToJiraComponent("node").
+						contactPerson("sairameshv").
+						productScope(kubernetes).
+						enhancementPR("https://github.com/kubernetes/enhancements/issues/5710").
+						mustRegister()
+
+	FeatureGateCompositePodGroup = newFeatureGate("CompositePodGroup").
+					reportProblemsToJiraComponent("node").
+					contactPerson("sairameshv").
+					productScope(kubernetes).
+					enhancementPR("https://github.com/kubernetes/enhancements/issues/6012").
+					mustRegister()
+
+	FeatureGateTopologyAwareWorkloadScheduling = newFeatureGate("TopologyAwareWorkloadScheduling").
+							reportProblemsToJiraComponent("node").
+							contactPerson("sairameshv").
+							productScope(kubernetes).
+							enhancementPR("https://github.com/kubernetes/enhancements/issues/5732").
+							mustRegister()
+
+	FeatureGateDRAWorkloadResourceClaims = newFeatureGate("DRAWorkloadResourceClaims").
+						reportProblemsToJiraComponent("node").
+						contactPerson("sairameshv").
+						productScope(kubernetes).
+						enhancementPR("https://github.com/kubernetes/enhancements/issues/5729").
 						mustRegister()
 )

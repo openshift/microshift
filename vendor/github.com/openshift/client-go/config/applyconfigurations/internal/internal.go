@@ -2146,6 +2146,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: controlPlaneTopology
       type:
         scalar: string
+    - name: infrastructureTopology
+      type:
+        scalar: string
     - name: platformSpec
       type:
         namedType: com.github.openshift.api.config.v1.PlatformSpec
