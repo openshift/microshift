@@ -248,7 +248,7 @@ Configured Lifetimes Can Be Prepared While Running
     Restart MicroShift
     Renewal Matches Current Status    ${result}
     Renewal Activation Has Finished
-    Configured Certificate Lifetimes Are Applied    ${False}    ${result}
+    Configured Certificate Lifetimes Are Applied    ${False}    ${result}    1008    17520
     ${ca_after}=    CA Material Digest
     Should Be Equal    ${ca_before}    ${ca_after}
     [Teardown]    Restore Certificate Policy
@@ -265,7 +265,7 @@ Configured CA Renewal Bounds Descendant Lifetimes
     Restart MicroShift
     Renewal Matches Current Status    ${result}
     Renewal Activation Has Finished
-    Configured Certificate Lifetimes Are Applied    ${True}    ${result}
+    Configured Certificate Lifetimes Are Applied    ${True}    ${result}    1008    17520
     [Teardown]    Restore Certificate Policy
 
 Invalid Certificate Lifetimes Are Rejected
@@ -416,46 +416,6 @@ Renewed Certificates Meet ProdSec Rules
     ...    Command Should Work    rm -rf ${TC19_SNAPSHOT_DIR}
     ...    AND    Command Should Work    rm -f ${OLD_CA_PATTERNS}
 
-Configured And Default Certificate Lifetimes Are Applied
-    [Documentation]    Configured servingValidity and caValidity propagate into the notAfter of
-    ...    renewed CA and serving certificates, and once the configuration is removed
-    ...    the historical defaults (1y serving / 10y CA) apply again. Client and peer
-    ...    certificates are excluded: they are issued with hardcoded lifetimes
-    ...    (see Renewed Lifetimes Should Match).
-    ...
-    ...    Verifies OCPEDGE-2999 acceptance criteria, end to end:
-    ...    - "Custom serving lifetime appears in newly issued serving cert NotAfter"
-    ...    - "Custom CA lifetime appears in newly issued CA NotAfter"
-    ...    - "Defaults preserve current 1y serving / 10y CA behavior when unset"
-    ...    The planning math is unit-tested by TestPlanRenewal; this is the
-    ...    running-system half. OCPSTRAT-2899 TC-10 / TC-11.
-    ...    Fulfills OCPSTRAT-2899 AC #4/#5 (SHOULD): configurable validity,
-    ...    defaults preserved when unset.
-    [Tags]    qe    ocpstrat-2899
-    # The custom values (2y serving / 12y CA) are deliberately long: the
-    # rotation watcher's deadline is notAfter minus the policy window, and a
-    # much shorter validity would put that deadline in the past, turning the
-    # activation restart into an immediate rotation restart.
-    Drop In MicroShift Config    certificates: {servingValidity: 17520h, caValidity: 105192h}    99-tc10-lifetimes
-    ${result}=    Renewal Document    ca    json
-    Renewed Lifetimes Should Match    ${result}    17520    105192
-    Restart MicroShift
-    Renewal Matches Current Status    ${result}
-
-    Remove Drop In MicroShift Config    99-tc10-lifetimes
-    ${defaults}=    Renewal Document    ca    json
-    Renewed Lifetimes Should Match    ${defaults}    8760    87600
-    Restart MicroShift
-    Renewal Matches Current Status    ${defaults}
-    [Teardown]    Run Keywords
-    ...    Remove Drop In MicroShift Config    99-tc10-lifetimes
-    ...    AND    Renewal Document    ca    json
-    ...    AND    Restart MicroShift
-    # Removing the configuration alone does not rewrite certificates that
-    # were already issued: a failed run would leave the custom lifetimes in
-    # place for later suites. The teardown reissues with the default policy,
-    # mirroring Restore Certificate Policy.
-
 
 *** Keywords ***
 Drop In Certificate Policy
@@ -466,10 +426,13 @@ Drop In Certificate Policy
     ...    99-cert-renew-policy
 
 Restore Certificate Policy
-    [Documentation]    Restore both config and issued lifetimes so randomized later suites see default certificates.
+    [Documentation]    Restore both config and issued lifetimes so randomized later suites see default
+    ...    certificates. The restored default validity (1y serving / 10y CA) is asserted
+    ...    so a failed restore surfaces in the test that caused it.
     Remove Drop In MicroShift Config    99-cert-renew-policy
-    Renewal Document    ca    json
+    ${result}=    Renewal Document    ca    json
     Restart MicroShift
+    Configured Certificate Lifetimes Are Applied    ${True}    ${result}    8760    87600
 
 Certificate Policy Changed Without Reissuing
     [Documentation]    The CLI reads the updated policy but existing certificate validity stays unchanged.
@@ -486,13 +449,13 @@ Certificate Policy Changed Without Reissuing
 
 Configured Certificate Lifetimes Are Applied
     [Documentation]    Check encoded lifetimes, status and parent expiry after activation, allowing midnight alignment.
-    [Arguments]    ${renewed_cas}    ${result}
+    [Arguments]    ${renewed_cas}    ${result}    ${serving_hours}    ${ca_hours}
     ${status}=    Certificate Status Document
     ${ca_expiries}=    Evaluate    {i['name']: i['notAfter'] for i in $status['items'] if i['role'] == 'ca'}
     FOR    ${item}    IN    @{status}[items]
         Should Be Equal    ${item}[status]    Healthy
         IF    $item['role'] == 'serving' or ($renewed_cas and $item['role'] == 'ca')
-            ${hours}=    Evaluate    1008 if $item['role'] == 'serving' else 17520
+            ${hours}=    Set Variable If    '${item}[role]' == 'ca'    ${ca_hours}    ${serving_hours}
             ${lifetime}=    Evaluate
             ...    (datetime.datetime.fromisoformat($item['notAfter'].replace('Z', '+00:00')) - datetime.datetime.fromisoformat($item['notBefore'].replace('Z', '+00:00'))).total_seconds()
             ...    modules=datetime
@@ -762,33 +725,6 @@ Renewal Error Should Be Reported
     Should Be Equal    ${error}[kind]    Error
     Should Be Equal    ${error}[code]    ${code}
     Should Not Be Empty    ${error}[message]
-
-Renewed Lifetimes Should Match
-    [Documentation]    Every renewed CA and serving certificate's newNotAfter is about the
-    ...    configured validity away from now: at least 90% of it, and at most the
-    ...    validity plus three days (validity is aligned to the following midnight,
-    ...    which adds up to a day). The wide window only has to separate the
-    ...    configured value from the neighboring default (a factor of two apart),
-    ...    not measure it exactly.
-    ...
-    ...    Client and peer certificates are skipped: they are issued with hardcoded
-    ...    lifetimes (1y, and 10y for admin-kubeconfig-client) instead of the
-    ...    configured servingValidity, so their expiry does not follow the
-    ...    configuration (observed on the 2026-11-05 host run). The acceptance
-    ...    criteria only promise configured lifetimes for serving and CA
-    ...    certificates; whether client certificates should follow servingValidity
-    ...    is an open question for the feature developer.
-    [Arguments]    ${result}    ${serving_hours}    ${ca_hours}
-    ${now}=    Evaluate    datetime.datetime.now(datetime.timezone.utc)    modules=datetime
-    FOR    ${item}    IN    @{result}[items]
-        IF    '${item}[role]' not in ('ca', 'serving')    CONTINUE
-        ${hours}=    Set Variable If    '${item}[role]' == 'ca'    ${ca_hours}    ${serving_hours}
-        ${remaining}=    Evaluate
-        ...    (datetime.datetime.fromisoformat($item['newNotAfter'].replace('Z', '+00:00')) - $now).total_seconds() / 3600
-        ...    modules=datetime
-        Should Be True    ${hours} * 0.9 <= ${remaining} <= ${hours} + 72
-        ...    msg=${item}[service] ${item}[name] renewed with ${remaining} hours remaining, expected about ${hours}
-    END
 
 Kubeconfig Should Connect
     [Documentation]    The kubeconfig file at the given host path can reach the API server.
