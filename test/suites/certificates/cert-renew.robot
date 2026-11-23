@@ -432,6 +432,7 @@ Restore Certificate Policy
     Remove Drop In MicroShift Config    99-cert-renew-policy
     ${result}=    Renewal Document    ca    json
     Restart MicroShift
+    Renewal Matches Current Status    ${result}
     Configured Certificate Lifetimes Are Applied    ${True}    ${result}    8760    87600
 
 Certificate Policy Changed Without Reissuing
@@ -449,6 +450,9 @@ Certificate Policy Changed Without Reissuing
 
 Configured Certificate Lifetimes Are Applied
     [Documentation]    Check encoded lifetimes, status and parent expiry after activation, allowing midnight alignment.
+    ...    Client and peer certificates are skipped: they are issued with hardcoded
+    ...    lifetimes (1y, 10y for admin-kubeconfig-client) instead of the configured
+    ...    servingValidity (observed 2026-11-05 host run).
     [Arguments]    ${renewed_cas}    ${result}    ${serving_hours}    ${ca_hours}
     ${status}=    Certificate Status Document
     ${ca_expiries}=    Evaluate    {i['name']: i['notAfter'] for i in $status['items'] if i['role'] == 'ca'}
