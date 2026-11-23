@@ -1,14 +1,24 @@
-- kubernetes-kube-storage-version-migrator embedded-component 0f8a4eb84ace9b746cf25d51d80dacf34ca5f953 to 0c591355322c626c51e22f5071cbd61ed1d452dc
-  - bbc90a7 2026-11-04T16:53:42Z UPSTREAM: <carry>: [release-4.20] OCPBUGS-103897: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.50.0-sec.4 to address CVE-2026-33814
+- kubernetes embedded-component 8008e652cb56e8fb34e76d0736973b3e99816fb0 to 1684819c7d9e1ac63ecee8563a6f5d5d08c7e652
+  - f96f7b33d 2026-11-17T22:56:05Z UPSTREAM: 135680: test/e2e: increase memory limits in pod resize tests
 
-- machine-config-operator embedded-component 5898231e3a667bed143e9937556ff325f449e930 to 45ac1ae9219992cb7f21d84a547881d62799e318
-  - bbea61c0 2026-11-09T17:38:01Z NO-ISSUE: Temporarily skip four OS build controller unit tests
-  - 0ae3bd10 2026-11-06T23:27:02Z chore: update AMIs
-  - 3324533f 2026-10-30T15:18:17-05:00 MCD: Fix OCL rollback failure when extensions are installed
-
-- operator-framework-olm embedded-component e1d090d165aa3e31de614b18da7cf4dd2f6976f6 to fe6fa07eeec7fd97d8294b2d28ac8b2eb4e9df37
-  - 49c63ef6 2026-10-07T10:39:09-04:00 OCPBUGS-129501: Restore registry-server startup probe FailureThreshold to 15
-
-- ovn-kubernetes image-arm64 6f5e049f27d2ac6293e46758d45cd21a075ad726 to fcb4c0a7985afaffac2b6a9b23a1f7848835d132
+- ovn-kubernetes image-amd64 6f5e049f27d2ac6293e46758d45cd21a075ad726 to fbc37056e979371c1d43a638611eae75a82934ca
   - e8bec8f0 2026-11-05T07:04:03Z UPSTREAM: <carry>: Bump golang.org/x/net to openshift-sustaining fork to fix CVE-2026-33814
+  - 1c8c80b7 2026-10-29T16:30:35Z kubevirt: detect completed migration when source pod is gone
+  - a4a688cd 2026-10-09T12:44:46-07:00 Hand-copied fixes to get unit tests passing
+  - 1194cbec 2026-10-09T12:44:38-07:00 Improve nodenft.MatchNFTRules behavior
+  - fdc6fc7e 2026-10-09T12:44:38-07:00 Fix MarkIPsCache replaceAll
+  - 31e96731 2026-10-09T12:44:38-07:00 node: fix DeleteEndpointSlice namespace deletion race condition
+
+- kubernetes image-amd64 8008e652cb56e8fb34e76d0736973b3e99816fb0 to 1684819c7d9e1ac63ecee8563a6f5d5d08c7e652
+  - f96f7b33d 2026-11-17T22:56:05Z UPSTREAM: 135680: test/e2e: increase memory limits in pod resize tests
+
+- ovn-kubernetes image-arm64 fcb4c0a7985afaffac2b6a9b23a1f7848835d132 to fbc37056e979371c1d43a638611eae75a82934ca
+  - 1c8c80b7 2026-10-29T16:30:35Z kubevirt: detect completed migration when source pod is gone
+  - a4a688cd 2026-10-09T12:44:46-07:00 Hand-copied fixes to get unit tests passing
+  - 1194cbec 2026-10-09T12:44:38-07:00 Improve nodenft.MatchNFTRules behavior
+  - fdc6fc7e 2026-10-09T12:44:38-07:00 Fix MarkIPsCache replaceAll
+  - 31e96731 2026-10-09T12:44:38-07:00 node: fix DeleteEndpointSlice namespace deletion race condition
+
+- kubernetes image-arm64 8008e652cb56e8fb34e76d0736973b3e99816fb0 to 1684819c7d9e1ac63ecee8563a6f5d5d08c7e652
+  - f96f7b33d 2026-11-17T22:56:05Z UPSTREAM: 135680: test/e2e: increase memory limits in pod resize tests
 
