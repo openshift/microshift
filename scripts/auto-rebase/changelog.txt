@@ -1,0 +1,28 @@
+- kube-rbac-proxy image-arm64 72abb01aca3ca72d1f64328ef07b0cafd34e1f5e to f020c9afd08d567c13de48a52f7d5e8f32c4fcc6
+  - 6d2f1de 2026-09-14T11:44:54+01:00 OCPBUGS-104130: Replace golang.org/x/net with sustaining fork for CVE-2026-33814
+
+- kubernetes image-arm64 de7a68f8a8ffe60b623a6d5dd51db8a1fc4253b5 to dcd50d192b3ebb011ea31b47753bffef97bc7064
+  - 96cb24e15 2026-09-14T14:31:36-04:00 UPSTREAM: <drop>: update builder image to golang 1.25
+  - 395f8b289 2026-09-11T17:28:16-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 07bdccd1b 2026-09-11T17:27:57-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 3a634765b 2026-08-20T15:15:36Z Release commit for Kubernetes v1.34.11
+  - d6e8dc424 2026-08-06T12:47:36-04:00 Update golang.org/x deps
+  - 5c767c59f 2026-07-24T15:46:23-07:00 Bump to go 1.26.5
+  - f0c3b7d67 2026-07-24T15:46:23-07:00 fix the gomock errors
+  - 5db1b8dcd 2026-07-22T17:58:02Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.10
+  - bd6c4ad15 2026-07-22T17:46:29Z Release commit for Kubernetes v1.34.10
+  - 17c8878de 2026-07-15T13:08:38+07:00 Bump images and versions to golang 1.25.12 and update distroless-iptables
+  - 6b19b4138 2026-07-08T22:21:42+08:00 stop logging missing optional container annotations
+  - 0925913d4 2026-07-01T11:15:52-07:00 Fix vet and mock errrors
+  - b8b664865 2026-06-24T15:57:53-04:00 Make utf8 replacement char test pass on Go 1.27
+  - 086dd5baf 2026-06-23T14:56:34-04:00 Restore string JSON encoding of cri-api KeyValue
+  - ff18cff7c 2026-06-22T13:25:14+01:00 kubeadm: treat already promoted learner as successful
+  - 204bdf0e2 2026-06-17T11:49:36+02:00 kubeadm: use KubernetesAPICallTimeout for mandatory kubeadm-config fetch
+  - a76f455fd 2026-06-12T10:26:18-07:00 Update google.golang.org/protobuf to v1.36.12-0.20260120151049-f2248ac996af
+  - 9a52eec53 2026-06-11T17:48:34Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.9
+  - 7f303078a 2026-06-11T14:05:34+05:30 Fix job controller reporting active=0 during pod creation backoff
+  - 773bda9bd 2026-05-25T10:44:41+08:00 kubelet: defer CRI fallback removal to 1.38
+  - 53eb0adf2 2026-05-11T16:31:57-05:00 test/compatibility_lifecycle: resolve feature names from variables
+  - 898c6d3dd 2026-04-21T10:30:26+08:00 kubeadm: skip promote call when etcd member is already a voting member
+  - 9b963cf15 2026-03-11T23:23:57Z test: Fix data race on policy refresh interval
+
