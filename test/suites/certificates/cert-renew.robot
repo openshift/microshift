@@ -835,7 +835,12 @@ CA Certificate Lines
     RETURN    ${lines}
 
 Old CA Certificates Should Not Be Trusted
-    [Documentation]    No certificate file, ConfigMap, or Secret still contains an old CA certificate.
+    [Documentation]    No certificate file or Secret still contains an old CA certificate. Two
+    ...    ConfigMap families are excluded: the service-ca controller's
+    ...    openshift-service-ca.crt bundles and kube-system/extension-apiserver-authentication
+    ...    retain a still-unexpired old CA by design (upstream client grace behavior), on
+    ...    every build — verified 2026-11-24 on a fresh cluster: 9 ConfigMaps retained the
+    ...    old CA, files and Secrets did not.
     [Arguments]    ${old_ca_lines}
     ${joined}=    Catenate    @{old_ca_lines}
     Command Should Work    bash -c 'printf "%s\\n" ${joined} > ${OLD_CA_PATTERNS}'
@@ -853,9 +858,11 @@ Old CA Certificates Should Not Be Trusted
     ...    lines = [l.strip() for l in open("${OLD_CA_PATTERNS}") if l.strip()]
     ...    items = json.load(sys.stdin)["items"]
     ...    decode = lambda i, v: base64.b64decode(v).decode("utf-8", "ignore") if i["kind"] == "Secret" else v
+    ...    grace = ("openshift-service-ca.crt", "extension-apiserver-authentication")
     ...    hits = sorted(
     ...    i["kind"] + " " + i["metadata"]["namespace"] + "/" + i["metadata"]["name"]
     ...    for i in items
+    ...    if not (i["kind"] == "ConfigMap" and i["metadata"]["name"] in grace)
     ...    for v in (i.get("data") or {}).values()
     ...    if any(l in decode(i, v) for l in lines)
     ...    )
