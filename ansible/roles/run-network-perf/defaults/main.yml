@@ -24,3 +24,19 @@ network_perf_campaign: ""
 network_perf_results_dir: "{{ results_base_dir }}/{{ microshift_version }}/network-perf"
 # Fail when the campaign's containers ran different images (k8s-netperf pulls by tag)
 network_perf_fail_on_image_mismatch: true
+
+# Hosts that run the same-node workload: a list, a comma-separated string or "all"
+network_perf_same_node_hosts: all
+# Inventory group whose members are benchmarked against each other across clusters
+network_perf_c2cc_group: "{{ c2cc_group | default('c2cc') }}"
+# Download k8s-netperf from this URL instead of the release of network_perf_netperf_version
+network_perf_netperf_url: ""
+# Seconds run.sh may take beyond network_perf_timeout before it is stopped; its own worst
+# case for the download, the cluster calls and stopping k8s-netperf is 1540 s
+network_perf_run_margin: 1800
+# Seconds a command gets to end after TERM before it is killed; run.sh needs up to 70 s
+network_perf_kill_timeout: 90
+# Seconds for the e2e-benchmarking checkout
+network_perf_checkout_timeout: 300
+# Seconds for the Service DNS check towards the other clusters, image pull included
+network_perf_dns_timeout: 300

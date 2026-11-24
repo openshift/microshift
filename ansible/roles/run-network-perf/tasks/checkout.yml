@@ -1,0 +1,39 @@
+---
+# Check out e2e-benchmarking into _np_work_dir while the lock is held: the directory
+# is shared by every run of that host. Bounded git commands instead of the git module,
+# which has no deadline, and without git's background maintenance. Sets _np_e2e_commit.
+
+- name: Check out e2e-benchmarking
+  ansible.builtin.command:
+    argv: "{{ network_perf_contained + ['timeout', '-k', '10', network_perf_checkout_timeout | string, 'git',
+                                        '-c', 'maintenance.auto=false', '-c', 'gc.auto=0'] + item }}"
+  loop:
+    - [init, -q, "{{ _np_work_dir }}"]
+    - [-C, "{{ _np_work_dir }}", fetch, -q, --force, "{{ network_perf_e2e_repo }}", "{{ network_perf_e2e_git_revision }}"]
+    - [-C, "{{ _np_work_dir }}", checkout, -q, --force, --detach, FETCH_HEAD]
+    - [-C, "{{ _np_work_dir }}", rev-parse, HEAD]
+  loop_control:
+    label: "git {{ item | reject('equalto', _np_work_dir) | join(' ') }}"
+  register: _np_git
+  changed_when: true
+  delegate_to: localhost
+
+- name: Fingerprint the workload file
+  ansible.builtin.stat:
+    path: "{{ _np_work_dir }}/workloads/network-perf-v2/{{ network_perf_workload }}"
+    checksum_algorithm: sha256
+  register: _np_workload
+  delegate_to: localhost
+
+- name: Fail without the workload file
+  ansible.builtin.assert:
+    that:
+      - _np_workload.stat.exists
+    fail_msg: "{{ network_perf_workload }} is not in {{ _np_work_dir }}/workloads/network-perf-v2."
+    quiet: true
+
+- name: Set the checkout facts
+  ansible.builtin.set_fact:
+    _np_e2e_commit: "{{ _np_git.results[3].stdout | trim }}"
+    _np_workload_dir: "{{ _np_work_dir }}/workloads/network-perf-v2"
+    _np_workload_sha256: "{{ _np_workload.stat.checksum }}"

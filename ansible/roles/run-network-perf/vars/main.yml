@@ -1,0 +1,31 @@
+---
+# run-network-perf internal vars
+
+network_perf_run_uuid_annotation: k8s-netperf.cloud-bulldozer.io/run-uuid
+network_perf_benchmark_image: quay.io/cloud-bulldozer/k8s-netperf:latest
+
+# Runs a command so that it returns only after everything it started has ended,
+# registered in the journal of this run while it may still be running.
+network_perf_contained:
+  - "{{ ansible_playbook_python }}"
+  - "{{ role_path }}/files/contain.py"
+  - --grace
+  - "{{ network_perf_kill_timeout }}"
+  - "{{ _np_invocation_dir }}"
+  - "{{ _np_context }}"
+# oc with a deadline of its own, for use inside a poll
+network_perf_oc_plain: >-
+  {{ ['timeout', '-k', '10', network_perf_api_timeout | string, 'oc', '--request-timeout=' ~ network_perf_api_timeout ~ 's'] }}
+# Contained poll of one read until the cleanup time is used up; append differs|matches, the value and the read
+network_perf_poll: >-
+  {{ network_perf_contained + ['timeout', '-k', '10', network_perf_cleanup_timeout | string, role_path ~ '/files/poll.sh'] }}
+# Contained oc with a deadline; append --kubeconfig <file> and the command
+network_perf_oc: >-
+  {{ network_perf_contained + ['timeout', '-k', '10', network_perf_api_timeout | string, 'oc',
+                               '--request-timeout=' ~ network_perf_api_timeout ~ 's'] }}
+
+# Whether this host runs the same-node workload
+network_perf_same_node_selected: >-
+  {{ network_perf_same_node_hosts == 'all' or inventory_hostname in
+     (network_perf_same_node_hosts.split(',') | map('trim') | list if network_perf_same_node_hosts is string
+      else network_perf_same_node_hosts) }}

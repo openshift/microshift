@@ -1,0 +1,106 @@
+---
+# The cleanup tag: after an interrupted run, remove what the runs of a campaign left
+# on the clusters. Nothing on a cluster is touched before contain.py confirms that
+# every earlier run of the campaign has ended; this attempt is a run of its own.
+
+- name: Require the campaign to clean up
+  ansible.builtin.assert:
+    that:
+      - network_perf_campaign | default('') | length > 0
+    fail_msg: "Name the campaign: -e network_perf_campaign=<campaign>"
+    quiet: true
+
+- name: Start the journal of this cleanup
+  ansible.builtin.include_tasks: campaign.yml
+
+- name: Find the earlier runs of the campaign
+  ansible.builtin.find:
+    paths: "{{ _np_campaign_dir }}/.invocations"
+    file_type: directory
+    excludes: "{{ _np_token }}"
+  register: _np_found
+  failed_when: "_np_found.skipped_paths | default({'unread': true}) | length > 0"
+
+- name: Skip the runs that are cleaned up already
+  ansible.builtin.stat:
+    path: "{{ item }}/done"
+  loop: "{{ _np_found.files | map(attribute='path') | sort }}"
+  register: _np_done
+
+- name: List the runs to clean up
+  ansible.builtin.set_fact:
+    _np_context: cleanup
+    _np_old: "{{ _np_done.results | rejectattr('stat.exists') | map(attribute='item') | list }}"
+    _np_pending: {}
+    _np_held: []
+
+# Blocks later commands of those runs, then reports whether each has ended
+- name: Stop the earlier runs
+  ansible.builtin.command:
+    argv: ["{{ ansible_playbook_python }}", "{{ role_path }}/files/contain.py", --stop, "{{ item }}"]
+  loop: "{{ _np_old }}"
+  loop_control:
+    label: "{{ item | basename }}"
+  register: _np_stop
+  changed_when: true
+  failed_when: false
+
+- name: Fail while an earlier run has not ended
+  vars:
+    _np_reasons: >-
+      {{ _np_stop.results | rejectattr('rc', 'equalto', 0)
+         | map(attribute='stdout') | map('default', '{"reasons": ["no verdict"]}', true) | map('from_json')
+         | map(attribute='reasons') | flatten }}
+  ansible.builtin.assert:
+    that:
+      - _np_reasons | length == 0
+    fail_msg: >-
+      Nothing was changed on the clusters: {{ _np_reasons | join('; ') }}. When that run has ended, run
+      this again. If it cannot be shown to have ended, make sure by hand that none of its processes is
+      left, then delete the netperf and network-perf-lock namespaces of its clusters yourself.
+    quiet: true
+
+- name: Create the journal directory of this cleanup
+  ansible.builtin.file:
+    path: "{{ _np_invocation_dir }}/commands/{{ _np_context }}"
+    state: directory
+    mode: "0755"
+
+- name: Clean up after each run
+  ansible.builtin.include_tasks: cleanup-run.yml
+  loop: "{{ _np_old }}"
+  loop_control:
+    loop_var: _np_old_dir
+    label: "{{ _np_old_dir | basename }}"
+
+# The run that held such a lock may have been handled after the run it held up
+- name: Look again at the runs held up by another run's lock
+  ansible.builtin.include_tasks: cleanup-run.yml
+  loop: "{{ _np_held }}"
+  loop_control:
+    loop_var: _np_old_dir
+    label: "{{ _np_old_dir | basename }}"
+
+# Not when one of its own commands has not ended: the next cleanup must see that
+- name: Check that every command of this cleanup has ended
+  ansible.builtin.include_tasks: ended.yml
+
+- name: Mark this cleanup as finished
+  ansible.builtin.copy:
+    content: ""
+    dest: "{{ _np_invocation_dir }}/done"
+    mode: "0644"
+  when: _np_ended
+
+- name: Fail when something is left
+  vars:
+    _np_left_all: "{{ _np_pending | dict2items | map(attribute='value') | flatten }}"
+  ansible.builtin.assert:
+    that:
+      - _np_left_all | length == 0
+      - _np_ended
+    fail_msg: >-
+      Left as it is: {{ (_np_left_all + ([] if _np_ended else ['a command of this cleanup has not ended'])) | join('; ') }}.
+      Run this again once the cause is gone, or
+      delete the netperf and network-perf-lock namespaces there yourself if they are yours.
+    success_msg: "Campaign {{ _np_campaign }}: nothing of its runs is left on the clusters."

@@ -1,0 +1,50 @@
+---
+# Benchmark every ordered pair of the C2CC group, one direction at a time: client pods
+# on one cluster, server pods on the other. Runs on localhost. The campaign, the token
+# and the endpoints were set by the earlier plays and are read through hostvars.
+
+- name: Take over the campaign of the earlier plays
+  vars:
+    _np_members: "{{ groups[network_perf_c2cc_group] | default([]) | sort }}"
+    _np_seen: "{{ _np_members | map('extract', hostvars) | list }}"
+  block:
+    # A host that failed earlier never set these, so nothing starts across clusters
+    - name: Check that every cluster passed the earlier plays
+      ansible.builtin.assert:
+        that:
+          - _np_members | length >= 2
+          - _np_seen | selectattr('_np_checked', 'defined') | selectattr('_np_checked') | list | length == _np_members | length
+          - _np_seen | selectattr('_np_same_node_ok', 'defined') | selectattr('_np_same_node_ok') | list | length == _np_members | length
+          - _np_seen | map(attribute='_np_token') | unique | length == 1
+          - _np_seen | map(attribute='_np_campaign_dir') | unique | length == 1
+        fail_msg: >-
+          Not starting the run across clusters: an earlier step failed or was skipped on
+          {{ _np_members | reject('in', _np_seen | selectattr('_np_same_node_ok', 'defined')
+                                        | selectattr('_np_same_node_ok') | map(attribute='inventory_hostname') | list)
+             | join(', ') | default('a cluster', true) }}.
+        quiet: true
+
+    - name: Set the campaign
+      ansible.builtin.set_fact:
+        _np_campaign: "{{ hostvars[_np_members[0]]._np_campaign }}"
+        _np_campaign_dir: "{{ hostvars[_np_members[0]]._np_campaign_dir }}"
+        _np_token: "{{ hostvars[_np_members[0]]._np_token }}"
+        _np_invocation_dir: "{{ hostvars[_np_members[0]]._np_invocation_dir }}"
+        _np_pairs: "{{ _np_members | permutations(2) | list }}"
+
+- name: Check that the journal of this run exists
+  ansible.builtin.stat:
+    path: "{{ _np_invocation_dir }}/invocation.json"
+  register: _np_journal
+  failed_when: not _np_journal.stat.exists
+
+- name: Run each direction
+  ansible.builtin.include_tasks: pair.yml
+  loop: "{{ _np_pairs }}"
+  loop_control:
+    loop_var: _np_pair
+    label: "{{ _np_pair | join(' to ') }}"
+
+- name: Show where the results are
+  ansible.builtin.debug:
+    msg: "Results of campaign {{ _np_campaign }}: {{ _np_campaign_dir }}"

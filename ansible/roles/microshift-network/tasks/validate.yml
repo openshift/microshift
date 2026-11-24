@@ -1,7 +1,8 @@
 ---
 # microshift-network validation from inventory variables only, so peers outside
-# --limit are checked too. Sets microshift_network and c2cc_remote_cidrs; hosts
-# without the role's variables skip the checks (which need ansible.utils).
+# --limit are checked too. Sets microshift_network, c2cc_remote_cidrs and
+# c2cc_peer_domains; hosts without the role's variables skip the checks (which
+# need ansible.utils).
 
 - name: Require pod and service networks in inventory
   ansible.builtin.assert:
@@ -30,6 +31,7 @@
       mtu: ""
       remote_clusters: []
     c2cc_remote_cidrs: []
+    c2cc_peer_domains: {}
 
 - name: Build and check the network settings
   when: _mn_in_use | bool
@@ -199,3 +201,5 @@
         c2cc_remote_cidrs: >-
           {{ (_mn_remote_clusters | map(attribute='clusterNetwork') | flatten)
              + (_mn_remote_clusters | map(attribute='serviceNetwork') | flatten) }}
+        # DNS suffix this host uses for each peer's Services
+        c2cc_peer_domains: "{{ dict(_mn_peers | zip(_mn_remote_clusters | map(attribute='domain'))) }}"

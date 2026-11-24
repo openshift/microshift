@@ -1,0 +1,55 @@
+---
+# Check that this host's kubeconfig exists and belongs to this host's cluster, and
+# record the endpoint the benchmark tasks use.
+
+- name: Check that this host's kubeconfig exists
+  ansible.builtin.stat:
+    path: "{{ network_perf_kubeconfig }}"
+  register: _np_kubeconfig
+  delegate_to: localhost
+
+- name: Fail without this host's kubeconfig
+  ansible.builtin.assert:
+    that:
+      - _np_kubeconfig.stat.exists
+    fail_msg: "{{ network_perf_kubeconfig }} is missing; run the kubeconfig play for {{ inventory_hostname }} first."
+    quiet: true
+
+# A kubeconfig for another host would benchmark and clean up the wrong cluster
+- name: Read the node of this host's cluster
+  ansible.builtin.command:
+    argv: [timeout, -k, "10", "{{ network_perf_api_timeout }}", oc, --kubeconfig, "{{ network_perf_kubeconfig }}",
+           "--request-timeout={{ network_perf_api_timeout }}s", get, nodes, -o, json]
+  register: _np_nodes
+  changed_when: false
+  delegate_to: localhost
+
+# IP addresses must match exactly; DNS names also match on their first label.
+- name: Check that the kubeconfig belongs to this host
+  vars:
+    _np_items: "{{ (_np_nodes.stdout | from_json)['items'] }}"
+    _np_node_ids: >-
+      {{ (_np_items | map(attribute='status.addresses') | flatten | map(attribute='address') | list)
+         + (_np_items | map(attribute='metadata.name') | list) }}
+    _np_host_ids: "{{ [ansible_host | default(inventory_hostname), inventory_hostname] | unique }}"
+    _np_node_short: >-
+      {{ _np_node_ids | reject('match', '^[0-9.]+$') | reject('search', ':')
+         | map('regex_replace', '\..*$', '') | list }}
+    _np_host_short: >-
+      {{ _np_host_ids | reject('match', '^[0-9.]+$') | reject('search', ':')
+         | map('regex_replace', '\..*$', '') | list }}
+  ansible.builtin.assert:
+    that:
+      - _np_items | length == 1
+      - (_np_node_ids | intersect(_np_host_ids) | length > 0) or (_np_node_short | intersect(_np_host_short) | length > 0)
+    fail_msg: >-
+      {{ network_perf_kubeconfig }} points at a cluster whose node ({{ _np_node_ids | join(', ') }})
+      is not {{ inventory_hostname }}.
+    quiet: true
+
+- name: Record this host's endpoint
+  ansible.builtin.set_fact:
+    _np_endpoint:
+      name: "{{ inventory_hostname }}"
+      kubeconfig: "{{ network_perf_kubeconfig }}"
+      work_dir: "{{ network_perf_work_dir }}"

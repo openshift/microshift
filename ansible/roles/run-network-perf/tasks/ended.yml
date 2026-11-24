@@ -1,0 +1,15 @@
+---
+# Whether every command this run started in _np_context has ended completely.
+# contain.py removes a command's entry only then; the exit status does not show it,
+# because the supervisor itself can be killed. A directory that cannot be read
+# counts as not ended. Sets _np_ended.
+
+- name: Look for commands that have not ended
+  ansible.builtin.find:
+    paths: "{{ _np_invocation_dir }}/commands/{{ _np_context }}"
+  register: _np_entries
+  delegate_to: localhost
+
+- name: Set whether every command has ended
+  ansible.builtin.set_fact:
+    _np_ended: "{{ _np_entries.matched == 0 and _np_entries.skipped_paths | default({'unread': true}) | length == 0 }}"

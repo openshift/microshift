@@ -32,6 +32,7 @@
     path: "{{ kubeconfig_local_file }}"
   delegate_to: localhost
   register: kubeconfig_local_file_check
+  when: kubeconfig_link_default | bool
 
 - name: Create/overwrite symbolic link if default is not a regular file
   ansible.builtin.file:
@@ -40,7 +41,9 @@
     state: link
     force: true
   delegate_to: localhost
-  when: not kubeconfig_local_file_check.stat.exists or (kubeconfig_local_file_check.stat.islnk | default(false))
+  when:
+    - kubeconfig_link_default | bool
+    - not kubeconfig_local_file_check.stat.exists or (kubeconfig_local_file_check.stat.islnk | default(false))
 
 - name: Notify user if default kubeconfig is a regular file and was not overwritten
   ansible.builtin.debug:
@@ -49,12 +52,16 @@
       A new kubeconfig has been saved to '{{ kubeconfig_dest_file }}'.
       Please update your KUBECONFIG environment variable or switch contexts manually.
   delegate_to: localhost
-  when: kubeconfig_local_file_check.stat.exists and (kubeconfig_local_file_check.stat.isreg | default(false))
+  when:
+    - kubeconfig_link_default | bool
+    - kubeconfig_local_file_check.stat.exists and (kubeconfig_local_file_check.stat.isreg | default(false))
 
 - name: Verify connectivity to MicroShift cluster
   block:
     - name: Test cluster connectivity with oc
-      ansible.builtin.command: oc get nodes --kubeconfig={{ kubeconfig_dest_file }}
+      ansible.builtin.command:
+        argv: [timeout, -k, "10", "{{ kubeconfig_api_timeout }}", oc, "--kubeconfig={{ kubeconfig_dest_file }}",
+               "--request-timeout={{ kubeconfig_api_timeout }}s", get, nodes]
       delegate_to: localhost
       register: oc_test
       changed_when: false

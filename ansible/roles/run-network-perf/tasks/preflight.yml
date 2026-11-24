@@ -1,0 +1,72 @@
+---
+# Control node checks for network-perf.yml, before any cluster is touched.
+
+- name: Check the control node
+  run_once: true
+  delegate_to: localhost
+  block:
+    - name: Look for the tools the run needs
+      ansible.builtin.command:
+        argv: [sh, -c, 'for t in "$@"; do command -v "$t" >/dev/null || echo "$t"; done', sh,
+               oc, kubectl, git, curl, tar, timeout]
+      register: _np_missing
+      changed_when: false
+
+    - name: Fail without the tools, or on a control node that is not Linux
+      ansible.builtin.assert:
+        that:
+          - _np_missing.stdout_lines | length == 0
+          - lookup('ansible.builtin.pipe', 'uname -s') == 'Linux'
+        fail_msg: >-
+          The control node must run Linux and have oc, kubectl, git, curl, tar and timeout
+          (missing: {{ _np_missing.stdout_lines | join(', ') | default('none', true) }}).
+        quiet: true
+
+    - name: Check the address filters the C2CC validation needs
+      block:
+        - name: Use an ansible.utils address filter
+          ansible.builtin.assert:
+            that:
+              - ('192.0.2.1/24' | ansible.utils.ipaddr('network')) == '192.0.2.0'
+            quiet: true
+      rescue:
+        - name: Fail without ansible.utils and netaddr
+          ansible.builtin.fail:
+            msg: >-
+              Install the ansible.utils collection (ansible-galaxy collection install ansible.utils)
+              and the Python netaddr package on the control node.
+
+    # A limit can leave out a cluster, or the localhost play that runs across clusters
+    - name: Fail when the run is limited to some hosts
+      ansible.builtin.assert:
+        that:
+          - ansible_limit | default('', true) | length == 0
+        fail_msg: "Run this playbook without --limit: it needs every host of the {{ network_perf_c2cc_group }} group and localhost."
+        quiet: true
+
+    - name: Check the C2CC group
+      vars:
+        _np_members: "{{ groups[network_perf_c2cc_group] | default([]) }}"
+      ansible.builtin.assert:
+        that:
+          - _np_members | length >= 2
+          - _np_members | difference(ansible_play_hosts_all) | length == 0
+        fail_msg: >-
+          The {{ network_perf_c2cc_group }} inventory group needs at least two hosts, all of them in
+          this run (do not --limit it to some): {{ _np_members | join(', ') | default('it is empty', true) }}.
+        quiet: true
+
+    # Results and journals are kept per <host> and per <client>-to-<server>
+    - name: Fail when two runs would share a name
+      vars:
+        _np_members: "{{ groups[network_perf_c2cc_group] | default([]) }}"
+        _np_names: "{{ [_np_members, _np_members | permutations(2) | map('join', '-to-') | list] | flatten }}"
+      ansible.builtin.assert:
+        that:
+          - _np_names | unique | length == _np_names | length
+          - "'cross-cluster' not in _np_members"
+        fail_msg: >-
+          The host names of the {{ network_perf_c2cc_group }} group ({{ _np_members | join(', ') }}) make two
+          runs share a results directory: no name may be cross-cluster, or equal two other names joined
+          by -to-. Rename a host in the inventory.
+        quiet: true

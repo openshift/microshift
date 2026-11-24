@@ -1,0 +1,164 @@
+---
+# One direction (_np_pair): client pods on the first cluster, server pods on the second.
+
+- name: Set the direction
+  ansible.builtin.set_fact:
+    _np_client: "{{ hostvars[_np_pair.0]._np_endpoint }}"
+    _np_server: "{{ hostvars[_np_pair.1]._np_endpoint }}"
+    # The DNS suffix the client's cluster uses for the server's Services
+    _np_server_domain: "{{ hostvars[_np_pair.0].c2cc_peer_domains[_np_pair.1] }}"
+    _np_context: "{{ _np_pair.0 }}-to-{{ _np_pair.1 }}"
+    _np_run_dir: "{{ _np_campaign_dir }}/cross-cluster/{{ _np_pair.0 }}-to-{{ _np_pair.1 }}"
+    _np_work_dir: "{{ hostvars[_np_pair.0]._np_endpoint.work_dir }}"
+    _np_keep_locks: []
+    _np_claim_uuids: []
+    _np_bench: {}
+    _np_lock: {}
+    _np_unlock: {}
+
+- name: Create the journal directory of this direction
+  ansible.builtin.file:
+    path: "{{ _np_invocation_dir }}/commands/{{ _np_context }}"
+    state: directory
+    mode: "0755"
+
+- name: Run the direction while holding both clusters
+  vars:
+    # Always claimed in the same order
+    _np_ordered: "{{ [_np_client, _np_server] | sort(attribute='name') }}"
+  block:
+    - name: Claim the first cluster
+      ansible.builtin.include_tasks: claim.yml
+      vars:
+        _np_target: "{{ _np_ordered[0] }}"
+
+    # Not a loop: a looped include evaluates its condition before the first claim ran
+    - name: Claim the second cluster
+      ansible.builtin.include_tasks: claim.yml
+      vars:
+        _np_target: "{{ _np_ordered[1] }}"
+      when: (_np_lock[_np_ordered[0].name] | default({})).state | default('') == 'ours'
+
+    - name: Fail unless both clusters are ours
+      ansible.builtin.assert:
+        that:
+          - _np_lock | dict2items | selectattr('value.state', 'equalto', 'ours') | list | length == 2
+        fail_msg: >-
+          Could not claim the network-perf-lock namespace on both clusters
+          ({{ _np_lock | dict2items | map(attribute='key') | zip(_np_lock | dict2items | map(attribute='value.state'))
+              | map('join', ' ') | join(', ') }}). Another network-perf run is using a cluster; if none is,
+          delete that namespace and run again.
+        quiet: true
+
+    - name: Check out e2e-benchmarking for the client
+      ansible.builtin.include_tasks: checkout.yml
+
+    # Continuing a campaign adds iterations after the ones already saved, failed ones included
+    - name: Create the results directory for this direction
+      ansible.builtin.file:
+        path: "{{ _np_run_dir }}"
+        state: directory
+        mode: "0755"
+
+    # An incomplete listing must not make an existing iteration look new
+    - name: Find the iterations already saved for this direction
+      ansible.builtin.find:
+        paths: "{{ _np_run_dir }}"
+        file_type: directory
+        patterns: "iteration-*"
+      register: _np_saved
+      failed_when: "_np_saved.skipped_paths | default({'unread': true}) | length > 0"
+
+    # The same directory name can belong to another pair of an earlier inventory
+    - name: Find the records of the iterations already saved
+      ansible.builtin.find:
+        paths: "{{ _np_saved.files | map(attribute='path') | list }}"
+        patterns: run-info.json
+      register: _np_saved_records
+      failed_when: "_np_saved_records.skipped_paths | default({'unread': true}) | length > 0"
+      when: _np_saved.files | length > 0
+
+    - name: Read the records of the iterations already saved
+      ansible.builtin.slurp:
+        src: "{{ item.path }}"
+      loop: "{{ _np_saved_records.files | default([]) }}"
+      loop_control:
+        label: "{{ item.path | dirname | basename }}"
+      register: _np_saved_info
+
+    - name: Fail when the saved iterations are another pair's
+      vars:
+        _np_this: "{{ _np_pair.0 }} to {{ _np_pair.1 }}"
+        _np_theirs: >-
+          {%- set out = [] -%}
+          {%- for r in _np_saved_info.results -%}
+          {%- set i = r.content | b64decode | from_json -%}
+          {%- set _ = out.append(i.client ~ ' to ' ~ i.server | default('')) -%}
+          {%- endfor -%}
+          {{ out | unique | difference([_np_this]) }}
+      ansible.builtin.assert:
+        that:
+          - _np_theirs | length == 0
+        fail_msg: >-
+          {{ _np_run_dir }} holds iterations of {{ _np_theirs | join(', ') }}: other hosts whose names give
+          the same directory. Use a new campaign.
+        quiet: true
+
+    - name: Number the new iterations
+      vars:
+        _np_last: >-
+          {{ _np_saved.files | map(attribute='path') | map('basename')
+             | map('regex_replace', '^iteration-', '') | map('int') | max | default(0) }}
+      ansible.builtin.set_fact:
+        _np_iterations: "{{ range((_np_last | int) + 1, (_np_last | int) + 1 + (network_perf_iterations | int)) | list }}"
+
+    - name: Run the iterations
+      ansible.builtin.include_tasks: iteration.yml
+      vars:
+        _np_uuid_seed: "cross-cluster/{{ _np_pair.0 }}/{{ _np_pair.1 }}"
+      loop: "{{ _np_iterations }}"
+      loop_control:
+        loop_var: network_perf_iteration
+
+  always:
+    # Whatever failed above: a lock goes only when its cluster has no benchmark namespace
+    - name: Check that no benchmark is left on the clusters
+      ansible.builtin.include_tasks: remove-benchmark.yml
+      vars:
+        _np_uuids: "{{ _np_claim_uuids }}"
+      loop: "{{ [_np_client, _np_server] }}"
+      loop_control:
+        loop_var: _np_target
+        label: "{{ _np_target.name }}"
+      when: (_np_lock[_np_target.name] | default({})).state | default('') == 'ours'
+
+    - name: Check that every command has ended
+      ansible.builtin.include_tasks: ended.yml
+
+    # Each cluster on its own: one that cannot be released does not hold up the other
+    - name: Release the clusters
+      ansible.builtin.include_tasks: release.yml
+      loop: "{{ [_np_client, _np_server] }}"
+      loop_control:
+        loop_var: _np_target
+        label: "{{ _np_target.name }}"
+      when:
+        - _np_ended
+        - _np_bench[_np_target.name] | default('unknown') == 'absent'
+        - (_np_lock[_np_target.name] | default({})).state | default('') == 'ours'
+
+    - name: Check that both clusters are released
+      vars:
+        _np_ours: "{{ _np_lock | dict2items | selectattr('value.state', 'equalto', 'ours') | map(attribute='key') | list }}"
+        _np_left: >-
+          {{ _np_ours | reject('in', _np_unlock | dict2items | selectattr('value', 'in', ['absent', 'replaced'])
+                                     | map(attribute='key') | list) | list }}
+      ansible.builtin.assert:
+        that:
+          - _np_left | length == 0
+        fail_msg: >-
+          Keeping the network-perf-lock namespace on {{ _np_left | join(' and ') }}:
+          {{ 'a command of this run may still be running' if not _np_ended
+             else 'a netperf namespace is there or could not be checked, or the lock could not be removed' }}.
+          Clean up with: ansible-playbook network-perf.yml --tags cleanup -e network_perf_campaign={{ _np_campaign }}
+        quiet: true
