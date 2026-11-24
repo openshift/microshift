@@ -26,6 +26,9 @@ install_and_configure_composer() {
         createrepo yum-utils selinux-policy-devel jq wget lorax rpm-build \
         containernetworking-plugins expect httpd-tools vim-common"
 
+    # Keep the host container policy compatible with runtime dependency upgrades.
+    "${DNF_RETRY}" "upgrade" "container-selinux"
+
     # The mock utility comes from the EPEL repository
     "${DNF_RETRY}" "install" "https://dl.fedoraproject.org/pub/epel/epel-release-latest-${version_id_major}.noarch.rpm"
     "${DNF_RETRY}" "install" "mock nginx tomcli parallel aria2"
