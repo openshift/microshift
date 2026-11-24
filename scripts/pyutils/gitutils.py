@@ -139,9 +139,27 @@ class GitUtils():
                     # One API call per file can outlive the ~1h token; keep it fresh.
                     gh_repo = gh.refresh_client()
 
-            parent_gh_commit = gh_repo.get_git_commit(parent_sha)
-            new_tree = gh_repo.create_git_tree(tree_elements, parent_gh_commit.tree)
-            new_commit = gh_repo.create_git_commit(local_commit.message, new_tree, [parent_gh_commit])
+            operation = "get parent commit"
+            tree_sha = None
+            logging.info("Publishing local commit %s (%s), parent=%s, tree entries=%d",
+                         local_commit.hexsha, local_commit.summary, parent_sha, len(tree_elements))
+            try:
+                parent_gh_commit = gh_repo.get_git_commit(parent_sha)
+                operation = "create tree"
+                new_tree = gh_repo.create_git_tree(tree_elements, parent_gh_commit.tree)
+                tree_sha = new_tree.sha
+                logging.info("Created tree %s for local commit %s, parent=%s",
+                             tree_sha, local_commit.hexsha, parent_sha)
+                operation = "create commit"
+                new_commit = gh_repo.create_git_commit(local_commit.message, new_tree, [parent_gh_commit])
+            except GithubException as error:
+                headers = {key.lower(): value for key, value in (error.headers or {}).items()}
+                logging.error("GitHub %s failed: local commit=%s, parent=%s, tree=%s, "
+                              "tree entries=%d, status=%s, request_id=%s, message=%s",
+                              operation, local_commit.hexsha, parent_sha, tree_sha, len(tree_elements),
+                              error.status, headers.get("x-github-request-id", "unknown"),
+                              error.data.get("message") if isinstance(error.data, dict) else error.data)
+                raise
             logging.info(f"Created verified commit {new_commit.sha[:8]}: {local_commit.summary}")
             parent_sha = new_commit.sha
 
