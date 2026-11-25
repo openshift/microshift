@@ -143,8 +143,13 @@ render_operator_index() {
     fi
 
     if [[ -f "${PULL_SECRET_FILE}" && ! -f "${docker_config}" ]]; then
-        mkdir -p "${HOME}/.docker/"
-        ln -s "${PULL_SECRET_FILE}" "${docker_config}"
+        # Bail out without cleanup if the link cannot be created (e.g. a
+        # dangling symlink already exists), so we never remove a file we
+        # did not create. errexit does not apply when called under `if !`.
+        if ! mkdir -p "${HOME}/.docker/" || ! ln -s "${PULL_SECRET_FILE}" "${docker_config}"; then
+            echo "ERROR: failed to link ${PULL_SECRET_FILE} to ${docker_config}" >&2
+            return 1
+        fi
         clear_docker_config=true
     fi
 
