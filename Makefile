@@ -104,7 +104,7 @@ GO_TEST_PACKAGES=./cmd/... ./pkg/...
 export CGO_ENABLED ?= 1
 
 # Specify OCP build tools image tag when building rpm with podman
-RPM_BUILDER_IMAGE_TAG := rhel-9-golang-1.24-openshift-4.20
+RPM_BUILDER_IMAGE_TAG := rhel-9-golang-1.25-openshift-4.21
 
 all: generate-config microshift etcd
 
