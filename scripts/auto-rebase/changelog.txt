@@ -1,60 +1,19 @@
-- api embedded-component ca0b115da1b166b050da9126c8d565616775dae2 to 9ac77f18ba5d75d066f98058eadb2f6702d4f896
-  - 4a949648 2026-11-21T18:48:19Z TRT-3115: Revert #2942 "OCPNODE-3833: PodAndContainerStatsFromCRI as Tech-Preview"
-  - fd2a1251 2026-11-20T09:41:45+01:00 features: enable PodAndContainerStatsFromCRI as TP
-  - f89200c5 2026-11-19T10:39:05-05:00 NE-2389: ship the IngressController CRD in the payload
-  - 49156aba 2026-11-17T10:42:01-06:00 EtcdBackup and EtcdBackupPolicy are a SelfManagedHA feature only
+- etcd embedded-component 0066318fa231d64cd56f58e651ac05cbf613a590 to f2df44534da01f0352ef8eb3bc43f9ff49736ee3
+  - 109cb2d5 2026-11-20T11:22:00-05:00 UPSTREAM: <carry>: Add a DOWNSTREAM_OWNERS file to define  OpenShift owner rights
 
-- cluster-ingress-operator embedded-component 8fc1523c3173ed4f83ac39931205b58544aecf22 to 5f6c087b107f1305c1be959780cd752b3b8ca7dc
-  - 4279f9a8 2026-11-19T15:27:50+05:30 NE-2126: Add migrated Ingress-to-Route QE tests
-  - d064a424 2026-11-18T22:33:04-05:00 NE-2921: Add E2E tests for the managed profile lifecycle
-  - 88545a4a 2026-11-18T22:33:04-05:00 NE-2921: Skip LB and DNS conditions on ClusterIP Gateways
-  - 477c51ca 2026-11-18T22:33:04-05:00 NE-2921: Add VAP to reserve managed GatewayClass names
-  - b3554ebb 2026-11-18T22:33:04-05:00 NE-2921: Delete stale DNS records for ClusterIP Gateways
-  - 25262f92 2026-11-18T22:33:04-05:00 NE-2921: Add managed ClusterIP GatewayClass profile
-
-- cluster-network-operator embedded-component 5711dcf5d887dba086ae5a9db2ba2d2a7753c0d1 to fabe61aba68857f57a0bb585e8b5cc37b7453150
-  - 26b4970 2026-11-16T15:25:40+05:30 Add noOverlay configuration to ClusterUserDefinedNetwork CRD
-  - 621cbe5 2026-09-23T11:08:47+05:30 OCPBUGS-120940: quote YAML string fields in iptables-alerter Event
-
-- machine-config-operator embedded-component 9dfb6bda9b5f66d9330faf157133cf4887be1aba to 4cda875afc1492b907149e53905a39dee717cad4
-  - d2d067fe 2026-11-20T15:17:44Z NO-ISSUE: use a test-only list of supported Ignition versions in extended tests
-  - 31e7d9c9 2026-11-20T09:23:37+01:00 Set terminationMessagePolicy on sno-coredns containers
-  - 9456c35a 2026-11-20T09:23:37+01:00 Do not render forward if there's no DNS upstreams
-  - ba416c12 2026-11-20T09:23:37+01:00 Use NM dropin for rc-manager=unmanaged
-  - 826ca403 2026-11-20T09:23:37+01:00 Drop WantedBy=multi-user.target
-  - b83b3583 2026-11-20T09:23:37+01:00 Safely retry SNO resolver updates
-  - ca39182e 2026-11-20T09:23:37+01:00 Reconcile the SNO host resolver
-  - c6d9f215 2026-11-20T09:23:37+01:00 Add CoreDNS static pod for None-platform SNO
-  - b6e5c226 2026-11-20T09:23:37+01:00 Gate SNO CoreDNS rendering
-  - e42f10cc 2026-11-19T13:53:29-05:00 test: add special mode bits testing
-  - 07909ba3 2026-11-19T17:33:21Z Fix comments
-  - 07d6ad71 2026-11-19T17:33:21Z Prepare GA CAPI bootimages tests
-  - a6e3c18d 2026-11-17T16:50:08+01:00 Thread feature gate handler through all template render callers
-  - ad5f7341 2026-11-17T16:50:08+01:00 Render CRI-O stats config when PodAndContainerStatsFromCRI is enabled
-  - fc7c54ec 2026-11-17T11:38:01Z OCPBUGS-90622: Add RequiresMountsFor=/var to services that run podman
-
-- operator-framework-olm embedded-component 9822880e21db21a145dfd8b560d866039324044d to 4aa20aa2644764212efd93364baed09529a9b0f9
-  - aba3a8f0 2026-11-20T00:04:10Z :seedling: bump github.com/prometheus/common from 0.73.1 to 0.74.0 (#3971)
-  - 9f9d6052 2026-11-20T00:03:19Z :seedling: bump golang.org/x/net from 0.61.0 to 0.62.0 (#3969)
-
-- service-ca-operator embedded-component ed872ba14b615ca5726ae90e987268877a0b0b20 to 2d3ddea30758a63800f2774fa879e2a5e8304d90
-  - a72e5f9 2026-11-20T16:13:59Z Update container images to ocp 5.1
-  - 180e200 2026-11-20T15:48:28Z Bump kubernetes dependencies to v0.37.2
-
-- ovn-kubernetes image-amd64 f686ec839d757c12d8efa2991fa9091372b9f440 to 440a707aa1142a8ae482947f95ea4fc68bded633
-  - 9d4710b8 2026-11-18T17:10:30+05:30 openshift/ote: drop API validation tests moved to crd-integration
-  - e771400c 2026-11-18T06:54:50+05:30 fix(egressip): fix node capacity pointer aliasing and recover failed CPICs
-  - 38a8078a 2026-11-15T13:25:17Z egressip: avoid mutating cached cloud private ip config
-  - 85971276 2026-11-14T06:07:50Z crd-integration: migrate vtep and cnc api tests to envtest
-  - 26ff59dc 2026-11-10T16:47:06+01:00 workflow: add backport workflow using korthout/backport-action
-  - 142e36c8 2026-11-06T10:19:19Z util: replace go-cmp in network comparisons
-
-- service-ca-operator image-amd64 ed872ba14b615ca5726ae90e987268877a0b0b20 to 2d3ddea30758a63800f2774fa879e2a5e8304d90
-  - a72e5f9 2026-11-20T16:13:59Z Update container images to ocp 5.1
-  - 180e200 2026-11-20T15:48:28Z Bump kubernetes dependencies to v0.37.2
-
-- ovn-kubernetes image-arm64 440a707aa1142a8ae482947f95ea4fc68bded633 to a8af7df7e3083755154cfe5f5dc5323bef7c5f08
+- ovn-kubernetes image-amd64 440a707aa1142a8ae482947f95ea4fc68bded633 to a8af7df7e3083755154cfe5f5dc5323bef7c5f08
   - ea834dce 2026-10-02T12:10:17-07:00 node: add unit tests for MCS-blocking openshift nftables table
   - db77bf01 2026-09-11T13:57:15-07:00 node: put MCS-blocking nftables rules in a separate OpenShift table
   - 55881f76 2026-09-11T13:47:24-07:00 node: drop non--syn legacy MCS iptables cleanup variant
+
+- oc image-arm64 4bd02390bf64d514f18bf5531f2c0bbbc3d946f1 to f4c5fb03a5e36feb510d4c2bfe385525ca3d6040
+  - 27297a2b 2026-11-23T17:08:02Z OCPEDGE-2953: hermetic e2e coverage for oc adm transition topology and status (#2466)
+  - 61710287 2026-11-19T00:20:33+05:30 OCPBUGS-141847: Fix fmt.Println with unused %w format verb in upgrade status
+
+- ovn-kubernetes image-arm64 a8af7df7e3083755154cfe5f5dc5323bef7c5f08 to 447ae4084180fdc640f3432823b84ef7311f6b13
+  - 5826c24c 2026-11-19T09:57:37+01:00 openshift: Activate MACSecurity localnet virtualization test
+  - bcf2751e 2026-11-19T08:28:30+01:00 openshift: activate MACSecurity layer2 virtualization test
+  - 99fbcf5f 2026-11-19T08:27:00+01:00 openshift: mirror netshoot from the community e2e images
+  - 8147df21 2026-11-19T08:27:00+01:00 openshift: configure the Fedora container disk mirror
+  - 39f840a6 2026-11-19T08:27:00+01:00 openshift: separate source and runtime test image configuration
 
