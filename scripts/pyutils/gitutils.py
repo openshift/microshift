@@ -85,17 +85,23 @@ class GitUtils():
             logging.info(f"[DRY RUN] Creating verified commits via GitHub API for branch {branch_name}")
             return
 
-        # Collect commits between base_branch and branch_name, oldest first
+        # The entrypoint may have committed on the local base branch already.
+        # Start at its common ancestor with upstream so those commits are replayed
+        # too, and pin the parent rather than using a potentially newer remote tip.
+        gh_repo = gh.refresh_client()
+        base_ref = f"refs/remotes/{self.remote.name}/{base_branch}"
+        self.remote.fetch(f"+refs/heads/{base_branch}:{base_ref}")
+        base_sha = self.git_repo.merge_base(base_ref, branch_name)[0].hexsha
         commits = list(reversed(list(
-            self.git_repo.iter_commits(f"{base_branch}..{branch_name}")
+            self.git_repo.iter_commits(f"{base_sha}..{branch_name}")
         )))
 
         if not commits:
             logging.info(f"No commits to push for branch {branch_name}")
             return
 
-        gh_repo = gh.refresh_client()
-        parent_sha = gh_repo.get_branch(base_branch).commit.sha
+        parent_sha = base_sha
+        logging.info("Replaying %d commits onto %s for branch %s", len(commits), base_sha, branch_name)
 
         for local_commit in commits:
             # Refresh up front so the tree/commit API calls are covered even for
@@ -133,9 +139,27 @@ class GitUtils():
                     # One API call per file can outlive the ~1h token; keep it fresh.
                     gh_repo = gh.refresh_client()
 
-            parent_gh_commit = gh_repo.get_git_commit(parent_sha)
-            new_tree = gh_repo.create_git_tree(tree_elements, parent_gh_commit.tree)
-            new_commit = gh_repo.create_git_commit(local_commit.message, new_tree, [parent_gh_commit])
+            operation = "get parent commit"
+            tree_sha = None
+            logging.info("Publishing local commit %s (%s), parent=%s, tree entries=%d",
+                         local_commit.hexsha, local_commit.summary, parent_sha, len(tree_elements))
+            try:
+                parent_gh_commit = gh_repo.get_git_commit(parent_sha)
+                operation = "create tree"
+                new_tree = gh_repo.create_git_tree(tree_elements, parent_gh_commit.tree)
+                tree_sha = new_tree.sha
+                logging.info("Created tree %s for local commit %s, parent=%s",
+                             tree_sha, local_commit.hexsha, parent_sha)
+                operation = "create commit"
+                new_commit = gh_repo.create_git_commit(local_commit.message, new_tree, [parent_gh_commit])
+            except GithubException as error:
+                headers = {key.lower(): value for key, value in (error.headers or {}).items()}
+                logging.error("GitHub %s failed: local commit=%s, parent=%s, tree=%s, "
+                              "tree entries=%d, status=%s, request_id=%s, message=%s",
+                              operation, local_commit.hexsha, parent_sha, tree_sha, len(tree_elements),
+                              error.status, headers.get("x-github-request-id", "unknown"),
+                              error.data.get("message") if isinstance(error.data, dict) else error.data)
+                raise
             logging.info(f"Created verified commit {new_commit.sha[:8]}: {local_commit.summary}")
             parent_sha = new_commit.sha
 
