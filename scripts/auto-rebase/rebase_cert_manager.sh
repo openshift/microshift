@@ -223,7 +223,8 @@ download_cert_manager(){
     render_operator_index "${operator_manifest}" "${OPERATOR_INDEX}"
 
     # find the latest published cert-manager-operator ie: cert-manager-operator.v1.16.0
-    export operator="$(get_latest_bundle "${OPERATOR_INDEX}")"
+    operator="$(get_latest_bundle "${OPERATOR_INDEX}")"
+    export operator
     yq 'select (.name==env(operator))' ${OPERATOR_INDEX} >"${OPERATOR_CERT_MANAGER_INDEX}"
 
     echo  "found operator version ${operator}"
@@ -257,7 +258,8 @@ write_cert_manager_images_for_arch() {
     jq -n "{\"release\": {\"base\": \"${operatorVersion}\"}, \"images\": {}}" > "${cert_manager_release_json}"
 
     # controllerImage
-    local operatorImageFull=$(yq '.properties[] | select(.type == "olm.csv.metadata").value.annotations.containerImage' "${OPERATOR_CERT_MANAGER_INDEX}")
+    local operatorImageFull
+    operatorImageFull=$(yq '.properties[] | select(.type == "olm.csv.metadata").value.annotations.containerImage' "${OPERATOR_CERT_MANAGER_INDEX}")
     arch_digest=$(oc -a "${PULL_SECRET_FILE}" image info -o json --filter-by-os "linux/${arch}" "${operatorImageFull}" | jq -r '.digest')
     operatorImageFull="${operatorImageFull%@*}@${arch_digest}"
 
@@ -271,11 +273,13 @@ write_cert_manager_images_for_arch() {
 
     # relatedImages
     for index in $(yq '.relatedImages.[] | path | .[-1] ' "${OPERATOR_CERT_MANAGER_INDEX}"); do
-        local image=$(yq ".relatedImages.${index}.image" "${OPERATOR_CERT_MANAGER_INDEX}" )
+        local image
+        image=$(yq ".relatedImages.${index}.image" "${OPERATOR_CERT_MANAGER_INDEX}" )
         arch_digest=$(oc -a "${PULL_SECRET_FILE}" image info -o json --filter-by-os "linux/${arch}" "${image}" | jq -r '.digest')
         image="${image%@*}@${arch_digest}"
 
-        local component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
+        local component
+        component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
         if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
             yq -i -o json ".images += {\"${component}\": \"${image}\"}" "${cert_manager_release_json}"
 
