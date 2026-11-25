@@ -1,32 +1,8 @@
-- cluster-network-operator embedded-component 40589aad7d751bc84ff96a82ccec9c4376ec3714 to 1e59ac1595adb71e5408a97bcde100e131ec1a3f
-  - a823279 2026-10-21T12:54:49Z multus: Refresh ignored namespaces on namespace changes
+- machine-config-operator embedded-component 7e0993aea5cc33876be5eb5498245434a58a14fb to d0b16a1178a2351c04cf9a12340c21e676ce6159
+  - 8493609f 2026-11-17T10:39:10-05:00 Strip irreconcilable storage sections from OCL revert MC
+  - 16fc03ef 2026-11-12T09:52:43-05:00 controller and manifest VAPs: block OSStream downgrades from rhel-10 to rhel-9
 
-- machine-config-operator embedded-component 5ba6e9577fbf4f0ecedfe627e3de7cb73066313f to 7e0993aea5cc33876be5eb5498245434a58a14fb
-  - 17188d5a 2026-11-16T15:47:03Z OCPBUGS-128859: Fix mtu-migration sed eating space separator on IPv6 routes
-  - 3a4172a0 2026-11-16T15:46:35Z OCPBUGS-140607: Pass --cert-dir to buildah bud for internal registry trust
-  - fa75a7a5 2026-11-10T19:00:13Z Stop timer for Azure VIP routes reconciliation 15 minutes after boot
-  - a6cf160c 2026-11-10T19:00:13Z Add SyslogIdentifier to GCP routes service
-  - be51564e 2026-11-10T19:00:12Z Add timer for Azure VIP routes reconciliation
-
-- oc image-amd64 6b40d97dee3b6c7b007aa3c415364304e747e0d0 to 5f5d12605c98ef982ce50dd9f008aa31f20b9952
-  - 3de138f1 2026-11-03T10:54:46Z OCPBUGS-135979: update klauspost/compress to v1.20.2 to fix CVE-2026-116591
-
-- ovn-kubernetes image-amd64 13bb7569663ea6f5e9832d5e32158653f3486699 to 47a85d59646e4a6dcfd33fdceaf1c6beacf350c8
-  - be923a5a 2026-11-12T13:47:22Z controller: test onDelete enqueues work for delete tombstones
-  - 1750075e 2026-11-06T08:48:17Z controller: handle delete tombstones in onDelete
-  - 9799a9a7 2026-11-04T12:38:12+01:00 kubevirt: refresh IPv4 gateways after default network migration
-  - d4fb8787 2026-11-04T12:38:12+01:00 kubevirt: isolate layer2 gateway reconciliation
-  - 77b4452f 2026-11-04T12:38:12+01:00 kubevirt: introduce default-network reconciliation entry point
-
-- oc image-arm64 6b40d97dee3b6c7b007aa3c415364304e747e0d0 to 5f5d12605c98ef982ce50dd9f008aa31f20b9952
-  - 3de138f1 2026-11-03T10:54:46Z OCPBUGS-135979: update klauspost/compress to v1.20.2 to fix CVE-2026-116591
-
-- ovn-kubernetes image-arm64 13bb7569663ea6f5e9832d5e32158653f3486699 to 7973f4cd384b9c80ac9679f4df7fb66b0991ba04
+- ovn-kubernetes image-amd64 47a85d59646e4a6dcfd33fdceaf1c6beacf350c8 to 7973f4cd384b9c80ac9679f4df7fb66b0991ba04
   - 3cc23ea5 2026-11-13T13:33:37Z ovn: use a single advertisement snapshot per node sync
   - ee4400f7 2026-11-13T10:38:59Z ovn: mark nodes for resync under the node handler lock on reconcile
-  - be923a5a 2026-11-12T13:47:22Z controller: test onDelete enqueues work for delete tombstones
-  - 1750075e 2026-11-06T08:48:17Z controller: handle delete tombstones in onDelete
-  - 9799a9a7 2026-11-04T12:38:12+01:00 kubevirt: refresh IPv4 gateways after default network migration
-  - d4fb8787 2026-11-04T12:38:12+01:00 kubevirt: isolate layer2 gateway reconciliation
-  - 77b4452f 2026-11-04T12:38:12+01:00 kubevirt: introduce default-network reconciliation entry point
 
