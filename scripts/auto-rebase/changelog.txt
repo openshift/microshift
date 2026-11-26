@@ -1,8 +1,0 @@
-- machine-config-operator embedded-component 7e0993aea5cc33876be5eb5498245434a58a14fb to d0b16a1178a2351c04cf9a12340c21e676ce6159
-  - 8493609f 2026-11-17T10:39:10-05:00 Strip irreconcilable storage sections from OCL revert MC
-  - 16fc03ef 2026-11-12T09:52:43-05:00 controller and manifest VAPs: block OSStream downgrades from rhel-10 to rhel-9
-
-- ovn-kubernetes image-amd64 47a85d59646e4a6dcfd33fdceaf1c6beacf350c8 to 7973f4cd384b9c80ac9679f4df7fb66b0991ba04
-  - 3cc23ea5 2026-11-13T13:33:37Z ovn: use a single advertisement snapshot per node sync
-  - ee4400f7 2026-11-13T10:38:59Z ovn: mark nodes for resync under the node handler lock on reconcile
-
