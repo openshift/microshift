@@ -1,3 +1,15 @@
-- kube-rbac-proxy image-arm64 591277560f328601273f88f2881e09ccccd90a97 to 74746c338f4885b2f7b790c7b5946471d9b3a77c
+- cluster-network-operator embedded-component d0c6f75e06c861c7f2d5355dab0e7bd8a20de43c to 91486475e59dda650d37f15da04222e7861d0905
+  - ebdc909 2026-09-10T13:10:47+05:30 UPSTREAM: <carry>: Fix raised to bump golang.org/x/net to patched version to solve CVE-2026-33814 vulnerability
+
+- kubernetes-kube-storage-version-migrator embedded-component fdef30c84b3d45ede364500984221c3f492b1415 to 8cbb72975430d638d54266c2c5e2df19c7b078dd
+  - d3c29f9 2026-11-04T17:16:34+00:00 UPSTREAM: <carry>: [release-4.19] OCPBUGS-103678: Replace golang.org/x/net with github.com/openshift-sustaining/net@v0.43.0-sec.4 to address CVE-2026-33814
+
+- operator-framework-olm embedded-component f6281d2dce8510e1cab53334694268c2b88b70ee to 5c4cab050165732424ee97d163fa2cc190f6eddc
+  - 181ed927 2026-10-07T10:43:33-04:00 OCPBUGS-129502: Restore registry-server startup probe FailureThreshold to 15
+
+- kube-rbac-proxy image-amd64 591277560f328601273f88f2881e09ccccd90a97 to 74746c338f4885b2f7b790c7b5946471d9b3a77c
   - e3ecb32 2026-09-29T21:44:44+05:30 Replace golang.org/x/net with github.com/openshift-sustaining/net v0.43.0-sec.4 to resolve CVE-2026-39821
+
+- ovn-kubernetes image-arm64 f50842657ce6358847b981330921cd162b9b7405 to 7f4099ab5e0be80f86d828861eeda1da953bcd61
+  - 00d51c11 2026-10-31T18:48:33+00:00 egressip: handle LinkNotFoundError gracefully in isEgressIPOnLink
 
