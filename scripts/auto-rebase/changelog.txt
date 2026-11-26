@@ -1,17 +1,37 @@
-- kube-rbac-proxy image-arm64 72abb01aca3ca72d1f64328ef07b0cafd34e1f5e to f020c9afd08d567c13de48a52f7d5e8f32c4fcc6
-  - 6d2f1de 2026-09-14T11:44:54+01:00 OCPBUGS-104130: Replace golang.org/x/net with sustaining fork for CVE-2026-33814
-
-- kubernetes image-arm64 de7a68f8a8ffe60b623a6d5dd51db8a1fc4253b5 to dcd50d192b3ebb011ea31b47753bffef97bc7064
+- kubernetes embedded-component de7a68f8a8ffe60b623a6d5dd51db8a1fc4253b5 to dffe62795496dfdb8a320c14a8cad1fdd4f2c8a7
+  - f8fd36584 2026-11-22T19:00:06+05:30 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
+  - e7c16bc6a 2026-11-19T20:55:29Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 5bafe0f04 2026-10-27T12:03:02Z Release commit for Kubernetes v1.34.13
+  - b809ef712 2026-10-22T17:43:18+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
+  - 2af641c23 2026-10-21T10:20:15+05:30 [release-1.34] upgrade .go-version to 1.26.10
+  - 6e060729f 2026-10-17T22:25:41+08:00 hack: match OpenSSL 3.5 CN=127.0.0.1 output in client cert check
+  - 6c6342b94 2026-10-17T00:09:32+02:00 Bump images and versions to Go 1.26.9 and update distroless-iptables
+  - b4dbde84c 2026-10-13T10:31:04-04:00 kubelet: fix kubeletconfig.cgroupDriver in configz
+  - d1603e52a 2026-10-06T20:35:26-07:00 apiserver: accept large identity header sets with Go 1.27
+  - b5e5c04f3 2026-09-23T17:20:12Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.12
+  - 26c891576 2026-09-23T17:08:30Z Release commit for Kubernetes v1.34.12
+  - 8013808e5 2026-09-16T17:21:05-07:00 Restore only .spec part from ControllerRevision for any StatefulSet
+  - 664f48a82 2026-09-16T16:48:02-07:00 Refuse UNC symlink targets in Windows subPath resolution
   - 96cb24e15 2026-09-14T14:31:36-04:00 UPSTREAM: <drop>: update builder image to golang 1.25
+  - 0b4d3398c 2026-09-11T23:31:28-07:00 scheduler: fix negative namespace selector evaluation
   - 395f8b289 2026-09-11T17:28:16-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
   - 07bdccd1b 2026-09-11T17:27:57-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 858797485 2026-09-11T07:15:27Z Fix flapping pod.status.resourceClaimStatuses
+  - 8e2d815bf 2026-09-08T11:01:16+08:00 DRA: avoid integer overflow in per-claim device-limit checks
+  - 646f78da6 2026-09-02T10:22:10+05:30 Add year to copyright
+  - 87d768dd1 2026-08-29T15:56:52+05:30 Add copyright boilerplate to filespec_test.go
+  - 68fa3bf72 2026-08-29T15:56:45+05:30 Fix windows backslash escaping
+  - 77693cb97 2026-08-27T23:08:03+08:00 Avoid leaking node-specific kubelet config into the ConfigMap
+  - 963b0d5f8 2026-08-20T15:27:33Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.11
   - 3a634765b 2026-08-20T15:15:36Z Release commit for Kubernetes v1.34.11
   - d6e8dc424 2026-08-06T12:47:36-04:00 Update golang.org/x deps
+  - b29447504 2026-07-27T10:45:44+03:00 kubelet/dra: reset devices before processing response
   - 5c767c59f 2026-07-24T15:46:23-07:00 Bump to go 1.26.5
   - f0c3b7d67 2026-07-24T15:46:23-07:00 fix the gomock errors
   - 5db1b8dcd 2026-07-22T17:58:02Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.10
   - bd6c4ad15 2026-07-22T17:46:29Z Release commit for Kubernetes v1.34.10
   - 17c8878de 2026-07-15T13:08:38+07:00 Bump images and versions to golang 1.25.12 and update distroless-iptables
+  - d0bc6f236 2026-07-14T13:48:40-06:00 e2e: storage snapshot tests should read custom timeouts from manifest
   - 6b19b4138 2026-07-08T22:21:42+08:00 stop logging missing optional container annotations
   - 0925913d4 2026-07-01T11:15:52-07:00 Fix vet and mock errrors
   - b8b664865 2026-06-24T15:57:53-04:00 Make utf8 replacement char test pass on Go 1.27
@@ -25,4 +45,103 @@
   - 53eb0adf2 2026-05-11T16:31:57-05:00 test/compatibility_lifecycle: resolve feature names from variables
   - 898c6d3dd 2026-04-21T10:30:26+08:00 kubeadm: skip promote call when etcd member is already a voting member
   - 9b963cf15 2026-03-11T23:23:57Z test: Fix data race on policy refresh interval
+
+- machine-config-operator embedded-component a15cd81fcde5c3cfa403ab9dd0ce3bf7409b8f8b to 209ecca79f4638f7265b4f283bf9eb197f53fb43
+  - bb75b365 2026-11-20T16:04:05Z OCPBUGS-128859: Fix mtu-migration sed eating space separator on IPv6 routes
+  - 4162742b 2026-11-13T10:53:47Z OCPBUGS-139929: Render waits for sub-controllers MCs
+  - bcdc0d80 2026-11-09T18:05:43Z daemon & upgrademonitor: fix MCN stale current config edge case
+
+- kube-rbac-proxy image-amd64 72abb01aca3ca72d1f64328ef07b0cafd34e1f5e to f020c9afd08d567c13de48a52f7d5e8f32c4fcc6
+  - 6d2f1de 2026-09-14T11:44:54+01:00 OCPBUGS-104130: Replace golang.org/x/net with sustaining fork for CVE-2026-33814
+
+- ovn-kubernetes image-amd64 055440152f97390db94a74e43ca495567c77acd4 to 491202d25a680a2efc9a0fcd9b70465dca5ed4c1
+  - 6cc662fc 2026-11-11T14:12:48+05:30 Revert "REVERT ME: Precreate CDN gateway topology before NAD/UDN sync"
+  - 9fd86479 2026-10-29T09:00:12Z Remove isEmptyStatusManagedField restriction from startup cleanup
+  - 5859dedc 2026-10-28T00:21:19+05:30 controllermanager: add UDN EgressIP Start-order NBDB unit tests
+  - edaf5317 2026-10-28T00:21:16+05:30 egressip: register networks via reconciler before live EIP programming
+  - 1b6efe9c 2026-10-28T00:17:43+05:30 networkmanager: async UDN start for ovnkube-controller
+  - 9408a460 2026-10-28T00:17:02+05:30 networkmanager: delete dynamic UDN once its last NAD goes inactive
+  - 6735d5af 2026-10-27T21:25:00+05:30 networkmanager: retain controllers after failed start
+
+- kubernetes image-amd64 de7a68f8a8ffe60b623a6d5dd51db8a1fc4253b5 to dffe62795496dfdb8a320c14a8cad1fdd4f2c8a7
+  - f8fd36584 2026-11-22T19:00:06+05:30 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
+  - e7c16bc6a 2026-11-19T20:55:29Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 5bafe0f04 2026-10-27T12:03:02Z Release commit for Kubernetes v1.34.13
+  - b809ef712 2026-10-22T17:43:18+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
+  - 2af641c23 2026-10-21T10:20:15+05:30 [release-1.34] upgrade .go-version to 1.26.10
+  - 6e060729f 2026-10-17T22:25:41+08:00 hack: match OpenSSL 3.5 CN=127.0.0.1 output in client cert check
+  - 6c6342b94 2026-10-17T00:09:32+02:00 Bump images and versions to Go 1.26.9 and update distroless-iptables
+  - b4dbde84c 2026-10-13T10:31:04-04:00 kubelet: fix kubeletconfig.cgroupDriver in configz
+  - d1603e52a 2026-10-06T20:35:26-07:00 apiserver: accept large identity header sets with Go 1.27
+  - b5e5c04f3 2026-09-23T17:20:12Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.12
+  - 26c891576 2026-09-23T17:08:30Z Release commit for Kubernetes v1.34.12
+  - 8013808e5 2026-09-16T17:21:05-07:00 Restore only .spec part from ControllerRevision for any StatefulSet
+  - 664f48a82 2026-09-16T16:48:02-07:00 Refuse UNC symlink targets in Windows subPath resolution
+  - 96cb24e15 2026-09-14T14:31:36-04:00 UPSTREAM: <drop>: update builder image to golang 1.25
+  - 0b4d3398c 2026-09-11T23:31:28-07:00 scheduler: fix negative namespace selector evaluation
+  - 395f8b289 2026-09-11T17:28:16-04:00 UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 07bdccd1b 2026-09-11T17:27:57-04:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 858797485 2026-09-11T07:15:27Z Fix flapping pod.status.resourceClaimStatuses
+  - 8e2d815bf 2026-09-08T11:01:16+08:00 DRA: avoid integer overflow in per-claim device-limit checks
+  - 646f78da6 2026-09-02T10:22:10+05:30 Add year to copyright
+  - 87d768dd1 2026-08-29T15:56:52+05:30 Add copyright boilerplate to filespec_test.go
+  - 68fa3bf72 2026-08-29T15:56:45+05:30 Fix windows backslash escaping
+  - 77693cb97 2026-08-27T23:08:03+08:00 Avoid leaking node-specific kubelet config into the ConfigMap
+  - 963b0d5f8 2026-08-20T15:27:33Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.11
+  - 3a634765b 2026-08-20T15:15:36Z Release commit for Kubernetes v1.34.11
+  - d6e8dc424 2026-08-06T12:47:36-04:00 Update golang.org/x deps
+  - b29447504 2026-07-27T10:45:44+03:00 kubelet/dra: reset devices before processing response
+  - 5c767c59f 2026-07-24T15:46:23-07:00 Bump to go 1.26.5
+  - f0c3b7d67 2026-07-24T15:46:23-07:00 fix the gomock errors
+  - 5db1b8dcd 2026-07-22T17:58:02Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.10
+  - bd6c4ad15 2026-07-22T17:46:29Z Release commit for Kubernetes v1.34.10
+  - 17c8878de 2026-07-15T13:08:38+07:00 Bump images and versions to golang 1.25.12 and update distroless-iptables
+  - d0bc6f236 2026-07-14T13:48:40-06:00 e2e: storage snapshot tests should read custom timeouts from manifest
+  - 6b19b4138 2026-07-08T22:21:42+08:00 stop logging missing optional container annotations
+  - 0925913d4 2026-07-01T11:15:52-07:00 Fix vet and mock errrors
+  - b8b664865 2026-06-24T15:57:53-04:00 Make utf8 replacement char test pass on Go 1.27
+  - 086dd5baf 2026-06-23T14:56:34-04:00 Restore string JSON encoding of cri-api KeyValue
+  - ff18cff7c 2026-06-22T13:25:14+01:00 kubeadm: treat already promoted learner as successful
+  - 204bdf0e2 2026-06-17T11:49:36+02:00 kubeadm: use KubernetesAPICallTimeout for mandatory kubeadm-config fetch
+  - a76f455fd 2026-06-12T10:26:18-07:00 Update google.golang.org/protobuf to v1.36.12-0.20260120151049-f2248ac996af
+  - 9a52eec53 2026-06-11T17:48:34Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.9
+  - 7f303078a 2026-06-11T14:05:34+05:30 Fix job controller reporting active=0 during pod creation backoff
+  - 773bda9bd 2026-05-25T10:44:41+08:00 kubelet: defer CRI fallback removal to 1.38
+  - 53eb0adf2 2026-05-11T16:31:57-05:00 test/compatibility_lifecycle: resolve feature names from variables
+  - 898c6d3dd 2026-04-21T10:30:26+08:00 kubeadm: skip promote call when etcd member is already a voting member
+  - 9b963cf15 2026-03-11T23:23:57Z test: Fix data race on policy refresh interval
+
+- ovn-kubernetes image-arm64 055440152f97390db94a74e43ca495567c77acd4 to 491202d25a680a2efc9a0fcd9b70465dca5ed4c1
+  - 6cc662fc 2026-11-11T14:12:48+05:30 Revert "REVERT ME: Precreate CDN gateway topology before NAD/UDN sync"
+  - 9fd86479 2026-10-29T09:00:12Z Remove isEmptyStatusManagedField restriction from startup cleanup
+  - 5859dedc 2026-10-28T00:21:19+05:30 controllermanager: add UDN EgressIP Start-order NBDB unit tests
+  - edaf5317 2026-10-28T00:21:16+05:30 egressip: register networks via reconciler before live EIP programming
+  - 1b6efe9c 2026-10-28T00:17:43+05:30 networkmanager: async UDN start for ovnkube-controller
+  - 9408a460 2026-10-28T00:17:02+05:30 networkmanager: delete dynamic UDN once its last NAD goes inactive
+  - 6735d5af 2026-10-27T21:25:00+05:30 networkmanager: retain controllers after failed start
+
+- kubernetes image-arm64 dcd50d192b3ebb011ea31b47753bffef97bc7064 to dffe62795496dfdb8a320c14a8cad1fdd4f2c8a7
+  - f8fd36584 2026-11-22T19:00:06+05:30 UPSTREAM: <carry>: bump otel to v1.44.0 to fix CVE-2026-41178
+  - e7c16bc6a 2026-11-19T20:55:29Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - 5bafe0f04 2026-10-27T12:03:02Z Release commit for Kubernetes v1.34.13
+  - b809ef712 2026-10-22T17:43:18+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
+  - 2af641c23 2026-10-21T10:20:15+05:30 [release-1.34] upgrade .go-version to 1.26.10
+  - 6e060729f 2026-10-17T22:25:41+08:00 hack: match OpenSSL 3.5 CN=127.0.0.1 output in client cert check
+  - 6c6342b94 2026-10-17T00:09:32+02:00 Bump images and versions to Go 1.26.9 and update distroless-iptables
+  - b4dbde84c 2026-10-13T10:31:04-04:00 kubelet: fix kubeletconfig.cgroupDriver in configz
+  - d1603e52a 2026-10-06T20:35:26-07:00 apiserver: accept large identity header sets with Go 1.27
+  - b5e5c04f3 2026-09-23T17:20:12Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.12
+  - 26c891576 2026-09-23T17:08:30Z Release commit for Kubernetes v1.34.12
+  - 8013808e5 2026-09-16T17:21:05-07:00 Restore only .spec part from ControllerRevision for any StatefulSet
+  - 664f48a82 2026-09-16T16:48:02-07:00 Refuse UNC symlink targets in Windows subPath resolution
+  - 0b4d3398c 2026-09-11T23:31:28-07:00 scheduler: fix negative namespace selector evaluation
+  - 858797485 2026-09-11T07:15:27Z Fix flapping pod.status.resourceClaimStatuses
+  - 8e2d815bf 2026-09-08T11:01:16+08:00 DRA: avoid integer overflow in per-claim device-limit checks
+  - 646f78da6 2026-09-02T10:22:10+05:30 Add year to copyright
+  - 87d768dd1 2026-08-29T15:56:52+05:30 Add copyright boilerplate to filespec_test.go
+  - 68fa3bf72 2026-08-29T15:56:45+05:30 Fix windows backslash escaping
+  - 77693cb97 2026-08-27T23:08:03+08:00 Avoid leaking node-specific kubelet config into the ConfigMap
+  - 963b0d5f8 2026-08-20T15:27:33Z Update CHANGELOG/CHANGELOG-1.34.md for v1.34.11
+  - b29447504 2026-07-27T10:45:44+03:00 kubelet/dra: reset devices before processing response
+  - d0bc6f236 2026-07-14T13:48:40-06:00 e2e: storage snapshot tests should read custom timeouts from manifest
 
