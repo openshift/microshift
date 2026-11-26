@@ -1,19 +1,66 @@
-- etcd embedded-component 0066318fa231d64cd56f58e651ac05cbf613a590 to f2df44534da01f0352ef8eb3bc43f9ff49736ee3
-  - 109cb2d5 2026-11-20T11:22:00-05:00 UPSTREAM: <carry>: Add a DOWNSTREAM_OWNERS file to define  OpenShift owner rights
+- ovn-kubernetes image-arm64 447ae4084180fdc640f3432823b84ef7311f6b13 to d7ee8852075b0ffd10dda955f19738ceb413f753
+  - adfdd16b 2026-11-25T09:47:44Z sync test annotations with upstream changes
+  - 4e609434 2026-11-24T17:42:17+01:00 multinet: fix SubnetOverlapCheck to ensure no panic
+  - 1c0929f2 2026-11-24T17:42:14+01:00 node-identity: make skip-ovnkube-identity-self-pods stronger
+  - d43b67b7 2026-11-24T15:46:47+01:00 util: remove unused GetNodeEgressLabel helper and egress-assignable const
+  - 21cb7105 2026-11-24T15:46:47+01:00 clustermanager: emit event on invalid egressNodeSelector
+  - ec11e669 2026-11-24T15:46:46+01:00 networkmanager: return live default network from GetActiveNetworkForNamespace
+  - 883771c0 2026-11-24T15:46:46+01:00 test(egressip): verify no-EIP fallback via BGP server when default network is advertised
+  - 20f1cdcd 2026-11-24T15:46:46+01:00 docs(egressip): add egressNodeSelector guide with examples
+  - 4d14123e 2026-11-24T15:46:46+01:00 test(egressip): add E2E tests for egressNodeSelector
+  - 366a1b1e 2026-11-24T15:46:46+01:00 test: rename nodeSwitch helper to assignedEgressNode
+  - 731166e0 2026-11-24T15:46:46+01:00 test: add unit tests for egressNodeSelector
+  - 89a283b3 2026-11-24T15:46:46+01:00 clustermanager: use three-state reachability; defer NoMatchingNodeFound while unprobed
+  - 8f442ad7 2026-11-23T23:53:07+01:00 clustermanager: consolidate host-cidrs parsing into initEgressIPAllocator
+  - 7d71d867 2026-11-23T23:53:07+01:00 clustermanager: decouple node health flags from EIP selector in node event handlers
+  - 8e0636ed 2026-11-23T23:53:07+01:00 clustermanager: make event handler, health-check, and assignment selector-aware
+  - e91c9615 2026-11-23T23:53:07+01:00 clustermanager: cache compiled egressNodeSelectors on the controller
+  - 80f200c1 2026-11-23T23:53:06+01:00 clustermanager: Use egressNodeSelector for node filtering in assignment
+  - 21fe0893 2026-11-23T14:34:08+01:00 coderabbit: flag stale requirements.md on dependency bumps
+  - a2eed465 2026-11-23T13:51:21+01:00 docs: update external requirements for 1.3, 1.4 and master
+  - 1e5b0b5c 2026-11-23T12:02:14Z ote: sync test annotations with upstream changes
+  - 19b79ed1 2026-11-23T11:45:21Z ote: allocate host ports through the shared ConfigMap allocator
+  - 6dd1afe7 2026-11-23T11:45:21Z openshift: bump go.mod to k8s 1.37.1
+  - 77921594 2026-11-23T12:50:51+05:30 ovnkube: set cluster-manager leader metric in leader-election callbacks
+  - 50f1aac6 2026-11-22T10:29:16-08:00 ovn,cni,util: fix typos in log messages and shell scripts
+  - 16ec91c0 2026-11-20T12:51:11-08:00 crd: tighten EgressFirewall value validation
+  - 736fe674 2026-11-20T11:56:34-05:00 coderabbit: avoid requiring redundant error wrapping
+  - bb079515 2026-11-20T11:56:34-05:00 docs: guide agents toward focused test reuse
+  - 62231652 2026-11-20T11:56:34-05:00 docs: define explanatory code comment style for agents
+  - 2064756d 2026-11-20T11:56:34-05:00 networkmanager: retain advertisement updates during network startup
+  - 0b65cc2f 2026-11-20T11:56:34-05:00 e2e: cover route advertisement partial failure recovery
+  - dabaa8b9 2026-11-20T11:56:34-05:00 routeadvertisements: separate acceptance from node programming
+  - a7946e27 2026-11-20T10:56:50-05:00 routeadvertisements: isolate node configuration failures
+  - abd6e391 2026-11-20T15:59:18+01:00 kind: add AWS domain name to the coredns patch
+  - a9898d99 2026-11-20T08:42:24+02:00 e2e,virt,mac-sec: Cover conn. check from source node
+  - e24f4971 2026-11-20T03:24:34Z networkmanager: scope RA update reconciliation
+  - bdb0a217 2026-11-19T13:42:46+01:00 layer2: remove legacy gateway and routing paths
+  - 3a95a787 2026-11-19T12:42:17+05:30 Use base-branch binaries for upgrade tests
+  - 8390193a 2026-11-19T12:42:17+05:30 Skip feature tests due to changes in 1.37 test suite
+  - d9ff70a8 2026-11-19T12:42:17+05:30 codegen: pin code-generator to v0.37.1 and regenerate clients
+  - c8d0530b 2026-11-19T12:42:17+05:30 licenses: regenerate third-party license tree for k8s 1.37
+  - 01f0ff3e 2026-11-19T12:42:17+05:30 deps: replace FieldsV1.Raw with NewFieldsV1
+  - ce2bde61 2026-11-19T12:42:17+05:30 deps: migrate x/exp/maps to stdlib and drop golang.org/x/exp
+  - b061ac56 2026-11-19T12:42:16+05:30 ci/docs: pin K8S_VERSION to v1.37.0
+  - 3864a7de 2026-11-19T12:42:16+05:30 deps: rebase test/e2e to k8s 1.37 and migrate Exec API
+  - 5433579e 2026-11-19T12:42:16+05:30 deps: rebase go-controller to k8s 1.37
+  - 164dad44 2026-11-19T12:42:16+05:30 deps: rebase test/crd-integration to k8s 1.37
+  - 0e98151a 2026-11-19T12:42:15+05:30 deps: rebase test/conformance to k8s 1.37
+  - e78feffa 2026-11-18T10:02:59-08:00 e2e: allocate host ports via ConfigMap
+  - eb8f39b1 2026-11-18T14:31:25+01:00 ovn: bump Fedora 44 image to ovn-26.09.0-61.fc44
+  - 0a251de8 2026-11-17T18:58:11+02:00 kind: rewrite kubeconfig before first kubectl use in -ric mode
+  - ac5bc65c 2026-11-17T09:55:59Z networkmanager: initialise node NAD informer when route advertisements are enabled
+  - 28ac39c1 2026-11-16T18:06:35Z routeadvertisements: filter generated FRRConfigs before sort
+  - fde55d2f 2026-11-13T09:36:58+01:00 node: reconcile the local node first and on its own queue
+  - 27a0ba43 2026-11-10T16:31:12-03:00 docs: refresh the control-plane command trace
+  - 81e9644b 2026-11-10T16:08:48-03:00 test: count cluster nodes for the framework in e2e-cp.sh
+  - 3145b0ad 2026-11-09T13:57:12-03:00 test: name the e2e-cp.sh worker node count after what it is
+  - ed43f5f9 2026-11-09T13:57:12-03:00 test: guard the WHAT argument drop in e2e-cp.sh
+  - 7dbd29c8 2026-11-09T13:57:12-03:00 test: quote focus and skip expressions in e2e-cp.sh
+  - f28a6925 2026-11-09T13:57:11-03:00 ci: run dual-stack shard specs on the converted cluster
+  - 375bedf1 2026-11-09T13:57:11-03:00 test: fail shard runs that select zero specs
+  - 89faa7d7 2026-11-09T13:57:11-03:00 ci: fix the dual-stack conversion shard focus
 
-- ovn-kubernetes image-amd64 440a707aa1142a8ae482947f95ea4fc68bded633 to a8af7df7e3083755154cfe5f5dc5323bef7c5f08
-  - ea834dce 2026-10-02T12:10:17-07:00 node: add unit tests for MCS-blocking openshift nftables table
-  - db77bf01 2026-09-11T13:57:15-07:00 node: put MCS-blocking nftables rules in a separate OpenShift table
-  - 55881f76 2026-09-11T13:47:24-07:00 node: drop non--syn legacy MCS iptables cleanup variant
-
-- oc image-arm64 4bd02390bf64d514f18bf5531f2c0bbbc3d946f1 to f4c5fb03a5e36feb510d4c2bfe385525ca3d6040
-  - 27297a2b 2026-11-23T17:08:02Z OCPEDGE-2953: hermetic e2e coverage for oc adm transition topology and status (#2466)
-  - 61710287 2026-11-19T00:20:33+05:30 OCPBUGS-141847: Fix fmt.Println with unused %w format verb in upgrade status
-
-- ovn-kubernetes image-arm64 a8af7df7e3083755154cfe5f5dc5323bef7c5f08 to 447ae4084180fdc640f3432823b84ef7311f6b13
-  - 5826c24c 2026-11-19T09:57:37+01:00 openshift: Activate MACSecurity localnet virtualization test
-  - bcf2751e 2026-11-19T08:28:30+01:00 openshift: activate MACSecurity layer2 virtualization test
-  - 99fbcf5f 2026-11-19T08:27:00+01:00 openshift: mirror netshoot from the community e2e images
-  - 8147df21 2026-11-19T08:27:00+01:00 openshift: configure the Fedora container disk mirror
-  - 39f840a6 2026-11-19T08:27:00+01:00 openshift: separate source and runtime test image configuration
+- kubernetes image-arm64 90b87c7dec8046734eea9392ae39b9bbf3b5b29b to f1ea6c6cb65fc66fb6e36e7ff527d46e8c42bcca
+  - 757dab581 2026-10-26T08:37:49+01:00 UPSTREAM: <carry>: integrate strict cpu reservation and workload partitioning
 
