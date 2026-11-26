@@ -92,6 +92,110 @@ EOF
     fi
 }
 
+# Return the head of the cert-manager stable-v1 channel from a rendered OPM
+# index. Entry order carries no meaning, so follow the Operator Registry rule:
+# the head is the entry that no other channel entry replaces or skips.
+get_latest_bundle() {
+    local operator_index="$1"
+    local heads
+
+    heads=$(yq -r 'select(.schema == "olm.channel" and .package == "openshift-cert-manager-operator" and .name == "stable-v1")
+        | [.entries[] | .replaces, (.skips // [])[]] as $replaced
+        | .entries[] | select(.name as $n | $replaced | any_c(. == $n) | not) | .name' "${operator_index}")
+    if [[ -z "${heads}" || $(wc -l <<< "${heads}") -ne 1 ]]; then
+        echo "ERROR: expected one stable-v1 channel head, found: ${heads//$'\n'/ }" >&2
+        return 1
+    fi
+    echo "${heads}"
+}
+
+# Return the version of the newest cert-manager bundle in a rendered OPM index.
+get_latest_version() {
+    local operator_index="$1"
+    local operator_bundle
+
+    operator_bundle=$(get_latest_bundle "${operator_index}")
+    if [[ -z "${operator_bundle}" || "${operator_bundle}" == "null" ]]; then
+        echo "ERROR: no stable-v1 cert-manager operator bundle found in ${operator_index}" >&2
+        return 1
+    fi
+
+    yq -r "select(.name == \"${operator_bundle}\") | .properties[] | select(.type == \"olm.package\") | .value.version" "${operator_index}"
+}
+
+# Read the version currently recorded in the checked-in release metadata.
+get_current_version() {
+    local release_file="$1"
+    jq -er '.release.base | select(type == "string" and length > 0)' "${release_file}"
+}
+
+# Render an OPM index, temporarily exposing the pull secret in Docker's config
+# location when opm requires it. The caller owns the output file.
+render_operator_index() {
+    local operator_manifest="$1"
+    local output_file="$2"
+    local docker_config="${HOME}/.docker/config.json"
+    local clear_docker_config=false
+    local opm="${BIN_DIR}/opm"
+
+    if [[ ! -x "${opm}" ]]; then
+        opm="$(command -v opm)"
+    fi
+
+    if [[ -f "${PULL_SECRET_FILE}" && ! -f "${docker_config}" ]]; then
+        # Bail out without cleanup if the link cannot be created (e.g. a
+        # dangling symlink already exists), so we never remove a file we
+        # did not create. errexit does not apply when called under `if !`.
+        if ! mkdir -p "${HOME}/.docker/" || ! ln -s "${PULL_SECRET_FILE}" "${docker_config}"; then
+            echo "ERROR: failed to link ${PULL_SECRET_FILE} to ${docker_config}" >&2
+            return 1
+        fi
+        clear_docker_config=true
+    fi
+
+    if ! "${opm}" render "${operator_manifest}" -o yaml > "${output_file}"; then
+        if "${clear_docker_config}"; then
+            rm "${docker_config}"
+        fi
+        return 1
+    fi
+
+    if "${clear_docker_config}"; then
+        rm "${docker_config}"
+    fi
+}
+
+# Detect current/latest version drift without changing the checkout.
+detect_cert_manager_version() {
+    local operator_manifest="$1"
+    local release_file="${REPOROOT}/assets/optional/cert-manager/release-cert-manager-x86_64.json"
+    local temporary_dir operator_index current_version latest_version
+
+    temporary_dir=$(mktemp -d)
+    operator_index="${temporary_dir}/operator-index.yaml"
+    if ! render_operator_index "${operator_manifest}" "${operator_index}"; then
+        rm -rf "${temporary_dir}"
+        return 1
+    fi
+
+    if ! current_version=$(get_current_version "${release_file}") || \
+        ! latest_version=$(get_latest_version "${operator_index}") || \
+        [[ -z "${current_version}" || -z "${latest_version}" || "${latest_version}" == "null" ]]; then
+        echo "ERROR: failed to determine current and latest cert-manager versions" >&2
+        rm -rf "${temporary_dir}"
+        return 1
+    fi
+    rm -rf "${temporary_dir}"
+
+    echo "current: ${current_version}"
+    echo "latest:  ${latest_version}"
+    if [[ "${current_version}" == "${latest_version}" ]]; then
+        echo "action:  none"
+    else
+        echo "action:  rebase"
+    fi
+}
+
 # Clone a repo at a commit
 clone_repo() {
     local repo="$1"
@@ -120,23 +224,12 @@ download_cert_manager(){
 
     operator_manifest="$1"
 
-    # opm needs credentials to pull the image, but there's no flag like -a or --authfile to provide our ~/.pull-secret.json
-    clear_docker_config=false
-    if [[ -f "${PULL_SECRET_FILE}" && ! -f "${HOME}/.docker/config.json" ]]; then
-        mkdir -p "${HOME}/.docker/"
-        ln -s "${PULL_SECRET_FILE}" "${HOME}/.docker/config.json"
-        clear_docker_config=true
-    fi
-
     # get the whole operator yaml
-    ${BIN_DIR}/opm render "${operator_manifest}" -o yaml  >${OPERATOR_INDEX}
-
-    if "${clear_docker_config}"; then
-        rm "${HOME}/.docker/config.json"
-    fi
+    render_operator_index "${operator_manifest}" "${OPERATOR_INDEX}"
 
     # find the latest published cert-manager-operator ie: cert-manager-operator.v1.16.0
-    export operator=$(yq 'select(.package == "openshift-cert-manager-operator" and .name == "stable-v1") | .entries[-1].name' ${OPERATOR_INDEX})
+    operator="$(get_latest_bundle "${OPERATOR_INDEX}")"
+    export operator
     yq 'select (.name==env(operator))' ${OPERATOR_INDEX} >"${OPERATOR_CERT_MANAGER_INDEX}"
 
     echo  "found operator version ${operator}"
@@ -164,12 +257,14 @@ write_cert_manager_images_for_arch() {
     local cert_manager_release_json="${REPOROOT}/assets/optional/cert-manager/release-cert-manager-${GOARCH_TO_UNAME_MAP[${arch}]}.json"
     local cert_manager_images_yaml="${REPOROOT}/assets/optional/cert-manager/manager/images-${GOARCH_TO_UNAME_MAP[${arch}]}.yaml"
 
-    local operatorVersion=$(yq '.properties[] | select(.type == "olm.package").value.version' "${OPERATOR_CERT_MANAGER_INDEX}")
+    local operatorVersion
+    operatorVersion=$(get_latest_version "${OPERATOR_INDEX}")
 
     jq -n "{\"release\": {\"base\": \"${operatorVersion}\"}, \"images\": {}}" > "${cert_manager_release_json}"
 
     # controllerImage
-    local operatorImageFull=$(yq '.properties[] | select(.type == "olm.csv.metadata").value.annotations.containerImage' "${OPERATOR_CERT_MANAGER_INDEX}")
+    local operatorImageFull
+    operatorImageFull=$(yq '.properties[] | select(.type == "olm.csv.metadata").value.annotations.containerImage' "${OPERATOR_CERT_MANAGER_INDEX}")
     arch_digest=$(oc -a "${PULL_SECRET_FILE}" image info -o json --filter-by-os "linux/${arch}" "${operatorImageFull}" | jq -r '.digest')
     operatorImageFull="${operatorImageFull%@*}@${arch_digest}"
 
@@ -183,11 +278,13 @@ write_cert_manager_images_for_arch() {
 
     # relatedImages
     for index in $(yq '.relatedImages.[] | path | .[-1] ' "${OPERATOR_CERT_MANAGER_INDEX}"); do
-        local image=$(yq ".relatedImages.${index}.image" "${OPERATOR_CERT_MANAGER_INDEX}" )
+        local image
+        image=$(yq ".relatedImages.${index}.image" "${OPERATOR_CERT_MANAGER_INDEX}" )
         arch_digest=$(oc -a "${PULL_SECRET_FILE}" image info -o json --filter-by-os "linux/${arch}" "${image}" | jq -r '.digest')
         image="${image%@*}@${arch_digest}"
 
-        local component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
+        local component
+        component=$(yq ".relatedImages.${index}.name" "${OPERATOR_CERT_MANAGER_INDEX}")
         if [[  -n "${component}" && "${OPERATOR_COMPONENTS}" == *"${component}"* ]]; then
             yq -i -o json ".images += {\"${component}\": \"${image}\"}" "${cert_manager_release_json}"
 
@@ -247,19 +344,27 @@ rebase_cert_manager_to(){
 usage() {
     echo "Usage:"
     echo "$(basename "$0") to OPM_RELEASE_IMAGE                             Performs all the steps to rebase to a release image."
+    echo "$(basename "$0") detect OPM_RELEASE_IMAGE                        Prints current and latest cert-manager versions."
     echo "$(basename "$0") download OPM_RELEASE_IMAGE                       Downloads the content of a release image to disk in preparation for rebasing."
     echo "$(basename "$0") images                                           Rebases the component images to the downloaded release"
     echo "$(basename "$0") manifests                                        Rebases the component manifests to the downloaded release"
     exit 1
 }
 
-check_preconditions
-
 command=${1:-help}
+# detect is read-only: it must not install tools or write a container policy.
+if [[ "${command}" != "detect" ]]; then
+    check_preconditions
+fi
+
 case "$command" in
     to)
         [[ $# -lt 2 ]] && usage
         rebase_cert_manager_to "$2"
+        ;;
+    detect)
+        [[ $# -lt 2 ]] && usage
+        detect_cert_manager_version "$2"
         ;;
     download)
         #[[ $# -lt 3 ]] && usage
