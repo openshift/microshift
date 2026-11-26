@@ -54,10 +54,10 @@ _install() {
 }
 
 gettool_golangci-lint() {
-    local ver="2.1.6"
+    local ver="2.4.0"
     declare -A checksums=(
-        ["x86_64"]="e55e0eb515936c0fbd178bce504798a9bd2f0b191e5e357768b18fd5415ee541"
-        ["aarch64"]="582eb73880f4408d7fb89f12b502d577bd7b0b63d8c681da92bb6b9d934d4363")
+        ["x86_64"]="fae792524c04424c0ac369f5b8076f04b45cf29fc945a370e55d369a8dc11840"
+        ["aarch64"]="70ac11f55b80ec78fd3a879249cc9255121b8dfd7f7ed4fc46ed137f4abf17e7")
 
     declare -A arch_map=(
         ["x86_64"]="amd64"
