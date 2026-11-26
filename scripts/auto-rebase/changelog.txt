@@ -1,0 +1,127 @@
+- api embedded-component 9803e9208397dca8280dfeeb6270216bcf035098 to 5e2e491300342f81e07168106240a2ad960431bd
+  - 00d38245 2026-10-14T15:19:47-04:00 Promote VSphereMultiVCenterDay2 to GA in OCP 4.22
+
+- cluster-ingress-operator embedded-component 3ff64f4447a3e0e4fb7fa81980875841b436724c to b90068a57d6ae0139a8a8717f1e16f15407882f7
+  - 4bcff0d 2026-10-20T15:45:12Z Allow disabling endpoint address validation
+
+- cluster-network-operator embedded-component efa84fc1507c5287eddd65c5a1661da7f28c91cd to c3e2e335a4d52f4e5f97e35a9428305bd8075a94
+  - 4bb66a4 2026-11-13T18:34:01Z HyperShift: relax ovnkube-control-plane zone anti-affinity
+  - 8eff9e7 2026-10-21T13:26:04Z multus: Refresh ignored namespaces on namespace changes
+
+- etcd embedded-component 001a74e5c87c52b4e1828f18e89ef6b4bfa38958 to 198fd5c3a21cd4015ce020b5ea9114bfc097c630
+  - f012abed 2026-11-05T17:24:02-05:00 UPSTREAM: <drop>: manually resolve conflicts
+  - 0b065e61 2026-10-22T15:52:36-07:00 version: bump up to 3.6.16
+  - 2578838c 2026-10-22T14:22:53-07:00 dependency: bump github.com/klauspost/compress from v1.17.9 to v1.18.7
+  - 0a3eddc4 2026-10-21T09:56:25Z mvcc: fix data race between Hash and Restore
+  - 087fc31f 2026-10-20T16:16:51+08:00 Build with Go 1.26.10
+  - dd4ce837 2026-10-17T17:59:25+03:00 etcdserver: add test for processMessages output order
+  - f31a5aa5 2026-10-15T18:40:46+01:00 [release-3.6] Bump golang.org/x/net to v0.61.0
+  - 10cc38c4 2026-10-13T08:41:15-04:00 [release-3.6] Bump otel to v1.45.0 to fix GO-2026-6505
+  - a5e23b59 2026-10-09T19:48:52Z Bump go to 1.26.9
+  - 1413a8a0 2026-10-07T09:01:02-04:00 fix(txn): parse lease ID as hex in comparison
+  - a3346427 2026-09-22T13:52:05-07:00 version: bump up to 3.6.15
+  - 16f44fe5 2026-09-22T09:27:31+01:00 dependency: bump google.golang.org/grpc to v1.83.2
+  - 64063198 2026-09-21T19:09:38+01:00 fileutil: close locked files when purging fails
+  - 3b070b32 2026-09-11T20:24:07+01:00 Bump go to 1.26.8
+  - b741e79a 2026-09-10T16:46:29+08:00 fix: fsync snap directory when saving a received snapshot db
+  - c1572229 2026-09-10T09:36:45+01:00 fix: deflake TestIssue20271
+  - 4e6d3a96 2026-09-09T11:39:16+01:00 Deflake TestEtcdGrpcResolverRoundRobin: sleep 1s to allow all grpc sub channel to be ready
+  - 629123fb 2026-09-01T21:50:35Z build(deps): bump distroless/static-debian12 from `a9fcaed` to `d75cdd7`
+  - 24c5b693 2026-08-31T15:08:02-07:00 Bump github.com/gorilla/websocket from v1.4.2 to v1.5.3
+  - 3f895dd6 2026-08-31T15:08:00-07:00 Bump golang.org/x/text from v0.38.0 to v0.39.0
+  - bba6944a 2026-08-23T21:28:46+01:00 Bump go 1.25.14
+  - db0001ea 2026-08-14T15:09:26-07:00 Bump Go to 1.25.13
+  - b4536a06 2026-07-29T18:17:16+05:30 etcdctl: remove duplicate RaftTerm in endpoint status fields output The fields output for endpoint status currently prints RaftTerm twice, once from the response header and the other from the status body. Both of them come from the same raft term, so the second one is redundant.
+  - 2a71ac2a 2026-07-28T04:41:09Z build(deps): bump distroless/static-debian12 from `9c346e4` to `a9fcaed`
+  - 497f4a68 2026-07-26T22:39:45-07:00 dependency: bump go.opentelemetry.io/otel to v1.44.0
+  - fc04cf70 2026-07-23T12:19:04-07:00 version: bump up to 3.6.14
+  - 84b0d31d 2026-07-21T21:56:59-07:00 deps: bump google.golang.org/grpc to 1.82.1
+  - d2013b6d 2026-07-21T20:54:27Z Fix unsynchronized range over leaseCache.entries
+  - d4cbc7ec 2026-07-21T20:51:47Z Fix unbounded io.ReadAll on peer lease HTTP handler body
+  - 4d6d3e95 2026-07-21T20:49:25Z Set a reasonable value for snapshotLimitByte
+  - 10530caa 2026-07-21T20:47:36Z Set a 5-minutes ReadHeaderTimeout for client http.Server
+  - 89ff6d50 2026-07-21T20:45:23Z Set a tlsHandshakeTimeout for tlsListener
+  - cca254a7 2026-07-21T20:38:27Z Fix the costTxnReq ignores nested RequestTxn issue
+  - f3fb4dca 2026-07-21T20:38:27Z Add an unit test to reproduce the issue of costTxnReq ignores nested RequestTxn
+  - 6643f806 2026-07-10T15:29:05+01:00 Fix the security issue where a user granted read permission on one key could receive watch responses for every key starting from that key
+  - 724eb198 2026-07-10T15:28:19+01:00 Create a test case to reproduce the security issue that a user with low permission can watch more keys
+  - d26daa0b 2026-07-09T03:19:07Z [release-3.6] Bump Go to 1.25.12
+  - 1cdf1189 2026-07-01T14:02:38-07:00 dependency: bump golang.org/x/net from 0.54.0 to 0.55.0
+
+- kubernetes embedded-component c253e21014e70c72c2183b97f9582b9e96a2bc6b to 4d7864576af25b833ffb9633360b2a4e36c14605
+  - a2b2c8121 2026-11-18T11:07:37-05:00 UPSTREAM: <drop>: Generate 4.22 payload for end-to-end Multi testing
+  - b317bff53 2026-11-04T23:31:36Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - ae6fece6f 2026-10-27T12:02:52Z Release commit for Kubernetes v1.35.10
+  - a5d598f5f 2026-10-22T17:43:17+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
+  - 21728e78b 2026-10-21T10:24:23+05:30 [release-1.35] upgrade .go-version to 1.26.10
+  - 6b789cac0 2026-10-17T00:02:05+02:00 Bump images and versions to Go 1.26.9 and update distroless-iptables
+  - 68560be9e 2026-10-14T08:49:54+08:00 hack: match OpenSSL 3.5 CN=127.0.0.1 output in client cert check
+  - 542efa74a 2026-10-06T20:32:01-07:00 apiserver: accept large identity header sets with Go 1.27
+  - b3432bd6b 2026-09-24T23:49:42+09:00 job controller: simplify recreation regression test
+  - e19695ebd 2026-09-24T23:47:12+09:00 job controller: extend recreation regression coverage
+  - 7c021b29e 2026-09-24T23:47:12+09:00 job controller: clear expectations when deleting Job
+  - 2cc9e93d9 2026-09-23T17:19:46Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.9
+  - aae7c4755 2026-09-11T23:26:52-07:00 scheduler: fix negative namespace selector evaluation
+  - 0376f2ec0 2026-09-11T04:55:40Z Fix flapping pod.status.resourceClaimStatuses
+  - 757493a41 2026-07-27T11:41:58+03:00 kubelet/dra: reset devices before processing response
+
+- machine-config-operator embedded-component 32d59dd3bbe513d8430516c192ec5788385f55b2 to f1ed8069ffdeab486cc2b572cfe50114e1920ce6
+  - 6cd8c2e4 2026-11-19T18:02:01Z OCPBUGS-128859: Fix mtu-migration sed eating space separator on IPv6 routes
+  - 89567dec 2026-11-18T14:43:04Z OCPBUGS-140607: Pass --cert-dir to buildah bud for internal registry trust
+  - 81076926 2026-11-12T14:28:46+01:00 OCPBUGS-139929: Render waits for sub-controllers MCs
+  - ae2a07ee 2026-11-09T17:36:27Z NO-ISSUE: Temporarily skip four OS build controller unit tests
+  - 58bbf461 2026-11-07T21:27:00Z mosb: replace wildcard permissions with explicit verbs
+
+- oc image-amd64 a726d94391e468525cc5282067cadc1215b1fb5e to 682969f6eee555ac283220a285b316301f07c394
+  - b2a4fd7b 2026-11-11T16:55:02Z [release-4.22] OCPBUGS-135862: bump klauspost/compress to 1.20.2 to fix CVE-2026-116591
+  - fa5f6825 2026-11-05T13:16:09+05:30 Bump k8s.io/kubectl to v0.35.9 for CVE-2026-19444 (kubectl cp Windows path traversal)
+
+- router image-amd64 9f128654822c99daf9be794c0b5887ba52d13d9f to 61ccd520dd350378d38be0c81b388d438f5af84c
+  - 57506fa 2026-11-09T14:07:01Z Allow disabling endpoint address validation
+
+- ovn-kubernetes image-amd64 b313a0e6860449f2a4292047a495c2c28d2cd1d6 to bc568a0a3e0707e279f5db4e60f25c53e1931f93
+  - 9799a9a7 2026-11-04T12:38:12+01:00 kubevirt: refresh IPv4 gateways after default network migration
+  - d4fb8787 2026-11-04T12:38:12+01:00 kubevirt: isolate layer2 gateway reconciliation
+  - 77b4452f 2026-11-04T12:38:12+01:00 kubevirt: introduce default-network reconciliation entry point
+  - 9fd86479 2026-10-29T09:00:12Z Remove isEmptyStatusManagedField restriction from startup cleanup
+  - 5859dedc 2026-10-28T00:21:19+05:30 controllermanager: add UDN EgressIP Start-order NBDB unit tests
+  - edaf5317 2026-10-28T00:21:16+05:30 egressip: register networks via reconciler before live EIP programming
+  - 1b6efe9c 2026-10-28T00:17:43+05:30 networkmanager: async UDN start for ovnkube-controller
+  - 9408a460 2026-10-28T00:17:02+05:30 networkmanager: delete dynamic UDN once its last NAD goes inactive
+  - 6735d5af 2026-10-27T21:25:00+05:30 networkmanager: retain controllers after failed start
+
+- kubernetes image-amd64 c253e21014e70c72c2183b97f9582b9e96a2bc6b to 4d7864576af25b833ffb9633360b2a4e36c14605
+  - a2b2c8121 2026-11-18T11:07:37-05:00 UPSTREAM: <drop>: Generate 4.22 payload for end-to-end Multi testing
+  - b317bff53 2026-11-04T23:31:36Z UPSTREAM: <drop>: hack/update-vendor.sh, make update and update image
+  - ae6fece6f 2026-10-27T12:02:52Z Release commit for Kubernetes v1.35.10
+  - a5d598f5f 2026-10-22T17:43:17+05:30 Bump images and versions to Go 1.26.10 and update distroless-iptables
+  - 21728e78b 2026-10-21T10:24:23+05:30 [release-1.35] upgrade .go-version to 1.26.10
+  - 6b789cac0 2026-10-17T00:02:05+02:00 Bump images and versions to Go 1.26.9 and update distroless-iptables
+  - 68560be9e 2026-10-14T08:49:54+08:00 hack: match OpenSSL 3.5 CN=127.0.0.1 output in client cert check
+  - 542efa74a 2026-10-06T20:32:01-07:00 apiserver: accept large identity header sets with Go 1.27
+  - b3432bd6b 2026-09-24T23:49:42+09:00 job controller: simplify recreation regression test
+  - e19695ebd 2026-09-24T23:47:12+09:00 job controller: extend recreation regression coverage
+  - 7c021b29e 2026-09-24T23:47:12+09:00 job controller: clear expectations when deleting Job
+  - 2cc9e93d9 2026-09-23T17:19:46Z Update CHANGELOG/CHANGELOG-1.35.md for v1.35.9
+  - aae7c4755 2026-09-11T23:26:52-07:00 scheduler: fix negative namespace selector evaluation
+  - 0376f2ec0 2026-09-11T04:55:40Z Fix flapping pod.status.resourceClaimStatuses
+  - 757493a41 2026-07-27T11:41:58+03:00 kubelet/dra: reset devices before processing response
+
+- oc image-arm64 a726d94391e468525cc5282067cadc1215b1fb5e to 682969f6eee555ac283220a285b316301f07c394
+  - b2a4fd7b 2026-11-11T16:55:02Z [release-4.22] OCPBUGS-135862: bump klauspost/compress to 1.20.2 to fix CVE-2026-116591
+  - fa5f6825 2026-11-05T13:16:09+05:30 Bump k8s.io/kubectl to v0.35.9 for CVE-2026-19444 (kubectl cp Windows path traversal)
+
+- ovn-kubernetes image-arm64 b313a0e6860449f2a4292047a495c2c28d2cd1d6 to bc568a0a3e0707e279f5db4e60f25c53e1931f93
+  - 9799a9a7 2026-11-04T12:38:12+01:00 kubevirt: refresh IPv4 gateways after default network migration
+  - d4fb8787 2026-11-04T12:38:12+01:00 kubevirt: isolate layer2 gateway reconciliation
+  - 77b4452f 2026-11-04T12:38:12+01:00 kubevirt: introduce default-network reconciliation entry point
+  - 9fd86479 2026-10-29T09:00:12Z Remove isEmptyStatusManagedField restriction from startup cleanup
+  - 5859dedc 2026-10-28T00:21:19+05:30 controllermanager: add UDN EgressIP Start-order NBDB unit tests
+  - edaf5317 2026-10-28T00:21:16+05:30 egressip: register networks via reconciler before live EIP programming
+  - 1b6efe9c 2026-10-28T00:17:43+05:30 networkmanager: async UDN start for ovnkube-controller
+  - 9408a460 2026-10-28T00:17:02+05:30 networkmanager: delete dynamic UDN once its last NAD goes inactive
+  - 6735d5af 2026-10-27T21:25:00+05:30 networkmanager: retain controllers after failed start
+
+- kubernetes image-arm64 e2a920bba7847706cff21b86e6e76780736d0520 to 4d7864576af25b833ffb9633360b2a4e36c14605
+  - a2b2c8121 2026-11-18T11:07:37-05:00 UPSTREAM: <drop>: Generate 4.22 payload for end-to-end Multi testing
+
