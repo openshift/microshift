@@ -52,14 +52,6 @@ var configClientCache = make(map[string]configClientCacheEntry, 1)
 var configClientCacheLock sync.RWMutex
 
 type unstructuredClient struct {
-	base   dynamic.Interface
-	mapper meta.ResettableRESTMapper
-
-	Client    dynamic.ResourceInterface
-	Discovery discovery.AggregatedDiscoveryInterface
-
-	unstructured *unstructured.Unstructured
-
 	// modify is a function that modifies the existing object based on the required object.
 	// The first argument is a pointer to a boolean that should be set to true if the object was modified.
 	// i.e. `*modified = true`
@@ -68,6 +60,14 @@ type unstructuredClient struct {
 	// If Not set, the object will only have its metadata fields updated.
 	// If set, the object will be modified based on the function.
 	ModifyOnExists
+
+	base   dynamic.Interface
+	mapper meta.ResettableRESTMapper
+
+	Client    dynamic.ResourceInterface
+	Discovery discovery.AggregatedDiscoveryInterface
+
+	unstructured *unstructured.Unstructured
 }
 
 func unstructuredConfigAndClient(kubeconfigPath string) (configClientCacheEntry, error) {

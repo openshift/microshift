@@ -26,6 +26,7 @@ const defaultTTL = 120
 
 type Resolver struct {
 	sync.Mutex
+
 	domain map[string][]net.IP
 }
 
