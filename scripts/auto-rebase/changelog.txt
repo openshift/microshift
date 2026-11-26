@@ -1,24 +1,12 @@
-- kubernetes embedded-component 8008e652cb56e8fb34e76d0736973b3e99816fb0 to 1684819c7d9e1ac63ecee8563a6f5d5d08c7e652
-  - f96f7b33d 2026-11-17T22:56:05Z UPSTREAM: 135680: test/e2e: increase memory limits in pod resize tests
+- api embedded-component b32f49f8a70985c6ad9abb2dc579abc18d143051 to 81a284bb8e3c4e7183235f7865b8233ab16eef62
+  - ef7b448b 2026-11-04T13:32:05+05:30 fix(api): Correct API server Modern TLS profile documentation
 
-- ovn-kubernetes image-amd64 6f5e049f27d2ac6293e46758d45cd21a075ad726 to fbc37056e979371c1d43a638611eae75a82934ca
-  - e8bec8f0 2026-11-05T07:04:03Z UPSTREAM: <carry>: Bump golang.org/x/net to openshift-sustaining fork to fix CVE-2026-33814
-  - 1c8c80b7 2026-10-29T16:30:35Z kubevirt: detect completed migration when source pod is gone
-  - a4a688cd 2026-10-09T12:44:46-07:00 Hand-copied fixes to get unit tests passing
-  - 1194cbec 2026-10-09T12:44:38-07:00 Improve nodenft.MatchNFTRules behavior
-  - fdc6fc7e 2026-10-09T12:44:38-07:00 Fix MarkIPsCache replaceAll
-  - 31e96731 2026-10-09T12:44:38-07:00 node: fix DeleteEndpointSlice namespace deletion race condition
+- machine-config-operator embedded-component 45ac1ae9219992cb7f21d84a547881d62799e318 to 54c09119331aee1d76b1a3ef2fa3244f081d85fe
+  - 7280abb2 2026-11-24T12:06:25Z OCPBUGS-128859: Fix mtu-migration sed eating space separator on IPv6 routes
 
-- kubernetes image-amd64 8008e652cb56e8fb34e76d0736973b3e99816fb0 to 1684819c7d9e1ac63ecee8563a6f5d5d08c7e652
-  - f96f7b33d 2026-11-17T22:56:05Z UPSTREAM: 135680: test/e2e: increase memory limits in pod resize tests
+- ovn-kubernetes image-amd64 fbc37056e979371c1d43a638611eae75a82934ca to a2289adba7a0d2abd707ddc62b3d474b61827be9
+  - 84cfe480 2026-10-23T04:12:01-04:00 Downstream only: unicast gateway GARPs after VM migration
 
-- ovn-kubernetes image-arm64 fcb4c0a7985afaffac2b6a9b23a1f7848835d132 to fbc37056e979371c1d43a638611eae75a82934ca
-  - 1c8c80b7 2026-10-29T16:30:35Z kubevirt: detect completed migration when source pod is gone
-  - a4a688cd 2026-10-09T12:44:46-07:00 Hand-copied fixes to get unit tests passing
-  - 1194cbec 2026-10-09T12:44:38-07:00 Improve nodenft.MatchNFTRules behavior
-  - fdc6fc7e 2026-10-09T12:44:38-07:00 Fix MarkIPsCache replaceAll
-  - 31e96731 2026-10-09T12:44:38-07:00 node: fix DeleteEndpointSlice namespace deletion race condition
-
-- kubernetes image-arm64 8008e652cb56e8fb34e76d0736973b3e99816fb0 to 1684819c7d9e1ac63ecee8563a6f5d5d08c7e652
-  - f96f7b33d 2026-11-17T22:56:05Z UPSTREAM: 135680: test/e2e: increase memory limits in pod resize tests
+- ovn-kubernetes image-arm64 fbc37056e979371c1d43a638611eae75a82934ca to a2289adba7a0d2abd707ddc62b3d474b61827be9
+  - 84cfe480 2026-10-23T04:12:01-04:00 Downstream only: unicast gateway GARPs after VM migration
 
