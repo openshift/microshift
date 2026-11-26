@@ -650,12 +650,6 @@ func run(ctx context.Context, s *options.KubeletServer, kubeDeps *kubelet.Depend
 		}
 	}
 
-	// Register current configuration with /configz endpoint
-	err = initConfigz(ctx, &s.KubeletConfiguration)
-	if err != nil {
-		logger.Error(err, "Failed to register kubelet configuration with configz")
-	}
-
 	if len(s.ShowHiddenMetricsForVersion) > 0 {
 		metrics.SetShowHidden()
 	}
@@ -743,6 +737,12 @@ func run(ctx context.Context, s *options.KubeletServer, kubeDeps *kubelet.Depend
 	// Get cgroup driver setting from CRI
 	if err := getCgroupDriverFromCRI(ctx, s, kubeDeps); err != nil {
 		return err
+	}
+
+	// Register current configuration with /configz endpoint
+	err = initConfigz(ctx, &s.KubeletConfiguration)
+	if err != nil {
+		logger.Error(err, "Failed to register kubelet configuration with configz")
 	}
 
 	var cgroupRoots []string
@@ -1402,7 +1402,7 @@ func getCgroupDriverFromCRI(ctx context.Context, s *options.KubeletServer, kubeD
 			}
 			// CRI implementation doesn't support RuntimeConfig, fallback
 			legacyregistry.MustRegister(kubeletmetrics.CRILosingSupport)
-			kubeletmetrics.CRILosingSupport.WithLabelValues("1.36.0").Inc()
+			kubeletmetrics.CRILosingSupport.WithLabelValues("1.38.0").Inc()
 			logger.Info("CRI implementation should be updated to support RuntimeConfig. Falling back to using cgroupDriver from kubelet config.")
 			return nil
 		}

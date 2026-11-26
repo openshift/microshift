@@ -584,6 +584,8 @@ func (c *Client) getMemberStatus(memberID uint64) (isLearner bool, started bool,
 func (c *Client) MemberPromote(learnerID uint64) error {
 	var (
 		lastError     error
+		isLearner     bool
+		isStarted     bool
 		learnerIDUint = strconv.FormatUint(learnerID, 16)
 	)
 
@@ -591,7 +593,8 @@ func (c *Client) MemberPromote(learnerID uint64) error {
 
 	err := wait.PollUntilContextTimeout(context.Background(), constants.EtcdAPICallRetryInterval, kubeadmapi.GetActiveTimeouts().EtcdAPICall.Duration,
 		true, func(_ context.Context) (bool, error) {
-			isLearner, started, err := c.getMemberStatus(learnerID)
+			var err error
+			isLearner, isStarted, err = c.getMemberStatus(learnerID)
 			if err != nil {
 				lastError = errors.WithMessagef(err, "failed to get member %s status", learnerIDUint)
 				return false, nil
@@ -600,7 +603,7 @@ func (c *Client) MemberPromote(learnerID uint64) error {
 				klog.V(1).Infof("[etcd] Member %s was already promoted.", learnerIDUint)
 				return true, nil
 			}
-			if !started {
+			if !isStarted {
 				klog.V(1).Infof("[etcd] Member %s is not started yet. Waiting for it to be started.", learnerIDUint)
 				lastError = errors.Errorf("the etcd member %s is not started", learnerIDUint)
 				return false, nil
@@ -609,6 +612,10 @@ func (c *Client) MemberPromote(learnerID uint64) error {
 		})
 	if err != nil {
 		return lastError
+	}
+
+	if !isLearner {
+		return nil
 	}
 
 	klog.V(1).Infof("[etcd] Promoting a learner as a voting member: %s", learnerIDUint)
@@ -626,14 +633,39 @@ func (c *Client) MemberPromote(learnerID uint64) error {
 	// 2. context deadline exceeded
 	// 3. peer URLs already exists
 	// Once the client provides a way to check if the etcd learner is ready to promote, the retry logic can be revisited.
-	var promoteResp *clientv3.MemberPromoteResponse
+	var memberList []*etcdserverpb.Member
 	err = wait.PollUntilContextTimeout(context.Background(), constants.EtcdAPICallRetryInterval, kubeadmapi.GetActiveTimeouts().EtcdAPICall.Duration,
 		true, func(_ context.Context) (bool, error) {
+			// MemberPromote can return a transient client-side error even if the
+			// promotion already succeeded on the etcd side. Check the current
+			// member state before attempting another promotion so that retries
+			// remain idempotent.
+			resp, statusErr := c.listMembersOnce()
+			if statusErr != nil {
+				klog.V(5).Infof("[etcd] Failed to list members before promoting learner %s: %v", learnerIDUint, statusErr)
+				lastError = statusErr
+				return false, nil
+			}
+
+			for _, m := range resp.Members {
+				if m.ID != learnerID {
+					continue
+				}
+
+				if !m.IsLearner {
+					klog.V(1).Infof("[etcd] Member %s is already a voting member, treating promotion as successful", learnerIDUint)
+					memberList = resp.Members
+					return true, nil
+				}
+				break
+			}
+
 			ctx, cancel := context.WithTimeout(context.Background(), etcdTimeout)
 			defer cancel()
-			promoteResp, err = cli.MemberPromote(ctx, learnerID)
+			promoteResp, err := cli.MemberPromote(ctx, learnerID)
 			if err == nil {
 				klog.V(1).Infof("[etcd] The learner was promoted as a voting member: %s", learnerIDUint)
+				memberList = promoteResp.Members
 				return true, nil
 			}
 			klog.V(5).Infof("[etcd] Promoting the learner %s failed: %v", learnerIDUint, err)
@@ -644,7 +676,7 @@ func (c *Client) MemberPromote(learnerID uint64) error {
 		return lastError
 	}
 
-	for _, m := range promoteResp.Members {
+	for _, m := range memberList {
 		if m.ID == learnerID {
 			parsedPeerAddrs, err := url.Parse(m.PeerURLs[0])
 			if err != nil {
