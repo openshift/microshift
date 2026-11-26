@@ -12,8 +12,9 @@ import (
 )
 
 type showConfigOptions struct {
-	Mode string
 	genericclioptions.IOStreams
+
+	Mode string
 }
 
 func NewShowConfigCommand(ioStreams genericclioptions.IOStreams) *cobra.Command {

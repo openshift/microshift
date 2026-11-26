@@ -16,6 +16,7 @@ import (
 
 type MicroShiftmDNSController struct {
 	sync.Mutex
+
 	NodeName   string
 	NodeIP     string
 	KubeConfig string
