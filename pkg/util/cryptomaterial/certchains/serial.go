@@ -22,8 +22,9 @@ type serialFileGenerator struct {
 	file   string
 	serial int64
 	mu     sync.Mutex
-	// rename is injectable for interruption tests, as in certificate transactions.
-	rename func(string, string) error
+	// Inject failures on either side of the counter replacement in tests.
+	rename  func(string, string) error
+	syncDir func(*os.File) error
 }
 
 func loadSigningCA(certFile, keyFile, serialFile string) (*crypto.CA, error) {
@@ -37,7 +38,7 @@ func loadSigningCA(certFile, keyFile, serialFile string) (*crypto.CA, error) {
 	if err != nil {
 		return nil, err
 	}
-	ca.SerialGenerator = &serialFileGenerator{file: serialFile, serial: serial, rename: os.Rename}
+	ca.SerialGenerator = &serialFileGenerator{file: serialFile, serial: serial, rename: os.Rename, syncDir: (*os.File).Sync}
 	return ca, nil
 }
 
@@ -48,13 +49,13 @@ func ensureSerialGenerator(serialFile string) (*serialFileGenerator, error) {
 	if err != nil && !os.IsNotExist(err) {
 		return nil, err
 	}
-	g := &serialFileGenerator{file: serialFile, serial: serial, rename: os.Rename}
+	g := &serialFileGenerator{file: serialFile, serial: serial, rename: os.Rename, syncDir: (*os.File).Sync}
 	if os.IsNotExist(err) {
 		if err := os.MkdirAll(filepath.Dir(serialFile), 0755); err != nil { //nolint:gosec // Preserve library-go's CA directory permissions.
 			return nil, err
 		}
-		g.serial = 1 // Zero is unused and one is reserved for the CA.
-		if err := g.write(g.serial); err != nil {
+		// Zero is unused and one is reserved for the CA.
+		if err := g.write(1); err != nil {
 			return nil, err
 		}
 	}
@@ -94,7 +95,6 @@ func (g *serialFileGenerator) Next(_ *x509.Certificate) (int64, error) {
 	if err := g.write(next); err != nil {
 		return 0, err
 	}
-	g.serial = next
 	return next, nil
 }
 
@@ -122,5 +122,7 @@ func (g *serialFileGenerator) write(serial int64) error {
 	if err := g.rename(file.Name(), g.file); err != nil {
 		return err
 	}
-	return dir.Sync()
+	// The new counter is visible on disk even if syncing the directory fails.
+	g.serial = serial
+	return g.syncDir(dir)
 }

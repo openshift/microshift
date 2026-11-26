@@ -77,6 +77,22 @@ func TestSerialCounterRejectsStaleOrExhaustedGenerator(t *testing.T) {
 	require.Equal(t, "7FFFFFFFFFFFFFFF\n", string(contents))
 }
 
+func TestSerialCounterRetriesAfterDirectorySyncFailure(t *testing.T) {
+	g, err := ensureSerialGenerator(cryptomaterial.CASerialsPath(t.TempDir()))
+	require.NoError(t, err)
+
+	syncErr := errors.New("directory sync failed")
+	g.syncDir = func(*os.File) error { return syncErr }
+	serial, err := g.Next(nil)
+	require.ErrorIs(t, err, syncErr)
+	require.Zero(t, serial)
+
+	g.syncDir = (*os.File).Sync
+	serial, err = g.Next(nil)
+	require.NoError(t, err)
+	require.Equal(t, int64(3), serial, "skip the serial reserved by the failed issuance")
+}
+
 func TestSerialCounterResumesStartupAfterInterruptedUpdate(t *testing.T) {
 	for _, afterRename := range []bool{false, true} {
 		name := "before rename"
@@ -99,11 +115,10 @@ func TestSerialCounterResumesStartupAfterInterruptedUpdate(t *testing.T) {
 			g, err := ensureSerialGenerator(path)
 			require.NoError(t, err)
 			interrupted := errors.New("interrupted counter update")
-			g.rename = func(from, to string) error {
-				if afterRename {
-					require.NoError(t, os.Rename(from, to))
-				}
-				return interrupted
+			if afterRename {
+				g.syncDir = func(*os.File) error { return interrupted }
+			} else {
+				g.rename = func(string, string) error { return interrupted }
 			}
 			root := chains.GetSigner("root")
 			root.signerConfig.SerialGenerator = g
