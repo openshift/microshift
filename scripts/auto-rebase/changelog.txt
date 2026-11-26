@@ -1,0 +1,20 @@
+- machine-config-operator embedded-component d680cca82e00522cae4cb30784aed05ca8dad79f to 066f0e32db4f398994aadd6c7950fa2bc971d0fa
+  - 26d8962d 2026-11-13T14:04:29+01:00 OCPBUGS-128402: Do not abort node config reconciliation on status update failure
+
+- operator-framework-olm embedded-component b3573251315be79aa5bbe6a1cb0b5606b5371835 to 2deae94095996a86cd7a23a66474008c67369240
+  - d02472bc 2026-10-07T10:44:18-04:00 OCPBUGS-129503: Restore registry-server startup probe FailureThreshold to 15
+
+- ovn-kubernetes image-amd64 64266695b08bcaeedda876ecc5ff8829ef566ee9 to daeaf96aed0e023c1a3fd1bc4677e8dc6427958c
+  - 67c195f5 2026-10-29T16:16:02+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
+  - 730b2489 2026-10-27T17:47:33+05:30 Fix UDN controller startup timeout during pod sync
+  - 92374f84 2026-10-20T11:55:52-04:00 Fixes gateway egress IP node update logic
+  - e0883fbf 2026-10-20T11:55:49-04:00 EgressIP: Fix crash from mutating node informer object
+  - 7bb40671 2026-07-15T12:02:06-04:00 CORENET-5382: Unpin libreswan version
+
+- ovn-kubernetes image-arm64 64266695b08bcaeedda876ecc5ff8829ef566ee9 to daeaf96aed0e023c1a3fd1bc4677e8dc6427958c
+  - 67c195f5 2026-10-29T16:16:02+05:30 Add arkadeepsen, martinkennelly and pperiyasamy to OWNERS file
+  - 730b2489 2026-10-27T17:47:33+05:30 Fix UDN controller startup timeout during pod sync
+  - 92374f84 2026-10-20T11:55:52-04:00 Fixes gateway egress IP node update logic
+  - e0883fbf 2026-10-20T11:55:49-04:00 EgressIP: Fix crash from mutating node informer object
+  - 7bb40671 2026-07-15T12:02:06-04:00 CORENET-5382: Unpin libreswan version
+
