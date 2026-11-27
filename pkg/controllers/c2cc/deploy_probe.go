@@ -57,7 +57,7 @@ func (c *C2CCRouteManager) deployProbe(ctx context.Context) error {
 	if err := assets.ApplyClusterRoleBindings(ctx, c2ccClusterRoleBinding, c.kubeconfig); err != nil {
 		return fmt.Errorf("failed to apply c2cc cluster role binding: %w", err)
 	}
-	if err := assets.ApplyDeployments(ctx, c2ccDeployment, renderTemplate, params, c.kubeconfig); err != nil {
+	if err := assets.ApplyDeployments(ctx, c2ccDeployment, renderTemplate, params, c.kubeconfig, nil); err != nil {
 		return fmt.Errorf("failed to apply c2cc deployment: %w", err)
 	}
 	if err := assets.ApplyServices(ctx, c2ccService, renderTemplate, params, c.kubeconfig); err != nil {

@@ -135,6 +135,7 @@ linters:
       allow-packages:
         - autorecovery
         - apiserver
+        - assets
         - c2cc
         - certchains
         - cmd

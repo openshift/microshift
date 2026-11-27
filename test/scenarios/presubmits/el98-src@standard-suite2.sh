@@ -2,6 +2,8 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
+export SKIP_GREENBOOT=true
+
 scenario_create_vms() {
     prepare_kickstart host1 kickstart.ks.template rhel-9.8-microshift-source
     launch_vm rhel-9.8

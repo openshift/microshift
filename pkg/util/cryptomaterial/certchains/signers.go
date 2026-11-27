@@ -20,8 +20,10 @@ import (
 type CSRInfo interface{ GetMeta() CSRMeta }
 
 type CSRMeta struct {
-	Name     string
-	Validity time.Duration
+	Name           string
+	Service        string
+	Validity       time.Duration
+	RotationPolicy RotationPolicy
 }
 
 type ClientCertificateSigningRequestInfo struct {
@@ -51,9 +53,11 @@ func (i *PeerCertificateSigningRequestInfo) GetMeta() CSRMeta { return i.CSRMeta
 
 type CertificateSigner struct {
 	signerName     string
+	service        string
 	signerConfig   *crypto.CA
 	signerDir      string
 	signerValidity time.Duration
+	limitValidity  bool
 
 	subCAs             map[string]*CertificateSigner
 	signedCertificates map[string]*signedCertificateInfo
@@ -128,6 +132,7 @@ func (s *CertificateSigner) regenerateSelf() error {
 	}
 
 	s.signerConfig = signerConfig
+	s.boundIssuerValidity()
 
 	return s.AddToBundles(sets.List[string](s.caBundlePaths)...)
 }
@@ -230,7 +235,10 @@ func (s *CertificateSigner) AddToBundles(bundlePaths ...string) error {
 }
 
 func (s *CertificateSigner) toBuilder() CertificateSignerBuilder {
-	signer := NewCertificateSigner(s.signerName, s.signerDir, s.signerValidity)
+	signer := NewCertificateSigner(s.signerName, s.signerDir, s.signerValidity).WithService(s.service)
+	if builder, ok := signer.(*certificateSigner); ok {
+		builder.limitValidity = s.limitValidity
+	}
 
 	for _, subCA := range s.subCAs {
 		signer = signer.WithSubCAs(subCA.toBuilder())
@@ -268,6 +276,9 @@ func (s *CertificateSigner) SignCertificate(csrInfo CSRInfo) error {
 }
 
 func (s *CertificateSigner) SignSubCA(subSignerInfo CertificateSignerBuilder) error {
+	if builder, ok := subSignerInfo.(*certificateSigner); ok {
+		builder.limitValidity = s.limitValidity
+	}
 	subSignerName := subSignerInfo.Name()
 	subSignerDir := subSignerInfo.Directory()
 
@@ -354,11 +365,12 @@ func (s *CertificateSigner) SignPeerCertificate(signInfo *PeerCertificateSigning
 	certDir := filepath.Join(s.signerDir, signInfo.Name)
 
 	hostnameSet := sets.New[string](signInfo.Hostnames...)
-	if _, err := crypto.GetServerCert(
+	if existing, err := crypto.GetServerCert(
 		cryptomaterial.PeerCertPath(certDir),
 		cryptomaterial.PeerKeyPath(certDir),
 		hostnameSet,
 	); err == nil {
+		s.signedCertificates[signInfo.Name] = &signedCertificateInfo{CSRInfo: signInfo, tlsConfig: existing}
 		return nil
 	}
 
