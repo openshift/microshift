@@ -8,3 +8,7 @@ metadata:
     include.release.openshift.io/self-managed-high-availability: "true"
     capability.openshift.io/name: "OperatorLifecycleManager"
     include.release.openshift.io/hypershift: "true"
+spec:
+  features:
+    roleAggregation:
+      disable: true
