@@ -54,9 +54,12 @@ MicroShift Process ID
     RETURN    ${stdout}
 
 MicroShift Process ID Changed
-    [Documentation]    Compare the specified and current MicroShift process ID
+    [Documentation]    Compare the specified and current MicroShift process ID.
+    ...    An empty current PID (service mid-restart, no process running) must
+    ...    not satisfy the comparison: callers retry until a new process exists.
     [Arguments]    ${old_pid}
     ${cur_pid}=    MicroShift Process ID
+    Should Not Be Empty    ${cur_pid}    msg=MicroShift is not running
     Should Not Be Equal    ${cur_pid}    ${old_pid}
 
 Wait Until MicroShift Process ID Changes
