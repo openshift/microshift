@@ -3,6 +3,7 @@ package ingress
 import (
 	"github.com/blang/semver/v4"
 	"github.com/prometheus/client_golang/prometheus"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -80,22 +81,29 @@ func (c *Controller) Collect(ch chan<- prometheus.Metric) {
 	currentUnmanagedRoutes := sets.New[routeMetricLabels]()
 	for _, routeInstance := range routeInstances {
 		labelVal := 0
-		if owner, have := hasIngressOwnerRef(routeInstance.OwnerReferences); have {
-			for _, ingressInstance := range ingressInstances {
-				ingress, err := c.ingressLister.Ingresses(ingressInstance.Namespace).Get(ingressInstance.Name)
-				if err != nil || ingress == nil {
-					continue
+		if ownerName, have := hasIngressOwnerRef(routeInstance.OwnerReferences); have {
+			// Owner references are namespace-scoped, so the owning ingress
+			// is always in the same namespace as the route. The lister reads
+			// from a local cache, so both the lookup and ingressManaged() are cheap.
+			ingress, err := c.ingressLister.Ingresses(routeInstance.Namespace).Get(ownerName)
+			if err != nil && !apierrors.IsNotFound(err) {
+				utilruntime.HandleError(err)
+				return
+			}
+			// A missing ingress means the route is owned by a resource that does
+			// not exist - either deleted or a dangling reference. Such a route is
+			// not reported as unmanaged, and resetUnusedUnmanagedRoutesMetrics()
+			// zeroes a previously flagged series, so the metric does not flap.
+			managed := true
+			if err == nil && ingress != nil {
+				managed, err = c.ingressManaged(ingress)
+				if err != nil {
+					utilruntime.HandleError(err)
+					return
 				}
-				if ingress.Name == owner && ingress.Namespace == routeInstance.Namespace {
-					managed, err := c.ingressManaged(ingress)
-					if err != nil {
-						utilruntime.HandleError(err)
-						return
-					}
-					if !managed {
-						labelVal = 1
-					}
-				}
+			}
+			if !managed {
+				labelVal = 1
 			}
 		}
 		unmanagedRoutes.WithLabelValues(routeInstance.Name, routeInstance.Namespace, routeInstance.Spec.Host).Set(float64(labelVal))

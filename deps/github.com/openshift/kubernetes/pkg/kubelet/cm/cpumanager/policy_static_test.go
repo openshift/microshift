@@ -17,6 +17,7 @@ limitations under the License.
 package cpumanager
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -1125,6 +1126,46 @@ func TestStaticPolicyStartWithResvList(t *testing.T) {
 			stAssignments:    state.ContainerCPUAssignments{},
 			stDefaultCPUSet:  cpuset.New(),
 			expCSet:          cpuset.New(2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+		},
+		{
+			// context issue: https://issues.redhat.com/browse/OCPBUGS-77659
+			// expecting error in incosistent state
+			description:      "StrictCPUReservationOption enabled, detect inconsistent state",
+			topo:             topoDualSocketHT,
+			numReservedCPUs:  2,
+			reserved:         cpuset.New(0, 1),
+			cpuPolicyOptions: map[string]string{StrictCPUReservationOption: "true"},
+			stAssignments:    state.ContainerCPUAssignments{},
+			stDefaultCPUSet:  cpuset.New(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+			expErr:           errors.New(`some of strictly reserved cpus: "0-1" are present in defaultCpuSet: "0-11"`),
+		},
+		{
+			// context issue: https://issues.redhat.com/browse/OCPBUGS-77659
+			// start, record state before run any pods, restart empty
+			description:      "empty cpuset with StrictCPUReservationOption enabled, simulate restart from empty",
+			topo:             topoDualSocketHT,
+			numReservedCPUs:  2,
+			reserved:         cpuset.New(0, 1),
+			cpuPolicyOptions: map[string]string{StrictCPUReservationOption: "true"},
+			stAssignments:    state.ContainerCPUAssignments{},
+			stDefaultCPUSet:  cpuset.New(2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+			expCSet:          cpuset.New(2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+		},
+		{
+			// context issue: https://issues.redhat.com/browse/OCPBUGS-77659
+			// restart with a pinned pod
+			description:      "empty cpuset with StrictCPUReservationOption enabled, simulate restart with pinned pod",
+			topo:             topoDualSocketHT,
+			numReservedCPUs:  2,
+			reserved:         cpuset.New(0, 1),
+			cpuPolicyOptions: map[string]string{StrictCPUReservationOption: "true"},
+			stAssignments: map[string]map[string]cpuset.CPUSet{
+				"p1": {
+					"c1": cpuset.New(2, 3),
+				},
+			},
+			stDefaultCPUSet: cpuset.New(4, 5, 6, 7, 8, 9, 10, 11),
+			expCSet:         cpuset.New(4, 5, 6, 7, 8, 9, 10, 11),
 		},
 		{
 			description:     "reserved cores 0 & 1 are not present in available cpuset",

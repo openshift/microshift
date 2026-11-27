@@ -36,7 +36,7 @@ require (
 	github.com/golang/snappy v0.0.4
 	github.com/opencontainers/selinux v1.15.1
 	github.com/openshift/cluster-policy-controller v0.0.0-20261019223900-81e222007c2c
-	github.com/openshift/route-controller-manager v0.0.0-20261117174258-c367dd41ffd8
+	github.com/openshift/route-controller-manager v0.0.0-20261125113414-84dbde5a58d9
 	github.com/prometheus/client_model v0.6.2
 	github.com/prometheus/common v0.70.0
 	github.com/prometheus/prometheus v0.302.1
