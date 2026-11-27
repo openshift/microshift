@@ -209,7 +209,8 @@ func (p *staticPolicy) validateState(logger klog.Logger, s state.State) error {
 	tmpDefaultCPUset := s.GetDefaultCPUSet()
 
 	allCPUs := p.topology.CPUDetails.CPUs()
-	if p.options.StrictCPUReservation {
+	strictCPUReservation := p.options.StrictCPUReservation || managed.IsEnabled()
+	if strictCPUReservation {
 		allCPUs = allCPUs.Difference(p.reservedCPUs)
 	}
 
@@ -221,10 +222,6 @@ func (p *staticPolicy) validateState(logger klog.Logger, s state.State) error {
 		// state is empty initialize
 		s.SetDefaultCPUSet(allCPUs)
 		logger.Info("Static policy initialized", "defaultCPUSet", allCPUs)
-		if managed.IsEnabled() {
-			defaultCpus := s.GetDefaultCPUSet().Difference(p.reservedCPUs)
-			s.SetDefaultCPUSet(defaultCpus)
-		}
 		return nil
 	}
 
@@ -232,16 +229,14 @@ func (p *staticPolicy) validateState(logger klog.Logger, s state.State) error {
 	// 1. Check if the reserved cpuset is not part of default cpuset because:
 	// - kube/system reserved have changed (increased) - may lead to some containers not being able to start
 	// - user tampered with file
-	if p.options.StrictCPUReservation {
+	if strictCPUReservation {
 		if !p.reservedCPUs.Intersection(tmpDefaultCPUset).IsEmpty() {
 			return fmt.Errorf("some of strictly reserved cpus: %q are present in defaultCpuSet: %q",
 				p.reservedCPUs.Intersection(tmpDefaultCPUset).String(), tmpDefaultCPUset.String())
 		}
 	} else {
-		// 2. This only applies when managed mode is disabled. Active workload partitioning feature
-		//    removes the reserved cpus from the default cpu mask on purpose.
-		if !managed.IsEnabled() && !p.reservedCPUs.Intersection(tmpDefaultCPUset).Equals(p.reservedCPUs) {
-			return fmt.Errorf("not all reserved cpus: \"%s\" are present in defaultCpuSet: \"%s\"",
+		if !p.reservedCPUs.Intersection(tmpDefaultCPUset).Equals(p.reservedCPUs) {
+			return fmt.Errorf("not all reserved cpus: %q are present in defaultCpuSet: %q",
 				p.reservedCPUs.String(), tmpDefaultCPUset.String())
 		}
 	}
@@ -277,17 +272,9 @@ func (p *staticPolicy) validateState(logger klog.Logger, s state.State) error {
 		}
 	}
 	totalKnownCPUs = totalKnownCPUs.Union(tmpCPUSets...)
-	availableCPUs := p.topology.CPUDetails.CPUs()
-
-	// CPU (workload) partitioning removes reserved cpus
-	// from the default mask intentionally
-	if managed.IsEnabled() {
-		availableCPUs = availableCPUs.Difference(p.reservedCPUs)
-	}
-
-	if !totalKnownCPUs.Equals(availableCPUs) {
+	if !totalKnownCPUs.Equals(allCPUs) {
 		return fmt.Errorf("current set of available CPUs \"%s\" doesn't match with CPUs in state \"%s\"",
-			availableCPUs.String(), totalKnownCPUs.String())
+			allCPUs.String(), totalKnownCPUs.String())
 	}
 
 	return nil
