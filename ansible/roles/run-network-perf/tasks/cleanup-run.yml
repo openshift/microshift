@@ -1,0 +1,77 @@
+---
+# Remove what one earlier run (_np_old_dir, ended) left on its clusters and mark it
+# done when every cluster ended without its benchmark namespace and without its lock.
+
+- name: Find the records of the run
+  ansible.builtin.find:
+    paths: "{{ _np_old_dir }}"
+    patterns: "claim-*.json,run-*.json"
+  register: _np_old_files
+  failed_when: "_np_old_files.skipped_paths | default({'unread': true}) | length > 0"
+
+- name: Read the records of the run
+  ansible.builtin.slurp:
+    src: "{{ item.path }}"
+  loop: "{{ _np_old_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  register: _np_old_data
+
+- name: List the clusters and UUIDs of the run
+  vars:
+    _np_records: "{{ _np_old_data.results | map(attribute='content') | map('b64decode') | map('from_json') | list }}"
+    _np_claimed: "{{ _np_records | selectattr('cluster', 'defined') | list }}"
+    _np_ran: "{{ _np_records | selectattr('uuid', 'defined') | list }}"
+  ansible.builtin.set_fact:
+    _np_old_token: "{{ _np_old_dir | basename }}"
+    _np_old_uuids: "{{ _np_ran | map(attribute='uuid') | list }}"
+    _np_old_clusters: >-
+      {{ dict((_np_claimed | map(attribute='cluster') | list + _np_ran | map(attribute='clusters') | flatten | map(attribute='name') | list)
+              | zip(_np_claimed | map(attribute='kubeconfig') | list + _np_ran | map(attribute='clusters') | flatten | map(attribute='kubeconfig') | list))
+         | dict2items(key_name='name', value_name='kubeconfig') }}
+    _np_bench: {}
+    _np_unlock: {}
+    _np_resolved: {}
+    _np_old_locks: {}
+    _np_old_held: false
+
+- name: Clean up each cluster of the run
+  ansible.builtin.include_tasks: cleanup-cluster.yml
+  loop: "{{ _np_old_clusters }}"
+  loop_control:
+    loop_var: _np_target
+    label: "{{ _np_target.name }}"
+
+- name: Note what is left of the run
+  vars:
+    _np_left: >-
+      {{ _np_old_clusters | map(attribute='name')
+         | reject('in', _np_resolved | dict2items | selectattr('value') | map(attribute='key') | list) | list }}
+  ansible.builtin.set_fact:
+    _np_pending: >-
+      {%- set out = [] -%}
+      {%- for name in _np_left -%}
+      {%- set _ = out.append(name ~ ' (run ' ~ _np_old_token ~ '): ' ~ _np_old_locks[name] | default('not looked at')) -%}
+      {%- endfor -%}
+      {{ _np_pending | combine({_np_old_token: out}) }}
+    _np_old_resolved: "{{ _np_left | length == 0 }}"
+    _np_held: "{{ _np_held + ([_np_old_dir] if _np_old_held | bool else []) }}"
+
+- name: Record the outcome on each cluster
+  ansible.builtin.copy:
+    content: >-
+      {{ {'cluster': item.name, 'lock': _np_old_locks[item.name] | default('not read'),
+          'benchmark': _np_bench[item.name] | default('not read'),
+          'resolved': _np_resolved[item.name] | default(false)} | to_nice_json }}
+    dest: "{{ _np_old_dir }}/cleanup-{{ item.name }}.json"
+    mode: "0644"
+  loop: "{{ _np_old_clusters }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Mark the run as cleaned up
+  ansible.builtin.copy:
+    content: ""
+    dest: "{{ _np_old_dir }}/done"
+    mode: "0644"
+  when: _np_old_resolved

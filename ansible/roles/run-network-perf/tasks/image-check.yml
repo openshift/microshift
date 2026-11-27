@@ -1,0 +1,56 @@
+---
+# Compare the benchmark images of every successful iteration saved in the campaign,
+# earlier runs and both kinds of run included.
+
+- name: Compare the benchmark images of the campaign
+  run_once: true
+  block:
+    - name: Find the run records of the campaign
+      ansible.builtin.find:
+        paths: "{{ _np_campaign_dir }}"
+        patterns: run-info.json
+        recurse: true
+      register: _np_records
+      delegate_to: localhost
+
+    - name: Read the run records of the campaign
+      ansible.builtin.slurp:
+        src: "{{ item.path }}"
+      loop: "{{ _np_records.files }}"
+      loop_control:
+        label: "{{ item.path | relpath(_np_campaign_dir) }}"
+      register: _np_record_data
+      delegate_to: localhost
+
+    # A failed or uncleaned iteration is not a result to compare. Older records have no
+    # verdict; one without an image ID had failed its check as well.
+    - name: Collect the benchmark images of the campaign
+      ansible.builtin.set_fact:
+        _np_all_ids: >-
+          {%- set ids = [] -%}
+          {%- for r in _np_record_data.results | map(attribute='content') | map('b64decode') | map('from_json')
+              if r.passed | default(r.rc == 0 and r.locks_kept | default([]) | length == 0)
+                 and r.containers | map(attribute='imageID') | select('equalto', '') | list | length == 0 -%}
+          {%- for c in r.containers -%}
+          {%- set _ = ids.append(c.imageID) -%}
+          {%- endfor -%}
+          {%- endfor -%}
+          {{ ids | unique | sort }}
+
+    - name: Save the benchmark images of the campaign
+      ansible.builtin.copy:
+        content: "{{ _np_all_ids | to_nice_json }}\n"
+        dest: "{{ _np_campaign_dir }}/image-ids.json"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Fail when the benchmark containers ran different images
+      ansible.builtin.assert:
+        that:
+          - _np_all_ids | length <= 1
+        fail_msg: >-
+          The benchmark containers of campaign {{ _np_campaign_dir | basename }} ran
+          {{ _np_all_ids | length }} different images ({{ _np_all_ids | join(', ') }}); do not compare
+          these iterations.
+        quiet: true
+      when: network_perf_fail_on_image_mismatch | bool

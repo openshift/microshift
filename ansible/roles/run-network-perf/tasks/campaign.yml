@@ -1,0 +1,54 @@
+---
+# Campaign, invocation token and journal of this playbook run. The journal under
+# <campaign>/.invocations/<token>/ is what the cleanup tag works from.
+
+- name: Set the campaign and the token of this run
+  ansible.builtin.set_fact:
+    _np_campaign: "{{ network_perf_campaign | default(lookup('pipe', 'date -u +%Y-%m-%d_%H-%M-%S'), true) }}"
+    _np_token: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'digits'], length=20) }}"
+  run_once: true
+  when: _np_token is not defined
+
+- name: Set the paths of this run
+  ansible.builtin.set_fact:
+    _np_campaign_dir: "{{ network_perf_results_dir }}/{{ _np_campaign }}"
+    _np_invocation_dir: "{{ network_perf_results_dir }}/{{ _np_campaign }}/.invocations/{{ _np_token }}"
+
+# The campaign becomes a namespace label
+- name: Check the campaign name
+  ansible.builtin.assert:
+    that:
+      - _np_campaign is match('^[A-Za-z0-9]([-A-Za-z0-9_.]{0,61}[A-Za-z0-9])?$')
+    fail_msg: >-
+      network_perf_campaign "{{ _np_campaign }}" must be at most 63 letters, digits, "-", "_"
+      or ".", starting and ending with a letter or digit.
+    quiet: true
+  run_once: true
+
+- name: Create the journal of this run
+  ansible.builtin.file:
+    path: "{{ _np_invocation_dir }}"
+    state: directory
+    mode: "0755"
+  run_once: true
+  delegate_to: localhost
+
+# A task is templated in a worker forked from ansible-playbook, so the worker's
+# parent is the process the cleanup tag must find stopped.
+- name: Record this run
+  vars:
+    _np_stat: "{{ lookup('ansible.builtin.file', '/proc/self/stat') | regex_replace('^.*\\) ', '') }}"
+    _np_main_pid: "{{ _np_stat.split()[1] }}"
+    _np_main_stat: "{{ lookup('ansible.builtin.file', '/proc/' ~ _np_main_pid ~ '/stat') | regex_replace('^.*\\) ', '') }}"
+  ansible.builtin.copy:
+    content: >-
+      {{ {'campaign': _np_campaign, 'token': _np_token,
+          'hostname': lookup('ansible.builtin.file', '/proc/sys/kernel/hostname'),
+          'boot_id': lookup('ansible.builtin.file', '/proc/sys/kernel/random/boot_id'),
+          'uid': lookup('ansible.builtin.pipe', 'id -u'),
+          'pid': _np_main_pid, 'start': _np_main_stat.split()[19]} | to_nice_json }}
+    dest: "{{ _np_invocation_dir }}/invocation.json"
+    mode: "0644"
+    force: false
+  run_once: true
+  delegate_to: localhost

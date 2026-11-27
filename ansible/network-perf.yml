@@ -1,0 +1,153 @@
+---
+# Pod network benchmark for MicroShift hosts connected with C2CC: client and server
+# pods on one node, then across the clusters in both directions. It installs and
+# configures nothing; it creates and removes the netperf and network-perf-lock
+# namespaces on the clusters.
+#
+# Example Usage:
+#
+# ansible-playbook -i inventory/inventory network-perf.yml
+#
+# After an interrupted run:
+#
+# ansible-playbook -i inventory/inventory network-perf.yml --tags cleanup -e network_perf_campaign=<campaign>
+#
+
+- name: Check the control node and the inventory
+  hosts: microshift
+  strategy: ansible.builtin.linear
+  gather_facts: false
+  become: false
+  vars_files:
+    - vars/all.yml
+  tasks:
+    - name: Check the control node
+      ansible.builtin.import_role:
+        name: run-network-perf
+        tasks_from: preflight
+
+    - name: Validate microshift network and C2CC settings
+      ansible.builtin.import_role:
+        name: microshift-network
+        tasks_from: validate
+
+    - name: Set the campaign of this run
+      ansible.builtin.import_role:
+        name: run-network-perf
+        tasks_from: campaign
+
+# Skip with --skip-tags kubeconfig when ~/.kube/kubeconfig.<host> is already there
+- name: Pull kubeconfig from microshift host
+  hosts: microshift
+  strategy: ansible.builtin.linear
+  tags: [kubeconfig]
+  vars_files:
+    - vars/all.yml
+  roles:
+    - role: fetch-kubeconfig
+      vars:
+        kubeconfig_link_default: false
+
+- name: Verify C2CC connectivity
+  hosts: microshift
+  strategy: ansible.builtin.linear
+  tags: [c2cc-verify]
+  vars_files:
+    - vars/all.yml
+  pre_tasks:
+    - name: Share the C2CC verification timestamp
+      ansible.builtin.set_fact:
+        results_timestamp: "{{ results_timestamp | default(lookup('pipe', 'date +%Y-%m-%d_%H-%M-%S')) }}"
+      run_once: true
+  tasks:
+    - name: Verify C2CC towards every peer
+      ansible.builtin.import_role:
+        name: microshift-network
+        tasks_from: verify
+
+- name: Check the clusters
+  hosts: microshift
+  strategy: ansible.builtin.linear
+  gather_facts: false
+  become: false
+  vars_files:
+    - vars/all.yml
+  tasks:
+    - name: Check this host's cluster
+      ansible.builtin.import_role:
+        name: run-network-perf
+        tasks_from: prepare
+
+    # A host outside the group has no other cluster to resolve
+    - name: Check that the cluster is free and resolves the other clusters
+      ansible.builtin.import_role:
+        name: run-network-perf
+        tasks_from: c2cc-check
+      when: inventory_hostname in groups[c2cc_group | default('c2cc')]
+
+- name: Run the same-node network benchmark
+  hosts: microshift
+  strategy: ansible.builtin.linear
+  gather_facts: false
+  become: false
+  vars_files:
+    - vars/all.yml
+  vars:
+    # One host is enough when the hosts are alike; -e network_perf_same_node_hosts=all for every host
+    network_perf_same_node_hosts: "{{ groups[c2cc_group | default('c2cc')] | sort | first }}"
+  tasks:
+    # A long run is not worth starting when a cluster already failed its checks
+    - name: Stop unless every cluster passed the checks
+      ansible.builtin.assert:
+        that:
+          - groups[c2cc_group | default('c2cc')] | map('extract', hostvars) | selectattr('_np_checked', 'defined')
+            | list | length == groups[c2cc_group | default('c2cc')] | length
+        fail_msg: "Not starting the benchmark: a cluster failed the checks above."
+        quiet: true
+
+    - name: Run the same-node workload
+      ansible.builtin.import_role:
+        name: run-network-perf
+        tasks_from: same-node
+      when: network_perf_same_node_selected | bool
+
+    - name: Compare the benchmark images
+      ansible.builtin.import_role:
+        name: run-network-perf
+        tasks_from: image-check
+
+    - name: Record that this host is done with the same-node run
+      ansible.builtin.set_fact:
+        _np_same_node_ok: true
+
+- name: Run the cross-cluster network benchmark
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  vars_files:
+    - vars/all.yml
+  tasks:
+    - name: Run every direction
+      ansible.builtin.import_role:
+        name: run-network-perf
+        tasks_from: cross-cluster
+
+    - name: Compare the benchmark images
+      ansible.builtin.import_role:
+        name: run-network-perf
+        tasks_from: image-check
+
+- name: Clean up after an interrupted run
+  hosts: localhost
+  connection: local
+  tags: [never, cleanup]
+  gather_facts: false
+  become: false
+  vars_files:
+    - vars/all.yml
+  tasks:
+    - name: Remove what the runs of the campaign left on the clusters
+      ansible.builtin.import_role:
+        name: run-network-perf
+        tasks_from: cleanup

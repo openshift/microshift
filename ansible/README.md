@@ -184,6 +184,54 @@ This waits for every `RemoteCluster` to report `Healthy`, checks the C2CC routes
 rules, and saves them with the package versions to `c2cc-verify-<host>.txt` in the results
 directory.
 
+### Network Benchmark Across Clusters
+
+`network-perf.yml` measures the pod network of hosts that are installed and connected with C2CC.
+It installs and configures nothing on the hosts. With the inventory above (it must describe the
+C2CC settings the hosts have, including `c2cc_domain` when a host does not use the default):
+```bash
+ansible-playbook -i inventory/inventory network-perf.yml
+```
+In this order, it:
+1. checks the control node (Linux with `oc`, `kubectl`, `git`, `curl`, `tar`, GNU `timeout`, the
+   `ansible.utils` collection and the Python `netaddr` package) and the inventory,
+2. fetches each host's kubeconfig to `~/.kube/kubeconfig.<host>` without touching `~/.kube/config`
+   (skip with `--skip-tags kubeconfig` when the files are there),
+3. verifies C2CC on every host as `--tags c2cc-verify` does (ssh with privilege escalation; skip
+   with `--skip-tags c2cc-verify`),
+4. checks that no other benchmark uses a cluster and that pods on each cluster resolve Services of
+   the other clusters (`kubernetes.default.svc.<c2cc_domain>`),
+5. runs network-perf-v2 with client and server pods on one node, on the first host of the `c2cc`
+   group (`-e network_perf_same_node_hosts=all` for every host at once, or a comma-separated list),
+6. runs it across the clusters, one direction at a time: client pods on one cluster, server pods
+   on the other, to the pod IP and to a Service.
+
+A failure in steps 1 to 5 on any host stops the playbook before anything runs across clusters.
+The default workload is `full-run.yaml` of the e2e-benchmarking release in use; for a quick check
+of the whole procedure pass `-e network_perf_workload=smoke.yaml`. `-e network_perf_iterations=3`
+repeats every run, and `-e network_perf_campaign=<campaign>` adds iterations to an earlier
+campaign.
+
+Results go to `results/<microshift_version>/network-perf/<campaign>/`: `<host>/iteration-<NN>/` for
+the same-node runs and `cross-cluster/<client>-to-<server>/iteration-<NN>/` for each direction,
+with the files described under [Workloads](#workloads). The k8s-netperf CSV files of a same-node
+iteration and of a cross-cluster iteration have the same rows, so the two can be compared test by
+test. The path of the running iteration's `run.log` is printed when it starts.
+
+Interrupting the playbook (Ctrl-C) stops the running benchmark but leaves its `netperf` and
+`network-perf-lock` namespaces on the clusters, as does a run whose cleanup could not be
+confirmed. Remove them with:
+```bash
+ansible-playbook -i inventory/inventory network-perf.yml --tags cleanup -e network_perf_campaign=<campaign>
+```
+This works from the control node that started the run. It removes only namespaces that the runs
+of that campaign created, and only after it has established that nothing of those runs is still
+running; otherwise it changes nothing and says what to stop or to remove by hand.
+
+Without Internet access, point `network_perf_e2e_repo` at a mirror of e2e-benchmarking and
+`network_perf_netperf_url` at a k8s-netperf release tarball, and let the hosts pull
+`quay.io/cloud-bulldozer/k8s-netperf` through a registry mirror.
+
 ## Output
 
 The playbook stores results on the Ansible control node under `results/<microshift_version>/<timestamp>/`.
@@ -219,9 +267,9 @@ ansible-playbook -i inventory/inventory setup-node.yml --tags network-perf \
     -e run_network_perf_arg=true -e network_perf_iterations=3
 ```
 
-Results go to `results/<microshift_version>/network-perf/<campaign>/<host>/iteration-<NN>/`: the k8s-netperf CSV results (`result-*.csv` and `loss-rt-result-*.csv`), `run.log`, `cleanup.log` (benchmark namespace removal), `pods.json` and `run-info.json` (UUID, times, exit code, e2e-benchmarking commit, k8s-netperf version, workload checksum and the image ID of every benchmark container). Results are not indexed. Because k8s-netperf pulls its image by tag, the play fails at the end when the containers of a campaign ran different images (`image-ids.json` lists them); set `network_perf_fail_on_image_mismatch: false` to only record them. Pass `-e network_perf_campaign=<campaign>` to add iterations to an earlier campaign.
+Results go to `results/<microshift_version>/network-perf/<campaign>/<host>/iteration-<NN>/`: the k8s-netperf CSV results (`result-*.csv` and `loss-rt-result-*.csv`), `run.log` (written while the run goes on), `pods-<host>.json` and `run-info.json` (UUID, times, exit code, whether the iteration passed, e2e-benchmarking commit, k8s-netperf version, workload checksum, the image ID of every benchmark container and how the removal of the benchmark namespace ended). Results are not indexed. Because k8s-netperf pulls its image by tag, the play fails at the end when the containers of the campaign's passed iterations ran different images (`image-ids.json` lists them); set `network_perf_fail_on_image_mismatch: false` to only record them. Pass `-e network_perf_campaign=<campaign>` to add iterations to an earlier campaign.
 
-While it runs, the play holds a `network-perf-lock` namespace on each cluster, so a second run cannot start there. After a failed iteration the play itself removes the benchmark pods before it reads anything else from the cluster (run.sh in e2e-benchmarking v2.10.4 still runs its own debug queries first), and unless it can confirm that they are gone it fails and keeps the lock; delete the `netperf` and `network-perf-lock` namespaces by hand once the cluster is clean.
+While it runs, the play holds a `network-perf-lock` namespace on each cluster, so a second run cannot start there. After a failed iteration the play itself removes the benchmark pods before it reads anything else from the cluster. It removes a `netperf` namespace only when k8s-netperf marked it with the UUID of this run, and unless it can confirm that the namespace is gone and that nothing of the run is still running, it fails and keeps the lock. The `cleanup` tag of `network-perf.yml` (see [Network Benchmark Across Clusters](#network-benchmark-across-clusters)) removes what such a run left behind.
 
 ## Configuration Overview
 
@@ -260,6 +308,10 @@ Most of the following variables are defined in `vars/all.yml`. The source-build 
 | `network_perf_workload` | network-perf-v2 workload file | `"full-run.yaml"` |
 | `network_perf_e2e_git_revision` | e2e-benchmarking release to run network-perf-v2 from | `"v2.10.4"` |
 | `network_perf_netperf_version` | k8s-netperf release used by network-perf-v2 | `"v0.1.44"` |
+| `network_perf_netperf_url` | URL of a k8s-netperf tarball to use instead of that release | `""` |
+| `network_perf_same_node_hosts` | Hosts that run the same-node workload: `all`, a list or a comma-separated string (`network-perf.yml` defaults to the first host of the `c2cc` group) | `all` |
+| `network_perf_timeout` | Seconds k8s-netperf may run per iteration | `14400` |
+| `network_perf_dns_timeout` | Seconds for the Service DNS check of `network-perf.yml`, image pull included | `300` |
 | `kube_burner_version` | kube-burner-ocp release downloaded by the wrapper | `"1.12.6"` |
 | `kube_burner_url` | URL of a kube-burner-ocp tarball to use instead of the release | `""` |
 | `kube_burner_es_server` | Elasticsearch server for remote indexing of kube-burner results; results are indexed locally when metrics collection is enabled | `""` |

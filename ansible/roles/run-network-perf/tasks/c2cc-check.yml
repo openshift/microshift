@@ -1,0 +1,135 @@
+---
+# Before a campaign across clusters: check that this cluster is free and that its
+# pods resolve the Services of every other cluster of the group. The check runs as a
+# Job inside the lock namespace, so it is removed with the lock. Only network-perf.yml
+# uses this file.
+
+- name: Set the peers of this host
+  ansible.builtin.set_fact:
+    _np_context: "{{ inventory_hostname }}"
+    _np_peers: "{{ groups[network_perf_c2cc_group] | difference([inventory_hostname]) }}"
+
+- name: Create the journal directory of this context
+  ansible.builtin.file:
+    path: "{{ _np_invocation_dir }}/commands/{{ _np_context }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+
+- name: Fail without a DNS suffix for every peer
+  ansible.builtin.assert:
+    that:
+      - _np_peers | difference(c2cc_peer_domains | default({}) | list) | length == 0
+    fail_msg: >-
+      {{ inventory_hostname }} has no C2CC DNS suffix for
+      {{ _np_peers | difference(c2cc_peer_domains | default({}) | list) | join(', ') }}.
+    quiet: true
+
+- name: Check that no benchmark is left on the cluster
+  ansible.builtin.command:
+    argv: "{{ network_perf_oc + ['--kubeconfig', _np_endpoint.kubeconfig, 'get', 'namespace', 'netperf',
+                                 '--ignore-not-found', '-o', 'name'] }}"
+  register: _np_ns
+  changed_when: false
+  delegate_to: localhost
+
+- name: Fail when a netperf namespace already exists
+  ansible.builtin.assert:
+    that:
+      - _np_ns.stdout | trim | length == 0
+    fail_msg: "A netperf namespace exists on {{ inventory_hostname }}; an earlier benchmark was not cleaned up."
+    quiet: true
+
+- name: Claim the cluster for the check
+  ansible.builtin.include_tasks: claim.yml
+  vars:
+    _np_target: "{{ _np_endpoint }}"
+
+- name: Fail when the cluster is not ours
+  ansible.builtin.assert:
+    that:
+      - _np_lock[inventory_hostname].state == 'ours'
+    fail_msg: >-
+      Could not claim the network-perf-lock namespace on {{ inventory_hostname }}
+      ({{ _np_lock[inventory_hostname].state }}: {{ _np_lock[inventory_hostname].detail }}). Another
+      network-perf run is using this cluster; if none is, delete that namespace and run again.
+    quiet: true
+
+- name: Resolve the Services of the other clusters from a pod
+  vars:
+    _np_names: "{{ _np_peers | map('extract', c2cc_peer_domains) | map('regex_replace', '^', 'kubernetes.default.svc.') | list }}"
+  block:
+    # No runAsUser: MicroShift assigns one from the namespace's range (restricted-v2)
+    - name: Start the DNS check
+      ansible.builtin.command:
+        argv: "{{ network_perf_oc + ['--kubeconfig', _np_endpoint.kubeconfig, 'create', '-f', '-'] }}"
+        stdin: >-
+          {{ {'apiVersion': 'batch/v1', 'kind': 'Job',
+              'metadata': {'name': 'network-perf-dns', 'namespace': 'network-perf-lock'},
+              'spec': {'backoffLimit': 0, 'activeDeadlineSeconds': network_perf_dns_timeout | int,
+                       'template': {'spec': {'restartPolicy': 'Never', 'automountServiceAccountToken': false,
+                                             'containers': [{
+                         'name': 'dns', 'image': network_perf_benchmark_image,
+                         'securityContext': {'runAsNonRoot': true, 'readOnlyRootFilesystem': true,
+                                             'allowPrivilegeEscalation': false,
+                                             'capabilities': {'drop': ['ALL']},
+                                             'seccompProfile': {'type': 'RuntimeDefault'}},
+                         'command': ['sh', '-c', 'for n in "$@"; do until getent hosts "$n"; do sleep 2; done; done',
+                                     'dns'] + _np_names}]}}}} | to_json }}
+      register: _np_dns_create
+      changed_when: _np_dns_create.rc == 0
+      failed_when: false
+      delegate_to: localhost
+
+    - name: Wait for the DNS check
+      ansible.builtin.command:
+        argv: "{{ network_perf_contained + ['timeout', '-k', '10', (network_perf_dns_timeout | int + 60) | string,
+                                           role_path ~ '/files/poll.sh', 'matches', '*[CF][oa][mi]*']
+                  + network_perf_oc_plain
+                  + ['--kubeconfig', _np_endpoint.kubeconfig, 'get', 'job', 'network-perf-dns', '-n', 'network-perf-lock',
+                     '-o', 'jsonpath={.status.conditions[?(@.status==\"True\")].type}'] }}"
+      register: _np_dns
+      changed_when: false
+      failed_when: false
+      when: _np_dns_create.rc == 0
+      delegate_to: localhost
+
+    - name: Read the log of the DNS check
+      ansible.builtin.command:
+        argv: "{{ network_perf_oc + ['--kubeconfig', _np_endpoint.kubeconfig, 'logs', 'job/network-perf-dns',
+                                     '-n', 'network-perf-lock', '--tail=20'] }}"
+      register: _np_dns_log
+      changed_when: false
+      failed_when: false
+      delegate_to: localhost
+
+  always:
+    - name: Check that every command has ended
+      ansible.builtin.include_tasks: ended.yml
+
+    - name: Release the cluster after the check
+      ansible.builtin.include_tasks: release.yml
+      vars:
+        _np_target: "{{ _np_endpoint }}"
+      when: _np_ended
+
+    - name: Check the DNS answers and the release
+      vars:
+        _np_dns_done: "{{ (_np_dns.stdout | default('')).split() if _np_dns.rc | default(1) == 0 else [] }}"
+      ansible.builtin.assert:
+        that:
+          - "'Complete' in _np_dns_done"
+          - _np_unlock[inventory_hostname] | default('unknown') in ['absent', 'replaced']
+        fail_msg: >-
+          {{ 'The network-perf-lock namespace on ' ~ inventory_hostname ~ ' could not be removed; clean up with the'
+             ~ ' cleanup tag for campaign ' ~ _np_campaign ~ '.'
+             if 'Complete' in _np_dns_done else
+             'Pods on ' ~ inventory_hostname ~ ' could not resolve ' ~ _np_names | join(', ') ~ ' within '
+             ~ network_perf_dns_timeout ~ ' s. Check the C2CC domain of each cluster in the inventory against'
+             ~ ' the clusterToCluster configuration on the hosts. ' ~ (_np_dns_create.stderr | default(''))
+             ~ ' ' ~ (_np_dns_log.stdout | default('')) }}
+        quiet: true
+
+- name: Record that the cluster passed the checks
+  ansible.builtin.set_fact:
+    _np_checked: true

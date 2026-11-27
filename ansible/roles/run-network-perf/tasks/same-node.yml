@@ -1,0 +1,104 @@
+---
+# Same-node run on this host's cluster: client and server pods on its one node.
+
+- name: Set the same-node paths
+  ansible.builtin.set_fact:
+    _np_context: "{{ inventory_hostname }}"
+    _np_run_dir: "{{ _np_campaign_dir }}/{{ inventory_hostname }}"
+    _np_work_dir: "{{ _np_endpoint.work_dir }}"
+    _np_keep_locks: []
+    _np_claim_uuids: []
+    _np_bench: {}
+
+- name: Create the journal directory of this context
+  ansible.builtin.file:
+    path: "{{ _np_invocation_dir }}/commands/{{ _np_context }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+
+- name: Claim the cluster for this run
+  ansible.builtin.include_tasks: claim.yml
+  vars:
+    _np_target: "{{ _np_endpoint }}"
+
+- name: Fail when the cluster is not ours
+  ansible.builtin.assert:
+    that:
+      - _np_lock[inventory_hostname].state == 'ours'
+    fail_msg: >-
+      Could not claim the network-perf-lock namespace on {{ inventory_hostname }}
+      ({{ _np_lock[inventory_hostname].state }}: {{ _np_lock[inventory_hostname].detail }}). Another
+      network-perf run is using this cluster; if none is, delete that namespace and run again.
+    quiet: true
+
+- name: Run the campaign while holding the cluster
+  block:
+    - name: Check out e2e-benchmarking for this host
+      ansible.builtin.include_tasks: checkout.yml
+
+    # Continuing a campaign adds iterations after the ones already saved.
+    - name: Create the results directory for this host
+      ansible.builtin.file:
+        path: "{{ _np_run_dir }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+
+    # An incomplete listing must not make an existing iteration look new
+    - name: Find the iterations already saved for this host
+      ansible.builtin.find:
+        paths: "{{ _np_run_dir }}"
+        file_type: directory
+        patterns: "iteration-*"
+      register: _np_saved
+      failed_when: "_np_saved.skipped_paths | default({'unread': true}) | length > 0"
+      delegate_to: localhost
+
+    - name: Number the new iterations
+      vars:
+        _np_last: >-
+          {{ _np_saved.files | map(attribute='path') | map('basename')
+             | map('regex_replace', '^iteration-', '') | map('int') | max | default(0) }}
+      ansible.builtin.set_fact:
+        _np_iterations: "{{ range((_np_last | int) + 1, (_np_last | int) + 1 + (network_perf_iterations | int)) | list }}"
+
+    - name: Run the iterations
+      ansible.builtin.include_tasks: iteration.yml
+      vars:
+        _np_client: "{{ _np_endpoint }}"
+        _np_uuid_seed: "{{ inventory_hostname }}"
+      loop: "{{ _np_iterations }}"
+      loop_control:
+        loop_var: network_perf_iteration
+
+  always:
+    # Whatever failed above: the lock goes only when the cluster has no benchmark namespace
+    - name: Check that no benchmark is left on the cluster
+      ansible.builtin.include_tasks: remove-benchmark.yml
+      vars:
+        _np_target: "{{ _np_endpoint }}"
+        _np_uuids: "{{ _np_claim_uuids }}"
+
+    - name: Check that every command has ended
+      ansible.builtin.include_tasks: ended.yml
+
+    - name: Release the cluster
+      ansible.builtin.include_tasks: release.yml
+      vars:
+        _np_target: "{{ _np_endpoint }}"
+      when: _np_ended and _np_bench[inventory_hostname] | default('unknown') == 'absent'
+
+    - name: Check that the cluster is released
+      ansible.builtin.assert:
+        that:
+          - _np_ended
+          - _np_bench[inventory_hostname] | default('unknown') == 'absent'
+          - _np_unlock[inventory_hostname] | default('unknown') in ['absent', 'replaced']
+        fail_msg: >-
+          Keeping the network-perf-lock namespace on {{ inventory_hostname }}:
+          {{ 'a command of this run may still be running' if not _np_ended
+             else 'a netperf namespace is there (' ~ _np_bench[inventory_hostname] | default('unknown') ~ '), so a benchmark may still be there'
+             if _np_bench[inventory_hostname] | default('unknown') != 'absent' else 'the lock could not be removed' }}.
+          Clean up with: ansible-playbook network-perf.yml --tags cleanup -e network_perf_campaign={{ _np_campaign }}
+        quiet: true

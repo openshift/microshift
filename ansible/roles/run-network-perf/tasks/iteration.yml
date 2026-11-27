@@ -1,38 +1,55 @@
 ---
-# One network-perf-v2 iteration. --clean=false keeps the pods to record their image;
-# after a failed run (benchmark possibly still running) they are removed first, and
-# the cluster stays locked unless their removal is confirmed.
+# One network-perf-v2 iteration from _np_client, to _np_server on another cluster
+# when it is set. --clean=false keeps the pods to record their image; the role
+# removes them itself, after a failed run before it reads anything else, and keeps
+# the lock of a cluster whose removal it cannot confirm.
 
 - name: Set the iteration identity
   ansible.builtin.set_fact:
-    _np_iter_dir: "{{ _np_host_dir }}/iteration-{{ '%02d' | format(network_perf_iteration) }}"
-    _np_uuid: "{{ (inventory_hostname ~ '/' ~ _np_campaign_dir ~ '/' ~ network_perf_iteration) | to_uuid }}"
+    _np_iter_dir: "{{ _np_run_dir }}/iteration-{{ '%02d' | format(network_perf_iteration) }}"
+    _np_uuid: "{{ (_np_uuid_seed ~ '/' ~ _np_campaign_dir ~ '/' ~ network_perf_iteration) | to_uuid }}"
+    _np_clusters: "{{ [_np_client] + ([_np_server] if _np_server | default({}) | length > 0 else []) }}"
     _np_containers: []
-    # Keep the cluster lock unless cleanup below confirms the netperf namespace is gone
-    _np_keep_lock: true
+    _np_bench: {}
+    _np_run: {}
+    _np_evidence_saved: false
 
-- name: Check that no benchmark resources are left on the cluster
+# Until the clusters are known to be free of a benchmark, their locks stay
+- name: Keep the locks while the benchmark state is unknown
+  ansible.builtin.set_fact:
+    _np_keep_locks: "{{ _np_clusters | map(attribute='name') | list }}"
+
+- name: Check that no benchmark resources are left on the clusters
   ansible.builtin.command:
-    argv: [timeout, -k, "10", "{{ network_perf_api_timeout }}", oc, --kubeconfig, "{{ network_perf_kubeconfig }}",
-           "--request-timeout={{ network_perf_api_timeout }}s", get, namespace, netperf, --ignore-not-found, -o, name]
+    argv: "{{ network_perf_oc + ['--kubeconfig', item.kubeconfig, 'get', 'namespace', 'netperf',
+                                 '--ignore-not-found', '-o', 'name'] }}"
+  loop: "{{ _np_clusters }}"
+  loop_control:
+    label: "{{ item.name }}"
   register: _np_ns
   changed_when: false
   delegate_to: localhost
 
-- name: Fail when the netperf namespace already exists
+- name: Fail when a netperf namespace already exists
   ansible.builtin.assert:
     that:
-      - _np_ns.stdout | length == 0
+      - _np_ns.results | map(attribute='stdout') | map('trim') | join('') | length == 0
     fail_msg: >-
-      The netperf namespace exists on {{ inventory_hostname }}; an earlier benchmark was not
-      cleaned up.
+      A netperf namespace exists on
+      {{ _np_ns.results | selectattr('stdout') | map(attribute='item.name') | join(', ') }};
+      an earlier benchmark was not cleaned up.
     quiet: true
 
+- name: Let go of the locks again
+  ansible.builtin.set_fact:
+    _np_keep_locks: []
+
+# mkdir fails on anything that is already there, a symlink included: the results
+# of an earlier iteration are never written into
 - name: Create the iteration results directory
-  ansible.builtin.file:
-    path: "{{ _np_iter_dir }}"
-    state: directory
-    mode: "0755"
+  ansible.builtin.command:
+    argv: [mkdir, -m, "0755", "{{ _np_iter_dir }}"]
+  changed_when: true
   delegate_to: localhost
 
 # run.sh prints every *.csv in its directory, so start without the previous ones.
@@ -53,21 +70,51 @@
     label: "{{ item.path | basename }}"
   delegate_to: localhost
 
+# run.sh keeps a cached binary by its version alone, whatever URL it came from
+- name: Remove the cached k8s-netperf
+  ansible.builtin.file:
+    path: "{{ _np_workload_dir }}/k8s-netperf"
+    state: absent
+  delegate_to: localhost
+
+# Written before the launch, so an interrupted run leaves its UUID and clusters
+- name: Remember the run for the release of the locks
+  ansible.builtin.set_fact:
+    _np_claim_uuids: "{{ _np_claim_uuids | default([]) + [_np_uuid] }}"
+
+- name: Record the run
+  ansible.builtin.copy:
+    content: "{{ {'uuid': _np_uuid, 'iteration_dir': _np_iter_dir, 'clusters': _np_clusters} | to_nice_json }}\n"
+    dest: "{{ _np_invocation_dir }}/run-{{ _np_uuid }}.json"
+    mode: "0644"
+  delegate_to: localhost
+
 - name: Run network-perf-v2 and save its evidence
   block:
-    - name: Record the start time
+    - name: Keep the locks until the removal is confirmed
       ansible.builtin.set_fact:
+        _np_keep_locks: "{{ _np_clusters | map(attribute='name') | list }}"
         _np_start: "{{ now(utc=true).strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+
+    - name: Show where the run log is
+      ansible.builtin.debug:
+        msg: "k8s-netperf is running; follow it with: tail -f {{ _np_iter_dir }}/run.log"
 
     # Set every input env.sh and run.sh read, so the control node's environment can't leak in
     - name: Run k8s-netperf through network-perf-v2
       ansible.builtin.command:
-        argv: [./run.sh]
+        argv: >-
+          {{ network_perf_contained
+             + ['sh', '-c', 'exec timeout --foreground -k 90 "$1" ./run.sh >> "$2" 2>&1', 'run.sh',
+                (network_perf_timeout | int + network_perf_run_margin | int) | string, _np_iter_dir ~ '/run.log'] }}
         chdir: "{{ _np_workload_dir }}"
       environment:
-        KUBECONFIG: "{{ network_perf_kubeconfig }}"
+        KUBECONFIG: "{{ _np_client.kubeconfig }}"
+        SERVER_KUBECONFIG: "{{ _np_server.kubeconfig | default('') }}"
+        SERVER_DOMAIN: "{{ _np_server_domain | default('') }}"
+        SERVER_PROMETHEUS_URL: ""
         PLATFORM: microshift
-        LOCAL: "true"
+        LOCAL: "{{ 'false' if _np_clusters | length > 1 else 'true' }}"
         POD: "true"
         VM: "false"
         USE_VIRTCTL: ""
@@ -85,11 +132,17 @@
         WORKLOAD_NAME: k8s-netperf
         NETPERF_VERSION: "{{ network_perf_netperf_version }}"
         NETPERF_FILENAME: k8s-netperf
-        NETPERF_URL: ""
+        NETPERF_URL: "{{ network_perf_netperf_url }}"
         OS: Linux
         UUID: "{{ _np_uuid }}"
         CLEAN_UP: "false"
         TEST_TIMEOUT: "{{ network_perf_timeout }}"
+        # With --clean=false k8s-netperf ends on the first TERM, so a short grace is enough
+        TEST_KILL_AFTER: "30"
+        DOWNLOAD_TIMEOUT: "600"
+        CALL_TIMEOUT: "60"
+        INDEX_TIMEOUT: "300"
+        LC_ALL: C
         METRICS: "false"
         PROMETHEUS_URL: ""
         ES_SERVER: ""
@@ -108,8 +161,10 @@
 
     - name: Read the benchmark pods
       ansible.builtin.command:
-        argv: [timeout, -k, "10", "{{ network_perf_api_timeout }}", oc, --kubeconfig, "{{ network_perf_kubeconfig }}",
-               "--request-timeout={{ network_perf_api_timeout }}s", get, pods, -n, netperf, -o, json]
+        argv: "{{ network_perf_oc + ['--kubeconfig', item.kubeconfig, 'get', 'pods', '-n', 'netperf', '-o', 'json'] }}"
+      loop: "{{ _np_clusters }}"
+      loop_control:
+        label: "{{ item.name }}"
       register: _np_pods
       changed_when: false
       failed_when: false
@@ -119,14 +174,22 @@
     - name: Describe the benchmark containers
       ansible.builtin.set_fact:
         _np_containers: >-
-          {{ _np_containers + [{'pod': item.0.metadata.name, 'node': item.0.spec.nodeName | default(''),
-                                'container': item.1.name, 'image': item.1.image,
-                                'imageID': item.1.imageID | default('')}] }}
+          {{ _np_containers + [{'cluster': item.0.item.name, 'pod': item.1.metadata.name,
+                                'node': item.1.spec.nodeName | default(''),
+                                'container': item.2.name, 'image': item.2.image,
+                                'imageID': item.2.imageID | default('')}] }}
       loop: >-
-        {{ ((_np_pods.stdout | from_json)['items'] if (_np_pods.rc | default(1)) == 0 else [])
-           | subelements('status.containerStatuses', skip_missing=true) }}
+        {%- set out = [] -%}
+        {%- for r in _np_pods.results | default([]) if r.rc | default(1) == 0 -%}
+        {%- for p in (r.stdout | from_json)['items'] -%}
+        {%- for c in p.status.containerStatuses | default([]) -%}
+        {%- set _ = out.append([r, p, c]) -%}
+        {%- endfor -%}
+        {%- endfor -%}
+        {%- endfor -%}
+        {{ out }}
       loop_control:
-        label: "{{ item.0.metadata.name }}/{{ item.1.name }}"
+        label: "{{ item.0.item.name }}/{{ item.1.metadata.name }}/{{ item.2.name }}"
 
     - name: Find the results of this iteration
       ansible.builtin.find:
@@ -147,79 +210,96 @@
         label: "{{ item.path | basename }}"
       delegate_to: localhost
 
-    - name: Archive the run log, the benchmark pods and the run record
+    - name: Archive the benchmark pods
       ansible.builtin.copy:
-        content: "{{ item.content }}"
-        dest: "{{ _np_iter_dir }}/{{ item.name }}"
+        content: "{{ item.stdout | default('') }}\n"
+        dest: "{{ _np_iter_dir }}/pods-{{ item.item.name }}.json"
         mode: "0644"
-      loop:
-        - name: run.log
-          content: "{{ _np_run.stdout }}\n--- stderr ---\n{{ _np_run.stderr }}\n"
-        - name: pods.json
-          content: "{{ _np_pods.stdout | default('') }}\n"
-        - name: run-info.json
-          content: >-
-            {{ {'host': inventory_hostname, 'campaign': _np_campaign_dir | basename,
-                'iteration': network_perf_iteration, 'uuid': _np_uuid, 'rc': _np_run.rc,
-                'start': _np_start, 'end': _np_end,
-                'e2e_repo': network_perf_e2e_repo, 'e2e_revision': network_perf_e2e_git_revision,
-                'e2e_commit': _np_git.after, 'netperf_version': network_perf_netperf_version,
-                'workload': network_perf_workload, 'workload_sha256': _np_workload.stat.checksum,
-                'kubeconfig': network_perf_kubeconfig, 'containers': _np_containers} | to_nice_json }}
+      loop: "{{ _np_pods.results | default([]) }}"
       loop_control:
-        label: "{{ item.name }}"
+        label: "{{ item.item.name }}"
       delegate_to: localhost
 
+    # Not reached when a task above failed
+    - name: Note that the results and pods are saved
+      ansible.builtin.set_fact:
+        _np_evidence_saved: true
+
+  # Nothing below may fail before every cluster has been tried.
   always:
     - name: Remove the benchmark pods
-      ansible.builtin.command:
-        argv: [timeout, -k, "10", "{{ network_perf_cleanup_timeout | int + network_perf_api_timeout | int }}",
-               oc, --kubeconfig, "{{ network_perf_kubeconfig }}", "--request-timeout={{ network_perf_api_timeout }}s",
-               delete, namespace, netperf, --ignore-not-found, --wait=true, "--timeout={{ network_perf_cleanup_timeout }}s"]
-      register: _np_cleanup
-      changed_when: true
-      failed_when: false
-      delegate_to: localhost
+      ansible.builtin.include_tasks: remove-benchmark.yml
+      vars:
+        _np_uuids: ["{{ _np_uuid }}"]
+      loop: "{{ _np_clusters }}"
+      loop_control:
+        loop_var: _np_target
+        label: "{{ _np_target.name }}"
 
-    - name: Check that the benchmark pods are gone
+    - name: Check that every command has ended
+      ansible.builtin.include_tasks: ended.yml
+
+    # A lock is released only where the benchmark is gone and nothing of the run is left
+    - name: Decide which locks to keep
+      ansible.builtin.set_fact:
+        _np_keep_locks: >-
+          {{ _np_clusters | map(attribute='name')
+             | reject('in', (_np_bench | dict2items | selectattr('value', 'equalto', 'absent')
+                             | map(attribute='key') | list) if _np_ended else [])
+             | list }}
+
+    - name: Read the end of the run log
       ansible.builtin.command:
-        argv: [timeout, -k, "10", "{{ network_perf_api_timeout }}", oc, --kubeconfig, "{{ network_perf_kubeconfig }}",
-               "--request-timeout={{ network_perf_api_timeout }}s", get, namespace, netperf, --ignore-not-found, -o, name]
-      register: _np_gone
+        argv: [tail, -n, "40", "{{ _np_iter_dir }}/run.log"]
+      register: _np_tail
       changed_when: false
       failed_when: false
       delegate_to: localhost
 
-    - name: Release the lock of this iteration once the benchmark pods are gone
+    # One verdict, for the record and for the check below
+    - name: Judge the iteration
+      vars:
+        _np_names: "{{ _np_clusters | map(attribute='name') | list }}"
+        _np_seen: "{{ _np_containers | map(attribute='cluster') | unique | list }}"
       ansible.builtin.set_fact:
-        _np_keep_lock: false
-      when: _np_gone.rc == 0 and _np_gone.stdout | length == 0
+        _np_passed: >-
+          {{ _np_run.rc | default(-1) == 0 and _np_evidence_saved | bool and _np_keep_locks | length == 0
+             and _np_names | difference(_np_seen) | length == 0
+             and _np_containers | map(attribute='imageID') | select('equalto', '') | list | length == 0 }}
 
-    - name: Archive the outcome of the removal
+    - name: Archive the run record
       ansible.builtin.copy:
         content: >-
-          rc={{ _np_cleanup.rc }}
-
-          {{ _np_cleanup.stdout }}
-
-          {{ _np_cleanup.stderr }}
-
-          confirmed gone: {{ _np_gone.rc == 0 and _np_gone.stdout | length == 0 }}
-        dest: "{{ _np_iter_dir }}/cleanup.log"
+          {{ {'host': _np_client.name, 'client': _np_client.name, 'server': _np_server.name | default(''),
+              'mode': 'cross-cluster' if _np_clusters | length > 1 else 'same-node',
+              'campaign': _np_campaign, 'iteration': network_perf_iteration, 'uuid': _np_uuid,
+              'passed': _np_passed | bool, 'stderr': _np_run.stderr | default(''),
+              'rc': _np_run.rc | default(-1), 'start': _np_start | default(''), 'end': _np_end | default(''),
+              'e2e_repo': network_perf_e2e_repo, 'e2e_revision': network_perf_e2e_git_revision,
+              'e2e_commit': _np_e2e_commit, 'netperf_version': network_perf_netperf_version,
+              'netperf_url': network_perf_netperf_url,
+              'workload': network_perf_workload, 'workload_sha256': _np_workload_sha256,
+              'kubeconfig': _np_client.kubeconfig, 'server_kubeconfig': _np_server.kubeconfig | default(''),
+              'containers': _np_containers, 'benchmark_removal': _np_bench, 'commands_ended': _np_ended,
+              'locks_kept': _np_keep_locks} | to_nice_json }}
+        dest: "{{ _np_iter_dir }}/run-info.json"
         mode: "0644"
       delegate_to: localhost
 
 - name: Check the iteration
+  vars:
+    _np_names: "{{ _np_clusters | map(attribute='name') | list }}"
+    _np_seen: "{{ _np_containers | map(attribute='cluster') | unique | list }}"
   ansible.builtin.assert:
     that:
-      - _np_run.rc == 0
-      - _np_cleanup.rc == 0
-      - not (_np_keep_lock | default(false))
-      - _np_containers | length > 0
-      - _np_containers | map(attribute='imageID') | select('equalto', '') | list | length == 0
+      - _np_passed | bool
     fail_msg: >-
-      Iteration {{ network_perf_iteration }} on {{ inventory_hostname }} failed (run.sh exit code
-      {{ _np_run.rc }}, namespace removal exit code {{ _np_cleanup.rc }}, removal confirmed:
-      {{ not (_np_keep_lock | default(false)) }}, {{ _np_containers | length }} benchmark
-      containers recorded); see {{ _np_iter_dir }}.
+      Iteration {{ network_perf_iteration }} from {{ _np_names | join(' to ') }} failed: run.sh exit code
+      {{ _np_run.rc | default('none') }}{{ '' if _np_ended else '; a command may still be running' }}; benchmark namespace
+      {{ _np_bench | dict2items | map(attribute='key') | zip(_np_bench | dict2items | map(attribute='value'))
+         | map('join', ' ') | join(', ') }};
+      benchmark containers recorded on {{ _np_seen | join(', ') | default('no cluster', true) }}.
+      See {{ _np_iter_dir }}.
+      {{ ('End of run.log: ' ~ _np_tail.stdout ~ ' Messages of the launch: ' ~ _np_run.stderr | default('none', true))
+         if _np_run.rc | default(1) != 0 else '' }}
     quiet: true

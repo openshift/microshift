@@ -1,0 +1,59 @@
+---
+# Remove the netperf namespace on one cluster (_np_target) if k8s-netperf marked it
+# with one of this run's UUIDs (_np_uuids). No task here fails the play. Sets
+# _np_bench[name]: absent, foreign (not ours: left alone) or unknown.
+
+- name: Read the benchmark namespace on {{ _np_target.name }}
+  ansible.builtin.command:
+    argv: "{{ network_perf_oc + ['--kubeconfig', _np_target.kubeconfig, 'get', 'namespace', 'netperf',
+                                 '--ignore-not-found', '-o', 'json'] }}"
+  register: _np_bench_read
+  changed_when: false
+  failed_when: false
+  delegate_to: localhost
+
+- name: Remove the benchmark namespace on {{ _np_target.name }}
+  vars:
+    _np_bench_meta: >-
+      {{ (_np_bench_read.stdout | from_json).metadata
+         if _np_bench_read.rc == 0 and _np_bench_read.stdout | trim | length > 0 else {} }}
+    _np_bench_ours: >-
+      {{ (_np_bench_meta.annotations | default({}))[network_perf_run_uuid_annotation] | default('')
+         in _np_uuids }}
+  block:
+    # Deletes this object only: a namespace created since by someone else has another UID
+    - name: Delete the benchmark namespace on {{ _np_target.name }}
+      ansible.builtin.command:
+        argv: "{{ network_perf_oc + ['--kubeconfig', _np_target.kubeconfig, 'delete', '--raw',
+                                     '/api/v1/namespaces/netperf', '-f', '-'] }}"
+        stdin: "{{ {'apiVersion': 'v1', 'kind': 'DeleteOptions', 'preconditions': {'uid': _np_bench_meta.uid}} | to_json }}"
+      register: _np_bench_delete
+      changed_when: _np_bench_delete.rc == 0
+      failed_when: false
+      when: _np_bench_ours | bool
+      delegate_to: localhost
+
+    - name: Wait until the benchmark namespace is gone on {{ _np_target.name }}
+      ansible.builtin.command:
+        argv: "{{ network_perf_poll + ['differs', _np_bench_meta.uid] + network_perf_oc_plain
+                  + ['--kubeconfig', _np_target.kubeconfig, 'get', 'namespace', 'netperf',
+                     '--ignore-not-found', '-o', 'jsonpath={.metadata.uid}'] }}"
+      register: _np_bench_gone
+      changed_when: false
+      failed_when: false
+      when: _np_bench_ours | bool
+      delegate_to: localhost
+
+    # After our delete, a namespace under that name with another UID is someone else's
+    - name: Set the benchmark state on {{ _np_target.name }}
+      vars:
+        _np_bench_after: "{{ _np_bench_gone.stdout | default('') | trim }}"
+      ansible.builtin.set_fact:
+        _np_bench: >-
+          {{ _np_bench | default({}) | combine({_np_target.name:
+               'unknown' if _np_bench_read.rc != 0
+               else 'absent' if _np_bench_meta | length == 0
+               else 'foreign' if not (_np_bench_ours | bool)
+               else 'unknown' if _np_bench_gone.rc | default(1) != 0
+               else 'absent' if _np_bench_after | length == 0
+               else 'foreign'}) }}

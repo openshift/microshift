@@ -1,0 +1,59 @@
+---
+# Release network-perf-lock on one cluster (_np_target) if it carries this run's
+# token (_np_release_token, default the current run). No task here fails the play.
+# Sets _np_unlock[name]: absent, replaced (ours is gone, another run's is there),
+# foreign (not ours, left alone) or unknown.
+
+- name: Read the lock to release on {{ _np_target.name }}
+  ansible.builtin.command:
+    argv: "{{ network_perf_oc + ['--kubeconfig', _np_target.kubeconfig, 'get', 'namespace', 'network-perf-lock',
+                                 '--ignore-not-found', '-o', 'json'] }}"
+  register: _np_unlock_read
+  changed_when: false
+  failed_when: false
+  delegate_to: localhost
+
+- name: Release the lock on {{ _np_target.name }}
+  vars:
+    _np_unlock_meta: >-
+      {{ (_np_unlock_read.stdout | from_json).metadata
+         if _np_unlock_read.rc == 0 and _np_unlock_read.stdout | trim | length > 0 else {} }}
+    _np_unlock_ours: >-
+      {{ (_np_unlock_meta.labels | default({}))['network-perf-token'] | default('')
+         == _np_release_token | default(_np_token) }}
+  block:
+    # Deletes this object only: a lock created since by another run has another UID
+    - name: Delete the lock on {{ _np_target.name }}
+      ansible.builtin.command:
+        argv: "{{ network_perf_oc + ['--kubeconfig', _np_target.kubeconfig, 'delete', '--raw',
+                                     '/api/v1/namespaces/network-perf-lock', '-f', '-'] }}"
+        stdin: "{{ {'apiVersion': 'v1', 'kind': 'DeleteOptions', 'preconditions': {'uid': _np_unlock_meta.uid}} | to_json }}"
+      register: _np_unlock_delete
+      changed_when: _np_unlock_delete.rc == 0
+      failed_when: false
+      when: _np_unlock_ours | bool
+      delegate_to: localhost
+
+    - name: Wait until the lock is gone on {{ _np_target.name }}
+      ansible.builtin.command:
+        argv: "{{ network_perf_poll + ['differs', _np_unlock_meta.uid] + network_perf_oc_plain
+                  + ['--kubeconfig', _np_target.kubeconfig, 'get', 'namespace', 'network-perf-lock',
+                     '--ignore-not-found', '-o', 'jsonpath={.metadata.uid}'] }}"
+      register: _np_unlock_gone
+      changed_when: false
+      failed_when: false
+      when: _np_unlock_ours | bool
+      delegate_to: localhost
+
+    - name: Set the release outcome on {{ _np_target.name }}
+      vars:
+        _np_unlock_after: "{{ _np_unlock_gone.stdout | default('') | trim }}"
+      ansible.builtin.set_fact:
+        _np_unlock: >-
+          {{ _np_unlock | default({}) | combine({_np_target.name:
+               'unknown' if _np_unlock_read.rc != 0
+               else 'absent' if _np_unlock_meta | length == 0
+               else 'foreign' if not (_np_unlock_ours | bool)
+               else 'unknown' if _np_unlock_gone.rc | default(1) != 0
+               else 'absent' if _np_unlock_after | length == 0
+               else 'replaced'}) }}

@@ -4,3 +4,8 @@
 kubeconfig_directory: "{{ lookup('env', 'HOME') }}/.kube"
 kubeconfig_local_file: "{{ kubeconfig_directory }}/config"
 kubeconfig_remote_file: "/var/lib/microshift/resources/kubeadmin/{{ ansible_facts.fqdn }}/kubeconfig"
+
+# Point the default kubeconfig at the fetched one (never replaces a regular file)
+kubeconfig_link_default: true
+# Seconds the connectivity check may take
+kubeconfig_api_timeout: 60

@@ -1,0 +1,58 @@
+---
+# One cluster (_np_target) of an earlier run: its lock must be that run's or absent,
+# then its benchmark namespace is removed and, only when that is confirmed, its lock.
+# No task here fails the play; _np_resolved[name] is true when nothing of the run is left.
+
+- name: Read the lock of the earlier run on {{ _np_target.name }}
+  ansible.builtin.command:
+    argv: "{{ network_perf_oc + ['--kubeconfig', _np_target.kubeconfig, 'get', 'namespace', 'network-perf-lock',
+                                 '--ignore-not-found', '-o', 'json'] }}"
+  register: _np_old_lock
+  changed_when: false
+  failed_when: false
+
+- name: Set the state of that lock on {{ _np_target.name }}
+  vars:
+    _np_old_meta: >-
+      {{ (_np_old_lock.stdout | from_json).metadata
+         if _np_old_lock.rc == 0 and _np_old_lock.stdout | trim | length > 0 else {} }}
+  ansible.builtin.set_fact:
+    _np_old_locks: >-
+      {{ _np_old_locks | combine({_np_target.name:
+           'could not be read' if _np_old_lock.rc != 0
+           else 'absent' if _np_old_meta | length == 0
+           else 'of that run' if (_np_old_meta.labels | default({}))['network-perf-token'] | default('') == _np_old_token
+           else 'held by another run'}) }}
+    _np_resolved: "{{ _np_resolved | combine({_np_target.name: false}) }}"
+    _np_old_held: >-
+      {{ _np_old_held | bool or (_np_old_lock.rc == 0 and _np_old_meta | length > 0
+         and (_np_old_meta.labels | default({}))['network-perf-token'] | default('') != _np_old_token) }}
+
+- name: Remove the benchmark of the earlier run on {{ _np_target.name }}
+  ansible.builtin.include_tasks: remove-benchmark.yml
+  vars:
+    _np_uuids: "{{ _np_old_uuids }}"
+  when: _np_old_locks[_np_target.name] in ['absent', 'of that run']
+
+# A command of this cleanup that has not ended could still act on the cluster
+- name: Check that every command of this cleanup has ended
+  ansible.builtin.include_tasks: ended.yml
+
+- name: Release the lock of the earlier run on {{ _np_target.name }}
+  ansible.builtin.include_tasks: release.yml
+  vars:
+    _np_release_token: "{{ _np_old_token }}"
+  when:
+    - _np_ended
+    - _np_old_locks[_np_target.name] in ['absent', 'of that run']
+    - _np_bench[_np_target.name] | default('') == 'absent'
+
+# Resolved only when the lock name is absent: another run's lock leaves it pending
+- name: Describe what is left on {{ _np_target.name }}
+  ansible.builtin.set_fact:
+    _np_resolved: "{{ _np_resolved | combine({_np_target.name: _np_unlock[_np_target.name] | default('') == 'absent'}) }}"
+    _np_old_locks: >-
+      {{ _np_old_locks | combine({_np_target.name:
+           'lock ' ~ (_np_unlock[_np_target.name] | default(_np_old_locks[_np_target.name])) ~ ', benchmark namespace '
+           ~ (_np_bench[_np_target.name] | default('not looked at'))
+           ~ ('' if _np_ended else ', a command of this cleanup has not ended')}) }}

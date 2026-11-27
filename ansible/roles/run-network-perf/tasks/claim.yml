@@ -1,0 +1,58 @@
+---
+# Claim network-perf-lock on one cluster (_np_target: name, kubeconfig). Namespace
+# creation fails if it exists, so the lock excludes any other run, from any control
+# node. Sets _np_lock[name].state: ours, held (kept by an earlier step of this run),
+# foreign, absent or unknown.
+
+- name: Name the claim on {{ _np_target.name }}
+  ansible.builtin.set_fact:
+    _np_claim: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_lowercase', 'digits'], length=12) }}"
+
+# Written first, so an interrupted run leaves the cluster to look at
+- name: Record the claim on {{ _np_target.name }}
+  ansible.builtin.copy:
+    content: "{{ {'cluster': _np_target.name, 'kubeconfig': _np_target.kubeconfig, 'claim': _np_claim} | to_nice_json }}\n"
+    dest: "{{ _np_invocation_dir }}/claim-{{ _np_target.name }}.json"
+    mode: "0644"
+  delegate_to: localhost
+
+# Labelled in the create itself: a lock without them is never ours
+- name: Create the lock on {{ _np_target.name }}
+  ansible.builtin.command:
+    argv: "{{ network_perf_oc + ['--kubeconfig', _np_target.kubeconfig, 'create', '-f', '-'] }}"
+    stdin: >-
+      {{ {'apiVersion': 'v1', 'kind': 'Namespace',
+          'metadata': {'name': 'network-perf-lock',
+                       'labels': {'network-perf-campaign': _np_campaign, 'network-perf-token': _np_token,
+                                  'network-perf-claim': _np_claim}}} | to_json }}
+  register: _np_lock_create
+  changed_when: _np_lock_create.rc == 0
+  failed_when: false
+  delegate_to: localhost
+
+# The create's answer can be lost; the labels on the cluster decide
+- name: Read the lock on {{ _np_target.name }}
+  ansible.builtin.command:
+    argv: "{{ network_perf_oc + ['--kubeconfig', _np_target.kubeconfig, 'get', 'namespace', 'network-perf-lock',
+                                 '--ignore-not-found', '-o', 'json'] }}"
+  register: _np_lock_read
+  changed_when: false
+  failed_when: false
+  delegate_to: localhost
+
+- name: Set the lock state on {{ _np_target.name }}
+  vars:
+    _np_lock_meta: >-
+      {{ (_np_lock_read.stdout | from_json).metadata
+         if _np_lock_read.rc == 0 and _np_lock_read.stdout | trim | length > 0 else {} }}
+    _np_lock_labels: "{{ _np_lock_meta.labels | default({}) }}"
+  ansible.builtin.set_fact:
+    _np_lock: >-
+      {{ _np_lock | default({}) | combine({_np_target.name: {
+           'uid': _np_lock_meta.uid | default(''),
+           'detail': (_np_lock_create.stderr ~ ' ' ~ _np_lock_read.stderr) | trim,
+           'state': 'unknown' if _np_lock_read.rc != 0
+                    else 'absent' if _np_lock_meta | length == 0
+                    else 'foreign' if _np_lock_labels['network-perf-token'] | default('') != _np_token
+                    else 'held' if _np_lock_labels['network-perf-claim'] | default('') != _np_claim
+                    else 'ours'}}) }}
