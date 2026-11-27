@@ -1,0 +1,3 @@
+- machine-config-operator embedded-component d0b16a1178a2351c04cf9a12340c21e676ce6159 to aa5d2b3b4a7c359c49b701a271b2acca44a1edf7
+  - db3b389f 2026-11-03T15:42:13Z OCPBUGS-72554: on-prem: redispatch API VIP connections away from unreachable masters
+
