@@ -16,8 +16,9 @@ Test Tags           restart
 
 
 *** Variables ***
-${CERTIFICATE_LOCK}     /var/lib/microshift-backups/certs.lock
-${RUNTIME_LOCK}         /var/lib/microshift-backups/certs-runtime.lock
+${CERTIFICATE_LOCK}         /var/lib/microshift-backups/certs.lock
+${RUNTIME_LOCK}             /var/lib/microshift-backups/certs-runtime.lock
+${KUBELET_SIGNER_DIR}       /var/lib/microshift/certs/kubelet-csr-signer-signer
 
 
 *** Test Cases ***
@@ -162,6 +163,7 @@ Leaf Renewal Keeps CAs Unchanged
 
 CA Renewal Updates The Whole Chain
     [Documentation]    Prepare all CAs online with old credentials still usable; activate the new chain on restart.
+    ${serial_before}=    Command Should Work    cat ${KUBELET_SIGNER_DIR}/serial.txt
     ${pods_before}=    Certificate Consumer Pod UIDs
     ${before}=    Certificate Status Document
     ${files_before}=    Certificate Material Digest
@@ -177,9 +179,34 @@ CA Renewal Updates The Whole Chain
     Should Be Equal As Integers    ${restarts}    0    msg=CA activation must not require an automatic startup retry
     ${ca_after}=    CA Material Digest
     Should Not Be Equal    ${ca_before}    ${ca_after}
+    CSR Signer Serial Has Advanced    ${serial_before}
     Renewal Matches Current Status    ${result}
     Renewal Activation Has Finished
     Certificate Consumers Use Renewed Material    ${pods_before}    ${True}
+
+Startup Repairs Interrupted CA Writes Without Resetting Counters
+    [Documentation]    Recover incomplete root and intermediate key writes, reissue descendants and retain issuance history.
+    FOR    ${signer_dir}    IN    ${KUBELET_SIGNER_DIR}    ${KUBELET_SIGNER_DIR}/csr-signer
+        Stop MicroShift
+        ${root_serial}=    Command Should Work    cat ${KUBELET_SIGNER_DIR}/serial.txt
+        ${child_serial}=    Command Should Work    cat ${KUBELET_SIGNER_DIR}/csr-signer/serial.txt
+        ${counter_inode}=    Command Should Work    stat -c '%d:%i' ${KUBELET_SIGNER_DIR}/serial.txt
+        Command Should Work    truncate -s 0 ${signer_dir}/ca.key
+        Start And Wait For MicroShift
+        ${new_counter_inode}=    Command Should Work    stat -c '%d:%i' ${KUBELET_SIGNER_DIR}/serial.txt
+        Should Not Be Equal    ${counter_inode}    ${new_counter_inode}
+        ...    msg=The parent counter must be replaced when reissuing its intermediate
+        CSR Signer Serial Has Advanced    ${root_serial}
+        ${client_serial}=    Command Should Work
+        ...    openssl x509 -in ${KUBELET_SIGNER_DIR}/csr-signer/kubelet-client/client.crt -noout -serial
+        Should Be True    int($client_serial.split('=')[1], 16) > int($child_serial, 16)
+        ${verify}=    Catenate
+        ...    SEPARATOR=${SPACE}
+        ...    openssl verify -CAfile ${KUBELET_SIGNER_DIR}/ca.crt -untrusted ${KUBELET_SIGNER_DIR}/csr-signer/ca.crt
+        ...    ${KUBELET_SIGNER_DIR}/csr-signer/kubelet-client/client.crt ${KUBELET_SIGNER_DIR}/csr-signer/kubelet-server/server.crt
+        Command Should Work    ${verify}
+    END
+    [Teardown]    Start And Wait For MicroShift
 
 Unchanged Certificates Do Not Restart Managed Pods
     [Documentation]    Ordinary starts preserve certificate generations and do not wait for a certificate rollout.
@@ -531,6 +558,12 @@ Renewal Matches Current Status
     FOR    ${item}    IN    @{result}[items]
         Should Be True    $expiries[($item['service'], $item['name'])] == $item['newNotAfter']
     END
+
+CSR Signer Serial Has Advanced
+    [Documentation]    CA renewal must continue the parent's issuance counter instead of resetting it.
+    [Arguments]    ${serial_before}
+    ${serial_after}=    Command Should Work    openssl x509 -in ${KUBELET_SIGNER_DIR}/csr-signer/ca.crt -noout -serial
+    Should Be True    int($serial_after.split('=')[1], 16) > int($serial_before, 16)
 
 Renewal Activation Has Finished
     [Documentation]    Activation removes the pending generation and releases the operation lock.

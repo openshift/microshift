@@ -11,7 +11,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apiserver/pkg/authentication/user"
-	"k8s.io/klog/v2"
 
 	"github.com/openshift/library-go/pkg/crypto"
 	"github.com/openshift/microshift/pkg/util/cryptomaterial"
@@ -84,6 +83,7 @@ func (s *CertificateSigner) Regenerate(certPath ...string) error {
 			if err := s.regenerateSelf(); err != nil {
 				return fmt.Errorf("failed to regenerate CA %q: %v", s.signerName, err)
 			}
+			s.boundIssuerValidity()
 		}
 
 		for _, subCAName := range s.GetSubCANames() {
@@ -115,14 +115,16 @@ func (s *CertificateSigner) Regenerate(certPath ...string) error {
 }
 
 func (s *CertificateSigner) regenerateSelf() error {
-	if err := os.RemoveAll(s.signerDir); err != nil {
-		return fmt.Errorf("failed to regenerate CA %q: %v", s.signerName, err)
+	// Preserve issuance history, including counters belonging to nested CAs.
+	serialGenerator, err := ensureSerialGenerator(cryptomaterial.CASerialsPath(s.signerDir))
+	if err != nil {
+		return fmt.Errorf("failed to load serial counter for CA %q: %w", s.signerName, err)
 	}
 
-	signerConfig, _, err := crypto.EnsureCA(
+	signerConfig, err := crypto.MakeSelfSignedCA(
 		cryptomaterial.CACertPath(s.signerDir),
 		cryptomaterial.CAKeyPath(s.signerDir),
-		cryptomaterial.CASerialsPath(s.signerDir),
+		"", // Supplying a serial file would reset the existing counter.
 		s.signerName,
 		s.signerValidity,
 	)
@@ -131,8 +133,8 @@ func (s *CertificateSigner) regenerateSelf() error {
 		return fmt.Errorf("failed to regenerate %s CA certificate: %w", s.signerName, err)
 	}
 
+	signerConfig.SerialGenerator = serialGenerator
 	s.signerConfig = signerConfig
-	s.boundIssuerValidity()
 
 	return s.AddToBundles(sets.List[string](s.caBundlePaths)...)
 }
@@ -143,8 +145,15 @@ func (s *CertificateSigner) regenerateSubCA(subCAName string) error {
 		return NewSignerNotFound(subCAName)
 	}
 
-	if err := os.RemoveAll(subCA.signerDir); err != nil {
-		return fmt.Errorf("failed to remove subCA dir %q: %v", subCA.signerDir, err)
+	// Replace only the CA material; SignSubCA reloads the preserved counter.
+	if _, err := s.signerConfig.MakeAndWriteSubCA(
+		cryptomaterial.CABundlePath(subCA.signerDir),
+		cryptomaterial.CAKeyPath(subCA.signerDir),
+		"",
+		subCA.signerName,
+		subCA.signerValidity,
+	); err != nil {
+		return fmt.Errorf("failed to regenerate subCA %q certificate: %w", subCA.signerName, err)
 	}
 
 	if err := s.SignSubCA(subCA.toBuilder()); err != nil {
@@ -282,7 +291,7 @@ func (s *CertificateSigner) SignSubCA(subSignerInfo CertificateSignerBuilder) er
 	subSignerName := subSignerInfo.Name()
 	subSignerDir := subSignerInfo.Directory()
 
-	subCA, _, err := libraryGoEnsureSubCA(
+	subCA, err := ensureSubCA(
 		s.signerConfig,
 		cryptomaterial.CABundlePath(subSignerDir),
 		cryptomaterial.CAKeyPath(subSignerDir),
@@ -322,12 +331,19 @@ func (s *CertificateSigner) SignSubCA(subSignerInfo CertificateSignerBuilder) er
 func (s *CertificateSigner) SignClientCertificate(signInfo *ClientCertificateSigningRequestInfo) error {
 	certDir := filepath.Join(s.signerDir, signInfo.Name)
 
-	tlsConfig, _, err := s.signerConfig.EnsureClientCertificate(
+	tlsConfig, err := crypto.GetClientCertificate(
 		cryptomaterial.ClientCertPath(certDir),
 		cryptomaterial.ClientKeyPath(certDir),
 		signInfo.UserInfo,
-		signInfo.Validity,
 	)
+	if err != nil || tlsConfig.Certs[0].CheckSignatureFrom(s.signerConfig.Config.Certs[0]) != nil {
+		tlsConfig, err = s.signerConfig.MakeClientCertificate(
+			cryptomaterial.ClientCertPath(certDir),
+			cryptomaterial.ClientKeyPath(certDir),
+			signInfo.UserInfo,
+			signInfo.Validity,
+		)
+	}
 
 	if err != nil {
 		return fmt.Errorf("failed to generate client certificate for %q: %w", signInfo.Name, err)
@@ -343,12 +359,20 @@ func (s *CertificateSigner) SignClientCertificate(signInfo *ClientCertificateSig
 func (s *CertificateSigner) SignServingCertificate(signInfo *ServingCertificateSigningRequestInfo) error {
 	certDir := filepath.Join(s.signerDir, signInfo.Name)
 
-	tlsConfig, _, err := s.signerConfig.EnsureServerCert(
+	hostnames := sets.New[string](signInfo.Hostnames...)
+	tlsConfig, err := crypto.GetServerCert(
 		cryptomaterial.ServingCertPath(certDir),
 		cryptomaterial.ServingKeyPath(certDir),
-		sets.New[string](signInfo.Hostnames...),
-		signInfo.Validity,
+		hostnames,
 	)
+	if err != nil || tlsConfig.Certs[0].CheckSignatureFrom(s.signerConfig.Config.Certs[0]) != nil {
+		tlsConfig, err = s.signerConfig.MakeAndWriteServerCert(
+			cryptomaterial.ServingCertPath(certDir),
+			cryptomaterial.ServingKeyPath(certDir),
+			hostnames,
+			signInfo.Validity,
+		)
+	}
 
 	if err != nil {
 		return fmt.Errorf("failed to generate serving certificate for %q: %w", signInfo.Name, err)
@@ -369,7 +393,7 @@ func (s *CertificateSigner) SignPeerCertificate(signInfo *PeerCertificateSigning
 		cryptomaterial.PeerCertPath(certDir),
 		cryptomaterial.PeerKeyPath(certDir),
 		hostnameSet,
-	); err == nil {
+	); err == nil && existing.Certs[0].CheckSignatureFrom(s.signerConfig.Config.Certs[0]) == nil {
 		s.signedCertificates[signInfo.Name] = &signedCertificateInfo{CSRInfo: signInfo, tlsConfig: existing}
 		return nil
 	}
@@ -445,48 +469,22 @@ func signedCertificateInfoMapKeysOrdered(stringMap map[string]*signedCertificate
 	return keys
 }
 
-// libraryGoEnsureSubCA comes from lib-go 4.12, use (ca *CA) EnsureSubCA from there once we get the updated lib-go
-func libraryGoEnsureSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expire time.Duration) (*crypto.CA, bool, error) {
-	if subCA, err := crypto.GetCA(certFile, keyFile, serialFile); err == nil {
-		return subCA, false, nil
+// Unlike library-go's EnsureSubCA, verify the parent before reusing a CA and
+// preserve its issuance counter when repairing an interrupted regeneration.
+func ensureSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expire time.Duration) (*crypto.CA, error) {
+	if subCA, err := loadSigningCA(certFile, keyFile, serialFile); err == nil && subCA.Config.Certs[0].CheckSignatureFrom(ca.Config.Certs[0]) == nil {
+		return subCA, nil
 	}
-	subCA, err := libraryGoMakeAndWriteSubCA(ca, certFile, keyFile, serialFile, name, expire)
-	return subCA, true, err
-}
 
-// lilibraryGoMakeAndWriteSubCA comes from lib-go 4.12, use (ca *CA) MakeAndWriteSubCA from there once we get the updated lib-go
-func libraryGoMakeAndWriteSubCA(ca *crypto.CA, certFile, keyFile, serialFile, name string, expire time.Duration) (*crypto.CA, error) {
-	klog.V(4).Infof("Generating sub-CA certificate in %s, key in %s, serial in %s", certFile, keyFile, serialFile)
-
-	subCAConfig, err := crypto.MakeCAConfigForDuration(name, expire, ca)
+	serialGenerator, err := ensureSerialGenerator(serialFile)
 	if err != nil {
 		return nil, err
 	}
-
-	if err := subCAConfig.WriteCertConfigFile(certFile, keyFile); err != nil {
+	subCA, err := ca.MakeAndWriteSubCA(certFile, keyFile, "", name, expire)
+	if err != nil {
 		return nil, err
 	}
-
-	var serialGenerator crypto.SerialGenerator
-	if len(serialFile) > 0 {
-		// create / overwrite the serial file with a zero padded hex value (ending in a newline to have a valid file)
-		if err := os.WriteFile(serialFile, []byte("00\n"), 0600); err != nil {
-			return nil, err
-		}
-
-		serialGenerator, err = crypto.NewSerialFileGenerator(serialFile)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		serialGenerator = &crypto.RandomSerialGenerator{}
-	}
-
-	subCA := &crypto.CA{
-		Config:          subCAConfig,
-		SerialGenerator: serialGenerator,
-	}
-
+	subCA.SerialGenerator = serialGenerator
 	return subCA, nil
 }
 
