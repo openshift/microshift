@@ -2,9 +2,7 @@
 
 # Sourced from scenario.sh and uses functions defined there.
 
-# shellcheck disable=SC2034  # used elsewhere
-# Increase greenboot timeout for optional packages (more services to start)
-GREENBOOT_TIMEOUT=1200
+export SKIP_GREENBOOT=true
 
 # Currently, RHOAI is only available for x86_64
 check_platform() {
@@ -21,9 +19,13 @@ check_platform() {
 scenario_create_vms() {
     check_platform true
 
-    # Increased disk size because of the additional embedded images (especially OVMS which is ~3.5GiB)
-    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-bootc.ks.template rhel98-bootc-source-optionals
-    launch_vm rhel98-bootc --vm_disksize 30 --vm_vcpus 4
+    # Increased disk size for the additional AI model serving container images
+    # pulled at runtime (especially OVMS which is ~3.5GiB).
+    LVM_SYSROOT_SIZE=20480 prepare_kickstart host1 kickstart-liveimg.ks.template ""
+    launch_vm rhel102-installer --vm_disksize 30 --vm_vcpus 4
+    configure_rpm_scenario host1 "10.2" \
+        microshift-ai-model-serving \
+        microshift-ai-model-serving-release-info
 }
 
 scenario_remove_vms() {

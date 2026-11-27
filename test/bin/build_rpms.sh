@@ -23,17 +23,20 @@ build_rpms() {
         build_cmds=("make rpm-podman")
     fi
 
-    build_cmds+=(
-        # Build RPMs with the version number of the next minor release,
-        # but using the same source code as the normal build.
-        'make -C test/ fake-next-minor-rpm' \
-        # Build RPMs from release-$MAJOR.$MINOR of this repo.
-        # These RPMs are useful in providing a layer to upgrade from.
-        'make -C test/ build-base-branch' \
-        # Build microshift-test-agent helping with creating unhealthy system scenarios
-        # such as: microshift being unable to make a backup or greenboot checks failing
-        './test/agent/build.sh' \
-    )
+    # RPM jobs install only the current branch RPMs, so skip the extra builds
+    if [[ ! "${CI_JOB_NAME:-}" =~ .*rpm.* ]]; then
+        build_cmds+=(
+            # Build RPMs with the version number of the next minor release,
+            # but using the same source code as the normal build.
+            'make -C test/ fake-next-minor-rpm' \
+            # Build RPMs from release-$MAJOR.$MINOR of this repo.
+            # These RPMs are useful in providing a layer to upgrade from.
+            'make -C test/ build-base-branch' \
+            # Build microshift-test-agent helping with creating unhealthy system scenarios
+            # such as: microshift being unable to make a backup or greenboot checks failing
+            './test/agent/build.sh' \
+        )
+    fi
     local -r num_build_cmds="${#build_cmds[@]}"
     local -r build_rpms_log="${IMAGEDIR}/build_rpms.json"
     local -r build_rpms_jobs_log="${IMAGEDIR}/build_rpms_jobs.txt"
